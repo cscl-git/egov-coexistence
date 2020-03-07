@@ -453,6 +453,8 @@ public interface FinancialConstants {
 	public static final String STATUS_MODULE_NAME_SUPPLIER = "Supplier";
 	public static final Integer FINANCIALYEAR_STARTING_MONTH = 4;
 	public static final String EMPTY_STRING = "";
+    public static final String INSTRUMENT_TYPE_PEX = "pex";
+    public static final String MODEOFPAYMENT_PEX  = "pex";
 
 	
 }

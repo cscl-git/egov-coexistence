@@ -97,12 +97,19 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Results(value = { @Result(name = "search", location = "rtgsIssueRegisterReport-search.jsp"),
+        @Result(name = "searchPex", location = "pexIssueRegisterReport-search.jsp"),
 		@Result(name = "PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "application/pdf", "contentDisposition",
 				"no-cache;filename=RtgsIssueRegisterReport.pdf" }),
 		@Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "application/xls", "contentDisposition",
 				"no-cache;filename=RtgsIssueRegisterReport.xls" }),
+		@Result(name = "HTML", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+        "text/html" }),
+@Result(name = "PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+        "application/pdf", "contentDisposition", "no-cache;filename=PexIssueRegisterReport.pdf" }),
+@Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+        "application/xls", "contentDisposition", "no-cache;filename=PexIssueRegisterReport.xls" }),
 		@Result(name = "HTML", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "text/html" }) })
 @ParentPackage("egov")
@@ -529,5 +536,165 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	public void setSearchResult(final Boolean searchResult) {
 		this.searchResult = searchResult;
 	}
+	
+	@ValidationErrorPage("search")
+    @Action(value = "/report/pexIssueRegisterReport-newForm")
+    public String newFormPex() {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(fromDate);
+            LOGGER.info(toDate);
+        }
+        return "searchPex";
+    }
+	
+    @SkipValidation
+    @Action(value = "/report/pexIssueRegisterReport-exportPdf")
+    public String exportPdfPex() throws JRException, IOException {
+    	searchPex();
+        if (rtgsDisplayList.size() > 0) {
+            inputStream = reportHelper.exportPdf(inputStream, jasperpath, getParamMap(), rtgsReportList);
+            return "PDF";
+        }
+        prepare();
+        return newForm();
+    }
+
+    @SkipValidation
+    @Action(value = "/report/pexIssueRegisterReport-exportHtml")
+    public String exportHtmlPex() {
+        searchPex();
+        if (rtgsDisplayList.size() > 0) {
+            inputStream = reportHelper.exportHtml(inputStream, jasperpath, getParamMap(), rtgsReportList,
+                    JRHtmlExporterParameter.SIZE_UNIT_POINT);
+            return "HTML";
+        }
+        addActionMessage("No data found ");
+        prepare();
+        return "search";
+    }
+
+    @SkipValidation
+    @Action(value = "/report/pexIssueRegisterReport-exportXls")
+    public String exportXlsPex() throws JRException, IOException {
+    	searchPex();
+        if (rtgsDisplayList.size() > 0) {
+            inputStream = reportHelper.exportXls(inputStream, jasperpath, getParamMap(), rtgsReportList);
+            return "XLS";
+        }
+        prepare();
+        return newForm();
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @ValidationErrorPage(NEW)
+    @ReadOnly
+    @Action(value = "/report/pexIssueRegisterReport-searchPex")
+    public String searchPex() {
+        searchResult = Boolean.TRUE;
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug(" Seraching RTGS result for given criteria ");
+
+        final Query query = persistenceService.getSession().createSQLQuery(getQueryStringPex().toString())
+                .addScalar("ihId", BigDecimalType.INSTANCE)
+                .addScalar("rtgsNumber")
+                .addScalar("rtgsDate")
+                .addScalar("vhId", BigDecimalType.INSTANCE)
+                .addScalar("paymentNumber")
+                .addScalar("paymentDate")
+                .addScalar("paymentAmount")
+                .addScalar("department")
+                .addScalar("status")
+                .addScalar("bank")
+                .addScalar("bankBranch")
+                .addScalar("dtId", BigDecimalType.INSTANCE)
+                .addScalar("dkId", BigDecimalType.INSTANCE)
+                .addScalar("accountNumber");
+        if (null == parameters.get("rtgsAssignedFromDate")[0] || parameters.get("rtgsAssignedFromDate")[0].equalsIgnoreCase(""))
+            query.setDate("finStartDate", new java.sql.Date(fromDate.getTime()));
+        if (LOGGER.isInfoEnabled())
+            LOGGER.info("Search Query ------------>" + query);
+
+        query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
+        rtgsDisplayList = query.list();
+        populateSubLedgerDetails();
+        rtgsReportList.addAll(rtgsDisplayList);
+        return "searchPex";
+    }
+
+    private StringBuffer getQueryStringPex() {
+        StringBuffer queryString = new StringBuffer();
+        String deptQry = "";
+        String fundQry = "";
+        String phQry = "";
+        StringBuffer bankQry = new StringBuffer("");
+        SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
+        final DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
+        StringBuffer instrumentHeaderQry = new StringBuffer("");
+        try {
+            if (null != parameters.get("departmentid")[0] && !parameters.get("departmentid")[0].equalsIgnoreCase("-1"))
+                deptQry = " AND vmis.departmentid     =" + parameters.get("departmentid")[0];
+            if (null != parameters.get("rtgsAssignedFromDate")[0]
+                    && !parameters.get("rtgsAssignedFromDate")[0].equalsIgnoreCase(""))
+
+                instrumentHeaderQry = instrumentHeaderQry.append(" and   ih.transactiondate >='"
+                        + dateFormat.format(formatter.parse(parameters.get("rtgsAssignedFromDate")[0])) + "'");
+            else
+                instrumentHeaderQry = instrumentHeaderQry.append(" and   ih.transactiondate >=:finStartDate");
+            if (null != parameters.get("rtgsAssignedToDate")[0] && !parameters.get("rtgsAssignedToDate")[0].equalsIgnoreCase(""))
+                instrumentHeaderQry = instrumentHeaderQry.append(" and   ih.transactiondate  <='"
+                        + dateFormat.format(formatter.parse(parameters.get("rtgsAssignedToDate")[0])) + "'");
+            if (null != parameters.get("bank")[0] && !parameters.get("bank")[0].equals("-1")
+                    && !parameters.get("bank")[0].equalsIgnoreCase(""))
+                bankQry = bankQry.append(" AND b.id = " + parameters.get("bank")[0]);
+            if (null != parameters.get("bankbranch.id")[0] && !parameters.get("bankbranch.id")[0].equals("-1")
+                    && !parameters.get("bankbranch.id")[0].equalsIgnoreCase(""))
+                bankQry = bankQry.append(" AND branch.id=" + parameters.get("bankbranch.id")[0]);
+            if (null != parameters.get("bankaccount.id")[0] && !parameters.get("bankaccount.id")[0].equals("-1")
+                    && !parameters.get("bankaccount.id")[0].equalsIgnoreCase("")) {
+                phQry = " AND ph.bankaccountnumberid=" + parameters.get("bankaccount.id")[0];
+                instrumentHeaderQry = instrumentHeaderQry.append(" and   ih.bankaccountid ="
+                        + parameters.get("bankaccount.id")[0]);
+            }
+            if (null != parameters.get("instrumentnumber")[0] && !parameters.get("instrumentnumber")[0].equalsIgnoreCase(""))
+                instrumentHeaderQry = instrumentHeaderQry.append(" and   ih.transactionnumber ='"
+                        + parameters.get("instrumentnumber")[0] + "'");
+            if (null != parameters.get("fundId")[0] && !parameters.get("fundId")[0].equalsIgnoreCase(""))
+                fundQry = " AND vh.fundId            =" + parameters.get("fundId")[0];
+
+            queryString = queryString
+                    .append(" SELECT ih.id as ihId , ih.transactionnumber as rtgsNumber,  ih.transactiondate as rtgsDate, vh.id as vhId,  vh.vouchernumber as paymentNumber,"
+                            +
+                            " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
+                            +
+                            " dept.name as department,   stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
+                            +
+                            " egf_instrumentvoucher iv,  egf_instrumentheader ih,  eg_department dept ,egw_status stat WHERE "
+                            +
+                            " ph.voucherheaderid   =vh.id AND vmis.voucherheaderid = vh.id "
+                            + bankQry.toString()
+                            + "  AND ih.bankaccountid = ba.id and branch.id = ba.branchid and branch.bankid = b.id and vh.status = 0 "
+                            +
+                            fundQry
+                            + phQry
+                            + " and stat.id= ih.id_status "
+                            +
+                            " AND dept.id = vmis.departmentid "
+                            + deptQry
+                            + "  and lower(ph.type)=lower('pex') "
+                            + instrumentHeaderQry.toString()
+                            +
+                            " AND IV.VOUCHERHEADERID  IS NOT NULL AND iv.voucherheaderid   =vh.id AND ih.instrumentnumber IS NULL "
+                            +
+                            " AND ih.id = iv.instrumentheaderid "
+                            +
+                            " AND vh.type   = 'Payment' and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id , ih.transactionnumber,"
+                            +
+                            " ih.transactiondate, vh.id,  vh.vouchernumber,vh.voucherDate, vmis.departmentid,  dept.name, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber,dept.name");
+        } catch (ParseException e) {
+
+        }
+        return queryString;
+    }
 
 }

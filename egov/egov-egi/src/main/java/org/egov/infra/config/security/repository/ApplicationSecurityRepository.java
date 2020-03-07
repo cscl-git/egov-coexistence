@@ -88,6 +88,7 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 			
 			context.setAuthentication(this.prepareAuthenticationObj(request, cur_user));
 		} catch (Exception e) {
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			LOGGER.error(" ***  Session is not found in Redis. Creating empty security context");
 			return SecurityContextHolder.createEmptyContext();
@@ -161,7 +162,7 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 		user.setUsername(userinfo.getUserName());
 		user.setActive(userinfo.getActive());
 		user.setAccountLocked(userinfo.getAccountLocked());
-		user.setGender(Gender.valueOf(userinfo.getGender().toUpperCase()));
+		//user.setGender(Gender.valueOf(userinfo.getGender().toUpperCase()));
 		user.setPassword(" ");
 		user.setName(userinfo.getName());
 		user.setPwdExpiryDate(userinfo.getPwdExpiryDate());

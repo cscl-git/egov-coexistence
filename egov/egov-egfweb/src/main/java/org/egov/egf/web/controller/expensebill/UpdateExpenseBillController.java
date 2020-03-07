@@ -48,6 +48,7 @@
 package org.egov.egf.web.controller.expensebill;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -63,10 +64,13 @@ import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
+import org.egov.infra.filestore.entity.FileStoreMapper;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
@@ -86,6 +90,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping(value = "/expensebill")
 public class UpdateExpenseBillController extends BaseBillController {
+	private static final String SUPPORTING_DOCS = "supportingDocs";
 
     private static final String NET_PAYABLE_AMOUNT = "netPayableAmount";
 
@@ -98,6 +103,13 @@ public class UpdateExpenseBillController extends BaseBillController {
     private static final String EXPENSEBILL_VIEW = "expensebill-view";
 
     private static final String NET_PAYABLE_ID = "netPayableId";
+    @Autowired
+    @Qualifier("persistenceService")
+    private PersistenceService persistenceService;
+    @Autowired
+    protected FileStoreService fileStoreService;   
+    private List<FileStoreMapper> originalFiles = new ArrayList<FileStoreMapper>();
+    
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
     @Autowired
@@ -161,6 +173,9 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (department != null)
             egBillregister.getEgBillregistermis().setDepartmentName(department);
         model.addAttribute(EG_BILLREGISTER, egBillregister);
+        originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
+                "from FileStoreMapper where fileName like '%"+egBillregister.getBillnumber()+"%' order by id desc ").setMaxResults(10).list();
+        model.addAttribute(SUPPORTING_DOCS,originalFiles);
         if (egBillregister.getState() != null
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
@@ -348,4 +363,12 @@ public class UpdateExpenseBillController extends BaseBillController {
 
         return departmentName;
     }
+    
+    public List<FileStoreMapper> getOriginalFiles() {
+		return originalFiles;
+	}
+
+	public void setOriginalFiles(List<FileStoreMapper> originalFiles) {
+		this.originalFiles = originalFiles;
+	}
 }

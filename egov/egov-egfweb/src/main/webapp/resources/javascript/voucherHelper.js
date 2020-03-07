@@ -973,6 +973,10 @@ function fillNeibrAfterSplitGlcode(obj)
 		var currRow=getRowIndex(obj);
 		document.getElementById('billDetailslist['+currRow+'].glcodeIdDetail').value=allGlcodes[key];
 		document.getElementById('billDetailslist['+currRow+'].accounthead').value=temp[1].split("`~`")[0];
+		if((obj.value).startsWith("3"))
+		{
+			document.getElementById('billDetailslist['+currRow+'].rateDetail').style.visibility="visible";
+		}
 		var flag=false;
 		for (var i=0; i<slDetailTableIndex;i++ )
 		{
@@ -2333,4 +2337,80 @@ function disableForm() {
 		}
 } 
 
+function createRateFieldFormatterJV(prefix,suffix,onblurfunction){
+    return function(el, oRecord, oColumn, oData) {
+		var value = (YAHOO.lang.isValue(oData))?oData:"";
+		el.innerHTML ="<select id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' onchange='updateRateDetailJV()' style='text-align:right;width:90px;visibility: hidden' maxlength='18'><option value='0'>--Select--</option><option value='2'>2</option><option value='5'>5</option><option value='9'>9</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select>";
+	}
+}
+function updateRateDetailJV()
+{
+	var deb=0;
+	var cred=0;
+	var rateDeb=0;
+	for(var i=0;i<billDetailTableIndex+1;i++)
+		{
+			if(null != document.getElementById('billDetailslist['+i+'].rateDetail') && (document.getElementById('billDetailslist['+i+'].rateDetail')).value != 0)
+				{
+					var rate=document.getElementById('billDetailslist['+i+'].rateDetail').value;
+					var amount=0;
+					if(!isNaN(rate))
+						{
+							amount=parseFloat((rate*rateDeb)/100);
+							if((document.getElementById('billDetailslist['+i+'].accounthead').value).includes("GST"))
+							{
+								document.getElementById('billDetailslist['+i+'].debitAmountDetail').value=amount;
+								deb=deb+amount;
+							}
+							else
+								{
+								document.getElementById('billDetailslist['+i+'].creditAmountDetail').value=amount;
+								cred=cred+amount;
+								}
+						}
+					
+				}
+			else if(null != document.getElementById('billDetailslist['+i+'].debitAmountDetail') && document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != 0)
+				{
+					rateDeb=rateDeb+parseFloat(document.getElementById('billDetailslist['+i+'].debitAmountDetail').value);
+					deb=deb+parseFloat(document.getElementById('billDetailslist['+i+'].debitAmountDetail').value);
+				}
+			else if(null != document.getElementById('billDetailslist['+i+'].creditAmountDetail') && document.getElementById('billDetailslist['+i+'].creditAmountDetail').value != 0)
+				{
+					cred=cred+parseFloat(document.getElementById('billDetailslist['+i+'].creditAmountDetail').value);
+				}
+		}
+	document.getElementById('totaldbamount').value = amountConverter(deb);
+	document.getElementById('totalcramount').value = amountConverter(cred);
+	
+	
+	
+}
+
+function updateDebitAmountJV()
+{	
+	var amt=0;
+	
+	for(var i=0;i<billDetailTableIndex+1;i++)
+	{
+		
+		if(null != document.getElementById('billDetailslist['+i+'].debitAmountDetail')){
+			var val = document.getElementById('billDetailslist['+i+'].debitAmountDetail').value;
+			if(val!="" && !isNaN(val))
+			{
+				amt = amt + parseFloat(val);
+			}
+		}
+	}
+	document.getElementById('totaldbamount').value = amountConverter(amt);
+}
+function deductionRateFormatter(tableName,columnName,type){
+    return function(el, oRecord, oColumn, oData) {
+    	 var table_name=eval(tableName);  var index=table_name.getRecordIndex(oRecord);  	 var fieldName=tableName+"["+index+"]"+columnName;  	 while(document.getElementById(fieldName))    	 {    		 index++;    fieldName=tableName+"["+index+"]"+columnName; 	 }
+		var value = (YAHOO.lang.isValue(oData))?oData:"";
+		el.innerHTML ="<select id='"+tableName+"["+index+"]"+columnName+"' name='"+tableName+"["+index+"]"+columnName+"' onchange='calculateNet(this)' ><option value='0'>--Select--</option><option value='2'>2</option><option value='5'>5</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select>";
+		
+	}
+		
+}
 

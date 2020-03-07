@@ -987,6 +987,10 @@ function fillNeibrAfterSplitGlcode(obj)
 		document.getElementById('billDetailslist['+currRow+'].glcodeIdDetail').value=temp[2];
 		document.getElementById('billDetailslist['+currRow+'].glcodeDetail').value=temp[1];
 		check();
+		if(obj.value.includes("GST"))
+		{
+		document.getElementById('billDetailslist['+currRow+'].rateDetail').style.visibility="visible";
+		}
 	}
 	else if(glcodeId==null || glcodeId=="")
 	{
@@ -1718,4 +1722,37 @@ alert('failure');
 
 function updateGrid(prefix,field,index,value){
 	document.getElementById(prefix+'['+index+'].'+field).value=value;
+}
+
+function createRateFieldFormatter(prefix,suffix,onblurfunction,table){
+    return function(el, oRecord, oColumn, oData) {
+    var rec=billDetailTableIndex;
+	var value = (YAHOO.lang.isValue(oData))?oData:"";
+	el.innerHTML ="<select id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' onchange='updateCreditAmountRate()' style='text-align:right;width:80px;visibility: hidden' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' ><option value='0'>--Select--</option><option value='2'>2</option><option value='5'>5</option><option value='9'>9</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select>";
+	}
+}
+
+function updateCreditAmountRate()
+{
+	var amt=0;
+	for(var i=0;i<billDetailTableIndex+1;i++)
+	{
+		if(null != document.getElementById('billDetailslist['+i+'].rateDetail') && document.getElementById('billDetailslist['+i+'].rateDetail').value != 0)
+			{
+				var rate=document.getElementById('billDetailslist['+i+'].rateDetail').value;
+				var rateAmt=(rate*amt)/100;
+				document.getElementById('billDetailslist['+i+'].creditAmountDetail').value=parseFloat(rateAmt);
+				amt=amt+parseFloat(rateAmt);
+			}
+		else if(null != document.getElementById('billDetailslist['+i+'].creditAmountDetail')){
+			var val = document.getElementById('billDetailslist['+i+'].creditAmountDetail').value;
+			if(val=='') val=0;
+			if(val!="" && !isNaN(val))
+			{
+				amt = amt + parseFloat(document.getElementById('billDetailslist['+i+'].creditAmountDetail').value);
+			}
+		}
+	}
+	document.getElementById('totalcramount').value = amt;
+	populatesubledgeramount1();
 }

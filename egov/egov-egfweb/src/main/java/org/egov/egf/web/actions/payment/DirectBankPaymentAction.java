@@ -153,6 +153,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private static final String MDP_CHEQUE = FinancialConstants.MODEOFPAYMENT_CHEQUE;
     private static final String MDP_RTGS = FinancialConstants.MODEOFPAYMENT_RTGS;
     private static final String MDP_CASH = FinancialConstants.MODEOFPAYMENT_CASH;
+    private static final String MDP_PEX = FinancialConstants.MODEOFPAYMENT_PEX;
     private String button;
     private VoucherService voucherService;
     private static final Logger LOGGER = Logger.getLogger(DirectBankPaymentAction.class);
@@ -208,6 +209,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         modeOfPaymentMap.put(MDP_CHEQUE, getText(MDP_CHEQUE));
 //        modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
         modeOfPaymentMap.put(MDP_RTGS, getText(MDP_RTGS));
+        modeOfPaymentMap.put(MDP_PEX, getText(MDP_PEX));
 
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);

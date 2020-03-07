@@ -2381,6 +2381,12 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             if (paymentMode.equals(FinancialConstants.MODEOFPAYMENT_RTGS))
                 instrumentHeaderList.add(prepareInstrumentHeaderForRtgs(account, parameters.get("rtgsRefNo")[0],
                         totalPaidAmt, formatter.parse(parameters.get("rtgsDate")[0]), ""));
+            else if(paymentMode.equals(FinancialConstants.MODEOFPAYMENT_PEX))
+            {
+            	instrumentHeaderList.add(prepareInstrumentHeaderForPex(
+                        account, parameters.get("pexRefNo")[0], totalPaidAmt,
+                        formatter.parse(parameters.get("pexDate")[0]), ""));
+            }
             else if (isChequeNoGenerationAuto()) // if cheque number generation
                                                  // is auto
             {
@@ -3057,4 +3063,55 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     public void setCreateVoucher(final CreateVoucher createVoucher) {
         this.createVoucher = createVoucher;
     }
+    
+    public boolean isPexNoGenerationAuto() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting isRtgsNoGenerationAuto...");
+        final List<AppConfigValues> appList = appConfigValuesService
+                .getConfigValuesByModuleAndKey(Constants.EGF,
+                        "PEXNO_GENERATION_AUTO");
+        final String chequeNoGeneration = appList.get(0).getValue();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed isRtgsNoGenerationAuto.");
+        if (chequeNoGeneration.equalsIgnoreCase("Y"))
+            return true;
+        else
+            return false;
+    }
+    
+    protected Map<String, Object> prepareInstrumentHeaderForPex(
+            final Bankaccount account, final String txnNo,
+            final BigDecimal amount, final Date date, final String key) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting prepareInstrumentHeaderForRtgs...");
+        final Map<String, Object> instrumentHeaderMap = new HashMap<String, Object>();
+        instrumentHeaderMap.put(VoucherConstant.IS_PAYCHECK, "1");
+        instrumentHeaderMap.put(VoucherConstant.INSTRUMENT_TYPE,
+                FinancialConstants.INSTRUMENT_TYPE_PEX);
+        instrumentHeaderMap.put(VoucherConstant.INSTRUMENT_AMOUNT, amount);
+        instrumentHeaderMap.put(VoucherConstant.TRANSACTION_NUMBER, txnNo);
+        instrumentHeaderMap.put(VoucherConstant.TRANSACTION_DATE, date);
+        instrumentHeaderMap.put(VoucherConstant.BANK_CODE, account
+                .getBankbranch().getBank().getCode());
+        // / instrumentHeaderMap.put(VoucherConstant.PAY_TO, partyName);
+        instrumentHeaderMap.put(VoucherConstant.BANKACCOUNTID, account.getId());
+        if (!key.equals("")) {
+            if (key.split(DELIMETER)[1] != null
+                    && !key.split(DELIMETER)[1].equals("")
+                    && !key.split(DELIMETER)[1].equals("null"))
+                instrumentHeaderMap.put(VoucherConstant.DETAIL_TYPE_ID,
+                        Integer.valueOf(key.split(DELIMETER)[1]));
+            if (key.split(DELIMETER)[2] != null
+                    && !key.split(DELIMETER)[2].equals("")
+                    && !key.split(DELIMETER)[2].equals("null"))
+                instrumentHeaderMap.put(VoucherConstant.DETAIL_KEY_ID,
+                        Long.valueOf(key.split(DELIMETER)[2]));
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed prepareInstrumentHeaderForRtgs.");
+        return instrumentHeaderMap;
+    }
+
+    
+    
 }
