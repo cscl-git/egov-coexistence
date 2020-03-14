@@ -861,7 +861,7 @@ public class EgovCommon {
         if (null != listBndryLvl && !listBndryLvl.isEmpty()) {
             final Boundary boundary = listBndryLvl.get(0);
             final Long boundaryId = boundary.getId();
-            try {
+            /*try {
                 final Connection connection = null;
 
                 final String bndQry = "SELECT glcode AS chequeinhand,id FROM CHARTOFACCOUNTS where id = (SELECT chequeinhand FROM CODEMAPPING WHERE EG_BOUNDARYID=?)";
@@ -895,7 +895,7 @@ public class EgovCommon {
                 LOGGER.error("Exception occuerd while getting  "
                         + e.getMessage(), e);
                 throw new ApplicationRuntimeException(e.getMessage());
-            }
+            }*/
 
         } else {
             if (LOGGER.isDebugEnabled())

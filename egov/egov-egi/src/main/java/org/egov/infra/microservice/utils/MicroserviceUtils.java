@@ -1342,8 +1342,10 @@ public class MicroserviceUtils {
     
     public Object getMdmsData(List<ModuleDetail> moduleDetails,boolean isStateLevel, String tenantId, String token){
         String mdmsUrl = appConfigManager.getEgovMdmsSerHost()+ this.mdmsSearchUrl;
+        
         RequestInfo requestInfo = new RequestInfo();
         requestInfo.setAuthToken(token != null && !token.isEmpty() ? token : getUserToken());
+        
         MdmsCriteria mdmscriteria = new MdmsCriteria();
         if(tenantId == null){
             if(isStateLevel){
@@ -1354,7 +1356,9 @@ public class MicroserviceUtils {
         }else{
             mdmscriteria.setTenantId(tenantId);
         }
+        
         mdmscriteria.setModuleDetails(moduleDetails);
+        
         MdmsCriteriaReq mdmsrequest = new MdmsCriteriaReq();
         mdmsrequest.setRequestInfo(requestInfo);
         mdmsrequest.setMdmsCriteria(mdmscriteria);

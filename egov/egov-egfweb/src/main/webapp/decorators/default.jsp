@@ -56,7 +56,7 @@
 		<spring:eval expression="@environment.getProperty('analytics.config')" scope="application"/>
 	</c:if>
  <%@ include file="/includes/meta.jsp" %>    
-		<title>eGov Financials <decorator:title/></title>
+		<title>MCC Financials <decorator:title/></title>
 		<link rel="icon" href="<cdn:url value='/resources/global/images/favicon.png' context='/services/egi'/>" sizes="32x32">
 		<link href="<cdn:url value='/resources/css/budget.css?rnd=${app_release_no}'/>" rel="stylesheet" type="text/css" />
 		<link href="<cdn:url value='/resources/css/commonegovnew.css?rnd=${app_release_no}'/>" rel="stylesheet" type="text/css" />
@@ -116,7 +116,7 @@ window.document.onkeydown = function(event) {
 		    
 		    <!-- footer -->
 		    <!-- footer class="main">
-			    Powered by <a href="http://egovernments.org/" target="_blank">eGovernments Foundation</a>
+			    
 			</footer> -->
 	   </div>
 	   

@@ -61,6 +61,7 @@
 			<tr>
 				<th><spring:message code="lbl.account.code" text="Account Code"/></th>
 				<th><spring:message code="lbl.account.head" text="Account Head"/></th>
+				<th><spring:message code="lbl.account.rate" text="Rate"/></th>
 				<th><spring:message code="lbl.credit.amount" text="Credit Amount"/></th>
 				<th><spring:message code="lbl.action" text="Action"/></th> 					
 			</tr>
@@ -80,6 +81,15 @@
 				<td>
 					<input type="text" id="tempCreditDetails[0].creditAccountHead" name="tempCreditDetails[0].creditAccountHead"  class="form-control creditdetailname" disabled>  
 				</td>
+				<td>
+					<form:select path="" name="tempCreditDetails[0].rate" id="tempCreditDetails[0].rate" onchange="calcualteNetpaybleAmount();" class="form-control table-input text-right creditAmount" >
+					<form:option value="0">---Select---</form:option>
+					<form:option value="2">2</form:option>
+					<form:option value="5">5</form:option>
+					<form:option value="9">9</form:option>
+					<form:option value="12">12</form:option>
+					</form:select>
+				</td> 
 				<td>
 					<form:input path="" name="tempCreditDetails[0].creditamount" id="tempCreditDetails[0].creditamount" data-errormsg="Credit Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  />
 				</td> 

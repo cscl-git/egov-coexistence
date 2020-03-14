@@ -251,6 +251,10 @@ loadFinAccSuccessHandler = function(req, res) {
 				amounttype);
 		updateSpanMisc(VOUCHERCREDITDETAILLIST, 'creditAmountDetailamountTypeLabel', i,
 				amountTypeSign);
+		if(res.results[i].accounthead.includes("GST"))
+    	{
+    		document.getElementById("billCreditDetailslist.["+i+"].rate").style.visibility='visible';
+    	}
 		totalcramt = parseFloat(totalcramt)
 				+ parseFloat(res.results[i].creditAmountDetail);
 		if (totalcramt > 0) {

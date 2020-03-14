@@ -1025,13 +1025,26 @@ function calcualteNetpaybleAmount(){
 	for (var count = 0; count <=creditAmoutrowcount; ++count) {
 
 		if (null != document.getElementById("tempCreditDetails[" + count
-				+ "].creditamount")) {
+				+ "].rate") && document.getElementById("tempCreditDetails[" + count
+						+ "].rate") != 0) {
 			var val = document.getElementById("tempCreditDetails[" + count
-					+ "].creditamount").value;
+					+ "].rate").value;
 			if (val != "" && !isNaN(val)) {
-				creditamt = parseFloat(Number(creditamt) + Number(val)).toFixed(2);
+				var amt=(val*debitamt)/100;
+				document.getElementById("tempCreditDetails[" + count
+						+ "].creditamount").value=parseFloat(Number(amt)).toFixed(2);
+				creditamt = parseFloat(Number(creditamt) + Number(amt)).toFixed(2);
 			}
 		}
+		else if (null != document.getElementById("tempCreditDetails[" + count
+				+ "].creditamount"))
+			{
+				var val = document.getElementById("tempCreditDetails[" + count
+						+ "].creditamount").value;
+				if (val != "" && !isNaN(val)) {
+					creditamt = parseFloat(Number(creditamt) + Number(val)).toFixed(2);
+				}
+			}
 	}
 	netPayableAmount=amountConverter(debitamt-creditamt);
 	$("#expense-netPayableAmount").val(netPayableAmount);
@@ -1040,6 +1053,7 @@ function calcualteNetpaybleAmount(){
 	$("#expenseBillTotalCreditAmount").html(creditamt);
 //	document.getElementById("expense-netPayableAmount").value= amountConverter(debitamt-creditamt);
 }
+
 function amountConverter(amt) {
 	var formattedAmt = amt.toFixed(2);
 	return formattedAmt;
