@@ -68,28 +68,21 @@ public class MSCommController {
         return approvers;
     }
 
-    @RequestMapping(value = "/rest/ClearToken", method = RequestMethod.POST)
+	@RequestMapping(value = "/rest/ClearToken", method = RequestMethod.POST)
     @ResponseBody
     private ResponseEntity logout(@RequestBody RequestInfoWrapper request,HttpServletRequest httpReq) {
-        try {
+    	try {
             String access_token = request.getRequestInfo().getAuthToken();
-            String sessionId = httpReq.getSession().getId();
-//            String sessionId =(String) microserviceUtils.readSesionIdByAuthToken(access_token);
-            if(sessionId!=null && !sessionId.equalsIgnoreCase("null")){
-                System.out.println("********* Retrieved session::authtoken******** "+sessionId+"::"+access_token);
-                if(redisRepository!=null){
-                 System.out.println("*********** Deleting the session for redisrepository "+ sessionId);   
-//                    redisRepository.delete(sessionId);
-                    microserviceUtils.removeSessionFromRedis(access_token, sessionId);
-                }
-                
+            System.out.println("*********** access_token : logout::: "+ access_token);   
+        	if(redisRepository!=null){
+        		String sessionId = (String)microserviceUtils.readFromRedis(access_token, access_token);
+             	System.out.println("*********** Deleting the session for redisrepository : logout:::"+ sessionId);
+                //microserviceUtils.removeSessionFromRedis(access_token, sessionId);
+             	microserviceUtils.removeSession(access_token, sessionId);
+                System.out.println("*********** removeSession Completed "+ sessionId);  
             }
-
-//            if (null != access_token) {
-//                microserviceUtils.removeSessionFromRedis(access_token);
-//            }
         } catch (Exception ex) {
-
+        	ex.printStackTrace();
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<>(HttpStatus.OK);

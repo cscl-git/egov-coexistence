@@ -189,7 +189,7 @@
 		th.colSpan = 4;
 		</s:if>
 		<s:else>
-		th.colSpan = 3;
+		th.colSpan = 4;
 		</s:else>
 		
 		th.innerHTML = 'Total&nbsp;&nbsp;&nbsp;';

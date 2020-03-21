@@ -352,7 +352,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     "DataEntryCutOffDate");
             if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
                 if (null == model || null == model.getId() || model.getCurrentState().getValue().endsWith("NEW")) {
-                    validActions = Arrays.asList(FORWARD, FinancialConstants.CREATEANDAPPROVE);
+                    validActions = Arrays.asList(FORWARD);
                 } else {
                     if (model.getCurrentState() != null) {
                         validActions = this.customizedWorkFlowService.getNextValidActions(model.getStateType(),

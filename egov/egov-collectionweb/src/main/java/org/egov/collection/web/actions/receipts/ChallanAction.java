@@ -276,7 +276,7 @@ public class ChallanAction extends BaseFormAction {
      *
      * @return
      */
-    @Action(value = "/receipts/challan-newform")
+	@Action(value = "/receipts/challan-newform")
     @ValidationErrorPage(value = ERROR)
     @SkipValidation
     public String newform() {

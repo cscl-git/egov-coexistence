@@ -1226,11 +1226,11 @@ public class MicroserviceUtils {
     }
 
     public void saveAuthToken(String auth_token, String sessionId) {
-        redisTemplate.opsForHash().putIfAbsent(auth_token, sessionId, sessionId);
+        redisTemplate.opsForHash().putIfAbsent(auth_token, auth_token, sessionId);
     }
 
     public String readSesionIdByAuthToken(String auth_token) {
-
+    	
         if (redisTemplate.hasKey(auth_token)) {
             return (String) redisTemplate.opsForValue().get(auth_token);
         }
@@ -1262,21 +1262,32 @@ public class MicroserviceUtils {
         else
             return null;
     }
+    
+    public void removeSession(String access_token, String sessionId) {
+        LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);
+        LOGGER.info("redisTemplate.hasKey(access_token))::: " + redisTemplate.hasKey(access_token));
+        LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
+        if (null != access_token && redisTemplate.hasKey(access_token)){
+            if (sessionId != null) {
+            	redisTemplate.delete(sessionId);
+            	LOGGER.info("spring:session:sessions:" + sessionId);
+            	LOGGER.info("spring:session:sessions:expires:" + sessionId);
+                redisTemplate.delete("spring:session:sessions:" + sessionId);
+                redisTemplate.delete("spring:session:sessions:expires:" + sessionId);
+                redisTemplate.opsForHash().delete(access_token,sessionId);
+                redisTemplate.opsForHash().delete(sessionId, "current_user");
+            } else
+                LOGGER.info("session not found in redis for : " + access_token);
+        }else{
+            LOGGER.info("authtoken not found in redis : " + access_token);
+        }
+    }
 
     public void removeSessionFromRedis(String access_token, String sessionId) {
         LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);
         if (null != access_token && redisTemplate.hasKey(access_token)){
             sessionId = (String)redisTemplate.opsForHash().get(sessionId, sessionId);
-            if (sessionId != null) {
-                System.out.println("***********sessionId**** " + sessionId);
-                redisTemplate.delete(sessionId);
-                System.out.println("spring:session:sessions:" + sessionId);
-                System.out.println("spring:session:sessions:expires:" + sessionId);
-                redisTemplate.delete("spring:session:sessions:" + sessionId);
-                redisTemplate.delete("spring:session:sessions:expires:" + sessionId);
-                redisTemplate.opsForHash().delete(access_token,sessionId);
-            } else
-                LOGGER.info("session not found in redis for : " + access_token);
+            removeSession(access_token, sessionId);
         }else{
             LOGGER.info("authtoken not found in redis : " + access_token);
         }

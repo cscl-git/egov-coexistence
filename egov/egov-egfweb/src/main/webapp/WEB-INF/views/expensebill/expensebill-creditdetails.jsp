@@ -84,10 +84,24 @@
 				<td>
 					<form:select path="" name="tempCreditDetails[0].rate" id="tempCreditDetails[0].rate" onchange="calcualteNetpaybleAmount();" class="form-control table-input text-right creditAmount" >
 					<form:option value="0">---Select---</form:option>
-					<form:option value="2">2</form:option>
-					<form:option value="5">5</form:option>
-					<form:option value="9">9</form:option>
-					<form:option value="12">12</form:option>
+					<form:option value="0.125">0.125%</form:option>
+					<form:option value="0.25">0.25%</form:option>
+					<form:option value="1.500">1.500%</form:option>
+					<form:option value="1">1%</form:option>
+					<form:option value="2">2%</form:option>
+					<form:option value="2.5">2.5%</form:option>
+					<form:option value="3">3%</form:option>
+					<form:option value="5">5%</form:option>
+					<form:option value="6">6%</form:option>
+					<form:option value="9">9%</form:option>
+					<form:option value="10">10%</form:option>
+					<form:option value="12">12%</form:option>
+					<form:option value="14">14%</form:option>
+					<form:option value="15">15%</form:option>
+					<form:option value="18">18%</form:option>
+					<form:option value="20">20%</form:option>
+					<form:option value="28">28%</form:option>
+					<form:option value="30">30%</form:option>
 					</form:select>
 				</td> 
 				<td>

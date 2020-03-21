@@ -167,10 +167,13 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 //        owners.add(4L);
 //        owners.add(1L);
         if (!owners.isEmpty()) {
+        	System.out.println("Owner");
             List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
             for (String type : types) {
+            	System.out.println("type : "+type);
                 Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
                 if (inboxRenderService.isPresent()) {
+                	System.out.println("draft : "+draft);
                     InboxRenderService<T> renderService = inboxRenderService.get();
                     workflowItems.addAll(draft ? renderService.getDraftWorkflowItems(owners) :
                             renderService.getAssignedWorkflowItems(owners));
@@ -211,6 +214,7 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
         try {
             if (getWorkflowType(type) != null)
                 inboxRenderService = applicationContext.getBean(String.format(INBOX_RENDER_SERVICE_SUFFIX, type), InboxRenderService.class);
+            System.out.println("renderer");
         } catch (BeansException e) {
             LOG.warn("{}InboxRenderService bean not defined", type, e);
         }
@@ -243,10 +247,12 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
        
     	List<Long> positions = new ArrayList();
     	Long empId = ApplicationThreadLocals.getUserId();
+    	System.out.println("emp id : "+empId);
     	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
     	
     	if(null !=employs && employs.size()>0 )
-    		
+    		System.out.println("pos size : "+employs.size());
+    	System.out.println("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
     	employs.get(0).getAssignments().forEach(assignment->{
     		positions.add(assignment.getPosition());
     	});

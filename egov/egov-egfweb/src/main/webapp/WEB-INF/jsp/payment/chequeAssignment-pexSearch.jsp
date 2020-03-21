@@ -52,7 +52,7 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css"
-	href="/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 <title>PEX Ref. No Assignment Search</title>
 </head>
 <body onload="onload()">
@@ -192,7 +192,7 @@
 
 		}
 		function submitForm() {
-			document.chequeAssignment.action = '/EGF/payment/chequeAssignment-searchPEX.action';
+			document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-searchPEX.action';
 			document.chequeAssignment.submit();
 		}
 	</script>

@@ -73,6 +73,7 @@ public class InboxController {
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public List<Inbox> showInbox() {
+    	System.out.println("Inbox");
         return inboxRenderServiceDelegate.getCurrentUserInboxItems();
     }
 

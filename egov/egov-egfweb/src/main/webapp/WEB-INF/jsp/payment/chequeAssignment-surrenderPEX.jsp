@@ -52,7 +52,7 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css" 
-href="/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 <title><s:text name="surrender.pex" /></title>
 </head>
 <body>
@@ -230,13 +230,13 @@ href="/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 	function openDetails(val)
 	{
 	var mode="view";
- 	window.open("/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+val+"&showMode="+mode,"","height=650,width=900,scrollbars=yes,left=30,top=30,status=yes");
+ 	window.open("/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+val+"&showMode="+mode,"","height=650,width=900,scrollbars=yes,left=30,top=30,status=yes");
  	}
  	function surrenderChq(){
  		resetSelectedRowsId();
  		disableAll();
  		document.getElementById('button').value='surrender';
- 		document.chequeAssignment.action = '/EGF/payment/chequeAssignment-save.action?containsPEX=true';
+ 		document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-save.action?containsPEX=true';
 		document.chequeAssignment.submit();
 		return true;
  	}
@@ -284,7 +284,7 @@ href="/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 	 	
  		}
 	 	disableAll();
-	 	document.chequeAssignment.action = '/EGF/payment/chequeAssignment-save.action?containsPEX='+document.getElementById('containsPEX').value;
+	 	document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-save.action?containsPEX='+document.getElementById('containsPEX').value;
 		document.chequeAssignment.submit();
 		
  	}

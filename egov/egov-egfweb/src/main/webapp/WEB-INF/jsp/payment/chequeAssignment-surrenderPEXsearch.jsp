@@ -52,7 +52,7 @@
 <html>
 <head>
 <link rel="stylesheet" type="text/css"
-	href="/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 <title><s:text name="surrender.pex.search" /></title>
 </head>
 <body>
@@ -92,7 +92,7 @@
 					<td class="bluebox"><s:textfield name="voucherNumber"
 							id="voucherNumber" value="%{voucherNumber}" /></td>
 					<td class="bluebox"><s:text
-							name="chq.assignment.transacton.no" /></td>
+							name="chq.assignment.pex.transacton.no" /></td>
 					<td class="bluebox"><s:textfield name="instrumentNumber"
 							id="instrumentNumber" onkeyup="validateOnlyNumber()" /></td>
 				</tr>
@@ -145,7 +145,7 @@
 	
 	<script>
 		function onSubmit() {
-			document.chequeAssignment.action = '/EGF/payment/chequeAssignment-searchForPEXSurrender.action';
+			document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-searchForPEXSurrender.action';
 			document.chequeAssignment.submit();
 		}
 		var date = '<s:date name="currentDate" format="dd/MM/yyyy"/>';

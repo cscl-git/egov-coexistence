@@ -99,6 +99,10 @@ public abstract class GenericWorkFlowController {
      */
     protected void prepareWorkflow(final Model prepareModel, final StateAware model,
             final WorkflowContainer container) {
+    	if(null != model)
+    	{
+    		System.out.println("Type  : "+model.getStateType());
+    	}
         prepareModel.addAttribute("approverDepartmentList", addAllDepartments());
         prepareModel.addAttribute("validActionList", getValidActions(model, container));
         prepareModel.addAttribute("nextAction", getNextAction(model, container));
@@ -124,6 +128,11 @@ public abstract class GenericWorkFlowController {
                         container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                         model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
                         container.getCurrentDesignation());
+        if(null != wfMatrix)
+        {
+        	System.out.println("NextAction : "+wfMatrix.getNextAction());
+        }
+        
         return wfMatrix == null ? "" : wfMatrix.getNextAction();
     }
 
@@ -148,6 +157,7 @@ public abstract class GenericWorkFlowController {
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                     State.DEFAULT_STATE_VALUE_CREATED, container.getPendingActions(), model.getCreatedDate(),
                     container.getCurrentDesignation());
+        System.out.println("Valid Actions : "+validActions);
         return validActions;
     }
 

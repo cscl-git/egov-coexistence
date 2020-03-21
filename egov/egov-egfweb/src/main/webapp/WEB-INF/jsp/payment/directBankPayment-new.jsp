@@ -206,7 +206,7 @@
 		var tfoot = billDetailsTable.getTbodyEl().parentNode.createTFoot();
 		var tr = tfoot.insertRow(-1);
 		var th = tr.appendChild(document.createElement('th'));
-		th.colSpan = 5;
+		th.colSpan = 6;
 		th.innerHTML = 'Total&nbsp;&nbsp;&nbsp;';
 		th.align='right';
 		var td = tr.insertCell(-1);

@@ -406,9 +406,9 @@ function loadCoa(id){
 	if(coaCode != 'undefined' && coaCode!=''){
 		var url;
 		if(isNaN(coaCode))
-			url = '/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaDescription='+coaCode;
+			url = '/services/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaDescription='+coaCode;
 		else
-			url = '/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaCode='+coaCode;
+			url = '/services/EGF/payment/advanceRequisitionPayment-ajaxLoadCoa.action?coaCode='+coaCode;
 	
 		var req2 = initiateRequest();
 		req2.onreadystatechange = function(){
@@ -2340,7 +2340,7 @@ function disableForm() {
 function createRateFieldFormatterJV(prefix,suffix,onblurfunction){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML ="<select id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' onchange='updateRateDetailJV()' style='text-align:right;width:90px;visibility: hidden' maxlength='18'><option value='0'>--Select--</option><option value='2'>2</option><option value='5'>5</option><option value='9'>9</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select>";
+		el.innerHTML ="<select id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' onchange='updateRateDetailJV()' style='text-align:right;width:90px;visibility: hidden' maxlength='18'><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
 	}
 }
 function updateRateDetailJV()
@@ -2408,7 +2408,7 @@ function deductionRateFormatter(tableName,columnName,type){
     return function(el, oRecord, oColumn, oData) {
     	 var table_name=eval(tableName);  var index=table_name.getRecordIndex(oRecord);  	 var fieldName=tableName+"["+index+"]"+columnName;  	 while(document.getElementById(fieldName))    	 {    		 index++;    fieldName=tableName+"["+index+"]"+columnName; 	 }
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML ="<select id='"+tableName+"["+index+"]"+columnName+"' name='"+tableName+"["+index+"]"+columnName+"' onchange='calculateNet(this)' ><option value='0'>--Select--</option><option value='2'>2</option><option value='5'>5</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select>";
+		el.innerHTML ="<select id='"+tableName+"["+index+"]"+columnName+"' name='"+tableName+"["+index+"]"+columnName+"' onchange='calculateNet(this)' ><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
 		
 	}
 		

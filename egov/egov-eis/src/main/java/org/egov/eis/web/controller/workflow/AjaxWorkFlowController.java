@@ -87,14 +87,14 @@ public class AjaxWorkFlowController {
             @ModelAttribute("designations") @RequestParam final String departmentRule, @RequestParam final String currentState,
             @RequestParam final String type,
             @RequestParam final String amountRule, @RequestParam final String additionalRule,
-            @RequestParam final String pendingAction, @RequestParam final Long approvalDepartment) {
+            @RequestParam final String pendingAction, @RequestParam final String approvalDepartment) {
 
         List<Designation> designationList = designationService.getDesignationsByNames(
                 customizedWorkFlowService.getNextDesignations(type,
                         departmentRule, null, additionalRule, currentState,
                         pendingAction, new Date()));
-        if (designationList.isEmpty())
-            designationList = designationService.getAllDesignationByDepartment(approvalDepartment, new Date());
+        //if (designationList.isEmpty())
+          //  designationList = designationService.getAllDesignationByDepartment(approvalDepartment, new Date());
         return designationList;
 
     }
@@ -105,15 +105,18 @@ public class AjaxWorkFlowController {
             @ModelAttribute("designations") @RequestParam final String departmentRule, @RequestParam final String currentState,
             @RequestParam final String type,
             @RequestParam final String amountRule, @RequestParam final String additionalRule,
-            @RequestParam final String pendingAction, @RequestParam final Long approvalDepartment) {
-
+            @RequestParam final String pendingAction, @RequestParam final String approvalDepartment) {
+    	System.out.println("type : "+type);
         List<Designation> designationList = assignmentService
                 .getDesignationsByActiveAssignmentAndDesignationNames(
                         customizedWorkFlowService.getNextDesignationsForActiveAssignments(type,
                                 departmentRule, null, additionalRule, currentState,
                                 pendingAction, new Date()));
         if (designationList.isEmpty())
-            designationList = designationService.getAllDesignationByDepartment(approvalDepartment, new Date());
+        {
+        	System.out.println("EMPTY DESIG");
+        }
+            //designationList = designationService.getAllDesignationByDepartment(approvalDepartment, new Date());
         return designationList;
 
     }

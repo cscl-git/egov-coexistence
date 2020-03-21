@@ -447,7 +447,7 @@ public class ContingentBillAction extends BaseBillAction {
         if (!cutOffDateconfigValue.isEmpty())
         {
             if (null == bill || null == bill.getId() || bill.getCurrentState().getValue().endsWith("NEW")) {
-                validActions = Arrays.asList(FORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FORWARD);
             } else {
                 if (bill.getCurrentState() != null) {
                     validActions = this.customizedWorkFlowService.getNextValidActions(bill

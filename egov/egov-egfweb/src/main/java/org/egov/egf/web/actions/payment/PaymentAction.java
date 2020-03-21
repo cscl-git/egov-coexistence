@@ -1680,7 +1680,7 @@ public class PaymentAction extends BasePaymentAction {
         if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
             if (null == paymentheader || null == paymentheader.getId()
                     || paymentheader.getCurrentState().getValue().endsWith("NEW"))
-                validActions = Arrays.asList(FORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FORWARD);
             else if (paymentheader.getCurrentState() != null)
                 validActions = customizedWorkFlowService.getNextValidActions(paymentheader.getStateType(),
                         getWorkFlowDepartment(), getAmountRule(), getAdditionalRule(),

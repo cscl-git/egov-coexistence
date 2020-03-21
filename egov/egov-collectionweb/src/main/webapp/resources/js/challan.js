@@ -1728,7 +1728,7 @@ function createRateFieldFormatter(prefix,suffix,onblurfunction,table){
     return function(el, oRecord, oColumn, oData) {
     var rec=billDetailTableIndex;
 	var value = (YAHOO.lang.isValue(oData))?oData:"";
-	el.innerHTML ="<select id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' onchange='updateCreditAmountRate()' style='text-align:right;width:80px;visibility: hidden' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' ><option value='0'>--Select--</option><option value='2'>2</option><option value='5'>5</option><option value='9'>9</option><option value='10'>10</option><option value='12'>12</option><option value='15'>15</option></select>";
+	el.innerHTML ="<select id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' onchange='updateCreditAmountRate()' style='text-align:right;width:80px;visibility: hidden' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' ><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
 	}
 }
 
