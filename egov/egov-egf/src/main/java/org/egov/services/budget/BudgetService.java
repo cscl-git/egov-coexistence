@@ -402,4 +402,38 @@ public class BudgetService extends PersistenceService<Budget, Long> {
                                 + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
                 .setLong("createdStatus", createdStatus.getId()).executeUpdate();
     }
+    
+    public List<Budget> getBudgetsForUploadReportCAO() {
+        return findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,  1 , 1) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    }
+    
+    
+    
+    public List<Budget> getBudgetsForUploadReportACMC() {
+        return findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,  1 , 1) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathCAO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "ACMC Verify");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathACMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budget set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
 }

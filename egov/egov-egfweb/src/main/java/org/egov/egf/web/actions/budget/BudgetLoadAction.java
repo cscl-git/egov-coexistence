@@ -256,7 +256,7 @@ public class BudgetLoadAction extends BaseFormAction {
             fsIP.close();
             prepareOutPutFileWithFinalStatus(budgetUploadList);
 
-            addActionMessage(getText("budget.load.sucessful"));
+            addActionMessage(getText("budget.load.sucessful.cao"));
 
         } catch (final ValidationException e)
         {

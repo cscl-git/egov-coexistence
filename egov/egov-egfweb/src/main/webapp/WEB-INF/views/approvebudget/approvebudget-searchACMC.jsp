@@ -48,9 +48,10 @@
 
 
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
+
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
-<form:form role="form" action="update"
+<form:form role="form" action="updateACMC"
 	modelAttribute="budgetUploadReport" id="approvebudgetsearchform"
 	cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
@@ -59,23 +60,23 @@
 			<div class="col-md-12">
 				<div class="panel panel-primary" data-collapsed="0">
 					<c:if test="${not empty message}">
-						<div id="message" class="success" style="color: green;">
+						<div id="message" class="success">
 							<spring:message code="${message}" />
 						</div>
 					</c:if>
 					<div class="panel-heading">
-						<div class="panel-title"><spring:message code="title.approvebudget.search" text="Approve Uploaded Budget"/> </div>
+						<div class="panel-title">Verify Uploaded Budget</div>
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
 							<label class="col-sm-3 control-label text-right"><spring:message
-									code="lbl.budget" text="Budget"/> <span class="mandatory1">*</span></label>
+									code="lbl.budget" /> <span class="mandatory1">*</span></label>
 							<div class="col-sm-3 add-margin">
 								<form:select path="reBudget.id" required="required"
 									id="reBudget" cssClass="form-control"
 									cssErrorClass="form-control error">
 									<form:option value="">
-										<spring:message code="lbl.select" text="Select"/>
+										<spring:message code="lbl.select" />
 									</form:option>
 									<form:options items="${budgets}" itemValue="id"
 										itemLabel="name" />
@@ -83,14 +84,14 @@
 								<form:errors path="reBudget" cssClass="error-msg" />
 							</div>
 							<label class="col-sm-2 control-label text-right"><spring:message
-									code="lbl.referenceBudget" text="Reference Budget"/> </label>
+									code="lbl.referenceBudget" /> </label>
 							<div class="col-sm-3 add-margin">
 								<div id="referenceBudget"></div>
 							</div>
 						</div>
-												<br>
 						<br>
-								<div class="form-group" id="toogleDiv" style="display:none">
+						<br>
+						<div class="form-group" id="toogleDiv" style="display:none">
 							
 							<c:if test="${budgetDetails !=null && !budgetDetails.isEmpty() }">
 							<table border="0" width="100%" cellspacing="0" cellpadding="0">
@@ -103,7 +104,7 @@
 				<th class="bluebgheadtd">Original Amount</th>
 				<!-- <th class="bluebgheadtd">Approved Amount</th> -->
 				<th class="bluebgheadtd">Anticipatory Amount</th>
-				<!-- <th class="bluebgheadtd">Budget Available</th>-->
+				<!--<th class="bluebgheadtd">Budget Available</th>-->
 				
 				</tr>
 				
@@ -127,14 +128,13 @@
 						</div>
 						<br>
 						<br>
-						
 						<div class="form-group">
 							<div class="text-center">
 								<button type='submit' class='btn btn-primary' id="btnsearch">
-									<spring:message code='lbl.approve' text="Approve"/>
+									<spring:message code='lbl.verify' />
 								</button>
 								<a href='javascript:void(0)' class='btn btn-default'
-									onclick='self.close()'><spring:message code='lbl.close' text="Close"/></a>
+									onclick='self.close()'><spring:message code='lbl.close' /></a>
 							</div>
 						</div>
 					</div>

@@ -114,6 +114,10 @@ public class BudgetDetail extends StateAware {
 
     @Transient
     private BigDecimal nextYrapprovedAmount = new BigDecimal("0.0");
+    
+    @Transient
+    private String execDeptName ;
+    
     private BigDecimal budgetAvailable = new BigDecimal("0.0");
 
     @Column(name = "anticipatory_amount")
@@ -493,5 +497,13 @@ public class BudgetDetail extends StateAware {
     public void setStatus(final EgwStatus status) {
         this.status = status;
     }
+
+	public String getExecDeptName() {
+		return execDeptName;
+	}
+
+	public void setExecDeptName(String execDeptName) {
+		this.execDeptName = execDeptName;
+	}
 
 }

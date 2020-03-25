@@ -82,7 +82,7 @@
 					<input type="text" id="tempCreditDetails[0].creditAccountHead" name="tempCreditDetails[0].creditAccountHead"  class="form-control creditdetailname" disabled>  
 				</td>
 				<td>
-					<form:select path="" name="tempCreditDetails[0].rate" id="tempCreditDetails[0].rate" onchange="calcualteNetpaybleAmount();" class="form-control table-input text-right creditAmount" >
+					<form:select path="" name="tempCreditDetails[0].rate" id="tempCreditDetails[0].rate" onchange="calcualteNetpaybleAmount();" class="form-control table-input text-right" >
 					<form:option value="0">---Select---</form:option>
 					<form:option value="0.125">0.125%</form:option>
 					<form:option value="0.25">0.25%</form:option>

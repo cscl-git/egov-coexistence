@@ -48,8 +48,14 @@
 
 package org.egov.egf.web.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.egov.commons.service.ChartOfAccountsService;
+import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.model.budget.Budget;
+import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetUploadReport;
 import org.egov.services.budget.BudgetDetailService;
 import org.egov.services.budget.BudgetService;
@@ -67,6 +73,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/approvebudget")
 public class ApproveBudgetController {
     private final static String APPROVEBUDGET_SEARCH = "approvebudget-search";
+    private final static String APPROVEBUDGET_SEARCH_CAO = "approvebudget-searchCAO";
+    private final static String APPROVEBUDGET_SEARCH_ACMC = "approvebudget-searchACMC";
+    private List<BudgetDetail> budgetDetailsList=new ArrayList<BudgetDetail>();
+
     @Autowired
     @Qualifier("budgetService")
     private BudgetService budgetService;
@@ -76,9 +86,75 @@ public class ApproveBudgetController {
     @Autowired
     @Qualifier("chartOfAccountsService")
     private ChartOfAccountsService chartOfAccountsService;
+    
+    @Autowired
+    private DepartmentService departmentService;
 
     private void prepareNewForm(Model model) {
         model.addAttribute("budgets", budgetService.getBudgetsForUploadReport());
+        budgetDetailsList=budgetDetailService.getBudgetDetailsForUploadReport();
+        if(null != budgetDetailsList && !budgetDetailsList.isEmpty())
+        {
+        	for(BudgetDetail bd:budgetDetailsList)
+            {
+        		Department dept=departmentService.getDepartmentById(Long.parseLong(bd.getExecutingDepartment()));
+        		if(null != dept)
+        		{
+        			bd.setExecDeptName(dept.getName());
+        		}
+        		else
+        		{
+        			bd.setExecDeptName("");
+        		}
+            	
+            }
+        }        
+        model.addAttribute("budgetDetails",budgetDetailsList);
+    }
+    
+    private void prepareNewFormCAO(Model model) {
+        model.addAttribute("budgets", budgetService.getBudgetsForUploadReportCAO());
+        budgetDetailsList=budgetDetailService.getBudgetDetailsForUploadReportCAO();
+        if(null != budgetDetailsList && !budgetDetailsList.isEmpty())
+        {
+        	for(BudgetDetail bd:budgetDetailsList)
+            {
+        		Department dept=departmentService.getDepartmentById(Long.parseLong(bd.getExecutingDepartment()));
+        		if(null != dept)
+        		{
+        			bd.setExecDeptName(dept.getName());
+        		}
+        		else
+        		{
+        			bd.setExecDeptName("");
+        		}
+            	
+            }
+        }
+        model.addAttribute("budgetDetails",budgetDetailsList);
+        
+    }
+    
+    private void prepareNewFormACMC(Model model) {
+        model.addAttribute("budgets", budgetService.getBudgetsForUploadReportACMC());
+        budgetDetailsList=budgetDetailService.getBudgetDetailsForUploadReportACMC();
+        if(null != budgetDetailsList && !budgetDetailsList.isEmpty())
+        {
+        	for(BudgetDetail bd:budgetDetailsList)
+            {
+        		Department dept=departmentService.getDepartmentById(Long.parseLong(bd.getExecutingDepartment()));
+        		if(null != dept)
+        		{
+        			bd.setExecDeptName(dept.getName());
+        		}
+        		else
+        		{
+        			bd.setExecDeptName("");
+        		}
+            	
+            }
+        }
+        model.addAttribute("budgetDetails",budgetDetailsList);
     }
 
     @RequestMapping(value = "/search", method = {RequestMethod.GET,RequestMethod.POST})
@@ -88,6 +164,26 @@ public class ApproveBudgetController {
         prepareNewForm(model);
         model.addAttribute("budgetUploadReport", budgetUploadReport);
         return APPROVEBUDGET_SEARCH;
+
+    }
+    
+    @RequestMapping(value = "/verifyCAO", method = {RequestMethod.GET,RequestMethod.POST})
+    public String verifyCAO(Model model)
+    {
+        BudgetUploadReport budgetUploadReport = new BudgetUploadReport();
+        prepareNewFormCAO(model);
+        model.addAttribute("budgetUploadReport", budgetUploadReport);
+        return APPROVEBUDGET_SEARCH_CAO;
+
+    }
+    
+    @RequestMapping(value = "/verifyACMC", method = {RequestMethod.GET,RequestMethod.POST})
+    public String verifyACMC(Model model)
+    {
+        BudgetUploadReport budgetUploadReport = new BudgetUploadReport();
+        prepareNewFormACMC(model);
+        model.addAttribute("budgetUploadReport", budgetUploadReport);
+        return APPROVEBUDGET_SEARCH_ACMC;
 
     }
 
@@ -104,6 +200,36 @@ public class ApproveBudgetController {
         redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.success");
 
         return "redirect:/approvebudget/search";
+    }
+    
+    @RequestMapping(value = "/updateCAO", method = RequestMethod.POST)
+    public String updateCAO(@ModelAttribute final BudgetUploadReport budgetUploadReport, final BindingResult errors,
+            final RedirectAttributes redirectAttrs) {
+        Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
+        Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
+        budgetService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
+        budgetDetailService.updateByMaterializedPathCAO(reBudget.getMaterializedPath());
+        budgetService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
+        budgetDetailService.updateByMaterializedPathCAO(beBudget.getMaterializedPath());
+        //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
+        redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.cao.success");
+
+        return "redirect:/approvebudget/verifyCAO";
+    }
+    
+    @RequestMapping(value = "/updateACMC", method = RequestMethod.POST)
+    public String updateACMC(@ModelAttribute final BudgetUploadReport budgetUploadReport, final BindingResult errors,
+            final RedirectAttributes redirectAttrs) {
+        Budget reBudget = budgetService.findById(budgetUploadReport.getReBudget().getId(), false);
+        Budget beBudget = budgetService.getReferenceBudgetFor(reBudget);
+        budgetService.updateByMaterializedPathACMC(reBudget.getMaterializedPath());
+        budgetDetailService.updateByMaterializedPathACMC(reBudget.getMaterializedPath());
+        budgetService.updateByMaterializedPathACMC(beBudget.getMaterializedPath());
+        budgetDetailService.updateByMaterializedPathACMC(beBudget.getMaterializedPath());
+        //chartOfAccountsService.updateActiveForPostingByMaterializedPath(reBudget.getMaterializedPath());
+        redirectAttrs.addFlashAttribute("message", "msg.uploaded.budget.acmc.success");
+
+        return "redirect:/approvebudget/verifyACMC";
     }
 
 }

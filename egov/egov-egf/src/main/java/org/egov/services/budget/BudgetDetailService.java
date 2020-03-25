@@ -1765,13 +1765,13 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                     deptSet.add(dept.getCode());
 
                 deptList.addAll(deptSet);
-                final EgwStatus budgetStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "Created");
+                final EgwStatus budgetStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGET", "CAO Verify");
                 createRootBudget(RE, beFYear, reFYear, deptList, budgetStatus);
 
                 createRootBudget(BE, beFYear, reFYear, deptList, budgetStatus);
 
             }
-            final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+            final EgwStatus budgetDetailStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
 
             budgetUploadList = createBudgetDetails(RE, budgetUploadList, reFYear, budgetDetailStatus);
 
@@ -1799,7 +1799,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                         budgetUpload.getCoa().getId(), fyear, budgetType);
 
                 if (temp != null) {
-                    if (temp.getStatus().getCode().equalsIgnoreCase("Created")) {
+                    if (temp.getStatus().getCode().equalsIgnoreCase("CAO Verify")) {
                         BigDecimal amount;
                         if (budgetType.equalsIgnoreCase(RE))
                             amount = budgetUpload.getReAmount();
@@ -2413,5 +2413,42 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public BudgetDetail getBudgetDetailByReferencceBudget(final String uniqueNo, final Long budgetId) {
         return budgetDetailRepository.findByReferenceBudget(uniqueNo, budgetId);
     }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReportCAO() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'CAO Verify'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReportACMC() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'ACMC Verify'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForUploadReport() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'Created'");
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathCAO(final String materializedPath) {
+        final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathACMC(final String materializedPath) {
+        final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+        final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+
 
 }

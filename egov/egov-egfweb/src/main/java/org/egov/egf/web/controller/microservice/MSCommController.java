@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.session.data.redis.RedisOperationsSessionRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -70,16 +71,19 @@ public class MSCommController {
 
 	@RequestMapping(value = "/rest/ClearToken", method = RequestMethod.POST)
     @ResponseBody
+    @CrossOrigin(origins = "*", allowedHeaders = "*")	
     private ResponseEntity logout(@RequestBody RequestInfoWrapper request,HttpServletRequest httpReq) {
     	try {
             String access_token = request.getRequestInfo().getAuthToken();
             System.out.println("*********** access_token : logout::: "+ access_token);   
         	if(redisRepository!=null){
         		String sessionId = (String)microserviceUtils.readFromRedis(access_token, access_token);
-             	System.out.println("*********** Deleting the session for redisrepository : logout:::"+ sessionId);
-                //microserviceUtils.removeSessionFromRedis(access_token, sessionId);
-             	microserviceUtils.removeSession(access_token, sessionId);
-                System.out.println("*********** removeSession Completed "+ sessionId);  
+        		if(sessionId != null) {
+	             	System.out.println("*********** Deleting the session for redisrepository : logout:::"+ sessionId);
+	                //microserviceUtils.removeSessionFromRedis(access_token, sessionId);
+	             	microserviceUtils.removeSession(access_token, sessionId);
+	                System.out.println("*********** removeSession Completed "+ sessionId); 
+        		}
             }
         } catch (Exception ex) {
         	ex.printStackTrace();
