@@ -108,7 +108,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     private PersistenceService persistenceService;
     @Autowired
     protected FileStoreService fileStoreService;   
-    private List<FileStoreMapper> originalFiles = new ArrayList<FileStoreMapper>();
+    //private List<FileStoreMapper> originalFiles = new ArrayList<FileStoreMapper>();
     
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
@@ -173,9 +173,9 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (department != null)
             egBillregister.getEgBillregistermis().setDepartmentName(department);
         model.addAttribute(EG_BILLREGISTER, egBillregister);
-        originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
+        /*originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
                 "from FileStoreMapper where fileName like '%"+egBillregister.getBillnumber()+"%' order by id desc ").setMaxResults(10).list();
-        model.addAttribute(SUPPORTING_DOCS,originalFiles);
+        model.addAttribute(SUPPORTING_DOCS,originalFiles);*/
         if (egBillregister.getState() != null
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
@@ -364,11 +364,11 @@ public class UpdateExpenseBillController extends BaseBillController {
         return departmentName;
     }
     
-    public List<FileStoreMapper> getOriginalFiles() {
+    /*public List<FileStoreMapper> getOriginalFiles() {
 		return originalFiles;
 	}
 
 	public void setOriginalFiles(List<FileStoreMapper> originalFiles) {
 		this.originalFiles = originalFiles;
-	}
+	}*/
 }

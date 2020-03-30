@@ -155,10 +155,11 @@
 			var bankId = bankbranchId.substring(0, index);
 			var brId = bankbranchId.substring(index + 1, bankbranchId.length);
 			document.getElementById("bankbranch").value = brId;
-			populatebankaccount({
+			
+		populatebankaccount({
 				bankId : bankId,
 				branchId : brId + '&asOnDate=' + date,
-				type : 'ADVICE'
+				type : 'PEX'
 			});
 		}
 	</script>

@@ -239,7 +239,7 @@
 				<s:if test="%{paymentMode=='pex'}">
 					//result= validateForRtgsMode();  
 				</s:if>    
-				document.chequeAssignment.action='/EGF/payment/chequeAssignment-updatePex.action';
+				document.chequeAssignment.action='/services/EGF/payment/chequeAssignment-updatePex.action';
 	    		document.chequeAssignment.submit();
 								 
 				return true;                   

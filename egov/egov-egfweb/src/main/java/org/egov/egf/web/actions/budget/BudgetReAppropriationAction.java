@@ -103,6 +103,9 @@ import java.util.Map;
 @ParentPackage("egov")
 @Results({
         @Result(name = "new", location = "budgetReAppropriation-new.jsp"),
+        @Result(name = "newCao", location = "budgetReAppropriation-new.jsp"),
+        @Result(name = "newAcmc", location = "budgetReAppropriation-new.jsp"),
+        @Result(name = "newMc", location = "budgetReAppropriation-new.jsp"),
         @Result(name = "search", location = "budgetReAppropriation-search.jsp"),
         @Result(name = "beRe", location = "budgetReAppropriation-beRe.jsp")
 })
@@ -278,6 +281,23 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     @Override
     public String execute() throws Exception {
         return NEW;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-budgetCAO")
+    public String budgetCAO() {
+        
+        return NEWCAO;
+    }
+    
+    @Action(value = "/budget/budgetReAppropriation-budgetACMC")
+    public String budgetACMC() {
+        
+        return NEWACMC;
+    }
+    @Action(value = "/budget/budgetReAppropriation-budgetMC")
+    public String budgetMC() {
+        
+        return NEWMC;
     }
 
     @Override

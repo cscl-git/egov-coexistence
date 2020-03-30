@@ -393,7 +393,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
         // overriding function Mandatory Condition only for cheque assignment search
         mandatoryFields.remove("function");
-        voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
+        //voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepare.");
     }
@@ -1695,7 +1695,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 sql.append(" and  iv.voucherHeaderId.vouchermis.departmentcode='" + department + "'");
             if (voucherHeader.getVoucherNumber() != null && !voucherHeader.getVoucherNumber().isEmpty())
                 sql.append(" and  iv.voucherHeaderId.voucherNumber='" + voucherHeader.getVoucherNumber() + "'");
-            final String mainquery = "select ih from  InstrumentVoucher iv,InstrumentHeader ih ,InstrumentType it where iv.instrumentHeaderId.id =ih.id and ih.transactionNumber is not null and ih.instrumentType=it.id and it.type = 'advice' and   iv.voucherHeaderId.status=0  and iv.voucherHeaderId.type='"
+            final String mainquery = "select ih from  InstrumentVoucher iv,InstrumentHeader ih ,InstrumentType it where iv.instrumentHeaderId.id =ih.id and ih.transactionNumber is not null and ih.instrumentType=it.id and it.type = 'pex' and   iv.voucherHeaderId.status=0  and iv.voucherHeaderId.type='"
                     + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "'  " + sql + " "
 
                     + " and ih.statusId.id in (?)  order by iv.voucherHeaderId.voucherDate";
@@ -1823,7 +1823,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed validateForSurrenderSearch.");
     }
-
+  
     @ValidationErrorPage(value = "surrendercheques")
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-save")
@@ -1843,16 +1843,14 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                     addActionError("Please select atleast one Cheque for Surrendering");
                     return searchForRTGSSurrender();
 
-                } 
-                else if(containsPEX)
-                {
-                	addActionError("Please select atleast one Cheque for Surrendering");
-                    return searchForPEXSurrender();
                 }
-                else
+				else if(containsPEX){
+					addActionError("Please select atleast one Cheque for Surrendering");
+				    return searchForPEXSurrender();
+				}
+				else
                     throw new ValidationException(Arrays.asList(new ValidationError("Exception while surrender Cheque ",
                             "Please select atleast one Cheque for Surrendering ")));
-
             }
             final List<InstrumentHeader> suurenderChequelist = new ArrayList<InstrumentHeader>();
             final List<String> chequeNoList = new ArrayList<String>();
@@ -1888,39 +1886,41 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                     if (instrumentHeader != null) {
                         instrumentHeader.setSurrendarReason(surrendarReasons[i]);
                         suurenderChequelist.add(instrumentHeader);
-                        //if (instrumentHeader.getTransactionNumber() != null)
-                          //  containsRTGS = true;
+                        if (instrumentHeader.getTransactionNumber() != null){
+                        	if(instrumentHeader.getInstrumentType().getType().equalsIgnoreCase("pex")){
+                        		containsPEX = true;
+                        	}
+                        	else if(instrumentHeader.getInstrumentType().getType().equalsIgnoreCase("advice")){
+                        		containsRTGS = true;
+                        	}
+						}
                     }
-
                 }
                 if (!reasonMissingRows.toString().isEmpty())
                     if (containsRTGS) {
                         addActionError("please select the Reason for Surrendering the cheque for selected  rows");
                         return searchForRTGSSurrender();
-
                     }
-                    else if(containsPEX)
-                    {
+                    else if(containsPEX){
                     	addActionError("please select the Reason for Surrendering the cheque for selected  rows");
                         return searchForPEXSurrender();
                     }
                     else
                         throw new ValidationException(Arrays.asList(new ValidationError("Exception while surrender Cheque ",
                                 "please select the Reason for Surrendering the cheque for selected  rows")));
+                
                 instrumentService.surrenderCheques(suurenderChequelist);
+               
                 if (button.equalsIgnoreCase("surrenderAndReassign") && containsRTGS == true)
                     throw new ValidationException(Arrays.asList(new ValidationError(
                             "Cannot reassign RTGS Numbers. Use RTGS Screen ",
                             "Cannot reassign RTGS Numbers. Use RTGS Screen")));
-                else if(button.equalsIgnoreCase("surrenderAndReassign") && containsPEX)
-                {
+                else if(button.equalsIgnoreCase("surrenderAndReassign") && containsPEX == true){
                 	throw new ValidationException(Arrays.asList(new ValidationError(
-                            "Cannot reassign RTGS Numbers. Use RTGS Screen ",
-                            "Cannot reassign RTGS Numbers. Use RTGS Screen")));
+                            "Cannot reassign PEX Numbers. Use PEX Screen ",
+                            "Cannot reassign PEX Numbers. Use PEX Screen")));
                 }
-               
                 else if (button.equalsIgnoreCase("surrenderAndReassign") && containsRTGS == false && containsPEX == false) {
-
                     for (int i = 0; i < surrender.length; i++)
                         if (surrender[i] != null)
                             if (!isChequeNoGenerationAuto()) {
@@ -2902,8 +2902,10 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         Bankaccount bnkAcc;
         Bankaccount selBnkAcc = new Bankaccount();
         pexChequeAssignmentList = paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader);
+        System.out.println("paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader)" +pexChequeAssignmentList.size());
         dbpPexAssignmentList = paymentService.getDirectBankPaymentVoucherForRTGSInstrument(parameters, voucherHeader);
-
+        System.out.println("paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader)" +dbpPexAssignmentList.size());
+        
         pexChequeAssignmentList.addAll(dbpPexAssignmentList);
         if (!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
             final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF,
@@ -2996,12 +2998,14 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             if (row.getKey() != null && getPexSeceltedAccMap().get(row.getKey()) != null && getPexSeceltedAccMap().get(row.getKey())) {
                 if (isPexNoGenerationAuto()) {
                     final String[] dateArray = new String[]{getPexdateMap().get(String.valueOf(Long.valueOf(row.getKey())))};
+                    System.out.println("dateArray:: " +dateArray.length + dateArray);
                     Date pexdate = null;
                     final Date autoNoCutOffDate = FinancialConstants.RTGS_FINYEAR_WISE_ROLLING_SEQ_CUTOFF_DATE;
                     String pexNo;
                     if (dateArray[0] != null) {
                         final String date = dateArray[0];
                         pexdate = formatter.parse(date);
+                        System.out.println("pexdate:: " +pexdate);
                     }
                     final String finYearRange = financialYearDAO.getFinancialYearByDate(pexdate).getFinYearRange();
 
@@ -3012,13 +3016,18 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                         pexNo = new StringBuilder().append(pexNo).append("/").append(finYearRange).toString();
                     } else
                         pexNo = pexNumberGenerator.getNextNumber("PEX_RefNumber");
+                    
+                    System.out.println("pexNo:: " +pexNo);
 
                     final String[] refNoArray = new String[]{pexNo};
                     parameters.put("pexRefNo", refNoArray);
+                    System.out.println("refNoArray1:: " +refNoArray);
                 } else {
                     final String[] refNoArray = new String[]{getPexRefNoMap().get(row.getKey())};
                     parameters.put("pexRefNo", refNoArray);
+                    System.out.println("refNoArray2:: " +refNoArray);
                 }
+                
                 final String[] dateArray = new String[]{getPexdateMap().get(row.getKey())};
                 parameters.put("pexDate", dateArray);
                 chequeAssignmentList = resultMap.get(row.getKey());

@@ -880,7 +880,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
         if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
             if (null == paymentheader || null == paymentheader.getId()
                     || paymentheader.getCurrentState().getValue().endsWith("NEW"))
-                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
             else if (paymentheader.getCurrentState() != null)
                 validActions = customizedWorkFlowService.getNextValidActions(paymentheader.getStateType(),
                         getWorkFlowDepartment(), getAmountRule(), getAdditionalRule(),

@@ -262,7 +262,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                                 + "\\n"
                                 + getText("pjv.voucher.approved",
                                         new String[] { this.getEmployeeName(voucherHeader.getState()
-                                                .getCreatedBy()) });
+                                                .getOwnerPosition()) });
                         target = "success";
                     }
 
@@ -278,7 +278,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                                 + "\\n"
                                 + getText("pjv.voucher.approved",
                                         new String[] { this.getEmployeeName(voucherHeader.getState()
-                                                .getCreatedBy()) });
+                                        		.getOwnerPosition()) });
 
                         target = "success";
 
@@ -328,7 +328,7 @@ public class JournalVoucherAction extends BaseVoucherAction
         {
             if (null == voucherHeader || null == voucherHeader.getId()
                     || voucherHeader.getCurrentState().getValue().endsWith("NEW")) {
-                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD, FinancialConstants.CREATEANDAPPROVE);
+                validActions = Arrays.asList(FinancialConstants.BUTTONFORWARD);
             } else {
                 if (voucherHeader.getCurrentState() != null) {
                     validActions = this.customizedWorkFlowService.getNextValidActions(voucherHeader

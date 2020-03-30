@@ -2383,9 +2383,10 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         totalPaidAmt, formatter.parse(parameters.get("rtgsDate")[0]), ""));
             else if(paymentMode.equals(FinancialConstants.MODEOFPAYMENT_PEX))
             {
-            	instrumentHeaderList.add(prepareInstrumentHeaderForPex(
+            	Map<String, Object> instrumentHeaderMap = prepareInstrumentHeaderForPex(
                         account, parameters.get("pexRefNo")[0], totalPaidAmt,
-                        formatter.parse(parameters.get("pexDate")[0]), ""));
+                        formatter.parse(parameters.get("pexDate")[0]), "");
+            	instrumentHeaderList.add(instrumentHeaderMap);
             }
             else if (isChequeNoGenerationAuto()) // if cheque number generation
                                                  // is auto
@@ -3108,7 +3109,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         Long.valueOf(key.split(DELIMETER)[2]));
         }
         if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed prepareInstrumentHeaderForRtgs.");
+            LOGGER.debug("Completed prepareInstrumentHeaderForPex.");
         return instrumentHeaderMap;
     }
 

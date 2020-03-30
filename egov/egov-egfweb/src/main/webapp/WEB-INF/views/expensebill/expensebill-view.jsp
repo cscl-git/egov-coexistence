@@ -119,8 +119,8 @@
                               data-tabidx=0><spring:message code="lbl.header" text="Header"/></a></li>
         <li><a data-toggle="tab" href="#checklist" data-tabidx=1><spring:message
                 code="lbl.checklist" text="CheckList"/> </a></li>
-                       <li><a data-toggle="tab" href="#supportingDocuments" data-tabidx=1><spring:message
-                code="lbl.sdocuments"/> </a></li>
+                      <!-- <li><a data-toggle="tab" href="#supportingDocuments" data-tabidx=1><spring:message
+                code="lbl.sdocuments"/> </a></li>-->
               
     </ul>
 
@@ -138,9 +138,9 @@
         <div class="tab-pane fade" id="checklist">
             <jsp:include page="expensebill-view-checklist.jsp"/>
         </div>
-         <div class="tab-pane fade" id="supportingDocuments">
+         <!-- <div class="tab-pane fade" id="supportingDocuments">
             <jsp:include page="expensebill-view-supporingDocs.jsp"/>
-        </div>
+        </div>-->
         <c:if test="${!workflowHistory.isEmpty() && mode != 'readOnly'}">
             <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
         </c:if>

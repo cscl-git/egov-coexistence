@@ -764,8 +764,9 @@ public class CreateVoucher {
 			// if u need workflow enable above lines and fix workflow
 		} catch (final ValidationException ve) {
 			LOGGER.error(ERR, ve);
+			ve.printStackTrace();
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
-			errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
 			throw new ValidationException(errors);
 		} catch (final Exception e) {
 			LOGGER.error(ERR, e);
@@ -1199,7 +1200,8 @@ public class CreateVoucher {
 
 		catch (final ValidationException ve) {
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
-			errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+			ve.printStackTrace();
 			throw new ValidationException(errors);
 		} catch (final Exception e) {
 			LOGGER.error(ERR, e);

@@ -273,8 +273,7 @@ public class FinancialUtils {
                 final HashMap<String, Object> workflowHistory = new HashMap<>(0);
                 workflowHistory.put("date", stateHistory.getDateInfo());
                 workflowHistory.put("comments", stateHistory.getComments());
-                workflowHistory.put("updatedBy", stateHistory.getLastModifiedBy() + "::"
-                        + stateHistory.getLastModifiedBy());
+                workflowHistory.put("updatedBy", this.microServiceUtil.getEmployeeByPositionId(stateHistory.getLastModifiedBy()));
                 workflowHistory.put("status", stateHistory.getValue());
                 final Long owner = stateHistory.getOwnerPosition();
                 final State _sowner = stateHistory.getState();
@@ -299,7 +298,7 @@ public class FinancialUtils {
             }
             map.put("date", state.getDateInfo());
             map.put("comments", state.getComments() != null ? state.getComments() : "");
-            map.put("updatedBy", state.getLastModifiedBy() + "::" + state.getLastModifiedBy());
+            map.put("updatedBy", this.microServiceUtil.getEmployeeByPositionId(state.getLastModifiedBy()));
             map.put("status", state.getValue());
             final Long ownerPosition = state.getOwnerPosition();
             // user = state.getOwnerUser();
