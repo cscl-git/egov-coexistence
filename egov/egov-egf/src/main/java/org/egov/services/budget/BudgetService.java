@@ -388,7 +388,21 @@ public class BudgetService extends PersistenceService<Budget, Long> {
     }
 
     public List<Budget> getBudgetsForUploadReport() {
-        return findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,  1 , 1) from BudgetDetail bd where bd.status.code = 'Created')");
+    	List<Budget> budgetList=new ArrayList<Budget>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'Created')");
+    	if(budgetList!= null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'Created')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'Created')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'Created')");
+    	}
+        return budgetList;
     }
 
     @Transactional
@@ -404,13 +418,41 @@ public class BudgetService extends PersistenceService<Budget, Long> {
     }
     
     public List<Budget> getBudgetsForUploadReportCAO() {
-        return findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,  1 , 1) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	List<Budget> budgetList=new ArrayList<>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'CAO Verify')");
+    	}
+        return budgetList;
     }
     
     
     
     public List<Budget> getBudgetsForUploadReportACMC() {
-        return findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,  1 , 1) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	List<Budget> budgetList=new ArrayList<Budget>();
+    	budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,1) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,2) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,3) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	}
+    	if(budgetList != null && budgetList.isEmpty())
+    	{
+    		budgetList=findAllBy("select distinct b from Budget b where b.name like '%RE%' and b.materializedPath  in (select distinct substring(bd.materializedPath,1,4) from BudgetDetail bd where bd.status.code = 'ACMC Verify')");
+    	}
+        return budgetList;
     }
     
     @Transactional

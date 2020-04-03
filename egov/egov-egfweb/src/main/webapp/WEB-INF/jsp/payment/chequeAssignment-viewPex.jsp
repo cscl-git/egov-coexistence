@@ -151,11 +151,11 @@
 	<script>   
 function generateReport(type,instrumentnumber,bankaccount,bankbranch,bank){
 	if(type=='pdf'){
-		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="+
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="+
 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	}
 	else if(type=='xls'){
-		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="+
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="+
 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	}
 	

@@ -3790,6 +3790,90 @@ public class CommonAction extends BaseFormAction {
         return "bank";
 
     }
+    
+    @SuppressWarnings("unchecked")
+    @Action(value = "/voucher/common-ajaxLoadBanksWithPayGenAndPEXNotAssigned")
+    public String ajaxLoadBanksWithPayGenAndPEXNotAssigned() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting ajaxLoadBanksWithPayGenAndRTGSNotAssigned...");
+        List<Object[]> bankBranch;
+        final StringBuffer bankQuery = new StringBuffer();
+        try {
+            bankQuery
+                    .append("SELECT DISTINCT CONCAT(CONCAT(bank.id,'-'),bankBranch.id) AS bankbranchid,CONCAT(CONCAT(bank.name,' '),"
+                            +
+                            " bankBranch.branchname) AS bankbranchname	FROM voucherheader vh,Bank bank,Bankbranch bankBranch,Bankaccount bankaccount,"
+                            +
+                            " paymentheader ph,egf_instrumentvoucher iv right outer join voucherheader vh1 ON  vh1.id =iv.VOUCHERHEADERID"
+                            +
+                            " WHERE ph.voucherheaderid=vh.id AND vh.status=0  AND bank.isactive=true  AND bankBranch.isactive=true AND bank.id = bankBranch.bankid"
+                            +
+                            " AND bankBranch.id = bankaccount.branchid  AND  bankaccount.TYPE IN ('RECEIPTS_PAYMENTS','PAYMENTS')"
+                            +
+                            " AND  vh1.id=vh.id AND iv.VOUCHERHEADERID IS NULL	 AND ph.type = '"
+                            + FinancialConstants.MODEOFPAYMENT_PEX
+                            + "' "
+                            +
+                            " AND vh.name = '"
+                            + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE
+                            + "' "
+                            +
+                            " UNION"
+                            +
+                            " SELECT DISTINCT CONCAT(CONCAT(bank.id,'-'),bankBranch.id) AS bankbranchid,CONCAT(CONCAT(bank.name,' '),"
+                            +
+                            " bankBranch.branchname) AS bankbranchname"
+                            +
+                            " FROM egf_instrumentvoucher iv,voucherheader vh,Bank bank,Bankbranch bankBranch,Bankaccount bankaccount,"
+                            +
+                            " vouchermis vmis,"
+                            +
+                            " paymentheader ph,egw_status egws,(SELECT ih1.id,ih1.id_status FROM egf_instrumentheader ih1,"
+                            +
+                            " (SELECT bankid,bankaccountid,instrumentnumber,MAX(lastmodifieddate) AS lastmodifieddate FROM egf_instrumentheader GROUP BY bankid,bankaccountid,"
+                            +
+                            " instrumentnumber) max_rec WHERE max_rec.bankid=ih1.bankid AND max_rec.bankaccountid=ih1.bankaccountid AND max_rec.instrumentnumber=ih1.instrumentnumber"
+                            +
+                            " AND max_rec.lastmodifieddate=ih1.lastmodifieddate) ih WHERE ph.voucherheaderid=vh.id AND vh.id= vmis.voucherheaderid"
+                            +
+                            " AND vh.status=0  AND ph.voucherheaderid=vh.id 	AND bank.isactive=true "
+                            +
+                            " AND bankBranch.isactive=true AND bank.id = bankBranch.bankid AND bankBranch.id = bankaccount.branchid "
+                            +
+                            " AND bankaccount.TYPE IN ('RECEIPTS_PAYMENTS','PAYMENTS') AND  iv.voucherheaderid=vh.id AND iv.instrumentheaderid=ih.id "
+                            +
+                            " AND ih.id_status=egws.id AND egws.description IN  ('Surrendered','Surrender_For_Reassign')" +
+                            " AND  ph.type = '" + FinancialConstants.MODEOFPAYMENT_PEX + "' " +
+                            " AND vh.name = '" + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE + "' " +
+                            "  order by 2 ");
+
+            bankBranch = persistenceService.getSession().createSQLQuery(bankQuery.toString()).list();
+
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Bank list size is " + bankBranch.size());
+            bankBranchList = new ArrayList<Map<String, Object>>();
+            Map<String, Object> bankBrmap;
+            for (final Object[] element : bankBranch) {
+                bankBrmap = new HashMap<String, Object>();
+                bankBrmap.put("bankBranchId", element[0].toString());
+                bankBrmap.put("bankBranchName", element[1].toString());
+                bankBranchList.add(bankBrmap);
+            }
+
+        } catch (final HibernateException e) {
+            LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+                    new HibernateException(e.getMessage()));
+
+        } catch (final Exception e) {
+            LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+                    new Exception(e.getMessage()));
+        }
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed ajaxLoadBanksWithPayGenAndRTGSNotAssigned.");
+        return "bank";
+
+    }
 
     @SuppressWarnings("unchecked")
     @Action(value = "/voucher/common-ajaxLoadBankAccountsWithPayGenAndRTGSNotAssigned")
@@ -3867,6 +3951,123 @@ public class CommonAction extends BaseFormAction {
                             +
                             " AND ph.type = '"
                             + FinancialConstants.MODEOFPAYMENT_RTGS
+                            + "' "
+                            +
+                            " and ih.id_status=egws.id and egws.description in ('Surrendered','Surrender_For_Reassign') )"
+                            +
+                            " and coa.id=bankaccount.glcodeid and bankaccount.type in ('RECEIPTS_PAYMENTS','PAYMENTS')  and bankaccount.branchid="
+                            + branchId);
+
+            queryString = queryString.append(bankaccountFundQuery);
+
+            final List<Object[]> bankAccounts = persistenceService.getSession().createSQLQuery(queryString.toString()).list();
+
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Bank accont list size is " + bankAccounts.size() + "and Query is " + queryString.toString());
+            final List<String> addedBanks = new ArrayList<String>();
+            for (final Object[] account : bankAccounts) {
+                final String accountNumberAndType = account[0].toString() + "-" + account[1].toString();
+                if (!addedBanks.contains(accountNumberAndType)) {
+                    final Bankaccount bankaccount = new Bankaccount();
+                    bankaccount.setAccountnumber(account[0].toString());
+                    bankaccount.setAccounttype(account[1].toString());
+                    final CChartOfAccounts chartofaccounts = new CChartOfAccounts();
+                    chartofaccounts.setGlcode(account[3].toString());
+                    bankaccount.setChartofaccounts(chartofaccounts);
+                    bankaccount.setId(Long.valueOf(account[2].toString()));
+                    addedBanks.add(accountNumberAndType);
+                    accNumList.add(bankaccount);
+                }
+            }
+        } catch (final HibernateException e) {
+            LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+                    new HibernateException(e.getMessage()));
+        } catch (final Exception e) {
+            LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+                    new Exception(e.getMessage()));
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed ajaxLoadBankAccountsWithPayGenAndRTGSNotAssigned.");
+        return "bankAccNum";
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    @Action(value = "/voucher/common-ajaxLoadBankAccountsWithPayGenAndPEXNotAssigned")
+    public String ajaxLoadBankAccountsWithPayGenAndPEXNotAssigned() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting ajaxLoadBankAccountsWithPayGenAndRTGSNotAssigned...");
+        try {
+            accNumList = new ArrayList<Bankaccount>();
+            String bankaccountFundQuery = "";
+            String voucherheaderFundQuery = "";
+            if (fundId != null && fundId != 0 && fundId != -1) {
+                bankaccountFundQuery = " and bankaccount.fundid=" + fundId.longValue();
+                voucherheaderFundQuery = "  AND VH.FUNDID=" + fundId;
+            }
+            StringBuffer queryString = new StringBuffer();
+            // query to fetch vouchers for which RTGS not assigned
+            queryString = queryString
+                    .append("SELECT  bankaccount.accountnumber AS accountnumber,  bankaccount.accounttype AS accounttype,"
+                            +
+                            " CAST(bankaccount.id AS INTEGER) AS id, coa.glcode AS glCode  FROM chartofaccounts coa, bankaccount bankaccount"
+                            +
+                            " WHERE bankaccount.ID IN (SELECT DISTINCT PH.bankaccountnumberid  "
+                            +
+                            " FROM   paymentheader ph,  voucherheader vh left OUTER JOIN egf_instrumentvoucher iv ON vh.id =iv.VOUCHERHEADERID"
+                            +
+                            " WHERE ph.voucherheaderid  =vh.id AND vh.status=0 "
+                            + voucherheaderFundQuery
+                            + " AND ph.voucherheaderid    =vh.id"
+                            +
+                            " AND iv.VOUCHERHEADERID   IS NULL "
+                            +
+                            " AND vh.name = '"
+                            + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE
+                            + "' "
+                            +
+                            " AND ph.type = '"
+                            + FinancialConstants.MODEOFPAYMENT_PEX
+                            + "' "
+                            +
+                            " AND coa.id                =bankaccount.glcodeid AND bankaccount.type     IN ('RECEIPTS_PAYMENTS','PAYMENTS'))"
+                            +
+                            bankaccountFundQuery +
+                            " AND bankaccount.branchid  =" + branchId + " and bankaccount.isactive=true ");
+            // query to fetch vouchers for which cheque has been assigned and surrendered
+            queryString
+                    .append(" union select bankaccount.accountnumber as accountnumber,bankaccount.accounttype as accounttype,cast(bankaccount.id as integer) as id,coa.glcode as glCode "
+                            +
+                            " from chartofaccounts coa, "
+                            +
+                            " Bankaccount bankaccount"
+                            +
+                            " where bankaccount.id in(SELECT DISTINCT PH.bankaccountnumberid  from  "
+                            +
+                            " egf_instrumentvoucher iv,voucherheader vh,"
+                            +
+                            " paymentheader ph,egw_status egws,(select ih1.id,ih1.id_status from egf_instrumentheader ih1, "
+                            +
+                            " (select bankid,bankaccountid,instrumentnumber,max(id) as id from egf_instrumentheader group by bankid,bankaccountid,"
+                            +
+                            " instrumentnumber) max_rec where max_rec.bankid=ih1.bankid and max_rec.bankaccountid=ih1.bankaccountid and max_rec.instrumentnumber=ih1.instrumentnumber "
+                            +
+                            " and max_rec.id=ih1.id) ih where ph.voucherheaderid=vh.id   "
+                            +
+                            voucherheaderFundQuery
+                            +
+                            " and vh.status=0 and  ph.voucherheaderid=vh.id and  iv.voucherheaderid=vh.id and iv.instrumentheaderid=ih.id "
+                            +
+                            " and ph.bankaccountnumberid=bankaccount.id  and vh.type='"
+                            + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT
+                            + "'"
+                            +
+                            " AND vh.name = '"
+                            + FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE
+                            + "' "
+                            +
+                            " AND ph.type = '"
+                            + FinancialConstants.MODEOFPAYMENT_PEX
                             + "' "
                             +
                             " and ih.id_status=egws.id and egws.description in ('Surrendered','Surrender_For_Reassign') )"

@@ -1566,7 +1566,7 @@ label.error {
 .page-container .main-content td.greybox select,
 .page-container .main-content td.bluebox input[type="text"],
 .page-container .main-content td.bluebox select {
-  width: auto;
+  width: 250px;
   height: 30px;
   padding: 5px 10px;
   font-size: 12px;

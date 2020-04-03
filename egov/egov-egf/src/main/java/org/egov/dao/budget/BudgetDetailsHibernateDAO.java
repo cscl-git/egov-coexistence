@@ -1932,28 +1932,27 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                     "coa_majorcode_length");
             if (appList.isEmpty())
                 throw new ValidationException(EMPTY_STRING, "coa_majorcode_length is not defined");
-            final int majorcodelength = Integer.valueOf(appList.get(0).getValue());
+            final int majorcodelength = Integer.valueOf(appList.get(0).getValue());//3
 
             appList = appConfigValuesService.getConfigValuesByModuleAndKey(EGF, "coa_minorcode_length");
             if (appList.isEmpty())
                 throw new ValidationException(EMPTY_STRING, "coa_minorcode_length is not defined");
-            final int minorcodelength = Integer.valueOf(appList.get(0).getValue());
+            final int minorcodelength = Integer.valueOf(appList.get(0).getValue());//5
 
             // check the budget group is defined at detailcode level or
             // detailcode within the range
             String query = " from BudgetGroup bg where bg.minCode.glcode<='" + coa.getGlcode()
                     + "' and bg.maxCode.glcode>='" + coa.getGlcode()
                     + "'  and bg in (select budgetGroup from BudgetDetail) and bg.isActive=true";
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("getBudgetHeadByGlcode detailcode query=====" + query);
+                LOGGER.info("getBudgetHeadByGlcode detailcode query=====" + query);
             List bgList = persistenceService.findAllBy(query);
             if (bgList.isEmpty()) {
                 query = " from BudgetGroup bg where bg.minCode.glcode<='"
                         + coa.getGlcode().substring(0, minorcodelength) + "' and bg.maxCode.glcode>='"
                         + coa.getGlcode().substring(0, minorcodelength)
                         + "' and bg in (select budgetGroup from BudgetDetail) and bg.isActive=true";
-                if (LOGGER.isDebugEnabled())
-                    LOGGER.debug("getBudgetHeadByGlcode minorcode query=====" + query);
+                
+                    LOGGER.info("getBudgetHeadByGlcode minorcode query=====" + query);
                 // persistenceService.setType(BudgetGroup.class);
                 bgList = persistenceService.findAllBy(query);
                 if (bgList.isEmpty()) {
@@ -1961,6 +1960,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                             + coa.getGlcode().substring(0, majorcodelength)
                             + "' and bg in (select budgetGroup from BudgetDetail) and bg.isActive=true ";
                     // persistenceService.setType(BudgetGroup.class);
+                    LOGGER.info(" query=====" + query);
                     bgList = persistenceService.findAllBy(query);
                     if (bgList.isEmpty())
                         throw new ValidationException(EMPTY_STRING,
@@ -1972,10 +1972,12 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             } else
                 return bgList;
         } catch (final ValidationException v) {
+        	v.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", v.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             LOGGER.error("Exception in getBudgetHeadByGlcode API=" + e.getMessage());
             throw new ValidationException(EMPTY_STRING, e.getMessage());
         }

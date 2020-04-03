@@ -51,44 +51,46 @@
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <html>
 <head>
-<link rel="stylesheet" type="text/css"
-	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
-<title>RTGS Ref. No Assignment Search</title>
+<link rel="stylesheet" type="text/css" href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+<title><s:text
+		name="rtgs.assignment.remittance.pay.search.heading" /></title>
 </head>
 <body onload="onload()">
-	<s:form action="chequeAssignment" theme="simple" id="chequeAssignment"
-		name="chequeAssignment">
+	<s:form action="chequeAssignment" theme="simple">
 		<jsp:include page="../budget/budgetHeader.jsp">
-			<jsp:param name="heading" value="RTGS Ref. No. Assignment Search" />
+			<jsp:param name="heading"
+				value="PEX Ref.No Assignment Search for Auto Remittance Payment" />
 		</jsp:include>
 		<span id="errorSpan"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="chq.rtgs.assignment.search.heading" />
+				<s:text name="chq.pex.assignment.search.heading" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
 					<td class="bluebox" width="30%"><s:text
 							name="chq.assignment.paymentvoucherdatefrom" /></td>
-					<td class="bluebox"><s:textfield id="fromDate" name="fromDate"
-							value="%{fromDate}" data-date-end-date="0d"
-							onkeyup="DateFormat(this,this.value,event,false,'3')"
-							placeholder="DD/MM/YYYY" class="form-control datepicker"
-							data-inputmask="'mask': 'd/m/y'" /></td>
+					<td class="bluebox"><s:textfield name="fromDate" id="fromDate"
+							maxlength="20" value="%{fromDate}"
+							onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
+						href="javascript:show_calendar('forms[0].fromDate');"
+						style="text-decoration: none">&nbsp;<img
+							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a><br />(dd/mm/yyyy)</td>
 					<td class="bluebox" width="30%"><s:text
 							name="chq.assignment.paymentvoucherdateto" /></td>
-					<td class="bluebox"><s:textfield id="toDate" name="toDate"
-							value="%{toDate}" data-date-end-date="0d"
-							onkeyup="DateFormat(this,this.value,event,false,'3')"
-							placeholder="DD/MM/YYYY" class="form-control datepicker"
-							data-inputmask="'mask': 'd/m/y'" /></td>
+					<td class="bluebox"><s:textfield name="toDate" id="toDate"
+							maxlength="20" value="%{toDate}"
+							onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
+						href="javascript:show_calendar('forms[0].toDate');"
+						style="text-decoration: none">&nbsp;<img
+							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
 				</tr>
 				<tr>
 					<td class="greybox"><s:text name="payment.mode" /><span
 						class="mandatory"></span></td>
 					<td class="greybox"><s:radio id="paymentMode"
-							name="paymentMode" list="#{'rtgs':'RTGS'}"
+							name="paymentMode" list="#{'pex':'PEX'}"
 							onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>
 					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
@@ -111,16 +113,16 @@
 
 					<td class="greybox" id="deptLabel"><s:text
 							name="voucher.department" /></td>
-					<td class="greybox"><s:select name="vouchermis.departmentcode"
-							id="vouchermis.departmentcode" list="dropdownData.departmentList"
-							listKey="code" listValue="name" headerKey="-1"
+					<td class="greybox"><s:select name="vouchermis.departmentid"
+							id="vouchermis.departmentid" list="dropdownData.departmentList"
+							listKey="id" listValue="name" headerKey="-1"
 							headerValue="%{getText('lbl.choose.options')}"
-							value="voucherHeader.vouchermis.departmentcode" /></td>
+							value="voucherHeader.vouchermis.departmentid.id" /></td>
 				</tr>
 				<tr>
 					<egov:ajaxdropdown id="bank_branch" fields="['Text','Value']"
 						dropdownId="bank_branch"
-						url="voucher/common-ajaxLoadAllBanks.action" />
+						url="voucher/common-ajaxLoadBanksWithPayGenAndPEXNotAssigned.action" />
 					<td class="greybox"><s:text name="chq.assignment.bank" /></td>
 					<td class="greybox"><s:select name="bank_branch"
 							id="bank_branch" list="bankBranchMap" headerKey="-1"
@@ -128,7 +130,7 @@
 							value="%{bank_branch}" /></td>
 					<egov:ajaxdropdown id="bankaccount" fields="['Text','Value']"
 						dropdownId="bankaccount"
-						url="voucher/common-ajaxLoadBankAccountsWithApprovedPayments.action" />
+						url="voucher/common-ajaxLoadBankAccountsWithPayGenAndPEXNotAssigned.action" />
 					<td class="greybox"><s:text name="chq.assignment.bankaccount" /></td>
 					<td class="greybox" colspan="2"><s:select name="bankaccount"
 							id="bankaccount" list="dropdownData.bankaccountList" listKey="id"
@@ -136,66 +138,87 @@
 							headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 							value="%{bankaccount}" /></td>
 				</tr>
+				<tr>
+					<td class="bluebox"><s:text
+							name="rtgs.assignment.remittance.pay.do" /></td>
+					<td class="bluebox"><s:select id="drawingOfficerId"
+							name="drawingOfficerId" cssClass="selectwk"
+							list="dropdownData.drawingofficerList" listKey="id"
+							listValue="name" headerValue="Choose" headerKey="0"
+							value="%{drawingOfficer.id}" /></td>
+					<td class="bluebox"><s:text
+							name="rtgs.assignment.remittance.pay.coa" /></td>
+					<td class="bluebox"><s:select name="recoveryId"
+							id="recoveryId" list="dropdownData.recoveryList" listKey="id"
+							listValue="type" headerKey="" headerValue="%{getText('lbl.choose.options')}"
+							onchange="setRecoveryCode();" /></td>
 
+					</td>
+				</tr>
 
-				<!-- <tr> 	<td class="bluebox">
-				<s:text name="chq.assignment.re-assignsurrendercheque"/>
-				</td class="bluebox">
-				<td class="bluebox">
-				<s:checkbox id="reassignSurrenderChq" name="reassignSurrenderChq" />
-				</td class="bluebox">
-				</tr> -->
 			</table>
 			<div class="buttonbottom">
-				<s:submit method="searchRTGS" key="lbl.search" id="searchBtn"
-					cssClass="buttonsubmit" onclick="submitForm();" />
+				<s:submit method="searchRemittancePEX" key="lbl.search"
+					id="searchBtn" cssClass="buttonsubmit"  onclick="submitForm();"/>
 				<input type="button" value='<s:text name="lbl.close"/>'
-					onclick="javascript:window.close();window.parent.postMessage('close','*');" class="button" />
+					onclick="javascript:window.close()" class="button" />
 			</div>
 		</div>
+		<table align="center" width="100%" cellpadding="0" cellspacing="0">
+			</tr>
+			<td style="text-align: left" class="bluebox"><font color="red">*<s:text name="msg.please.select.service.tax.coa.in.search.criteria"/> </font></td>
+			<tr>
+		</table>
 		<s:hidden name="bankbranch" id="bankbranch" />
-		<s:hidden name="rtgsContractorAssignment"
-			id="rtgsContractorAssignment" />
-		<s:hidden name="billSubType" id="billSubType" value="%{billSubType}" />
-		<s:hidden name="region" id="region" value="%{region}" />
+		
+		<s:hidden name="serviceTexCOA" id="serviceTexCOA" />
+		<s:hidden name="recoveryCode" id="recoveryCode" />
 	</s:form>
 	<script>
-		var date = '<s:date name="currentDate" format="dd/MM/yyyy"/>';
-		function onload() {
-			populatebank_branch();
-		}
+				var date='<s:date name="currentDate" format="dd/MM/yyyy"/>';
+				function onload()
+				{
+					populatebank_branch(); 
+				}
+							
+				function loadBank(obj)
+				{
+					var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+					
+					if(obj.options[obj.selectedIndex].value!=-1){
+						populatebank_branch({fundId:obj.options[obj.selectedIndex].value+'&asOnDate='+date});              
+					}else{
+						populatebank_branch();                         
+					}
+				}
+				function loadBankAccount(obj)
+				{
+					var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
+					var fund = document.getElementById('fundId');
+					if(obj.options[obj.selectedIndex].value!=-1)
+					{
+						var x=	obj.options[obj.selectedIndex].value.split("-");
+						//bootbox.alert("heelo"+x);                            
+						document.getElementById("bankbranch").value=x[1];
+						populatebankaccount({branchId:x[1]+'&asOnDate='+date,fundId:fund.options[fund.selectedIndex].value});
+					}
+					
+				}
+				function setRecoveryCode()
+				{
 
-		function loadBank(obj) {
-			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
-
-			if (obj.options[obj.selectedIndex].value != -1) {
-				populatebank_branch({
-					fundId : obj.options[obj.selectedIndex].value
-							+ '&asOnDate=' + date
-				});
-			} else {
-				populatebank_branch();
-			}
-		}
-		function loadBankAccount(obj) {
-			var vTypeOfAccount = '<s:property value="%{typeOfAccount}"/>';
-			var fund = document.getElementById('fundId');
-			if (obj.options[obj.selectedIndex].value != -1) {
-				var x = obj.options[obj.selectedIndex].value.split("-");
-				//bootbox.alert("heelo"+x);                            
-				document.getElementById("bankbranch").value = x[1];
-				populatebankaccount({
-					branchId : x[1] + '&asOnDate=' + date,
-					fundId : fund.options[fund.selectedIndex].value
-				});
-			}
-
-		}
-		function submitForm() {
-			document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-searchRTGS.action';
-			document.chequeAssignment.submit();
-		}
-	</script>
+					//bootbox.alert(jQuery('#recoveryId option:selected').text());
+				if(jQuery('#recoveryId option:selected').text()=="350200301" || jQuery('#recoveryId option:selected').text()=="350200302")
+					{
+					document.getElementById("recoveryCode").value=jQuery('#recoveryId option:selected').text();
+					}
+				}
+				
+				function submitForm() {
+					document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-searchRemittancePEX.action';
+					document.chequeAssignment.submit();
+				}
+			</script>
 	
 </body>
 </html>
