@@ -109,6 +109,7 @@
 		</div>
 				
 		<label class="col-sm-2 control-label text-right"><spring:message code="lbl.narration" text="Narration"/>
+		<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:textarea path="egBillregistermis.narration" id="narration" class="form-control" maxlength="1024" ></form:textarea>
