@@ -553,6 +553,7 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
         reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
         reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "RTGS");
         final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
         reportParams.put("totalAmount", totalAmount);
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
@@ -582,6 +583,7 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("letterContext", letterContext.toString());
         reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
         reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "PEX");
         reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
         final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
         reportParams.put("totalAmount", totalAmount);

@@ -252,6 +252,42 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		paramMap.put("rtgsReportList", rtgsReportList);
 		return paramMap;
 	}
+	
+	protected Map<String, Object> getParamMapPex() {
+
+		String fundAndBankHeading = "";
+		String dateRange = "";
+		final DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+		final Date date = new Date();
+		String newFromDate = "";
+		String newToDate = "";
+		String reportRundate = "";
+		fundAndBankHeading = "PEX Register for " + persistenceService
+				.find("select name from Fund where id = ?", Integer.parseInt(parameters.get("fundId")[0])).toString();
+
+		if (null != parameters.get("rtgsAssignedFromDate")[0]
+				&& !parameters.get("rtgsAssignedFromDate")[0].isEmpty())
+			dateRange = "from " + parameters.get("rtgsAssignedFromDate")[0];
+		else {
+			newFromDate = dateFormat.format(fromDate);
+			dateRange = "from " + newFromDate;
+		}
+		if (null != parameters.get("rtgsAssignedToDate")[0]
+				&& !parameters.get("rtgsAssignedToDate")[0].isEmpty())
+			dateRange = dateRange + " to " + parameters.get("rtgsAssignedToDate")[0];
+		else {
+			newToDate = dateFormat.format(toDate);
+			dateRange = dateRange + " to " + newToDate;
+		}
+		reportRundate = dateFormat.format(date);
+		paramMap.put("fundAndBankHeading", fundAndBankHeading);
+		paramMap.put("dateRange", dateRange);
+		paramMap.put("reportRundate", reportRundate);
+		paramMap.put("ulbName", getUlbName());
+		paramMap.put("rtgsDetailsList", rtgsDisplayList);
+		paramMap.put("rtgsReportList", rtgsReportList);
+		return paramMap;
+	}
 
 	public void finYearDate() {
 		if (LOGGER.isDebugEnabled())
@@ -302,21 +338,23 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		searchResult = Boolean.TRUE;
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug(" Seraching PEX result for given criteria ");
-
+		System.out.println("SEARCH PEX 1");
 		final Query query = persistenceService.getSession().createSQLQuery(getQueryStringPex().toString())
 				.addScalar("ihId", BigDecimalType.INSTANCE).addScalar("rtgsNumber").addScalar("rtgsDate")
 				.addScalar("vhId", BigDecimalType.INSTANCE).addScalar("paymentNumber").addScalar("paymentDate")
 				.addScalar("paymentAmount").addScalar("department").addScalar("status").addScalar("bank")
 				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE)
 				.addScalar("dkId", BigDecimalType.INSTANCE).addScalar("accountNumber");
+		System.out.println("SEARCH PEX 2");
 		if (null == parameters.get("rtgsAssignedFromDate")[0]
 				|| parameters.get("rtgsAssignedFromDate")[0].isEmpty())
 			query.setDate("finStartDate", new java.sql.Date(fromDate.getTime()));
 		if (LOGGER.isInfoEnabled())
 			LOGGER.info("Search Query ------------>" + query);
-
+		System.out.println("Query Search : "+query);
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
+		System.out.println("List size : "+rtgsDisplayList.size());
 		populateSubLedgerDetails();
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
@@ -457,7 +495,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 							+ " AND vh.type = 'Payment' and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id,ih.transactionnumber,"
 							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");
 		} catch (ParseException e) {
-
+			e.printStackTrace();
 		}
 		return queryString;
 	}
@@ -627,7 +665,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		this.searchResult = searchResult;
 	}
 	
-	@ValidationErrorPage("search")
+	@ValidationErrorPage("searchPex")
     @Action(value = "/report/pexIssueRegisterReport-newForm")
     public String newFormPex() {
         if (LOGGER.isInfoEnabled()) {
@@ -640,39 +678,48 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
     @SkipValidation
     @Action(value = "/report/pexIssueRegisterReport-exportPdf")
     public String exportPdfPex() throws JRException, IOException {
+    	System.out.println("PDF 1");
     	searchPex();
+    	System.out.println("PDF 2");
         if (rtgsDisplayList.size() > 0) {
-            inputStream = reportHelper.exportPdf(inputStream, jasperpath, getParamMap(), rtgsReportList);
+            inputStream = reportHelper.exportPdf(inputStream, jasperpath, getParamMapPex(), rtgsReportList);
             return "PDF_PEX";
         }
         prepare();
-        return newForm();
+        System.out.println("PDF 3");
+        return newFormPex();
     }
 
     @SkipValidation
     @Action(value = "/report/pexIssueRegisterReport-exportHtml")
     public String exportHtmlPex() {
+    	System.out.println("HTML 1");
         searchPex();
+        System.out.println("HTML 2");
         if (rtgsDisplayList.size() > 0) {
-            inputStream = reportHelper.exportHtml(inputStream, jasperpath, getParamMap(), rtgsReportList,
+            inputStream = reportHelper.exportHtml(inputStream, jasperpath, getParamMapPex(), rtgsReportList,
                     JRHtmlExporterParameter.SIZE_UNIT_POINT);
             return "HTML_PEX";
         }
         addActionMessage("No data found ");
         prepare();
-        return "search";
+        System.out.println("HTML 3");
+        return "searchPex";
     }
 
     @SkipValidation
     @Action(value = "/report/pexIssueRegisterReport-exportXls")
     public String exportXlsPex() throws JRException, IOException {
+    	System.out.println("XLS 1");
     	searchPex();
+    	System.out.println("XLS 2");
         if (rtgsDisplayList.size() > 0) {
-            inputStream = reportHelper.exportXls(inputStream, jasperpath, getParamMap(), rtgsReportList);
+            inputStream = reportHelper.exportXls(inputStream, jasperpath, getParamMapPex(), rtgsReportList);
             return "XLS_PEX";
         }
         prepare();
-        return newForm();
+        System.out.println("XLS 3");
+        return newFormPex();
 
     }
 
