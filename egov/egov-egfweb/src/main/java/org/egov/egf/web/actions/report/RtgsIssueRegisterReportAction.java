@@ -441,6 +441,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	}
     
     private StringBuffer getQueryStringPex() {
+    	System.out.println("QUERY 1");
 		StringBuffer queryString = new StringBuffer();
 		String deptQry = "";
 		String fundQry = "";
@@ -450,35 +451,35 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		final DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		StringBuffer instrumentHeaderQry = new StringBuffer("");
 		try {
-			if (null != parameters.get("departmentcode")[0]
+			if (null != parameters.get("departmentcode") && null != parameters.get("departmentcode")[0]
 					&& !parameters.get("departmentcode")[0].equalsIgnoreCase("-1"))
 				deptQry = " AND vmis.departmentcode ='" + parameters.get("departmentcode")[0] + "'";
-			if (null != parameters.get("rtgsAssignedFromDate")[0]
+			if (null != parameters.get("rtgsAssignedFromDate") && null != parameters.get("rtgsAssignedFromDate")[0]
 					&& !parameters.get("rtgsAssignedFromDate")[0].isEmpty())
 
 				instrumentHeaderQry = instrumentHeaderQry.append(" and ih.transactiondate >='"
 						+ dateFormat.format(formatter.parse(parameters.get("rtgsAssignedFromDate")[0])) + "'");
 			else
 				instrumentHeaderQry = instrumentHeaderQry.append(" and ih.transactiondate >=:finStartDate");
-			if (null != parameters.get("rtgsAssignedToDate")[0] && !parameters.get("rtgsAssignedToDate")[0].isEmpty())
+			if (null != parameters.get("rtgsAssignedToDate") && null != parameters.get("rtgsAssignedToDate")[0] && !parameters.get("rtgsAssignedToDate")[0].isEmpty())
 				instrumentHeaderQry = instrumentHeaderQry.append(" and ih.transactiondate  <='"
 						+ dateFormat.format(formatter.parse(parameters.get("rtgsAssignedToDate")[0])) + "'");
-			if (null != parameters.get("bank")[0] && !parameters.get("bank")[0].equals("-1")
+			if (null != parameters.get("bank") && null != parameters.get("bank")[0] && !parameters.get("bank")[0].equals("-1")
 					&& !parameters.get("bank")[0].isEmpty())
 				bankQry = bankQry.append(" AND b.id = " + parameters.get("bank")[0]);
-			if (null != parameters.get("bankbranch.id")[0] && !parameters.get("bankbranch.id")[0].equals("-1")
+			if (null != parameters.get("bankbranch.id") && null != parameters.get("bankbranch.id")[0] && !parameters.get("bankbranch.id")[0].equals("-1")
 					&& !parameters.get("bankbranch.id")[0].isEmpty())
 				bankQry = bankQry.append(" AND branch.id=" + parameters.get("bankbranch.id")[0]);
-			if (null != parameters.get("bankaccount.id")[0] && !parameters.get("bankaccount.id")[0].equals("-1")
+			if (null != parameters.get("bankaccount.id") && null != parameters.get("bankaccount.id")[0] && !parameters.get("bankaccount.id")[0].equals("-1")
 					&& !parameters.get("bankaccount.id")[0].isEmpty()) {
 				phQry = " AND ph.bankaccountnumberid=" + parameters.get("bankaccount.id")[0];
 				instrumentHeaderQry = instrumentHeaderQry
 						.append(" and ih.bankaccountid =" + parameters.get("bankaccount.id")[0]);
 			}
-			if (null != parameters.get("instrumentnumber")[0] && !parameters.get("instrumentnumber")[0].isEmpty())
+			if (null != parameters.get("instrumentnumber") && null != parameters.get("instrumentnumber")[0] && !parameters.get("instrumentnumber")[0].isEmpty())
 				instrumentHeaderQry = instrumentHeaderQry
 						.append(" and   ih.transactionnumber ='" + parameters.get("instrumentnumber")[0] + "'");
-			if (null != parameters.get("fundId")[0] && !parameters.get("fundId")[0].isEmpty())
+			if (null != parameters.get("fundId") && null != parameters.get("fundId")[0] && !parameters.get("fundId")[0].isEmpty())
 				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
 
 			queryString = queryString
@@ -496,7 +497,10 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");
 		} catch (ParseException e) {
 			e.printStackTrace();
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
+		
 		return queryString;
 	}
 
