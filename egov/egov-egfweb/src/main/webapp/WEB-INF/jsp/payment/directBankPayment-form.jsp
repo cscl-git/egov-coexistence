@@ -82,8 +82,8 @@
 			listValue="accountnumber+'-'+accounttype" headerKey=""
 			headerValue="%{getText('lbl.choose.options')}"
 			onChange="populateNarration(this);populateAvailableBalance(this);" />
-		<s:textfield name="accnumnar" id="accnumnar"
-			value="%{commonBean.accnumnar}" readonly="true" tabindex="-1" /></td>
+		<!--<s:textfield name="accnumnar" id="accnumnar"
+			value="%{commonBean.accnumnar}" readonly="true" tabindex="-1" /></td>-->
 	<egov:updatevalues id="availableBalance" fields="['Text']"
 		url="/payment/payment-ajaxGetAccountBalance.action" />
 	<td class="bluebox" id="balanceText"><s:text

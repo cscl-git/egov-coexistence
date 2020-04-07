@@ -128,6 +128,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	private InputStream inputStream;
 	private ReportHelper reportHelper;
 	String jasperpath = "/reports/templates/rtgsIssueRegisterReportAction.jasper";
+	String jasperpathPEX = "/reports/templates/rtgsIssueRegisterReportActionPEX.jasper";
 	private StringBuffer header = new StringBuffer();
 	List<BankAdviceReportInfo> rtgsDisplayList = new ArrayList<BankAdviceReportInfo>();
 	List<Object> rtgsReportList = new ArrayList<Object>();
@@ -686,7 +687,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
     	searchPex();
     	System.out.println("PDF 2");
         if (rtgsDisplayList.size() > 0) {
-            inputStream = reportHelper.exportPdf(inputStream, jasperpath, getParamMapPex(), rtgsReportList);
+            inputStream = reportHelper.exportPdf(inputStream, jasperpathPEX, getParamMapPex(), rtgsReportList);
             return "PDF_PEX";
         }
         prepare();
@@ -701,7 +702,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
         searchPex();
         System.out.println("HTML 2");
         if (rtgsDisplayList.size() > 0) {
-            inputStream = reportHelper.exportHtml(inputStream, jasperpath, getParamMapPex(), rtgsReportList,
+            inputStream = reportHelper.exportHtml(inputStream, jasperpathPEX, getParamMapPex(), rtgsReportList,
                     JRHtmlExporterParameter.SIZE_UNIT_POINT);
             return "HTML_PEX";
         }

@@ -258,6 +258,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     }
 
     @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.accountNumberId", message = "", key = REQUIRED),
@@ -509,10 +510,10 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                         throw new ValidationException(errors);
                     }
                 }
-            else
-                throw new ValidationException(
+            ///else
+                /*throw new ValidationException(
                         Arrays.asList(new ValidationError("no.subledger.cannot.create.rtgs.payment",
-                                "There is no subledger selected cannot create RTGS Payment")));
+                                "There is no subledger selected cannot create RTGS Payment")));*/
         }
 
     }
