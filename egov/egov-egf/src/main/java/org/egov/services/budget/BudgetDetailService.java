@@ -2449,6 +2449,18 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
                 .executeUpdate();
     }
+    
+    public List<BudgetDetail> getBudgetDetailsForReAppCao() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP CAO'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForReAppAcmc() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP ACMC'");
+    }
+    
+    public List<BudgetDetail> getBudgetDetailsForReAppMc() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP MC'");
+    }
 
 
 }

@@ -258,6 +258,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     }
 
     @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.accountNumberId", message = "", key = REQUIRED),
@@ -321,8 +322,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                                 + paymentheader.getVoucherheader().getVoucherNumber() + " and "
                                 + getText("budget.recheck.sucessful", new String[] {
                                         paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() }));
-                    addActionMessage(getText("payment.voucher.approved", new String[] { paymentService
-                            .getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+                    addActionMessage(getText("payment.voucher.approved", new String[] {  this.getEmployeeName(paymentheader.getState()
+                            .getOwnerPosition())  }));
                 }
             } else
                 throw new ValidationException(
@@ -509,10 +510,10 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                         throw new ValidationException(errors);
                     }
                 }
-            else
-                throw new ValidationException(
+            ///else
+                /*throw new ValidationException(
                         Arrays.asList(new ValidationError("no.subledger.cannot.create.rtgs.payment",
-                                "There is no subledger selected cannot create RTGS Payment")));
+                                "There is no subledger selected cannot create RTGS Payment")));*/
         }
 
     }
@@ -900,11 +901,11 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.rejected", new String[] {
-                    paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+            addActionMessage(getText("payment.voucher.rejected", new String[] { this.getEmployeeName(paymentheader.getState()
+                    .getOwnerPosition()) }));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.approved", new String[] {
-                    paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+            addActionMessage(getText("payment.voucher.approved", new String[] { this.getEmployeeName(paymentheader.getState()
+                    .getOwnerPosition()) }));
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.cancelled"));
         else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -1134,4 +1135,9 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public void setCutOffDate(final String cutOffDate) {
         this.cutOffDate = cutOffDate;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

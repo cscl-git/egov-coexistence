@@ -155,21 +155,29 @@ public class PaymentActionHelper {
             List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist, WorkflowBean workflowBean)
     {
         try {
+        	System.out.println("Part 1");
             voucherHeader = createVoucherAndledger(voucherHeader, commonBean, billDetailslist, subLedgerlist);
+            System.out.println("Part 2");
             paymentheader = paymentService.createPaymentHeader(voucherHeader,
                     Integer.valueOf(commonBean.getAccountNumberId()), commonBean
                             .getModeOfPayment(), commonBean.getAmount());
+            System.out.println("Part 3");
             if (commonBean.getDocumentId() != null)
                 billVhId = (CVoucherHeader) persistenceService.getSession().load(CVoucherHeader.class,
                         commonBean.getDocumentId());
+            System.out.println("Part 4");
             createMiscBillDetail(billVhId, commonBean, voucherHeader);
+            System.out.println("Part 5");
             paymentheader = sendForApproval(paymentheader, workflowBean);
+            System.out.println("Part 6");
         } catch (final ValidationException e) {
             LOGGER.error(e.getMessage(), e);
+            e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getMessage()));
             throw new ValidationException(errors);

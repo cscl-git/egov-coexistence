@@ -437,6 +437,116 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
         budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
         budgetDetail.setBudgetAvailable(budgetAvailable);
+        EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP CAO");
+        budgetDetail.setStatus(status);
+        budgetDetailService.update(budgetDetail);
+        getSession().flush();
+    }
+    
+    @Transactional
+    public void updatePlanningBudgetCao(final BudgetReAppropriation reAppropriation) {
+        getSession().flush();
+        // BigDecimal multiplicationFactor = new
+        // BigDecimal(Double.parseDouble(getAppConfigFor("EGF","planning_budget_multiplication_factor")));
+        final BudgetDetail budgetDetail = budgetDetailService.find("from BudgetDetail where id=?", reAppropriation
+                .getBudgetDetail().getId());
+        BigDecimal budgetAvailable = budgetDetail.getBudgetAvailable() == null ? BigDecimal.ZERO : budgetDetail
+                .getBudgetAvailable();
+        BigDecimal Budgetapproved = BigDecimal.ZERO;
+        BigDecimal planningBudgetApproved = BigDecimal.ZERO;
+        BigDecimal planningBudgetUsage = BigDecimal.ZERO;
+        // budgetAvailable= (be+addrelease)*planingpercent - consumption
+
+        Budgetapproved = budgetDetail.getApprovedAmount().add(budgetDetail.getApprovedReAppropriationsTotal());
+
+        if (reAppropriation.getAdditionAmount() != null && reAppropriation.getAdditionAmount().compareTo(BigDecimal.ZERO) == 1)
+            Budgetapproved = Budgetapproved.add(reAppropriation.getAdditionAmount());
+        else if (reAppropriation.getDeductionAmount() != null
+                && reAppropriation.getDeductionAmount().compareTo(BigDecimal.ZERO) == 1)
+            Budgetapproved = Budgetapproved.subtract(reAppropriation.getDeductionAmount());
+        if (budgetDetail.getPlanningPercent() == null)
+            planningBudgetApproved = Budgetapproved;
+        else
+            planningBudgetApproved = Budgetapproved.multiply(budgetDetail.getPlanningPercent()).divide(new BigDecimal(String
+                    .valueOf(100)));
+
+        planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
+        budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
+        budgetDetail.setBudgetAvailable(budgetAvailable);
+        EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP ACMC");
+        budgetDetail.setStatus(status);
+        budgetDetailService.update(budgetDetail);
+        getSession().flush();
+    }
+    
+    @Transactional
+    public void updatePlanningBudgetAcmc(final BudgetReAppropriation reAppropriation) {
+        getSession().flush();
+        // BigDecimal multiplicationFactor = new
+        // BigDecimal(Double.parseDouble(getAppConfigFor("EGF","planning_budget_multiplication_factor")));
+        final BudgetDetail budgetDetail = budgetDetailService.find("from BudgetDetail where id=?", reAppropriation
+                .getBudgetDetail().getId());
+        BigDecimal budgetAvailable = budgetDetail.getBudgetAvailable() == null ? BigDecimal.ZERO : budgetDetail
+                .getBudgetAvailable();
+        BigDecimal Budgetapproved = BigDecimal.ZERO;
+        BigDecimal planningBudgetApproved = BigDecimal.ZERO;
+        BigDecimal planningBudgetUsage = BigDecimal.ZERO;
+        // budgetAvailable= (be+addrelease)*planingpercent - consumption
+
+        Budgetapproved = budgetDetail.getApprovedAmount().add(budgetDetail.getApprovedReAppropriationsTotal());
+
+        if (reAppropriation.getAdditionAmount() != null && reAppropriation.getAdditionAmount().compareTo(BigDecimal.ZERO) == 1)
+            Budgetapproved = Budgetapproved.add(reAppropriation.getAdditionAmount());
+        else if (reAppropriation.getDeductionAmount() != null
+                && reAppropriation.getDeductionAmount().compareTo(BigDecimal.ZERO) == 1)
+            Budgetapproved = Budgetapproved.subtract(reAppropriation.getDeductionAmount());
+        if (budgetDetail.getPlanningPercent() == null)
+            planningBudgetApproved = Budgetapproved;
+        else
+            planningBudgetApproved = Budgetapproved.multiply(budgetDetail.getPlanningPercent()).divide(new BigDecimal(String
+                    .valueOf(100)));
+
+        planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
+        budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
+        budgetDetail.setBudgetAvailable(budgetAvailable);
+        EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP MC");
+        budgetDetail.setStatus(status);
+        budgetDetailService.update(budgetDetail);
+        getSession().flush();
+    }
+    
+    @Transactional
+    public void updatePlanningBudgetMc(final BudgetReAppropriation reAppropriation) {
+        getSession().flush();
+        // BigDecimal multiplicationFactor = new
+        // BigDecimal(Double.parseDouble(getAppConfigFor("EGF","planning_budget_multiplication_factor")));
+        final BudgetDetail budgetDetail = budgetDetailService.find("from BudgetDetail where id=?", reAppropriation
+                .getBudgetDetail().getId());
+        BigDecimal budgetAvailable = budgetDetail.getBudgetAvailable() == null ? BigDecimal.ZERO : budgetDetail
+                .getBudgetAvailable();
+        BigDecimal Budgetapproved = BigDecimal.ZERO;
+        BigDecimal planningBudgetApproved = BigDecimal.ZERO;
+        BigDecimal planningBudgetUsage = BigDecimal.ZERO;
+        // budgetAvailable= (be+addrelease)*planingpercent - consumption
+
+        Budgetapproved = budgetDetail.getApprovedAmount().add(budgetDetail.getApprovedReAppropriationsTotal());
+
+        if (reAppropriation.getAdditionAmount() != null && reAppropriation.getAdditionAmount().compareTo(BigDecimal.ZERO) == 1)
+            Budgetapproved = Budgetapproved.add(reAppropriation.getAdditionAmount());
+        else if (reAppropriation.getDeductionAmount() != null
+                && reAppropriation.getDeductionAmount().compareTo(BigDecimal.ZERO) == 1)
+            Budgetapproved = Budgetapproved.subtract(reAppropriation.getDeductionAmount());
+        if (budgetDetail.getPlanningPercent() == null)
+            planningBudgetApproved = Budgetapproved;
+        else
+            planningBudgetApproved = Budgetapproved.multiply(budgetDetail.getPlanningPercent()).divide(new BigDecimal(String
+                    .valueOf(100)));
+
+        planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
+        budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
+        budgetDetail.setBudgetAvailable(budgetAvailable);
+        EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
+        budgetDetail.setStatus(status);
         budgetDetailService.update(budgetDetail);
         getSession().flush();
     }
@@ -514,6 +624,90 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         }
         return true;
     }
+    
+    @Transactional
+    public boolean createReAppropriationCao(final String actionName,
+            final List<BudgetReAppropriationView> budgetReAppropriationList,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate) {
+        try {
+            if (budgetReAppropriationList.isEmpty()
+                    || !rowsToAddForExistingDetails(budgetReAppropriationList))
+                return false;
+            validateMandatoryFields(budgetReAppropriationList);
+            final List<BudgetReAppropriationView> addedList = new ArrayList<BudgetReAppropriationView>();
+            for (final BudgetReAppropriationView appropriation : budgetReAppropriationList) {
+                validateDuplicates(addedList, appropriation);
+                saveAndStartWorkFlowForExistingdetailsCao(actionName, appropriation, position, financialYear, beRe, misc, asOnDate);
+                addedList.add(appropriation);
+            }
+        } catch (final ValidationException e)
+        {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e)
+        {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        return true;
+    }
+    
+    @Transactional
+    public boolean createReAppropriationAcmc(final String actionName,
+            final List<BudgetReAppropriationView> budgetReAppropriationList,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate) {
+        try {
+            if (budgetReAppropriationList.isEmpty()
+                    || !rowsToAddForExistingDetails(budgetReAppropriationList))
+                return false;
+            validateMandatoryFields(budgetReAppropriationList);
+            final List<BudgetReAppropriationView> addedList = new ArrayList<BudgetReAppropriationView>();
+            for (final BudgetReAppropriationView appropriation : budgetReAppropriationList) {
+                validateDuplicates(addedList, appropriation);
+                saveAndStartWorkFlowForExistingdetailsAcmc(actionName, appropriation, position, financialYear, beRe, misc, asOnDate);
+                addedList.add(appropriation);
+            }
+        } catch (final ValidationException e)
+        {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e)
+        {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        return true;
+    }
+    
+    @Transactional
+    public boolean createReAppropriationMc(final String actionName,
+            final List<BudgetReAppropriationView> budgetReAppropriationList,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate) {
+        try {
+            if (budgetReAppropriationList.isEmpty()
+                    || !rowsToAddForExistingDetails(budgetReAppropriationList))
+                return false;
+            validateMandatoryFields(budgetReAppropriationList);
+            final List<BudgetReAppropriationView> addedList = new ArrayList<BudgetReAppropriationView>();
+            for (final BudgetReAppropriationView appropriation : budgetReAppropriationList) {
+                validateDuplicates(addedList, appropriation);
+                saveAndStartWorkFlowForExistingdetailsMc(actionName, appropriation, position, financialYear, beRe, misc, asOnDate);
+                addedList.add(appropriation);
+            }
+        } catch (final ValidationException e)
+        {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
+                    e.getErrors().get(0).getMessage())));
+        } catch (final Exception e)
+        {
+            throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
+                    e.getMessage())));
+        }
+        return true;
+    }
 
     @Transactional
     public void saveAndStartWorkFlowForExistingdetails(final String actionName, final BudgetReAppropriationView reAppView,
@@ -550,6 +744,117 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         persist(appropriation);
         // Need to call on approve (After implementing workflow)
         updatePlanningBudget(appropriation);
+    }
+    
+    @Transactional
+    public void saveAndStartWorkFlowForExistingdetailsCao(final String actionName, final BudgetReAppropriationView reAppView,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate) {
+        final BudgetReAppropriation appropriation = new BudgetReAppropriation();
+        EgwStatus status = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP CAO");
+        reAppView.getBudgetDetail().setStatus(status);
+        final List<BudgetDetail> searchBy = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
+                reAppView.getBudgetDetail());
+        if (searchBy.size() != 1)
+            throw new ValidationException(Arrays.asList(new ValidationError("budget.reappropriation.invalid.combination",
+                    "budget.reappropriation.invalid.combination")));
+        appropriation.setBudgetDetail(searchBy.get(0));
+        appropriation.setReAppropriationMisc(misc);
+        appropriation.setAnticipatoryAmount(reAppView.getAnticipatoryAmount());
+        try {
+            appropriation.setAsOnDate(Constants.DDMMYYYYFORMAT2.parse(asOnDate));
+        } catch (final Exception e) {
+            LOGGER.error("Error while parsing date");
+        }
+        if ("Addition".equalsIgnoreCase(reAppView.getChangeRequestType()))
+            appropriation.setAdditionAmount(reAppView.getDeltaAmount());
+        else
+            appropriation.setDeductionAmount(reAppView.getDeltaAmount());
+
+        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved"));
+        validateDeductionAmount(appropriation);
+        /*
+         * appropriation.start().withOwner(position); budgetReAppropriationWorkflowService.transition(actionName, appropriation,
+         * "");
+         */
+        applyAuditing(appropriation);
+        persist(appropriation);
+        // Need to call on approve (After implementing workflow)
+        updatePlanningBudgetCao(appropriation);
+    }
+    
+    @Transactional
+    public void saveAndStartWorkFlowForExistingdetailsAcmc(final String actionName, final BudgetReAppropriationView reAppView,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate) {
+        final BudgetReAppropriation appropriation = new BudgetReAppropriation();
+        EgwStatus status = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP ACMC");
+        reAppView.getBudgetDetail().setStatus(status);
+        final List<BudgetDetail> searchBy = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
+                reAppView.getBudgetDetail());
+        if (searchBy.size() != 1)
+            throw new ValidationException(Arrays.asList(new ValidationError("budget.reappropriation.invalid.combination",
+                    "budget.reappropriation.invalid.combination")));
+        appropriation.setBudgetDetail(searchBy.get(0));
+        appropriation.setReAppropriationMisc(misc);
+        appropriation.setAnticipatoryAmount(reAppView.getAnticipatoryAmount());
+        try {
+            appropriation.setAsOnDate(Constants.DDMMYYYYFORMAT2.parse(asOnDate));
+        } catch (final Exception e) {
+            LOGGER.error("Error while parsing date");
+        }
+        if ("Addition".equalsIgnoreCase(reAppView.getChangeRequestType()))
+            appropriation.setAdditionAmount(reAppView.getDeltaAmount());
+        else
+            appropriation.setDeductionAmount(reAppView.getDeltaAmount());
+
+        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved"));
+        validateDeductionAmount(appropriation);
+        /*
+         * appropriation.start().withOwner(position); budgetReAppropriationWorkflowService.transition(actionName, appropriation,
+         * "");
+         */
+        applyAuditing(appropriation);
+        persist(appropriation);
+        // Need to call on approve (After implementing workflow)
+        updatePlanningBudgetAcmc(appropriation);
+    }
+    
+    @Transactional
+    public void saveAndStartWorkFlowForExistingdetailsMc(final String actionName, final BudgetReAppropriationView reAppView,
+            final Position position, final CFinancialYear financialYear, final String beRe, final BudgetReAppropriationMisc misc,
+            final String asOnDate) {
+        final BudgetReAppropriation appropriation = new BudgetReAppropriation();
+        EgwStatus status = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP MC");
+        reAppView.getBudgetDetail().setStatus(status);
+        final List<BudgetDetail> searchBy = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
+                reAppView.getBudgetDetail());
+        if (searchBy.size() != 1)
+            throw new ValidationException(Arrays.asList(new ValidationError("budget.reappropriation.invalid.combination",
+                    "budget.reappropriation.invalid.combination")));
+        appropriation.setBudgetDetail(searchBy.get(0));
+        appropriation.setReAppropriationMisc(misc);
+        appropriation.setAnticipatoryAmount(reAppView.getAnticipatoryAmount());
+        try {
+            appropriation.setAsOnDate(Constants.DDMMYYYYFORMAT2.parse(asOnDate));
+        } catch (final Exception e) {
+            LOGGER.error("Error while parsing date");
+        }
+        if ("Addition".equalsIgnoreCase(reAppView.getChangeRequestType()))
+            appropriation.setAdditionAmount(reAppView.getDeltaAmount());
+        else
+            appropriation.setDeductionAmount(reAppView.getDeltaAmount());
+
+        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved"));
+        validateDeductionAmount(appropriation);
+        /*
+         * appropriation.start().withOwner(position); budgetReAppropriationWorkflowService.transition(actionName, appropriation,
+         * "");
+         */
+        applyAuditing(appropriation);
+        persist(appropriation);
+        // Need to call on approve (After implementing workflow)
+        updatePlanningBudgetAcmc(appropriation);
     }
 
     @Transactional

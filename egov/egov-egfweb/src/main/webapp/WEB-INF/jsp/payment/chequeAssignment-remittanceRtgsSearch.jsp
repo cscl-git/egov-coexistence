@@ -159,7 +159,7 @@
 			</table>
 			<div class="buttonbottom">
 				<s:submit method="searchRemittanceRTGS" key="lbl.search"
-					id="searchBtn" cssClass="buttonsubmit" />
+					id="searchBtn" cssClass="buttonsubmit"  onclick="submitForm();"/>
 				<input type="button" value='<s:text name="lbl.close"/>'
 					onclick="javascript:window.close()" class="button" />
 			</div>
@@ -180,6 +180,11 @@
 				function onload()
 				{
 					populatebank_branch(); 
+				}
+				
+				function submitForm() {
+					document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-searchRemittanceRTGS.action';
+					document.chequeAssignment.submit();
 				}
 							
 				function loadBank(obj)
@@ -215,11 +220,6 @@
 					}
 				}
 			</script>
-	<s:if test="%{!validateUser('chequeassignment')}">
-		<script>
-					document.getElementById('searchBtn').disabled=true;
-					document.getElementById('errorSpan').innerHTML='<s:text name="chq.assignment.invalid.user"/>'
-				</script>
-	</s:if>
+	
 </body>
 </html>

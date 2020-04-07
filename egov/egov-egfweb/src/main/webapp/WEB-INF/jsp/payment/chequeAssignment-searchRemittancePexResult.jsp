@@ -55,7 +55,7 @@
 <head>
 <link rel="stylesheet" type="text/css" href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 <title><s:text
-		name="rtgs.assignment.remittance.pay.search.heading" /></title>
+		name="pex.assignment.remittance.pay.search.heading" /></title>
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 </head>
@@ -67,13 +67,13 @@
 	<s:form action="chequeAssignment" theme="simple">
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading"
-				value="RTGS Ref. No Assignment Search for Auto Remittance Payment" />
+				value="PEX Ref. No Assignment Search for Auto Remittance Payment" />
 		</jsp:include>
 		<span class="error-msg"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				RTGS Ref.No Assignment Search for Auto Remittance Payment
+				PEX Ref.No Assignment Search for Auto Remittance Payment
 				<s:if test="%{(drawingOfficerCode!=null)}"> for the drawingofficer - <s:property
 						value="drawingOfficerCode" />
 				</s:if>
@@ -108,7 +108,7 @@
 
 				</tr>
 				<s:set var="counter" value="0" />
-				<s:iterator value="accountNoAndRemittanceRtgsEntryMap" status="stat">
+				<s:iterator value="accountNoAndRemittancePexEntryMap" status="stat">
 					<tr>
 						<td class="greybox"><s:property
 								value="key.bankAccount.bankbranch.bank.name" /> - <s:property
@@ -134,50 +134,50 @@
 
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
 									id="voucherHeaderId"
-									name="rtgsList[%{#counter}].voucherHeaderId"
+									name="pexList[%{#counter}].voucherHeaderId"
 									value="%{voucherHeaderId}" /> <s:checkbox
-									name="rtgsList[%{#counter}].isSelected"
+									name="pexList[%{#counter}].isSelected"
 									id="isSelected%{#counter}" onclick="update(this)" /></td>
 							<td align="left" style="text-align: center"
 								class="blueborderfortdnew"><s:property value="#s.index+1" />
 							</td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="departmentName" name="rtgsList[%{#counter}].departmentName"
+									id="departmentName" name="pexList[%{#counter}].departmentName"
 									value="%{departmentName}" />
 								<s:property value="%{departmentName}" /></td>
 							<s:if test="%{(drawingOfficerCode == null)}">
 								<td style="text-align: center" class="blueborderfortdnew">
 									<s:hidden id="drawingOfficerNameTAN"
-										name="rtgsList[%{#counter}].drawingOfficerNameTAN"
+										name="pexList[%{#counter}].drawingOfficerNameTAN"
 										value="%{drawingOfficerNameTAN}" /> <s:property
 										value="%{drawingOfficerNameTAN}" />
 								</td>
 							</s:if>
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="voucherNumber" name="rtgsList[%{#counter}].voucherNumber"
+									id="voucherNumber" name="pexList[%{#counter}].voucherNumber"
 									value="%{voucherNumber}" /><a href="javascript:void(0);"
 								onclick='viewVoucher(<s:property value="voucherHeaderId"/>);'><s:property
 										value="%{voucherNumber}" /></a>&nbsp;</td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="voucherDate" name="rtgsList[%{#counter}].voucherDate"
+									id="voucherDate" name="pexList[%{#counter}].voucherDate"
 									value="%{voucherDate}" />
 								<s:date name="%{voucherDate}" var="tempPaymentDate"
 									format="dd/MM/yyyy" />
 								<s:date name="%{voucherDate}" format="dd/MM/yyyy" /> <s:hidden
-									name="rtgsList[%{#counter}].tempPaymentDate"
+									name="pexList[%{#counter}].tempPaymentDate"
 									value="%{tempPaymentDate}"></s:hidden></td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
-									id="paidTo" name="rtgsList[%{#counter}].paidTo"
+									id="paidTo" name="pexList[%{#counter}].paidTo"
 									value="%{paidTo}" />
 								<s:property value="%{paidTo}" /></td>
 							<td style="text-align: right" class="blueborderfortdnew"><s:hidden
-									id="paidAmount" name="rtgsList[%{#counter}].paidAmount"
+									id="paidAmount" name="pexList[%{#counter}].paidAmount"
 									value="%{paidAmount}" />
 								<s:text name="format.number">
 									<s:param value="%{paidAmount}" />
 								</s:text></td>
 							<s:hidden id="bankAccountId"
-								name="rtgsList[%{#counter}].bankAccountId"
+								name="pexList[%{#counter}].bankAccountId"
 								value="%{bankAccountId}" />
 							<s:set var="counter" value="%{#counter+1}" />
 							<s:if test="%{nonSubledger == true}">
@@ -194,11 +194,11 @@
 						<td></td>
 						<td></td>
 						<td></td>
-						<s:if test="%{ paymentMode=='rtgs'}">
-							<td class="greybox"><s:text name="chq.assignment.rtgs.date" /><span
+						<s:if test="%{ paymentMode=='pex'}">
+							<td class="greybox"><s:text name="chq.assignment.pex.date" /><span
 								class="mandatory">*</span> <s:textfield
-									id="rtgsdateMap[%{#count}]" name="rtgsdateMap[%{#count}]"
-									value="%{rtgsdateMap[#count]}" onchange="updateDate(this)"
+									id="pexdateMap[%{#count}]" name="pexdateMap[%{#count}]"
+									value="%{pexdateMap[#count]}" onchange="updateDate(this)"
 									onkeyup="DateFormat(this,this.value,event,false,'3')" /></td>
 						</s:if>
 					</tr>
@@ -212,12 +212,11 @@
 			<div class="buttonbottom">
 				<s:hidden id="selectedRows" name="selectedRows"
 					value="%{selectedRows}" />
-				<s:hidden id="rtgsContractorAssignment"
-					name="rtgsContractorAssignment" value="%{rtgsContractorAssignment}" />
+				
 				<s:hidden id="paymentMode" name="paymentMode" value="%{paymentMode}" />
 
 
-				<s:submit id="assignChequeBtn" method="update" value="Assign Cheque"
+				<s:submit id="assignChequeBtn" method="updatePex" value="Assign Cheque"
 					cssClass="buttonsubmit" onclick="return validate();" />
 				<input type="button" value="Close"
 					onclick="javascript:window.close()" class="button" />
@@ -255,8 +254,7 @@
 					return false;
 				}
 				
-				  
-				document.chequeAssignment.action='/services/EGF/payment/chequeAssignment-update.action';
+				document.chequeAssignment.action='/services/EGF/payment/chequeAssignment-updatePex.action';
 	    		document.chequeAssignment.submit();
 								 
 				return true;                   

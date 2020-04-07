@@ -257,7 +257,8 @@ public class RemitRecoveryAction extends BasePaymentAction {
         addDropdownData("recoveryList", listRecovery);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_CASH, getText("cash.consolidated.cheque"));
-//        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
+        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
+        modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_PEX, "PEX");
         this.setPartialPayment("deduction");
         setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_CASH);
     }
@@ -340,7 +341,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
                 rbean.setPartialAmount(rbean.getAmount());
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("RemitRecoveryAction | remit | size after filter" + listRemitBean.size());
-            setModeOfPayment(FinancialConstants.MODEOFPAYMENT_CASH);
+            setModeOfPayment(modeOfPayment);
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("RemitRecoveryAction | remit | end");
             if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
@@ -389,12 +390,15 @@ public class RemitRecoveryAction extends BasePaymentAction {
             if(isPartialPaymentEnabled){
                 setPartialAmountForSelectedDeduction();
             }
+            System.out.println("Part 1");
             validateFields();
+            System.out.println("Part 2");
             voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
             voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE);
             final HashMap<String, Object> headerDetails = createHeaderAndMisDetails();
             recovery = (Recovery) persistenceService.find("from Recovery where id=?", remittanceBean.getRecoveryId());
             populateWorkflowBean();
+            System.out.println("Part 3");
             paymentheader = paymentActionHelper.createRemittancePayment(paymentheader, voucherHeader,
                     Integer.valueOf(commonBean.getAccountNumberId()), getModeOfPayment(),
                     remittanceBean.getTotalAmount(), listRemitBean, recovery, remittanceBean, remittedTo, workflowBean,
@@ -414,8 +418,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
             else {
                 addActionMessage(getText("remittancepayment.transaction.success")
                         + paymentheader.getVoucherheader().getVoucherNumber());
-                addActionMessage(getText("payment.voucher.approved", new String[] {
-                        paymentService.getEmployeeNameForPositionId(paymentheader.getState().getOwnerPosition()) }));
+
+                addActionMessage(getText("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
+                        .getOwnerPosition()) }));
             }
 
         } catch (final ValidationException e) {
@@ -1141,5 +1146,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
     public void setDefaultPaymentMode(String defaultPaymentMode) {
         this.defaultPaymentMode = defaultPaymentMode;
     }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
     
 }

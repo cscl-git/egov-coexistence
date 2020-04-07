@@ -156,6 +156,9 @@ import net.sf.jasperreports.engine.JRException;
         @Result(name = "accountList", location = "stopPayment-accountList.jsp"),
         @Result(name = "viewsurrender", location = "chequeAssignment-viewsurrender.jsp"),
         @Result(name = "remittanceRtgsSearch", location = "chequeAssignment-remittanceRtgsSearch.jsp"),
+        @Result(name = "remittancePexSearch", location = "chequeAssignment-remittancePexSearch.jsp"),
+        @Result(name = "searchRemittanceRtgsResult", location = "chequeAssignment-searchRemittanceRtgsResult.jsp"),
+        @Result(name = "searchRemittancePexResult", location = "chequeAssignment-searchRemittancePexResult.jsp"),
         @Result(name = "before_remittance_search", location = "chequeAssignment-before_remittance_search.jsp"),
         @Result(name = "before_salary_search", location = "chequeAssignment-before_salary_search.jsp"),
         @Result(name = "searchRtgsResult", location = "chequeAssignment-searchRtgsResult.jsp"),
@@ -297,6 +300,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private Map chequeSlNoMap;
     Map<Bankaccount, List<ChequeAssignment>> accountNoAndRtgsEntryMap = new HashMap<Bankaccount, List<ChequeAssignment>>();
     Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittanceRtgsEntryMap = new HashMap<BankAccountRemittanceCOA, List<ChequeAssignment>>();
+    Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittancePexEntryMap = new HashMap<BankAccountRemittanceCOA, List<ChequeAssignment>>();
     Map<String, String> rtgsdateMap = new HashMap<String, String>();
     Map<String, String> rtgsRefNoMap = new HashMap<String, String>();
     Map<String, Boolean> rtgsSeceltedAccMap = new HashMap<String, Boolean>();
@@ -514,6 +518,25 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepareBeforeRemittanceRtgsSearch.");
     }
+    
+    public void prepareBeforeSearchForPexRemittance() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting prepareBeforeSearchForPexRemittance...");
+        addDropdownData("drawingofficerList", getPersistenceService().findAllBy("from DrawingOfficer where id in" +
+                " (select drawingOfficer.id from DepartmentDOMapping) order by code"));
+        final List<Recovery> listRecovery = recoveryService.getAllActiveAutoRemitTds();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("RemitRecoveryAction | Tds list size : " + listRecovery.size());
+        addDropdownData("recoveryList", listRecovery);
+        paymentMode = FinancialConstants.MODEOFPAYMENT_PEX;
+        rtgsContractorAssignment = false;
+        if (deptNonMandatory == true)
+            mandatoryFields.remove("department");
+        if (mandatoryFields.contains("fund"))
+            mandatoryFields.remove("fund");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed prepareBeforeSearchForPexRemittance.");
+    }
 
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-beforeRemittanceRtgsSearch")
@@ -526,9 +549,22 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             LOGGER.debug("Completed beforeRemittanceRtgsSearch.");
         return "remittanceRtgsSearch";
     }
+    
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-beforeSearchForPexRemittance")
+    public String beforeSearchForPexRemittance() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting beforeRemittancePexSearch...");
+        paymentMode = FinancialConstants.MODEOFPAYMENT_PEX;
+        //rtgsContractorAssignment = true;
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed beforeRemittancePexSearch.");
+        return "remittancePexSearch";
+    }
 
     @ValidationErrorPage(value = "remittanceRtgsSearch")
     @SkipValidation
+    @Action(value = "/payment/chequeAssignment-searchRemittanceRTGS")
     public String searchRemittanceRTGS() throws ApplicationException, ParseException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchRemittanceRTGS...");
@@ -542,7 +578,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         // TODO Initialize to null not new ()
         CChartOfAccounts coa = new CChartOfAccounts();
 
-        rtgsChequeAssignmentList = paymentService.getPaymentVoucherForRemittanceRTGSInstrument(parameters, voucherHeader);
+        rtgsChequeAssignmentList = paymentService.getPaymentVoucherNotInInstrument(parameters, voucherHeader);
 
         for (final ChequeAssignment chqAssgn : rtgsChequeAssignmentList) {
             BankAccountRemittanceCOA bnkAccCOA = new BankAccountRemittanceCOA();
@@ -603,6 +639,85 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed searchRemittanceRTGS.");
         return "searchRemittanceRtgsResult";
+    }
+    
+    @ValidationErrorPage(value = "remittancePexSearch")
+    @SkipValidation
+    @Action(value = "/payment/chequeAssignment-searchRemittancePEX")
+    public String searchRemittancePEX() throws ApplicationException, ParseException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting searchRemittancePEX...");
+        List<ChequeAssignment> pexChequeAssignmentList = null;
+        List<ChequeAssignment> pexEntry = new ArrayList<ChequeAssignment>();
+        //rtgsContractorAssignment = true;
+        boolean addList = false;
+        // TODO Initialize to null not new ()
+        Bankaccount bnkAcc = new Bankaccount();
+        new BankAccountRemittanceCOA();
+        // TODO Initialize to null not new ()
+        CChartOfAccounts coa = new CChartOfAccounts();
+
+        pexChequeAssignmentList = paymentService.getPaymentVoucherForRemittanceRTGSInstrument(parameters, voucherHeader);
+
+        for (final ChequeAssignment chqAssgn : pexChequeAssignmentList) {
+            BankAccountRemittanceCOA bnkAccCOA = new BankAccountRemittanceCOA();
+            if (accountNoAndRemittancePexEntryMap.isEmpty()) {
+                pexEntry = new ArrayList<ChequeAssignment>();
+                bnkAcc = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
+                        Long.parseLong(chqAssgn.getBankAccountId().toString()));
+                coa = (CChartOfAccounts) persistenceService.find("from CChartOfAccounts where id =?", new Long(chqAssgn
+                        .getGlcodeId().toString()));
+                bnkAccCOA.setBankAccount(bnkAcc);
+                bnkAccCOA.setRemittanceCOA(coa);
+                pexEntry.add(chqAssgn);
+                accountNoAndRemittancePexEntryMap.put(bnkAccCOA, pexEntry);
+                pexdateMap.put(bnkAcc.getId().toString(), formatter.format(currentDate));
+            } else {
+                final Set<BankAccountRemittanceCOA> bankAccntKeySet = accountNoAndRemittancePexEntryMap.keySet();
+                final java.util.Iterator keySetitr = bankAccntKeySet.iterator();
+                while (keySetitr.hasNext()) {
+                    final BankAccountRemittanceCOA bkcoa = (BankAccountRemittanceCOA) keySetitr.next();
+                    addList = false;
+                    if (bkcoa.getBankAccount().getId().equals(Integer.parseInt(chqAssgn.getBankAccountId().toString())) &&
+                            bkcoa.getRemittanceCOA().getId().toString().equals(chqAssgn.getGlcodeId().toString())) {
+                        bnkAccCOA = bkcoa;
+                        addList = false;
+                        break;
+                    } else
+                        addList = true;
+                }
+                if (!addList) {
+                	accountNoAndRemittancePexEntryMap.get(bnkAccCOA).add(chqAssgn);
+                } else {
+                    pexEntry = new ArrayList<ChequeAssignment>();
+                    bnkAcc = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
+                            Long.parseLong(chqAssgn.getBankAccountId().toString()));
+                    coa = (CChartOfAccounts) persistenceService.find("from CChartOfAccounts where id =?", new Long(chqAssgn
+                            .getGlcodeId().toString()));
+                    bnkAccCOA.setBankAccount(bnkAcc);
+                    bnkAccCOA.setRemittanceCOA(coa);
+                    pexEntry.add(chqAssgn);
+                    accountNoAndRemittancePexEntryMap.put(bnkAccCOA, pexEntry);
+                    pexdateMap.put(bnkAcc.getId().toString(), formatter.format(currentDate));
+                }
+            }
+        }
+        getSession().put("accountNoAndPexEntryMapSession", accountNoAndRemittancePexEntryMap);
+        if (0 != drawingOfficerId) {
+            final DrawingOfficer drawingOfficer = (DrawingOfficer) persistenceService.find("from DrawingOfficer where id =?",
+                    drawingOfficerId);
+            drawingOfficerCode = drawingOfficer.getCode();
+        }
+        assignmentType = "BillPayment";
+        if (!"".equals(parameters.get("recoveryId")[0])) {
+            final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?",
+                    new Long(parameters.get("recoveryId")[0]));
+            if (recovery.getChartofaccounts().getChartOfAccountDetails().isEmpty())
+                nonSubledger = true;
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed searchRemittanceRTGS.");
+        return "searchRemittancePexResult";
     }
 
     @SkipValidation
@@ -3216,6 +3331,15 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         //getReversalGlCodes();
         return "process";
     }
+
+	public Map<BankAccountRemittanceCOA, List<ChequeAssignment>> getAccountNoAndRemittancePexEntryMap() {
+		return accountNoAndRemittancePexEntryMap;
+	}
+
+	public void setAccountNoAndRemittancePexEntryMap(
+			Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittancePexEntryMap) {
+		this.accountNoAndRemittancePexEntryMap = accountNoAndRemittancePexEntryMap;
+	}
 
 
 }
