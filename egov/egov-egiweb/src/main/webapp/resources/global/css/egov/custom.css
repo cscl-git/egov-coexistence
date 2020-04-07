@@ -1456,7 +1456,7 @@ label.error {
 }
 .page-container .main-content div.subheadsmallnew {
   background-color: #ffffff;
-  color: #f2851f;
+  color: #006699;
 }
 .page-container .main-content div.buttonbottom {
   margin-bottom: 0px;
@@ -1646,7 +1646,7 @@ label.error {
 }
 .btn-custom {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
 }
 .btn-custom:hover,
@@ -1664,10 +1664,19 @@ label.error {
   outline: none;
   opacity: 0.8;
 }
+
+.btn-default {
+  color: #ffffff;
+  background-color: #f7b623;
+  border-color: #fe7a51;
+  width: 100px;
+}
+
 .btn-primary {
   color: #ffffff;
   background-color: #f7b623;
   border-color: #fe7a51;
+  width: 100px;
 }
 .btn-primary:hover,
 .btn-primary:focus,
@@ -1700,7 +1709,7 @@ label.error {
 .btn-default.active.focus,
 .open > .dropdown-toggle.btn-default.focus {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
   outline: none;
   opacity: 0.8;
@@ -1709,6 +1718,7 @@ label.error {
   color: #ffffff;
   background-color: #f7b623;
   border-color: #fe7a51;
+  width: 100px;
 }
 .btn-danger {
   color: #ffffff !important;
@@ -1816,7 +1826,7 @@ label.error {
 .panel-primary .panel-heading {
   background-color: #ffffff;
   border-color: #ffffff;
-  padding: 15px;
+  padding: 30px;
   position: relative;
 }
 .panel-primary .panel-heading .panel-title {
@@ -1992,7 +2002,7 @@ table.dataTable tbody.no-pointer tr:hover {
 .pagination .active > span:hover,
 .pagination .active > a:focus,
 .pagination .active > span:focus {
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
 }
 .buttons-margin {
@@ -2041,7 +2051,7 @@ footer.main a {
     background: #265988;
     padding: 10px 20px;
     border-radius: 5px;
-	 color: white;
+	color: white;
 }
 .position_alert {
     position: fixed;
@@ -2076,3 +2086,21 @@ footer.main a {
     border-left: 3px solid #f7b623;
 }
 
+.form-control {
+  display: block;
+  width: 95%;
+  height: 34px;
+  padding: 6px 12px;
+  font-size: 14px;
+  line-height: 1.42857143;
+  color: #555;
+  background-color: #fff;
+  background-image: none;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+          box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+  -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+       -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+          transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}

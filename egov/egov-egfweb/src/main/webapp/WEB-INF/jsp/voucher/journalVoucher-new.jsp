@@ -130,7 +130,7 @@
 				</div>
 				<br />
 				<div id="labelAD" align="center">
-					<table width="80%" border=0 id="labelid">
+					<table width="89%" border=0 id="labelid">
 						<th><s:text name="lbl.account.details"/> </th>
 					</table>
 				</div>
@@ -140,11 +140,11 @@
 				<script>
 		
 		makeVoucherDetailTable();
-		document.getElementById('billDetailTable').getElementsByTagName('table')[0].width="80%"
+		document.getElementById('billDetailTable').getElementsByTagName('table')[0].width="89%"
 	 </script>
 				<br />
 				<div id="labelSL" align="center">
-					<table width="80%" border=0 id="labelid">
+					<table width="89%" border=0 id="labelid">
 						<th><s:text name="lbl.subledger.details"/> </th>
 					</table>
 				</div>
@@ -156,7 +156,7 @@
 			
 			makeSubLedgerTable();
 			
-			document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="80%"
+			document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="89%"
 		</script>
 				<br />
 				<div class="subheadsmallnew" /></div>

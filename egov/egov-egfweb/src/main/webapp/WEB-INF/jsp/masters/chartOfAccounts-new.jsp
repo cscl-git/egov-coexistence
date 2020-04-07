@@ -159,7 +159,7 @@
 					value='<s:property value="parentId"/>' />
 				<s:submit name="Save" key="lbl.save"
 					onclick="javascript: return validate();" cssClass="buttonsubmit" />
-				<s:submit value="<s:text name='lbl.close'/>" onclick="javascript: self.close()"
+				<s:submit name="Close" key="lbl.close" onclick="javascript: self.close()"
 					cssClass="buttonsubmit" />
 			</div>
 			<s:token />
