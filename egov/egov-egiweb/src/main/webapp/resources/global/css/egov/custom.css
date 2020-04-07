@@ -230,14 +230,14 @@ label.error {
 }
 .oldbuttonsection input.buttonsubmit,
 .oldbuttonsection input.button {
-  width: auto;
+  /*width: auto;*/
   font-family: semibold;
   text-align: center;
   border-style: none;
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #fe7a51 none repeat scroll 0% 0%;
+  background: #f7b623 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -246,9 +246,9 @@ label.error {
 }
 .oldbuttonsection input.buttonsubmit.normal,
 .oldbuttonsection input.button {
-  color: #333;
-  background-color: #ffffff;
-  border-color: #CCC;
+  color: #ffffff;
+  background-color: #f7b623;
+  border-color: #fe7a51;
 }
 .oldbuttonsection input.buttonsubmit:hover,
 .oldbuttonsection input.buttonsubmit:active,
@@ -257,7 +257,7 @@ label.error {
 .oldbuttonsection input.button:focus,
 .oldbuttonsection input.button:active {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
   opacity: 0.8;
 }
@@ -1415,14 +1415,14 @@ label.error {
 }
 .page-container .main-content div.formmainbox input.buttonsubmit,
 .page-container .main-content div.formmainbox input.button {
-  width: auto;
+  /*width: auto;*/
   font-family: semibold;
   text-align: center;
   border-style: none;
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #fe7a51 none repeat scroll 0% 0%;
+  background: #f7b623 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -1431,9 +1431,9 @@ label.error {
 }
 .page-container .main-content div.formmainbox input.buttonsubmit.normal,
 .page-container .main-content div.formmainbox input.button {
-  color: #333;
-  background-color: #ffffff;
-  border-color: #CCC;
+  color: #ffffff;
+  background-color: #f7b623;
+  border-color: #fe7a51;
 }
 .page-container .main-content div.formmainbox input.buttonsubmit:hover,
 .page-container .main-content div.formmainbox input.buttonsubmit:active,
@@ -1442,7 +1442,7 @@ label.error {
 .page-container .main-content div.formmainbox input.button:focus,
 .page-container .main-content div.formmainbox input.button:active {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
   opacity: 0.8;
 }
@@ -1450,7 +1450,7 @@ label.error {
   font-family: semibold;
   font-size: 16px;
   font-weight: bold;
-  color: #f2851f;
+  color: #265988;
   padding: 15px 15px;
   background: #ffffff;
 }
@@ -1469,14 +1469,14 @@ label.error {
 }
 .page-container .main-content input.buttonsubmit,
 .page-container .main-content input.button {
-  width: auto;
+  /*width: auto;*/
   font-family: semibold;
   text-align: center;
   border-style: none;
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #fe7a51 none repeat scroll 0% 0%;
+  background: #f7b623 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -1485,9 +1485,9 @@ label.error {
 }
 .page-container .main-content input.buttonsubmit.normal,
 .page-container .main-content input.button {
-  color: #333;
-  background-color: #ffffff;
-  border-color: #CCC;
+  color: #ffffff;
+  background-color: #f7b623;
+  border-color: #fe7a51;
 }
 .page-container .main-content input.buttonsubmit:hover,
 .page-container .main-content input.buttonsubmit:active,
@@ -1496,7 +1496,7 @@ label.error {
 .page-container .main-content input.button:focus,
 .page-container .main-content input.button:active {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
   opacity: 0.8;
 }
