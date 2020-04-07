@@ -148,9 +148,7 @@
 	<td class="bluebox"><s:select name="contraBean.toBankAccountId"
 			id="toAccountNumber" list="dropdownData.toAccNumList" listKey="id"
 			listValue="accountnumber" headerKey="-1" headerValue="----Choose----"
-			onChange="populatetoNarration(this);loadToBalance(this)" /> <s:textfield
-			name="toAccnumnar" id="toAccnumnar" value="%{toAccnumnar}"
-			readonly="true" tabindex="-1" /></td>
+			onChange="populatetoNarration(this);loadToBalance(this)" /> </td>
 </tr>
 
 <tr>
