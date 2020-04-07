@@ -127,6 +127,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 	private SimpleDateFormat sqlformat = new SimpleDateFormat("dd-MMM-yyyy");
 	private static final String EXCEPTION_WHILE_SAVING_DATA = "Exception while saving Data";
 	private static final String MDC_CHEQUE = "cheque";
+	
 	private static final String MDC_OTHER = "RTGS/NEFT";
 	private static final String REVERSE = "reverse";
 	private static final long serialVersionUID = 1L;
@@ -258,7 +259,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 		try {
 			getHibObjectsFromContraBean();
 			if (egovCommon.isShowChequeNumber())
-				if (contraBean.getModeOfCollection().equals(MDC_CHEQUE))
+				if (contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
 					validateChqNumber(contraBean.getChequeNumber(), contraVoucher.getFromBankAccountId().getId(),
 							voucherHeader);
 			voucherHeader = contraBTBActionHelper.create(contraBean, contraVoucher, voucherHeader);
@@ -363,7 +364,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 			if (instrumentVoucher2 != null)
 				instrumentService.cancelInstrument(instrumentVoucher2.getInstrumentHeaderId());
 			persistenceService.getSession().flush();
-			if (contraBean.getModeOfCollection().equals(MDC_CHEQUE))
+			if (contraBean.getModeOfCollection().equalsIgnoreCase(MDC_CHEQUE))
 				if (!egovCommon.isShowChequeNumber())
 					try {
 						contraBean.setChequeNumber(chequeService.nextChequeNumber(contraBean.getFromBankAccountId(), 1,voucherHeader.getVouchermis().getDepartmentcode()));
