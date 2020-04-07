@@ -1141,8 +1141,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     {
 
         LOGGER.error("size--------" + parameters.size());
-        if (!paymentMode.equalsIgnoreCase("cash"))
-            prepareChequeAssignmentList();
+        ///if (!paymentMode.equalsIgnoreCase("cash"))
+            //prepareChequeAssignmentList();
         final List<AppConfigValues> printAvailConfig = appConfigValuesService
                 .getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "chequeprintavailableat");
 
@@ -1160,15 +1160,15 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             }
         }
 
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createInstrument...");
+            LOGGER.info("Starting createInstrument...");
         loadChequeSerialNo(bankaccount);
         try {
+        	System.out.println("Before");
             validateData();
+            System.out.println("Before After");
             if (reassignSurrenderChq || !isChequeNoGenerationAuto())
                 validateDataForManual();
-            
-            
+            System.out.println("Before After All");
             final String[] dateArray1 = new String[]{parameters.get("chequeDt")[0]};
         	System.out.println("date : "+dateArray1[0]);
             if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
@@ -1252,16 +1252,17 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 return "searchpayment";
             }
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             final List<ValidationError> errors = new ArrayList<ValidationError>();
             errors.add(new ValidationError("exp", e.getMessage()));
             throw new ValidationException(errors);
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed createInstrument.");
+            LOGGER.info("Completed createInstrument.");
 
         return "view";
     }

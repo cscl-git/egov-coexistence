@@ -194,7 +194,7 @@ function printAdviceExcel(){
 	 	var bankbranch=document.getElementById("bankBranchId").value;
 	 	var bankaccount=document.getElementById("bankAccountNoId").value;
 	 	 var instrumentnumber=document.getElementById("transactionNumber").value;
-		 var url="${pageContext.request.contextPath}/report/bankAdviceReport!exportExcel.action?bank.id="+
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="+
 		 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 		 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }
@@ -203,7 +203,7 @@ function printAdvicePdf(){
 	var bankbranch=document.getElementById("bankBranchId").value;
 	var bankaccount=document.getElementById("bankAccountNoId").value;
 	 var instrumentnumber=document.getElementById("transactionNumber").value;
-	 var url="${pageContext.request.contextPath}/report/bankAdviceReport!exportPDF.action?bank.id="+
+	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="+
 	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }

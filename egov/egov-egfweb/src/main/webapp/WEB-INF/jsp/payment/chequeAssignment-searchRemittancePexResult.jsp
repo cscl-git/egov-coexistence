@@ -497,11 +497,7 @@
 			
 			 
 		</script>
-	<s:if test="%{isFieldMandatory('department')}">
-		<script>
-				document.getElementById('departmentid').disabled=true;
-			</script>
-	</s:if>
+	
 	<s:if
 		test="chequeAssignmentList == null || chequeAssignmentList.size==0">
 		<script>
