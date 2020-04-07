@@ -166,7 +166,7 @@
 <div id="budgetSearchGrid">
 	<div align="center">
 		<br>
-		<table cellspacing="0" cellpadding="0" border="0" width="89%"
+		<table cellspacing="0" cellpadding="0" border="0" width="95%"
 			style="border-right: 0px solid rgb(197, 197, 197);"
 			class="tablebottom">
 			<tbody>
@@ -182,7 +182,7 @@
 						</div> <script>
 							makeVoucherDetailTable();
 							document.getElementById('billDetailTable')
-									.getElementsByTagName('table')[0].width = "89%";
+									.getElementsByTagName('table')[0].width = "95%";
 						</script>
 					</td>
 				</tr>
@@ -197,7 +197,7 @@
 	<div id="budgetSearchGrid">
 		<div align="center">
 			<br>
-			<table cellspacing="0" cellpadding="0" border="0" width="89%"
+			<table cellspacing="0" cellpadding="0" border="0" width="95%"
 				style="border-right: 0px solid rgb(197, 197, 197);"
 				class="tablebottom">
 				<tbody>
@@ -215,7 +215,7 @@
 								<script>
 									makeSubLedgerTable();
 									document.getElementById('subLedgerTable')
-											.getElementsByTagName('table')[0].width = "89%"
+											.getElementsByTagName('table')[0].width = "95%"
 								</script>
 						</td>
 					</tr>

@@ -239,13 +239,12 @@ today = dd+'/'+mm+'/'+yyyy;
 						<td class="greybox"><s:select name="functionId"
 								id="functionId" list="dropdownData.functionList" listKey="id"
 								listValue="name" headerKey="" headerValue="%{getText('lbl.choose.options')}"
-								value="functionId" style="width:180px" /></td>
+								value="functionId" /></td>
 						<td class="greybox"><s:text name="voucher.functionary" />
 						<td class="greybox"><s:select name="functionaryId"
 								id="functionaryId" list="dropdownData.functionaryList"
 								listKey="id" listValue="name" headerKey=""
-								headerValue="%{getText('lbl.choose.options')}" value="functionaryId"
-								style="width:180px" /></td>
+								headerValue="%{getText('lbl.choose.options')}" value="functionaryId"/></td>
 					</tr>
 					<tr>
 						<td class="bluebox"></td>
