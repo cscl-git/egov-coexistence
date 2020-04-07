@@ -1517,7 +1517,7 @@ label.error {
 }
 .page-container .main-content .yui-skin-sam .yui-dt th {
   color: #ffffff;
-  background: #f2851f;
+  background: #265988;
 }
 .page-container .main-content .yui-skin-sam .yui-dt td {
   border-right: 1px solid #E9E9E9;
@@ -1666,7 +1666,7 @@ label.error {
 }
 .btn-primary {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
 }
 .btn-primary:hover,
@@ -1707,7 +1707,7 @@ label.error {
 }
 .btn-secondary {
   color: #ffffff;
-  background-color: #fe7a51;
+  background-color: #f7b623;
   border-color: #fe7a51;
 }
 .btn-danger {
@@ -1841,7 +1841,7 @@ label.error {
   padding-top: 0;
 }
 .panel-primary .panel-body .form-group label {
-  color: #00bbd3;
+  /*color: #00bbd3;*/
 }
 .panel-primary .panel-body .header-color {
   color: #f2851f;
@@ -1894,8 +1894,8 @@ label.error {
 }
 .table thead:first-child > tr:first-child th {
   border-bottom: none;
-  background: #f8f8f8;
-  color: #767676;
+  background: #265988;
+  color: #ffffff;
   font-weight: normal;
 }
 .table thead > tr > th {
@@ -2018,3 +2018,61 @@ footer.main a {
 .DTTT_print_info {
   display: none;
 }
+
+.navbar-fixed-top {
+    top: 0;
+    border-width: 0 0 1px;
+    background-color: white;
+    width: 100%;
+}
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+    position: fixed;
+    z-index: 9999999;
+    width: 100%;
+    background-color: white;
+	margin-left: -1px;
+}
+.position_alert1 {
+    position: fixed;
+    z-index: 9999;
+    top: 5px;
+    right: 520px;
+    background: #265988;
+    padding: 10px 20px;
+    border-radius: 5px;
+	 color: white;
+}
+.position_alert {
+    position: fixed;
+    z-index: 9999;
+    top: 5px;
+    right: 20px;
+    background: #265988;
+    padding: 10px 20px;
+    border-radius: 5px;
+	 color: white;
+}
+
+.position_alert2 {
+    position: fixed;
+    z-index: 9999;
+    top: 5px;
+    right: 270px;
+    background: #265988;
+    padding: 10px 20px;
+    border-radius: 5px;
+	 color: white;
+}
+
+.tab-content {
+    margin-top: 100px;
+    position: absolute;
+    width: 95%;
+    
+}
+
+.selected {
+    border-left: 3px solid #f7b623;
+}
+
