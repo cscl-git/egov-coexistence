@@ -280,7 +280,9 @@ public class ChallanAction extends BaseFormAction {
     @ValidationErrorPage(value = ERROR)
     @SkipValidation
     public String newform() {
-        setLoginDept();
+		System.out.println("Part 1");
+        //setLoginDept();
+        System.out.println("Part 2");
         final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         try {
             cutOffDate = sdf.parse(collectionsUtil.getAppConfigValue(
@@ -289,6 +291,7 @@ public class ChallanAction extends BaseFormAction {
         } catch (final ParseException e) {
             LOGGER.error(getText("Error parsing Cut Off Date") + e.getMessage());
         }
+        System.out.println("Part 3");
         return NEW;
     }
 

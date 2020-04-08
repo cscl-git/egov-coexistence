@@ -418,7 +418,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     e.getMessage())));
         }
         if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.saved") + misc.getSequenceNumber());
+            addActionMessage(getText("budget.reappropriation.existing.new.saved"));
         if (reAppForNewBudgetCreated)
             addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
         clearFields();
@@ -463,7 +463,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     e.getMessage())));
         }
         if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.saved") + misc.getSequenceNumber());
+            addActionMessage(getText("budget.reappropriation.existing.cao.saved") + misc.getSequenceNumber());
         if (reAppForNewBudgetCreated)
             addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
         clearFields();
@@ -508,7 +508,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     e.getMessage())));
         }
         if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.saved") + misc.getSequenceNumber());
+            addActionMessage(getText("budget.reappropriation.existing.acmc.saved"));
         if (reAppForNewBudgetCreated)
             addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
         clearFields();
@@ -553,7 +553,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     e.getMessage())));
         }
         if (reAppropriationCreated)
-            addActionMessage(getText("budget.reappropriation.existing.saved") + misc.getSequenceNumber());
+            addActionMessage(getText("budget.reappropriation.existing.mc.saved"));
         if (reAppForNewBudgetCreated)
             addActionMessage(getText("budget.reappropriation.new.saved") + misc.getSequenceNumber());
         clearFields();

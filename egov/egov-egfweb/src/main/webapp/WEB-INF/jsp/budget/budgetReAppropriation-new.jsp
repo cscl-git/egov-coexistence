@@ -498,15 +498,11 @@
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
-									<input type="submit" value="<s:text name='lbl.close'/>"
+									<input type="submit" value="Forward to CAO"
 										id="budgetReAppropriation__create" name="method:create"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />
-									<!-- <input type="submit" value="Forward"
-													id="budgetReAppropriation__createAndForward"
-													name="method:createAndForward"
-													onClick="javascript: return validate(true,'createAndForward');"
-													class="buttonsubmit" /> -->
+									
 									<s:submit onclick="javascript: self.close()" key="lbl.close"
 										cssClass="button" />
 								</div>
@@ -514,22 +510,7 @@
 						</tr>
 					</table>
 				</div>
-				<%-- <div class="tabbertab" style="height: 430px;">
-									<h2>Approval Details</h2>
-									<div class="buttonbottom" style="padding-bottom: 10px;">
-										<input type="submit" value="Save"
-											id="budgetReAppropriation__create" name="method:create"
-											onClick="javascript: return validate(false,'create');"
-											class="buttonsubmit" />
-										<!-- <input type="submit" value="Forward"
-											id="budgetReAppropriation__createAndForward"
-											name="method:createAndForward"
-											onClick="javascript: return validate(true,'createAndForward');"
-											class="buttonsubmit" /> -->
-										<s:submit value="Close" onclick="javascript: self.close()"
-											cssClass="button" />
-									</div>
-								</div> --%>
+				
 				<!-- Individual tab -->
 
 			</div>

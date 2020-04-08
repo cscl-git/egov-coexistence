@@ -113,33 +113,7 @@
 					return false;
 				anticipatory = false;
 				estimate = false;
-				invalidNumber = "";
-				<!--for(i=0;i<budgetDetailsTable.getRecordSet().getLength();i++){
-					if(isNaN(document.getElementById('budgetReAppropriationList['+i+'].anticipatoryAmount').value) )
-						anticipatory = true;
-				}				
-				for(i=0;i<budgetDetailsTable.getRecordSet().getLength();i++){
-					if(isNaN(document.getElementById('budgetReAppropriationList['+i+'].deltaAmount').value) )
-						estimate = true;
-				}
-				if(alertMessage(estimate,anticipatory) ==false)
-					return false;	-->
-				anticipatory = false;
-				estimate = false;
-				<!--for(i=0;i<budgetReAppropriationTable.getRecordSet().getLength();i++){
-					if(isNaN(document.getElementById('newBudgetReAppropriationList['+i+'].deltaAmount').value) )
-						estimate = true;
-				}		
-				if(alertMessage(estimate,anticipatory) ==false)
-					return false;
-				for(i=0;i<budgetDetailsTable.getRecordSet().getLength();i++){
-					if(document.getElementById('budgetReAppropriationList['+i+'].budgetDetail.budgetGroup.id').value != 0 && document.getElementById('budgetReAppropriationList['+i+'].deltaAmount').value <= 0)
-						invalidNumber = " amount should be greater than 0";
-					if(document.getElementById('budgetReAppropriationList['+i+'].budgetDetail.budgetGroup.id').value != 0 && document.getElementById('budgetReAppropriationList['+i+'].anticipatoryAmount').value <= 0)
-						invalidNumber = "Anticipatory amount should be greater than 0";
-					if(document.getElementById('budgetReAppropriationList['+i+'].changeRequestType').value == 'Deduction' && document.getElementById('budgetReAppropriationList['+i+'].deltaAmount').value > parseInt(document.getElementById('budgetReAppropriationList['+i+'].availableAmount').innerHTML))
-						invalidNumber = "Dedution amount should be less than or equal to Balance Fund Available Amount";
-				}-->
+				invalidNumber = "";				
 				for(i=0;i<budgetReAppropriationTable.getRecordSet().getLength();i++){
 					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].deltaAmount').value <= 0)
 						invalidNumber = "Budget Estimate amount should be greater than 0";
@@ -257,11 +231,8 @@
 			}
 			function loadActuals(event){
 				event.preventDefault();
-				var isValid =validateMandatoryForGetActual();
-				if(isValid){
 				document.budgetDetailForm.action='/services/EGF/budget/budgetReAppropriation-loadActualsCao.action';
 	    		document.budgetDetailForm.submit();
-				};
 			}
 		</script>
 	<s:actionmessage theme="simple" />
@@ -498,15 +469,11 @@
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
-									<input type="submit" value="<s:text name='lbl.close'/>"
+									<input type="submit" value="Forward to ACMC"
 										id="budgetReAppropriation__create" name="method:createCao"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />
-									<!-- <input type="submit" value="Forward"
-													id="budgetReAppropriation__createAndForward"
-													name="method:createAndForward"
-													onClick="javascript: return validate(true,'createAndForward');"
-													class="buttonsubmit" /> -->
+									
 									<s:submit onclick="javascript: self.close()" key="lbl.close"
 										cssClass="button" />
 								</div>
@@ -514,22 +481,7 @@
 						</tr>
 					</table>
 				</div>
-				<%-- <div class="tabbertab" style="height: 430px;">
-									<h2>Approval Details</h2>
-									<div class="buttonbottom" style="padding-bottom: 10px;">
-										<input type="submit" value="Save"
-											id="budgetReAppropriation__create" name="method:create"
-											onClick="javascript: return validate(false,'create');"
-											class="buttonsubmit" />
-										<!-- <input type="submit" value="Forward"
-											id="budgetReAppropriation__createAndForward"
-											name="method:createAndForward"
-											onClick="javascript: return validate(true,'createAndForward');"
-											class="buttonsubmit" /> -->
-										<s:submit value="Close" onclick="javascript: self.close()"
-											cssClass="button" />
-									</div>
-								</div> --%>
+				
 				<!-- Individual tab -->
 
 			</div>

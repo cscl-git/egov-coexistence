@@ -1263,7 +1263,22 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             throw new ValidationException(errors);
         }
             LOGGER.info("Completed createInstrument.");
-
+        if(instHeaderList != null && !instHeaderList.isEmpty())
+        {
+        	System.out.println("11111111111111111111");
+        	for( InstrumentHeader row :instHeaderList)
+        	{
+        		System.out.println("row:::::::::::::::"+row.toString());
+        		if(row.getInstrumentVouchers() !=null && !row.getInstrumentVouchers().isEmpty())
+        		{
+        			System.out.println("222222222222222");
+        			for(InstrumentVoucher row1:row.getInstrumentVouchers())
+        			{
+        				System.out.println("row1:::::::"+row1.toString());
+        			}
+        		}
+        	}
+        }
         return "view";
     }
 
