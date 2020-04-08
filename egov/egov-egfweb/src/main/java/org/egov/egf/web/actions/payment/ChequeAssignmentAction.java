@@ -1141,8 +1141,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     {
 
         LOGGER.error("size--------" + parameters.size());
-        ///if (!paymentMode.equalsIgnoreCase("cash"))
-            //prepareChequeAssignmentList();
+        if (!paymentMode.equalsIgnoreCase("cash") && !paymentMode.equalsIgnoreCase("rtgs") && !paymentMode.equalsIgnoreCase("pex"))
+            prepareChequeAssignmentList();
         final List<AppConfigValues> printAvailConfig = appConfigValuesService
                 .getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "chequeprintavailableat");
 
@@ -1169,8 +1169,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             if (reassignSurrenderChq || !isChequeNoGenerationAuto())
                 validateDataForManual();
             System.out.println("Before After All");
-            final String[] dateArray1 = new String[]{parameters.get("chequeDt")[0]};
-        	System.out.println("date : "+dateArray1[0]);
+            //final String[] dateArray1 = new String[]{parameters.get("chequeDt")[0]};
+        	//System.out.println("date : "+dateArray1[0]);
             if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
             {
             	final String[] dateArray = new String[]{parameters.get("chequeDt")[0]};
