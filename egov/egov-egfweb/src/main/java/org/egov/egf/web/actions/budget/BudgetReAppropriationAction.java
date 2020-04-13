@@ -296,7 +296,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     }
     @Action(value = "/budget/budgetReAppropriation-budgetMC")
     public String budgetMC() {
-        
+        System.out.println("MC --> "+NEWMC);
         return NEWMC;
     }
 
@@ -350,13 +350,13 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     
     @Action(value = "/budget/budgetReAppropriation-createAcmc")
     public String createAcmc() {
-        save(ApplicationThreadLocals.getUserId().intValue());
+        saveAcmc(ApplicationThreadLocals.getUserId().intValue());
         return NEWACMC;
     }
     
     @Action(value = "/budget/budgetReAppropriation-createMc")
     public String createMc() {
-        save(ApplicationThreadLocals.getUserId().intValue());
+        saveMc(ApplicationThreadLocals.getUserId().intValue());
         return NEWMC;
     }
 
@@ -683,7 +683,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
         //removeEmptyReAppropriation(newBudgetReAppropriationList);
         
         //if (budgetReAppropriationService.rowsToAddForExistingDetails(budgetReAppropriationList))
-        List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppAcmc();
+        List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppMc();
     	budgetReAppropriationList.clear();
     	BudgetReAppropriationView vw=null;
     	for(BudgetDetail bd:detailList)

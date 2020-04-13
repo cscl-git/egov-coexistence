@@ -51,7 +51,7 @@
 <%@ page language="java"%>
 <html>
 <head>
-<title><s:text name="budget.reappropriation.title" /></title>
+<title><s:text name="budget.reappropriation.verify.title" /></title>
 <link rel="stylesheet" href="/services/EGF/resources/css/tabber.css?rnd=${app_release_no}"
 	TYPE="text/css">
 <script type="text/javascript" src="/services/EGF/resources/javascript/tabber.js?rnd=${app_release_no}"></script>
@@ -66,7 +66,7 @@
 <body>
 	<%@ include file='common-includes.jsp'%>
 	<jsp:include page="budgetHeader.jsp" />
-	<%@ include file='budgetReAppropriationSetUp.jsp'%>
+	<%@ include file='budgetReAppropriationSetUpVerify.jsp'%>
 	<%@ include file='addReAppropriationSetUp.jsp'%>
 	<script>
 					
@@ -114,14 +114,7 @@
 				anticipatory = false;
 				estimate = false;
 				invalidNumber = "";
-				for(i=0;i<budgetReAppropriationTable.getRecordSet().getLength();i++){
-					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].deltaAmount').value <= 0)
-						invalidNumber = "Budget Estimate amount should be greater than 0";
-					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].planningPercent').value <= 0)
-						invalidNumber = "Planning Budget Percentage should be greater than 0";
-					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].deltaAmount').value < 0)
-						invalidNumber = "Addition amount should be greater than 0";
-				}	
+				
 				if(invalidNumber != ""){
 					bootbox.alert(invalidNumber);
 					return false;
@@ -141,36 +134,7 @@
 				return;
 			}
 
-			var validateMandatoryForGetActual =  () => {
-				if(document.getElementById('financialYear').value==0){
-					bootbox.alert("<s:text name='msg.please.select.financial.year'/>");
-					return false;
-				}
-				if(document.getElementById('budgetReAppropriation_executingDepartment').value==0){
-					bootbox.alert('<s:text name="msg.please.select.executing.department"/>');
-					return false;
-				}		
-				for(i=0;i<budgetDetailsTable.getRecordSet().getLength();i++){
-					if(document.getElementById('budgetReAppropriationList['+i+'].budgetDetail.budgetGroup.id').value === '0'){
-						bootbox.alert('<s:text name="msg.please.budget.group"/>');
-						return false;
-						}
-					<s:if test="%{shouldShowField('function')}">				
-					if(document.getElementById('budgetReAppropriationList['+i+'].budgetDetail.function.id').value === '0'){
-						bootbox.alert('<s:text name="msg.please.select.function"/>');
-						return false;	
-						}
-					</s:if>
-					<s:if test="%{shouldShowField('fund')}">				
-					if(document.getElementById('budgetReAppropriationList['+i+'].budgetDetail.fund.id').value === '0'){
-						bootbox.alert('<s:text name="msg.please.select.fund"/>');
-						return false;
-						}
-					</s:if>
-					
-				}
-				return true;
-			}
+			
 
 			function alertMessage(estimate,anticipatory){
 				if(estimate && anticipatory){
@@ -203,7 +167,7 @@
 							element.selectedIndex = 1;
 						else
 							element.selectedIndex = 0;
-						updateBudgetDropDown();
+						//updateBudgetDropDown();
 				        },
 				     failure: function(o) {
 				     }
@@ -231,11 +195,8 @@
 			}
 			function loadActuals(event){
 				event.preventDefault();
-				var isValid =validateMandatoryForGetActual();
-				if(isValid){
 				document.budgetDetailForm.action='/services/EGF/budget/budgetReAppropriation-loadActualsAcmc.action';
 	    		document.budgetDetailForm.submit();
-				};
 			}
 		</script>
 	<s:actionmessage theme="simple" />
@@ -284,7 +245,7 @@
 											list="dropdownData.executingDepartmentList" listKey="code"
 											listValue="name" name="budgetDetail.executingDepartment"
 											headerKey="0" headerValue="%{getText('lbl.choose.options')}"
-											onchange="updateGrid('budgetDetail.executingDepartment.id',document.getElementById('budgetReAppropriation_executingDepartment').selectedIndex);updateReAppGrid('budgetDetail.executingDepartment.id',document.getElementById('budgetReAppropriation_executingDepartment').selectedIndex);"
+											onchange="updateGrid('budgetDetail.executingDepartment.id',document.getElementById('budgetReAppropriation_executingDepartment').selectedIndex);"
 											value="budgetDetail.executingDepartment"
 											id="budgetReAppropriation_executingDepartment"></s:select></td>
 								</s:if>
@@ -296,7 +257,7 @@
 									<td class="greybox"><s:select list="dropdownData.fundList"
 											listKey="id" listValue="name" name="budgetDetail.fund.id"
 											headerKey="0" headerValue="%{getText('lbl.choose.options')}"
-											onchange="updateGrid('budgetDetail.fund.id',document.getElementById('budgetReAppropriation_fund').selectedIndex);updateReAppGrid('budgetDetail.fund.id',document.getElementById('budgetReAppropriation_fund').selectedIndex)"
+											onchange="updateGrid('budgetDetail.fund.id',document.getElementById('budgetReAppropriation_fund').selectedIndex);"
 											value="fund.id" id="budgetReAppropriation_fund"></s:select></td>
 								</s:if>
 							</tr>
@@ -311,7 +272,7 @@
 											list="dropdownData.functionList" listKey="id"
 											listValue="name" name="budgetDetail.function.id"
 											headerKey="0" headerValue="%{getText('lbl.choose.options')}"
-											onchange="updateGrid('budgetDetail.function.id',document.getElementById('budgetReAppropriation_function').selectedIndex);updateReAppGrid('budgetDetail.function.id',document.getElementById('budgetReAppropriation_function').selectedIndex)"
+											onchange="updateGrid('budgetDetail.function.id',document.getElementById('budgetReAppropriation_function').selectedIndex);"
 											value="function.id" id="budgetReAppropriation_function"></s:select></td>
 								</s:if>
 								<s:if test="%{shouldShowHeaderField('functionary')}">
@@ -323,7 +284,7 @@
 											list="dropdownData.functionaryList" listKey="id"
 											listValue="name" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
 											name="budgetDetail.functionary.id"
-											onchange="updateGrid('budgetDetail.functionary.id',document.getElementById('budgetReAppropriation_functionary').selectedIndex);updateReAppGrid('budgetDetail.functionary.id',document.getElementById('budgetReAppropriation_functionary').selectedIndex)"
+											onchange="updateGrid('budgetDetail.functionary.id',document.getElementById('budgetReAppropriation_functionary').selectedIndex);"
 											value="functionary.id" id="budgetReAppropriation_functionary"></s:select></td>
 								</s:if>
 							</tr>
@@ -354,7 +315,7 @@
 											list="dropdownData.subSchemeList" listKey="id"
 											listValue="name" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
 											name="budgetDetail.subScheme"
-											onchange="updateGrid('budgetDetail.subScheme.id',document.getElementById('budgetReAppropriation_subScheme').selectedIndex);updateReAppGrid('budgetDetail.subScheme.id',document.getElementById('budgetReAppropriation_subScheme').selectedIndex)"
+											onchange="updateGrid('budgetDetail.subScheme.id',document.getElementById('budgetReAppropriation_subScheme').selectedIndex);"
 											value="subScheme.id" id="budgetReAppropriation_subScheme"></s:select></td>
 								</s:if>
 
@@ -440,33 +401,7 @@
 				computeAvailable("budgetReAppropriationList",i);
 			}
 		</script> <br />
-						<table width="100%" border="0" cellspacing="0" cellpadding="0"
-							id="budgetReAppropriationFormTable">
-							<tr>
-								<td>&nbsp;</td>
-							</tr>
-							<tr>
-								<td colspan="9">
-									<div class="subheadsmallnew">
-										<strong><s:text name="budget.reappropriation.add" /></strong>
-									</div>
-								</td>
-							</tr>
-						</table>
-						<div class="yui-skin-sam"
-							style="width: 100%; overflow-x: auto; overflow-y: hidden;">
-							<div id="budgetReAppropriationsTable"></div>
-							<br />
-						</div> <script>
-			makeBudgetReAppropriationTable();
-			hideReAppropriationTableColumns();
-			document.getElementById('budgetReAppropriationsTable').getElementsByTagName('table')[0].width = "70%";
-			addReAppGridRows();
-			updateAllReAppGridValues()
-			<s:if test="%{getActionErrors().size()>0 || getFieldErrors().size()>0}">
-				setValuesForReAppropriation();
-			</s:if>
-		</script>
+						
 					</span>
 					<table width="60%" border="0" cellspacing="0" cellpadding="0">
 						<tr>

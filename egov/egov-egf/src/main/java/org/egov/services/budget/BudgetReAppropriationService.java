@@ -854,7 +854,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         applyAuditing(appropriation);
         persist(appropriation);
         // Need to call on approve (After implementing workflow)
-        updatePlanningBudgetAcmc(appropriation);
+        updatePlanningBudgetMc(appropriation);
     }
 
     @Transactional

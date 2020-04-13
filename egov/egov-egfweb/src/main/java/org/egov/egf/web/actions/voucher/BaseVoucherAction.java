@@ -163,6 +163,12 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		return NEW;
 
 	}
+	
+	@SkipValidation
+	public String assignNumber() {
+		return SUMMARYFORM;
+
+	}
 
 	@Override
 	public void prepare() {

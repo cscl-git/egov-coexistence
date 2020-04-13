@@ -546,30 +546,30 @@ public class PendingTDSReportAction extends BaseFormAction {
             RemittanceBean remittanceBean = new RemittanceBean();
             remittanceBean.setRecoveryId(recovery.getId());
             if(remitRecoveryService.isNonControlledCodeTds(remittanceBean)){
-                final String qry = "select vh.name,sum(erd.remittedamt),er.month "
+                final String qry = "select vh.name,erd.remittedamt,er.month ,erd.assign_number "
                         + "FROM eg_remittance_detail erd,voucherheader vh1 RIGHT OUTER JOIN eg_remittance er ON vh1.id=er.paymentvhid,"
                         + "voucherheader vh,vouchermis mis,generalledger gl,fund f, eg_remittance_gl ergl WHERE erd.remittanceglid = ergl.id AND "
                         + "erd.remittanceid=er.id  AND gl.glcodeid ="+recovery.getChartofaccounts().getId()+" AND vh.id =mis.voucherheaderid AND vh1.status =0  AND "
                         + "gl.id = ergl.glid  AND gl.voucherheaderid     =vh.id  AND er.fundid =f.id AND f.id = "+fund.getId()+" AND vh.status =0 AND "
                         + "vh.voucherDate <= to_date('"+Constants.DDMMYYYYFORMAT2.format(asOnDate)+"','dd/MM/yyyy') and  "
                         + "vh.voucherDate >= to_date('"+Constants.DDMMYYYYFORMAT2.format(financialYearDAO.getFinancialYearByDate(asOnDate).getStartingDate())+"','dd/MM/yyyy') "+ deptQuery
-                        + "group by er.month,vh.name order by er.month,vh.name";
+                        + " order by er.month,vh.name";
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug(qry);
                 result = persistenceService.getSession().createSQLQuery(qry).list();
                 
              // Query to get total deduction
-                final String qryTolDeduction = "SELECT type,MONTH,SUM(glamt) FROM (SELECT DISTINCT er.month AS MONTH,ergl.glamt AS glamt,ergl.glid as glid,vh.name AS type "
+                final String qryTolDeduction = "SELECT type,MONTH,glamt FROM (SELECT DISTINCT er.month AS MONTH,ergl.glamt AS glamt,ergl.glid as glid,vh.name AS type "
                         + "FROM eg_remittance_detail erd,voucherheader vh1 RIGHT OUTER JOIN eg_remittance er ON vh1.id=er.paymentvhid,"
                         + "voucherheader vh,vouchermis mis,generalledger gl,fund f, eg_remittance_gl ergl WHERE erd.remittanceglid = ergl.id AND "
                         + "erd.remittanceid=er.id  AND gl.glcodeid = "+recovery.getChartofaccounts().getId()+" AND vh.id =mis.voucherheaderid AND vh1.status =0  AND "
                         + "gl.id = ergl.glid  AND gl.voucherheaderid     =vh.id  AND er.fundid =f.id AND f.id = "+fund.getId()+" AND vh.status =0 AND "
                         + "vh.voucherDate <= to_date('"+Constants.DDMMYYYYFORMAT2.format(asOnDate)+"','dd/MM/yyyy') and  "
                         + "vh.voucherDate >= to_date('"+Constants.DDMMYYYYFORMAT2.format(financialYearDAO.getFinancialYearByDate(asOnDate).getStartingDate())+"','dd/MM/yyyy')) "
-                        + "as temptable group by type,month";
+                        + "as temptable order by type,month";
                 resultTolDeduction = persistenceService.getSession().createSQLQuery(qryTolDeduction).list();
             }else{
-                final String qry = "select vh.name,sum(erd.remittedamt),er.month from eg_remittance_detail erd,"
+                final String qry = "select vh.name,erd.remittedamt,er.month,erd.assign_number from eg_remittance_detail erd,"
                         +
                         " voucherheader vh1 right outer join eg_remittance er on vh1.id=er.paymentvhid,voucherheader vh,vouchermis mis,generalledger gl,generalledgerdetail gld,fund f,eg_remittance_gldtl ergl where "
                         +
@@ -582,12 +582,12 @@ public class PendingTDSReportAction extends BaseFormAction {
                         " and vh.status=0 and vh.voucherDate <= to_date('" + Constants.DDMMYYYYFORMAT2.format(asOnDate)
                         + "','dd/MM/yyyy') and " + "vh.voucherDate >= to_date('"
                         + Constants.DDMMYYYYFORMAT2.format(financialYearDAO.getFinancialYearByDate(asOnDate).getStartingDate())
-                        + "','dd/MM/yyyy') " + deptQuery + partyNameQuery + " group by er.month,vh.name order by er.month,vh.name";
+                        + "','dd/MM/yyyy') " + deptQuery + partyNameQuery + "  order by er.month,vh.name";
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug(qry);
                 result = persistenceService.getSession().createSQLQuery(qry).list();
                 // Query to get total deduction
-                final String qryTolDeduction = "SELECT type,MONTH,SUM(gldtamt) FROM (SELECT DISTINCT er.month AS MONTH,ergl.gldtlamt AS gldtamt,"
+                final String qryTolDeduction = "SELECT type,MONTH,gldtamt FROM (SELECT DISTINCT er.month AS MONTH,ergl.gldtlamt AS gldtamt,"
                         +
                         "ergl.gldtlid as gldtlid,vh.name AS type FROM eg_remittance_detail erd,voucherheader vh1 RIGHT OUTER JOIN eg_remittance er ON vh1.id=er.paymentvhid,"
                         +
@@ -606,7 +606,7 @@ public class PendingTDSReportAction extends BaseFormAction {
                         + "','dd/MM/yyyy') and "
                         + " vh.voucherDate >= to_date('"
                         + Constants.DDMMYYYYFORMAT2.format(financialYearDAO.getFinancialYearByDate(asOnDate).getStartingDate())
-                        + "','dd/MM/yyyy') " + deptQuery + partyNameQuery + ") as temptable group by type,month";
+                        + "','dd/MM/yyyy') " + deptQuery + partyNameQuery + ") as temptable order by type,month";
                 resultTolDeduction = persistenceService.getSession().createSQLQuery(qryTolDeduction).list();
             }
         } catch (final ApplicationRuntimeException e) {
@@ -622,10 +622,18 @@ public class PendingTDSReportAction extends BaseFormAction {
                 final String monthChk = DateUtils.getAllMonthsWithFullNames().get(Integer.valueOf(entry[2].toString()) + 1);
                 if (monthChk.equalsIgnoreCase(DateUtils.getAllMonthsWithFullNames().get(
                         Integer.valueOf(dedentry[1].toString()) + 1))
-                        && dedentry[0].toString().equalsIgnoreCase(entry[0].toString())) {
+                        && dedentry[0].toString().equalsIgnoreCase(entry[0].toString()) && dedentry[2].toString().equalsIgnoreCase(entry[1].toString())) {
                     tds.setNatureOfDeduction(entry[0].toString());
                     tds.setTotalRemitted(new BigDecimal(entry[1].toString()));
                     tds.setMonth(DateUtils.getAllMonthsWithFullNames().get(Integer.valueOf(entry[2].toString()) + 1));
+                    if(entry[3] != null)
+                    {
+                    	tds.setAutoAssignNumber(entry[3].toString());
+                    }
+                    else
+                    {
+                    	tds.setAutoAssignNumber(null);
+                    }
                     final BigDecimal totDeduction = new BigDecimal(dedentry[2].toString());
                     tds.setTotalDeduction(totDeduction);
                     remittedTDS.add(tds);

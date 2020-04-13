@@ -112,12 +112,22 @@
 										<s:else>0.00</s:else>
 									</div>
 								</td>
-								<td class="blueborderfortd"><div align="right">
-								<s:if test="%{#p.autoAssignNumber != null}">
-								<s:property value="autoAssignNumber" />
-								</s:if>
-										&nbsp;
-									</div></td>
+								<td class="blueborderfortd">
+									<div align="right">
+									<s:if test="%{#p.autoAssignNumber != null}">
+									<s:property value="autoAssignNumber" />&nbsp;
+									</s:if>
+									<s:else>
+											<input type="hidden" id="remDtlIds<s:property value="#stat.index"/>"
+												name="remDtlIds[<s:property value="#stat.index"/>]"
+												value='<s:property value="remDtlId"/>' />
+											<input type="text" style="width :100%"
+							id="remAssignNumbers<s:property value="#stat.index"/>"
+						name="remAssignNumbers[<s:property value="#stat.index"/>]"/>
+										</s:else>
+									
+									</div>
+								</td>
 							</tr>
 						</s:iterator>
 					</table>
@@ -128,11 +138,11 @@
 	</td>
 	</tr>
 	</table>
-	<div class="buttonbottom" align="center">
-		Export Options: <label onclick="exportXls()"><a
-			href='javascript:void(0);'>Excel</a></label> | <label onclick="exportPdf()"><a
-			href="javascript:void(0);">PDF</a></label>
+	
+<div class="buttonbottom" align="center">
+		<s:submit class="buttonsubmit" value='Save'
+					id="save" method="saveAssignNumbers"
+					onclick="submitAssignNumbers();" />
 	</div>
-
 </s:elseif>
 <s:else>No records found</s:else>
