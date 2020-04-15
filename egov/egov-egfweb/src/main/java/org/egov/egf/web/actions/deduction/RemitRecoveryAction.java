@@ -598,15 +598,15 @@ public class RemitRecoveryAction extends BasePaymentAction {
     /**
      * @return
      */
-    public String beforeEdit() {
+    /*public String beforeEdit() {
         showApprove = true;
         // voucherHeader.setId(paymentheader.getVoucherheader().getId());
         prepareForViewModifyReverse();
         // loadApproverUser(voucherHeader.getType());
         return EDIT;
-    }
+    }*/
 
-    @ValidationErrorPage(value = EDIT)
+    //@ValidationErrorPage(value = EDIT)
     @Action(value = "/deduction/remitRecovery-edit")
     public String edit() {
         try {
@@ -1257,6 +1257,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
 	
 	@Action(value = "/deduction/remitRecovery-ajaxLoadSummaryData")
     public String ajaxLoadSummaryData() {
+		System.out.println("CCCCCC");
 		prepareAssign();
         populateSummaryData();
         System.out.println("AAAAAAA");

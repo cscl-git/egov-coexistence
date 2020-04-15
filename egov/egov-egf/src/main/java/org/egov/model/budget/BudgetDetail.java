@@ -77,6 +77,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -376,6 +377,31 @@ public class BudgetDetail extends StateAware {
                     total = total.subtract(entry.getDeductionAmount());            
             }
         }
+        return total;
+    }
+    
+    public BigDecimal getApprovedReAppropriationsTotalReapp() {
+        BigDecimal total = BigDecimal.ZERO;
+        BudgetReAppropriation entry=null;
+        budgetReAppropriations = budgetReAppropriations == null
+                ? new HashSet<>()
+                : budgetReAppropriations;
+                List<BudgetReAppropriation> reAppList=new ArrayList<BudgetReAppropriation>();
+                reAppList.addAll(budgetReAppropriations);
+                Collections.sort(reAppList, Collections.reverseOrder());
+                if(reAppList != null && !reAppList.isEmpty())
+                {
+                	entry=reAppList.get(0);
+                }
+            if (!entry.getStatus().getDescription()
+                    .equalsIgnoreCase("Cancelled")){
+            	if ((entry.getAdditionAmount() != null)
+                        && BigDecimal.ZERO
+                        .compareTo(entry.getAdditionAmount()) != 0)
+                    total = total.add(entry.getAdditionAmount());
+                else
+                    total = total.subtract(entry.getDeductionAmount());
+            }
         return total;
     }
 

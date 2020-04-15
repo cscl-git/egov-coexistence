@@ -140,9 +140,8 @@
 	</table>
 	
 <div class="buttonbottom" align="center">
-		<s:submit class="buttonsubmit" value='Save'
-					id="save" method="saveAssignNumbers"
-					onclick="submitAssignNumbers();" />
+		<input type="button" value="Save" class="buttonsubmit"
+				onclick="submitAssignNumbers()" />
 	</div>
 </s:elseif>
 <s:else>No records found</s:else>

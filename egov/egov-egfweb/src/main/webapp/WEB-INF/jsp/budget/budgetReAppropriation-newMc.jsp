@@ -153,10 +153,6 @@
 					bootbox.alert('<s:text name="msg.please.select.financial.year"/>');
 					return false;
 				}
-				if(document.getElementById('budgetReAppropriation_executingDepartment').value==0){
-					bootbox.alert('<s:text name="msg.please.select.executing.department"/>');
-					return false;
-				}
 				return true;
 			}
 			var callback = {
@@ -233,34 +229,7 @@
 								<td class="bluebox"><s:select name="isBeRe" id="isBeRe"
 										list="#{'BE':'BE','RE':'RE'}" value="beRe" disabled="true" /></td>
 							</tr>
-							<tr>
-								<s:if test="%{shouldShowHeaderField('executingDepartment')}">
-									<td class="greybox">&nbsp;</td>
-									<td class="greybox"><s:text
-											name="budgetdetail.executingDepartment" /> <s:if
-											test="%{isFieldMandatory('executingDepartment')}">
-											<span class="mandatory1">*</span>
-										</s:if></td>
-									<td width="22%" class="greybox"><s:select
-											list="dropdownData.executingDepartmentList" listKey="code"
-											listValue="name" name="budgetDetail.executingDepartment"
-											headerKey="0" headerValue="%{getText('lbl.choose.options')}"
-											onchange="updateGrid('budgetDetail.executingDepartment.id',document.getElementById('budgetReAppropriation_executingDepartment').selectedIndex);"
-											value="budgetDetail.executingDepartment"
-											id="budgetReAppropriation_executingDepartment"></s:select></td>
-								</s:if>
-								<s:if test="%{shouldShowHeaderField('fund')}">
-									<td class="greybox"><s:text name="fund" /> <s:if
-											test="%{isFieldMandatory('fund')}">
-											<span class="mandatory1">*</span>
-										</s:if></td>
-									<td class="greybox"><s:select list="dropdownData.fundList"
-											listKey="id" listValue="name" name="budgetDetail.fund.id"
-											headerKey="0" headerValue="%{getText('lbl.choose.options')}"
-											onchange="updateGrid('budgetDetail.fund.id',document.getElementById('budgetReAppropriation_fund').selectedIndex);"
-											value="fund.id" id="budgetReAppropriation_fund"></s:select></td>
-								</s:if>
-							</tr>
+							
 							<tr>
 								<s:if test="%{shouldShowHeaderField('function')}">
 									<td class="bluebox">&nbsp;</td>

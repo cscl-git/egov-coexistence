@@ -61,8 +61,8 @@ function resetPage(){
 	
 	<div class="subheadnew">Deductions remittance summary</div>
 
-	<s:form action="pendingTDSReport" theme="simple"
-		name="pendingTDSReport">
+	<s:form action="remitRecovery" theme="simple"
+		name="remitRecoveryForm">
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
 			<tr>
 				<td class="greybox" width="10%">Recovery Code:<span

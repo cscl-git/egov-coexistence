@@ -778,7 +778,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
          * "");
          */
         applyAuditing(appropriation);
-        persist(appropriation);
+        //persist(appropriation);
         // Need to call on approve (After implementing workflow)
         updatePlanningBudgetCao(appropriation);
     }
@@ -815,7 +815,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
          * "");
          */
         applyAuditing(appropriation);
-        persist(appropriation);
+        //persist(appropriation);
         // Need to call on approve (After implementing workflow)
         updatePlanningBudgetAcmc(appropriation);
     }
@@ -852,7 +852,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
          * "");
          */
         applyAuditing(appropriation);
-        persist(appropriation);
+        //persist(appropriation);
         // Need to call on approve (After implementing workflow)
         updatePlanningBudgetMc(appropriation);
     }

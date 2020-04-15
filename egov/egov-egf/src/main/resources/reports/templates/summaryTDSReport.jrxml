@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.9.0.final using JasperReports Library version 6.9.0-cb8f9004be492ccc537180b49c026951f4220bf3  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="summaryTDSReport" pageWidth="600" pageHeight="612" whenNoDataType="AllSectionsNoDetail" columnWidth="560" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9f4f8029-0aac-4aa2-aa29-c80274829863">
 	<property name="net.sf.jasperreports.export.pdf.exclude.origin.keep.first.band.columnHeader" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.columnHeader" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.html.exclude.origin.keep.first.band.columnHeader" value="columnHeader"/>
-	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.zoom" value="1.4641000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="ulbName" class="java.lang.String"/>
@@ -18,6 +17,7 @@
 	<field name="month" class="java.lang.String"/>
 	<field name="totalRemitted" class="java.math.BigDecimal"/>
 	<field name="totalDeduction" class="java.math.BigDecimal"/>
+	<field name="autoAssignNumber" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -97,7 +97,7 @@
 	<columnHeader>
 		<band height="33" splitType="Stretch">
 			<staticText>
-				<reportElement x="418" y="0" width="142" height="33" uuid="d877ff94-f33c-4232-aec9-1ff8069ceb9f"/>
+				<reportElement x="359" y="0" width="101" height="33" uuid="d877ff94-f33c-4232-aec9-1ff8069ceb9f"/>
 				<box>
 					<pen lineWidth="1.0" lineColor="#010101"/>
 					<topPen lineWidth="1.0"/>
@@ -111,7 +111,7 @@
 				<text><![CDATA[Deduction Amount(Rs)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="273" y="0" width="145" height="33" uuid="a81cff53-78c4-46af-95a1-c3222d610cd1"/>
+				<reportElement x="273" y="0" width="86" height="33" uuid="a81cff53-78c4-46af-95a1-c3222d610cd1"/>
 				<box>
 					<pen lineWidth="1.0" lineColor="#010101"/>
 					<topPen lineWidth="1.0"/>
@@ -166,12 +166,26 @@
 				</textElement>
 				<text><![CDATA[Month]]></text>
 			</staticText>
+			<staticText>
+				<reportElement x="460" y="0" width="100" height="33" uuid="8b6a304d-3007-4785-8e1e-b9cc3ce27e4e"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#010101"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Acknowledge Number]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
 		<band height="31" splitType="Stretch">
 			<textField pattern="###0.00" isBlankWhenNull="true">
-				<reportElement x="418" y="0" width="142" height="31" uuid="448319a6-ace8-4fa8-8b31-2498be04955d"/>
+				<reportElement x="359" y="0" width="101" height="31" uuid="448319a6-ace8-4fa8-8b31-2498be04955d"/>
 				<box>
 					<pen lineWidth="1.0" lineColor="#010101"/>
 					<topPen lineWidth="1.0"/>
@@ -183,7 +197,7 @@
 				<textFieldExpression><![CDATA[$F{totalDeduction}]]></textFieldExpression>
 			</textField>
 			<textField pattern="###0.00" isBlankWhenNull="true">
-				<reportElement x="273" y="0" width="145" height="31" uuid="dd514a6e-4af1-4845-bcee-2d0e279b8caa"/>
+				<reportElement x="273" y="0" width="86" height="31" uuid="dd514a6e-4af1-4845-bcee-2d0e279b8caa"/>
 				<box>
 					<pen lineWidth="1.0" lineColor="#010101"/>
 					<topPen lineWidth="1.0"/>
@@ -229,6 +243,18 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{month}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="460" y="0" width="100" height="31" uuid="a59ea10b-72b2-4f3d-9f2c-7d9157946c8f"/>
+				<box>
+					<pen lineWidth="1.0" lineColor="#010101"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{autoAssignNumber}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

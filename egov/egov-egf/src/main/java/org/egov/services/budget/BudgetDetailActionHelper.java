@@ -137,7 +137,7 @@ public class BudgetDetailActionHelper {
         for (final BudgetDetail detail : budgetDetailList) {
             if (detail != null)
                 detail.setId(null);
-            BudgetDetail reCurrentYear = budgetDetailService.setRelatedEntitesOn(detail);
+            BudgetDetail reCurrentYear = budgetDetailService.setRelatedEntitesOn(detail,false);
             reCurrentYear.setUniqueNo(budgetDetailService.generateUniqueNo(reCurrentYear));
             budgetDetailService.applyAuditing(reCurrentYear);
             reCurrentYear = budgetDetailService.transitionWorkFlow(reCurrentYear, workflowBean);
@@ -150,7 +150,7 @@ public class BudgetDetailActionHelper {
             beNextYear.setOriginalAmount(beAmounts.get(index));
             beNextYear.setDocumentNumber(detail.getDocumentNumber());
             beNextYear.setAnticipatoryAmount(reCurrentYear.getAnticipatoryAmount());
-            beNextYear = budgetDetailService.setRelatedEntitesOn(beNextYear);
+            beNextYear = budgetDetailService.setRelatedEntitesOn(beNextYear,false);
             beNextYear.setUniqueNo(budgetDetailService.generateUniqueNo(beNextYear));
             if (workflowBean.getWorkFlowAction().equalsIgnoreCase(FinancialConstants.BUTTONSAVE))
                 beNextYear.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,

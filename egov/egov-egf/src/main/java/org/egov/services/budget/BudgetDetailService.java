@@ -231,7 +231,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public BudgetDetail createBudgetDetail(final BudgetDetail detail, final Position position,
             final PersistenceService service) {
         try {
-            setRelatedEntitesOn(detail);
+            setRelatedEntitesOn(detail,true);
 
             return detail;
         } catch (final ConstraintViolationException e) {
@@ -579,9 +579,16 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
 
     }
 
-    public BudgetDetail setRelatedEntitesOn(final BudgetDetail detail) {
-
-        detail.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved"));
+    public BudgetDetail setRelatedEntitesOn(final BudgetDetail detail,boolean status) {
+    	if(status)
+    	{
+    		detail.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP CAO"));
+    	}
+    	else
+    	{
+    		detail.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved"));
+    	}
+        
         if (detail.getBudget() != null) {
             detail.setBudget(persistenceService.getSession().load(Budget.class, detail.getBudget().getId()));
             addMaterializedPath(detail);

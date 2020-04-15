@@ -178,8 +178,8 @@ function getData(){
 
 function submitAssignNumbers()
 {
-	document.pendingTDSReport.action = '/services/EGF/deduction/remitRecovery-saveAssignNumbers.action';
-	document.pendingTDSReport.submit();
+	document.remitRecoveryForm.action = '/services/EGF/deduction/remitRecovery-saveAssignNumbers.action';
+	document.remitRecoveryForm.submit();
 	}
 
 
