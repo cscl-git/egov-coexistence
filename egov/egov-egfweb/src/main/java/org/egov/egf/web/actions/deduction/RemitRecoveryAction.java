@@ -1434,18 +1434,26 @@ public class RemitRecoveryAction extends BasePaymentAction {
     public String saveAssignNumbers() {
 		System.out.println("Enter");
 		prepareAssign();
-		System.out.println("remDtlIds.size()  -- >"+remDtlIds.size());
-		for(Long row:remDtlIds)
+		int i=0;
+		try
 		{
-			System.out.println("ID : : "+row);
+			for(String number:remAssignNumbers)
+			{
+				if(number != null && !number.isEmpty())
+				{
+					persistenceService.getSession()
+	                .createSQLQuery(
+	                        "update eg_remittance_detail  set assign_number = :assignNumber where id =:dtlId ")
+	                .setLong("dtlId", remDtlIds.get(i)).setString("assignNumber", number)
+	                .executeUpdate();
+				}
+				i++;
+			}
+		}catch (Exception e) {
+			e.printStackTrace();
 		}
-		System.out.println("remAssignNumbers.size()  -- >"+remAssignNumbers.size());
-		
-		for(String numbers:remAssignNumbers)
-		{
-			System.out.println("Number :::"+numbers);
-		}
-        System.out.println("BBBBB");
+		System.out.println("Done");
+		message="Acknowledge Number(s) has been saved successfully";
         return assignNumber();
     }
     

@@ -89,6 +89,7 @@ public class InstrumentHeader extends BaseModel {
     private CFinancialYear serialNo;
     private ECSType ECSType;
     private String ifscCode;
+    private String voucherNumber;
 
     private Set<InstrumentVoucher> instrumentVouchers = new HashSet<InstrumentVoucher>(0);
 
@@ -454,5 +455,13 @@ public class InstrumentHeader extends BaseModel {
     public void setIfscCode(String ifscCode) {
         this.ifscCode = ifscCode;
     }
+
+	public String getVoucherNumber() {
+		return voucherNumber;
+	}
+
+	public void setVoucherNumber(String voucherNumber) {
+		this.voucherNumber = voucherNumber;
+	}
 
 }

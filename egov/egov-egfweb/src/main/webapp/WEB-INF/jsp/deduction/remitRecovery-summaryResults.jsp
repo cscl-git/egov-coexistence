@@ -46,13 +46,17 @@
   ~
   --%>
 
+<script>
 
+</script>
 <%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
 <s:if test="%{message != ''}">
 	<label style="color: red"><s:property value="message" /></label>
 </s:if>
 <s:elseif test="%{remittedTDS.size()>0}">
 	<br />
+	<s:form action="saveAssignNumbers" theme="simple"
+		name="remitRecoveryFormAssign">
 	<table width="99%" border="0" cellspacing="0" cellpadding="0">
 		<tr>
 
@@ -121,7 +125,7 @@
 											<input type="hidden" id="remDtlIds<s:property value="#stat.index"/>"
 												name="remDtlIds[<s:property value="#stat.index"/>]"
 												value='<s:property value="remDtlId"/>' />
-											<input type="text" style="width :100%"
+											<input type="text" style="width :100%" maxlength = "50"
 							id="remAssignNumbers<s:property value="#stat.index"/>"
 						name="remAssignNumbers[<s:property value="#stat.index"/>]"/>
 										</s:else>
@@ -142,5 +146,6 @@
 <div class="buttonbottom" align="center">
 	<s:submit type="submit" cssClass="buttonsubmit"  id="saveAssignNumbers" name="saveAssignNumbers" method="saveAssignNumbers" onclick="return submitAssignNumbers();" />
 	</div>
+	</s:form>
 </s:elseif>
 <s:else>No records found</s:else>

@@ -1265,35 +1265,14 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             LOGGER.info("Completed createInstrument.");
         if(instHeaderList != null && !instHeaderList.isEmpty())
         {
-        	System.out.println("11111111111111111111");
         	
         	for( InstrumentHeader row :instHeaderList)
         	{
-        		System.out.println("amount:"+row.getInstrumentAmount());
-        		System.out.println("amount:"+row.getTransactionDate());
-        		System.out.println("amount:"+row.getTransactionNumber());
-        		System.out.println("row:::::::::::::::"+row.toString());
-        		if(row.getInstrumentVouchers() !=null && !row.getInstrumentVouchers().isEmpty())
-        		{
-        			System.out.println("222222222222222");
-        			for(InstrumentVoucher row1:row.getInstrumentVouchers())
-        			{
-        				System.out.println("row1:::::::"+row1.toString());
-        			}
-        		}
-        	}
-        	System.out.println("--------------------");
-        	for(InstrumentVoucher row:instVoucherList)
-        	{
-        		System.out.println("SSSSSSSSSSSSS");
-        		System.out.println("row.getInstrumentHeaderId().getBankBranchName()"+row.getInstrumentHeaderId().getBankBranchName());
-        		System.out.println("row.getInstrumentHeaderId().getInstrumentAmount()"+row.getInstrumentHeaderId().getInstrumentAmount());
-        		System.out.println("row.getInstrumentHeaderId().getTransactionNumber()"+row.getInstrumentHeaderId().getTransactionNumber());
-        		System.out.println("row.getInstrumentHeaderId().getId()"+row.getInstrumentHeaderId().getId());
-        		System.out.println("row.getInstrumentHeaderId().getBankId()"+row.getInstrumentHeaderId().getBankId());
-        		System.out.println("row.getInstrumentHeaderId().getBankId()"+row.getVoucherHeaderId().getVoucherNumber());
+        		final InstrumentVoucher instrumentHeaderDtl = instrumentVoucherService.getInstrumentVoucherByVoucherHeader(row.getId());
+        		row.setVoucherNumber(instrumentHeaderDtl.getVoucherHeaderId().getVoucherNumber());
         	}
         }
+        System.out.println("done");
         return "view";
     }
 

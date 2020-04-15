@@ -58,7 +58,9 @@ function resetPage(){
 </head>
 <div class="formmainbox">
 	<div class="formheading"></div>
-	
+	<s:if test="%{message != ''}">
+	<label style="color: green"><s:property value="message" /></label>
+</s:if>
 	<div class="subheadnew">Deductions remittance summary</div>
 
 	<s:form action="remitRecovery" theme="simple"
@@ -123,9 +125,9 @@ function resetPage(){
 				Class="button" />
 		</div>
 		<s:hidden name="detailKey" id="detailKey"></s:hidden>
-		<br><br><br><br>
-		<div id="results"></div>
+		
 	</s:form>
+	<div id="results"></div>
 </div>
 
 

@@ -265,6 +265,7 @@ public class BankAdviceReportAction extends BaseFormAction {
     }
 
     public List getSubLedgerDetailQueryAndParams(final InstrumentHeader instrumentHeader) {
+    	System.out.println("entery method");
         final HashMap<Object, Map<Object, BigDecimal>> detailTypeMap = new HashMap<Object, Map<Object, BigDecimal>>();
         HashMap<Object, BigDecimal> detailKeyMap = new HashMap<Object, BigDecimal>();
         Map<Object, BigDecimal> tempMap = new HashMap<Object, BigDecimal>();
@@ -294,15 +295,15 @@ public class BankAdviceReportAction extends BaseFormAction {
 
         final Query WithNetPayableSubledgerQuery = persistenceService.getSession().createSQLQuery(query);
         WithNetPayableSubledgerQuery.setParameter(0, instrumentHeader.getId());
-
+        System.out.println("1");
         // Get without subledger one
         final Query getDebitsideSubledgerQuery = persistenceService.getSession().createSQLQuery(withNoSubledgerQry);
         getDebitsideSubledgerQuery.setParameter(0, instrumentHeader.getId());
         getDebitsideSubledgerQuery.setParameter(1, instrumentHeader.getId());
-
+        System.out.println("2");
         final List<Object[]> retList = WithNetPayableSubledgerQuery.list();
         retList.addAll(getDebitsideSubledgerQuery.list());
-
+        System.out.println("3");
         for (final Object[] obj : retList)
             if (detailTypeMap.isEmpty()) {
                 detailKeyMap = new HashMap<Object, BigDecimal>();
@@ -327,6 +328,7 @@ public class BankAdviceReportAction extends BaseFormAction {
                     detailTypeMap.put(obj[0], detailKeyMap);
                 }
             }
+        System.out.println("End");
 
         return retList;
     }
@@ -445,11 +447,18 @@ public class BankAdviceReportAction extends BaseFormAction {
     @ValidationErrorPage(NEW)
     @Action(value = "/report/bankAdviceReport-exportExcel")
     public String exportExcel() {
+    	System.out.println("Enter excel");
+    	System.out.println("bank.getId()"+bank.getId());
+    	System.out.println("bankbranch.getId()"+bankbranch.getId());
+    	System.out.println("bankaccount.getId()"+bankaccount.getId());
         final Map<String, Object> reportParams = new HashMap<String, Object>();
         reportParams.put("bankName", getBankName(bank.getId()));
+        System.out.println("getBankName(bank.getId())"+getBankName(bank.getId()));
         reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
         reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+        System.out.println("XXCXC");
         final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        System.out.println("After subledger report");
         final ReportRequest reportInput = new ReportRequest("bankAdviceExcelReport", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.XLS);
         contentType = ReportViewerUtil.getContentType(ReportFormat.XLS);
@@ -620,9 +629,15 @@ public class BankAdviceReportAction extends BaseFormAction {
 
         final List retList = getSubLedgerDetailQueryAndParams(instrumentnumber);
         if (retList != null && !retList.isEmpty())
+        {
+        	System.out.println("NOT NULL");
             return populateSubLedgerDetails(retList);
+        }
         else
+        {
+        	System.out.println("NULL");
             return Collections.EMPTY_LIST;
+        }
     }
 
     @Override
