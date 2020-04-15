@@ -141,7 +141,7 @@ import com.opensymphony.xwork2.validator.annotations.Validation;
         @Result(name = "messages", location = "remitRecovery-messages.jsp"),
         @Result(name = "view", location = "remitRecovery-view.jsp"),
         @Result(name = RemitRecoveryAction.SUMMARYFORM, location = "remitRecovery-summaryForm.jsp"),
-        @Result(name = "edit", location = "remitRecovery-summaryForm.jsp"),
+        //@Result(name = "edit", location = "remitRecovery-summaryForm.jsp"),
         @Result(name = "summaryResults", location = "remitRecovery-summaryResults.jsp"),
         @Result(name = "remitDetail", location = "remitRecovery-remitDetail.jsp") })
 public class RemitRecoveryAction extends BasePaymentAction {
@@ -1425,6 +1425,11 @@ public class RemitRecoveryAction extends BasePaymentAction {
 		this.remAssignNumbers = remAssignNumbers;
 	}
 	
+	public void prepareSaveAssignNumbers() {
+		prepareAssign();
+    }
+	
+	@ValidationErrorPage(value = RemitRecoveryAction.SUMMARYFORM)
 	@Action(value = "/deduction/remitRecovery-saveAssignNumbers")
     public String saveAssignNumbers() {
 		System.out.println("Enter");

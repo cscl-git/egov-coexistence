@@ -461,7 +461,7 @@ var totaldbamt=0,totalcramt=0;
         var creditDetailColumns = [
             {key:"glcodeid",hidden:true,width:10, formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".glcodeIdDetail","hidden",VOUCHERCREDITDETAILTABLE)},
             {key:"accounthead", label:'Account Head <span class="mandatory"></span>',formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".accounthead","text",VOUCHERCREDITDETAILTABLE)},
-            {key:"rate",label:'Rate', formatter:createRateFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".rate","",VOUCHERCREDITDETAILTABLE)}
+            {key:"rate",label:'Rate', formatter:createRateFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".rate","",VOUCHERCREDITDETAILTABLE)},
             {key:"amounttype",hidden:true,width:10,formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".amounttype","text",VOUCHERCREDITDETAILTABLE)},
             {key:"creditamount",label:'Amount (Rs.)', formatter:createAmountFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".creditAmountDetail","",VOUCHERCREDITDETAILTABLE)}
         ];
@@ -803,7 +803,7 @@ var totaldbamt=0,totalcramt=0;
         makeCreditDetailTable();
         document.getElementById('creditDetailTable').getElementsByTagName('table')[0].width="100%";
      </script>
-     <div id="codescontainer"></div>
+     <!-- <div id="codescontainer"></div>
      <br/>
      <div id="rebateDetails">
     <div class="subheadsmallnew"><span class="subheadnew"><s:text name="billreceipt.billdetails.Rebate"/></span></div>
@@ -831,7 +831,7 @@ var totaldbamt=0,totalcramt=0;
             
             document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="100%";
         </script>
-<div id="subledgercodescontainer"></div> 
+<div id="subledgercodescontainer"></div>  -->
   </td></tr>
 
       <tr>

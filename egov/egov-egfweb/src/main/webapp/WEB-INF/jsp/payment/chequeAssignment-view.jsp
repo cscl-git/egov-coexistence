@@ -53,12 +53,29 @@
 <head>
 <link rel="stylesheet" type="text/css"
 	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
-<title><s:text name="chq.assignment.heading.view" /></title>
+	<s:if test="%{paymentMode=='cheque' || paymentMode=='cash'}">
+	<title><s:text name="chq.assignment.heading.view" /></title>
+	</s:if>
+	<s:if test="%{paymentMode=='rtgs'}">
+	<title><s:text name="chq.rtgs.assignment.heading.view" /></title>
+	</s:if>
+	<s:if test="%{paymentMode=='pex'}">
+	<title><s:text name="chq.pex.assignment.heading.view" /></title>
+	</s:if>
+
 </head>
 <body>
 	<s:form action="chequeAssignment" theme="simple">
 		<jsp:include page="../budget/budgetHeader.jsp">
-			<jsp:param name="heading" value="Cheque Assignment View" />
+		<s:if test="%{paymentMode=='cheque' || paymentMode=='cash'}">
+	<jsp:param name="heading" value="Cheque Assignment View" />
+	</s:if>
+	<s:if test="%{paymentMode=='rtgs'}">
+	<jsp:param name="heading" value="RTGS Assignment View" />
+	</s:if>
+	<s:if test="%{paymentMode=='pex'}">
+	<jsp:param name="heading" value="PEX Assignment View" />
+	</s:if>
 		</jsp:include>
 		<span class="mandatory1"> <s:actionerror /> <s:fielderror />
 		</span>
@@ -91,6 +108,18 @@
 						</s:if>
 
 					</s:if>
+					<s:elseif test="%{paymentMode=='pex'}">
+					<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.paymentvoucherno" /></th>
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.pex.refno" /></th>
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.pex.amount" /></th>
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.pex.date" /></th>
+						<th class="bluebgheadtdnew"><s:text
+								name="chq.assignment.instrument.status" /></th>
+					</s:elseif>
 					<s:else>
 						<th class="bluebgheadtdnew"><s:text
 								name="chq.assignment.paymentvoucherno" /></th>
@@ -149,15 +178,21 @@
 							<td style="text-align: center" class="blueborderfortdnew"><s:property
 									value="%{voucherHeaderId.voucherNumber}" /></td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:property
-									value="%{instrumentHeaderId.transactionNumber}" /></td>
+									value="%{transactionNumber}" /></td>
 							<td style="text-align: right" class="blueborderfortdnew"><s:property
-									value="%{instrumentHeaderId.instrumentAmount}" /></td>
+									value="%{instrumentAmount}" /></td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:date
-									name="%{instrumentHeaderId.transactionDate}"
+									name="%{transactionDate}"
 									format="dd/MM/yyyy" /></td>
 							<td style="text-align: center" class="blueborderfortdnew"><s:property
-									value="%{instrumentHeaderId.statusId.description}" /></td>
-
+									value="%{statusId.description}" /></td>
+							<td style="text-align: center" class="blueborderfortdnew">
+							
+							<input type="button" value='Excel'
+						class="buttonsubmit" onclick="return printAdviceExcel()" />
+					<input type="button" value='Pdf'
+						class="buttonsubmit" onclick="return printAdvicePdf()" />
+							</td>
 						</tr>
 					</s:iterator>
 					<input type="hidden" name='transactionNumber'
@@ -176,13 +211,6 @@
 			</table>
 			<br />
 			<div class="buttonbottom">
-
-				<s:if test="%{paymentMode=='rtgs'}">
-					<input type="button" value='<s:text name="lbl.generate.bank.advice.excel"/>'
-						class="buttonsubmit" onclick="return printAdviceExcel()" />
-					<input type="button" value='<s:text name="lbl.generate.bank.advice.pdf"/>'
-						class="buttonsubmit" onclick="return printAdvicePdf()" />
-				</s:if>
 				<input type="button" value='<s:text name="lbl.close"/>'
 					onclick="javascript:window.parent.postMessage('close','*');" class="buttonsubmit" />
 			</div>
@@ -198,12 +226,32 @@ function printAdviceExcel(){
 		 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 		 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }
+
+function printAdviceExcelPex(){
+	 var bank=document.getElementById("bank").value;
+	var bankbranch=document.getElementById("bankBranchId").value;
+	var bankaccount=document.getElementById("bankAccountNoId").value;
+	 var instrumentnumber=document.getElementById("transactionNumber").value;
+	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="+
+	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+}
 function printAdvicePdf(){
 	 var bank=document.getElementById("bank").value;
 	var bankbranch=document.getElementById("bankBranchId").value;
 	var bankaccount=document.getElementById("bankAccountNoId").value;
 	 var instrumentnumber=document.getElementById("transactionNumber").value;
 	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="+
+	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+}
+
+function printAdvicePdfPex(){
+	 var bank=document.getElementById("bank").value;
+	var bankbranch=document.getElementById("bankBranchId").value;
+	var bankaccount=document.getElementById("bankAccountNoId").value;
+	 var instrumentnumber=document.getElementById("transactionNumber").value;
+	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="+
 	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }

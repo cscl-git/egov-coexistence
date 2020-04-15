@@ -178,9 +178,10 @@ function getData(){
 
 function submitAssignNumbers()
 {
-	document.remitRecoveryForm.action = '/services/EGF/deduction/remitRecovery-saveAssignNumbers.action';
+	document.remitRecoveryForm.action='/services/EGF/deduction/remitRecovery-saveAssignNumbers.action';
 	document.remitRecoveryForm.submit();
-	}
+	return true;
+}
 
 
 </script>
