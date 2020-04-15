@@ -408,14 +408,16 @@ loadBankDetailFailureHandler = function(){
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="card" id="cardradiobutton" name="paytradiobutton" /> Credit/Debit card
 			&nbsp;
-	</span> <span style="float: left;" id="bankradiobuttonspan"> <input
+	</span> 
+	<!-- <span style="float: left;" id="bankradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="bankchallan" id="bankradiobutton" name="paytradiobutton" /> Direct Bank &nbsp;
 	</span> </span> <span style="float: left;" id="onlineradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="online" id="onlineradiobutton" name="paytradiobutton" /> SBI MOPS Bank
 			challan &nbsp;
-	</span></td>
+	</span>-->
+	</td>
 </tr>
 
 <tr id="cashdetails">

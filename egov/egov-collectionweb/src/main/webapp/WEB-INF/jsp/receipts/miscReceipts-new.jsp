@@ -803,7 +803,7 @@ var totaldbamt=0,totalcramt=0;
         makeCreditDetailTable();
         document.getElementById('creditDetailTable').getElementsByTagName('table')[0].width="100%";
      </script>
-     <!-- <div id="codescontainer"></div>
+     <div id="codescontainer"></div>
      <br/>
      <div id="rebateDetails">
     <div class="subheadsmallnew"><span class="subheadnew"><s:text name="billreceipt.billdetails.Rebate"/></span></div>
@@ -813,8 +813,8 @@ var totaldbamt=0,totalcramt=0;
      </div>
      <script>
         
-        //makeRebateDetailTable();
-        //document.getElementById('rebateDetailTable').getElementsByTagName('table')[0].width="100%";
+       makeRebateDetailTable();
+       document.getElementById('rebateDetailTable').getElementsByTagName('table')[0].width="100%";
      </script>
      <div id="rebatecodescontainer"></div>
      <br/>
@@ -827,11 +827,11 @@ var totaldbamt=0,totalcramt=0;
          </div>
         <script>
             
-            //makeSubLedgerTable();
+            makeSubLedgerTable();
             
-            //document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="100%";
+            document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="100%";
         </script>
-<div id="subledgercodescontainer"></div>  -->
+<div id="subledgercodescontainer"></div> 
   </td></tr>
 
       <tr>
