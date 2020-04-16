@@ -80,7 +80,7 @@
 							<th class="bluebgheadtd">Month</th>
 							<th class="bluebgheadtd">Total Deduction(Rs)</th>
 							<th class="bluebgheadtd">Total Remitted(Rs)</th>
-							<th class="bluebgheadtd">Acknowledge Number</th>
+							<th class="bluebgheadtd">Acknowledgement Number</th>
 						</tr>
 						<s:iterator value="remittedTDS" status="stat" var="p">
 							<tr>
@@ -144,7 +144,7 @@
 	</table>
 	
 <div class="buttonbottom" align="center">
-	<s:submit type="submit" cssClass="buttonsubmit"  id="saveAssignNumbers" name="saveAssignNumbers" method="saveAssignNumbers" onclick="return submitAssignNumbers();" />
+	<s:submit type="submit" cssClass="buttonsubmit" key="lbl.save" id="saveAssignNumbers" name="saveAssignNumbers" method="saveAssignNumbers" onclick="return submitAssignNumbers();" />
 	</div>
 	</s:form>
 </s:elseif>

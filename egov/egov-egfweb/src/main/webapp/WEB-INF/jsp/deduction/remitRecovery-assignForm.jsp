@@ -61,7 +61,7 @@ function resetPage(){
 	<s:if test="%{message != ''}">
 	<label style="color: green"><s:property value="message" /></label>
 </s:if>
-	<div class="subheadnew">Deductions remittance summary</div>
+	<div class="subheadnew">Assign Acknowledgement Screen</div>
 
 	<s:form action="remitRecovery" theme="simple"
 		name="remitRecoveryForm">
