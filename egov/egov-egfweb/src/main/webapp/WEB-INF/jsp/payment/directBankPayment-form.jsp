@@ -160,7 +160,7 @@
 	<td class="bluebox"></td>
 	<td class="bluebox"><s:text name="voucher.narration" /></td>
 	<td class="bluebox" colspan="3"><s:textarea name="description"
-			id="description" style="width:580px" /></td>
+			id="description" style="width:95%" /></td>
 </tr>
 </table>
 <div id="budgetSearchGrid">

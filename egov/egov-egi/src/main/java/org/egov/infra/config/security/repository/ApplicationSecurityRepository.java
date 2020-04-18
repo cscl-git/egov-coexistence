@@ -127,8 +127,8 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
         user_token = request.getParameter("auth_token");
         tenantid = request.getParameter("tenantId");
         HttpSession session = request.getSession();
-        LOGGER.info(" *** authtoken "+user_token);
-        
+        LOGGER.info(" *** authtoken in  getUserDetails()::: "+user_token);
+        LOGGER.info(" *** tenant in  getUserDetails()::: "+tenantid);
         if (user_token == null){
             session.setAttribute("error-code", 440);
             throw new Exception("AuthToken not found");

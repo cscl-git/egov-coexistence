@@ -78,9 +78,10 @@
 			value="%{contraBean.fromBankAccountId}" id="fromAccountNumber"
 			list="dropdownData.fromAccNumList" listKey="id"
 			listValue="accountnumber" headerKey="-1" headerValue="----Choose----"
-			onChange="populatefromNarration(this);loadFromBalance(this)" /> <s:textfield
+			onChange="populatefromNarration(this);loadFromBalance(this)" /> 
+			<!--<s:textfield
 			name="fromAccnumnar" id="fromAccnumnar" value="%{fromAccnumnar}"
-			readonly="true" tabindex="-1" /></td>
+			readonly="true" tabindex="-1" />--></td>
 </tr>
 
 <tr>
@@ -228,7 +229,7 @@
 	<td class="greybox"></td>
 	<td class="greybox"><s:text name="voucher.narration" /></td>
 	<td class="greybox" colspan="3"><s:textarea name="description"
-			id="description" style="width:580px" /></td>
+			id="description" style="width:84%" /></td>
 	<td class="greybox"></td>
 	<td class="greybox"></td>
 </tr>

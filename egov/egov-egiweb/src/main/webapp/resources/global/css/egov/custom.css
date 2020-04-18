@@ -216,7 +216,7 @@ label.error {
 }
 .mandatory1 {
   font-weight: normal;
-  color: red;
+  color: #265988;
 }
 /*LESS - Functions*/
 .oldbuttonsection div.buttonbottom {
@@ -237,7 +237,7 @@ label.error {
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #f7b623 none repeat scroll 0% 0%;
+  background: #fe7a51 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -247,7 +247,7 @@ label.error {
 .oldbuttonsection input.buttonsubmit.normal,
 .oldbuttonsection input.button {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
 }
 .oldbuttonsection input.buttonsubmit:hover,
@@ -257,7 +257,7 @@ label.error {
 .oldbuttonsection input.button:focus,
 .oldbuttonsection input.button:active {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   opacity: 0.8;
 }
@@ -1238,7 +1238,7 @@ label.error {
 .page-container .main-content div.formmainbox td.greybox {
   background-color: #ffffff;
   font-size: 12px;
-  padding: 8px 5px;
+  /*padding: 8px 5px;*/
   color: #000000;
   text-align: left;
   font-family: regular;
@@ -1248,6 +1248,7 @@ label.error {
   font-size: 11px;
   color: #333333;
   padding: 6px 12px;
+  width: 80%;
 }
 .page-container .main-content div.formmainbox input,
 .page-container .main-content div.formmainbox input.amount,
@@ -1257,6 +1258,7 @@ label.error {
 .page-container .main-content div.formmainbox td.greybox input.hiddentext {
   font-family: regular;
   font-size: 11px;
+  width: 200px;
   color: #333333;
   background-color: #ffffff;
   border: 1px solid #CCCCCC;
@@ -1422,7 +1424,7 @@ label.error {
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #f7b623 none repeat scroll 0% 0%;
+  background: #fe7a51 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -1432,7 +1434,7 @@ label.error {
 .page-container .main-content div.formmainbox input.buttonsubmit.normal,
 .page-container .main-content div.formmainbox input.button {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
 }
 .page-container .main-content div.formmainbox input.buttonsubmit:hover,
@@ -1442,7 +1444,7 @@ label.error {
 .page-container .main-content div.formmainbox input.button:focus,
 .page-container .main-content div.formmainbox input.button:active {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   opacity: 0.8;
 }
@@ -1476,7 +1478,7 @@ label.error {
   font-size: 12px;
   font-weight: bold;
   padding: 6px 12px;
-  background: #f7b623 none repeat scroll 0% 0%;
+  background: #fe7a51 none repeat scroll 0% 0%;
   color: #ffffff;
   height: 30px;
   border-radius: 3px;
@@ -1486,7 +1488,7 @@ label.error {
 .page-container .main-content input.buttonsubmit.normal,
 .page-container .main-content input.button {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
 }
 .page-container .main-content input.buttonsubmit:hover,
@@ -1496,7 +1498,7 @@ label.error {
 .page-container .main-content input.button:focus,
 .page-container .main-content input.button:active {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   opacity: 0.8;
 }
@@ -1646,7 +1648,7 @@ label.error {
 }
 .btn-custom {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
 }
 .btn-custom:hover,
@@ -1667,14 +1669,14 @@ label.error {
 
 .btn-default {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   width: 100px;
 }
 
 .btn-primary {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   width: 100px;
 }
@@ -1709,14 +1711,14 @@ label.error {
 .btn-default.active.focus,
 .open > .dropdown-toggle.btn-default.focus {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   outline: none;
   opacity: 0.8;
 }
 .btn-secondary {
   color: #ffffff;
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
   width: 100px;
 }
@@ -1833,7 +1835,7 @@ label.error {
   font-weight: normal;
   font-family: regular;
   font-size: 19px;
-  color: #000000;
+  color: #265988;
   text-align: left;
 }
 .panel-primary .panel-heading .history-icon {
@@ -2002,7 +2004,7 @@ table.dataTable tbody.no-pointer tr:hover {
 .pagination .active > span:hover,
 .pagination .active > a:focus,
 .pagination .active > span:focus {
-  background-color: #f7b623;
+  background-color: #fe7a51;
   border-color: #fe7a51;
 }
 .buttons-margin {
@@ -2083,7 +2085,7 @@ footer.main a {
 }
 
 .selected {
-    border-left: 3px solid #f7b623;
+    border-left: 3px solid #fe7a51;
 }
 
 .form-control {
