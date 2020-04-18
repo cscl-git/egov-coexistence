@@ -160,7 +160,7 @@ function onSubmit()
 									<div name="daterow">
 										<s:date name="voucherDate" var="voucherDateId"
 											format="dd/MM/yyyy" />
-										<s:textfield id="voucherDate" name="voucherDate"
+										<s:textfield id="voucherDate" name="voucherDate" readonly="true" value="%{voucherDateId}"
 											class="form-control datepicker" data-date-end-date="0d" />
 									</div>
 								</td>

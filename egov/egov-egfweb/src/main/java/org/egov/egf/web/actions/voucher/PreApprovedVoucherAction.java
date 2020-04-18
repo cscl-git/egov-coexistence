@@ -352,7 +352,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     "DataEntryCutOffDate");
             if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
                 if (null == model || null == model.getId() || model.getCurrentState().getValue().endsWith("NEW")) {
-                    validActions = Arrays.asList(FORWARD);
+                    validActions = Arrays.asList(FORWARD,"Save As Draft");
                 } else {
                     if (model.getCurrentState() != null) {
                         validActions = this.customizedWorkFlowService.getNextValidActions(model.getStateType(),
@@ -362,7 +362,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 }
             } else {
                 if (null == model || null == model.getId() || model.getCurrentState().getValue().endsWith("NEW")) {
-                    validActions = Arrays.asList(FORWARD);
+                    validActions = Arrays.asList(FORWARD,"Save As Draft");
                 } else {
                     if (model.getCurrentState() != null) {
                         validActions = this.customizedWorkFlowService.getNextValidActions(model.getStateType(),
@@ -416,15 +416,18 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         boolean ismodifyJv = false;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("voucherHeader==" + voucherHeader);
+        System.out.println("voucherHeader.getState() :"+voucherHeader.getState().getValue());
         
-        if(voucherHeader.getVoucherDate()!=null) {
-            Date VoucherDate=voucherHeader.getVoucherDate();
-           if( chartOfAccounts.isClosedForPosting(df.format(VoucherDate))){
-               finanicalYearAndClosedPeriodCheckIsClosed=true;
-           }
-                   
-            
-        }
+		if (voucherHeader.getVoucherDate() != null) {
+			if (voucherHeader.getState().getValue().equalsIgnoreCase("New")) {
+				voucherHeader.setVoucherDate(new Date());
+			}
+
+			Date VoucherDate = voucherHeader.getVoucherDate();
+			if (chartOfAccounts.isClosedForPosting(df.format(VoucherDate))) {
+				finanicalYearAndClosedPeriodCheckIsClosed = true;
+			}
+		}
         /*
          * if (voucherHeader != null && voucherHeader.getState() != null) if (!validateOwner(voucherHeader.getState())) { final
          * List<ValidationError> errors = new ArrayList<ValidationError>(); errors.add(new ValidationError("exp", "Invalid User"
@@ -623,8 +626,17 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 }
             } else {
                 if (voucherHeader.getVouchermis().getBudgetaryAppnumber() == null) {
-                    addActionMessage(getText(egBillregister.getExpendituretype() + ".voucher.created",
-                            new String[] { voucherHeader.getVoucherNumber(), approverName }));
+                	if(workFlowAction.equalsIgnoreCase("Save As Draft"))
+                	{
+                		addActionMessage(getText(egBillregister.getExpendituretype() + ".voucher.saveAsDraft.created",
+                                new String[] { voucherHeader.getVoucherNumber(), " saved as draft " }));
+                	}
+                	else
+                	{
+                		addActionMessage(getText(egBillregister.getExpendituretype() + ".voucher.created",
+                                new String[] { voucherHeader.getVoucherNumber(), approverName }));
+                	}
+                    
                 } else {
                     addActionMessage(getText(egBillregister.getExpendituretype() + ".voucher.created",
                             new String[] { voucherHeader.getVoucherNumber(), approverName })
@@ -715,13 +727,14 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             type = billsService.getBillTypeforVoucher(voucherHeader);
             if (null == type)
                 type = "default";
-            EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
+            //EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
+            String empName=this.getEmployeeName(voucherHeader.getState().getOwnerPosition()) ;
             if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getText("pjv.voucher.rejected", new String[] {
-                        employee != null ? employee.getUser().getName() : "" }));
+                		empName != null ? empName : "" }));
             if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getText("pjv.voucher.approved", new String[] {
-                        employee != null ? employee.getUser().getName() : "" }));
+                		empName != null ? empName : "" }));
             if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getText("billVoucher.file.canceled"));
             else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -747,13 +760,43 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     }
 
     protected void populateWorkflowBean() {
-        workflowBean.setApproverPositionId(approverPositionId);
+    	if(workFlowAction.equalsIgnoreCase("Save As Draft"))
+    	{
+    		System.out.println("Save as draft");
+    		System.out.println("action : "+workFlowAction);
+    		Long position =populatePosition();
+    		workflowBean.setApproverPositionId(position);
+    	}
+    	else
+    	{
+    		workflowBean.setApproverPositionId(approverPositionId);
+    	}
         workflowBean.setApproverComments(approverComments);
         workflowBean.setWorkFlowAction(workFlowAction);
-        workflowBean.setCurrentState(currentState);
+        if(workFlowAction.equalsIgnoreCase("Save As Draft"))
+        {
+        	workflowBean.setCurrentState("SaveAsDraft");
+        }
+        else
+        {
+        	workflowBean.setCurrentState(currentState);
+        }
+        
     }
 
-    public String saveAsWorkingCopy() throws ValidationException {
+    private Long populatePosition() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		pos=employs.get(0).getAssignments().get(0).getPosition();
+    		
+    	}
+		return pos;
+	}
+
+	public String saveAsWorkingCopy() throws ValidationException {
         methodName = "saveAsWorkingCopy";
         if (parameters.get(VHID)[0].equals("")) {
             egBillregister = (EgBillregister) getPersistenceService().find(" from EgBillregister where id=?",
@@ -1514,5 +1557,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     public void setCutOffDate(String cutOffDate) {
         this.cutOffDate = cutOffDate;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

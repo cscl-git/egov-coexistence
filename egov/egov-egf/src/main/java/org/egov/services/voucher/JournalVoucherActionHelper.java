@@ -229,6 +229,9 @@ public class JournalVoucherActionHelper {
                     .withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
                     .withDateInfo(currentDate.toDate());
         } else {
+        	System.out.println("voucherHeader.getState() : "+voucherHeader.getState());
+        	System.out.println("voucherHeader.getState() : "+voucherHeader.getStateType());
+        	System.out.println("workflowBean.getCurrentState() : "+workflowBean.getCurrentState());
             if (null == voucherHeader.getState()) {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);

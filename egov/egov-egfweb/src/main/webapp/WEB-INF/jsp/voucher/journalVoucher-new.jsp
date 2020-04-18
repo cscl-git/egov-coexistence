@@ -101,7 +101,7 @@
 								class="mandatory1">*</span></td>
 
 							<td class="bluebox"><s:date name="voucherDate"
-									var="voucherDateId" format="dd/MM/yyyy" /> <s:textfield
+									var="voucherDateId" format="dd/MM/yyyy" /> <s:textfield readonly="true"
 									id="voucherDate" name="voucherDate" value="%{voucherDateId}"
 									data-date-end-date="0d"
 									onkeyup="DateFormat(this,this.value,event,false,'3')"

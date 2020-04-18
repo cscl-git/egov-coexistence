@@ -356,7 +356,7 @@ function openVoucher(vid)
 														</table>
 													</span>
 												</div>
-												<div class="tabbertab" id="viewtab">
+												<!-- <div class="tabbertab" id="viewtab"> -->
 													<h2>Cheque Details</h2>
 													<span>
 														<table align="center" border="0" cellpadding="0"

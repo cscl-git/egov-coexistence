@@ -87,20 +87,18 @@
 	<td class="bluebox"><s:date name="voucherTypeBean.partyBillDate"
 			var="partyBillDateId" format="dd/MM/yyyy" /> <s:textfield
 			name="voucherTypeBean.partyBillDate" id="partyBillDate"
-			value="%{partyBillDateId}" maxlength="10" size="15"
-			onkeyup="DateFormat(this,this.value,event,false,'3')" /> <a
-		href="javascript:show_calendar('jvcreateform.partyBillDate',null,null,'DD/MM/YYYY');"
-		style="text-decoration: none">&nbsp;<img tabIndex=-1
-			src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+			value="%{partyBillDateId}" data-date-end-date="0d"
+			onkeyup="DateFormat(this,this.value,event,false,'3')"
+			placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+			data-inputmask="'mask': 'd/m/y'" /></td>
 	<td class="bluebox"><s:text name="jv.billDate" /></td>
 	<td class="bluebox"><s:date name="voucherTypeBean.billDate"
 			var="billDateId" format="dd/MM/yyyy" /> <s:textfield
 			name="voucherTypeBean.billDate" id="billDate" value="%{billDateId}"
-			maxlength="10" size="15"
-			onkeyup="DateFormat(this,this.value,event,false,'3')" /> <a
-		href="javascript:show_calendar('jvcreateform.billDate',null,null,'DD/MM/YYYY');"
-		style="text-decoration: none">&nbsp;<img tabIndex=-1
-			src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+			data-date-end-date="0d"
+			onkeyup="DateFormat(this,this.value,event,false,'3')"
+			placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+			data-inputmask="'mask': 'd/m/y'" /></td>
 </tr>
 <input type="hidden" id="voucherTypeBean.voucherSubType"
 	name="voucherTypeBean.voucherSubType"
