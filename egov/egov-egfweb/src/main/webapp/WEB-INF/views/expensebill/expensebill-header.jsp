@@ -145,5 +145,11 @@
 			</form:select>
 			<form:errors path="egBillregistermis.egBillSubType" cssClass="add-margin error-msg" />
 		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.end.billdate" text="Last Date of Bill Payment"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input id="billEndDate" path="billEndDate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
+		</div>
 	</div>
 </div>

@@ -79,6 +79,7 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     private String billnumber;
     @NotNull
     private Date billdate;
+    private Date billEndDate;
     @NotNull
     private BigDecimal billamount;
     private BigDecimal fieldid;
@@ -462,4 +463,12 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     public enum BillStatus {
         CREATED, APPROVED, REJECTED, CANCELLED
     }
+
+	public Date getBillEndDate() {
+		return billEndDate;
+	}
+
+	public void setBillEndDate(Date billEndDate) {
+		this.billEndDate = billEndDate;
+	}
 }
