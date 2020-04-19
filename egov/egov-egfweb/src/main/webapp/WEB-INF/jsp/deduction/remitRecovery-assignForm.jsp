@@ -83,21 +83,16 @@ function resetPage(){
 					class="mandatory1">*</span></td>
 				<td class="bluebox"><s:textfield name="fromDate" id="fromDate"
 						cssStyle="width:100px" value='%{getFormattedDate(fromDate)}'
-						onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
-					href="javascript:show_calendar('pendingTDSReport.fromDate');"
-					style="text-decoration: none">&nbsp;<img
-						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)<br />
-				</td>
-
+						onkeyup="DateFormat(this,this.value,event,false,'3')" 
+						placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
 				<td class="bluebox" width="10%">As On Date:<span
 					class="mandatory1">*</span></td>
 				<td class="bluebox"><s:textfield name="asOnDate" id="asOnDate"
 						cssStyle="width:100px" value='%{getFormattedDate(asOnDate)}'
-						onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
-					href="javascript:show_calendar('pendingTDSReport.asOnDate');"
-					style="text-decoration: none">&nbsp;<img
-						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)<br />
-				</td>
+						onkeyup="DateFormat(this,this.value,event,false,'3')" 
+						placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
 			</tr>
 			<tr>
 				<td class="greybox" width="10%">Department:</td>

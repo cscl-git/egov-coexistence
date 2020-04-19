@@ -52,9 +52,11 @@
 <html>
 <head>
 <title><s:text name="budget.reappropriation.verify.title" /></title>
-<link rel="stylesheet" href="/services/EGF/resources/css/tabber.css?rnd=${app_release_no}"
+<link rel="stylesheet"
+	href="/services/EGF/resources/css/tabber.css?rnd=${app_release_no}"
 	TYPE="text/css">
-<script type="text/javascript" src="/services/EGF/resources/javascript/tabber.js?rnd=${app_release_no}"></script>
+<script type="text/javascript"
+	src="/services/EGF/resources/javascript/tabber.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="/services/EGF/resources/javascript/tabber2.js?rnd=${app_release_no}"></script>
 <STYLE type="text/css">
@@ -205,7 +207,9 @@
 		<div class="formmainbox">
 			<div class="tabber">
 				<div class="tabbertab">
-					<h2><s:text name="lbl.additional.appropriation"/> </h2>
+					<h2>
+						<s:text name="lbl.additional.appropriation" />
+					</h2>
 					<span>
 						<table width="60%" border="0" cellspacing="0" cellpadding="0">
 							<tr>
@@ -225,12 +229,13 @@
 										list="dropdownData.financialYearList" listKey="id"
 										listValue="finYearRange" name="financialYear.id"
 										value="financialYear.id" id="financialYear" headerKey="0"
-										headerValue="%{getText('lbl.choose.options')}" onchange="getBeRe();"></s:select></td>
+										headerValue="%{getText('lbl.choose.options')}"
+										onchange="getBeRe();"></s:select></td>
 								<td class="bluebox" width="19%"><s:text name="budget.bere" /></td>
 								<td class="bluebox"><s:select name="isBeRe" id="isBeRe"
 										list="#{'BE':'BE','RE':'RE'}" value="beRe" disabled="true" /></td>
 							</tr>
-							
+
 							<tr>
 								<s:if test="%{shouldShowHeaderField('function')}">
 									<td class="bluebox">&nbsp;</td>
@@ -252,7 +257,8 @@
 										</s:if></td>
 									<td class="bluebox"><s:select
 											list="dropdownData.functionaryList" listKey="id"
-											listValue="name" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
+											listValue="name" headerKey="0"
+											headerValue="%{getText('lbl.choose.options')}"
 											name="budgetDetail.functionary.id"
 											onchange="updateGrid('budgetDetail.functionary.id',document.getElementById('budgetReAppropriation_functionary').selectedIndex);"
 											value="functionary.id" id="budgetReAppropriation_functionary"></s:select></td>
@@ -283,7 +289,8 @@
 										</s:if></td>
 									<td class="greybox"><s:select
 											list="dropdownData.subSchemeList" listKey="id"
-											listValue="name" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
+											listValue="name" headerKey="0"
+											headerValue="%{getText('lbl.choose.options')}"
 											name="budgetDetail.subScheme"
 											onchange="updateGrid('budgetDetail.subScheme.id',document.getElementById('budgetReAppropriation_subScheme').selectedIndex);"
 											value="subScheme.id" id="budgetReAppropriation_subScheme"></s:select></td>
@@ -299,7 +306,8 @@
 										</s:if></td>
 									<td class="bluebox"><s:select
 											list="dropdownData.boundaryList" listKey="id"
-											listValue="name" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
+											listValue="name" headerKey="0"
+											headerValue="%{getText('lbl.choose.options')}"
 											name="budgetDetail.boundary.id"
 											onchange="updateGrid('budgetDetail.boundary.id',document.getElementById('budgetReAppropriation_boundary').selectedIndex)"
 											value="boundary.id" id="budgetReAppropriation_boundary"></s:select></td>
@@ -318,15 +326,15 @@
 								<td class="greybox"><input type="text" id="date"
 									name="appropriationMisc.reAppropriationDate"
 									style="width: 100px"
-									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"/>' /><a
-									href="javascript:show_calendar('budgetDetailForm.date');"
-									style="text-decoration: none">&nbsp;<img
-										src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"
+									placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/>' /></td>
 								<td class="greybox"><s:text
 										name="budgetReAppropriation.comments" /></td>
 								<td class="greybox"><s:textarea
 										id="appropriationMisc.remarks"
-										name="appropriationMisc.remarks" cols="50" /></td>
+										name="appropriationMisc.remarks" cols="50" rows="3"
+										style="width: 200px;" /></td>
 								<td class="greybox"></td>
 							</tr>
 						</table> <br />
@@ -349,7 +357,7 @@
 								<td colspan="9">
 									<div class="subheadsmallnew">
 										<strong><s:text
-												name="budget.reappropriation.add.release" /></strong>
+												name="budget.reappropriation.add.release.acmc.verify" /></strong>
 									</div>
 								</td>
 							</tr>
@@ -371,7 +379,7 @@
 				computeAvailable("budgetReAppropriationList",i);
 			}
 		</script> <br />
-						
+
 					</span>
 					<table width="60%" border="0" cellspacing="0" cellpadding="0">
 						<tr>
@@ -381,7 +389,7 @@
 										id="budgetReAppropriation__create" name="method:createAcmc"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />
-									
+
 									<s:submit onclick="javascript: self.close()" key="lbl.close"
 										cssClass="button" />
 								</div>
@@ -389,7 +397,7 @@
 						</tr>
 					</table>
 				</div>
-				
+
 				<!-- Individual tab -->
 
 			</div>
