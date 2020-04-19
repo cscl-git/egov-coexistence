@@ -325,10 +325,11 @@
 										name="budgetReAppropriation.asOnDate" /></td>
 								<td class="greybox"><input type="text" id="date"
 									name="appropriationMisc.reAppropriationDate"
-									style="width: 100px"
-									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"
-									placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/>' /></td>
+									style="width: 200px; height: 34px;"
+									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"/>' /><a
+									href="javascript:show_calendar('budgetDetailForm.date');"
+									style="text-decoration: none">&nbsp;<img
+										src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
 								<td class="greybox"><s:text
 										name="budgetReAppropriation.comments" /></td>
 								<td class="greybox"><s:textarea
