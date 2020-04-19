@@ -325,15 +325,14 @@
 								<td class="greybox"><input type="text" id="date"
 									name="appropriationMisc.reAppropriationDate"
 									style="width: 100px"
-									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"/>' /><a
-									href="javascript:show_calendar('budgetDetailForm.date');"
-									style="text-decoration: none">&nbsp;<img
-										src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+									value='<s:date name="appropriationMisc.reAppropriationDate" format="dd/MM/yyyy"
+									placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/>' /></td>
 								<td class="greybox"><s:text
 										name="budgetReAppropriation.comments" /></td>
 								<td class="greybox"><s:textarea
 										id="appropriationMisc.remarks"
-										name="appropriationMisc.remarks" cols="50" /></td>
+										name="appropriationMisc.remarks" cols="50" rows="3" style="width: 200px;"/></td>
 								<td class="greybox"></td>
 							</tr>
 						</table> <br />
@@ -356,7 +355,7 @@
 								<td colspan="9">
 									<div class="subheadsmallnew">
 										<strong><s:text
-												name="budget.reappropriation.add.release" /></strong>
+												name="budget.reappropriation.add.release.cao.verify" /></strong>
 									</div>
 								</td>
 							</tr>
@@ -385,7 +384,7 @@
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
-									<input type="submit" value="Forward to ACMC"
+									<input type="submit" value="Forward to AC"
 										id="budgetReAppropriation__create" name="method:createCao"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />

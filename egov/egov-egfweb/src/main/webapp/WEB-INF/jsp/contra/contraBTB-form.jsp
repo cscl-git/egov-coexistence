@@ -229,7 +229,7 @@
 	<td class="greybox"></td>
 	<td class="greybox"><s:text name="voucher.narration" /></td>
 	<td class="greybox" colspan="3"><s:textarea name="description"
-			id="description" style="width:84%" /></td>
+			id="description" style="width:93%" /></td>
 	<td class="greybox"></td>
 	<td class="greybox"></td>
 </tr>

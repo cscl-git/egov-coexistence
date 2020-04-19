@@ -75,18 +75,16 @@
 							name="chq.assignment.paymentvoucherdatefrom" /></td>
 					<td class="greybox"><s:textfield name="fromDate" id="fromDate"
 							maxlength="20" value="%{fromDate}"
-							onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
-						href="javascript:show_calendar('forms[0].fromDate');"
-						style="text-decoration: none">&nbsp;<img
-							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a><br />(dd/mm/yyyy)</td>
+							onkeyup="DateFormat(this,this.value,event,false,'3')" 
+							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off" /></td>
 					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherdateto" /></td>
 					<td class="greybox"><s:textfield name="toDate" id="toDate"
 							maxlength="20" value="%{toDate}"
-							onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
-						href="javascript:show_calendar('forms[0].toDate');"
-						style="text-decoration: none">&nbsp;<img
-							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+							onkeyup="DateFormat(this,this.value,event,false,'3')" 
+							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
 				</tr>
 				<tr>
 					<td class="greybox"></td>
