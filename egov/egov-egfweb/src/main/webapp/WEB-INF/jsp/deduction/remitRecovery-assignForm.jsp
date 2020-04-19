@@ -67,44 +67,47 @@ function resetPage(){
 		name="remitRecoveryForm">
 		<table width="100%" cellpadding="0" cellspacing="0" border="0">
 			<tr>
-				<td class="greybox" width="10%">Recovery Code:<span
+				<td class="greybox"></td>
+				<td class="greybox">Recovery Code<span
 					class="mandatory1">*</span></td>
 				<td class="greybox"><s:select name="recoveryAssign" id="recoveryAssign"
 						list="dropdownData.recoveryList" listKey="id" listValue="type"
 						headerKey="-1" headerValue="----Choose----" /></td>
-				<td class="greybox" width="10%">Fund:<span class="mandatory1">*</span></td>
+				<td class="greybox">Fund<span class="mandatory1">*</span></td>
 				<td class="greybox"><s:select name="fund" id="fund"
 						list="dropdownData.fundList" listKey="id" listValue="name"
 						headerKey="-1" headerValue="----Choose----" /></td>
-
 			</tr>
 			<tr>
+				<td class="greybox"></td>
 				<td class="bluebox" width="10%"><s:text name="from.date" /><span
 					class="mandatory1">*</span></td>
 				<td class="bluebox"><s:textfield name="fromDate" id="fromDate"
-						cssStyle="width:100px" value='%{getFormattedDate(fromDate)}'
+						value='%{getFormattedDate(fromDate)}'
 						onkeyup="DateFormat(this,this.value,event,false,'3')" 
 						placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
 								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
-				<td class="bluebox" width="10%">As On Date:<span
+				<td class="bluebox">As On Date<span
 					class="mandatory1">*</span></td>
 				<td class="bluebox"><s:textfield name="asOnDate" id="asOnDate"
-						cssStyle="width:100px" value='%{getFormattedDate(asOnDate)}'
+						value='%{getFormattedDate(asOnDate)}'
 						onkeyup="DateFormat(this,this.value,event,false,'3')" 
 						placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
 								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
 			</tr>
 			<tr>
-				<td class="greybox" width="10%">Department:</td>
+				<td class="greybox"></td>
+				<td class="greybox">Department</td>
 				<td class="greybox"><s:select name="department" id="department"
 						list="dropdownData.departmentList" listKey="code"
 						listValue="name" headerKey="-1" headerValue="----Choose----" />
 				</td>
-				<td class="greybox" width="10%"></td>
+				<td class="greybox"></td>
 				<td class="greybox"></td>
 			</tr>
 			<tr>
-				<td class="bluebox" width="10%"></td>
+				<td class="greybox"></td>
+				<td class="bluebox"></td>
 				<td class="bluebox"></td>
 				<td class="bluebox">&nbsp;</td>
 				<td class="bluebox">&nbsp;</td>
