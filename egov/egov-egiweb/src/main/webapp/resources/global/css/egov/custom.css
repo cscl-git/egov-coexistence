@@ -2108,3 +2108,20 @@ footer.main a {
        -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
           transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
+
+div#toogleDiv table.table.table-bordered tbody tr th {
+
+border-bottom: none;
+
+background: #265988;
+
+color: #ffffff;
+
+font-weight: normal!important;
+
+font-size: 14px;
+
+text-align: left;
+
+
+}

@@ -96,28 +96,28 @@
 							<c:if test="${budgetDetails !=null && !budgetDetails.isEmpty() }">
 							<table border="0" width="100%" class="table table-bordered"  cellspacing="0" cellpadding="0">
 				<tr>
-				<th class="bluebgheadtd">Executing Department</th>
-				<th class="bluebgheadtd">Fund</th>
-				<th class="bluebgheadtd">Function Name</th>
-				<th class="bluebgheadtd">Budget Name</th>
-				<th class="bluebgheadtd">Budget Group</th>
-				<th class="bluebgheadtd">Original Amount</th>
-				<th class="bluebgheadtd">Anticipatory Amount</th>
-				<th class="bluebgheadtd">Planning Percentage</th>
-				<th class="bluebgheadtd">Quarter-wise Percentage</th>				
+				<th>Executing Department</th>
+				<th>Fund</th>
+				<th>Function Name</th>
+				<th>Budget Name</th>
+				<th>Budget Group</th>
+				<th>Original Amount</th>
+				<th>Anticipatory Amount</th>
+				<th>Planning Percentage</th>
+				<th>Quarter-wise Percentage</th>				
 				</tr>
 				
 					 <c:forEach items="${budgetDetails}" var="details" varStatus="item">
 					 <tr>
-					 <td class="greybox">${details.execDeptName }</td>
-					 <td class="greybox">${details.fund.name }</td>
-					 <td class="greybox">${details.function.name }</td>
-					 <td class="greybox">${details.budget.name }</td>
-					 <td class="greybox">${details.budgetGroup.name }</td>
-					 <td class="greybox">${details.originalAmount }</td>
-					 <td class="greybox">${details.anticipatoryAmount }</td>
-					 <td class="greybox">${details.planningPercent }</td>
-					 <td class="greybox">${details.quarterpercent }</td>
+					 <td>${details.execDeptName }</td>
+					 <td>${details.fund.name }</td>
+					 <td>${details.function.name }</td>
+					 <td>${details.budget.name }</td>
+					 <td>${details.budgetGroup.name }</td>
+					 <td>${details.originalAmount }</td>
+					 <td>${details.anticipatoryAmount }</td>
+					 <td>${details.planningPercent }</td>
+					 <td>${details.quarterpercent }</td>
 					 </tr>
 					 </c:forEach>
 						 

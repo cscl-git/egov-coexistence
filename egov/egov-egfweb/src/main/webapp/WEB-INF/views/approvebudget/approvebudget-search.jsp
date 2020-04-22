@@ -110,15 +110,15 @@
 				
 					 <c:forEach items="${budgetDetails}" var="details" varStatus="item">
 					 <tr>
-					 <td class="greybox">${details.execDeptName }</td>
-					 <td class="greybox">${details.fund.name }</td>
-					 <td class="greybox">${details.function.name }</td>
-					 <td class="greybox">${details.budget.name }</td>
-					 <td class="greybox">${details.budgetGroup.name }</td>
-					 <td class="greybox">${details.originalAmount }</td>
-					 <td class="greybox">${details.anticipatoryAmount }</td>
-					 <td class="greybox">${details.planningPercent }</td>
-					 <td class="greybox">${details.quarterpercent }</td>
+					 <td>${details.execDeptName }</td>
+					 <td>${details.fund.name }</td>
+					 <td>${details.function.name }</td>
+					 <td>${details.budget.name }</td>
+					 <td>${details.budgetGroup.name }</td>
+					 <td>${details.originalAmount }</td>
+					 <td>${details.anticipatoryAmount }</td>
+					 <td>${details.planningPercent }</td>
+					 <td>${details.quarterpercent }</td>
 					 </tr>
 					 </c:forEach>
 						 
