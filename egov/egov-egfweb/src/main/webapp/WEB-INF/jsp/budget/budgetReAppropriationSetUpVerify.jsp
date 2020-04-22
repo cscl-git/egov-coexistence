@@ -179,6 +179,7 @@ function createAmountFieldFormatter(values,prefix,suffix){
 						"budgetDetail.boundary.id":'<s:property value="budgetDetail.boundary.id"/>',
 					</s:if>
 					"planningPercent":'<s:property value="planningPercent"/>',
+					"quarterPercent":'<s:property value="quarterPercent"/>',
 					"approved":'<s:property value="approvedAmount"/>',
 					"planningBudgetApproved":'<s:property value="planningBudgetApproved"/>',
 					"actuals":'<s:property value="actuals"/>',
@@ -211,6 +212,10 @@ function createAmountFieldFormatter(values,prefix,suffix){
 	var planningPercentageList=[];		
 		<s:iterator value="budgetReAppropriationList" status="stat">
 		planningPercentageList.push('<s:text name="format.number"><s:param name="value" value="budgetReAppropriationList[#stat.index].planningPercent"/></s:text>');
+		</s:iterator>
+	var quarterPercentageList=[];		
+		<s:iterator value="budgetReAppropriationList" status="stat">
+		quarterPercentageList.push('<s:text name="format.number"><s:param name="value" value="budgetReAppropriationList[#stat.index].quarterPercent"/></s:text>');
 		</s:iterator>
 	var planningBudgetApprovedList=[];		
 		<s:iterator value="budgetReAppropriationList" status="stat">
@@ -266,6 +271,7 @@ function createAmountFieldFormatter(values,prefix,suffix){
 				{key:"budgetDetail.boundary.id",label:'Field'+mandatorySign('boundary'),width:90,formatter:createDropdownFormatter(BUDGETDETAILLIST),  dropdownOptions:boundaryOptions} ,
 			</s:if>
 			{key:"planningPercent",label:'Planning Percentage',width:"30em", formatter:createAmountFieldFormatter(planningPercentageList,BUDGETDETAILLIST,".planningPercent")},
+			{key:"quarterPercent",label:'Quarter Percentage',width:"30em", formatter:createAmountFieldFormatter(quarterPercentageList,BUDGETDETAILLIST,".quarterPercent")},
 			{key:"approved",label:'Sanctioned<br/>Budget(Rs)',width:120, formatter:createAmountFieldFormatter(approvedAmountList,BUDGETDETAILLIST,".approvedAmount")},
 			{key:"appropriated",label:'Added/Released<br/>(Rs)',width:120, formatter:createAmountFieldFormatter(appropriatedAmountList,BUDGETDETAILLIST,".appropriatedAmount")},
 			{key:"planningBudgetApproved",label:'Planning Budget<br/> Approved(Rs)',width:"50em", formatter:createAmountFieldFormatter(planningBudgetApprovedList,BUDGETDETAILLIST,".planningBudgetApproved")},

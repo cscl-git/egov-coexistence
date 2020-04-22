@@ -122,6 +122,7 @@ public class BudgetLoadAction extends BaseFormAction {
     private static final int REAMOUNT_CELL_INDEX = 4;
     private static final int BEAMOUNT_CELL_INDEX = 5;
     private static final int PLANNINGPERCENTAGE_CELL_INDEX = 6;
+    private static final int QUARTERPERCENTAGE_CELL_INDEX = 7;
     private boolean errorInMasterData = false;
     private boolean isBudgetUploadFileEmpty = true;
     private MultipartFile[] originalFile = new MultipartFile[1];
@@ -597,6 +598,8 @@ public class BudgetLoadAction extends BaseFormAction {
                         : getStrValue(row.getCell(BEAMOUNT_CELL_INDEX)))));
                 budget.setPlanningPercentage(getNumericValue(row.getCell(PLANNINGPERCENTAGE_CELL_INDEX)) == null ? 0
                         : getNumericValue(row.getCell(PLANNINGPERCENTAGE_CELL_INDEX)).longValue());
+                budget.setQuarterpercent(getNumericValue(row.getCell(QUARTERPERCENTAGE_CELL_INDEX)) == null ? 0
+                        : getNumericValue(row.getCell(QUARTERPERCENTAGE_CELL_INDEX)).longValue());
             }
         } catch (final ValidationException e)
         {

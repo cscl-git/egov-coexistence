@@ -84,6 +84,7 @@ public class BudgetUpload  {
     private Long refBudId;
 
     private Long planningPercentage;
+    private Long quarterpercent;
 
     private BigDecimal beAmount;
 
@@ -258,6 +259,14 @@ public class BudgetUpload  {
     public void setBudgetInXls(MultipartFile budgetInXls) {
         this.budgetInXls = budgetInXls;
     }
+
+	public Long getQuarterpercent() {
+		return quarterpercent;
+	}
+
+	public void setQuarterpercent(Long quarterpercent) {
+		this.quarterpercent = quarterpercent;
+	}
 
     
 

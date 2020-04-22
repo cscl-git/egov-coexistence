@@ -339,12 +339,15 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     @Action(value = "/budget/budgetReAppropriation-create")
     public String create() {
         save(ApplicationThreadLocals.getUserId().intValue());
+        System.out.println("XXXXX");
         return NEW;
     }
     
     @Action(value = "/budget/budgetReAppropriation-createCao")
     public String createCao() {
+    	System.out.println("Cao");
         saveCao(ApplicationThreadLocals.getUserId().intValue());
+        System.out.println("End Cao");
         return NEWCAO;
     }
     
@@ -396,24 +399,29 @@ public class BudgetReAppropriationAction extends BaseFormAction {
             });
             misc = budgetReAppropriationService.createBudgetReAppropriationMisc(parameters.get(ACTIONNAME)[0] + "|" + userId,
                     beRe, financialYear, appropriationMisc, null);
+            System.out.println("11");
             removeEmptyReAppropriation(budgetReAppropriationList);
             reAppropriationCreated = budgetReAppropriationService.createReAppropriation(parameters.get(ACTIONNAME)[0] + "|"
                     + userId,
                     budgetReAppropriationList, null, financialYear, beRe, misc,
                     parameters.get("appropriationMisc.reAppropriationDate")[0]);
+            System.out.println("22");
             removeEmptyReAppropriation(newBudgetReAppropriationList);
             reAppForNewBudgetCreated = budgetReAppropriationService.createReAppropriationForNewBudgetDetail(
                     parameters.get(ACTIONNAME)[0] + "|" + userId,
                     newBudgetReAppropriationList, null, misc);
+            System.out.println("33");
             if (!reAppropriationCreated && !reAppForNewBudgetCreated)
                 throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
                         "budgetDetail.budgetGroup.mandatory")));
             newBudgetReAppropriationList.clear();
             budgetReAppropriationList.clear();
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
                     e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
                     e.getMessage())));
         }
@@ -432,11 +440,12 @@ public class BudgetReAppropriationAction extends BaseFormAction {
             financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id=?", financialYear.getId());
         try {
             removeEmptyReAppropriation(budgetReAppropriationList);
+            System.out.println("CAO1");
             reAppropriationCreated = budgetReAppropriationService.createReAppropriationCao(parameters.get(ACTIONNAME)[0] + "|"
                     + userId,
                     budgetReAppropriationList, null, financialYear, beRe, misc,
                     parameters.get("appropriationMisc.reAppropriationDate")[0]);
-            removeEmptyReAppropriation(newBudgetReAppropriationList);
+            System.out.println("CAO2");
             if (!reAppropriationCreated)
                 throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
                         "budgetDetail.budgetGroup.mandatory")));
@@ -467,7 +476,6 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     + userId,
                     budgetReAppropriationList, null, financialYear, beRe, misc,
                     parameters.get("appropriationMisc.reAppropriationDate")[0]);
-            removeEmptyReAppropriation(newBudgetReAppropriationList);
             
             if (!reAppropriationCreated)
                 throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
@@ -498,7 +506,6 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     + userId,
                     budgetReAppropriationList, null, financialYear, beRe, misc,
                     parameters.get("appropriationMisc.reAppropriationDate")[0]);
-            removeEmptyReAppropriation(newBudgetReAppropriationList);
             if (!reAppropriationCreated)
                 throw new ValidationException(Arrays.asList(new ValidationError("budgetDetail.budgetGroup.mandatory",
                         "budgetDetail.budgetGroup.mandatory")));
@@ -564,6 +571,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     @ValidationErrorPage(value = NEW)
     @Action(value = "/budget/budgetReAppropriation-loadActuals")
     public String loadActuals() {
+    	System.out.println("Load");
         removeEmptyReAppropriation(budgetReAppropriationList);
         removeEmptyReAppropriation(newBudgetReAppropriationList);
         //Updating the ExecutingDepartment in BudgetReAppropriation
@@ -573,8 +581,10 @@ public class BudgetReAppropriationAction extends BaseFormAction {
         });
         if (budgetReAppropriationService.rowsToAddForExistingDetails(budgetReAppropriationList))
             loadData(budgetReAppropriationList);
+        System.out.println("load 1");
         if (budgetReAppropriationService.rowsToAddExists(newBudgetReAppropriationList))
             loadData(newBudgetReAppropriationList);
+        System.out.println("Processed");
         return NEW;
     }
     
@@ -594,11 +604,6 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     		vw.setChangeRequestType("Addition");
     		budgetReAppropriationList.add(vw);
     	}
-    	//Updating the ExecutingDepartment in BudgetReAppropriation
-        //String executingDepartment = budgetDetail.getExecutingDepartment();
-        //budgetReAppropriationList.stream().forEach(bReApp -> {
-          //  bReApp.getBudgetDetail().setExecutingDepartment(executingDepartment);
-        //});
             loadData(budgetReAppropriationList);
         
         return NEWCAO;
@@ -622,13 +627,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     		budgetReAppropriationList.add(vw);
     	}
     	//Updating the ExecutingDepartment in BudgetReAppropriation
-        String executingDepartment = budgetDetail.getExecutingDepartment();
-        budgetReAppropriationList.stream().forEach(bReApp -> {
-            bReApp.getBudgetDetail().setExecutingDepartment(executingDepartment);
-        });
             loadData(budgetReAppropriationList);
-        if (budgetReAppropriationService.rowsToAddExists(newBudgetReAppropriationList))
-            loadData(newBudgetReAppropriationList);
         return NEWACMC;
     }
     @ValidationErrorPage(value = NEWMC)
@@ -648,36 +647,40 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     		vw.setChangeRequestType("Addition");
     		budgetReAppropriationList.add(vw);
     	}
-    	//Updating the ExecutingDepartment in BudgetReAppropriation
-        String executingDepartment = budgetDetail.getExecutingDepartment();
-        budgetReAppropriationList.stream().forEach(bReApp -> {
-            bReApp.getBudgetDetail().setExecutingDepartment(executingDepartment);
-        });
             loadData(budgetReAppropriationList);
-        if (budgetReAppropriationService.rowsToAddExists(newBudgetReAppropriationList))
-            loadData(newBudgetReAppropriationList);
         return NEWMC;
     }
     
 
     private void loadData(final List<BudgetReAppropriationView> reAppList) {
+    	System.out.println("Inside load");
         budgetReAppropriationService.validateMandatoryFields(reAppList);
         for (final BudgetReAppropriationView entry : reAppList) {
             entry.setBudgetDetail(budgetReAppropriationService.setRelatedValues(entry.getBudgetDetail()));
             final List<BudgetDetail> detailList = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
                     entry.getBudgetDetail());
+            System.out.println("detailSize ::"+financialYear.getId()+":::"+beRe);
+            System.out.println("detailSize ::"+detailList.size());
             if (detailList.size() == 1) {
+            	System.out.println("1");
                 final BudgetDetail budgetDetail = detailList.get(0);
+                System.out.println("2");
                 final Map<String, Object> paramMap = budgetDetailHelper.constructParamMap(getValueStack(), budgetDetail);
+                System.out.println("3");
                 paramMap.put(Constants.ASONDATE, appropriationMisc.getReAppropriationDate());
                 budgetDetail.getBudgetReAppropriations().stream().forEach(app -> {
                     LOGGER.info("app.getStatus()  :: "+app.getStatus());
                 });
+                System.out.println("4");
                 BigDecimal totalActualsFor = budgetDetailHelper.getTotalActualsFor(paramMap, appropriationMisc.getReAppropriationDate());
+                System.out.println("5 : "+totalActualsFor);
                 entry.setActuals(totalActualsFor);
+                System.out.println("6 : ");
                 entry.setApprovedAmount(budgetDetail.getApprovedAmount());
+                System.out.println("7 : "+budgetDetail.getPlanningPercent());
                 // this is total of reappropriated amount
                 entry.setAppropriatedAmount(budgetDetail.getApprovedReAppropriationsTotalReapp());
+                System.out.println("8");
                 entry.setAvailableAmount(entry.getApprovedAmount().add(entry.getAppropriatedAmount())
                         .subtract(entry.getActuals()));
                 if (budgetDetail.getPlanningPercent() == null)
@@ -685,6 +688,12 @@ public class BudgetReAppropriationAction extends BaseFormAction {
                     entry.setPlanningPercent(BigDecimal.ZERO);
                 else
                     entry.setPlanningPercent(budgetDetail.getPlanningPercent());
+                System.out.println("quarter :"+budgetDetail.getQuarterpercent());
+                if (budgetDetail.getQuarterpercent() == null)
+                    // TODO change the planningPercentage to planningPercent
+                    entry.setQuarterPercent(BigDecimal.ZERO);
+                else
+                    entry.setQuarterPercent(budgetDetail.getQuarterpercent());
 
                 if (budgetDetail.getPlanningPercent() == BigDecimal.ZERO)
                     entry.setPlanningBudgetApproved(entry.getApprovedAmount().add(entry.getAppropriatedAmount()));

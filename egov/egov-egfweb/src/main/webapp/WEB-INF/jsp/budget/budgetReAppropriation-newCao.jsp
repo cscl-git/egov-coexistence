@@ -67,7 +67,6 @@
 	<%@ include file='common-includes.jsp'%>
 	<jsp:include page="budgetHeader.jsp" />
 	<%@ include file='budgetReAppropriationSetUpVerify.jsp'%>
-	<%@ include file='addReAppropriationSetUp.jsp'%>
 	<script>
 					
 	function populateSubSchemes(scheme){
@@ -113,15 +112,8 @@
 					return false;
 				anticipatory = false;
 				estimate = false;
-				invalidNumber = "";				
-				for(i=0;i<budgetReAppropriationTable.getRecordSet().getLength();i++){
-					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].deltaAmount').value <= 0)
-						invalidNumber = "Budget Estimate amount should be greater than 0";
-					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].planningPercent').value <= 0)
-						invalidNumber = "Planning Budget Percentage should be greater than 0";
-					if(document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id').value != 0 && document.getElementById('newBudgetReAppropriationList['+i+'].deltaAmount').value < 0)
-						invalidNumber = "Addition amount should be greater than 0";
-				}	
+				invalidNumber = "";
+				
 				if(invalidNumber != ""){
 					bootbox.alert(invalidNumber);
 					return false;
@@ -136,6 +128,7 @@
 				if(!checkUser){
 					document.getElementById("actionName").value = 'save';
 				}
+				
 				document.budgetDetailForm.action='/services/EGF/budget/budgetReAppropriation-'+method+'Cao.action';
 	    		document.budgetDetailForm.submit();
 				return;
@@ -181,22 +174,7 @@
 				id = element.options[element.selectedIndex].value;
 				var transaction = YAHOO.util.Connect.asyncRequest('GET', 'budgetReAppropriation-ajaxLoadBeRe.action?id='+id, callback, null);
 			}
-			function updateBudgetDropDown(){
-				newBudgetList=document.getElementById('newBudgetDropDownList')
-				for(i=0;i<budgetReAppropriationTable.getRecordSet().getLength();i++){
-					element = document.getElementById('newBudgetReAppropriationList['+i+'].budgetDetail.budget.id')
-					if(element){
-						copyOptions(newBudgetList,element)
-					}
-				}
-			}
-			function updateBudgetDropDownForRow(index){
-				newBudgetList=document.getElementById('newBudgetDropDownList')
-				element = document.getElementById('newBudgetReAppropriationList['+index+'].budgetDetail.budget.id')
-				if(element){
-					copyOptions(newBudgetList,element)
-				}
-			}
+			
 			function loadActuals(event){
 				event.preventDefault();
 				document.budgetDetailForm.action='/services/EGF/budget/budgetReAppropriation-loadActualsCao.action';

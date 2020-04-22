@@ -1266,7 +1266,7 @@ public class MicroserviceUtils {
     public void removeSession(String access_token, String sessionId) {
         LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);
         LOGGER.info("redisTemplate.hasKey(access_token))::: " + redisTemplate.hasKey(access_token));
-        LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
+        //LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
         if (null != access_token && redisTemplate.hasKey(access_token)){
             if (sessionId != null) {
             	redisTemplate.delete(sessionId);

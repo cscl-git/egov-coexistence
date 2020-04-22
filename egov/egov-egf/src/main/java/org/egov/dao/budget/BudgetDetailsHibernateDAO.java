@@ -966,8 +966,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                 budgetheadid = (Long) paramMap.get(BUDGETHEADID);
             if (paramMap.get(Constants.ASONDATE) != null)
                 asondate = (java.util.Date) paramMap.get(Constants.ASONDATE);
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("deptCode=" + deptCode + ",functionid=" + functionid + ",functionaryid=" + functionaryid
+                LOGGER.info("deptCode=" + deptCode + ",functionid=" + functionid + ",functionaryid=" + functionaryid
                         + ",schemeid=" + schemeid + ",subschemeid=" + subschemeid + ",boundaryid=" + boundaryid
                         + ",budgetheadid=" + budgetheadid + ",asondate=" + asondate);
 
@@ -1045,9 +1044,11 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             else
                 return new BigDecimal(ob.toString());
         } catch (final ValidationException v) {
+        	v.printStackTrace();
             LOGGER.error("Exp in getActualBudgetUtilized API()####" + v.getErrors());
             throw new ValidationException(v.getErrors());
         } catch (final Exception e) {
+        	e.printStackTrace();
             LOGGER.error("Exp in getActualBudgetUtilized API()===" + e.getMessage());
             throw new ValidationException(EMPTY_STRING, "Exp in getActualBudgetUtilized API()===" + e.getMessage());
         }

@@ -69,7 +69,6 @@
 	<%@ include file='common-includes.jsp'%>
 	<jsp:include page="budgetHeader.jsp" />
 	<%@ include file='budgetReAppropriationSetUpVerify.jsp'%>
-	<%@ include file='addReAppropriationSetUp.jsp'%>
 	<script>
 					
 	function populateSubSchemes(scheme){

@@ -259,6 +259,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public List<BudgetDetail> searchByCriteriaWithTypeAndFY(final Long financialYear, final String type,
             final BudgetDetail detail) {
         if (detail.getBudget() != null && detail.getBudget().getId() != 0l) {
+        	System.out.println("aa1");
             final Map<String, Object> map = new HashMap<String, Object>();
             addCriteriaExcludingBudget(detail, map);
             final Criteria criteria = getSession().createCriteria(BudgetDetail.class);
@@ -268,6 +269,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             return criteria.createCriteria(Constants.BUDGET).add(Restrictions.eq("financialYear.id", financialYear))
                     .add(Restrictions.eq("isbere", type)).list();
         } else{
+        	System.out.println("aa2");
             Criteria constructCriteria = constructCriteria(detail);
             constructCriteria.add(Restrictions.eq("executingDepartment", detail.getExecutingDepartment()));
             return constructCriteria.createCriteria(Constants.BUDGET)
@@ -284,6 +286,10 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     }
 
     protected void addCriteriaExcludingBudget(final BudgetDetail detail, final Map<String, Object> map) {
+    	System.out.println("detail.getBudgetGroup().getId() : "+detail.getBudgetGroup().getId());
+    	System.out.println("detail.getFunction().getId() : "+detail.getFunction().getId());
+    	System.out.println("detail.getFund().getId() : "+detail.getFund().getId());
+    	System.out.println("detail.getStatus().getId() : "+detail.getStatus().getId());
         map.put("budgetGroup", detail.getBudgetGroup() == null ? 0l : detail.getBudgetGroup().getId());
         map.put("function", detail.getFunction() == null ? 0l : detail.getFunction().getId());
         map.put("functionary", detail.getFunctionary() == null ? 0 : detail.getFunctionary().getId());
@@ -1839,6 +1845,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                     budgetDetail.setExecutingDepartment(budgetUpload.getDeptCode());
                     budgetDetail.setAnticipatoryAmount(BigDecimal.ZERO);
                     budgetDetail.setPlanningPercent(BigDecimal.valueOf(budgetUpload.getPlanningPercentage()));
+                    budgetDetail.setQuarterpercent(BigDecimal.valueOf(budgetUpload.getQuarterpercent()));
                     if (budgetType.equalsIgnoreCase(RE)) {
                         budgetDetail.setOriginalAmount(budgetUpload.getReAmount());
                         budgetDetail.setApprovedAmount(budgetUpload.getReAmount());

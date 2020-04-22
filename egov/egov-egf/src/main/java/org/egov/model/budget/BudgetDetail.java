@@ -167,6 +167,7 @@ public class BudgetDetail extends StateAware {
     @Length(max = 32)
     private String uniqueNo;
     private BigDecimal planningPercent;
+    private BigDecimal quarterpercent;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status")
@@ -393,7 +394,7 @@ public class BudgetDetail extends StateAware {
                 {
                 	entry=reAppList.get(0);
                 }
-            if (!entry.getStatus().getDescription()
+            if (entry != null && !entry.getStatus().getDescription()
                     .equalsIgnoreCase("Cancelled")){
             	if ((entry.getAdditionAmount() != null)
                         && BigDecimal.ZERO
@@ -530,6 +531,14 @@ public class BudgetDetail extends StateAware {
 
 	public void setExecDeptName(String execDeptName) {
 		this.execDeptName = execDeptName;
+	}
+
+	public BigDecimal getQuarterpercent() {
+		return quarterpercent;
+	}
+
+	public void setQuarterpercent(BigDecimal quarterpercent) {
+		this.quarterpercent = quarterpercent;
 	}
 
 }

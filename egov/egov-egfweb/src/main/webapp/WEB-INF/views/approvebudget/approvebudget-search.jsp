@@ -90,21 +90,22 @@
 						</div>
 												<br>
 						<br>
+						<br>
+						<br>
 								<div class="form-group" id="toogleDiv" style="display:none">
 							
 							<c:if test="${budgetDetails !=null && !budgetDetails.isEmpty() }">
-							<table border="0" width="100%" cellspacing="0" cellpadding="0">
+							<table border="0" width="100%" class="table table-bordered" cellspacing="0" cellpadding="0">
 				<tr>
-				<th class="bluebgheadtd">Executing Department</th>
-				<th class="bluebgheadtd">Fund</th>
-				<th class="bluebgheadtd">Function Name</th>
-				<th class="bluebgheadtd">Budget Name</th>
-				<th class="bluebgheadtd">Budget Group</th>
-				<th class="bluebgheadtd">Original Amount</th>
-				<!-- <th class="bluebgheadtd">Approved Amount</th> -->
-				<th class="bluebgheadtd">Anticipatory Amount</th>
-				<!-- <th class="bluebgheadtd">Budget Available</th>-->
-				
+				<th>Executing Department</th>
+				<th>Fund</th>
+				<th>Function Name</th>
+				<th>Budget Name</th>
+				<th>Budget Group</th>
+				<th>Original Amount</th>
+				<th>Anticipatory Amount</th>
+				<th>Planning Percentage</th>
+				<th>Quarter-wise Percentage</th>
 				</tr>
 				
 					 <c:forEach items="${budgetDetails}" var="details" varStatus="item">
@@ -115,9 +116,9 @@
 					 <td class="greybox">${details.budget.name }</td>
 					 <td class="greybox">${details.budgetGroup.name }</td>
 					 <td class="greybox">${details.originalAmount }</td>
-					 <!-- <td class="greybox">${details.approvedAmount }</td> -->
 					 <td class="greybox">${details.anticipatoryAmount }</td>
-					 <!--<td class="greybox">${details.budgetAvailable }</td>-->
+					 <td class="greybox">${details.planningPercent }</td>
+					 <td class="greybox">${details.quarterpercent }</td>
 					 </tr>
 					 </c:forEach>
 						 
