@@ -467,8 +467,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
                         .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
                         .withNextAction(wfmatrix.getNextAction())
-                        .withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
-                                ? info.getAssignments().get(0).getPosition() : null);
+                        .withInitiator(user.getId());
 
             } else if (paymentheader.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 paymentheader.transition().progressWithStateCopy().end().withSenderName(user.getName())

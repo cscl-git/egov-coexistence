@@ -284,6 +284,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             final String approverName = String.valueOf(request.getParameter("approverName"));
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
+            System.out.println("End : "+approverDetails);
 
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
                     + updatedEgBillregister.getBillnumber();
