@@ -46,37 +46,38 @@
   ~
   --%>
 
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
-<%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
+<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
 <header class="navbar navbar-fixed-top-expense"><!-- set fixed position by adding class "navbar-fixed-top" -->
-    <nav class="navbar navbar-default navbar-custom navbar-fixed-top-expense">
-        <div class="container-fluid">
-            <div class="navbar-header col-md-10 col-xs-10">
-                <a class="navbar-brand" href="javascript:void(0);">
-                    <img src="<c:url value='/downloadfile/logo' context='/services/egi'/>" height="60">
-                    <div>
+<!--	<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header col-md-10 col-xs-10">
+				<a class="navbar-brand" href="javascript:void(0);">
+					<img src="<c:url value='/downloadfile/logo' context='/services/egi'/>" height="60">
+					<div>
 						<span class="title2">
 						<c:set var="titleKey">
-                            <tiles:getAsString name="page-title"/>
-                        </c:set>
+							<tiles:getAsString name="page-title"/>
+						</c:set>
 						<spring:message code="${titleKey}"/>
 						</span>
-                    </div>
-                </a>
-            </div>
+					</div>
+				</a>
+			</div>
 
-            <div class="nav-right-menu col-md-2 col-xs-2">
-                <ul class="hr-menu text-right">
-                    <li class="ico-menu">
-                        
-                    </li>
+			<div class="nav-right-menu col-md-2 col-xs-2">
+				<ul class="hr-menu text-right">
+					<li class="ico-menu">
+						
+					</li>
 
-                </ul>
-            </div>
+				</ul>
+			</div>
 
-        </div>
-    </nav>
+		</div>
+	</nav> -->
 </header>
