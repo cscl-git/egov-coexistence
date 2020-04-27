@@ -110,7 +110,9 @@
                                 <resource>
                                     <directory>../egov-egf/src/main/resources/db/migration</directory>
                                 </resource>
-                                
+                                <resource>
+                                    <directory>../egov-council/src/main/resources/db/migration</directory>
+                                </resource>
                                 <resource>
                                     <directory>../egov-portal/src/main/resources/db/migration</directory>
                                 </resource>
