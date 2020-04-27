@@ -461,10 +461,11 @@ var totaldbamt=0,totalcramt=0;
         var creditDetailColumns = [
             {key:"glcodeid",hidden:true,width:10, formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".glcodeIdDetail","hidden",VOUCHERCREDITDETAILTABLE)},
             {key:"accounthead", label:'Account Head <span class="mandatory"></span>',formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".accounthead","text",VOUCHERCREDITDETAILTABLE)},
-            {key:"rate",label:'Rate', formatter:createRateFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".rate","",VOUCHERCREDITDETAILTABLE)},
             {key:"amounttype",hidden:true,width:10,formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".amounttype","text",VOUCHERCREDITDETAILTABLE)},
             {key:"creditamount",label:'Amount (Rs.)', formatter:createAmountFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".creditAmountDetail","",VOUCHERCREDITDETAILTABLE)}
         ];
+        //{key:"rate",label:'Rate', formatter:createRateFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".rate","",VOUCHERCREDITDETAILTABLE)},
+        
         
         var creditDetailDS = new YAHOO.util.DataSource(); 
         billCreditDetailsTable = new YAHOO.widget.DataTable("creditDetailTable",creditDetailColumns, creditDetailDS);
