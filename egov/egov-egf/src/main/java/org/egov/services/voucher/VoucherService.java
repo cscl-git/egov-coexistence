@@ -271,6 +271,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		CChartOfAccounts coa = null;
 		boolean result = false;
 		paramMap.put("asondate", billregister.getBilldate());
+		paramMap.put("paymentBillDate", billregister.getBilldate());
 		if (billregister.getEgBillregistermis().getScheme() != null)
 			paramMap.put("schemeid", billregister.getEgBillregistermis().getScheme().getId());
 		if (billregister.getEgBillregistermis().getSubScheme() != null)
@@ -300,7 +301,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			}
 
 			if (!result)
-				throw new ValidationException("", "Budget Check failed for " + coa.getGlcode());
+				throw new ValidationException("", "Quarterly budget exceeded for " + coa.getGlcode());
 		}
 		return result;
 	}

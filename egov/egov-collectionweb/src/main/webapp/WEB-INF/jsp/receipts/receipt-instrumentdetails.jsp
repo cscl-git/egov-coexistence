@@ -47,7 +47,6 @@
   --%>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
-
 #chequebankrow .searchBoxCls button{
     float: inherit;
     width: 8%;
@@ -59,11 +58,9 @@
     /* border-left: none; */
     cursor: pointer;
 }
-
 #chequebankrow .searchBoxCls button:hover {
   background: #0b7dda;
 }
-
 #chequebankrow .searchBoxCls::after {
   content: "";
   clear: both;
@@ -71,14 +68,12 @@
 }
 </style>
 <script>
-
 function callpopulateapportioningamountforbills(){
 	<s:if test="%{!isBillSourcemisc()}">  
 		populateapportioningamount();
 	</s:if>
 	
 }
-
 apportionLoadFailureHandler= function(){
 	   // document.getElementById("errorstyle").style.display='';
 		//document.getElementById("errorstyle").innerHTML='Error Loading Apportioned Amount';
@@ -90,7 +85,6 @@ apportionLoadFailureHandler= function(){
 		var checkpartpaymentvalue=document.getElementById("partPaymentAllowed").value;
 		var checkoverridevalue=document.getElementById("overrideAccountHeads").value;
 		var collectiontotal=0,cashamount=0,chequeamount=0,cardamount=0,bankamount=0;
-
 		var noofaccounts=document.getElementById("totalNoOfAccounts").value;
 		var credittotal=0;
 		collectiontotal=calculateCollectionTotal();
@@ -104,7 +98,6 @@ apportionLoadFailureHandler= function(){
 				break;
 			}
 		}
-
 		if(document.getElementById("callbackForApportioning").value=="true")
 		{
 			document.getElementById("amountoverrideerror").style.display="none";
@@ -223,9 +216,6 @@ apportionLoadFailureHandler= function(){
 				}//end of if checkpartpaymentvalue=="true"
 			}	
 	}//end of function populateapportioningamount
-
-
-
 	apportionLoadHandler = function(req,res){
 	  results=res.results;
 	  var noofaccounts=document.getElementById("totalNoOfAccounts").value;
@@ -242,8 +232,6 @@ apportionLoadFailureHandler= function(){
 	    } 
 	  }
 	}
-
-
 function showInstrumentDetails(obj){
 	console.log('obj.id : ',obj.id);
 	if(obj.id=='cashradiobutton'){
@@ -353,7 +341,6 @@ function validateTransactionNumber()
 			}
 		 }
 }
-
 function findBankDetailsByIfsc(){
 	var ifscCode = document.getElementById("instrumentIfscCode").value;
         if(ifscCode.length == 11){
@@ -408,16 +395,14 @@ loadBankDetailFailureHandler = function(){
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="card" id="cardradiobutton" name="paytradiobutton" /> Credit/Debit card
 			&nbsp;
-	</span> 
-	<!-- <span style="float: left;" id="bankradiobuttonspan"> <input
+	</span> <span style="float: left;" id="bankradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="bankchallan" id="bankradiobutton" name="paytradiobutton" /> Direct Bank &nbsp;
 	</span> </span> <span style="float: left;" id="onlineradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="online" id="onlineradiobutton" name="paytradiobutton" /> SBI MOPS Bank
 			challan &nbsp;
-	</span>-->
-	</td>
+	</span></td>
 </tr>
 
 <tr id="cashdetails">

@@ -199,7 +199,7 @@ public class ReceiptAction extends BaseFormAction {
     private Boolean chequeAllowed = Boolean.TRUE;
     private Boolean ddAllowed = Boolean.TRUE;
     private Boolean bankAllowed = Boolean.TRUE;
-    private Boolean onlineAllowed = Boolean.TRUE;
+    private Boolean onlineAllowed = Boolean.FALSE;
     private Boolean isReceiptCancelEnable = Boolean.TRUE;
     /**
      * An instance of <code>InstrumentHeader</code> representing the cash instrument details entered by the user during receipt

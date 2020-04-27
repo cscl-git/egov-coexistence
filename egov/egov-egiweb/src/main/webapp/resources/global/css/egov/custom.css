@@ -2036,8 +2036,17 @@ footer.main a {
 .navbar-fixed-top {
     top: 0;
     border-width: 0 0 1px;
+    /*background-color: white;*/
+    width: 100%;
+    position: fixed;
+}
+
+.navbar-fixed-top-expense {
+    top: 0;
+    border-width: 0 0 1px;
     background-color: white;
     width: 100%;
+    position: fixed;
 }
 .nav-tabs {
     border-bottom: 1px solid #ddd;

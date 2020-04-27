@@ -58,7 +58,14 @@
         <put-attribute name="body" value=""/>
         <!-- put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/> -->
     </definition>
-
+    
+	<definition name="base_layout_expense_form" template="/WEB-INF/views/template/main.jsp">
+        <put-attribute name="title" value=""/>
+        <put-attribute name="header" value="/WEB-INF/views/template/header_expense.jsp"/>
+        <put-attribute name="body" value=""/>
+        <!-- put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/> -->
+    </definition>
+    
     <definition name="error" template="/WEB-INF/views/template/error.jsp">
         <put-attribute name="page-title" value="title.error.page" cascade="true"/>
         <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/>
@@ -528,7 +535,7 @@
                        value="/WEB-INF/views/budgetdefinition/budgetdefinition-search.jsp"/>
     </definition>
 
-    <definition name="expensebill-form" extends="base_layout">
+    <definition name="expensebill-form" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-form.jsp"/>
     </definition>
@@ -538,12 +545,12 @@
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-success.jsp"/>
     </definition>
 
-    <definition name="expensebill-view" extends="base_layout">
+    <definition name="expensebill-view" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="lbl.expensebill" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-view.jsp"/>
     </definition>
 
-    <definition name="expensebill-update" extends="base_layout">
+    <definition name="expensebill-update" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-update.jsp"/>
     </definition>
