@@ -68,22 +68,15 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 			cur_user = (CurrentUser)this.microserviceUtils.readFromRedis(request.getSession().getId(), "current_user");
 			if (cur_user==null) {
 				LOGGER.info(" ***  Session is not available in redis.... , trying to login");
-				/*if(request.getRequestURI().contains("/rest/")){
-				    return SecurityContextHolder.createEmptyContext();
-				}
-				else*/{
-//				    ApplicationThreadLocals.clearValues();
-				 cur_user = new CurrentUser(this.getUserDetails(request));
+				cur_user = new CurrentUser(this.getUserDetails(request));
 				this.microserviceUtils.savetoRedis(session.getId(), "current_user", cur_user);
-				}
-
-			}{
-			    String oldToken = (String)session.getAttribute(MS_USER_TOKEN);
-			    String newToken = (String)this.microserviceUtils.readFromRedis(session.getId(), "auth_token");
-			    if(null!=oldToken && null!=newToken && !oldToken.equals(newToken)){
-			        session.setAttribute(MS_USER_TOKEN, newToken);
-			    }
 			}
+		    String oldToken = (String)session.getAttribute(MS_USER_TOKEN);
+		    String newToken = (String)this.microserviceUtils.readFromRedis(session.getId(), "auth_token");
+		    if(null!=oldToken && null!=newToken && !oldToken.equals(newToken)){
+		        session.setAttribute(MS_USER_TOKEN, newToken);
+		    }
+			
 			LOGGER.info(" ***  Session   found  in redis.... ," + request.getSession().getId());
 			
 			context.setAuthentication(this.prepareAuthenticationObj(request, cur_user));
@@ -127,8 +120,8 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
         user_token = request.getParameter("auth_token");
         tenantid = request.getParameter("tenantId");
         HttpSession session = request.getSession();
-        LOGGER.info(" *** authtoken in  getUserDetails()::: "+user_token);
-        LOGGER.info(" *** tenant in  getUserDetails()::: "+tenantid);
+        LOGGER.info(" *** authtoken "+user_token);
+        
         if (user_token == null){
             session.setAttribute("error-code", 440);
             throw new Exception("AuthToken not found");

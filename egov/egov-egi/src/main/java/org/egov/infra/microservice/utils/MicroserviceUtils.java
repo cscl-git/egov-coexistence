@@ -1264,11 +1264,11 @@ public class MicroserviceUtils {
     }
     
     public void removeSession(String access_token, String sessionId) {
-        LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);
-        LOGGER.info("redisTemplate.hasKey(access_token))::: " + redisTemplate.hasKey(access_token));
-        //LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
+        LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);        
         if (null != access_token && redisTemplate.hasKey(access_token)){
-            if (sessionId != null) {
+        	LOGGER.info("redisTemplate.hasKey(access_token))::: " + redisTemplate.hasKey(access_token));            
+            if (null != sessionId) {
+            	LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
             	redisTemplate.delete(sessionId);
             	LOGGER.info("spring:session:sessions:" + sessionId);
             	LOGGER.info("spring:session:sessions:expires:" + sessionId);
