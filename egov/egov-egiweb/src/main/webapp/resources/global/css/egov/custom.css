@@ -1265,6 +1265,7 @@ label.error {
   padding-right: 2px;
   padding-bottom: 2px;
   padding-left: 4px;
+  height:34px;
 }
 .page-container .main-content div.formmainbox input.tablerow {
   width: 95%;
