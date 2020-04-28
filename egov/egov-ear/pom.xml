@@ -89,6 +89,7 @@
         <dependency>
             <groupId>org.egov</groupId>
             <artifactId>egov-lcmsweb</artifactId>
+	    <artifactId>egov-councilweb</artifactId>
             <version>${project.parent.version}</version>
             <type>war</type>
         </dependency>
@@ -132,6 +133,7 @@
         <dependency>
             <groupId>org.egov</groupId>
             <artifactId>egov-lcms</artifactId>
+	    <artifactId>egov-council</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
        <dependency>
@@ -201,13 +203,18 @@
                             <groupId>org.egov</groupId>
                             <artifactId>egov-egfweb</artifactId>
                             <contextRoot>/services/EGF</contextRoot>
-                 	    </webModule>
-                 	    <webModule>
+                 	</webModule>
+                 	<webModule>
                             <groupId>org.egov</groupId>
                             <artifactId>egov-lcmsweb</artifactId>
                             <contextRoot>/services/lcms</contextRoot>
                         </webModule>
-                 	    <webModule>
+			<webModule>
+                            <groupId>org.egov</groupId>
+                            <artifactId>egov-councilweb</artifactId>
+                            <contextRoot>/services/council</contextRoot>
+                        </webModule>
+                 	<webModule>
                             <groupId>org.egov</groupId>
                             <artifactId>egov-collectionweb</artifactId>
                             <contextRoot>/services/collection</contextRoot>
