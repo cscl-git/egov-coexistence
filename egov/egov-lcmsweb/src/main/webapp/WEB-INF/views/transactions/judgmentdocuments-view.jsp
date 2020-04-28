@@ -71,7 +71,7 @@
 	</div>
 	<c:if test="${!judgment.judgmentDocuments.isEmpty() && mode == 'view' || mode =='edit'}">
 		<c:forEach items="${judgment.judgmentDocuments}" var="judgmentDocuments">
-			<a href="/egi/downloadfile?fileStoreId=${judgmentDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${judgmentDocuments.supportDocs.fileName }</a><br />
+			<a href="/services/egi/downloadfile?fileStoreId=${judgmentDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${judgmentDocuments.supportDocs.fileName }</a><br />
 		</c:forEach>
 	</c:if>
 	<c:if test="${mode == 'view' && judgment.judgmentDocuments.isEmpty()}">

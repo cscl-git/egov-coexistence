@@ -70,7 +70,7 @@
 	</div>
 	<c:if test="${!legalCase.legalCaseUploadDocuments.isEmpty() && mode == 'view' || mode =='edit'}">
 		<c:forEach items="${legalCase.legalCaseUploadDocuments}" var="legalCaseUploadDocuments">
-			<a href="/egi/downloadfile?fileStoreId=${legalCaseUploadDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${legalCaseUploadDocuments.supportDocs.fileName }</a><br />
+			<a href="/services/egi/downloadfile?fileStoreId=${legalCaseUploadDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${legalCaseUploadDocuments.supportDocs.fileName }</a><br />
 		</c:forEach>
 	</c:if>
 	<c:if test="${mode == 'view' && legalCase.legalCaseUploadDocuments.isEmpty()}">

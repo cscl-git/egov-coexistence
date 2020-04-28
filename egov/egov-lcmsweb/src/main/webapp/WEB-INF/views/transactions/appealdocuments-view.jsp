@@ -72,7 +72,7 @@
 	</div>
 	<c:if test="${!judgmentImpl.appeal[0].appealDocuments.isEmpty() && mode == 'view' || mode =='edit'}">
 		<c:forEach items="${judgmentImpl.appeal[0].appealDocuments}" var="judgmentImplDocuments">
-			<a href="/egi/downloadfile?fileStoreId=${judgmentImplDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${judgmentImplDocuments.supportDocs.fileName }</a><br />
+			<a href="/services/egi/downloadfile?fileStoreId=${judgmentImplDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${judgmentImplDocuments.supportDocs.fileName }</a><br />
 		</c:forEach>
 	</c:if>
 	<c:if test="${mode == 'view' && judgmentImpl.appeal[0].appealDocuments.isEmpty()}">

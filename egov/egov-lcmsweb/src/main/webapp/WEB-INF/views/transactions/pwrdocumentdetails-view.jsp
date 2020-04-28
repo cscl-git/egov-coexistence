@@ -72,7 +72,7 @@
 	</div>
 	<c:if test="${!legalCase.pwrList[0].pwrDocuments.isEmpty() && mode == 'view' || mode =='counteredit'}">
 		<c:forEach items="${legalCase.pwrList[0].pwrDocuments}" var="pwrDocuments">
-			<a href="/egi/downloadfile?fileStoreId=${pwrDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${pwrDocuments.supportDocs.fileName }</a><br />
+			<a href="/services/egi/downloadfile?fileStoreId=${pwrDocuments.supportDocs.fileStoreId}&moduleName=LCMS">${pwrDocuments.supportDocs.fileName }</a><br />
 		</c:forEach>
 	</c:if>
 	<c:if test="${mode == 'view' && legalCase.pwrList[0].pwrDocuments.isEmpty()}">

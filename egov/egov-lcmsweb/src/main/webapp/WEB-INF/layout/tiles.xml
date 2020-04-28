@@ -452,4 +452,28 @@
         <put-attribute name="body" value="/WEB-INF/views/reports/employeehearingDueReport-form.jsp"/>
     </definition>
 
+	<definition name="library-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.library.new" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/library-new.jsp"/>
+    </definition>
+
+    <definition name="library-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.library.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/library-view.jsp"/>
+    </definition>
+
+    <definition name="library-edit" extends="base_layout">
+        <put-attribute name="page-title" value="title.library.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/library-edit.jsp"/>
+    </definition>
+
+    <definition name="library-result" extends="base_layout">
+        <put-attribute name="page-title" value="title.library.result" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/library-result.jsp"/>
+    </definition>
+
+    <definition name="library-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.library.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/library-search.jsp"/>
+    </definition>
 </tiles-definitions>

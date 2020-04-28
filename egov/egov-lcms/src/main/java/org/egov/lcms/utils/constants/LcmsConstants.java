@@ -251,4 +251,6 @@ public class LcmsConstants {
     
     public static final String MODE = "mode";
     public static final String IS_REAPPEAL_CASE = "isReappealCase";
+    public static final String LIBRARY = "library";
+    public static final String LIBRARY_ID = "libraryId";
 }
