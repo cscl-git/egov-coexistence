@@ -1,24 +1,13 @@
-ALTER TABLE "ch.chandigarh".eglc_legalcase ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
-ALTER TABLE "ch.chandigarh".eglc_legalcase ADD COLUMN "nodalofficer" VARCHAR(100);
-ALTER TABLE "ch.chandigarh".eglc_legalcase ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
-ALTER TABLE "ch.chandigarh".eglc_legalcase ADD COLUMN "estimatepreparedby" VARCHAR(100);
-ALTER TABLE "ch.chandigarh".eglc_legalcase_aud ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
-ALTER TABLE "ch.chandigarh".eglc_legalcase_aud ADD COLUMN "nodalofficer" VARCHAR(100);
-ALTER TABLE "ch.chandigarh".eglc_legalcase_aud ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
-ALTER TABLE "ch.chandigarh".eglc_legalcase_aud ADD COLUMN "estimatepreparedby" VARCHAR(100);
-alter table "ch.chandigarh".eglc_legalcase alter column noticedate drop not null;
-alter table "ch.chandigarh".eglc_legalcase_aud alter column noticedate drop not null;
-
-ALTER TABLE generic.eglc_legalcase ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
-ALTER TABLE generic.eglc_legalcase ADD COLUMN "nodalofficer" VARCHAR(100);
-ALTER TABLE generic.eglc_legalcase ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
-ALTER TABLE generic.eglc_legalcase ADD COLUMN "estimatepreparedby" VARCHAR(100);
-ALTER TABLE generic.eglc_legalcase_aud ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
-ALTER TABLE generic.eglc_legalcase_aud ADD COLUMN "nodalofficer" VARCHAR(100);
-ALTER TABLE generic.eglc_legalcase_aud ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
-ALTER TABLE generic.eglc_legalcase_aud ADD COLUMN "estimatepreparedby" VARCHAR(100);
-alter table generic.eglc_legalcase alter column noticedate drop not null;
-alter table generic.eglc_legalcase_aud alter column noticedate drop not null;
+ALTER TABLE eglc_legalcase ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
+ALTER TABLE eglc_legalcase ADD COLUMN "nodalofficer" VARCHAR(100);
+ALTER TABLE eglc_legalcase ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
+ALTER TABLE eglc_legalcase ADD COLUMN "estimatepreparedby" VARCHAR(100);
+ALTER TABLE eglc_legalcase_aud ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
+ALTER TABLE eglc_legalcase_aud ADD COLUMN "nodalofficer" VARCHAR(100);
+ALTER TABLE eglc_legalcase_aud ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
+ALTER TABLE eglc_legalcase_aud ADD COLUMN "estimatepreparedby" VARCHAR(100);
+alter table eglc_legalcase alter column noticedate drop not null;
+alter table eglc_legalcase_aud alter column noticedate drop not null;
 
 CREATE TABLE eglc_documenttype_master
 (
@@ -96,6 +85,6 @@ CREATE TABLE eglc_library_aud
 );
 ALTER TABLE ONLY eglc_library_aud ADD CONSTRAINT pk_eglc_library_aud PRIMARY KEY (id, rev);
 
-INSERT INTO "ch.chandigarh".eglc_documenttype_master(id, code, documenttype, notes, ordernumber, active, createddate, lastmodifieddate, createdby, lastmodifiedby, "version") VALUES
+INSERT INTO eglc_documenttype_master(id, code, documenttype, notes, ordernumber, active, createddate, lastmodifieddate, createdby, lastmodifiedby, "version") VALUES
 (nextval('seq_eglc_documenttype_master'), 'ACT', 'ACT', 'ACT',1,true,now(), now(),1,1,0)
 ,(nextval('seq_eglc_documenttype_master'), 'Legal Information', 'Legal Information', 'Legal Information',2,true,now(), now(),1,1,0);
