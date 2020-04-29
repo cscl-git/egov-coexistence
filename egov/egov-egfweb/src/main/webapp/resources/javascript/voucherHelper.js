@@ -142,7 +142,7 @@ function createTextFieldFormatterJV(prefix,suffix,type){
 	
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:90px;' onkeyup='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
+		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:100%;' onkeyup='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
 		
 	}
 }
@@ -173,7 +173,7 @@ function createSLTextFieldwithSearchBtnFormatterJV(prefix,suffix,onblurfunction,
 function createLongTextFieldFormatterJV(prefix,suffix){
     return function(el, oRecord, oColumn, oData) {
     	var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='text' id='"+prefix+"["+index+"]"+suffix+"' name='"+prefix+"["+index+"]"+suffix+"' readOnly style='width:250px;'/>";
+		el.innerHTML = "<input type='text' id='"+prefix+"["+index+"]"+suffix+"' name='"+prefix+"["+index+"]"+suffix+"' readOnly style='width:100%;'/>";
 
     
     }
@@ -187,7 +187,7 @@ function createLongTextFieldFormatterJV(prefix,suffix){
 function createAmountFieldFormatterJV(prefix,suffix,onblurfunction){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='text' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='text-align:right;width:90px;' maxlength='18' onblur='validateDigitsAndDecimal(this);"+onblurfunction+"'/>";
+		el.innerHTML = "<input type='text' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='text-align:right;width:100%;' maxlength='18' onblur='validateDigitsAndDecimal(this);"+onblurfunction+"'/>";
 	}
 }
 function createSLTextFieldFormatterJV(prefix,suffix,onblurfunction){
@@ -2340,7 +2340,7 @@ function disableForm() {
 function createRateFieldFormatterJV(prefix,suffix,onblurfunction){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML ="<select id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' onchange='updateRateDetailJV()' style='text-align:right;width:90px;visibility: hidden' maxlength='18'><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
+		el.innerHTML ="<select id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' onchange='updateRateDetailJV()' style='text-align:right;width:100%;visibility: hidden' maxlength='18'><option value='0'>--Select--</option><option value='0.125'>0.125%</option><option value='0.25'>0.25%</option><option value='1.500'>1.500%</option><option value='1'>1%</option><option value='2'>2%</option><option value='2.50'>2.50%</option><option value='3'>3.00%</option><option value='5'>5%</option><option value='6'>6%</option><option value='9'>9%</option><option value='10'>10%</option><option value='12'>12%</option><option value='14'>14%</option><option value='15'>15%</option><option value='18'>18%</option><option value='20'>20%</option><option value='28'>28%</option><option value='30'>30%</option></select>";
 	}
 }
 function updateRateDetailJV()
