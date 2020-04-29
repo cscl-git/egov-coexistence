@@ -1,5 +1,6 @@
 <div class="row">
 	<div class="col-md-12">
+		<input type="hidden" id="mode"  name="mode" value="${mode}" />
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
@@ -40,7 +41,8 @@
 							<form:option value="false">NO</form:option>
 							<form:errors path="active" cssClass="error-msg" />
 						</form:select>
-					</div>					
+					</div>	
+					<input type="hidden" name="library" value="${library.id}" />				
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label text-right"><spring:message

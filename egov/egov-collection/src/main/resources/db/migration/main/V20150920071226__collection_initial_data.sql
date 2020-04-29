@@ -85,13 +85,15 @@ Insert into EG_ACTION (id,name,url,queryparams,parentmodule,ordernumber,displayn
 -----------------START--------------------
 --DROP SEQUENCE seq_eg_role;
 
-CREATE SEQUENCE seq_eg_role
+/*CREATE SEQUENCE seq_eg_role
     START WITH 100
     INCREMENT BY 1
     NO MINVALUE
     NO MAXVALUE
-    CACHE 1;
-    
+    CACHE 1;*/
+
+SELECT setval('"seq_eg_role"',(SELECT MAX(ID) FROM eg_role ));
+
 INSERT INTO eg_role(id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (nextval('seq_eg_role'),'Remitter','Remitter',to_timestamp('2015-08-15 11:04:23.846601','null'),1,1,to_timestamp('2015-08-15 11:04:23.846601','null'),null);
 ------------------END---------------------
 -----------------START--------------------

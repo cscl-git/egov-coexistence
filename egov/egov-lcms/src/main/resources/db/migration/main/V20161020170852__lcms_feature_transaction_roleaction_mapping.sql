@@ -65,7 +65,7 @@ INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_actio
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'legalajaxforemployeeposition') ,(select id FROM eg_feature WHERE name = 'Hearing'));
 
 ---Interim Order
-INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'New-LcInterimOrde') ,(select id FROM eg_feature WHERE name = 'Interim Order'));
+INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'New-LcInterimOrder') ,(select id FROM eg_feature WHERE name = 'Interim Order'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'View LcInterimOrder') ,(select id FROM eg_feature WHERE name = 'Interim Order'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'List LcInterimOrder') ,(select id FROM eg_feature WHERE name = 'Interim Order'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'Edit LcInterimOrder') ,(select id FROM eg_feature WHERE name = 'Interim Order'));
