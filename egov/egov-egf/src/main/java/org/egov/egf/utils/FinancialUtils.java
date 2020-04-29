@@ -175,6 +175,7 @@ public class FinancialUtils {
 //            nextDesign = !asignList.isEmpty() ? asignList.get(0).getDesignation().getName() : "";
 
         String approverDetails="";
+        System.out.println("workflowAction :"+workFlowAction);
         if (!FinancialConstants.BUTTONREJECT.toString().equalsIgnoreCase(workFlowAction))
 //            approverDetails = id + ","
 //                    + getApproverName(approvalPosition) + ","
@@ -183,10 +184,12 @@ public class FinancialUtils {
             approverDetails = id + "," + approverName;
         else
             approverDetails = id + "," + getInitiatorName(state.getCreatedBy());
+        
 //            approverDetails = id + ","
 //                    + getApproverName(state.getOwnerPosition()) + ","
 //                    + (currentUserAssignment != null ? currentUserAssignment.getDesignation().getName() : "") + ","
 //                    + (nextDesign != null ? state.getDesgName() : "");
+        System.out.println("approverDetails: "+approverDetails);
         return approverDetails;
     }
 
@@ -205,7 +208,7 @@ public class FinancialUtils {
     
     public String getInitiatorName(Long employeeId){
         
-      List<EmployeeInfo>empList =  microServiceUtil.getEmployee(employeeId, new Date(),null, null);
+      List<EmployeeInfo>empList =  microServiceUtil.getEmployee(employeeId, null,null, null);
       if(null!=empList && !empList.isEmpty())  
       return empList.get(0).getUser().getName();
       else

@@ -461,10 +461,11 @@ var totaldbamt=0,totalcramt=0;
         var creditDetailColumns = [
             {key:"glcodeid",hidden:true,width:10, formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".glcodeIdDetail","hidden",VOUCHERCREDITDETAILTABLE)},
             {key:"accounthead", label:'Account Head <span class="mandatory"></span>',formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".accounthead","text",VOUCHERCREDITDETAILTABLE)},
-            {key:"rate",label:'Rate', formatter:createRateFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".rate","",VOUCHERCREDITDETAILTABLE)},
             {key:"amounttype",hidden:true,width:10,formatter:createTextFieldFormatterCredit(VOUCHERCREDITDETAILLIST,".amounttype","text",VOUCHERCREDITDETAILTABLE)},
             {key:"creditamount",label:'Amount (Rs.)', formatter:createAmountFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".creditAmountDetail","",VOUCHERCREDITDETAILTABLE)}
         ];
+        //{key:"rate",label:'Rate', formatter:createRateFieldFormatterRebate(VOUCHERCREDITDETAILLIST,".rate","",VOUCHERCREDITDETAILTABLE)},
+        
         
         var creditDetailDS = new YAHOO.util.DataSource(); 
         billCreditDetailsTable = new YAHOO.widget.DataTable("creditDetailTable",creditDetailColumns, creditDetailDS);
@@ -748,7 +749,7 @@ var totaldbamt=0,totalcramt=0;
                   <s:date name="voucherDate" var="cdFormat" format="dd/MM/yyyy"/>
           <td width="24%" class="bluebox">
                 <s:textfield id="voucherDate" name="voucherDate" onfocus="javascript:vDateType='3';" onkeyup="DateFormat(this,this.value,event,false,'3')"  onblur="validateVoucherDate(this)" data-inputmask="'mask': 'd/m/y'"/>
-                <div class="highlight2" style="width:80px">DD/MM/YYYY</div>             
+                <!-- <div class="highlight2" style="width:80px">DD/MM/YYYY</div> -->            
           </td>
             <td width="21%" class="bluebox"><s:text name="challan.narration"/></td>
 		    <td width="24%" class="bluebox"><s:textarea name="referenceDesc" id="referenceDesc" value="%{referenceDesc}" cols="18" rows="1" maxlength="125" onkeyup="return ismaxlength(this)"/></td>

@@ -190,6 +190,7 @@ public class BudgetLoadAction extends BaseFormAction {
     @Action(value = "/budget/budgetLoad-upload")
     public String upload()
     {
+    	System.out.println("1");
         try {
             FileInputStream fsIP = new FileInputStream(budgetInXls);
 
@@ -203,21 +204,24 @@ public class BudgetLoadAction extends BaseFormAction {
             String beFinYearRange = getStrValue(beRow.getCell(1));
             CFinancialYear reFYear = financialYearDAO.getFinancialYearByFinYearRange(reFinYearRange);
             CFinancialYear beFYear = financialYearDAO.getNextFinancialYearByDate(reFYear.getStartingDate());
-
+            System.out.println("2");
             if (!validateFinancialYears(reFYear, beFYear, beFinYearRange))
                 throw new ValidationException(Arrays.asList(new ValidationError(
                         getText("be.year.is.not.immediate.next.fy.year.of.re.year"),
                         getText("be.year.is.not.immediate.next.fy.year.of.re.year"))));
             timeStamp = new Timestamp((new Date()).getTime()).toString().replace(".", "_");
             if (budgetInXlsFileName.contains("_budget_original_")) {
+            	System.out.println("3");
                 budgetOriginalFileName = budgetInXlsFileName.split("_budget_original_")[0] + "_budget_original_"
                         + timeStamp + "."
                         + budgetInXlsFileName.split("\\.")[1];
             } else if (budgetInXlsFileName.contains("_budget_output_")) {
+            	System.out.println("4");
                 budgetOriginalFileName = budgetInXlsFileName.split("_budget_output_")[0] + "_budget_original_"
                         + timeStamp + "."
                         + budgetInXlsFileName.split("\\.")[1];
             } else {
+            	System.out.println("5");
                 if (budgetInXlsFileName.length() > 60) {
                     throw new ValidationException(Arrays.asList(new ValidationError(
                             getText("file.name.should.be.less.then.60.characters"),
@@ -227,33 +231,37 @@ public class BudgetLoadAction extends BaseFormAction {
                             + timeStamp + "."
                             + budgetInXlsFileName.split("\\.")[1];
             }
-
+            System.out.println("6");
             final FileStoreMapper originalFileStore = fileStoreService.store(budgetInXls,
                     budgetOriginalFileName,
                     budgetInXlsContentType, FinancialConstants.MODULE_NAME_APPCONFIG,false);
 
             persistenceService.persist(originalFileStore);
             originalFileStoreId = originalFileStore.getFileStoreId();
-
+            System.out.println("7 : "+originalFileStoreId);
             List<BudgetUpload> budgetUploadList = loadToBudgetUpload(sheet);
+            System.out.println("8");
             if(isBudgetUploadFileEmpty){
                 fsIP.close();
                 throw new ValidationException(new ValidationError(getText("error.while.counting.upload.records"), "There should be atleast one record in the upload file"));
             }
+            System.out.println("9");
             budgetUploadList = validateMasterData(budgetUploadList);
             budgetUploadList = !errorInMasterData ? validateDuplicateData(budgetUploadList) : budgetUploadList;
-
+            System.out.println("10");
             if (errorInMasterData) {
+            	System.out.println("11");
                 fsIP.close();
                 prepareOutPutFileWithErrors(budgetUploadList);
                 addActionMessage(getText("error.while.validating.masterdata"));
                 return "result";
             }
+            System.out.println("12");
 
             budgetUploadList = removeEmptyRows(budgetUploadList);
-
+            System.out.println("13");
             budgetUploadList = budgetDetailService.loadBudget(budgetUploadList, reFYear, beFYear);
-
+            System.out.println("14");
             fsIP.close();
             prepareOutPutFileWithFinalStatus(budgetUploadList);
 
@@ -261,6 +269,7 @@ public class BudgetLoadAction extends BaseFormAction {
 
         } catch (final ValidationException e)
         {
+        	System.out.println("Issue V3 : "+e.getMessage());
             originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
                     "from FileStoreMapper where fileName like '%budget_original%' order by id desc ").setMaxResults(5).list();
             outPutFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
@@ -269,6 +278,8 @@ public class BudgetLoadAction extends BaseFormAction {
                     e.getErrors().get(0).getMessage())));
         } catch (final Exception e)
         {
+        	System.out.println("Issue V3 : "+e.getMessage());
+        	e.printStackTrace();
             originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
                     "from FileStoreMapper where fileName like '%budget_original%' order by id desc ").setMaxResults(5).list();
             outPutFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
@@ -497,10 +508,14 @@ public class BudgetLoadAction extends BaseFormAction {
             }
         } catch (final ValidationException e)
         {
+        	System.out.println("Issue V2 ;"+e.getMessage());
+        	e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
                     e.getErrors().get(0).getMessage())));
         } catch (final Exception e)
         {
+        	System.out.println("Issue e2 ;"+e.getMessage());
+        	e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
                     e.getMessage())));
         }
@@ -560,10 +575,12 @@ public class BudgetLoadAction extends BaseFormAction {
                 }
         } catch (final ValidationException e)
         {
+        	System.out.println("Issue V : "+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
                     e.getErrors().get(0).getMessage())));
         } catch (final Exception e)
         {
+        	System.out.println("Issue E : "+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
                     e.getMessage())));
         }
@@ -603,10 +620,12 @@ public class BudgetLoadAction extends BaseFormAction {
             }
         } catch (final ValidationException e)
         {
+        	System.out.println("Issue v1 : "+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getErrors().get(0).getMessage(),
                     e.getErrors().get(0).getMessage())));
         } catch (final Exception e)
         {
+        	System.out.println("Issue E1 : "+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(),
                     e.getMessage())));
         }

@@ -1698,7 +1698,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                         "bankaccountList",
                         persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
                                 Integer.valueOf(bank_branch.split("-")[1])));
-            loadReasonsForSurrendaring();
+            loadReasonsForSurrendaringRTGS();
             return beforeSearchForRTGSSurrender();
         }
 
@@ -1733,7 +1733,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             getSession().put("instrumentHeaderList", instrumentHeaderList);
 
             if (instrumentVoucherList.size() > 0)
-                loadReasonsForSurrendaring();
+                loadReasonsForSurrendaringRTGS();
             loadChequeSerialNo(bankaccount);
 
         } catch (final ParseException e) {
@@ -1760,7 +1760,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                         "bankaccountList",
                         persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
                                 Integer.valueOf(bank_branch.split("-")[1])));
-            loadReasonsForSurrendaring();
+            loadReasonsForSurrendaringPEX();
             return beforeSearchForRTGSSurrender();
         }
 
@@ -1795,7 +1795,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             getSession().put("instrumentHeaderList", instrumentHeaderList);
 
             if (instrumentVoucherList.size() > 0)
-                loadReasonsForSurrendaring();
+                loadReasonsForSurrendaringPEX();
             loadChequeSerialNo(bankaccount);
 
         } catch (final ParseException e) {
@@ -1916,7 +1916,19 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         final StringBuffer reasonMissingRows = new StringBuffer(50);
         prepareInstrumentList();
         loadBankAndAccount();
-        loadReasonsForSurrendaring();
+        if(containsPEX)
+        {
+        	loadReasonsForSurrendaringPEX();
+        }
+        else if (containsRTGS)
+        {
+        	loadReasonsForSurrendaringRTGS();
+        }
+        else
+        {
+        	loadReasonsForSurrendaring();
+        }
+        
         loadChequeSerialNo(bankaccount);
 
         try {
@@ -3308,6 +3320,41 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 			Map<BankAccountRemittanceCOA, List<ChequeAssignment>> accountNoAndRemittancePexEntryMap) {
 		this.accountNoAndRemittancePexEntryMap = accountNoAndRemittancePexEntryMap;
 	}
+	
+	private void loadReasonsForSurrendaringPEX() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting loadReasonsForSurrendaring...");
 
+        List<AppConfigValues> appConfigValuesList;
+        surrendarReasonMap = new LinkedHashMap<String, String>();
+        appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "Reason For PEX Surrendaring");
+        for (final AppConfigValues app : appConfigValuesList) {
+            final String value = app.getValue();
+            if (app.getValue().indexOf('|') != -1)
+                surrendarReasonMap.put(app.getValue(), value.substring(0, app.getValue().indexOf('|')));
+            else
+                surrendarReasonMap.put(app.getValue(), app.getValue());
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed loadReasonsForSurrendaring.");
+    }
+    
+    private void loadReasonsForSurrendaringRTGS() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting loadReasonsForSurrendaring...");
+
+        List<AppConfigValues> appConfigValuesList;
+        surrendarReasonMap = new LinkedHashMap<String, String>();
+        appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "Reason For RTGS Surrendaring");
+        for (final AppConfigValues app : appConfigValuesList) {
+            final String value = app.getValue();
+            if (app.getValue().indexOf('|') != -1)
+                surrendarReasonMap.put(app.getValue(), value.substring(0, app.getValue().indexOf('|')));
+            else
+                surrendarReasonMap.put(app.getValue(), app.getValue());
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed loadReasonsForSurrendaring.");
+    }
 
 }

@@ -1105,8 +1105,8 @@ public class PaymentAction extends BasePaymentAction {
         paymentActionHelper.getPaymentBills(paymentheader);
         EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(paymentheader.getState().getOwnerPosition());
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getText("payment.voucher.rejected", new String[] {
-                    employee != null ? employee.getUser().getName() : "" }));
+            addActionMessage(getText("payment.voucher.rejected", new String[] {this.getEmployeeName(paymentheader.getState()
+                    .getInitiatorPosition())}));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getMessage("payment.voucher.approved", new String[] {
                     employee != null ? employee.getUser().getName() : "" }));
@@ -2349,4 +2349,9 @@ public class PaymentAction extends BasePaymentAction {
     public void setBillIdsToPaymentAmountsMap(String billIdsToPaymentAmountsMap) {
         this.billIdsToPaymentAmountsMap = billIdsToPaymentAmountsMap;
     } 
+    
+public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

@@ -1791,6 +1791,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             budgetUploadList = createBudgetDetails(BE, budgetUploadList, beFYear, budgetDetailStatus);
 
         } catch (final ValidationException e) {
+        	System.out.println("issue V4 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
@@ -1804,15 +1805,18 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             final CFinancialYear fyear, final EgwStatus status) {
         final List<BudgetUpload> tempList = new ArrayList<BudgetUpload>();
         try {
-
+        	System.out.println("bbbbbb");
             for (final BudgetUpload budgetUpload : budgetUploadList) {
+            	System.out.println("cccccc");
                 BudgetDetail budgetDetail = new BudgetDetail();
                 final BudgetDetail temp = getBudgetDetail(budgetUpload.getFund().getId(),
                         budgetUpload.getFunction().getId(), budgetUpload.getDeptCode(),
                         budgetUpload.getCoa().getId(), fyear, budgetType);
 
                 if (temp != null) {
+                	System.out.println("ddddd");
                     if (temp.getStatus().getCode().equalsIgnoreCase("CAO Verify")) {
+                    	System.out.println("ffff");
                         BigDecimal amount;
                         if (budgetType.equalsIgnoreCase(RE))
                             amount = budgetUpload.getReAmount();
@@ -1834,12 +1838,13 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                             tempList.add(budgetUpload);
                         }
                     } else {
+                    	System.out.println("ggggg");
                         budgetUpload.setFinalStatus("Already budget is defined for this combination and Approved");
                         tempList.add(budgetUpload);
                     }
 
                 } else if (temp == null) {
-
+                	System.out.println("eeee");
                     budgetDetail.setFund(budgetUpload.getFund());
                     budgetDetail.setFunction(budgetUpload.getFunction());
                     budgetDetail.setExecutingDepartment(budgetUpload.getDeptCode());
@@ -1873,9 +1878,11 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 }
             }
         } catch (final ValidationException e) {
+        	System.out.println("issue V8 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	System.out.println("issue E8 :"+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
         return tempList;
@@ -1905,39 +1912,48 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
 
     @Transactional
     public BudgetGroup createBudgetGroup(CChartOfAccounts coa) {
+    	System.out.println("coa.getId() ::"+coa.getId());
         BudgetGroup budgetGroup = budgetGroupService.getBudgetGroup(coa.getId());
+        System.out.println("gr1");
         try {
             Serializable sequenceNumber = null;
             try {
                 sequenceNumber = databaseSequenceProvider.getNextSequence("seq_egf_budgetgroup");
             } catch (final SQLGrammarException e) {
             }
-
+            System.out.println("gr2");
             Long.valueOf(sequenceNumber.toString());
-
+            System.out.println("gr3");
             if (budgetGroup == null) {
+            	System.out.println("gr4");
                 budgetGroup = new BudgetGroup();
                 budgetGroup.setName(coa.getGlcode() + "-" + coa.getName());
                 budgetGroup.setDescription(coa.getName());
                 budgetGroup.setIsActive(true);
                 if (coa.getType().compareTo('E') == 0) {
+                	System.out.println("gr5");
                     budgetGroup.setAccountType(BudgetAccountType.REVENUE_EXPENDITURE);
                     budgetGroup.setBudgetingType(BudgetingType.DEBIT);
                 } else if (coa.getType().compareTo('A') == 0) {
+                	System.out.println("gr6");
                     budgetGroup.setAccountType(BudgetAccountType.CAPITAL_EXPENDITURE);
                     budgetGroup.setBudgetingType(BudgetingType.DEBIT);
                 } else if (coa.getType().compareTo('L') == 0) {
+                	System.out.println("gr7");
                     budgetGroup.setAccountType(BudgetAccountType.CAPITAL_RECEIPTS);
                     budgetGroup.setBudgetingType(BudgetingType.CREDIT);
                 } else if (coa.getType().compareTo('I') == 0) {
+                	System.out.println("gr8");
                     budgetGroup.setAccountType(BudgetAccountType.REVENUE_RECEIPTS);
                     budgetGroup.setBudgetingType(BudgetingType.CREDIT);
                 }
                 if (coa.getClassification().compareTo(1l) == 0 || coa.getClassification().compareTo(2l) == 0
                         || coa.getClassification().compareTo(4l) == 0) {
+                	System.out.println("gr9");
                     budgetGroup.setMinCode(coa);
                     budgetGroup.setMaxCode(coa);
                 }
+                System.out.println("gr10");
                 budgetGroup.setMajorCode(null);
                 budgetGroupService.applyAuditing(budgetGroup);
                 budgetGroup = budgetGroupService.persist(budgetGroup);
@@ -1948,9 +1964,13 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             }
 
         } catch (final ValidationException e) {
+        System.out.println("xxcdbc :"+e.getMessage());
+        e.printStackTrace();
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	System.out.println("xxcdbd :"+e.getMessage());
+            e.printStackTrace();
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
         return budgetGroup;
@@ -2011,9 +2031,11 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                     status);
 
         } catch (final ValidationException e) {
+        	System.out.println("issue V6 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	System.out.println("issue E6 :"+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
     }
