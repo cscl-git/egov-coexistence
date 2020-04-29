@@ -47,6 +47,20 @@
  */
 package org.egov.collection.web.actions.receipts;
 
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -87,6 +101,7 @@ import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.BusinessService;
 import org.egov.infra.utils.NumberUtil;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -97,24 +112,13 @@ import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.models.ServiceCategory;
 import org.egov.infstr.models.ServiceDetails;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.pims.commons.Position;
 import org.hibernate.StaleObjectStateException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
 @ParentPackage("egov")
 @Results({ @Result(name = ChallanAction.NEW, location = "challan-new.jsp"),
@@ -130,6 +134,14 @@ public class ChallanAction extends BaseFormAction {
     private static final long serialVersionUID = 1L;
 
     protected List<String> headerFields;
+    
+    Map<String,String> serviceCategoryNames = new HashMap<String,String>();
+    Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
+    private String serviceCategory;
+    
+    @Autowired
+    @Qualifier("masterDataCache")
+    private EgovMasterDataCaching masterDataCache;
 
     protected List<String> mandatoryFields;
     private List<ReceiptDetailInfo> subLedgerlist;
@@ -248,7 +260,8 @@ public class ChallanAction extends BaseFormAction {
 
     private Long serviceCategoryId;
 
-    private Long serviceId;
+    private String serviceId;
+    private String serviceIdText;
     private ChallanService challanService;
     private String approverName;
     private Long functionId;
@@ -1053,6 +1066,7 @@ public class ChallanAction extends BaseFormAction {
             setupDropdownDataExcluding("receiptMisc.fund");
             addDropdownData("fundList", collectionsUtil.getAllFunds());
         }
+        getServiceCategoryList();
         addDropdownData("serviceCategoryList",
                 serviceCategoryService.findAllByNamedQuery(CollectionConstants.QUERY_ACTIVE_SERVICE_CATEGORY));
         if (null != service && null != service.getServiceCategory() && service.getServiceCategory().getId() != -1)
@@ -1066,8 +1080,7 @@ public class ChallanAction extends BaseFormAction {
         else
             addDropdownData("serviceList", Collections.emptyList());
         if (headerFields.contains(CollectionConstants.DEPARTMENT))
-            addDropdownData("departmentList",
-                    persistenceService.findAllByNamedQuery(CollectionConstants.QUERY_ALL_DEPARTMENTS));
+            addDropdownData("departmentList",masterDataCache.get("egi-department"));
         if (headerFields.contains(CollectionConstants.FUNCTION))
             addDropdownData("functionList", functionDAO.getAllActiveFunctions());
         if (headerFields.contains(CollectionConstants.FIELD))
@@ -1434,11 +1447,11 @@ public class ChallanAction extends BaseFormAction {
         this.challanWorkflowService = challanWorkflowService;
     }
 
-    public Long getServiceId() {
+    public String getServiceId() {
         return serviceId;
     }
 
-    public void setServiceId(final Long serviceId) {
+    public void setServiceId(final String serviceId) {
         this.serviceId = serviceId;
     }
 
@@ -1536,5 +1549,61 @@ public class ChallanAction extends BaseFormAction {
                 && receiptHeader.getReceiptdate().before(receiptHeader.getChallan().getChallanDate()))
             addActionError(getText("challan.error.receiptdate.lessthan.challandate"));
     }
+    
+    private void getServiceCategoryList() {
+        List<BusinessService> businessService = microserviceUtils.getBusinessService("Finance");
+        for(BusinessService bs : businessService){
+            String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
+            String[] splitSerCode = bs.getCode().split(Pattern.quote("."));
+            if(splitServName.length==2 && splitSerCode.length == 2){
+                if(!serviceCategoryNames.containsKey(splitSerCode[0])){
+                    serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+                }
+                if(serviceTypeMap.containsKey(splitSerCode[0])){
+                    Map<String, String> map = serviceTypeMap.get(splitSerCode[0]);
+                    map.put(splitSerCode[1], splitServName[1]);
+                    serviceTypeMap.put(splitSerCode[0], map);
+                }else{
+                    Map<String, String> map = new HashMap<>();
+                    map.put(splitSerCode[1], splitServName[1]);
+                    serviceTypeMap.put(splitSerCode[0],map);
+                }
+            }else{
+                serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+            }
+        }
+    }
+
+	public Map<String, String> getServiceCategoryNames() {
+		return serviceCategoryNames;
+	}
+
+	public void setServiceCategoryNames(Map<String, String> serviceCategoryNames) {
+		this.serviceCategoryNames = serviceCategoryNames;
+	}
+
+	public String getServiceCategory() {
+		return serviceCategory;
+	}
+
+	public void setServiceCategory(String serviceCategory) {
+		this.serviceCategory = serviceCategory;
+	}
+
+	public Map<String, Map<String, String>> getServiceTypeMap() {
+		return serviceTypeMap;
+	}
+
+	public void setServiceTypeMap(Map<String, Map<String, String>> serviceTypeMap) {
+		this.serviceTypeMap = serviceTypeMap;
+	}
+
+	public String getServiceIdText() {
+		return serviceIdText;
+	}
+
+	public void setServiceIdText(String serviceIdText) {
+		this.serviceIdText = serviceIdText;
+	}
 
 }
