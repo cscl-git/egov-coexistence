@@ -75,7 +75,7 @@ CREATE TABLE eglc_library_aud
 (
   id bigint NOT NULL,
   rev bigint NOT NULL,
-  title character varying(255)
+  title character varying(255),
   documenttype bigint,
   reffileid character varying(100),
   active boolean,
