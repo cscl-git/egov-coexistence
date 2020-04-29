@@ -17,7 +17,7 @@ import org.egov.lcms.masters.service.DocumentTypeMasterService;
 import org.egov.lcms.transactions.entity.Library;
 import org.egov.lcms.transactions.service.LibraryService;
 import org.egov.lcms.utils.constants.LcmsConstants;
-import org.egov.lcms.web.adaptor.CourtMasterJsonAdaptor;
+import org.egov.lcms.web.adaptor.LibraryJsonAdaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -156,7 +156,7 @@ public class LibraryController {
 
     public Object toSearchResultJson(final Object object) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
-        final Gson gson = gsonBuilder.registerTypeAdapter(Library.class, new CourtMasterJsonAdaptor()).create();
+        final Gson gson = gsonBuilder.registerTypeAdapter(Library.class, new LibraryJsonAdaptor()).create();
         return gson.toJson(object);
     }
 }

@@ -1,42 +1,43 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
-<form:form role="form" action="search" modelAttribute="courtMaster"
-	id="courtMastersearchform"
+<form:form role="form" action="search" modelAttribute="library"
+	id="librarysearchform"
 	cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	<div class="row">
 		<div class="col-md-12">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="panel-heading">
-					<div class="panel-title">Search Court</div>
+					<div class="panel-title"><spring:message code="title.library.search" /></div>
 				</div>
 				<div class="panel-body">
 					<div class="form-group">
-						<label class="col-sm-2 control-label text-right"><spring:message
-								code="lbl.courttype" />: </label>
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.document.type" />: 
+						</label>
 						<div class="col-sm-3 add-margin">
-							<form:select path="courtType" id="courtType"
+							<form:select path="documentType" id="documentType"
 								cssClass="form-control" cssErrorClass="form-control error">
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:options items="${courtTypeMasters}" itemValue="id"
-									itemLabel="courtType" />
+								<form:options items="${documentTypeMasters}" itemValue="id"
+									itemLabel="documentType" />
 							</form:select>
-							<form:errors path="courtType" cssClass="error-msg" />
+							<form:errors path="documentType" cssClass="error-msg" />
 						</div>
-						<label class="col-sm-2 control-label text-right"><spring:message
-								code="lbl.name" /> :</label>
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.title" /> :
+						</label>
 						<div class="col-sm-3 add-margin">
-							<form:input path="name"
-								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="100" />
-							<form:errors path="name" cssClass="error-msg" />
+							<form:input path="title" class="form-control text-left patternvalidation" data-pattern="address" maxlength="255" />
+							<form:errors path="title" cssClass="error-msg" />
 						</div>
 					</div>
 					<div class="form-group">
-						<label class="col-sm-2 control-label text-right"><spring:message
-								code="lbl.active" /> :</label>
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.active" /> :
+						</label>
 						<div class="col-sm-2 add-margin">
 							<form:select path="active" id="active" cssClass="form-control"
 								cssErrorClass="form-control error">
@@ -52,8 +53,6 @@
 							<button type='button' class='btn btn-primary' id="btnsearch">
 								<spring:message code='lbl.search' />
 							</button>
-							<a href='javascript:void(0)' class='btn btn-default'
-								onclick='self.close()'><spring:message code='lbl.close' /></a>
 						</div>
 					</div>
 				</div>
@@ -68,8 +67,8 @@
 			id="resultTable">
 			<thead>
 				<tr>
-					<th><spring:message code="lbl.courttype" /></th>
-					<th><spring:message code="lbl.name" /></th>
+					<th><spring:message code="lbl.document.type" /></th>
+					<th><spring:message code="lbl.title" /></th>
 					<th><spring:message code="lbl.active" /></th>
 				</tr>
 			</thead>
@@ -84,19 +83,11 @@
 		}
 	});
 </script>
-<link rel="stylesheet"
-	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>" />
-<link rel="stylesheet"
-	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.tableTools.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/TableTools.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/js/app/courtMasterHelper.js?rnd=${app_release_no}'/>"></script>
+<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>" />
+<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
+<script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/egi'/>"></script>
+<script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.bootstrap.js' context='/services/egi'/>"></script>
+<script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.tableTools.js' context='/services/egi'/>"></script>
+<script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/TableTools.min.js' context='/services/egi'/>"></script>
+<script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
+<script type="text/javascript" src="<cdn:url value='/resources/js/app/libraryHelper.js?rnd=${app_release_no}'/>"></script>

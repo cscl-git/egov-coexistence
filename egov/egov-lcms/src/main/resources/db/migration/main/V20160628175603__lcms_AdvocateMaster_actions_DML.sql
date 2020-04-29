@@ -56,9 +56,8 @@ COMMENT ON COLUMN eglc_advocate_master_aud.revtype IS 'It will holds the type of
 0=Creation,1=Modification,2=Deletions';
 
 -----Inserting Accountdetailtype
-INSERT INTO accountdetailtype (id, name, description, tablename, columnname, attributename, nbroflevels, isactive, created, lastmodified, modifiedby, full_qualified_name,version) 
-VALUES (nextval('seq_accountdetailtype'), 'lawyer', 'Standing Counsel', 'eglc_advocate_master', 'id', 'advocate_master_id', 
-1, 'TRUE', 'now()', 'now()', null, 'org.egov.lcms.masters.entity.AdvocateMaster',0);
+INSERT INTO accountdetailtype (id,"name",description,tablename,columnname,attributename,nbroflevels,full_qualified_name,createddate,lastmodifieddate,lastmodifiedby,"version",isactive,createdby) VALUES 
+(nextval('seq_accountdetailtype'),'lawyer','Standing Counsel','eglc_advocate_master','id','advocate_master_id',1,'org.egov.lcms.masters.entity.AdvocateMaster','2020-04-15 00:00:00.000','2020-04-15 00:00:00.000',NULL,0,true,1);
 
 ----Inserting eg_module 
 
