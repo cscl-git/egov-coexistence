@@ -16,8 +16,8 @@ values (nextval('SEQ_EG_ACTION'),'CreateCaseType','/masters/caseType/create/',nu
 (select id from eg_module where name='LCMS Masters'),3,'Create CaseType','true','lcms',0,1,now(),1,now(),
 (select id from eg_module where name='LCMS'));
 
-INSERT INTO eg_role (id,"name",description,createddate,createdby,lastmodifiedby,lastmodifieddate,"version",internal) VALUES 
-(nextval('seq_eg_role'),'Super User','Super User',now(),1,1,now(),0,true);
+INSERT INTO eg_role (id,"name",description,createddate,createdby,lastmodifiedby,lastmodifieddate,"version") VALUES 
+(nextval('seq_eg_role'),'Super User','Super User',now(),1,1,now(),0);
 
 Insert INTO eg_roleaction (roleid,actionid) values
 ((select id from eg_role where name='Super User'),(select id from eg_action where name='CreateCaseType'));
