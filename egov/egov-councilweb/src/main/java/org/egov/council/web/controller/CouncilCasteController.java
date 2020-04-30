@@ -85,7 +85,7 @@ public class CouncilCasteController {
     @Autowired
     private MessageSource messageSource;
 
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
 
         CouncilCaste councilCaste = new CouncilCaste();
@@ -139,7 +139,7 @@ public class CouncilCasteController {
         return COUNCILCASTE_RESULT;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         CouncilCaste councilCaste = new CouncilCaste();
         model.addAttribute(COUNCIL_CASTE, councilCaste);

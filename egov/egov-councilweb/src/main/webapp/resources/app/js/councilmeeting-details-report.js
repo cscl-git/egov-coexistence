@@ -103,7 +103,7 @@ $(document).ready(function() {
 										"sClass" : "text-left",
 										"render": function ( data, type, row, meta ) {
 											if(row.id!=null){
-											return '<a target="_new" onclick="openPopup(\'/council/councilmom/view/'+ row.id +'\')">'+data+'</a>' 
+											return '<a target="_new" onclick="openPopup(\'/services/council/councilmom/view/'+ row.id +'\')">'+data+'</a>' 
 											}
 											else
 												{

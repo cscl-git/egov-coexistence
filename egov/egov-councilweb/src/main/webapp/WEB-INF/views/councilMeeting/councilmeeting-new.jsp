@@ -50,7 +50,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
-<form:form role="form" action="/council/councilmeeting/create" modelAttribute="councilMeeting" 
+<form:form role="form" action="/services/council/councilmeeting/create" modelAttribute="councilMeeting" 
 	id="councilMeetingform" cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	<%@ include file="councilmeeting-form.jsp"%>
@@ -87,7 +87,7 @@
 		     }
 
 		if ($('form').valid()) {
-			 var action = '/council/councilmeeting/create' ;
+			 var action = '/services/council/councilmeeting/create' ;
  			$('#councilMeetingform').attr('method', 'post');
  			$('#councilMeetingform').attr('action', action); 
 		} else {

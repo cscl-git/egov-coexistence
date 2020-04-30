@@ -157,7 +157,7 @@
 								value="${councilPreamble.filestoreid.fileStoreId}" />
 
 							<a
-								href="/council/councilmember/downloadfile/${councilPreamble.filestoreid.fileStoreId}"
+								href="/services/council/councilmember/downloadfile/${councilPreamble.filestoreid.fileStoreId}"
 								data-gallery> ${councilPreamble.filestoreid.fileName}</a>
 							<small class="error-msg"><spring:message
 									code="lbl.mesg.document" /></small>

@@ -85,7 +85,7 @@ public class CouncilDesignationController {
     @Autowired
     private MessageSource messageSource;
 
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
         CouncilDesignation councilDesignation = new CouncilDesignation();
         councilDesignation.setCode(RandomStringUtils.random(4, Boolean.TRUE, Boolean.TRUE).toUpperCase());
@@ -146,7 +146,7 @@ public class CouncilDesignationController {
         return COUNCILDESIGNATION_RESULT;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         CouncilDesignation councilDesignation = new CouncilDesignation();
         model.addAttribute(COUNCIL_DESIGNATION, councilDesignation);

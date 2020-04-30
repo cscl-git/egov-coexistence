@@ -198,7 +198,7 @@ function validateAgendaNumber(agendaNumber){
 	var agendaresponse=false;
 	if(agendaNumber != '') {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-agendaNo",      
+			url: "/services/council/councilmom/checkUnique-agendaNo",      
 			type: "GET",
 			data: {
 				agendaNumber : agendaNumber,  
@@ -228,7 +228,7 @@ function validateMeetingNumber(){
 	var meetingNumber=$('#meetingNumber').val();
 	if(meetingNumber != '') {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-MeetingNo",      
+			url: "/services/council/councilmom/checkUnique-MeetingNo",      
 			type: "GET",
 			data: {
 				meetingNumber : meetingNumber,  
@@ -252,7 +252,7 @@ function validatePreambleNumber(preambleNumber){
 	var preambleNo= preambleNumber.val()
 	if(preambleNo != '') {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-preambleNo",      
+			url: "/services/council/councilmom/checkUnique-preambleNo",      
 			type: "GET",
 			data: {
 				preambleNumber : preambleNo, 
@@ -276,7 +276,7 @@ function validateResolutionNumber(resolutionNumber){
 	var resolutionNo = resolutionNumber.val();
 	if(resolutionNo != '') {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-resolutionNo",      
+			url: "/services/council/councilmom/checkUnique-resolutionNo",      
 			type: "GET",
 			data: {
 				resolutionNumber : resolutionNo, 
@@ -318,7 +318,7 @@ $('#buttonSubmit').click(function(e) {
 		 }
 	 }
 	 if ($('form').valid() && !nonUniqueAgenda) {
-		 var action = '/council/councilmom/savedataentry' ;
+		 var action = '/services/council/councilmom/savedataentry' ;
 			$('#councilMeetingform').attr('method', 'post');
 			$('#councilMeetingform').attr('action', action); 
 			$('form').submit();			
@@ -364,7 +364,7 @@ function generateOrderNo(){
 function loadDepartmentlist(selectBoxName){
 
  $.ajax({
-		url: "/council/councilmom/departmentlist",     
+		url: "/services/council/councilmom/departmentlist",     
 		type: "GET",
 		async: false,
 		dataType: "json",
@@ -407,7 +407,7 @@ function validateAgengaDetails(){
 function loadResolutionlist(selectBoxNameResolution){
 
 	 $.ajax({
-			url: "/council/councilmom/resolutionlist",     
+			url: "/services/council/councilmom/resolutionlist",     
 			type: "GET",
 			async: false,
 			dataType: "json",

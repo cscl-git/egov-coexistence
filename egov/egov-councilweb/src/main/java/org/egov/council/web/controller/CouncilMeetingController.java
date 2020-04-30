@@ -190,7 +190,7 @@ public class CouncilMeetingController {
         return councilMeetingTypeService.findAllActiveMeetingType();
     }
     
-    @RequestMapping(value = "/new/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/new/{id}", method = RequestMethod.POST)
     public String newForm(@ModelAttribute final CouncilMeeting councilMeeting, @PathVariable("id") final Long id,
                           final Model model) {
 
@@ -324,7 +324,7 @@ public class CouncilMeetingController {
         return COUNCILMEETING_RESULT;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         CouncilMeeting councilMeeting = new CouncilMeeting();
         model.addAttribute(COUNCIL_MEETING, councilMeeting);

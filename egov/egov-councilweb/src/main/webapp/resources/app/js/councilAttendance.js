@@ -114,8 +114,8 @@ function getFormData($form){
     return indexed_array;
 }
 
-var viewurl='/council/councilmeeting/attendance/search/view/';
-var editurl='/council/councilmeeting/attend/search/edit/';
+var viewurl='/services/council/councilmeeting/attendance/search/view/';
+var editurl='/services/council/councilmeeting/attend/search/edit/';
 function callAjaxSearch() {
 	
 	jQuery('.report-section').removeClass('display-hide');
@@ -161,7 +161,7 @@ function callAjaxSearch() {
 					"data" : "meetingDate", "sClass" : "text-left"},{ 
 					"data" : "meetingType", "sClass" : "text-left",
 					"render": function ( data, type, row, meta ) {
-						return '<a target="_new" onclick="openPopup(\'/council/councilmeeting/attendance/search/view/'+ row.id +'\')">'+data+'</a>' 
+						return '<a target="_new" onclick="openPopup(\'/services/council/councilmeeting/attendance/search/view/'+ row.id +'\')">'+data+'</a>' 
 					  }
 					},
 					{"data" : "totCommitteMemCount", "sClass" : "text-center"},
@@ -225,7 +225,7 @@ $('#finalizeAttendanceBtn').click(
                         	    },
                         	    callback: function(result) {
                                    if (result) {
-                                        var action = '/council/councilmeeting/attendance/finalizeattendance';
+                                        var action = '/services/council/councilmeeting/attendance/finalizeattendance';
                                             $('#councilMeetingform').attr('method', 'post');
                                             $('#councilMeetingform').attr('action', action);
                                             isSubmit=true;

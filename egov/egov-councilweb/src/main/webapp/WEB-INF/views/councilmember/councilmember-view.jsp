@@ -132,7 +132,7 @@
 						<c:if test="${not empty councilMember.photo}">
 																<div class="col-md-3 col-xs-6 add-margin view-content">
 																	<img class='imagem_artigo' src='data:image/jpg;Base64, ${imageFile}' alt="IMG DESC">
-																	<img width="100" height="70" src='/council/councilmember/image?${councilMember.id}' /> 
+																	<img width="100" height="70" src='/services/council/councilmember/image?${councilMember.id}' /> 
 																</div>	
 																</c:if>
 						</div> --%>
@@ -147,16 +147,16 @@
 								<c:when test="${councilMember.photo != null}">
 									<%-- <c:if test="${(councilMember.photo.contentType == 'image/jpg') || (councilMember.photo.contentType == 'image/jpeg')|| (councilMember.photo.contentType == 'image/gif')|| 
 										(councilMember.photo.contentType == 'image/png')}">
-										<a href="/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
+										<a href="/services/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
 												data-gallery> <img class="img-width add-margin"
-												src="/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}" alt="councilMember.photo.fileName"/></a>
+												src="/services/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}" alt="councilMember.photo.fileName"/></a>
 										</c:if> --%>
 									<a
-										href="/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
+										href="/services/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
 										data-gallery target="_blank"> <img
 										class="img-width add-margin"
 										style="max-width: 50%; max-height: 50%;"
-										src="/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
+										src="/services/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
 										alt="${councilMember.photo.fileName}" /></a>
 
 								</c:when>

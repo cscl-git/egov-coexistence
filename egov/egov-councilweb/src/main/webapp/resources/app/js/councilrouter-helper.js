@@ -107,7 +107,7 @@ function getPosition() {
 	var department = $('#department').val();
 	
 	jQuery.ajax({
-			url: "/eis/report/positions?deptId="
+			url: "/services/eis/report/positions?deptId="
 				+ department + "&desigId=",
 			type: "GET",
 			dataType: "json",

@@ -100,7 +100,7 @@ public class CouncilCommitteeTypeController {
     @Autowired
     private CouncilCommitteeMemberService councilCommitteeMemberService;
 
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
 
         CommitteeType committeeType = new CommitteeType();
@@ -257,7 +257,7 @@ public class CouncilCommitteeTypeController {
         return COUNCILCOMMITTEETYPE_RESULT;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         CommitteeType committeeType = new CommitteeType();
         model.addAttribute(COMMITTEE_TYPE, committeeType);

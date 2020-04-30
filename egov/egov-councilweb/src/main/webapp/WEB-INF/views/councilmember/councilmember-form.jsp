@@ -281,10 +281,10 @@
 								value="${councilMember.photo.fileStoreId}" />
 
 							<a
-								href="/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
+								href="/services/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
 								data-gallery> <img class="img-width add-margin"
 								style="max-width: 25%; max-height: 25%;"
-								src="/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
+								src="/services/council/councilmember/downloadfile/${councilMember.photo.fileStoreId}"
 								alt="${councilMember.photo.fileName}" /></a>
 								<small class="error-msg"><spring:message code="lbl.mesg.upload.size"/></small>
 						</c:when>

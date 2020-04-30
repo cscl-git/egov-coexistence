@@ -66,8 +66,8 @@ var row = '<tr>'+
  '<td><span class="more">{{gistTextBoxValue}}</span></td>'+
  '<td class="text-right"><span>{{amountTextBoxValue}}</span></td>'+
  '<td><input type="hidden" class="form-control" name="councilAgendaDetailsForUpdate[{{idx}}].preamble.id" value="{{preamableId}}"/>'+
- '<a class="btn btn-xs btn-secondary" href="/council/councilpreamble/view/{{preamableId}}"  target="popup"' +
- 'onclick="window.open(\'/council/councilpreamble/view/{{preamableId}}\',\'popup\',\'width=600,height=600,resizable=no\'); return false;">'+
+ '<a class="btn btn-xs btn-secondary" href="/services/council/councilpreamble/view/{{preamableId}}"  target="popup"' +
+ 'onclick="window.open(\'/services/council/councilpreamble/view/{{preamableId}}\',\'popup\',\'width=600,height=600,resizable=no\'); return false;">'+
  '<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View'+
 	'</a>&nbsp;<button type="button" class="btn btn-xs btn-secondary delete"><span class="glyphicon glyphicon-trash"></span>&nbsp;Delete</button></td>'+
 '</tr>';
@@ -324,7 +324,7 @@ function validateAgendaNumber(agendaNumber){
 	var agendaresponse=false;
 	if(agendaNumber != '') {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-agendaNo",      
+			url: "/services/council/councilmom/checkUnique-agendaNo",      
 			type: "GET",
 			data: {
 				agendaNumber : agendaNumber,  
@@ -415,7 +415,7 @@ $(document).ready(function() {
 		else if($('#emptyRow').length){
 			emptyRowAlert();
 		}else if ($('#councilAgendaform').valid() && !nonUniqueAgenda) {
-			 var action = '/council/agenda/create' ;
+			 var action = '/services/council/agenda/create' ;
 				$('#councilAgendaform').attr('method', 'post');
 				$('#councilAgendaform').attr('action', action); 
 				$('#councilAgendaform').submit();			

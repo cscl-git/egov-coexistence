@@ -72,7 +72,7 @@ public class CouncilManualSequenceNoController {
     @Autowired
     private CouncilSequenceGenerationService councilSequenceGenerationService;
 
-    @RequestMapping(value = "/create", method = GET)
+    @RequestMapping(value = "/create", method = POST)
     public String newForm(final Model model) {
         String preambleseq = StringUtils.EMPTY;
         String resolutionseq = StringUtils.EMPTY;

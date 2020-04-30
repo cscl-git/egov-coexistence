@@ -174,7 +174,7 @@ jQuery('#add-sumoto').click(function(){
 function loadDepartmentlist(selectBoxName){
 
  $.ajax({
-		url: "/council/councilmom/departmentlist",     
+		url: "/services/council/councilmom/departmentlist",     
 		type: "GET",
 		async: false,
 		dataType: "json",
@@ -193,7 +193,7 @@ function loadDepartmentlist(selectBoxName){
 function loadResolutionlist(selectBoxNameResolution){
 
 	 $.ajax({
-			url: "/council/councilmom/resolutionlist",     
+			url: "/services/council/councilmom/resolutionlist",     
 			type: "GET",
 			async: false,
 			dataType: "json",
@@ -212,7 +212,7 @@ function loadResolutionlist(selectBoxNameResolution){
 function loadWardnumberlist(selectBoxNameWard){
 
 	 $.ajax({
-			url: "/council/councilmom/wardlist",     
+			url: "/services/council/councilmom/wardlist",     
 			type: "GET",
 			async: false,
 			dataType: "json",
@@ -296,7 +296,7 @@ $('#buttonFinalSubmit')
 										// To disable MOM Resolution PDF button after submit form,
 										// to prevent multiple submission.
 										obj.attr('disabled','disabled');
-										 var action = '/council/councilmom/generateresolution';
+										 var action = '/services/council/councilmom/generateresolution';
 								 			$('#councilMomform').attr('method', 'post');
 								 			$('#councilMomform').attr('action', action); 
 								 			document.forms["councilMomform"].submit();

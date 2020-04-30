@@ -102,7 +102,7 @@ public class CouncilRouterController {
         model.addAttribute("preambleType", PreambleTypeEnum.values());
     }
 
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
         prepareNewForm(model);
         CouncilRouter councilRouter = new CouncilRouter();
@@ -157,7 +157,7 @@ public class CouncilRouterController {
         return COUNCILROUTER_VIEW;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         CouncilRouter councilRouter = new CouncilRouter();
         prepareNewForm(model);

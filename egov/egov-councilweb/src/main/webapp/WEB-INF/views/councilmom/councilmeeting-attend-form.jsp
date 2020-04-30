@@ -51,7 +51,7 @@
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
 
 <form:form role="form"
-	action="/council/councilmeeting/attendance/update" method="post"
+	action="/services/council/councilmeeting/attendance/update" method="post"
 	modelAttribute="councilMeeting" name="councilMeetingform"
 	id="councilMeetingform" cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">

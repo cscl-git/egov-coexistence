@@ -100,7 +100,7 @@
 						<c:choose>
 							<c:when test="${councilPreamble.filestoreid != null}">
 								<a
-									href="/council/councilpreamble/downloadfile/${councilPreamble.filestoreid.fileStoreId}"
+									href="/services/council/councilpreamble/downloadfile/${councilPreamble.filestoreid.fileStoreId}"
 									data-gallery target="_blank">${councilPreamble.filestoreid.fileName}</a>
 
 							</c:when>

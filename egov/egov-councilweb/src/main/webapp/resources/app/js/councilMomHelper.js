@@ -180,7 +180,7 @@ function validateResolutionNumber(resolutionNumber, preambleId){
 	var resolutionNo = resolutionNumber.val();
 	if(resolutionNo) {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-resolutionNo",      
+			url: "/services/council/councilmom/checkUnique-resolutionNo",      
 			type: "GET",
 			data: {
 				resolutionNumber : resolutionNo, 

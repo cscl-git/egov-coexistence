@@ -207,7 +207,7 @@
 <div class="row text-center">
 	<div class="add-margin">
 		<button type="button" id="printAgenda" value="Print Agenda"
-			onclick="location.href='/council/councilmeeting/generateagenda/'+${councilMeeting.id};"
+			onclick="location.href='/services/council/councilmeeting/generateagenda/'+${councilMeeting.id};"
 			class='btn btn-primary'>Print Meeting Notice</button>
 		<a href="javascript:void(0)" class="btn btn-default"
 			onclick="self.close()">Close</a>

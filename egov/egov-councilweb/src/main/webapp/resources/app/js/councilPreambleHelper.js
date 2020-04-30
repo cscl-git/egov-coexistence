@@ -372,7 +372,7 @@ function validatePreambleNumber(preambleNumber){
 	var preambleNo= preambleNumber.val()
 	if(preambleNo != '') {
 		$.ajax({
-			url: "/council/councilmom/checkUnique-preambleNo",      
+			url: "/services/council/councilmom/checkUnique-preambleNo",      
 			type: "GET",
 			data: {
 				preambleNumber : preambleNo, 

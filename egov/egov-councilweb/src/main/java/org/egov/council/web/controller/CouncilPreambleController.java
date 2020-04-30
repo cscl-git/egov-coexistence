@@ -88,6 +88,7 @@ import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -156,10 +157,12 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     private AppConfigValueService appConfigValueService;
     @Autowired
     private BidderService bidderService;
+    @Autowired
+    protected EgovMasterDataCaching masterDataCache;
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
-        return deptService.getAllDepartments();
+        return masterDataCache.get("egi-department");
     }
 
     @ModelAttribute("wards")
@@ -186,7 +189,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         return egwStatusHibernateDAO.getStatusByModule(IMPLEMENTATIONSTATUS);
     }
 
-    @RequestMapping(value = "/new", method = RequestMethod.GET)
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
         CouncilPreamble councilPreamble = new CouncilPreamble();
         councilPreamble.setType(PreambleType.GENERAL);
@@ -479,7 +482,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
             return COUNCILPREAMBLE_VIEW;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         model.addAttribute(COUNCIL_PREAMBLE, new CouncilPreamble());
         return COUNCILPREAMBLE_SEARCH;

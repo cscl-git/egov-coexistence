@@ -139,9 +139,9 @@
 										name="councilAgendaDetailsForUpdate[${counter.index}].preamble.id"
 										readonly="readonly" value="${contact.preamble.id}" /> <a
 										class="btn btn-xs btn-secondary"
-										href="/council/councilpreamble/view/${contact.preamble.id}"
+										href="/services/council/councilpreamble/view/${contact.preamble.id}"
 										target="popup"
-										onclick="window.open('/council/councilpreamble/view/${contact.preamble.id}','popup','width=600,height=600,resizable=no'); return false;">
+										onclick="window.open('/services/council/councilpreamble/view/${contact.preamble.id}','popup','width=600,height=600,resizable=no'); return false;">
 											<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
 									</a>
 										<button type="button" class="btn btn-xs btn-secondary delete">

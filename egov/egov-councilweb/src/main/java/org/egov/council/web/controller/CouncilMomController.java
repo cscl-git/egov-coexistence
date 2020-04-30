@@ -202,7 +202,7 @@ public class CouncilMomController {
         return egwStatusHibernateDAO.getStatusByModule(COUNCIL_RESOLUTION);
     }
 
-    @RequestMapping(value = "/new/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/new/{id}", method = RequestMethod.POST)
     public String newForm(@PathVariable("id") final Long id, Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
 
@@ -323,7 +323,7 @@ public class CouncilMomController {
         return COUNCILMOM_VIEW;
     }
 
-    @RequestMapping(value = "/search/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
     public String search(@PathVariable("mode") final String mode, Model model) {
         CouncilMeeting councilMeeting = new CouncilMeeting();
         model.addAttribute(COUNCIL_MEETING, councilMeeting);

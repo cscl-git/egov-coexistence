@@ -117,7 +117,7 @@ public class CouncilDataEntryController {
         return councilMeetingTypeService.findAllActiveMeetingType();
     }
     
-    @RequestMapping(value = "/createdataentry", method = RequestMethod.GET)
+    @RequestMapping(value = "/createdataentry", method = RequestMethod.POST)
     public String showCouncilForm(final Model model) {
         MeetingMOM meetingMOM = new MeetingMOM();
         model.addAttribute(MEETING_MOM, meetingMOM);

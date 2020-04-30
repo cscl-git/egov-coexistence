@@ -82,7 +82,7 @@
 
 <script>
 $( document ).ready(function() {
-	window.location.href = '/council/councilmeeting/downloadfile/'+$('#id').val();
+	window.location.href = '/services/council/councilmeeting/downloadfile/'+$('#id').val();
 });
 
 </script>

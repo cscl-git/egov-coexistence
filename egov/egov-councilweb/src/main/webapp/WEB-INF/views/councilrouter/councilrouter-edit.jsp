@@ -76,7 +76,7 @@
 <script>
 	$('#buttonSubmit').click(function(e) {
 		if ($('form').valid()) {
-			 var action = '/council/councilrouter/update' ;
+			 var action = '/services/council/councilrouter/update' ;
 			$('#councilRouterform').attr('method', 'post');
 			$('#councilRouterform').attr('action', action); 
 		} else {

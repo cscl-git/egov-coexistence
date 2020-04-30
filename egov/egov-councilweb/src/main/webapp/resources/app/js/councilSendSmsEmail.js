@@ -118,7 +118,7 @@ $("#resultTable").on('click','tbody tr td  .view',function(event) {
 	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
 	
 	$.ajax({
-	   url: '/council/councilmeeting/sendsmsemail?id='+id+'&msg='+msg,
+	   url: '/services/council/councilmeeting/sendsmsemail?id='+id+'&msg='+msg,
 	   data: {
 	      format: 'json'
 	   },
