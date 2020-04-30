@@ -144,9 +144,7 @@ function onBodyLoad(){
 	
 	check();
 	
-	if(dom.get("deptId")!=null){
-		document.getElementById('deptId').disabled=true;
-	}
+	
 	
 	// page has to be disabled when view through search option/ when challan has to be modified -->
 	<s:if test="%{sourcePage=='search' || (model.id!=null && model.challan.state.value=='CREATED' && sourcePage!='inbox')}">
@@ -602,6 +600,45 @@ function populatepositionuseronload()
 	}	
 }
 
+function populateServiceType(selected){
+    var isServiceTypeExist = false;
+    document.getElementById('serviceTable').innerHTML='';
+    if(selected == -1){
+		return;
+    }
+    <s:iterator value="serviceCategoryNames" var="obj">
+    var serTypeKey = '<s:property value="#obj.key"/>';
+    var serTypeValue = '<s:property value="serviceTypeMap[#obj.key]"/>';
+    if(selected == serTypeKey && serTypeValue != ''){
+    	isServiceTypeExist = true;
+    	addServiceTypeDropdown('serviceTable');
+			<s:iterator value="serviceTypeMap[#obj.key]" status="stat" var="names">
+				var stKey = '<s:property value="#names.key"/>';
+				var stValue = '<s:property value="#names.value"/>';
+				document.getElementById('serviceId').options[<s:property value="#stat.index+1"/>]= new Option(stValue,stKey);
+		</s:iterator>
+    }
+	 </s:iterator>
+	 if(!isServiceTypeExist){
+		 loadFinDetails(this);
+	 }
+}
+function addServiceTypeDropdown(tableId){
+    var table = document.getElementById(tableId);
+    var row = table.insertRow(0);
+    var cell1 = row.insertCell(0);
+    var cell2 = row.insertCell(1);
+    cell1.className='bluebox';
+    cell1.width="45%";
+    cell2.className='bluebox';
+    cell2.width="50%";
+    cell1.innerHTML = '<s:text name="miscreceipt.service" /><span class="mandatory"/>';
+    cell2.innerHTML = '<select name="serviceId" id="serviceId" onchange="loadFinDetails(this)"/>';
+	document.getElementById('serviceId').options.length=0;
+	document.getElementById('serviceId').options[0]= new Option('--------Choose--------','0');
+
+}
+
 
 
 </script>
@@ -692,12 +729,11 @@ function populatepositionuseronload()
         <td width="4%" class="bluebox">&nbsp;</td>
          
         <td width="21%" class="bluebox"><s:text name="miscreceipt.service.category" /><span class="mandatory"/> </td>
-        <td width="30%" class="bluebox"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="serviceCategoryId" id="serviceCategoryId" cssClass="selectwk" list="dropdownData.serviceCategoryList" listKey="id" listValue="name" value="%{serviceCategoryId}" onChange="populateService(this);" />
-       	<egov:ajaxdropdown id="service" fields="['Text','Value']" dropdownId="serviceId" url="receipts/ajaxReceiptCreate-ajaxLoadServiceByCategoryForChallan.action" /></td>
-        <td width="21%" class="bluebox"><s:text name="miscreceipt.service" /><span class="mandatory"/> </td>
-        <td width="30%" class="bluebox"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="serviceId" id="serviceId" cssClass="selectwk"
-			list="dropdownData.serviceList" listKey="id" listValue="code" value="%{serviceId}" onchange="loadFinDetails(this);"/>
-        </td>
+        <td width="30%" class="bluebox"><s:select headerKey="-1" headerValue="----Choose----" name="serviceCategory" id="serviceCategoryid" cssClass="selectwk" list="serviceCategoryNames" value="%{service.serviceCategory}" onChange="populateServiceType(this.value);" /></td>
+        <td class="bluebox" colspan='2'>
+       	<table width="100%" id='serviceTable'>
+       	</table>
+       	</td>
          
        
         </tr>
@@ -788,65 +824,39 @@ function populatepositionuseronload()
 
 <!-- Change to Manual WorkFlow on Create Challan-->
  <!-- When request is to check/approve challan -->
- <table id="approvedet" width="100%" border="0" cellspacing="0" cellpadding="0">
-	<tr><td> 
-	<table width="100%" border="0" cellspacing="0" cellpadding="0">
-	    <!-- Remarks have to displayed on Challan Check/Approve. -->
-		<s:if test="%{sourcePage=='inbox' && (model.challan.state.value=='CREATED' || model.challan.state.value=='CHECKED')}">
-		<tr>
-		   <td width="4%" class="bluebox">&nbsp;</td>
-		   <td width="21%" class="bluebox"><s:text name="challan.approve.remarks"/></td>
-		   <td width="75%" class="bluebox" colspan="3"><s:textfield id="approvalRemarks" type="text" name="approvalRemarks" cssStyle="width:75%" /></td>
-		</tr>
-		</s:if>
-		<!-- Reason For Cancellation has to be displayed for Challan CANCEL	 -->
-		<s:if test="%{(sourcePage=='inbox' && model.challan.state.value=='REJECTED') || (actionName=='CHALLAN_MODIFY' && hasErrors())}">
-			<tr>
-			   <td width="4%" class="bluebox">&nbsp;</td>
-			   <td width="21%" class="bluebox"><s:text name="challan.reason.cancellation"/></td>
-			   <td width="75%" class="bluebox" colspan="3"><s:textfield type="text" id="challan.reasonForCancellation" name="challan.reasonForCancellation" value="%{challan.reasonForCancellation}" cssStyle="width:75%" /></td>
-			</tr>
-		</s:if>
-		<!--  Designation and Position has to be displayed for Challan Create/Check/Modify -->
-		<!--  Designation and Position should not be displayed when invoked from search -->
-		<s:if test="%{model.id==null || (model.challan.state.value=='REJECTED' || model.challan.state.value=='CHECKED')}">
-		<tr> 
-		<div class="subheadnew">
-			<s:text name="approval.authority.information"/>
-		</div>
-		 </tr>
-		<tr>
-			<td width="4%" class="bluebox2">&nbsp;</td>
-			<td width="15%" class="bluebox2"> Approver Department <s:if test="%{model.id==null}"><span class="mandatory"/></s:if></td>
-			<td width="20%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="approverDeptId" id="approverDeptId" cssClass="selectwk" list="dropdownData.approverDepartmentList" listKey="id" listValue="name" value="%{approverDeptId}"
-onChange="onChangeDeparment(this.value)" /> 
-		<egov:ajaxdropdown id="designationIdDropdown" fields="['Text','Value']" dropdownId='designationId'
-			         url='receipts/ajaxChallanApproval-approverDesignationList.action' selectedValue="%{designationId}"/>
-			</td>
+ <div id="loadingMask" style="display:none;overflow:hidden;text-align: center"><img src="/services/collection/resources/images/bar_loader.gif"/> <span style="color: red">Please wait....</span></div>
 
-			
-		      	<td width="15%" class="bluebox2"><s:text name="challan.approve.designation"/><s:if test="%{model.id==null}"><span class="mandatory"/></s:if></td>
-			  <td width="20%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="designationId" id="designationId" cssClass="selectwk"  list="dropdownData.designationMasterList" listKey="id" listValue="name" value="%{designationId}" onChange="onChangeDesignation(this.value)"/>
-			  <egov:ajaxdropdown id="positionUserDropdown" fields="['Text','Value']" dropdownId='positionUser'
-			         url='receipts/ajaxChallanApproval-positionUserList.action' selectedValue="%{position.id}"/>	 
-			 </td>
-			 <td width="15%" class="bluebox2"><s:text name="challan.approve.userposition"/><s:if test="%{model.id==null}"><span class="mandatory"/></s:if></td>
-				<td width="20%" class="bluebox2">
-					<s:select headerValue="%{getText('challan.select')}"  headerKey="-1"
-	                list="dropdownData.postionUserList" listKey="position.id" id="positionUser" listValue="position.name"
-	                label="positionUser" name="positionUser" value="%{positionUser}"/>
-				</td>
-		</tr>
-		</s:if>
-	</table>
-	</td></tr>
-	</table>
+<div align="left" class="mandatorycoll"><s:text name="common.mandatoryfields"/> </div>
+<!-- </div> -->
+	<input type="hidden" name="actionName" id="actionName" value="{actionName}" />
+	<s:date name="cutOffDate" var="cutOffDateFormat" format="dd/MM/yyyy"/>
+    <s:hidden label="cutOffDate" id="cutOffDate"  name="cutOffDate" value="%{cutOffDateFormat}"/>
+	 <div class="buttonbottom" align="center" id="printButton">
+		<!-- Action Buttons should be displayed only in case of Create New Challan or 
+		     If page is opened from inbox -->
+			<s:if test="%{model.id==null || (sourcePage=='inbox' && !hasActionMessages()) || (actionName=='CHALLAN_MODIFY' && hasErrors()) || (actionName=='CHALLAN_VALIDATE' && hasErrors())}" >
+			<s:iterator value="%{validActions}">
+				<s:submit type="submit" cssClass="buttonsubmit" value="%{description}" id="%{name}" name="actionButton" onclick="document.challan.actionName.value='%{name}';document.challan.action='challan-save.action'; return validate(this);"/>
+		    </s:iterator>	
+	    </s:if>
+	   
+	     &nbsp;
+	    <s:if test="%{model.id==null}" >
+	    	<input name="button" type="button" class="button" id="button" value="Reset" onclick="checkreset();"/>
+	    </s:if>
+	    <s:if test="%{model.id!=null}" >
+				
+				<s:submit type="submit" cssClass="buttonsubmit" id="buttonprint" value="Print" onclick="document.challan.action='challan-printChallan.action'" /> 			
+	    </s:if>
+	    &nbsp;<input name="button" type="button" class="button" id="buttonclose2" value="Close" onclick="window.close();" />
+    </div>
+ 
 <s:hidden id="receiptId" name="receiptId" value="%{model.id}"/>
    	<s:hidden id="sourcePage" name="sourcePage" value="%{sourcePage}"/>
 	<s:hidden id="challanNextState" name="challanNextState" value="%{challan.state.nextAction}"/>
 </s:push>
 </s:form>
 </div>
-<script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
+<!-- <script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>-->
 </body>
 

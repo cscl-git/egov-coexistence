@@ -55,10 +55,6 @@ COMMENT ON COLUMN eglc_advocate_master_aud.lastmodifiedby IS 'Foreign Key of EG_
 COMMENT ON COLUMN eglc_advocate_master_aud.revtype IS 'It will holds the type of  revision -means There are 3 Types of revisions ,
 0=Creation,1=Modification,2=Deletions';
 
------Inserting Accountdetailtype
-INSERT INTO accountdetailtype (id, name, description, tablename, columnname, attributename, nbroflevels, isactive, created, lastmodified, modifiedby, full_qualified_name,version) 
-VALUES (nextval('seq_accountdetailtype'), 'lawyer', 'Standing Counsel', 'eglc_advocate_master', 'id', 'advocate_master_id', 
-1, 'TRUE', 'now()', 'now()', null, 'org.egov.lcms.masters.entity.AdvocateMaster',0);
 
 ----Inserting eg_module 
 

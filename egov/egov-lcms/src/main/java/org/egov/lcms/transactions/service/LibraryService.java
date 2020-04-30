@@ -42,12 +42,12 @@ public class LibraryService  extends PersistenceService<Library, Long>{
     }
     
     @Transactional
-    public Library persist(final Library library, AttachedDocument file) throws IOException {
-    	applyAuditing(library);
+    public Library persist(final Library library, AttachedDocument file) throws IOException {    	
     	if(null != file) {
     		library.setFilestoreid(getFileStoreObj(file));
     		library.setReffileid(library.getFilestoreid().getFileStoreId());
     	}
+    	applyAuditing(library);
         return libraryRepository.save(library);
     }
     
