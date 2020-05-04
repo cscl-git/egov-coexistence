@@ -50,6 +50,8 @@ package org.egov.lcms.transactions.service;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infstr.services.PersistenceService;
+import org.egov.lcms.masters.entity.vo.AttachedDocument;
 import org.egov.lcms.transactions.entity.Judgment;
 import org.egov.lcms.transactions.entity.JudgmentDocuments;
 import org.egov.lcms.transactions.entity.ReportStatus;
@@ -61,8 +63,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -71,10 +71,10 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class JudgmentService {
+public class JudgmentService extends PersistenceService<Judgment, Long>{    
 
-    @Autowired
-    private final JudgmentRepository judgmentRepository;
+	@Autowired
+    private JudgmentRepository judgmentRepository;
 
     @Autowired
     private LegalCaseUtil legalCaseUtil;
@@ -87,24 +87,29 @@ public class JudgmentService {
 
     @Autowired
     private LegalCaseService legalCaseService;
+    
     @Autowired
     private JudgmentDocumentsRepository judgmentDocumentsRepository;
-
-    @Autowired
-    public JudgmentService(final JudgmentRepository judgmentRepository) {
-        this.judgmentRepository = judgmentRepository;
+    
+    public JudgmentService() {
+        super(Judgment.class);
     }
+    
+    public JudgmentService(Class<Judgment> type) {
+		super(type);
+	}
 
     @Transactional
-    public Judgment persist(final Judgment judgment, final MultipartFile[] files) throws IOException, ParseException {
+    public Judgment persist(final Judgment judgment, final List<AttachedDocument> files) throws IOException, ParseException {
         final EgwStatus statusObj = legalCaseUtil.getStatusForModuleAndCode(LcmsConstants.MODULE_TYPE_LEGALCASE,
                 LcmsConstants.LEGALCASE_STATUS_JUDGMENT);
         judgment.getLegalCase().setStatus(statusObj);
         final ReportStatus reportStatus = null;
         judgment.getLegalCase().setReportStatus(reportStatus);
+        applyAuditing(judgment);
         final Judgment savedjudgment = judgmentRepository.save(judgment);
-        legalCaseSmsService.sendSmsToOfficerInchargeForJudgment(judgment);
-        legalCaseSmsService.sendSmsToStandingCounselForJudgment(judgment);
+        //legalCaseSmsService.sendSmsToOfficerInchargeForJudgment(judgment);
+        //legalCaseSmsService.sendSmsToStandingCounselForJudgment(judgment);
         legalCaseService.persistLegalCaseIndex(savedjudgment.getLegalCase(), null, savedjudgment, null, null);
         final List<JudgmentDocuments> documentDetails = getDocumentDetails(savedjudgment, files);
         if (!documentDetails.isEmpty()) {
@@ -140,22 +145,20 @@ public class JudgmentService {
             judgment.getLegalCase().setNextDate(judgment.getOrderDate());
     }
 
-    public List<JudgmentDocuments> getDocumentDetails(final Judgment judgment, final MultipartFile[] files)
+    public List<JudgmentDocuments> getDocumentDetails(final Judgment judgment, final List<AttachedDocument> files)
             throws IOException {
         final List<JudgmentDocuments> documentDetailsList = new ArrayList<>();
-
-        if (files != null)
-            for (int i = 0; i < files.length; i++)
-                if (!files[i].isEmpty()) {
-                    final JudgmentDocuments applicationDocument = new JudgmentDocuments();
-                    applicationDocument.setJudgment(judgment);
-                    applicationDocument.setDocumentName(LcmsConstants.JUDGMENT_DOCUMENTNAME);
-                    applicationDocument.setSupportDocs(
-                            fileStoreService.store(files[i].getInputStream(), files[i].getOriginalFilename(),
-                                    files[i].getContentType(), LcmsConstants.MODULE_NAME));
-                    documentDetailsList.add(applicationDocument);
-
-                }
+        if (null != files) {
+            for (AttachedDocument attachedDocument:files) {
+                final JudgmentDocuments applicationDocument = new JudgmentDocuments();
+                applicationDocument.setJudgment(judgment);
+                applicationDocument.setDocumentName(LcmsConstants.JUDGMENT_DOCUMENTNAME);
+                applicationDocument.setSupportDocs(
+                        fileStoreService.store(attachedDocument.getFileStream(), attachedDocument.getFileName(),
+                        		attachedDocument.getMimeType(), LcmsConstants.MODULE_NAME));
+                documentDetailsList.add(applicationDocument);
+            }
+        }
         return documentDetailsList;
     }
 

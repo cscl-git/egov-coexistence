@@ -314,7 +314,7 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
             legalCaseAdvocatetemp.setOrderDateJunior(legalCaseAdvocate.getOrderDateJunior());
             legalCaseAdvocatetemp.setOrderNumberJunior(legalCaseAdvocate.getOrderNumberJunior());
             legalCaseAdvocate.getLegalCase().getLegalCaseAdvocates().add(legalCaseAdvocatetemp);
-            legalCaseSmsService.sendSmsToStandingCounsel(legalCaseAdvocatetemp);
+            //legalCaseSmsService.sendSmsToStandingCounsel(legalCaseAdvocatetemp);
 
         } else {
             legalCaseAdvocate.setAdvocateMaster(advocateName);
@@ -322,11 +322,11 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
             legalCaseAdvocate.setSeniorAdvocate(seniorLegalMaster);
             legalCaseAdvocate.setIsActive(Boolean.TRUE);
             legalCaseAdvocate.getLegalCase().getLegalCaseAdvocates().add(legalCaseAdvocate);
-            legalCaseSmsService.sendSmsToStandingCounsel(legalCaseAdvocate);
+            //legalCaseSmsService.sendSmsToStandingCounsel(legalCaseAdvocate);
         }
+        applyAuditing(legalCaseAdvocate);
         persistLegalCaseIndex(legalCaseAdvocate.getLegalCase(), null, null, null, null);
         return legalCaseRepository.save(legalCaseAdvocate.getLegalCase());
-
     }
 
     @Transactional

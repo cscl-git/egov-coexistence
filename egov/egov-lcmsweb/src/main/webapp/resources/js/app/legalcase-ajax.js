@@ -147,47 +147,4 @@ $(document).ready(function(){
 	});
 	
 	typeaheadWithEventsHandling(typeaheadobj, '#senioradvocateId'); 
-	/*
-	$("#departmentName").blur(function() {
-		var desigId = $("#departmentName").val();
-		if (null != desigId || '' != desigId) {
-			$('.designationerror').hide();
-		} else
-			$("#departmentId").val("");
-	});
-	var assignPosition = new Bloodhound({
-		datumTokenizer : function(datum) {
-			return Bloodhound.tokenizers
-					.whitespace(datum.value);
-		},
-		queryTokenizer : Bloodhound.tokenizers.whitespace,
-		remote : {
-			url : '/services/lcms/legalcase/ajax/positions',
-			replace : function(url, uriEncodedQuery) {
-				return url + '?positionName=' + uriEncodedQuery
-						+ '&departmentName='
-						+ $("#departmentName").val();
-	
-			},
-			filter : function(data) {
-				return $.map(data, function(advocate) {
-					return {
-						name : advocate,
-						value : advocate
-					};
-				});
-			}
-		}
-	});
-	assignPosition.initialize();
-	var typeaheadobj = $('#positionName').typeahead({
-		hint : false,
-		highlight : false,
-		minLength : 1
-	}, {
-		displayKey : 'name',
-		source : assignPosition.ttAdapter()
-	});
-	typeaheadWithEventsHandling(typeaheadobj, '#positionId'); 
-	*/
 });
