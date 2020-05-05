@@ -383,7 +383,7 @@ var makeBillDetailTable = function() {
 		var billDetailColumns = [ 
 			{key:"accounthead", label:'Account Head <span class="mandatory"/>',formatter:createLongTextFieldFormatter(VOUCHERDETAILLIST,".accounthead",VOUCHERDETAILTABLE)},				
 			{key:"glcode",label:'Account Code ', formatter:createTextFieldFormatter(VOUCHERDETAILLIST,".glcodeDetail","text",VOUCHERDETAILTABLE)},
-			{key:"rate", label:'Rate',formatter:createRateFieldFormatter(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()",VOUCHERDETAILTABLE)},
+			//{key:"rate", label:'Rate',formatter:createRateFieldFormatter(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()",VOUCHERDETAILTABLE)},
 			{key:"creditamount",label:'Amount (Rs.)', formatter:createAmountFieldFormatter(VOUCHERDETAILLIST,".creditAmountDetail","updateCreditAmount()",VOUCHERDETAILTABLE)},
 			{key:"financialYearId",label:'Financial Year <span class="mandatory"/>', formatter:createDropdownFormatterFYear(VOUCHERDETAILLIST,'<s:property value="%{currentFinancialYearId}"/>'),  dropdownOptions:fYearOptions},
 			{key:'Add',label:'Add',formatter:createAddImageFormatter("${pageContext.request.contextPath}")},
@@ -620,7 +620,7 @@ function populateServiceType(selected){
     }
 	 </s:iterator>
 	 if(!isServiceTypeExist){
-		 loadFinDetails(this);
+		 //loadFinDetails(this);
 	 }
 }
 function addServiceTypeDropdown(tableId){
@@ -633,7 +633,7 @@ function addServiceTypeDropdown(tableId){
     cell2.className='bluebox';
     cell2.width="50%";
     cell1.innerHTML = '<s:text name="miscreceipt.service" /><span class="mandatory"/>';
-    cell2.innerHTML = '<select name="serviceId" id="serviceId" onchange="loadFinDetails(this)"/>';
+    cell2.innerHTML = '<select name="serviceId" id="serviceId" />';
 	document.getElementById('serviceId').options.length=0;
 	document.getElementById('serviceId').options[0]= new Option('--------Choose--------','0');
 
