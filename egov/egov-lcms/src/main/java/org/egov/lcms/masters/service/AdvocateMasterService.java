@@ -180,7 +180,6 @@ public class AdvocateMasterService extends PersistenceService<AdvocateMaster, Lo
             user.setPan(advocateMaster.getPanNumber());
             advocateMaster.setAdvocateUser(user);
         }
-
     }
 
     private User createNewAdvocateUser(final AdvocateMaster advocateMaster, final BusinessUser businessUser) {

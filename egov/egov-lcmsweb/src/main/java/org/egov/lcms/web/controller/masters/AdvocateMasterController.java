@@ -134,8 +134,8 @@ public class AdvocateMasterController {
             advocateMaster.setBankBranch(null);
         advocateMasterService.persist(advocateMaster);
         model.addAttribute("mode", "create");
-        advocateMasterService.createAccountDetailKey(advocateMaster);
-        advocateMasterService.createAdvocateUser(advocateMaster);
+        //advocateMasterService.createAccountDetailKey(advocateMaster);
+        //advocateMasterService.createAdvocateUser(advocateMaster);
         //legalCaseSmsService.sendSmsAndEmailForAdvocate(advocateMaster);
         return "redirect:/advocatemaster/result/" + advocateMaster.getId() + ",create";
     }
@@ -176,7 +176,7 @@ public class AdvocateMasterController {
 
         advocateMasterService.persist(advocateMaster);
         model.addAttribute("mode", "edit");
-        advocateMasterService.createAdvocateUser(advocateMaster);
+        //advocateMasterService.createAdvocateUser(advocateMaster);
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.advocateMaster.update", null, null));
         return "redirect:/advocatemaster/result/" + advocateMaster.getId() + ",edit";
     }

@@ -148,6 +148,27 @@
 								maxlength="1024" required="required" />
 							<form:errors path="judgmentDetails" cssClass="error-msg" />
 						</div>
+						<label class="col-sm-3 control-label text-right">
+							<spring:message code="lbl.is.department.acted" /> ?:
+						</label>
+						<div class="col-sm-3 add-margin">
+							<form:checkbox id="isDepartmentActed" path="isDepartmentActed"
+								value="isDepartmentActed" />
+							<form:errors path="isDepartmentActed" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label text-right"><spring:message
+								code="lbl.action.details" />:
+						</label>
+						<div class="col-sm-3 add-margin">
+							<form:textarea class="form-control text-left patternvalidation"
+								path="departmentActionDetails" id="departmentActionDetails"
+								name="departmentActionDetails"
+								data-pattern="alphanumericwithspecialcharacterswithspace"
+								maxlength="1024"/>
+							<form:errors path="departmentActionDetails" cssClass="error-msg" />
+						</div>
 					</div>
 
 					<div class="form-group" id="enquirydetails" style="display: none">
@@ -203,7 +224,7 @@
 								data-pattern="alphanumericwithspecialcharacterswithspace"
 								maxlength="1024" />
 							<form:errors path="setasidePetitionDetails" cssClass="error-msg" />
-						</div>
+						</div>						
 					</div>
 
 					<div id="judgmentDocuments"></div>
