@@ -592,10 +592,10 @@ function fillNeibrAfterSplitGlcodeCredit(obj)
 		document.getElementById('billCreditDetailslist['+currRow+'].glcodeIdDetail').value=temp[2];
 		document.getElementById('billCreditDetailslist['+currRow+'].glcodeDetail').value=temp[1];
 		check();
-		if(obj.value.includes("GST"))
+		/*if(obj.value.includes("GST"))
 		{
 		document.getElementById('billCreditDetailslist['+currRow+'].rateDetail').style.visibility="visible";
-		}
+		}*/
 	}
 	else if(glcodeId==null || glcodeId==""){
 		document.getElementById('billCreditDetailslist['+currRow+'].glcodeIdDetail').value="";

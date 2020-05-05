@@ -987,10 +987,10 @@ function fillNeibrAfterSplitGlcode(obj)
 		document.getElementById('billDetailslist['+currRow+'].glcodeIdDetail').value=temp[2];
 		document.getElementById('billDetailslist['+currRow+'].glcodeDetail').value=temp[1];
 		check();
-		if(obj.value.includes("GST"))
+		/*if(obj.value.includes("GST"))
 		{
 		document.getElementById('billDetailslist['+currRow+'].rateDetail').style.visibility="visible";
-		}
+		}*/
 	}
 	else if(glcodeId==null || glcodeId=="")
 	{
