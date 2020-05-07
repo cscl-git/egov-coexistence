@@ -114,8 +114,9 @@ public class LegalCaseSmsService {
     // Send SMS Notification to the Employee Added in Hearing Screen
     public void sendSmsToHearingEmployee(final Hearings hearings) {
         if (hearings.getTempEmplyeeHearing() != null && !hearings.getTempEmplyeeHearing().isEmpty())
-            for (final EmployeeHearing hearingEmp : hearings.getTempEmplyeeHearing())
-                getSmsForHearingsEmployee(hearings, hearingEmp.getEmployee());
+            for (final EmployeeHearing hearingEmp : hearings.getTempEmplyeeHearing()) {
+                //getSmsForHearingsEmployee(hearings, hearingEmp.getEmployee());
+            }
 
     }
 

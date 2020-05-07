@@ -98,7 +98,7 @@ public class EditHearingsController {
             model.addAttribute(HEARINGS, hearings);
             return "hearings-edit";
         }
-        hearingsService.persist(hearings);
+        hearingsService.persistHearings(hearings);
         redirectAttrs.addFlashAttribute(HEARINGS, hearings);
         model.addAttribute(LcmsConstants.MODE, "edit");
         model.addAttribute("message", "Hearing updated successfully.");

@@ -111,16 +111,16 @@
 				id="employeeDetails">
 				<thead>
 					<tr>
-						<th class="text-center">Position-Employee</th>
+						<th class="text-center">Department-Employee</th>
 					</tr>
 				</thead>
 				<tbody>
 					<c:forEach items="${hearings.employeeHearingList}"
 						var="employeeHearingList" varStatus="counter">
 						<tr>
-							<td class="text-left"><c:out
-									value="${employeeHearingList.employee.name}"></c:out>- <c:out
-									value="${employeeHearingList.employee.username}"></c:out></td>
+							<td class="text-left">
+								<c:out value="${employeeHearingList.employeeName}"></c:out>
+							</td>
 						</tr>
 					</c:forEach>
 				</tbody>

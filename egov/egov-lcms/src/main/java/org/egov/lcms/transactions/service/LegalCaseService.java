@@ -198,17 +198,6 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
         }
         legalcase.getCounterAffidavits().clear();
         legalcase.setCounterAffidavits(caListtemp);
-        /*
-         * for (final LegalCaseDepartment legaldeptObj : legalDept) { String[] stremp = null;
-         * legaldeptObj.setLegalCase(legalcase); if (legaldeptObj.getPosition().getName() != null &&
-         * legaldeptObj.getPosition().getName().contains("@")) { stremp = legaldeptObj.getPosition().getName().split("@");
-         * legaldeptObj.setPosition(legalCaseUtil.getPositionByName(stremp[0])); } else {
-         * legaldeptObj.setPosition(legalCaseUtil.getPositionByName(legaldeptObj .getPosition().getName())); }
-         * legaldeptObj.setDepartment(legalCaseUtil.getDepartmentByName( legaldeptObj.getDepartment().getName()));
-         * legalcaseDetails.add(legaldeptObj); } legalcase.getLegalCaseDepartment().clear();
-         * legalcase.setLegalCaseDepartment(legalcaseDetails);
-         */
-
     }
 
     public List<LegalCaseUploadDocuments> getLegalCaseDocList(final LegalCase legalCase) {

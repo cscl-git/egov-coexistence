@@ -125,53 +125,66 @@
 						</c:otherwise>
 					</c:choose>
 					<div class="form-group">
-						<label class="col-sm-2 control-label text-right"><spring:message
-								code="lbl.positionofemployee" /> :</label>
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.department" /> :
+						</label>
 						<div class="col-sm-3 add-margin">
-							<form:input id="positionEmpName" type="text"
-								class="form-control " autocomplete="off" path="" name=""
-								value="" placeholder="" />
-							<input type="hidden" id="positionEmpId" value="" />
-
+							<select class="form-control" name="department" id="department">
+								<option value=""><spring:message code="lbls.select" /></option>
+							</select>
 						</div>
-						<button type="button" class="btn btn-default" value="Add"
-							id="addid">Add</button>
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.designation" /> :
+						</label>
+						<div class="col-sm-3 add-margin">
+							<select class="form-control" name="designation" id="designation">
+								<option value=""><spring:message code="lbls.select" /></option>
+							</select>
+						</div>					
 					</div>
-					<table class="table table-striped table-bordered"
-						id="employeeDetails">
+					<div class="form-group">
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.employee" /> :
+						</label>
+						<div class="col-sm-3 add-margin">
+							<select class="form-control" name="employee" id="employee">
+								<option value=""><spring:message code="lbls.select" /></option>
+							</select>
+						</div>					
+					</div>
+					<div class="form-group text-center">
+						<button type="button" class="btn btn-default" value="Add" id="addid">Add</button>
+					</div>
+					<table class="table table-striped table-bordered" id="employeeDetails">
 						<thead>
 							<tr>
-								<th class="text-center">Position-Employee</th>
+								<th class="text-center">Department-Employee</th>
 							</tr>
 						</thead>
-
 						<tbody>
 							<c:choose>
 								<c:when test="${not empty hearings.getTempEmplyeeHearing()}">
 									<c:forEach items="${hearings.getTempEmplyeeHearing()}"
 										var="positionTemplList" varStatus="counter">
 										<tr>
-											<td class="text-right"><form:input
-													path="positionTemplList[${counter.index}].employee.name"
-													cssClass="form-control confValues"
-													value="${positionTemplList.employee.name}"
-													id="positionTemplList[${counter.index}].employee.name" />
-												<%--   <input type="hidden" name="positionTemplList[${counter.index}].id" value="${positionTemplList.id}" />  --%>
+											<td class="text-right">
+												<form:input path="positionTemplList[${counter.index}].employeeName" cssClass="form-control confValues"
+															value="${positionTemplList.employeeName}" id="positionTemplList[${counter.index}].employeeName" />
 											</td>
-
 										</tr>
 									</c:forEach>
 								</c:when>
 								<c:otherwise>
-
 									<tr>
-										<td><form:input path="positionTemplList[0].empPosName"
-												cssClass="form-control" id="positionTemplList[0].empPosName" />
+										<td>
+											<form:input type="text" path="positionTemplList[0].employeeName" cssClass="form-control" id="positionTemplList[0].employeeName" readonly="readonly"/>
+											<form:input type="hidden" path="positionTemplList[0].employeeId" cssClass="form-control" id="positionTemplList[0].employeeId" />
 										</td>
-
-										<td><span class="add-padding"><i
-												class="fa fa-trash" data-func="add" aria-hidden="true"
-												id="emp_delete_row"></i></span></td>
+										<td>
+											<span class="add-padding">
+												<i class="fa fa-trash" data-func="add" aria-hidden="true" id="emp_delete_row"></i>
+											</span>
+										</td>
 									</tr>
 								</c:otherwise>
 							</c:choose>
