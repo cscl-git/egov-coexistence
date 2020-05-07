@@ -57,7 +57,7 @@ $(document).ready(function(){
 	function loadPetitionTypes(){
 
         $.ajax({
-			url: "/lcms/legalcase/ajax-petitionTypeByCourtType",     
+			url: "/services/lcms/legalcase/ajax-petitionTypeByCourtType",     
 			type: "GET",
 			data: {
 				courtType: $('#courtType').val()  
@@ -80,7 +80,7 @@ $(document).ready(function(){
 	function loadCourtNames(){
 
         $.ajax({
-			url: "/lcms/legalcase/ajax-courtNameByCourtType",     
+			url: "/services/lcms/legalcase/ajax-courtNameByCourtType",     
 			type: "GET",
 			data: {
 				courtType: $('#courtType').val()  

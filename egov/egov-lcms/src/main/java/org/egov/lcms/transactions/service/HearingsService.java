@@ -48,8 +48,8 @@
 package org.egov.lcms.transactions.service;
 
 import org.egov.commons.EgwStatus;
-import org.egov.eis.entity.Employee;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.lcms.entity.es.HearingsDocument;
 import org.egov.lcms.service.es.HearingsDocumentService;
 import org.egov.lcms.transactions.entity.EmployeeHearing;
@@ -76,7 +76,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class HearingsService {
+public class HearingsService extends PersistenceService<Hearings, Long>{
 
     @Autowired
     private HearingsRepository hearingsRepository;
@@ -95,9 +95,17 @@ public class HearingsService {
 
     @Autowired
     private HearingsDocumentService hearingsDocumentService;
+    
+    public HearingsService() {
+        super(Hearings.class);
+    }
+    
+    public HearingsService(final Class<Hearings> type) {
+        super(type);
+    }
 
     @Transactional
-    public Hearings persist(final Hearings hearings) throws ParseException {
+    public Hearings persistHearings(final Hearings hearings) throws ParseException{
         buildEmplyeeList(hearings);
         updateNextDate(hearings, hearings.getLegalCase());
         final EgwStatus statusObj = legalCaseUtil.getStatusForModuleAndCode(LcmsConstants.MODULE_TYPE_LEGALCASE,
@@ -105,11 +113,11 @@ public class HearingsService {
         hearings.getLegalCase().setStatus(statusObj);
         final ReportStatus reportStatus = null;
         hearings.getLegalCase().setReportStatus(reportStatus);
-        legalCaseSmsService.sendSmsToOfficerInchargeForHearings(hearings);
-        legalCaseSmsService.sendSmsToHearingEmployee(hearings);
-        legalCaseSmsService.sendSmsToStandingCounselForHearings(hearings);
-        legalCaseService.persistLegalCaseIndex(hearings.getLegalCase(), null,
-                null, null, null);
+        //legalCaseSmsService.sendSmsToOfficerInchargeForHearings(hearings);
+        //legalCaseSmsService.sendSmsToHearingEmployee(hearings);
+        //legalCaseSmsService.sendSmsToStandingCounselForHearings(hearings);
+        applyAuditing(hearings);
+        legalCaseService.persistLegalCaseIndex(hearings.getLegalCase(), null, null, null, null);
         hearingsRepository.save(hearings);
         persistHearingsIndex(hearings);
         return hearings;
@@ -117,16 +125,14 @@ public class HearingsService {
 
     @Transactional
     public Hearings buildEmplyeeList(final Hearings hearings) {
-        String empUserName;
         for (final EmployeeHearing hearingEmp : hearings.getPositionTemplList()) {
-            if (hearingEmp.getEmpPosName() != null) {
-                empUserName = hearingEmp.getEmpPosName().split("@")[1];
-                prepareEmployeeHearingList(hearings, empUserName, hearingEmp);
+            if (hearingEmp.getEmployeeId() != null) {
+                prepareEmployeeHearingList(hearings, hearingEmp.getEmployeeId(), hearingEmp.getEmployeeName(), hearingEmp);
             }
-            if (hearingEmp.getId() == null && hearingEmp.getEmployee() != null
-                    && hearingEmp.getEmployee().getName() != null && hearingEmp.getEmployee().getName().contains("@")) {
-                empUserName = hearingEmp.getEmployee().getName().split("@")[1];
-                prepareEmployeeHearingList(hearings, empUserName, hearingEmp);
+            if (hearingEmp.getId() == null 
+            		&& hearingEmp.getEmployeeId() != null
+                    && hearingEmp.getEmployeeName() != null) {
+                prepareEmployeeHearingList(hearings, hearingEmp.getEmployeeId(), hearingEmp.getEmployeeName(), hearingEmp);
             }
         }
         if (!hearings.getPositionTemplList().isEmpty()
@@ -141,11 +147,11 @@ public class HearingsService {
         return hearings;
     }
 
-    private void prepareEmployeeHearingList(final Hearings hearings, final String empUserName,
+    private void prepareEmployeeHearingList(final Hearings hearings, final long empUserId, final String empUserName,
             final EmployeeHearing hearingEmp) {
-        final Employee employeeObj = legalCaseUtil.getEmployeeByUserName(empUserName);
         hearingEmp.setHearing(hearings);
-        hearingEmp.setEmployee(employeeObj);
+        hearingEmp.setEmployeeId(empUserId);
+        hearingEmp.setEmployeeName(empUserName);
         hearings.getEmployeeHearingList().add(hearingEmp);
     }
 
@@ -196,7 +202,5 @@ public class HearingsService {
 
     public HearingsDocument persistHearingsIndex(final Hearings hearings) throws ParseException {
         return hearingsDocumentService.persistHearingsDocumentIndex(hearings);
-
     }
-
 }

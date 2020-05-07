@@ -239,7 +239,7 @@ function callAjaxBydrillDownReport(aggregatedByValues) {
 	$('#reportgeneration-header').show();
 	$.ajax({
 		type: "GET",
-		url: "/lcms/reports/genericdrilldownreportresults",
+		url: "/services/lcms/reports/genericdrilldownreportresults",
 		cache: true,
 		dataType: "json",
 		data:{'aggregatedBy' :aggregatedBy,

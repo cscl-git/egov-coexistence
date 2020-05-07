@@ -49,6 +49,10 @@ package org.egov.lcms.web.controller.ajax;
 
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.service.AssignmentService;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.Designation;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -68,6 +72,9 @@ public class AjaxEmployeePositionController {
 
     @Autowired
     private AssignmentService assignmentService;
+    
+    @Autowired
+    MicroserviceUtils microserviceUtils;
 
     @RequestMapping(value = "/ajax/getpositionEmployee", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody Map<Long, String> getPositionForDeptAndDesig(
@@ -110,5 +117,41 @@ public class AjaxEmployeePositionController {
                 employeeMap.put(assign.getEmployee().getId(), empName);
             }
         return employeeMap;
+    }
+    
+    @RequestMapping(value = "ajax/getEmployeesByDeptAndDesig", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Map<Long, String> getEmployeeByDeptAndDesig(@RequestParam final String deptId, @RequestParam final String desgnId) {
+        final Map<Long, String> employeeMap = new HashMap<Long, String>();
+        List<EmployeeInfo> employees = microserviceUtils.getApprovers(deptId, desgnId);
+        for (final EmployeeInfo employee : employees) {
+            if (employee != null) {
+                employeeMap.put(employee.getUser().getId(), employee.getUser().getName());
+            }
+        }
+        return employeeMap;
+    }
+    
+    @RequestMapping(value = "ajax/getDepartments", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Map<String, String> getDepartments() {
+        final Map<String, String> departmentsMap = new HashMap<String, String>();
+        List<Department> departments = microserviceUtils.getDepartments();
+        for (final Department department : departments) {
+            if (department != null) {
+            	departmentsMap.put(department.getCode(), department.getName());
+            }
+        }
+        return departmentsMap;
+    }
+    
+    @RequestMapping(value = "ajax/getDesignations", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody Map<String, String> getDesignations() {
+        final Map<String, String> designationsMap = new HashMap<String, String>();
+        List<Designation> designations = microserviceUtils.getDesignations();
+        for (final Designation designation : designations) {
+            if (designation != null) {
+            	designationsMap.put(designation.getCode(), designation.getName());
+            }
+        }
+        return designationsMap;
     }
 }
