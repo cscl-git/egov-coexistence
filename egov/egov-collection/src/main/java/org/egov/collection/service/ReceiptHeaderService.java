@@ -766,7 +766,14 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
         challan.setReceiptHeader(receiptHeader);
         receiptHeader.setChallan(challan);
-        super.persist(receiptHeader);
+        try {
+        	//persistenceService.applyAuditing(receiptHeader);
+        	super.persist(receiptHeader);
+        }catch (Exception e) {
+			System.out.println("Error : "+e.getMessage());
+			e.printStackTrace();
+		}
+        
         LOGGER.info("Persisting challan with challan number " + challan.getChallanNumber());
         challanService.workflowtransition(receiptHeader.getChallan(), position, actionName, approvalRemarks);
         System.out.println("persistChallan ends");
