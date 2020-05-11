@@ -286,10 +286,6 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     }
 
     protected void addCriteriaExcludingBudget(final BudgetDetail detail, final Map<String, Object> map) {
-    	System.out.println("detail.getBudgetGroup().getId() : "+detail.getBudgetGroup().getId());
-    	System.out.println("detail.getFunction().getId() : "+detail.getFunction().getId());
-    	System.out.println("detail.getFund().getId() : "+detail.getFund().getId());
-    	System.out.println("detail.getStatus().getId() : "+detail.getStatus().getId());
         map.put("budgetGroup", detail.getBudgetGroup() == null ? 0l : detail.getBudgetGroup().getId());
         map.put("function", detail.getFunction() == null ? 0l : detail.getFunction().getId());
         map.put("functionary", detail.getFunctionary() == null ? 0 : detail.getFunctionary().getId());

@@ -336,6 +336,10 @@ public class BudgetSearchAction extends BaseFormAction {
     // serach screen
     @Action(value = "/budget/budgetSearch-groupedBudgets")
     public String groupedBudgets() {
+    	try
+    	{
+    		
+    	
         final Budget budget = budgetDetail.getBudget();
         final Budget selectedBudget=budget;
         // Dont restrict search by the selected budget, but by all budgets in the tree of selected budget
@@ -350,6 +354,10 @@ public class BudgetSearchAction extends BaseFormAction {
             addActionError(getText("budget.no.details.found"));
         budgetDetail.setBudget(selectedBudget);
         setRelatedEntitiesOn();
+    	}catch (Exception e) {
+			System.out.println("error : "+e.getMessage());
+			e.printStackTrace();
+		} 
         return Constants.LIST;
     }
 
