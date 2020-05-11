@@ -1517,7 +1517,7 @@ label.error {
   background-image: none;
   text-align: center;
 }
-.page-container .main-content .yui-skin-sam .yui-dt th {
+.page-container .main-content .yui-skin-sam .yui-dt th .yui-dt th a {
   color: #ffffff;
   background: #265988;
 }

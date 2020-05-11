@@ -57,10 +57,12 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
+import org.egov.commons.EgwStatus;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.egf.model.BudgetAmountView;
 import org.egov.eis.service.EisCommonService;
@@ -139,6 +141,7 @@ public class BudgetSearchAction extends BaseFormAction {
     private String twopreviousfinYearRange = "";
     private boolean shouldShowREAppropriations = true;
     List<AppConfigValues> excludeList = new ArrayList<AppConfigValues>();
+    
 
     @Autowired
     @Qualifier("persistenceService")
@@ -156,6 +159,9 @@ public class BudgetSearchAction extends BaseFormAction {
     @Autowired
     @Qualifier("masterDataCache")
     private EgovMasterDataCaching masterDataCache;
+    
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
 
     public String getMessage() {
         return message;
@@ -468,6 +474,7 @@ public class BudgetSearchAction extends BaseFormAction {
             computeTwopreviousYearRange();
         }
         criteria.setBudget(null);
+        criteria.setStatus(egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved"));        
         savedbudgetDetailList = budgetDetailService.findAllBudgetDetailsWithReAppropriation(budget, criteria);
         re = checkRe(budget);
         computeAmounts(savedbudgetDetailList);
