@@ -50,10 +50,13 @@ package org.egov.eis.web.controller.workflow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
-import org.egov.eis.entity.Assignment;
-import org.egov.eis.entity.AssignmentAdaptor;
+//import org.egov.eis.entity.Assignment;
+//import org.egov.eis.entity.AssignmentAdaptor;
 import org.egov.eis.service.AssignmentService;
 import org.egov.eis.service.DesignationService;
+import org.egov.infra.microservice.models.Assignment;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.web.support.json.adapter.AssignmentAdaptor;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
 import org.egov.pims.commons.Designation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -80,6 +83,9 @@ public class AjaxWorkFlowController {
 
     @Autowired
     private AssignmentService assignmentService;
+    
+    @Autowired
+    private MicroserviceUtils microserviceUtils;
 
     @RequestMapping(value = "/ajaxWorkFlow-getDesignationsByObjectType", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -160,12 +166,13 @@ public class AjaxWorkFlowController {
 
     @RequestMapping(value = "/ajaxWorkFlow-positionsByDepartmentAndDesignation", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
-    public String getWorkFlowPositionByDepartmentAndDesignation(@RequestParam final Long approvalDepartment,
-                                                                @RequestParam final Long approvalDesignation) {
-        if (approvalDepartment != null && approvalDepartment != 0 && approvalDepartment != -1
-                && approvalDesignation != null && approvalDesignation != 0 && approvalDesignation != -1) {
-            List<Assignment> assignmentList = assignmentService.findAllAssignmentsByDeptDesigAndDates(approvalDepartment,
-                    approvalDesignation, new Date());
+    public String getWorkFlowPositionByDepartmentAndDesignation(@RequestParam final String approvalDepartment,
+                                                                @RequestParam final String approvalDesignation) {
+    	 if (approvalDesignation != null && !approvalDesignation.equalsIgnoreCase("-1") && approvalDepartment != null
+                 && !approvalDepartment.equalsIgnoreCase("-1")) {
+        	
+    		List<Assignment> assignmentList = microserviceUtils.getAssignments(approvalDepartment, approvalDesignation);
+            //List<Assignment> assignmentList = assignmentService.findAllAssignmentsByDeptDesigAndDates(approvalDepartment,approvalDesignation, new Date());
             final Gson jsonCreator = new GsonBuilder().registerTypeAdapter(Assignment.class, new AssignmentAdaptor())
                     .create();
             return jsonCreator.toJson(assignmentList, new TypeToken<Collection<Assignment>>() {

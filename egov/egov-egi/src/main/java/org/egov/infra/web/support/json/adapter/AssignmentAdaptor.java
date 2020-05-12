@@ -45,52 +45,24 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
+package org.egov.infra.web.support.json.adapter;
 
-package org.egov.infra.web.controller;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-import org.egov.infra.web.support.ui.Inbox;
-import org.egov.infra.workflow.entity.StateAware;
-import org.egov.infra.workflow.inbox.InboxRenderServiceDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import java.lang.reflect.Type;
 
-import java.util.List;
+import org.egov.infra.microservice.models.Assignment;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+public class AssignmentAdaptor implements JsonSerializer<Assignment> {
 
-@Controller
-@RequestMapping("/inbox")
-public class InboxController {
-
-    @Autowired
-    private InboxRenderServiceDelegate<StateAware> inboxRenderServiceDelegate;
-
-
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInbox() {
-        return inboxRenderServiceDelegate.getCurrentUserInboxItems();
-    }
-    
-    @GetMapping(value = "/items", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInbox(@RequestParam String module) {
-        return inboxRenderServiceDelegate.getCurrentUserInboxItems(module);
-    }
-
-    @GetMapping(value = "/draft", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showDraft() {
-        return inboxRenderServiceDelegate.getCurrentUserDraftItems();
-    }
-
-    @GetMapping(value = "/history", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInboxHistory(@RequestParam Long stateId) {
-        return inboxRenderServiceDelegate.getWorkflowHistoryItems(stateId);
+    @Override
+    public JsonElement serialize(final Assignment assignment, final Type type, final JsonSerializationContext jsc) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("positionId", assignment.getPosition());
+        jsonObject.addProperty("userName", assignment.getEmployeeName());
+        return jsonObject;
     }
 }

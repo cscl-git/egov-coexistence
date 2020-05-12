@@ -46,51 +46,23 @@
  *
  */
 
-package org.egov.infra.web.controller;
-
-import org.egov.infra.web.support.ui.Inbox;
-import org.egov.infra.workflow.entity.StateAware;
-import org.egov.infra.workflow.inbox.InboxRenderServiceDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+package org.egov.infra.workflow.matrix.repository;
 
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Controller
-@RequestMapping("/inbox")
-public class InboxController {
-
-    @Autowired
-    private InboxRenderServiceDelegate<StateAware> inboxRenderServiceDelegate;
-
-
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInbox() {
-        return inboxRenderServiceDelegate.getCurrentUserInboxItems();
-    }
-    
-    @GetMapping(value = "/items", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInbox(@RequestParam String module) {
-        return inboxRenderServiceDelegate.getCurrentUserInboxItems(module);
-    }
-
-    @GetMapping(value = "/draft", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showDraft() {
-        return inboxRenderServiceDelegate.getCurrentUserDraftItems();
-    }
-
-    @GetMapping(value = "/history", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInboxHistory(@RequestParam Long stateId) {
-        return inboxRenderServiceDelegate.getWorkflowHistoryItems(stateId);
-    }
+public interface WorkFlowDeptDesgMapRepository extends JpaRepository<WorkFlowDeptDesgMap, Long> {
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentState(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState);
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState and additionalRule= :additionalRule")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRule(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState,
+                                                              @Param("additionalRule") String additionalRule);
 }

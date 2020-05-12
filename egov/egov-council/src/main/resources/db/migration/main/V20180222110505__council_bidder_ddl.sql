@@ -1,3 +1,5 @@
+CREATE TABLE egw_contractor ( 	id int8 NOT NULL, 	CONSTRAINT pk_egw_contractor PRIMARY KEY (id) );
+
 create table egcncl_preamble_bidder(
  id bigint,
  preamble bigint,

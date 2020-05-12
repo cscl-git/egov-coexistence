@@ -46,51 +46,33 @@
  *
  */
 
-package org.egov.infra.web.controller;
-
-import org.egov.infra.web.support.ui.Inbox;
-import org.egov.infra.workflow.entity.StateAware;
-import org.egov.infra.workflow.inbox.InboxRenderServiceDelegate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+package org.egov.infra.workflow.matrix.service;
 
 import java.util.List;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_UTF8_VALUE;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
+import org.egov.infra.workflow.matrix.repository.WorkFlowDeptDesgMapRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Controller
-@RequestMapping("/inbox")
-public class InboxController {
+@Service
+@Transactional(readOnly = true)
+public class WorkFlowDeptDesgMapService {
 
     @Autowired
-    private InboxRenderServiceDelegate<StateAware> inboxRenderServiceDelegate;
+    private WorkFlowDeptDesgMapRepository workFlowDeptDesgMapRepository;
 
-
-    @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInbox() {
-        return inboxRenderServiceDelegate.getCurrentUserInboxItems();
+    public WorkFlowDeptDesgMap getWorkFlowDeptDesgMapObjectbyId(Long id) {
+        return workFlowDeptDesgMapRepository.findOne(id);
     }
     
-    @GetMapping(value = "/items", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInbox(@RequestParam String module) {
-        return inboxRenderServiceDelegate.getCurrentUserInboxItems(module);
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentState(String objectType, String currentState){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentState(objectType, currentState);
+    }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRule(String objectType, String currentState, String additionalRule){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
     }
 
-    @GetMapping(value = "/draft", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showDraft() {
-        return inboxRenderServiceDelegate.getCurrentUserDraftItems();
-    }
-
-    @GetMapping(value = "/history", produces = APPLICATION_JSON_UTF8_VALUE)
-    @ResponseBody
-    public List<Inbox> showInboxHistory(@RequestParam Long stateId) {
-        return inboxRenderServiceDelegate.getWorkflowHistoryItems(stateId);
-    }
 }

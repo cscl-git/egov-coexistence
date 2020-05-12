@@ -60,8 +60,9 @@
 
 </form:form>
 <div class="row display-hide report-section">
-	<div class="col-md-12 table-header text-left">Council Preamble
-		Search Result</div>
+	<div class="col-md-12 table-header text-left">
+		<spring:message code="title.agenda.search.result" />
+	</div>
 	<div class="col-md-12 form-group report-table-container">
 		<table class="table table-bordered table-hover multiheadertbl"
 			id="resultTable">
@@ -69,11 +70,9 @@
 				<tr>
 					<th><spring:message code="lbl.serial.no" /></th>
 					<th><spring:message code="lbl.department" /></th>
-					<th><spring:message code="lbl.ward.no" /></th>
 					<th><spring:message code="lbl.preamble.number" /></th>
 					<th><spring:message code="lbl.gistofpreamble" /></th>
 					<th><spring:message code="lbl.status" /></th>
-					<th><spring:message code="lbl.amount" />
 					<th><spring:message code="lbl.view" /></th>
 					<th>&nbsp;</th>
 				</tr>

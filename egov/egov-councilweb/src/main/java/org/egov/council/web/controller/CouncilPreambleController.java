@@ -59,11 +59,13 @@ import static org.egov.infra.utils.JsonUtils.toJSON;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.egov.commons.EgwStatus;
@@ -85,7 +87,11 @@ import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.Assignment;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.utils.EgovMasterDataCaching;
@@ -159,6 +165,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     private BidderService bidderService;
     @Autowired
     protected EgovMasterDataCaching masterDataCache;
+    @Autowired
+    private MicroserviceUtils microserviceUtils;
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
@@ -234,10 +242,10 @@ public class CouncilPreambleController extends GenericWorkFlowController {
             }
         }
         if (isAutoPreambleNoGenEnabled()){
-        PreambleNumberGenerator preamblenumbergenerator = autonumberServiceBeanResolver
-                .getAutoNumberServiceFor(PreambleNumberGenerator.class);
-        councilPreamble.setPreambleNumber(preamblenumbergenerator
-                .getNextNumber(councilPreamble));
+	        PreambleNumberGenerator preamblenumbergenerator = autonumberServiceBeanResolver
+	                .getAutoNumberServiceFor(PreambleNumberGenerator.class);
+	        councilPreamble.setPreambleNumber(preamblenumbergenerator
+	                .getNextNumber(councilPreamble));
         }
         councilPreamble.setStatus(egwStatusHibernateDAO
                 .getStatusByModuleAndCode(CouncilConstants.PREAMBLE_MODULENAME,
@@ -260,7 +268,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                 && !request.getParameter(APPROVAL_POSITION).isEmpty())
             approvalPosition = Long.valueOf(request
                     .getParameter(APPROVAL_POSITION));
-
+        
         councilPreambleService.create(councilPreamble, approvalPosition,
                 approvalComment, workFlowAction);
 
@@ -310,7 +318,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                     .getCurrentState().getValue());
             return COUNCILPREAMBLE_EDIT;
         }
-        List<Boundary> wardIdsList = new ArrayList<>();
+        /*List<Boundary> wardIdsList = new ArrayList<>();
 
         String selectedWardIds=request.getParameter("wardsHiddenIds");
 
@@ -322,7 +330,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                     wardIdsList.add(boundaryService.getBoundaryById(Long.valueOf(wrdId)));
             }
         }
-        councilPreamble.setWards(wardIdsList);
+        councilPreamble.setWards(wardIdsList);*/
 
         if (attachments != null && attachments.getSize() > 0) {
             try {
@@ -333,7 +341,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                         CouncilConstants.MODULE_NAME));
             } catch (IOException e) {
                 LOGGER.error(
-                        "Error in loading Employee photo" + e.getMessage(), e);
+                        "Error in loading agenda document" + e.getMessage(), e);
             }
         }
         
@@ -355,7 +363,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
             approverName = request.getParameter("approverName");
         if( request.getParameter("nextDesignation") == null)
             nextDesignation=StringUtils.EMPTY;
-            else
+        else
             nextDesignation = request.getParameter("nextDesignation");
 
         councilPreambleService.update(councilPreamble, approvalPosition,
@@ -425,25 +433,34 @@ public class CouncilPreambleController extends GenericWorkFlowController {
             final HttpServletResponse response) {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
         WorkflowContainer workFlowContainer = new WorkflowContainer();
+        
         //Setting pending action based on owner
-		/*
-		 * if (CouncilConstants.DESIGNATION_MANAGER.equalsIgnoreCase(councilPreamble.
-		 * getState().getOwnerPosition().get.getDeptDesig().getDesignation().getName())
-		 * && CouncilConstants.MANAGER_APPROVALPENDING.equalsIgnoreCase(councilPreamble.
-		 * getState().getNextAction())) {
-		 * workFlowContainer.setPendingActions(councilPreamble.getState().getNextAction(
-		 * )); } if (CouncilConstants.DESIGNATION_COMMISSIONER
-		 * .equalsIgnoreCase(councilPreamble.getState().getOwnerPosition().getDeptDesig(
-		 * ).getDesignation().getName()) &&
-		 * CouncilConstants.COMMISSIONER_APPROVALPENDING.equalsIgnoreCase(
-		 * councilPreamble.getState().getNextAction())) {
-		 * workFlowContainer.setPendingActions(councilPreamble.getState().getNextAction(
-		 * )); }
-		 */
-        if(CouncilConstants.REJECTED.equalsIgnoreCase(councilPreamble.getStatus().getCode()))
-        {
+		
+        List<String> assignedDesignations = null;
+        Long approvalPosition = councilPreamble.getState().getOwnerPosition();
+        if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0))) {
+        	EmployeeInfo approverInfo = microserviceUtils.getEmployeeById(approvalPosition);
+        	if(null != approverInfo && !CollectionUtils.isEmpty(approverInfo.getAssignments())) {
+        		assignedDesignations = approverInfo.getAssignments().stream().map(Assignment::getDesignation).collect(Collectors.toList());
+        	}
+        }
+        
+		if (!CollectionUtils.isEmpty(assignedDesignations)
+				&& assignedDesignations.contains(CouncilConstants.DESIGNATION_SECRETARY)
+				&& CouncilConstants.SECRETARY_APPROVALPENDING.equalsIgnoreCase(councilPreamble.getState().getNextAction())) {
+			workFlowContainer.setPendingActions(councilPreamble.getState().getNextAction()); 
+		}else if (!CollectionUtils.isEmpty(assignedDesignations)
+				&& assignedDesignations.contains(CouncilConstants.DESIGNATION_COMMISSIONER) 
+				&& CouncilConstants.COMMISSIONER_APPROVALPENDING.equalsIgnoreCase(councilPreamble.getState().getNextAction())) {
+			workFlowContainer.setPendingActions(councilPreamble.getState().getNextAction()); 
+		}else if (!CollectionUtils.isEmpty(assignedDesignations)
+				&& assignedDesignations.contains(CouncilConstants.DESIGNATION_MAYOR) 
+				&& CouncilConstants.MAYOR_APPROVALPENDING.equalsIgnoreCase(councilPreamble.getState().getNextAction())) {
+			workFlowContainer.setPendingActions(councilPreamble.getState().getNextAction()); 
+		}
+		 
+        if(CouncilConstants.REJECTED.equalsIgnoreCase(councilPreamble.getStatus().getCode())){
             model.addAttribute("additionalRule", COUNCIL_COMMON_WORKFLOW);
-
         }
         prepareWorkflow(model, councilPreamble, workFlowContainer);
         model.addAttribute("stateType", councilPreamble.getClass()

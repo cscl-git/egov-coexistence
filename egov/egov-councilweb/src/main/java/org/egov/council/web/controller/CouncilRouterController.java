@@ -118,7 +118,7 @@ public class CouncilRouterController {
         councilRouterService.validateCouncilRouter(councilRouter, errors);
         if (errors.hasErrors()) {
             prepareNewForm(model);
-            model.addAttribute(POSITION, positionMasterService.getPositionsByDepartment(councilRouter.getDepartment().getId()));
+            //model.addAttribute(POSITION, positionMasterService.getPositionsByDepartment(councilRouter.getDepartment().getId()));
             return COUNCILROUTER_NEW;
         }
         councilRouterService.create(councilRouter);
@@ -139,7 +139,7 @@ public class CouncilRouterController {
         councilRouterService.validateCouncilRouter(councilRouter, errors);
         if (errors.hasErrors()) {
             prepareNewForm(model);
-            model.addAttribute(POSITION, positionMasterService.getPositionsByDepartment(councilRouter.getDepartment().getId()));
+            //model.addAttribute(POSITION, positionMasterService.getPositionsByDepartment(councilRouter.getDepartment().getId()));
             return COUNCILROUTER_EDIT;
         }
 
@@ -170,7 +170,7 @@ public class CouncilRouterController {
     public String edit(@PathVariable("id") final Long id, final Model model) {
         final CouncilRouter councilRouter = councilRouterService.findById(id);
         prepareNewForm(model);
-        model.addAttribute(POSITION, positionMasterService.getPositionsByDepartment(councilRouter.getDepartment().getId()));
+        //model.addAttribute(POSITION, positionMasterService.getPositionsByDepartment(councilRouter.getDepartment().getId()));
         model.addAttribute(COUNCILROUTER, councilRouter);
         return COUNCILROUTER_EDIT;
     }

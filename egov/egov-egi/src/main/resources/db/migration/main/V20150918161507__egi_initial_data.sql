@@ -79,7 +79,7 @@ INSERT INTO eg_messagetemplate (id, templatename, template, locale, version) VAL
 
 -----------------START--------------------
 INSERT INTO eg_role (id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (5, 'CSC Operator', 'Collection Operator mans the Citizen Service Centers.', '2010-01-01 00:00:00', 1, 1, '2015-01-01 00:00:00', 0);
-INSERT INTO eg_role (id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (7, 'Citizen', 'Citizen who can raise complaint', '2010-01-01 00:00:00', 1, 1, '2015-01-01 00:00:00', 0);
+INSERT INTO eg_role (id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (7, 'CITIZEN', 'Citizen who can raise complaint', '2010-01-01 00:00:00', 1, 1, '2015-01-01 00:00:00', 0);
 INSERT INTO eg_role (id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (15, 'Employee', 'Default role for all employees', '2015-08-28 00:00:00', 1, 1, '2015-08-28 00:00:00', 0);
 INSERT INTO eg_role (id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (16, 'ULB Operator', 'ULB Operator', '2015-08-28 10:45:17.567676', 1, 1, '2015-08-28 10:45:17.567676', 0);
 INSERT INTO eg_role (id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (4, 'Super User', 'System Administrator. Can change all master data and has access to all the system screens.', '2010-01-01 00:00:00', 1, 1, '2015-01-01 00:00:00', 0);

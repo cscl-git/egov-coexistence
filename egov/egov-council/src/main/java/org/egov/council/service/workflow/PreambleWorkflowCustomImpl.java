@@ -60,6 +60,8 @@ import org.egov.eis.service.AssignmentService;
 import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
@@ -96,6 +98,9 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
 
     @Autowired
     private CouncilRouterService councilRouterService;
+    
+    @Autowired
+    private MicroserviceUtils microserviceUtils;
 
     @Override
     public void createCommonWorkflowTransition(CouncilPreamble councilPreamble, Long approvalPosition,
@@ -105,13 +110,23 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
         }
 
         final User user = securityUtils.getCurrentUser();
-        final DateTime currentDate = new DateTime();
-        Position pos = null;
-        Assignment wfInitiator = null;
-        WorkFlowMatrix wfmatrix = null;
-        List<Assignment> activeAssignment=Collections.emptyList();
+
+        EmployeeInfo info = null;
+        if (user != null && user.getId() != null)
+            info = microserviceUtils.getEmployeeById(user.getId());
         
-        if (null != councilPreamble.getId()) {
+        /*EmployeeInfo approverInfo = null;
+        if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0))) {
+        	approverInfo = microserviceUtils.getEmployeeById(approvalPosition);
+        }*/
+        
+        WorkFlowMatrix wfmatrix = null;
+        final DateTime currentDate = new DateTime();
+        //Position pos = null;
+        //Assignment wfInitiator = null;
+        //List<Assignment> activeAssignment=Collections.emptyList();
+        
+        /*if (null != councilPreamble.getId()) {
             if (ANONYMOUS.equalsIgnoreCase(assignmentService
                     .getAssignmentsForPosition(councilPreamble.getCreatedBy()).get(0).getEmployee().getName())) {
                 wfInitiator = assignmentService
@@ -140,14 +155,14 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
             pos = positionMasterService.getPositionById(approvalPosition);
         } else {
             pos = wfInitiator != null ? wfInitiator.getPosition() : null;
-        }   
+        }*/
+        
         // New Entry
         if (councilPreamble!=null &&  councilPreamble.getState()==null||CouncilConstants.REJECTED.equalsIgnoreCase(councilPreamble.getStatus().getCode())
                 || CouncilConstants.WF_ANONYMOUSPREAMBLE_STATE.equalsIgnoreCase(councilPreamble.getState().getValue())
                         && null == councilPreamble.getState().getPreviousOwner()) {
-            // IF APPLICATION IS CREATED AND DIRECTLY FORWARDED TO COMMISIONER
-            if (CouncilConstants.DESIGNATION_COMMISSIONER.equalsIgnoreCase(
-                    pos == null || null == pos.getDeptDesig() ? "" : pos.getDeptDesig().getDesignation().getName())) {
+            // IF APPLICATION IS CREATED AND DIRECTLY FORWARDED TO MAYOR
+            if (CouncilConstants.DESIGNATION_MAYOR.equalsIgnoreCase("")) {
                 wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, null,
                         CouncilConstants.WF_NEW_STATE, "Application Creation");
                 councilPreamble.setStatus(getStatusByPassingModuleAndCode(wfmatrix));
@@ -155,24 +170,23 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                     councilPreamble.transition().start()
                             .withSenderName(user.getUsername() + CouncilConstants.COLON_CONCATE + user.getName())
                             .withComments(approvalComent).withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
-                            .withOwner(pos).withNextAction(wfmatrix.getNextAction())
+                            .withOwner(approvalPosition).withNextAction(wfmatrix.getNextAction())
                             .withNatureOfTask(CouncilConstants.NATURE_OF_WORK)
-                            .withInitiator(wfInitiator==null?pos:wfInitiator.getPosition());
+                            .withInitiator(user.getId());
                 } else {
                     councilPreamble.transition().progressWithStateCopy()
                             .withSenderName(user.getUsername() + CouncilConstants.COLON_CONCATE + user.getName())
                             .withComments(approvalComent).withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
-                            .withOwner(pos).withNextAction(wfmatrix.getNextAction())
+                            .withOwner(approvalPosition).withNextAction(wfmatrix.getNextAction())
                             .withNatureOfTask(CouncilConstants.NATURE_OF_WORK)
-                            .withInitiator(wfInitiator==null?pos:wfInitiator.getPosition());
+                            .withInitiator(user.getId());
                 }
             } 
             // IF REJECTED APPLICATION GOT CANCELLED THEN TRANSITION OCCUR HERE
             else if (CouncilConstants.CANCEL
                     .equalsIgnoreCase(workFlowAction)) {
                 cancelworkflow(councilPreamble, approvalComent, user, currentDate);
-            }
-            
+            }            
             else {
 
                 wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, "CouncilCommonWorkflow",
@@ -183,23 +197,22 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                     councilPreamble.transition().start()
                             .withSenderName(user.getUsername() + CouncilConstants.COLON_CONCATE + user.getName())
                             .withComments(approvalComent).withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
-                            .withOwner(pos).withNextAction(wfmatrix.getNextAction())
+                            .withOwner(approvalPosition).withNextAction(wfmatrix.getNextAction())
                             .withNatureOfTask(CouncilConstants.NATURE_OF_WORK)
-                            .withInitiator(wfInitiator==null?pos:wfInitiator.getPosition());
+                            .withInitiator(user.getId());
                 } else {
                     councilPreamble.transition().progressWithStateCopy()
                             .withSenderName(user.getUsername() + CouncilConstants.COLON_CONCATE + user.getName())
                             .withComments(approvalComent).withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
-                            .withOwner(pos).withNextAction(wfmatrix.getNextAction())
+                            .withOwner(approvalPosition).withNextAction(wfmatrix.getNextAction())
                             .withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
                 }
             }
         } else if (CouncilConstants.WF_STATE_REJECT
                 .equalsIgnoreCase(workFlowAction)) {
-            councilPreamble.setStatus(getStatusByPassingStatusCode("REJECTED"));
-            rejectionWorkflowTransition(councilPreamble, approvalComent, user, currentDate, wfInitiator);
+            councilPreamble.setStatus(getStatusByPassingStatusCode(CouncilConstants.REJECTED));
+            rejectionWorkflowTransition(councilPreamble, approvalComent, user, currentDate);
         }
-
         else if (CouncilConstants.WF_APPROVE_BUTTON.equalsIgnoreCase(workFlowAction)) {
             wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, null,
                     councilPreamble.getCurrentState().getValue(), councilPreamble.getCurrentState().getNextAction());
@@ -209,10 +222,11 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
             } else {
                 councilPreamble.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(pos).withNextAction(wfmatrix.getNextAction())
+                        .withDateInfo(currentDate.toDate()).withOwner(approvalPosition).withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
             }
-        } else if (CouncilConstants.WF_PROVIDE_INFO_BUTTON.equalsIgnoreCase(workFlowAction)) {
+        } 
+        /*else if (CouncilConstants.WF_PROVIDE_INFO_BUTTON.equalsIgnoreCase(workFlowAction)) {
             if (ApplicationThreadLocals.getUserId().equals(
                     wfInitiator != null && wfInitiator.getEmployee() != null ? wfInitiator.getEmployee().getId() : 0)) {
                 councilPreamble.setStatus(getStatusByPassingStatusCode("REJECTED"));
@@ -220,9 +234,9 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
             } else {
                 rejectionWorkflowTransition(councilPreamble, approvalComent, user, currentDate, wfInitiator);
             }
-        }
+        }*/
         // IF HOD FORWARD TO MANAGER THEN TRANSITION OCCUR HERE
-        else if (CouncilConstants.CREATED.equalsIgnoreCase(councilPreamble.getStatus().getCode())
+        /*else if (CouncilConstants.CREATED.equalsIgnoreCase(councilPreamble.getStatus().getCode())
                 && CouncilConstants.DESIGNATION_MANAGER.equalsIgnoreCase(
                         pos == null || null == pos.getDeptDesig() ? "" : pos.getDeptDesig().getDesignation().getName())) {
             wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, null,
@@ -232,9 +246,9 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                     .withComments(approvalComent).withStateValue(wfmatrix.getCurrentState())
                     .withDateInfo(currentDate.toDate()).withOwner(pos).withNextAction(wfmatrix.getPendingActions())
                     .withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
-        }
+        }*/
         // IF HOD FORWARD TO Commissioner THEN TRANSITION OCCUR HERE
-        else if (("HODAPPROVED".equalsIgnoreCase(councilPreamble.getStatus().getCode())
+        /*else if (("HODAPPROVED".equalsIgnoreCase(councilPreamble.getStatus().getCode())
                 || CouncilConstants.CREATED.equalsIgnoreCase(councilPreamble.getStatus().getCode()))
                         && CouncilConstants.DESIGNATION_COMMISSIONER.equalsIgnoreCase(
                                 pos == null || null == pos.getDeptDesig() ? ""
@@ -251,13 +265,14 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                     .withComments(approvalComent).withStateValue(wfmatrix.getCurrentState())
                     .withDateInfo(currentDate.toDate()).withOwner(pos).withNextAction(wfmatrix.getPendingActions())
                     .withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
-        } else {
+        }*/
+        else {
             wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, null,
                     councilPreamble.getCurrentState().getValue(), null);
             councilPreamble.setStatus(getStatusByPassingModuleAndCode(wfmatrix));
             councilPreamble.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent).withStateValue(wfmatrix.getNextState())
-                    .withDateInfo(currentDate.toDate()).withOwner(pos).withNextAction(wfmatrix.getNextAction())
+                    .withDateInfo(currentDate.toDate()).withOwner(approvalPosition).withNextAction(wfmatrix.getNextAction())
                     .withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
         }
 
@@ -276,9 +291,9 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
     }
 
     private void rejectionWorkflowTransition(CouncilPreamble councilPreamble, String approvalComent, final User user,
-            final DateTime currentDate, Assignment wfInitiator) {
+            final DateTime currentDate) {
         WorkFlowMatrix wfmatrix;
-        if (CouncilConstants.CREATED.equalsIgnoreCase(councilPreamble.getState().getValue())
+        /*if (CouncilConstants.CREATED.equalsIgnoreCase(councilPreamble.getState().getValue())
                 && CouncilConstants.COMMISSIONER_APPROVALPENDING.equalsIgnoreCase(councilPreamble.getState().getNextAction())) {
             wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, null,
                     CouncilConstants.WF_REJECT_STATE, "Application Rejection");
@@ -288,16 +303,16 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                     .withDateInfo(currentDate.toDate())
                     .withOwner(wfInitiator != null ? wfInitiator.getPosition() : null)
                     .withNextAction(wfmatrix.getNextAction()).withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
-        } else {
+        } else {*/
             wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, "CouncilCommonWorkflow",
                     CouncilConstants.WF_REJECT_STATE, null);
             councilPreamble.transition().progressWithStateCopy()
                     .withSenderName(user.getUsername() + CouncilConstants.COLON_CONCATE + user.getName())
                     .withComments(approvalComent).withStateValue(CouncilConstants.WF_REJECT_STATE)
                     .withDateInfo(currentDate.toDate())
-                    .withOwner(wfInitiator != null ? wfInitiator.getPosition() : null)
+                    .withOwner(councilPreamble.getState().getInitiatorPosition())
                     .withNextAction(wfmatrix.getNextAction()).withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
-        }
+        //}
     }
 
     private EgwStatus getStatusByPassingModuleAndCode(WorkFlowMatrix wfmatrix) {

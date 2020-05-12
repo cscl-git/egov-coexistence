@@ -48,6 +48,7 @@
 
 package org.egov.infra.workflow.inbox;
 
+import org.apache.commons.lang3.StringUtils;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.EmployeeInfo;
@@ -74,6 +75,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -93,6 +95,8 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     private static final String SUPPLIER_BILL = "Supplier Bill";
     private static final String EXPENSE_BILL = "Expense Bill";
     private static final String WORKS_BILL = "Works Bill";
+    private static final String WORKFLOW_MODULE_AGENDA="agenda";
+    private static final List<String> WORKFLOW_MODULE_AGENDA_TYPES = Arrays.asList("CouncilPreamble","MeetingMOM");
     private static final Logger LOG = LoggerFactory.getLogger(InboxRenderServiceDelegate.class);
     private static final String INBOX_RENDER_SERVICE_SUFFIX = "%sInboxRenderService";
     private static final Map<String, WorkflowTypes> WORKFLOW_TYPE_CACHE = new ConcurrentHashMap<>();
@@ -124,8 +128,8 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
                 .collect(Collectors.toList());
     }
     @ReadOnly
-    public List<Inbox> getCurrentUserInboxItems(String token) {
-        return buildInbox(getAssignedWorkflowItems())
+    public List<Inbox> getCurrentUserInboxItems(String module) {
+        return buildInbox(getAssignedWorkflowItems(module))
                 .parallelStream()
                 .filter(item -> !item.isDraft())
                 .collect(Collectors.toList());
@@ -149,6 +153,11 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     public List<T> getAssignedWorkflowItems() {
         return getAssignedWorkflowItems(false);
     }
+    
+    @ReadOnly
+    public List<T> getAssignedWorkflowItems(String module) {
+        return getAssignedWorkflowItems(false, module);
+    }
 
     @ReadOnly
     public List<T> getAssignedWorkflowDrafts() {
@@ -167,13 +176,13 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 //        owners.add(4L);
 //        owners.add(1L);
         if (!owners.isEmpty()) {
-        	System.out.println("Owner");
+        	LOG.debug ("Owner");
             List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
             for (String type : types) {
-            	System.out.println("type : "+type);
+            	LOG.debug ("type : "+type);
                 Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
                 if (inboxRenderService.isPresent()) {
-                	System.out.println("draft : "+draft);
+                	LOG.debug ("draft : "+draft);
                     InboxRenderService<T> renderService = inboxRenderService.get();
                     workflowItems.addAll(draft ? renderService.getDraftWorkflowItems(owners) :
                             renderService.getAssignedWorkflowItems(owners));
@@ -181,6 +190,37 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
             }
         }
         return workflowItems;
+    }
+    
+    private List<T> getAssignedWorkflowItems(boolean draft, String module) {
+        List<T> workflowItems = new ArrayList<>();
+        List<Long> owners = currentUserPositionIds();
+        if (!owners.isEmpty()) {
+            List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
+            for (String type : types) {
+            	if(!StringUtils.isEmpty(module)
+            			&& !isAllowableType(module, type)) {
+            		continue;
+            	}
+            	
+                Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
+                if (inboxRenderService.isPresent()) {
+                    InboxRenderService<T> renderService = inboxRenderService.get();
+                    workflowItems.addAll(draft ? renderService.getDraftWorkflowItems(owners) :
+                            renderService.getAssignedWorkflowItems(owners));
+                }
+            }
+        }
+        return workflowItems;
+    }
+    
+    private boolean isAllowableType(String module, String type) {
+    	if(WORKFLOW_MODULE_AGENDA.equalsIgnoreCase(module)
+    			&& WORKFLOW_MODULE_AGENDA_TYPES.contains(type)) {
+    		return true;
+    	}
+    	
+    	return false;
     }
 
     private List<Inbox> buildInbox(List<T> items) {
@@ -214,7 +254,6 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
         try {
             if (getWorkflowType(type) != null)
                 inboxRenderService = applicationContext.getBean(String.format(INBOX_RENDER_SERVICE_SUFFIX, type), InboxRenderService.class);
-            System.out.println("renderer");
         } catch (BeansException e) {
             LOG.warn("{}InboxRenderService bean not defined", type, e);
         }
@@ -245,17 +284,17 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 
     private List<Long> currentUserPositionIds() {
        
-    	List<Long> positions = new ArrayList();
+    	List<Long> positions = new ArrayList<>();
     	Long empId = ApplicationThreadLocals.getUserId();
-    	System.out.println("emp id : "+empId);
+    	LOG.debug("emp id : "+empId);
     	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
     	
-    	if(null !=employs && employs.size()>0 )
-    		System.out.println("pos size : "+employs.size());
-    	System.out.println("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
-    	employs.get(0).getAssignments().forEach(assignment->{
-    		positions.add(assignment.getPosition());
-    	});
+    	if(null !=employs && employs.size()>0 ) {
+    		LOG.debug ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
+	    	employs.get(0).getAssignments().forEach(assignment->{
+	    		positions.add(assignment.getPosition());
+	    	});
+    	}
     	
     	return positions;
 //    	return this.ownerGroupService.getOwnerGroupsByUserId(getUserId())

@@ -72,7 +72,7 @@ public class CouncilPreambleJsonAdaptor implements JsonSerializer<CouncilPreambl
 		if (councilPreamble != null) {
 			jsonObject.addProperty("ward", councilPreamble.getWards().stream().map(Boundary::getName).collect(Collectors.joining(",")));
 			if (councilPreamble.getDepartment() != null)
-				jsonObject.addProperty("department", councilPreamble.getDepartment().getName());
+				jsonObject.addProperty("department", councilPreamble.getDepartment());
 			else
 				jsonObject.addProperty("department", StringUtils.EMPTY);
 			if (councilPreamble.getType() != null)

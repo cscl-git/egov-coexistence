@@ -46,79 +46,114 @@
  *
  */
 
-package org.egov.council.entity;
+package org.egov.infra.workflow.matrix.entity;
 
-import static org.egov.council.entity.CouncilRouter.SEQ_EGCNCL_ROUTER;
+import org.egov.infra.persistence.entity.AbstractPersistable;
+import org.hibernate.validator.constraints.SafeHtml;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-
-import org.egov.council.enums.PreambleTypeEnum;
-import org.egov.infra.admin.master.entity.Department;
-import org.egov.infra.persistence.entity.AbstractAuditable;
-import org.egov.pims.commons.Position;
+import javax.validation.constraints.NotNull;
+import static org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap.SEQ_WF_DEPT_DESG_MAP;
 
 @Entity
-@Table(name = "egcncl_router")
-@SequenceGenerator(name = SEQ_EGCNCL_ROUTER, sequenceName = SEQ_EGCNCL_ROUTER, allocationSize = 1)
-public class CouncilRouter extends AbstractAuditable {
+@Table(name = "EG_WF_DEPT_DESG_MAP")
+@SequenceGenerator(name = SEQ_WF_DEPT_DESG_MAP, sequenceName = SEQ_WF_DEPT_DESG_MAP, allocationSize = 1)
+public class WorkFlowDeptDesgMap extends AbstractPersistable<Long> implements Cloneable {
 
-    public static final String SEQ_EGCNCL_ROUTER = "seq_egcncl_router";
-    private static final long serialVersionUID = 8227838067322332444L;
+    public static final String SEQ_WF_DEPT_DESG_MAP = "SEQ_EG_WF_DEPT_DESG_MAP";
+    private static final long serialVersionUID = 4954386159285858993L;
     @Id
-    @GeneratedValue(generator = SEQ_EGCNCL_ROUTER, strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = SEQ_WF_DEPT_DESG_MAP, strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    //@ManyToOne
-    //@JoinColumn(name = "department")
-    //private Department department;
+    @NotNull
+    @SafeHtml
+    private String objectType;
+
+    @SafeHtml
+    private String currentState;
+
+    @SafeHtml
+    private String nextDepartment;
     
-    @JoinColumn(name = "department")
-    private String department;
+    @SafeHtml
+    private String nextDesignation;
+    
+    @SafeHtml
+    private String additionalRule;
 
-    @JoinColumn(name = "type")
-    private PreambleTypeEnum type;
+    public WorkFlowDeptDesgMap(String objectType, String currentState, String nextDepartment,
+			String nextDesignation, String additionalRule) {
+		super();
+		this.objectType = objectType;
+		this.currentState = currentState;
+		this.nextDepartment = nextDepartment;
+		this.nextDesignation = nextDesignation;
+		this.additionalRule= additionalRule;
+	}
 
-    @ManyToOne
-    @JoinColumn(name = "position")
-    private Position position;
+	public WorkFlowDeptDesgMap() {
 
+    }
+
+    @Override
+    public WorkFlowDeptDesgMap clone() {
+        return new WorkFlowDeptDesgMap(objectType, currentState, nextDepartment, nextDesignation, additionalRule);
+    }
+
+    @Override
     public Long getId() {
         return id;
     }
 
-    public String getDepartment() {
-        return department;
-    }
-
-    public Position getPosition() {
-        return position;
-    }
-
-    public void setId(Long id) {
+    @Override
+    public void setId(final Long id) {
         this.id = id;
     }
 
-    public void setDepartment(String department) {
-        this.department = department;
+    public String getObjectType() {
+        return objectType;
     }
 
-    public void setPosition(Position position) {
-        this.position = position;
+    public void setObjectType(final String objectType) {
+        this.objectType = objectType;
     }
 
-    public PreambleTypeEnum getType() {
-        return type;
+    public String getCurrentState() {
+        return currentState;
     }
 
-    public void setType(PreambleTypeEnum type) {
-        this.type = type;
+    public void setCurrentState(final String currentState) {
+        this.currentState = currentState;
     }
+
+    public String getNextDepartment() {
+		return nextDepartment;
+	}
+
+	public void setNextDepartment(String nextDepartment) {
+		this.nextDepartment = nextDepartment;
+	}
+	
+    public String getNextDesignation() {
+        return nextDesignation;
+    }
+
+    public void setNextDesignation(final String nextDesignation) {
+        this.nextDesignation = nextDesignation;
+    }
+
+	public String getAdditionalRule() {
+		return additionalRule;
+	}
+
+	public void setAdditionalRule(String additionalRule) {
+		this.additionalRule = additionalRule;
+	}
 
 }

@@ -53,8 +53,6 @@ import static org.egov.council.utils.constants.CouncilConstants.IMPLEMENTATION_S
 import static org.egov.council.utils.constants.CouncilConstants.MODULE_FULLNAME;
 import static org.egov.council.utils.constants.CouncilConstants.REJECTED;
 import static org.egov.council.utils.constants.CouncilConstants.RESOLUTION_APPROVED_PREAMBLE;
-import static org.egov.infra.utils.ApplicationConstant.ANONYMOUS_USERNAME;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,6 +76,7 @@ import org.egov.infra.admin.master.service.UserService;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.utils.StringUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -89,12 +88,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class CouncilPreambleService {
+public class CouncilPreambleService extends PersistenceService<CouncilPreamble, Long> {
 
     private static final String STATUS_CODE = "status.code";
     private static final String PREAMBLE_NUMBER_AUTO = "PREAMBLE_NUMBER_AUTO";
 
-    private final CouncilPreambleRepository councilPreambleRepository;
+    @Autowired
+    private CouncilPreambleRepository councilPreambleRepository;
     
     @PersistenceContext
     private EntityManager entityManager;
@@ -112,10 +112,13 @@ public class CouncilPreambleService {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    public CouncilPreambleService(final CouncilPreambleRepository councilPreambleRepository) {
-        this.councilPreambleRepository = councilPreambleRepository;
-    }
+    public CouncilPreambleService(final Class<CouncilPreamble> councilPreamble) {
+		super(councilPreamble);
+	}
+    
+    public CouncilPreambleService() {
+		super(CouncilPreamble.class);
+	}
 
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -128,7 +131,9 @@ public class CouncilPreambleService {
         if (approvalPosition != null && approvalPosition > 0 && StringUtils.isNotEmpty(workFlowAction))
             preambleWorkflowCustomImpl.createCommonWorkflowTransition(councilPreamble,
                     approvalPosition, approvalComment, workFlowAction);
-
+        
+        applyAuditing(councilPreamble);
+        applyAuditing(councilPreamble.getState());
         councilPreambleRepository.save(councilPreamble);
         return councilPreamble;
     }
@@ -159,6 +164,9 @@ public class CouncilPreambleService {
         if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
             preambleWorkflowCustomImpl.createCommonWorkflowTransition(councilPreamble, approvalPosition, approvalComment,
                     workFlowAction);
+        
+        applyAuditing(councilPreamble);
+        applyAuditing(councilPreamble.getState());
         councilPreambleRepository.save(councilPreamble);
         return councilPreamble;
     }

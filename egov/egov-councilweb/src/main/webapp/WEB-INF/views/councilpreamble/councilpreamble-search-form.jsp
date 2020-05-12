@@ -54,7 +54,7 @@
 	<div class="col-md-12">
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
-				<div class="panel-title">Search Preamble</div>
+				<div class="panel-title"><spring:message code="title.agenda.search" /></div>
 			</div>
 			<div class="panel-body">
 				<div class="form-group">
@@ -66,7 +66,7 @@
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
-							<form:options items="${departments}" itemValue="id"
+							<form:options items="${departments}" itemValue="code"
 								itemLabel="name" />
 						</form:select>
 						<form:errors path="department" cssClass="error-msg" />
@@ -98,20 +98,19 @@
 						<form:errors path="toDate" cssClass="error-msg" />
 					</div>
 				</div>
-				<div class="form-group">
+				<!-- <div class="form-group">
 					<label class="col-sm-2 control-label text-right"><spring:message
 							code="lbl.ward" /> </label>
 					<div class="col-sm-3 add-margin">
 						<select name="wards" multiple id="wards" size="5" class="form-control wards tick-indicator">
-					<option value="">All</option>
-					<c:forEach items="${wards}" var="ward">
-						<option value="${ward.id}" title="${ward.name}" >${ward.name}</option>
-					</c:forEach>
-				</select>
+							<option value="">All</option>
+							<c:forEach items="${wards}" var="ward">
+								<option value="${ward.id}" title="${ward.name}" >${ward.name}</option>
+							</c:forEach>
+						</select>
 					</div>
-					<input type="hidden" id="mode" name="mode" value="${mode}" />
-				</div>
-
+				</div> -->
+				<input type="hidden" id="mode" name="mode" value="${mode}" />
 			</div>
 		</div>
 	</div>
