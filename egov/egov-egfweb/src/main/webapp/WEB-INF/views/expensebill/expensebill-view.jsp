@@ -117,15 +117,15 @@
     <div class="panel-title text-center" style="color: green;">
         <c:out value="${message}"/><br/>
     </div>
-    <ul class="nav nav-tabs" id="settingstab">
+    <!--<ul class="nav nav-tabs" id="settingstab">
         <li class="active"><a data-toggle="tab" href="#expensebillheader"
                               data-tabidx=0><spring:message code="lbl.header" text="Header"/></a></li>
         <li><a data-toggle="tab" href="#checklist" data-tabidx=1><spring:message
                 code="lbl.checklist" text="CheckList"/> </a></li>
                       <!-- <li><a data-toggle="tab" href="#supportingDocuments" data-tabidx=1><spring:message
-                code="lbl.sdocuments"/> </a></li>-->
+                code="lbl.sdocuments"/> </a></li>
               
-    </ul>
+    </ul>-->
 
     <div class="tab-content">
         <div class="tab-pane fade in active" id="expensebillheader">
