@@ -2710,7 +2710,7 @@ public class CreateVoucher {
 		final CFiscalPeriod fiscalPeriod = fiscalPeriodHibernateDAO.getFiscalPeriodByDate(vh.getVoucherDate());
 		if (fiscalPeriod == null)
 			throw new ApplicationRuntimeException("Fiscal period is not defined for the voucher date");
-		sequenceName = vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
+		sequenceName = "sq_" + vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
 				+ fiscalPeriod.getName();
 		Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
 

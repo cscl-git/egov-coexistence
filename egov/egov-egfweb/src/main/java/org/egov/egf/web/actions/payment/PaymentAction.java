@@ -1108,7 +1108,7 @@ public class PaymentAction extends BasePaymentAction {
             addActionMessage(getText("payment.voucher.rejected", new String[] {this.getEmployeeName(paymentheader.getState()
                     .getInitiatorPosition())}));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
-            addActionMessage(getMessage("payment.voucher.approved", new String[] {this.getEmployeeName(voucherHeader.getState()
+            addActionMessage(getMessage("payment.voucher.approved", new String[] {this.getEmployeeName(paymentheader.getState()
             		.getOwnerPosition()) }));
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.cancelled"));
