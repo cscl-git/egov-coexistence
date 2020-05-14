@@ -186,18 +186,20 @@ public class JournalVoucherPrintAction extends BaseFormAction {
     private void generateVoucherReportList() {
         if (voucher != null) {
             for (final CGeneralLedger vd : voucher.getGeneralledger())
+            {
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getCreditAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService,
                             Integer.valueOf(voucher.getId().toString()), vd, egovCommon);
                     voucherReportList.add(voucherReport);
                 }
 
-            for (final CGeneralLedger vd : voucher.getGeneralledger())
-                if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getDebitAmount().doubleValue())) == 0) {
+            //for (final CGeneralLedger vd : voucher.getGeneralledger())
+                else  if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getDebitAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService,
                             Integer.valueOf(voucher.getId().toString()), vd, egovCommon);
                     voucherReportList.add(voucherReport);
                 }
+        }
         }
     }
 

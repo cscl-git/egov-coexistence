@@ -460,6 +460,8 @@ public class CreateVoucher {
 			headerDetails.put(VoucherConstant.VOUCHERDATE, vdt);
 			if (egBillregister.getId() != null)
 				headerDetails.put("billid", egBillregister.getId());
+			if (egBillregister.getNarration() != null)
+				headerDetails.put(VoucherConstant.NARRATION, egBillregister.getNarration());
 			if (billMis.getSourcePath() != null)
 				headerDetails.put(VoucherConstant.SOURCEPATH, billMis.getSourcePath());
 			if (billMis.getDepartmentcode() != null) {
@@ -481,6 +483,8 @@ public class CreateVoucher {
 			// TODO- read the fnction from billdetails. We can remove this
 			if (billMis.getFunction() != null)
 				headerDetails.put(VoucherConstant.FUNCTIONCODE, billMis.getFunction().getCode());
+			if (billMis.getBudgetaryAppnumber() != null)
+				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
 
 			for (final EgBilldetails egBilldetails : billDetailslist) {
 
@@ -1564,6 +1568,11 @@ public class CreateVoucher {
 		try {
 			// String voucherSubType="";
 			cVoucherHeader.setName(headerdetails.get(VoucherConstant.VOUCHERNAME).toString());
+			if(headerdetails.containsKey(VoucherConstant.NARRATION)
+					&& null != headerdetails.get(VoucherConstant.NARRATION)) {
+				final String narration = headerdetails.get(VoucherConstant.NARRATION).toString();
+				cVoucherHeader.setDescription(narration);
+			}
 			String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
 			cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
 			String vNumGenMode = null;
@@ -1869,6 +1878,10 @@ public class CreateVoucher {
 		if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && null != headerdetails.get(VoucherConstant.SERVICE_NAME)){
 		    final String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
 		    vouchermis.setServiceName(serviceName);
+		}
+		if(headerdetails.containsKey(VoucherConstant.BUDGETARYAPPNUMBER) && null != headerdetails.get(VoucherConstant.BUDGETARYAPPNUMBER)){
+		    final String budgetAppNo = headerdetails.get(VoucherConstant.BUDGETARYAPPNUMBER).toString();
+		    vouchermis.setBudgetaryAppnumber(budgetAppNo);
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("END | createVouchermis");
@@ -2697,7 +2710,7 @@ public class CreateVoucher {
 		final CFiscalPeriod fiscalPeriod = fiscalPeriodHibernateDAO.getFiscalPeriodByDate(vh.getVoucherDate());
 		if (fiscalPeriod == null)
 			throw new ApplicationRuntimeException("Fiscal period is not defined for the voucher date");
-		sequenceName = "sq_" + vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
+		sequenceName = vh.getFundId().getIdentifier() + "_" + getCgnType(vh.getType()).toLowerCase() + "_cgvn_"
 				+ fiscalPeriod.getName();
 		Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
 
