@@ -71,7 +71,7 @@ function resetPage(){
 				<td class="greybox">Recovery Code<span
 					class="mandatory1">*</span></td>
 				<td class="greybox"><s:select name="recoveryAssign" id="recoveryAssign"
-						list="dropdownData.recoveryList" listKey="id" listValue="type"
+						list="dropdownData.recoveryList" listKey="id" listValue="chartofaccounts.glcode+'-'+recoveryName"
 						headerKey="-1" headerValue="----Choose----" /></td>
 				<td class="greybox">Fund<span class="mandatory1">*</span></td>
 				<td class="greybox"><s:select name="fund" id="fund"
