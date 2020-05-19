@@ -387,7 +387,7 @@ public class ChallanAction extends BaseFormAction {
 
 			if (CollectionConstants.RECEIPT_STATUS_CODE_PENDING.equals(receiptHeader.getStatus().getCode())) {
 				loadReceiptDetails();
-				setCollectionModesNotAllowed();
+				//setCollectionModesNotAllowed();
 			} else {
 				errors.add(new ValidationError(
 						getText("challanreceipt.created.message", new String[] { receiptHeader.getReceiptnumber() }),
@@ -486,7 +486,7 @@ public class ChallanAction extends BaseFormAction {
 			receiptHeader.setIsModifiable(Boolean.TRUE);
 			receiptHeader.setCollectiontype(CollectionConstants.COLLECTION_TYPE_COUNTER);
 			// is this reqd
-			receiptHeader.setLocation(collectionsUtil.getLocationOfUser(getSession()));
+			//receiptHeader.setLocation(collectionsUtil.getLocationOfUser(getSession()));
 			receiptHeader
 					.setStatus(collectionsUtil.getStatusForModuleAndCode(CollectionConstants.MODULE_NAME_RECEIPTHEADER,
 							CollectionConstants.RECEIPT_STATUS_CODE_TO_BE_SUBMITTED));
@@ -769,6 +769,16 @@ public class ChallanAction extends BaseFormAction {
 		receiptHeader.setPaidBy(CollectionConstants.CHAIRPERSON);
 		receiptHeader.setSource(Source.SYSTEM.toString());
 		receiptHeader.setReceiptdate(new Date());
+		String servieDetails="";
+		if(serviceCategory != null && !serviceCategory.isEmpty())
+		{
+			servieDetails=servieDetails+serviceCategory;
+			if(serviceId != null && !serviceId.isEmpty())
+			{
+				servieDetails=servieDetails+"."+serviceId;
+			}
+		}
+		receiptHeader.setService(servieDetails);
 		/*
 		 * receiptHeader.setService(serviceDetailsService.findById(serviceId, false));
 		 * receiptHeader.getService().setServiceCategory(serviceCategoryService.findById
@@ -777,7 +787,7 @@ public class ChallanAction extends BaseFormAction {
 
 		receiptHeader.getReceiptMisc()
 				.setFund(fundDAO.fundById(receiptHeader.getReceiptMisc().getFund().getId(), false));
-		System.out.println("deptId :" + receiptHeader.getReceiptMisc().getDepartment());
+		System.out.println("deptId :" + deptId);
 		final Department depart = (Department) getPersistenceService()
 				.findByNamedQuery(CollectionConstants.QUERY_DEPARTMENT_BY_ID, Long.valueOf(deptId));
 		receiptHeader.getReceiptMisc().setDepartment(depart.getCode());
@@ -829,12 +839,13 @@ public class ChallanAction extends BaseFormAction {
 		receiptHeader.setTotalAmount(totalAmt);
 		receiptHeader.getChallan().setStatus(collectionsUtil.getStatusForModuleAndCode(
 				CollectionConstants.MODULE_NAME_CHALLAN, CollectionConstants.CHALLAN_STATUS_CODE_CREATED));
-		System.out.println(
-				"receiptHeader.getChallan().getService().getId() :" + receiptHeader.getChallan().getService().getId());
+		receiptHeader.getChallan().setService(receiptHeader.getService());
+		//System.out.println(
+			//	"receiptHeader.getChallan().getService().getId() :" + receiptHeader.getChallan().getService().getId());
 		// set service in challan
-		if (receiptHeader.getChallan().getService() != null && receiptHeader.getChallan().getService().getId() != null)
-			receiptHeader.getChallan().setService((ServiceDetails) getPersistenceService().findByNamedQuery(
-					CollectionConstants.QUERY_SERVICE_BY_ID, receiptHeader.getChallan().getService().getId()));
+		//if (receiptHeader.getChallan().getService() != null && receiptHeader.getChallan().getService().getId() != null)
+			//receiptHeader.getChallan().setService((ServiceDetails) getPersistenceService().findByNamedQuery(
+				//	CollectionConstants.QUERY_SERVICE_BY_ID, receiptHeader.getChallan().getService().getId()));
 		final SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 		try {
 			cutOffDate = sdf.parse(collectionsUtil.getAppConfigValue(CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
@@ -1071,9 +1082,12 @@ public class ChallanAction extends BaseFormAction {
 			receiptHeader = receiptHeaderService.findById(receiptId, false);
 			receiptHeader = receiptHeaderService.merge(receiptHeader);
 
-			if (receiptHeader.getChallan() != null && receiptHeader.getChallan().getService() != null
-					&& receiptHeader.getChallan().getService().getId() == -1)
-				receiptHeader.getChallan().setService(null);
+			/*
+			 * if (receiptHeader.getChallan() != null &&
+			 * receiptHeader.getChallan().getService() != null &&
+			 * receiptHeader.getChallan().getService().getId() == -1)
+			 * receiptHeader.getChallan().setService(null);
+			 */
 		}
 		addDropdownData("designationMasterList", Collections.emptyList());
 		addDropdownData("postionUserList", Collections.emptyList());
@@ -1100,19 +1114,20 @@ public class ChallanAction extends BaseFormAction {
 			addDropdownData("fundList", collectionsUtil.getAllFunds());
 		}
 		getServiceCategoryList();
-		addDropdownData("serviceCategoryList",
-				serviceCategoryService.findAllByNamedQuery(CollectionConstants.QUERY_ACTIVE_SERVICE_CATEGORY));
-		if (null != service && null != service.getServiceCategory() && service.getServiceCategory().getId() != -1)
-			addDropdownData("serviceList",
-					serviceDetailsService.findAllByNamedQuery(CollectionConstants.QUERY_SERVICE_BY_CATEGORY_FOR_TYPE,
-							service.getServiceCategory().getId(), CollectionConstants.SERVICE_TYPE_CHALLAN_COLLECTION,
-							Boolean.TRUE));
-		else if (serviceCategoryId != null)
-			addDropdownData("serviceList",
-					serviceDetailsService.findAllByNamedQuery(CollectionConstants.QUERY_SERVICE_BY_CATEGORY_FOR_TYPE,
-							serviceCategoryId, CollectionConstants.SERVICE_TYPE_CHALLAN_COLLECTION, Boolean.TRUE));
-		else
-			addDropdownData("serviceList", Collections.emptyList());
+		//addDropdownData("serviceCategoryList",
+			//	serviceCategoryService.findAllByNamedQuery(CollectionConstants.QUERY_ACTIVE_SERVICE_CATEGORY));
+		/*
+		 * if (null != service && null != service.getServiceCategory() &&
+		 * service.getServiceCategory().getId() != -1) addDropdownData("serviceList",
+		 * serviceDetailsService.findAllByNamedQuery(CollectionConstants.
+		 * QUERY_SERVICE_BY_CATEGORY_FOR_TYPE, service.getServiceCategory().getId(),
+		 * CollectionConstants.SERVICE_TYPE_CHALLAN_COLLECTION, Boolean.TRUE)); else if
+		 * (serviceCategoryId != null) addDropdownData("serviceList",
+		 * serviceDetailsService.findAllByNamedQuery(CollectionConstants.
+		 * QUERY_SERVICE_BY_CATEGORY_FOR_TYPE, serviceCategoryId,
+		 * CollectionConstants.SERVICE_TYPE_CHALLAN_COLLECTION, Boolean.TRUE)); else
+		 * addDropdownData("serviceList", Collections.emptyList());
+		 */
 		if (headerFields.contains(CollectionConstants.DEPARTMENT))
 			addDropdownData("departmentList", masterDataCache.get("egi-department"));
 		if (headerFields.contains(CollectionConstants.FUNCTION))
@@ -1583,7 +1598,7 @@ public class ChallanAction extends BaseFormAction {
 	}
 
 	private void getServiceCategoryList() {
-		List<BusinessService> businessService = microserviceUtils.getBusinessService("Finance");
+		List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
 		for (BusinessService bs : businessService) {
 			String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
 			String[] splitSerCode = bs.getCode().split(Pattern.quote("."));

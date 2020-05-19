@@ -62,6 +62,7 @@ import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.web.actions.voucher.VoucherReport;
 import org.egov.infra.admin.master.service.CityService;
+import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infra.utils.DateUtils;
@@ -127,6 +128,8 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
     private String bankAccountNumber = "";
     private transient ArrayList<Long> chequeNoList = new ArrayList<>();
     private transient ArrayList<String> chequeNosList = new ArrayList<>();
+    @Autowired
+    private DepartmentService departmentService;
 
     @Autowired
     private transient EgovCommon egovCommon;
@@ -371,14 +374,14 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getCreditAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService, Integer.valueOf(voucher.getId()
                             .toString()), vd, egovCommon);
-                    //voucherReport.setDepartment(voucher.getVouchermis().getDepartmentid());
+                    voucherReport.setDepartment(departmentService.getDepartmentById( Long.parseLong(voucher.getVouchermis().getDepartmentcode())));
                     voucherReportList.add(voucherReport);
                 }
             for (final CGeneralLedger vd : voucher.getGeneralledger())
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getDebitAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService, Integer.valueOf(voucher.getId()
                             .toString()), vd, egovCommon);
-                   // voucherReport.setDepartment(voucher.getVouchermis().getDepartmentid());
+                    voucherReport.setDepartment(departmentService.getDepartmentById( Long.parseLong(voucher.getVouchermis().getDepartmentcode())));
                     voucherReportList.add(voucherReport);
                 }
         }

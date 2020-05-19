@@ -53,7 +53,7 @@
 <head>
 <link rel="stylesheet" type="text/css"
 	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
-<title><s:text name="chq.assignment.heading.search" /></title>
+<title><s:text name="pex.assignment.heading.search" /></title>
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 </head>
@@ -213,7 +213,7 @@
 									onchange="validateChequeNumber(this)" /></td> -->
 
 							<td class="greybox"><s:text
-									name="chq.assignment.instrument.date" /><span
+									name="pex.assignment.instrumnt.date" /><span
 								class="mandatory1">*</span>(dd/mm/yyyy) <s:date name="chequeDt"
 									var="tempChequeDate" format="dd/MM/yyyy" /> <s:textfield
 									id="chequeDt" name="chequeDt" value="%{tempChequeDate}"

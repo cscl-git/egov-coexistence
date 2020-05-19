@@ -65,7 +65,7 @@
 		<span><font color="green"><s:actionmessage /></font></span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="chq.assignment.heading.view" />
+				<s:text name="chq.assignment.heading.generic.view" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>

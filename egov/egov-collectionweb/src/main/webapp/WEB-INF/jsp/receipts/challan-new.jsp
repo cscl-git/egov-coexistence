@@ -261,14 +261,9 @@ function validate(obj){
              document.getElementById("challan_error_area").innerHTML+='<s:text name="challan.error.payeename" />'+ "<br>";
              valid=false;
          }
-	 	 if(null != document.getElementById('serviceCategoryId') && document.getElementById('serviceCategoryId').value == -1){
+	 	 if((document.getElementById('serviceCategoryid') == null)  || (null != document.getElementById('serviceCategoryid') && document.getElementById('serviceCategoryid').value == -1)){
 
              document.getElementById("challan_error_area").innerHTML+='<s:text name="error.select.service.category" />'+ "<br>";
-             valid=false;
-         }
-         if(null != document.getElementById('serviceId') && document.getElementById('serviceId').value == -1){
-
-             document.getElementById("challan_error_area").innerHTML+='<s:text name="error.select.service.type" />'+ "<br>";
              valid=false;
          }
 		 
@@ -750,7 +745,7 @@ function addServiceTypeDropdown(tableId){
   			</s:else>
   			  <s:if test="%{shouldShowHeaderField('department')}">
 		   <td width="21%" class="bluebox2"><s:text name="challan.department"/><s:if test="%{isFieldMandatory('department')}"><span class="mandatory"/></s:if></td>
-		  <td width="24%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="id" listValue="name"  /> </td>
+		  <td width="24%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptId}"/> </td>
 	       </s:if>
 		   <s:else>
   			<td class="bluebox2" colspan="2"></td>
