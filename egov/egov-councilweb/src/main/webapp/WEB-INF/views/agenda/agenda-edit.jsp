@@ -130,7 +130,7 @@
 										name="councilAgendaDetailsForUpdate[${counter.index}].preamble.preambleNumber"
 										value="${contact.preamble.preambleNumber}" /> <c:out
 											value="${contact.preamble.preambleNumber}"></c:out></td>
-									<td><c:out value="${contact.preamble.department.name}"></c:out></td>
+									<td><c:out value="${contact.preamble.department}"></c:out></td>
 									<td><span class="more"><c:out
 												value="${contact.preamble.gistOfPreamble}"></c:out></span></td>
 									<td class="text-right"><c:out

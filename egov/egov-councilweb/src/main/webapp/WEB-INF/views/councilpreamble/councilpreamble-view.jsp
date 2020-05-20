@@ -190,12 +190,15 @@
 				</div>
 			</div>
 		</c:if>
-		<div class="text-center hide-close">
-			<div class="add-margin">
-				<a href="javascript:void(0)" class="btn btn-default"
-					onclick="self.close()">Close</a>
+		
+		<c:if test="${councilPreamble.status.code!= 'null' && !'CREATED'.equalsIgnoreCase(councilPreamble.status.code)}">
+			<div class="text-center hide-close">
+				<div class="add-margin">
+					<a href="javascript:void(0)" class="btn btn-default"
+						onclick="self.close()">Close</a>
+				</div>
 			</div>
-		</div>
+		</c:if>
 	</div>
 </div>
 

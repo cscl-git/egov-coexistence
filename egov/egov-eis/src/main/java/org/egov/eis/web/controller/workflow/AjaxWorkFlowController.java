@@ -50,6 +50,9 @@ package org.egov.eis.web.controller.workflow;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 //import org.egov.eis.entity.Assignment;
 //import org.egov.eis.entity.AssignmentAdaptor;
 import org.egov.eis.service.AssignmentService;
@@ -57,7 +60,9 @@ import org.egov.eis.service.DesignationService;
 import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.web.support.json.adapter.AssignmentAdaptor;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
+import org.egov.infra.workflow.matrix.service.WorkFlowDeptDesgMapService;
 import org.egov.pims.commons.Designation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -68,13 +73,17 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 public class AjaxWorkFlowController {
 
+	private static final String OBJECTTYPE_COUNCIL_PREAMBLE = "CouncilPreamble";
+	
     @Autowired
     private CustomizedWorkFlowService customizedWorkFlowService;
 
@@ -86,6 +95,9 @@ public class AjaxWorkFlowController {
     
     @Autowired
     private MicroserviceUtils microserviceUtils;
+    
+    @Autowired
+    private WorkFlowDeptDesgMapService workFlowDeptDesgMapService;
 
     @RequestMapping(value = "/ajaxWorkFlow-getDesignationsByObjectType", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
@@ -95,10 +107,39 @@ public class AjaxWorkFlowController {
             @RequestParam final String amountRule, @RequestParam final String additionalRule,
             @RequestParam final String pendingAction, @RequestParam final String approvalDepartment) {
 
-        List<Designation> designationList = designationService.getDesignationsByNames(
-                customizedWorkFlowService.getNextDesignations(type,
-                        departmentRule, null, additionalRule, currentState,
-                        pendingAction, new Date()));
+    	List<Designation> designationList = new ArrayList<Designation>();
+    	
+    	if(OBJECTTYPE_COUNCIL_PREAMBLE.equalsIgnoreCase(type)) {
+    		List<WorkFlowDeptDesgMap> deptDesgMap = null;
+    		
+    		if(!StringUtils.isBlank(additionalRule)) {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentStateAndAddRuleAndNextDept
+    					(type, currentState, additionalRule, approvalDepartment);
+    		}else {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentStateAndNextDept
+    					(type, currentState, approvalDepartment);
+    		}
+    		
+    		if(!CollectionUtils.isEmpty(deptDesgMap)) {
+				String desigCodes = deptDesgMap.stream().map(WorkFlowDeptDesgMap::getNextDesignation).collect(Collectors.joining(","));
+				List<org.egov.infra.microservice.models.Designation> tempDesignationList = microserviceUtils.getDesignation(desigCodes);
+				if(!CollectionUtils.isEmpty(tempDesignationList)) {
+					Designation desig = null;
+					for(org.egov.infra.microservice.models.Designation tempDesig : tempDesignationList) {
+						desig = new Designation();
+						desig.setName(tempDesig.getName());
+						desig.setCode(tempDesig.getCode());
+						designationList.add(desig);
+					}
+				}
+			}
+    	}else {
+    		designationList = designationService.getDesignationsByNames(
+                    customizedWorkFlowService.getNextDesignations(type,
+                            departmentRule, null, additionalRule, currentState,
+                            pendingAction, new Date()));
+    	}
+		
         //if (designationList.isEmpty())
           //  designationList = designationService.getAllDesignationByDepartment(approvalDepartment, new Date());
         return designationList;

@@ -47,12 +47,13 @@
  */
 package org.egov.council.service;
 
+import org.apache.log4j.Logger;
 import org.egov.council.entity.CommitteeMembers;
 import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.CouncilSmsDetails;
 import org.egov.infra.admin.master.entity.AppConfigValues;
-import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.microservice.models.User;
 import org.egov.infra.notification.service.NotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -75,6 +76,9 @@ public class CouncilSmsAndEmailService {
     private static final String DATE_FORMAT = "yyyy-MM-dd";
 
     private static final String AGENDAATTACHFILENAME = "agendadetails.rtf";
+    
+    private static final Logger LOGGER = Logger
+            .getLogger(CouncilSmsAndEmailService.class);
 
     @Autowired
     private NotificationService notificationService;
@@ -102,18 +106,26 @@ public class CouncilSmsAndEmailService {
         Boolean smsEnabled = isSmsEnabled();
 
         if (smsEnabled) {
-            for (CommitteeMembers committeeMembers : committeeMemberService
-                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
-                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
-                if (mobileNo != null) {
-                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage);
-                }
+        	try {
+	            for (CommitteeMembers committeeMembers : committeeMemberService
+	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
+	                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
+	                if (mobileNo != null) {
+	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage);
+	                }
+	            }
+        	}catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to council members of meeting number "+councilMeeting.getMeetingNumber());
             }
-            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
-            for (User user : listOfUsers) {
-                if (user.getMobileNumber() != null) {
-                    buildSmsForMeetingCouncilRoles(user.getUsername(), user.getMobileNumber(), councilMeeting, customMessage);
-                }
+            try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage);
+	                }
+	            }
+            }catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
             }
             buildCouncilSmsDetails(customMessage, councilMeeting);
         }
@@ -123,21 +135,29 @@ public class CouncilSmsAndEmailService {
         String emailId;
         Boolean emailEnabled = isEmailEnabled();
         if (emailEnabled) {
-            for (CommitteeMembers committeeMembers : committeeMemberService
-                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
-                emailId = committeeMembers.getCouncilMember().getEmailId();
-                if (emailId != null) {
-                    buildEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
-                            attachment);
-                }
-            }
-            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
-            for (User user : listOfUsers) {
-                if (user.getEmailId() != null) {
-                    buildEmailForMeetingForCouncilRoles(user.getUsername(), user.getEmailId(), councilMeeting, customMessage,
-                            attachment);
-                }
-            }
+        	try {
+	            for (CommitteeMembers committeeMembers : committeeMemberService
+	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
+	                emailId = committeeMembers.getCouncilMember().getEmailId();
+	                if (emailId != null) {
+	                    buildEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
+	                            attachment);
+	                }
+	            }
+	        }catch(Exception e) {
+	        	LOGGER.error("Unable to send EMAIL to council members of meeting number "+councilMeeting.getMeetingNumber());
+	        }
+        	try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
+	            for (User user : listOfUsers) {
+	                if (user.getEmailId() != null) {
+	                    buildEmailForMeetingForCouncilRoles(user.getUserName(), user.getEmailId(), councilMeeting, customMessage,
+	                            attachment);
+	                }
+	            }
+	        }catch(Exception e) {
+	        	LOGGER.error("Unable to send EMAIL to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
+	        }
         }
     }
 

@@ -48,12 +48,17 @@
 
 package org.egov.council.web.controller;
 
+import static org.egov.council.utils.constants.CouncilConstants.AGENDA_MODULENAME;
+import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_APPROVED;
 import static org.egov.council.utils.constants.CouncilConstants.CHECK_BUDGET;
 import static org.egov.council.utils.constants.CouncilConstants.IMPLEMENTATIONSTATUS;
 import static org.egov.council.utils.constants.CouncilConstants.IMPLEMENTATION_STATUS_FINISHED;
 import static org.egov.council.utils.constants.CouncilConstants.MODULE_FULLNAME;
+import static org.egov.council.utils.constants.CouncilConstants.PREAMBLEUSEDINAGENDA;
+import static org.egov.council.utils.constants.CouncilConstants.PREAMBLE_MODULENAME;
 import static org.egov.council.utils.constants.CouncilConstants.REVENUE_HIERARCHY_TYPE;
 import static org.egov.council.utils.constants.CouncilConstants.WARD;
+import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_INWORKFLOW;
 import static org.egov.infra.utils.JsonUtils.toJSON;
 
 import java.io.IOException;
@@ -71,10 +76,15 @@ import org.apache.log4j.Logger;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.PreambleNumberGenerator;
+import org.egov.council.entity.CommitteeType;
+import org.egov.council.entity.CouncilAgenda;
+import org.egov.council.entity.CouncilAgendaDetails;
 import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.enums.PreambleTypeEnum;
 import org.egov.council.service.BidderService;
+import org.egov.council.service.CommitteeTypeService;
+import org.egov.council.service.CouncilAgendaService;
 import org.egov.council.service.CouncilPreambleService;
 import org.egov.council.service.CouncilThirdPartyService;
 import org.egov.council.utils.constants.CouncilConstants;
@@ -95,6 +105,7 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.jfree.util.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -135,6 +146,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     private static final String COUNCILPREAMBLE_SEARCH = "councilpreamble-search";
     private static final String COUNCILPREAMBLE_UPDATE_STATUS = "councilpreamble-update-status";
     private static final String COMMONERRORPAGE = "common-error-page";
+    private static final String ADDITIONALRULE = "additionalRule";
     
     
     private static final String COUNCILPREAMBLE_API_VIEW = "councilpreamble-viewnew";
@@ -167,6 +179,10 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     protected EgovMasterDataCaching masterDataCache;
     @Autowired
     private MicroserviceUtils microserviceUtils;
+    @Autowired
+    protected CommitteeTypeService committeeTypeService;
+    @Autowired
+    protected CouncilAgendaService councilAgendaService;
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
@@ -175,21 +191,27 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 
     @ModelAttribute("wards")
     public List<Boundary> getWardsList() {
-        return boundaryService
+        /*return boundaryService
                 .getActiveBoundariesByBndryTypeNameAndHierarchyTypeName(WARD,
-                        REVENUE_HIERARCHY_TYPE);
+                        REVENUE_HIERARCHY_TYPE);*/
+    	return null;
     }
 
     @ModelAttribute("URL")
     public String getAppConfigValues() {
-        List<AppConfigValues> appConfigValue = appConfigValueService
+    	/*List<AppConfigValues> appConfigValue = appConfigValueService
                 .getConfigValuesByModuleAndKey(MODULE_FULLNAME, CHECK_BUDGET);
         if (appConfigValue != null && !appConfigValue.isEmpty())
             return appConfigValueService
                     .getConfigValuesByModuleAndKey(MODULE_FULLNAME,
                             CHECK_BUDGET)
-                    .get(0).getValue();
+                    .get(0).getValue();*/
         return "";
+    }
+    
+    @ModelAttribute("committeeType")
+    public List<CommitteeType> getCommitteTypeList() {
+        return committeeTypeService.getActiveCommiteeType();
     }
 
     @ModelAttribute("implementationStatus")
@@ -203,16 +225,16 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         councilPreamble.setType(PreambleType.GENERAL);
         model.addAttribute("autoPreambleNoGenEnabled", isAutoPreambleNoGenEnabled());     
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
-        model.addAttribute("additionalRule", COUNCIL_COMMON_WORKFLOW);
-        prepareWorkFlowOnLoad(model, councilPreamble);
+        model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
         model.addAttribute(CURRENT_STATE, "NEW");
+        prepareWorkFlowOnLoad(model, councilPreamble);
         return COUNCILPREAMBLE_NEW;
     }
 
     private void prepareWorkFlowOnLoad(final Model model,
                                        CouncilPreamble councilPreamble) {
         WorkflowContainer workFlowContainer = new WorkflowContainer();
-        prepareWorkflow(model, councilPreamble, workFlowContainer);
+        prepareWorkflow(model, councilPreamble, workFlowContainer, true);
         model.addAttribute("stateType", councilPreamble.getClass()
                 .getSimpleName());
     }
@@ -268,9 +290,14 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                 && !request.getParameter(APPROVAL_POSITION).isEmpty())
             approvalPosition = Long.valueOf(request
                     .getParameter(APPROVAL_POSITION));
-        
+
         councilPreambleService.create(councilPreamble, approvalPosition,
                 approvalComment, workFlowAction);
+        
+        //Create agenda
+        CouncilAgenda councilAgenda = new CouncilAgenda();
+        buildCouncilAgendaDetails(councilAgenda, councilPreamble);
+        councilAgendaService.create(councilAgenda);
 
         String message = messageSource.getMessage("msg.councilPreamble.create",
                 new String[]{
@@ -279,6 +306,23 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                 null);
         redirectAttrs.addFlashAttribute(MESSAGE2, message);
         return REDIRECT_COUNCILPREAMBLE_RESULT + councilPreamble.getId();
+    }
+    
+    private void buildCouncilAgendaDetails(CouncilAgenda councilAgenda, CouncilPreamble councilPreamble) {
+    	councilAgenda.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
+				AGENDA_MODULENAME, AGENDA_STATUS_INWORKFLOW));
+    	councilAgenda.setCommitteeType(councilPreamble.getCommitteeType());
+    	councilAgenda.setAgendaNumber(councilPreamble.getPreambleNumber());
+    	Long itemNumber = Long.valueOf(1);
+    	List<CouncilAgendaDetails> councilAgendaDetailsList = new ArrayList<CouncilAgendaDetails>();
+    	CouncilAgendaDetails councilAgendaDetails = new CouncilAgendaDetails();
+    	
+    	councilAgendaDetails.setPreamble(councilPreamble);
+        councilAgendaDetails.setAgenda(councilAgenda);
+        councilAgendaDetails.setItemNumber(itemNumber.toString());
+        councilAgendaDetails.setOrder(itemNumber);
+        councilAgendaDetailsList.add(councilAgendaDetails);
+        councilAgenda.setAgendaDetails(councilAgendaDetailsList);
     }
 
     @RequestMapping(value = "/downloadfile/{fileStoreId}")
@@ -368,6 +412,23 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 
         councilPreambleService.update(councilPreamble, approvalPosition,
                 approvalComment, workFlowAction);
+        
+        //We have merged preamble with agenda & created agenda functionality. 
+        //So when agenda gets approved then we need to update the status in preamble & agenda table.
+        if (CouncilConstants.WF_APPROVE_BUTTON
+                .equalsIgnoreCase(workFlowAction)) {
+        	List<CouncilAgenda> councilAgendaList = councilAgendaService.findByAgendaNo(councilPreamble.getPreambleNumber());
+        	if(!CollectionUtils.isEmpty(councilAgendaList)) {
+        		CouncilAgenda councilAgenda = councilAgendaList.get(0);
+        		councilAgenda.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
+        										AGENDA_MODULENAME, AGENDA_STATUS_APPROVED));
+        		((CouncilAgendaDetails)councilAgenda.getAgendaDetails().get(0)).getPreamble().setStatus(
+	                    egwStatusHibernateDAO.getStatusByModuleAndCode(
+	                            PREAMBLE_MODULENAME, PREAMBLEUSEDINAGENDA));
+        		councilAgendaService.update(councilAgenda);
+        	}
+        }
+        
         if (null != workFlowAction) {
             if (CouncilConstants.WF_STATE_REJECT
                     .equalsIgnoreCase(workFlowAction)) {
@@ -460,17 +521,27 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 		}
 		 
         if(CouncilConstants.REJECTED.equalsIgnoreCase(councilPreamble.getStatus().getCode())){
-            model.addAttribute("additionalRule", COUNCIL_COMMON_WORKFLOW);
+            model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
         }
-        prepareWorkflow(model, councilPreamble, workFlowContainer);
+        
+        try {
+        	//set committee type value
+        	councilPreamble.setCommitteeType(councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda().getCommitteeType());
+        }catch(Exception e) {
+        	Log.error("No agenda found with preambleid "+councilPreamble.getId());
+        }
+        
         model.addAttribute("stateType", councilPreamble.getClass()
                 .getSimpleName());
         model.addAttribute(CURRENT_STATE, councilPreamble.getCurrentState()
                 .getValue());
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
+        prepareWorkflow(model, councilPreamble, workFlowContainer, true);
+        
         model.addAttribute(APPLICATION_HISTORY,
                 councilThirdPartyService.getHistory(councilPreamble));
         model.addAttribute("wfNextAction", councilPreamble.getState().getNextAction());
+        
         if ("PREAMBLEAPPROVEDFORMOM".equals(councilPreamble.getStatus().getCode())
                 && !PreambleTypeEnum.WORKS.equals(councilPreamble.getTypeOfPreamble())) {
             return COUNCILPREAMBLE_VIEW;

@@ -120,6 +120,22 @@
 			</div>
 			<div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
+						code="lbl.committeetype" /> <span class="mandatory"></span> </label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="committeeType" id="committeeType"
+						required="required" cssClass="form-control"
+						cssErrorClass="form-control error">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:options items="${committeeType}" itemValue="id"
+							itemLabel="name" />
+					</form:select>
+					<form:errors path="committeeType" cssClass="error-msg" />
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.gistofpreamble" /><span class="mandatory"></span></label>
 				<div class="col-sm-8 add-margin">
 					<form:textarea path="gistOfPreamble" id="gistOfPreamble"

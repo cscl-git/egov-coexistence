@@ -69,6 +69,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.log4j.Logger;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.CouncilMeetingNumberGenerator;
 import org.egov.council.entity.CommitteeMembers;
@@ -140,6 +141,9 @@ public class CouncilMeetingController {
     private static final String COUNCILMEETING_EDIT_ATTENDANCE = "councilmeeting-attend-form";
     private static final String COUNCILMEETING_ATTENDANCE_RESULT = "councilmeeting-attend-result";
     private static final String MSG_MOM_RESOLUTION_CREATED = "msg.mom.create";
+    
+    private static final Logger LOGGER = Logger
+            .getLogger(CouncilMeetingController.class);
     @Autowired
     protected FileStoreUtils fileStoreUtils;
     @Autowired
@@ -190,7 +194,7 @@ public class CouncilMeetingController {
         return councilMeetingTypeService.findAllActiveMeetingType();
     }
     
-    @RequestMapping(value = "/new/{id}", method = RequestMethod.POST)
+    @RequestMapping(value = "/new/{id}", method = RequestMethod.GET)
     public String newForm(@ModelAttribute final CouncilMeeting councilMeeting, @PathVariable("id") final Long id,
                           final Model model) {
 
@@ -254,9 +258,19 @@ public class CouncilMeetingController {
         }
 
         councilMeetingService.create(councilMeeting);
-        councilSmsAndEmailService.sendSms(councilMeeting, null);
-        councilSmsAndEmailService.sendEmail(councilMeeting, null,
+        
+        try {
+        	councilSmsAndEmailService.sendSms(councilMeeting, null);
+        }catch(Exception e) {
+        	LOGGER.error("Unable to send SMS to for meeting number "+councilMeeting.getMeetingNumber());
+        }
+        try {
+        	councilSmsAndEmailService.sendEmail(councilMeeting, null,
                 councilReportService.generatePDFForAgendaDetails(councilMeeting));
+        }catch(Exception e) {
+        	LOGGER.error("Unable to send EMAIL of meeting number "+councilMeeting.getMeetingNumber());
+        }
+        
         redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilMeeting.success", null, null));
         return REDIRECT_COUNCILMEETING_RESULT + councilMeeting.getId();
     }
@@ -332,7 +346,7 @@ public class CouncilMeetingController {
 
     }
 
-    @RequestMapping(value = "/agendasearch/{mode}", method = RequestMethod.GET)
+    @RequestMapping(value = "/agendasearch/{mode}", method = RequestMethod.POST)
     public String searchagenda(@PathVariable("mode") final String mode, Model model) {
         model.addAttribute("councilAgenda", new CouncilAgenda());
         return COUNCIL_MEETING_AGENDA_SEARCH;
@@ -397,7 +411,7 @@ public class CouncilMeetingController {
         return "mom-resolution-response";
     }
 
-    @RequestMapping(value = "/attendance/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/attendance/search", method = RequestMethod.POST)
     public String getSearchAttendance(final Model model) {
         CouncilMeeting councilMeeting = new CouncilMeeting();
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
@@ -405,7 +419,7 @@ public class CouncilMeetingController {
         return COUNCILMEETING_ATTENDANCE_SEARCH;
     }
 
-    @RequestMapping(value = "/attendance/report/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/attendance/report/search", method = RequestMethod.POST)
     public String getSearchReportForAttendance(final Model model) {
         CouncilMeeting councilMeeting = new CouncilMeeting();
         model.addAttribute(COUNCIL_MEETING, councilMeeting);

@@ -110,7 +110,7 @@
 							<th align="center"><spring:message code="lbl.serial.no" /></th>
 							<th><spring:message code="lbl.department" /></th>
 							<th><spring:message code="lbl.agenda.number" /></th>
-							<th><spring:message code="lbl.preamble.number" /></th>
+							<%-- <th><spring:message code="lbl.preamble.number" /></th> --%>
 							<th><spring:message code="lbl.resolution" /></th>
 							<th><spring:message code="lbl.status" /></th>
 							<th><spring:message code="lbl.resolutionNumber" /></th>
@@ -124,11 +124,11 @@
 									varStatus="counter">
 									<tr>
 										<td align="center">${mom.itemNumber}</td>
-										<td><c:out value="${mom.preamble.department.name}" /></td>
+										<td><c:out value="${mom.preamble.department}" /></td>
 										<td align="center"><c:out
 												value="${mom.agenda.agendaNumber}" /></td>
-										<td width="10%"><c:out
-												value="${mom.preamble.preambleNumber}" /></td>
+										<%-- <td width="10%"><c:out
+												value="${mom.preamble.preambleNumber}" /></td> --%>
 										<td width="30%"><span class="more"><c:out
 													value="${mom.resolutionDetail ne null?mom.resolutionDetail:'N/A'}" /></span></td>
 										<td width="10%"><c:out
@@ -208,7 +208,7 @@
 	<div class="add-margin">
 		<button type="button" id="printAgenda" value="Print Agenda"
 			onclick="location.href='/services/council/councilmeeting/generateagenda/'+${councilMeeting.id};"
-			class='btn btn-primary'>Print Meeting Notice</button>
+			class='btn btn-primary' style="width:158px;">Print Meeting Notice</button>
 		<a href="javascript:void(0)" class="btn btn-default"
 			onclick="self.close()">Close</a>
 	</div>

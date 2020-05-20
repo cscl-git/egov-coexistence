@@ -261,7 +261,7 @@ function validatePreambleNumber(preambleNumber){
 			success: function (response) { 
 				if(!response) {
 						$(preambleNumber).val('');
-						bootbox.alert("Entered Preamble Number already exists. Please Enter Unique Number.");
+						bootbox.alert("Entered Agenda Number already exists. Please Enter Unique Number.");
 				}
 			}, 
 			error: function (response) {

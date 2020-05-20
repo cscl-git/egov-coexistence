@@ -65,4 +65,15 @@ public interface WorkFlowDeptDesgMapRepository extends JpaRepository<WorkFlowDep
     List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRule(@Param("objectType") String objectType,
                                                               @Param("currentState") String currentState,
                                                               @Param("additionalRule") String additionalRule);
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState and additionalRule= :additionalRule and nextdepartment = :nextdepartment")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRuleAndNextDept(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState,
+                                                              @Param("additionalRule") String additionalRule,
+                                                              @Param("nextdepartment") String nextdepartment);
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState and nextdepartment = :nextdepartment")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndNextDept(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState,
+                                                              @Param("nextdepartment") String nextdepartment);
 }

@@ -106,9 +106,9 @@
 							<th width="10%"><spring:message code="lbl.department" /><span
 								class="mandatory"></span></th>
 							<c:if test="${!autoPreambleNoGenEnabled}">
-							<th width="10%"><spring:message code="lbl.preamble.number" /><span
+								<th width="10%"><spring:message code="lbl.preamble.number" /><span
 								class="mandatory"></span></th>
-														</c:if>
+							</c:if>
 							<th width="20%"><spring:message code="lbl.gistofpreamble" /><span
 								class="mandatory"></span></th>
 							<th width="10%"><spring:message code="lbl.resolutionNumber" /><span

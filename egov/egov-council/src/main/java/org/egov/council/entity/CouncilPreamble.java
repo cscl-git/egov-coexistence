@@ -165,6 +165,9 @@ public class CouncilPreamble extends StateAware {
     private String approvalDesignation;
     
     @Transient
+    private CommitteeType committeeType;
+    
+    @Transient
     private String approvalComent;
 
     @Transient
@@ -363,6 +366,14 @@ public class CouncilPreamble extends StateAware {
 
 	public void setApprovalDesignation(String approvalDesignation) {
 		this.approvalDesignation = approvalDesignation;
+	}
+
+	public CommitteeType getCommitteeType() {
+		return committeeType;
+	}
+
+	public void setCommitteeType(CommitteeType committeeType) {
+		this.committeeType = committeeType;
 	}
     
 }

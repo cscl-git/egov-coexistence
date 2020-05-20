@@ -73,11 +73,6 @@
 				<text><![CDATA[Details of Agenda]]></text>
 			</staticText>
 			<staticText>
-				<reportElement mode="Opaque" x="463" y="38" width="92" height="35" uuid="ef873e26-37ee-4da5-9a3d-d6bc925eb8c5"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Amount]]></text>
-			</staticText>
-			<staticText>
 				<reportElement x="0" y="0" width="555" height="35" uuid="dd016ced-a5b1-41cf-a766-a0428a67822b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
@@ -114,7 +109,7 @@
 					<rightPen lineWidth="0.5"/>
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{preamble}.getDepartment().getName()]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{preamble}.getDepartment()]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="170" y="1" width="293" height="43" isPrintWhenDetailOverflows="true" uuid="35207553-d99e-457f-bf8f-9c9ba38ddbaa"/>
@@ -127,18 +122,6 @@
 				</box>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{preamble}.getGistOfPreamble()]]></textFieldExpression>
-			</textField>
-			<textField isStretchWithOverflow="true" pattern="#,##0.00;#,##0.00-" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" mode="Transparent" x="463" y="1" width="80" height="43" isPrintWhenDetailOverflows="true" uuid="547ffac2-9e37-4fd9-82db-5c66fea33726"/>
-				<box leftPadding="5">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{preamble}.getSanctionAmount()]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

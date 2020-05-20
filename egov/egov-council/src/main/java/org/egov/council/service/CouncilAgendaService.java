@@ -61,6 +61,7 @@ import org.egov.council.entity.CouncilAgendaDetails;
 import org.egov.council.repository.CouncilAgendaDetailsRepository;
 import org.egov.council.repository.CouncilAgendaRepository;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
@@ -72,18 +73,22 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class CouncilAgendaService {
-	
-    private final CouncilAgendaDetailsRepository councilAgendaDetailsRepository;
-    private final CouncilAgendaRepository councilAgendaRepository;
+public class CouncilAgendaService extends PersistenceService<CouncilAgenda, Long> {
+
+	@Autowired
+    private CouncilAgendaDetailsRepository councilAgendaDetailsRepository;
+	@Autowired
+    private CouncilAgendaRepository councilAgendaRepository;
     @PersistenceContext
     private EntityManager entityManager;
     
-    @Autowired
-    public CouncilAgendaService(final CouncilAgendaRepository councilAgendaRepository,final CouncilAgendaDetailsRepository councilAgendaDetailsRepository) {
-        this.councilAgendaRepository = councilAgendaRepository;
-        this.councilAgendaDetailsRepository= councilAgendaDetailsRepository;
-    }
+    public CouncilAgendaService(final Class<CouncilAgenda> councilAgenda) {
+		super(councilAgenda);
+	}
+    
+    public CouncilAgendaService() {
+  		super(CouncilAgenda.class);
+  	}
     
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -91,11 +96,15 @@ public class CouncilAgendaService {
 
     @Transactional
     public CouncilAgenda create(final CouncilAgenda councilAgenda) {
+    	applyAuditing(councilAgenda);
+    	applyAuditing(councilAgenda.getAgendaDetails().get(0));
         return councilAgendaRepository.save(councilAgenda);
     }
 
     @Transactional
     public CouncilAgenda update(final CouncilAgenda councilAgenda) {
+    	applyAuditing(councilAgenda);
+    	applyAuditing(councilAgenda.getAgendaDetails().get(0));
         return councilAgendaRepository.save(councilAgenda);
     }
     
@@ -114,6 +123,10 @@ public class CouncilAgendaService {
     }
     public List<CouncilAgenda> findByAgendaNo(String agendaNumber) {
         return councilAgendaRepository.findByAgendaNo(agendaNumber);
+    }
+    
+    public CouncilAgendaDetails findByPreambleId(Long preambleid) {
+        return councilAgendaDetailsRepository.findByPreambleId(preambleid).get(0);
     }
 
     public CouncilAgenda findOne(Long id) {

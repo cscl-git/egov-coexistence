@@ -74,5 +74,13 @@ public class WorkFlowDeptDesgMapService {
     public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRule(String objectType, String currentState, String additionalRule){
     	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
     }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRuleAndNextDept(String objectType, String currentState, String additionalRule, String nextDepartment){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndAddRuleAndNextDept(objectType, currentState, additionalRule, nextDepartment);
+    }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndNextDept(String objectType, String currentState, String nextDepartment){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndNextDept(objectType, currentState, nextDepartment);
+    }
 
 }

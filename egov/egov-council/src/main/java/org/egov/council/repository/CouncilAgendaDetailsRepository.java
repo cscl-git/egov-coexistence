@@ -47,13 +47,19 @@
  */
 package org.egov.council.repository;
 
+import java.util.List;
+
+import org.egov.council.entity.CouncilAgenda;
 import org.egov.council.entity.CouncilAgendaDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface CouncilAgendaDetailsRepository extends JpaRepository<CouncilAgendaDetails, java.lang.Long> {
 
-	
+	@Query("from CouncilAgendaDetails agendadetails where agendadetails.preamble.id=:preambleid")
+    List<CouncilAgendaDetails> findByPreambleId(@Param("preambleid") Long preambleid);
 	
 }

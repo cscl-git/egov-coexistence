@@ -63,7 +63,7 @@
 						<spring:message code="lbl.department" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilRouter.department.name}</div>
+						${councilRouter.department}</div>
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.type" />
 					</div>

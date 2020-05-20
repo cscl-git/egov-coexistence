@@ -78,7 +78,7 @@
 						<spring:message code="lbl.department" /> : 
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.department.name}</div>
+						${councilPreamble.department}</div>
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.amount" />
 					</div>

@@ -115,9 +115,9 @@
 						<tr>
 							<th align="center"><spring:message code="lbl.serial.no" /></th>
 							<th><spring:message code="lbl.department" /></th>
-							<th width="25%"><spring:message code="lbl.gistofpreamble" /></th>
-							<th width="20%"><spring:message code="lbl.bidders" /></th>
 							<th><spring:message code="lbl.preamble.number" /></th>
+							<th width="25%"><spring:message code="lbl.gistofpreamble" /></th>
+							<%-- <th width="20%"><spring:message code="lbl.bidders" /></th> --%>							
 							<th width="12%"><spring:message code="lbl.resolution" /><span
 								class="mandatory"></span></th>
 							<c:if test="${!autoResolutionNoGenEnabled}">
@@ -140,14 +140,15 @@
 											name="meetingMOMs[${counter.index}].itemNumber"
 											value="${mom.itemNumber}" />
 										</td>
-										<td><c:out value="${mom.preamble.department.name}" /></td>
+										<td><c:out value="${mom.preamble.department}" /></td>
+										<td><c:out value="${mom.preamble.preambleNumber}" /></td>
 										<td><span class="more"><c:out
 													value="${mom.preamble.gistOfPreamble}"/><br>
 													<c:out value="${mom.preamble.addtionalGistOfPreamble}"></c:out>
 													</span></td>
 
 
-										<td>
+										<%-- <td>
 											<c:if test="${!mom.preamble.bidderDetails.isEmpty()}">
 											<div class=" add-margin ">
 												<select name="mom.preamble.bidderDetails" multiple
@@ -161,7 +162,7 @@
 															title="${bidderDetail.bidder.name}" 
 															<c:if test="${bidderDetail.isAwarded}"> 
 															selected="selected" </c:if>>${bidderDetail.bidder.name}
-															<%-- <c:if test="${fn:contains(mom.preamble.bidderDetails, bidderDetail)}"> --%>
+															<c:if test="${fn:contains(mom.preamble.bidderDetails, bidderDetail)}">
 															</option>
                                                     
                                                      
@@ -181,9 +182,8 @@
 											<c:if test="${mom.preamble.bidderDetails.isEmpty()}">
 												<c:out value="N/A"></c:out>
 											</c:if>
-										</td>
+										</td> --%>
 
-										<td><c:out value="${mom.preamble.preambleNumber}" /></td>
 										<td><form:select
 												path="meetingMOMs[${counter.index}].resolutionStatus"
 												cssClass="form-control addorremoverequired"
