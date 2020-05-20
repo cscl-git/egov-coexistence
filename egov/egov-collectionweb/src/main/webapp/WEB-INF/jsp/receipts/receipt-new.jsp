@@ -1172,10 +1172,10 @@ function showHideMandataryMark(obj){
 	    			<s:text name="billreceipt.payment.totalamt.tobereceived"/>
 	   				<span class="bold">
 	    			
-	   				<input style="border:0px;background-color:#FFFFCC;font-weight:bold;" type="text" name="totalamounttobepaid" id="totalamounttobepaid" readonly="readonly" value='<s:property value="%{totalAmntToBeCollected}" />' >
+	   				<input style="border:0px;background-color:#265988;font-weight:bold;" type="text" name="totalamounttobepaid" id="totalamounttobepaid" readonly="readonly" value='<s:property value="%{totalAmntToBeCollected}" />' >
 	   				</span>
 	   			</s:if>
-	   			<s:text name="billreceipt.payment.totalamt.received"/><span><input style="border:0px;background-color:#FFFFCC;font-weight:bold;" type="text" name="totalamountdisplay" id="totalamountdisplay" readonly="readonly" tabindex='-1'></span>
+	   			<s:text name="billreceipt.payment.totalamt.received"/><span><input style="border:0px;background-color:#FFFFFF;font-weight:bold;" type="text" name="totalamountdisplay" id="totalamountdisplay" readonly="readonly" tabindex='-1'></span>
    			</div>
    			<s:hidden label="totalAmntToBeCollected" name="totalAmntToBeCollected" value="%{totalAmntToBeCollected}"/>
     	</td></tr>
@@ -1196,7 +1196,7 @@ function showHideMandataryMark(obj){
 		   <td class="bluebox"><s:textfield label="paidBy" id="paidBy" maxlength="150" name="paidBy" value="%{payeeName}" /></td>
 	    </tr>
 	    </s:if>
-		<table id="manualreceipt" >    
+		<!--  <table id="manualreceipt" >    
 		
 			<s:if test="%{manualReceiptNumberAndDateReq}">
 				<tr>
@@ -1216,7 +1216,7 @@ function showHideMandataryMark(obj){
 				</tr>
 			 </s:if>
 		
-		</table>
+		</table>-->
 		
 		</table>
 			

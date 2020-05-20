@@ -377,7 +377,7 @@ var fYearOptions=[{label:"--- Select ---", value:"0"}];
 var makeBillDetailTable = function() {
 		var billDetailColumns = [ 
 			{key:"accounthead", label:'Account Head <span class="mandatory"/>',formatter:createLongTextFieldFormatter(VOUCHERDETAILLIST,".accounthead",VOUCHERDETAILTABLE)},				
-			{key:"glcode",label:'Account Code ', formatter:createTextFieldFormatter(VOUCHERDETAILLIST,".glcodeDetail","text",VOUCHERDETAILTABLE)},
+			//{key:"glcode",label:'Account Code ', formatter:createTextFieldFormatter(VOUCHERDETAILLIST,".glcodeDetail","text",VOUCHERDETAILTABLE)},
 			//{key:"rate", label:'Rate',formatter:createRateFieldFormatter(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()",VOUCHERDETAILTABLE)},
 			{key:"creditamount",label:'Amount (Rs.)', formatter:createAmountFieldFormatter(VOUCHERDETAILLIST,".creditAmountDetail","updateCreditAmount()",VOUCHERDETAILTABLE)},
 			{key:"financialYearId",label:'Financial Year <span class="mandatory"/>', formatter:createDropdownFormatterFYear(VOUCHERDETAILLIST,'<s:property value="%{currentFinancialYearId}"/>'),  dropdownOptions:fYearOptions},
@@ -615,7 +615,7 @@ function populateServiceType(selected){
     }
 	 </s:iterator>
 	 if(!isServiceTypeExist){
-		 //loadFinDetails(this);
+		 loadFinDetails(this);
 	 }
 }
 function addServiceTypeDropdown(tableId){
@@ -628,7 +628,7 @@ function addServiceTypeDropdown(tableId){
     cell2.className='bluebox';
     cell2.width="50%";
     cell1.innerHTML = '<s:text name="miscreceipt.service" /><span class="mandatory"/>';
-    cell2.innerHTML = '<select name="serviceId" id="serviceId" />';
+    cell2.innerHTML = '<select name="serviceId" id="serviceId" onchange="loadFinDetails(this)"/>';
 	document.getElementById('serviceId').options.length=0;
 	document.getElementById('serviceId').options[0]= new Option('--------Choose--------','0');
 
@@ -831,7 +831,7 @@ function addServiceTypeDropdown(tableId){
 		     If page is opened from inbox -->
 			<s:if test="%{model.id==null || (sourcePage=='inbox' && !hasActionMessages()) || (actionName=='CHALLAN_MODIFY' && hasErrors()) || (actionName=='CHALLAN_VALIDATE' && hasErrors())}" >
 			<s:iterator value="%{validActions}">
-				<s:submit type="submit" cssClass="buttonsubmit" value="%{description}" id="%{name}" name="actionButton" onclick="document.challan.actionName.value='%{name}';document.challan.action='challan-save.action'; return validate(this);"/>
+				<s:submit type="submit" cssClass="buttonsubmit" value="Save" id="%{name}" name="actionButton" onclick="document.challan.actionName.value='%{name}';document.challan.action='challan-save.action'; return validate(this);"/>
 		    </s:iterator>	
 	    </s:if>
 	   

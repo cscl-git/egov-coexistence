@@ -510,7 +510,7 @@ var totaldbamt=0,totalcramt=0;
         td.setAttribute('class','tdfortotal');
         td.className='tdfortotal';
         td.style.padding='4px 10px';
-        td.innerHTML="<input type='text' style='text-align:right;width:100px;align:center;height:auto;'  id='totalcramount' name='totalcramount' readonly='true' tabindex='-1'/>";
+        td.innerHTML="<input type='text' style='text-align:right;width:200px;height:34px;align:center;height:auto;'  id='totalcramount' name='totalcramount' readonly='true' tabindex='-1'/>";
         if(totalcramt>0){
             totalcramt=totalcramt;
         }
@@ -752,13 +752,13 @@ var totaldbamt=0,totalcramt=0;
                 <!-- <div class="highlight2" style="width:80px">DD/MM/YYYY</div> -->            
           </td>
             <td width="21%" class="bluebox"><s:text name="challan.narration"/></td>
-		    <td width="24%" class="bluebox"><s:textarea name="referenceDesc" id="referenceDesc" value="%{referenceDesc}" cols="18" rows="1" maxlength="125" onkeyup="return ismaxlength(this)"/></td>
+		    <td width="24%" class="bluebox"><s:textarea name="referenceDesc" id="referenceDesc" value="%{referenceDesc}" cols="18" rows="3" style="width:200px;" maxlength="125" onkeyup="return ismaxlength(this)"/></td>
           </tr>
 	       <tr> <td width="4%" class="bluebox2">&nbsp;</td>
 		   <td class="bluebox" width="21%"><s:text name="billreceipt.counter.paidby"/><span class="mandatory1">*</span></td>
 		   <td class="bluebox"><s:textfield label="paidBy" id="paidBy" maxlength="49" name="paidBy" value="%{payeeName}" /></td>
 		   <td width="21%" class="bluebox2"><s:text name="challan.payeeAddress"/></td>
-		   <td width="24%" class="bluebox2"><s:textarea name="payeeAddress" id="payeeAddress" value="%{payeeAddress}" cols="18" rows="1" maxlength="255" onkeyup="return ismaxlength(this)"/></td>
+		   <td width="24%" class="bluebox2"><s:textarea name="payeeAddress" id="payeeAddress" value="%{payeeAddress}" cols="18" rows="3" style="width:200px;" maxlength="255" onkeyup="return ismaxlength(this)"/></td>
 	    </tr>
 	  <tr> 
            <s:if test="%{shouldShowHeaderField('field')}">
