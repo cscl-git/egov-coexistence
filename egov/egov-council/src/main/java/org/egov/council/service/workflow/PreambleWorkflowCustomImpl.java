@@ -111,9 +111,9 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
 
         final User user = securityUtils.getCurrentUser();
 
-        EmployeeInfo info = null;
+        /*EmployeeInfo info = null;
         if (user != null && user.getId() != null)
-            info = microserviceUtils.getEmployeeById(user.getId());
+            info = microserviceUtils.getEmployeeById(user.getId());*/
         
         /*EmployeeInfo approverInfo = null;
         if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0))) {

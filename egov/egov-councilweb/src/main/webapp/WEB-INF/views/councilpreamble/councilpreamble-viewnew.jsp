@@ -190,7 +190,7 @@
 		</div>
 		
 	<div class="panel panel-primary" data-collapsed="0">
-			<jsp:include page="applicationhistory-view.jsp"></jsp:include>
+			<jsp:include page="../workflow/applicationhistory-view.jsp" />
 		</div>
 		<div class="text-center hide-close">
 			<div class="add-margin">

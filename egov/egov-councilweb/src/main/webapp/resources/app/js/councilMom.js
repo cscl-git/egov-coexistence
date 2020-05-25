@@ -87,7 +87,7 @@ function callAjaxSearch() {
 				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
 				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
 				"oTableTools" : {
-					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [{"sExtends" : "xls"},
 						           {"sExtends" :"pdf"},
 						           {"sExtends" : "print"}]
@@ -135,7 +135,6 @@ if($('#autoResolutionNoGenEnabled').val()=="true") {
 		  '<tr>'+
 				 '<td><select name="meetingMOMs[{{idx}}].preamble.department" class="form-control" required="required" > <option value="" >Loading...</option></select></td>'+
 				 '<td><div class="input-group"><textarea class="form-control textarea-content" required="required" name="meetingMOMs[{{idx}}].preamble.gistOfPreamble" maxlength="10000"  value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Sumoto Resolution - GIST of Sumoto Resolution"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'+
-				 '<td><input type="text" class="form-control text-left patternvalidation" name="meetingMOMs[{{idx}}].preamble.sanctionAmount" {{readonly}} data-pattern="number" value="{{amountTextBoxValue}}"/></td>'+
 				 '<td><select name="meetingMOMs[{{idx}}].resolutionStatus" class="form-control addorremoverequired" required="required"><option value="">Loading...</option></select></td>'+
 				 '<td><div class="input-group"><textarea class="form-control textarea-content addorremoverequired" required="required" name="meetingMOMs[{{idx}}].resolutionDetail" maxlength="5000" value="{{amountTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Sumoto Resolution - Resolution comments"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'+
 		'</tr>';
@@ -144,7 +143,6 @@ if($('#autoResolutionNoGenEnabled').val()=="true") {
 		  '<tr>'+
 				 '<td><select name="meetingMOMs[{{idx}}].preamble.department" class="form-control" required="required" > <option value="" >Loading...</option></select></td>'+
 				 '<td><div class="input-group"><textarea class="form-control textarea-content" required="required" name="meetingMOMs[{{idx}}].preamble.gistOfPreamble" maxlength="10000"  value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Sumoto Resolution - GIST of Sumoto Resolution"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'+
-				 '<td><input type="text" class="form-control text-left patternvalidation" name="meetingMOMs[{{idx}}].preamble.sanctionAmount" {{readonly}} data-pattern="number" value="{{amountTextBoxValue}}"/></td>'+
 				 '<td><select name="meetingMOMs[{{idx}}].resolutionStatus" class="form-control addorremoverequired" required="required"><option value="">Loading...</option></select></td>'+
 				 '<td><input type="text" class="form-control text-left patternvalidation validnum" required="required" name="meetingMOMs[{{idx}}].resolutionNumber" {{readonly}} value="{{resolutionnumberTextBoxValue}}"/></td>'+
 				 '<td><div class="input-group"><textarea class="form-control textarea-content addorremoverequired" required="required" name="meetingMOMs[{{idx}}].resolutionDetail" maxlength="5000" value="{{amountTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Sumoto Resolution - Resolution comments"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'+
@@ -182,7 +180,7 @@ function loadDepartmentlist(selectBoxName){
 			$('select[name="'+selectBoxName+'"]').empty();
 			$('select[name="'+selectBoxName+'"]').append($("<option value=''>Select </option>"));
 			$.each(response.departmentLists, function(index, departmentLists) {
-				$('select[name="'+selectBoxName+'"]').append($('<option>').val(departmentLists.id).text(departmentLists.name));
+				$('select[name="'+selectBoxName+'"]').append($('<option>').val(departmentLists.code).text(departmentLists.name));
 			});
 		}, 
 		error: function (response) {

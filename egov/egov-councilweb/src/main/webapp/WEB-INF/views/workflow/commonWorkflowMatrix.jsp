@@ -51,7 +51,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
 
-<c:if test="${wfNextAction !='Mayor approval pending'}" > 
+<c:if test="${nextAction != 'null' && !'END'.equalsIgnoreCase(nextAction)}" > 
 	<div class="panel panel-primary" data-collapsed="0" >				
 		<div class="panel-heading">
 			<div class="panel-title">
@@ -117,6 +117,10 @@
 			</div>
 		</div>				
 	</div>
+</c:if>
+<c:if test="${nextAction != 'null' && 'END'.equalsIgnoreCase(nextAction)}" >
+	<form:hidden path="" id="wfStatus" name="wfStatus" />
+	<form:hidden path="" id="workFlowAction" name="workFlowAction" />
 </c:if>
 
 <div class="row">

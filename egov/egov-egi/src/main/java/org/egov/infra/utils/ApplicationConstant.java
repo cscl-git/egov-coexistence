@@ -112,6 +112,11 @@ public final class ApplicationConstant {
     public static final String COMMA = ",";
     public static final String UNKNOWN = "Unknown";
 
+    public static final String DEPARTMENT_CACHE_NAME = "egi-department";
+    public static final String DESIGNATION_CACHE_NAME = "egi-designation";
+    public static final String MODULE_GENERIC="Generic";
+    public static final String MODULE_AGENDA="Agenda";
+    public static final String MODULE_FINANCE="Finance";
 
     private ApplicationConstant() {
     }

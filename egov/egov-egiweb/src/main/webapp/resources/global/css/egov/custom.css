@@ -188,7 +188,8 @@ label.error {
   border-color: #ff0000;
 }
 .modal {
-  z-index: 10001;
+  /* z-index: 10001; */
+  z-index: 9999999;
 }
 .add-border {
   border-bottom: 1px solid #ebebeb;

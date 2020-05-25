@@ -50,20 +50,18 @@ package org.egov.council.web.controller;
 
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_MODULENAME;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_APPROVED;
-import static org.egov.council.utils.constants.CouncilConstants.CHECK_BUDGET;
 import static org.egov.council.utils.constants.CouncilConstants.IMPLEMENTATIONSTATUS;
 import static org.egov.council.utils.constants.CouncilConstants.IMPLEMENTATION_STATUS_FINISHED;
 import static org.egov.council.utils.constants.CouncilConstants.MODULE_FULLNAME;
 import static org.egov.council.utils.constants.CouncilConstants.PREAMBLEUSEDINAGENDA;
 import static org.egov.council.utils.constants.CouncilConstants.PREAMBLE_MODULENAME;
-import static org.egov.council.utils.constants.CouncilConstants.REVENUE_HIERARCHY_TYPE;
-import static org.egov.council.utils.constants.CouncilConstants.WARD;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_INWORKFLOW;
 import static org.egov.infra.utils.JsonUtils.toJSON;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,17 +89,13 @@ import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.council.web.adaptor.CouncilPreambleJsonAdaptor;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
-import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
-import org.egov.infra.admin.master.service.AppConfigValueService;
-import org.egov.infra.admin.master.service.BoundaryService;
-import org.egov.infra.admin.master.service.DepartmentService;
-import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.utils.EgovMasterDataCaching;
@@ -162,17 +156,11 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     @Autowired
     private MessageSource messageSource;
     @Autowired
-    private DepartmentService deptService;
-    @Autowired
     private EgwStatusHibernateDAO egwStatusHibernateDAO;
     @Autowired
     private AutonumberServiceBeanResolver autonumberServiceBeanResolver;
     @Autowired
     private CouncilThirdPartyService councilThirdPartyService;
-    @Autowired
-    private BoundaryService boundaryService;
-    @Autowired
-    private AppConfigValueService appConfigValueService;
     @Autowired
     private BidderService bidderService;
     @Autowired
@@ -186,7 +174,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
-        return masterDataCache.get("egi-department");
+        return masterDataCache.get(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_AGENDA);
     }
 
     @ModelAttribute("wards")
@@ -335,6 +323,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     @RequestMapping(value = "/result/{id}", method = RequestMethod.GET)
     public String result(@PathVariable("id") final Long id, Model model) {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
+        updateDepartment(councilPreamble);
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
         model.addAttribute(APPLICATION_HISTORY,
                 councilThirdPartyService.getHistory(councilPreamble));
@@ -560,6 +549,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
     public String view(@PathVariable("id") final Long id, Model model) {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
+        updateDepartment(councilPreamble);
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
         model.addAttribute(APPLICATION_HISTORY,
                 councilThirdPartyService.getHistory(councilPreamble));
@@ -589,8 +579,12 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         } else {
             searchResultList = councilPreambleService.search(councilPreamble);
         }
+		
+        List<CouncilPreamble> finalResultList = new ArrayList<CouncilPreamble>(searchResultList);
+        updateDepartment(finalResultList);
+        
         return new StringBuilder("{\"data\":")
-                .append(toJSON(searchResultList, CouncilPreamble.class,
+                .append(toJSON(finalResultList, CouncilPreamble.class,
                         CouncilPreambleJsonAdaptor.class))
                 .append("}").toString();
     }
@@ -598,6 +592,34 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     public Boolean isAutoPreambleNoGenEnabled() {
         return councilPreambleService.autoGenerationModeEnabled(
                 MODULE_FULLNAME, PREAMBLE_NUMBER_AUTO);
+    }
+    
+    private void updateDepartment(CouncilPreamble councilPreamble) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	if(deptMap.containsKey(councilPreamble.getDepartment())) {
+    		councilPreamble.setDepartmentName(deptMap.get(councilPreamble.getDepartment()));
+		}
+    	if(CouncilConstants.PREAMBLEUSEDINAGENDA.equalsIgnoreCase(councilPreamble.getStatus().getCode())) {
+    		List<CouncilAgenda> councilAgendaList = councilAgendaService.findByAgendaNo(councilPreamble.getPreambleNumber());
+        	if(!CollectionUtils.isEmpty(councilAgendaList)) {
+        		councilPreamble.setDisplayStatus(councilAgendaList.get(0).getStatus());
+        	}
+    	}
+    }
+    
+    private void updateDepartment(List<CouncilPreamble> finalResultList) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	finalResultList.stream().forEach(council->{
+	    	if(deptMap.containsKey(council.getDepartment())) {
+	    		council.setDepartment(deptMap.get(council.getDepartment()));
+			}
+	    	if(CouncilConstants.PREAMBLEUSEDINAGENDA.equalsIgnoreCase(council.getStatus().getCode())) {
+	    		List<CouncilAgenda> councilAgendaList = councilAgendaService.findByAgendaNo(council.getPreambleNumber());
+	        	if(!CollectionUtils.isEmpty(councilAgendaList)) {
+	        		council.setStatus(councilAgendaList.get(0).getStatus());
+	        	}
+	    	}
+    	});
     }
 
 }

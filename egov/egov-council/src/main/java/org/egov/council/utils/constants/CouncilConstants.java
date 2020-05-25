@@ -77,6 +77,7 @@ public class CouncilConstants {
     public static final String MEETINGUSEDINRMOM = "MOM CREATED";
     public static final String MEETINGCANCELLED = "CANCELLED";
     public static final String MOM_STATUS_APPROVED = "APPROVED";
+    public static final String COUNCIL_MEETING_MODULE_NAME = "CouncilMeeting";
     public static final String RESOLUTION_STATUS_APPROVED = "APPROVED";
     public static final String RESOLUTION_STATUS_ADJURNED = "ADJOURNED";
     public static final String RESOLUTION_STATUS_SANCTIONED = "SANCTIONED";
@@ -110,6 +111,7 @@ public class CouncilConstants {
     public static final String WF_ANONYMOUSPREAMBLE_STATE = "PreambleCreated";
     public static final String COLON_CONCATE = "::";
     public static final String NATURE_OF_WORK = "Agenda";
+    public static final String NATURE_OF_WORK_MOM = "MoM";
     public static final String PREAMBLE_MODULE_TYPE = "COUNCILPREAMBLE";
     public static final String WF_APPROVE_BUTTON = "Approve";
     public static final String MEETINGSTATUSCREATED = "CREATED";

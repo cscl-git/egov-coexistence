@@ -104,9 +104,10 @@
 				</div>
 			</div>
 			<div class="panel-body custom">
-				<div class="view-content">
-					The length of the companies collection is :
-					${fn:length(councilMeeting.meetingMOMs)}<br> Agenda Number :
+				<div class="view-content agenda-no">
+					<%-- The length of the companies collection is :
+					${fn:length(councilMeeting.meetingMOMs)}<br>  --%>
+					Agenda Number :
 					${councilMeeting.meetingMOMs[0].agenda.agendaNumber}
 				</div>
 
@@ -263,7 +264,7 @@
 								class="mandatory"></span></th>
 							<th width="27%"><spring:message code="lbl.gist.sumoto" /><span
 								class="mandatory"></span></th>
-							<th width="15%"><spring:message code="lbl.amount" /></th>
+							<%-- <th width="15%"><spring:message code="lbl.amount" /></th> --%>
 							<th width="12%"><spring:message code="lbl.resolution" /><span
 								class="mandatory"></span></th>
 							<c:if test="${!autoResolutionNoGenEnabled}">
@@ -321,5 +322,8 @@
 <style>
 .morecontent span {
 	display: none;
+}
+.agenda-no{
+	padding-bottom: 10px;
 }
 </style>

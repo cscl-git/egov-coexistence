@@ -63,7 +63,6 @@ import static org.egov.council.utils.constants.CouncilConstants.RESOLUTION_APPRO
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,7 +74,6 @@ import javax.persistence.PersistenceContext;
 import org.apache.commons.lang3.ArrayUtils;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.PreambleNumberGenerator;
-import org.egov.council.entity.CouncilAgenda;
 import org.egov.council.entity.CouncilAgendaDetails;
 import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.MeetingAttendence;
@@ -84,9 +82,9 @@ import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.repository.CouncilMeetingRepository;
 import org.egov.council.repository.CouncilMoMRepository;
 import org.egov.council.repository.MeetingAttendanceRepository;
+import org.egov.council.service.workflow.MeetingMomWorkflowCustomImpl;
 import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.eis.service.EisCommonService;
-import org.egov.infra.admin.master.service.UserService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
@@ -94,6 +92,7 @@ import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infra.utils.StringUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
@@ -115,7 +114,8 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
     private CouncilMeetingRepository councilMeetingRepository;
     @Autowired
     private MeetingAttendanceRepository meetingAttendanceRepository;
-    
+    @Autowired
+    private MeetingMomWorkflowCustomImpl meetingMomWorkflowCustomImpl;
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
@@ -151,6 +151,23 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
         return councilMeetingRepository.save(councilMeeting);
     }
 
+    @Transactional
+    public CouncilMeeting update(final CouncilMeeting councilMeeting, Long approvalPosition, String approvalComment,
+            String workFlowAction) {
+    	 if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
+    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
+                     workFlowAction);
+    	
+    	 applyAuditing(councilMeeting);
+    	 for(MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
+    		if(null != meetingMOM.getPreamble()) {
+    			applyAuditing(meetingMOM.getPreamble());
+    		}
+    	 }
+    	 applyAuditing(councilMeeting.getState());
+    	 return councilMeetingRepository.save(councilMeeting);
+    }
+    
     @Transactional
     public CouncilMeeting update(final CouncilMeeting councilMeeting) {
     	applyAuditing(councilMeeting);

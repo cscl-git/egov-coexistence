@@ -96,7 +96,7 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     private static final String EXPENSE_BILL = "Expense Bill";
     private static final String WORKS_BILL = "Works Bill";
     private static final String WORKFLOW_MODULE_AGENDA="agenda";
-    private static final List<String> WORKFLOW_MODULE_AGENDA_TYPES = Arrays.asList("CouncilPreamble","MeetingMOM");
+    private static final List<String> WORKFLOW_MODULE_AGENDA_TYPES = Arrays.asList("CouncilPreamble","CouncilMeeting");
     private static final Logger LOG = LoggerFactory.getLogger(InboxRenderServiceDelegate.class);
     private static final String INBOX_RENDER_SERVICE_SUFFIX = "%sInboxRenderService";
     private static final Map<String, WorkflowTypes> WORKFLOW_TYPE_CACHE = new ConcurrentHashMap<>();

@@ -60,7 +60,7 @@
 		</div>
 	</div>
 	<div class="panel-body history-slide display-hide">
-		<div class="row add-margin hidden-xs visible-sm visible-md visible-lg header-color">
+		<!-- <div class="row add-margin hidden-xs visible-sm visible-md visible-lg header-color">
 			<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.date"/></div>
 			<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.updatedby"/></div>
 			<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.status" /></div>
@@ -98,7 +98,40 @@
 				<c:otherwise>
 					<div class="col-md-3 col-xs-6 add-margin">No history Present.</div>
 				</c:otherwise>
-			</c:choose>
+			</c:choose> -->
+			
+		<table class="table table-bordered" id="momdetails">
+			<thead>
+				<tr>
+					<th><spring:message code="lbl.date" /></th>
+					<th><spring:message code="lbl.updatedby" /></th>
+					<th><spring:message code="lbl.status" /></th>
+					<th><spring:message code="lbl.currentowner" /></th>
+					<th><spring:message code="lbl.department" /></th>
+					<th><spring:message code="lbl.comments" /></th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:choose>
+					<c:when test="${!applicationHistory.isEmpty()}">
+						<c:forEach items="${applicationHistory}" var="history">
+							<tr>
+								<td>
+									<fmt:formatDate value="${history.date}" var="historyDate"
+										pattern="dd-MM-yyyy HH:mm a E" />
+									<c:out value="${historyDate}" />
+								</td>
+								<td><c:out value="${history.updatedBy}" /></td>
+								<td><c:out value="${history.status}" /></td>
+								<td><c:out value="${history.user}" /></td>
+								<td><c:out value="${history.department}" /></td>
+								<td><c:out value="${history.comments}" /></td>
+							</tr>
+						</c:forEach>
+					</c:when>
+				</c:choose>
+			</tbody>
+		</table>
 	</div>
 <script>$('.slide-history-menu').click(function(){ 
 		$('.history-slide').slideToggle();

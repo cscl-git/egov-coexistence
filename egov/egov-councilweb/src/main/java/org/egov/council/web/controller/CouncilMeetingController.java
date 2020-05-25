@@ -382,7 +382,7 @@ public class CouncilMeetingController {
                 .toString();
     }
 
-    @RequestMapping(value = "/viewsmsemail", method = RequestMethod.GET)
+    @RequestMapping(value = "/viewsmsemail", method = RequestMethod.POST)
     public String retrieveSmsAndEmailDetailsForCouncilMeeting(final Model model) {
         CouncilMeeting councilMeeting = new CouncilMeeting();
         model.addAttribute(COUNCIL_MEETING, councilMeeting);

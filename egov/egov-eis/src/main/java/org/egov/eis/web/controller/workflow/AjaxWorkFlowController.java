@@ -74,6 +74,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -82,7 +83,7 @@ import java.util.stream.Collectors;
 @Controller
 public class AjaxWorkFlowController {
 
-	private static final String OBJECTTYPE_COUNCIL_PREAMBLE = "CouncilPreamble";
+	private static final List<String> WF_DEPT_DESG_MAP = Arrays.asList("CouncilPreamble","MeetingMOM","CouncilMeeting");
 	
     @Autowired
     private CustomizedWorkFlowService customizedWorkFlowService;
@@ -109,7 +110,7 @@ public class AjaxWorkFlowController {
 
     	List<Designation> designationList = new ArrayList<Designation>();
     	
-    	if(OBJECTTYPE_COUNCIL_PREAMBLE.equalsIgnoreCase(type)) {
+    	if(WF_DEPT_DESG_MAP.contains(type)) {
     		List<WorkFlowDeptDesgMap> deptDesgMap = null;
     		
     		if(!StringUtils.isBlank(additionalRule)) {

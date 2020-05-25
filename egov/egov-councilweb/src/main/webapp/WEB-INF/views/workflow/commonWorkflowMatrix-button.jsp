@@ -93,8 +93,8 @@
 						<c:out value="${validButtons}" /> 
 					</form:button>
 				</c:forEach>
-				
-				<c:if test="${currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState)}">
+				<c:if test="${(currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState))
+								|| (stateType!= 'null' && 'CouncilMeeting'.equalsIgnoreCase(stateType))}">
 					<input type="button" name="button2" id="button2" value="Close"
 					class="btn btn-default" onclick="window.close();" />
 				</c:if> 

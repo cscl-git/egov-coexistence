@@ -81,6 +81,7 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -260,7 +261,12 @@ public class CouncilPreambleService extends PersistenceService<CouncilPreamble, 
         if (councilPreamble.getFromDate() != null && councilPreamble.getToDate() != null) {
             criteria.add(Restrictions.between("councilPreamble.createdDate", councilPreamble.getFromDate(),
                     DateUtils.addDays(councilPreamble.getToDate(), 1)));
+        }else if (councilPreamble.getFromDate() != null && councilPreamble.getToDate() == null) {
+            criteria.add(Restrictions.ge("councilPreamble.createdDate", councilPreamble.getFromDate()));
+        }else if (councilPreamble.getFromDate() == null && councilPreamble.getToDate() != null) {
+            criteria.add(Restrictions.le("councilPreamble.createdDate", DateUtils.addDays(councilPreamble.getToDate(), 1)));
         }
+        
         if (councilPreamble.getPreambleNumber() != null)
             criteria.add(Restrictions.ilike("councilPreamble.preambleNumber", councilPreamble.getPreambleNumber(),
                     MatchMode.ANYWHERE));
@@ -274,7 +280,7 @@ public class CouncilPreambleService extends PersistenceService<CouncilPreamble, 
                 criteria.createAlias("councilPreamble.wards", "wards").add(Restrictions.in("wards.id", boundaryid));
 
         }
-
+        criteria.addOrder(Order.desc("councilPreamble.lastModifiedDate"));
         criteria.setResultTransformer(Criteria.DISTINCT_ROOT_ENTITY);
         return criteria;
     }

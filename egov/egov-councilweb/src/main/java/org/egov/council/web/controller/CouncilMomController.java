@@ -84,8 +84,10 @@ import org.egov.council.entity.CouncilDataResponse;
 import org.egov.council.entity.CouncilDataUpdateRequest;
 import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.CouncilMeetingType;
+import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.CouncilPreambleBidderDetails;
 import org.egov.council.entity.MeetingMOM;
+import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.service.BidderService;
 import org.egov.council.service.CommitteeTypeService;
 import org.egov.council.service.CouncilMeetingService;
@@ -93,19 +95,25 @@ import org.egov.council.service.CouncilMeetingTypeService;
 import org.egov.council.service.CouncilPreambleService;
 import org.egov.council.service.CouncilReportService;
 import org.egov.council.service.CouncilSmsAndEmailService;
+import org.egov.council.service.CouncilThirdPartyService;
 import org.egov.council.service.es.CouncilMeetingIndexService;
+import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.council.web.adaptor.CouncilDepartmentJsonAdaptor;
 import org.egov.council.web.adaptor.CouncilMeetingJsonAdaptor;
+import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.utils.FileUtils;
 import org.egov.infra.utils.StringUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.web.support.json.adapter.BoundaryAdapter;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -119,6 +127,7 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -128,7 +137,7 @@ import com.google.gson.reflect.TypeToken;
 
 @Controller
 @RequestMapping("/councilmom")
-public class CouncilMomController {
+public class CouncilMomController  extends GenericWorkFlowController{
     
     private static final String RESOLUTION_NUMBER_AUTO = "RESOLUTION_NUMBER_AUTO";
     private static final String MESSAGE = "message";
@@ -141,6 +150,14 @@ public class CouncilMomController {
     private static final String COUNCILMOM_VIEW = "councilmom-view";
     private static final String COMMONERRORPAGE = "common-error-page";
     private static final String APPLICATION_RTF = "application/rtf";
+    
+    private static final String COUNCIL_COMMON_WORKFLOW = "CouncilCommonWorkflow";
+    private static final String APPLICATION_HISTORY = "applicationHistory";
+    private static final String APPROVAL_POSITION = "approvalPosition";
+    private static final String WORK_FLOW_ACTION = "workFlowAction";
+    private static final String APPROVAL_COMENT = "approvalComent";
+    private static final String CURRENT_STATE = "currentState";
+    private static final String ADDITIONALRULE = "additionalRule";
 
     @Autowired
     private EgwStatusHibernateDAO egwStatusHibernateDAO;
@@ -155,9 +172,6 @@ public class CouncilMomController {
     private CouncilMeetingService councilMeetingService;
 
     @Autowired
-    private DepartmentService departmentService;
-
-    @Autowired
     private BoundaryService boundaryService;
 
     @Autowired
@@ -165,8 +179,6 @@ public class CouncilMomController {
 
     @Autowired
     private CouncilPreambleService councilPreambleService;
-    @Autowired
-    private BidderService bidderService;
 
     @Autowired
     private CouncilReportService councilReportService;
@@ -181,6 +193,10 @@ public class CouncilMomController {
     private FileStoreService fileStoreService;
     @Autowired
     private CouncilMeetingTypeService councilMeetingTypeService;
+    @Autowired
+    protected EgovMasterDataCaching masterDataCache;
+    @Autowired
+    private CouncilThirdPartyService councilThirdPartyService;
 
     @ModelAttribute("committeeType")
     public List<CommitteeType> getCommitteTypeList() {
@@ -221,9 +237,31 @@ public class CouncilMomController {
             sortMeetingMomByItemNumber(councilMeeting);
             model.addAttribute("autoResolutionNoGenEnabled", isAutoResolutionNoGenEnabled());
             model.addAttribute(COUNCIL_MEETING, councilMeeting);
+            if(null == councilMeeting.getState()) {
+	            model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+	            model.addAttribute(CURRENT_STATE, "NEW");
+            }else {
+            	model.addAttribute(CURRENT_STATE, councilMeeting.getCurrentState()
+                        .getValue());
+            	if(CouncilConstants.REJECTED.equalsIgnoreCase(councilMeeting.getStatus().getCode())){
+                    model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+                }
+            	
+            	model.addAttribute(APPLICATION_HISTORY,
+                        councilThirdPartyService.getHistory(councilMeeting));
+            	model.addAttribute("wfNextAction", councilMeeting.getState().getNextAction());
+            }
+            prepareWorkFlowOnLoad(model, councilMeeting);
         }
         return COUNCILMOM_NEW;
     }
+    
+    private void prepareWorkFlowOnLoad(final Model model,
+            CouncilMeeting councilMeeting) {
+		model.addAttribute("stateType", councilMeeting.getClass().getSimpleName());
+		WorkflowContainer workFlowContainer = new WorkflowContainer();
+		prepareWorkflow(model, councilMeeting, workFlowContainer, true);
+	}
 
     private void sortMeetingMomByItemNumber(CouncilMeeting councilMeeting) {
         councilMeeting.getMeetingMOMs().sort(
@@ -235,33 +273,41 @@ public class CouncilMomController {
     public String update(
             @Valid @ModelAttribute final CouncilMeeting councilMeeting,
             final BindingResult errors, final Model model,
-            final RedirectAttributes redirectAttrs,final HttpServletRequest request) {
+            final RedirectAttributes redirectAttrs,final HttpServletRequest request,
+            @RequestParam String workFlowAction) {
         if (errors.hasErrors()) {
+        	prepareWorkFlowOnLoad(model, councilMeeting);
+        	if(null == councilMeeting.getCurrentState()) {
+        		model.addAttribute(CURRENT_STATE, "NEW");
+        	}else {
+        		model.addAttribute(CURRENT_STATE, councilMeeting
+                    .getCurrentState().getValue());
+        	}
             return COUNCILMEETING_EDIT;
         }
-        String biddersId = request.getParameter("councilBidderHdn");
+        /*String biddersId = request.getParameter("councilBidderHdn");
         if (StringUtils.isNotEmpty(biddersId)) {
-        String[] bidderId = biddersId.split(",");
-
-        ArrayList<CouncilPreambleBidderDetails> bidderlist = new ArrayList<>();
-        ArrayList<CouncilPreambleBidderDetails> existingBidderlist = new ArrayList<>();
-        for (String bidder : bidderId) {
-            if (bidder != null && !bidder.isEmpty())
-                bidderlist.add(bidderService.getBidderDetailsbyId(Long.valueOf(bidder)));
-        }
-        for (MeetingMOM mom : councilMeeting.getMeetingMOMs()) {
-            for (CouncilPreambleBidderDetails bidders : mom.getPreamble().getBidderDetails()) {
-                existingBidderlist.add(bidders);
-            }
-        }
-        existingBidderlist.removeAll(bidderlist);
-        for (CouncilPreambleBidderDetails selectedBidder : bidderlist) {
-            selectedBidder.setIsAwarded(true);
-        }
-        for (CouncilPreambleBidderDetails rejectedBidder : existingBidderlist) {
-            rejectedBidder.setIsAwarded(false);
-        }
-        }
+	        String[] bidderId = biddersId.split(",");
+	
+	        ArrayList<CouncilPreambleBidderDetails> bidderlist = new ArrayList<>();
+	        ArrayList<CouncilPreambleBidderDetails> existingBidderlist = new ArrayList<>();
+	        for (String bidder : bidderId) {
+	            if (bidder != null && !bidder.isEmpty())
+	                bidderlist.add(bidderService.getBidderDetailsbyId(Long.valueOf(bidder)));
+	        }
+	        for (MeetingMOM mom : councilMeeting.getMeetingMOMs()) {
+	            for (CouncilPreambleBidderDetails bidders : mom.getPreamble().getBidderDetails()) {
+	                existingBidderlist.add(bidders);
+	            }
+	        }
+	        existingBidderlist.removeAll(bidderlist);
+	        for (CouncilPreambleBidderDetails selectedBidder : bidderlist) {
+	            selectedBidder.setIsAwarded(true);
+	        }
+	        for (CouncilPreambleBidderDetails rejectedBidder : existingBidderlist) {
+	            rejectedBidder.setIsAwarded(false);
+	        }
+        }*/
         
         EgwStatus preambleResolutionApprovedStatus = egwStatusHibernateDAO.getStatusByModuleAndCode(PREAMBLE_MODULENAME,
                 RESOLUTION_APPROVED_PREAMBLE);
@@ -282,16 +328,62 @@ public class CouncilMomController {
 
             }
         }
-        councilMeeting
-                .setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
-                        MEETING_MODULENAME, MEETINGUSEDINRMOM));
+        
+        Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approverName = "";
+        String nextDesignation = "";
+        String message = StringUtils.EMPTY;
+        
+        if (request.getParameter(APPROVAL_COMENT) != null)
+            approvalComment = request.getParameter(APPROVAL_COMENT);
+        if (request.getParameter(WORK_FLOW_ACTION) != null)
+            workFlowAction = request.getParameter(WORK_FLOW_ACTION);
+        if (request.getParameter("approverName") != null)
+            approverName = request.getParameter("approverName");
+        if (request.getParameter("nextDesignation") != null)
+            nextDesignation = request.getParameter("nextDesignation");
+        if (request.getParameter(APPROVAL_POSITION) != null
+                && !request.getParameter(APPROVAL_POSITION).isEmpty())
+            approvalPosition = Long.valueOf(request
+                    .getParameter(APPROVAL_POSITION));
+        
         if (councilMeeting.getFiles() != null && councilMeeting.getFiles().length > 0) {
             councilMeeting.setSupportDocs(councilMeetingService.addToFileStore(councilMeeting.getFiles()));
         }
-        councilMeetingService.update(councilMeeting);
-
-        redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage(
-                "msg.councilMeeting.success", null, null));
+        councilMeetingService.update(councilMeeting, approvalPosition,
+                approvalComment, workFlowAction);
+        
+        if (null != workFlowAction 
+        		&& CouncilConstants.WF_APPROVE_BUTTON.equalsIgnoreCase(workFlowAction)) {
+        	councilMeeting
+                .setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
+                        MEETING_MODULENAME, MEETINGUSEDINRMOM));
+        	councilMeetingService.update(councilMeeting);
+        }
+        
+        if (null != workFlowAction) {
+            if (CouncilConstants.WF_STATE_REJECT
+                    .equalsIgnoreCase(workFlowAction)) {
+                message = getMessage("msg.meetingmom.reject",nextDesignation,approverName,
+                		councilMeeting);
+            } else if (CouncilConstants.WF_APPROVE_BUTTON
+                    .equalsIgnoreCase(workFlowAction)) {
+                message = getMessage("msg.meetingmom.success",nextDesignation,approverName,
+                		councilMeeting);
+            } else if (CouncilConstants.WF_FORWARD_BUTTON
+                    .equalsIgnoreCase(workFlowAction)) {
+            	if(null != councilMeeting.getStatus() && CouncilConstants.CREATED.equalsIgnoreCase(councilMeeting.getStatus().getCode())) {
+                    message = getMessage("msg.meetingmom.create",nextDesignation,approverName,
+                            		councilMeeting);      
+            	}else {
+            		message = getMessage("msg.meetingmom.forward",nextDesignation,approverName,
+                		councilMeeting);
+            	}
+            }
+            redirectAttrs.addFlashAttribute(MESSAGE, message);
+        }
+        
         return "redirect:/councilmom/result/" + councilMeeting.getId();
     }
 
@@ -356,7 +448,8 @@ public class CouncilMomController {
     @RequestMapping(value = "/departmentlist", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
     public String ajaxsearch(@ModelAttribute final CouncilMeeting councilMeeting) {
-        List<Department> departmentList = departmentService.getAllDepartments();
+        //List<Department> departmentList = departmentService.getAllDepartments();
+    	List<Department> departmentList = masterDataCache.get(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_AGENDA);
         return new StringBuilder("{ \"departmentLists\":")
                 .append(toJSON(departmentList, Department.class,
                         CouncilDepartmentJsonAdaptor.class))
@@ -501,4 +594,12 @@ public class CouncilMomController {
         return councilPreambleService.autoGenerationModeEnabled(
                 MODULE_FULLNAME, RESOLUTION_NUMBER_AUTO);
     }
+    
+    private String getMessage(String messageLabel,String designation,String approver,
+            final CouncilMeeting councilMeeting) {
+		String message;
+		message = messageSource.getMessage(messageLabel,
+									new String[] { councilMeeting.getMeetingNumber() ,approver.concat("~").concat(designation) }, null);
+		return message;
+	}
 }

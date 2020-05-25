@@ -70,14 +70,23 @@
 						<spring:message code="lbl.status" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.status.code}</div>
+						<c:choose>
+							<c:when test="${councilPreamble.displayStatus != null}">
+								${councilPreamble.displayStatus.description}
+							</c:when>
+							<c:otherwise>
+								${councilPreamble.status.description}
+							</c:otherwise>
+						</c:choose>
+					</div>
 				</div>
 				<div class="row add-border">
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.department" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.department}</div>
+						${councilPreamble.departmentName}
+					</div>
 					
 					<!-- <div class="col-xs-3 add-margin">
 						<spring:message code="lbl.amount" />
@@ -135,7 +144,7 @@
 
 		</div>
 		<div class="panel panel-primary" data-collapsed="0">
-			<jsp:include page="applicationhistory-view.jsp"></jsp:include>
+			<jsp:include page="../workflow/applicationhistory-view.jsp" />
 		</div>
 
 		<c:if test="${not councilPreamble.meetingMOMs.isEmpty()}">
