@@ -167,9 +167,9 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
         applyAuditing(legalcase);
         final LegalCase savedCaAndPwr = legalCaseRepository.save(legalcase);
         persistLegalCaseIndex(legalcase, null, null, null, null);
-        legalCaseSmsService.sendSmsToOfficerInchargeForCounterAffidavit(legalcase.getCounterAffidavits());
-        legalCaseSmsService.sendSmsToOfficerInchargeForPWR(legalcase.getPwrList());
-        legalCaseSmsService.sendSmsToStandingCounselForCounterAffidavit(legalcase.getCounterAffidavits());
+        //legalCaseSmsService.sendSmsToOfficerInchargeForCounterAffidavit(legalcase.getCounterAffidavits());
+        //legalCaseSmsService.sendSmsToOfficerInchargeForPWR(legalcase.getPwrList());
+        //legalCaseSmsService.sendSmsToStandingCounselForCounterAffidavit(legalcase.getCounterAffidavits());
         final List<PwrDocuments> documentDetails = getPwrDocumentDetails(savedCaAndPwr, files);
         if (!documentDetails.isEmpty()) {
             savedCaAndPwr.getPwrList().get(0).setPwrDocuments(documentDetails);

@@ -66,9 +66,6 @@
 				class="btn btn-default" value="Save">
 				<spring:message code="lbl.save" />
 			</form:button>
-			<form:button type="button" class="btn btn-default" id="btnclose">
-				<spring:message code="lbl.close" />
-			</form:button>
 		</div>
 	</div>
 </form:form>

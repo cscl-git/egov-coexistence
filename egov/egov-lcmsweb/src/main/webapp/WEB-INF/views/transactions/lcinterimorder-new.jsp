@@ -72,11 +72,7 @@
 				value="Save">
 				<spring:message code="lbl.submit" />
 			</button>
-			<button type='button' class='btn btn-default' id="btnclose">
-				<spring:message code='lbl.close' />
-			</button>
-			 <button type="button" class="btn btn-default" id="buttonBack" onclick="goback()"><spring:message code="lbl.back"/></button>
-
+			<button type="button" class="btn btn-default" id="buttonBack" onclick="goback()"><spring:message code="lbl.back"/></button>
 		</div>
 	</div>
 </form:form>

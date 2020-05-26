@@ -11,7 +11,7 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label text-right"><spring:message
 							code="lbl.title" /> :<span class="mandatory"></span> </label>
-					<div class="col-sm-10 add-margin">
+					<div class="col-sm-8 add-margin">
 						<form:input class="form-control patternvalidation" maxlength="255" id="title"
 							path="title" data-pattern="address" required="required"/>
 						<form:errors path="title" cssClass="add-margin error-msg" />

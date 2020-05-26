@@ -60,7 +60,7 @@
 
 				<c:if test="${mode =='create'}">
 					<div class="panel-heading">
-						<div class="panel-title">Judgment</div>
+						<div class="panel-title">Create Judgment</div>
 					</div>
 				</c:if>
 

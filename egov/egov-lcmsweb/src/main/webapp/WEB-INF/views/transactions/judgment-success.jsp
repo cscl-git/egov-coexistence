@@ -202,11 +202,6 @@
 		</div>
 		</div>
 		 <jsp:include page="judgmentdocuments-view.jsp"/> 
-		<div class="row text-center">
-			<div class="add-margin">
-				<a href="javascript:void(0)" class="btn btn-default"
-					onclick="self.close()">Close</a>
-			</div>
-		</div>
+		
 		
 </form:form>

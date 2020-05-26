@@ -125,13 +125,11 @@
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.casenumber" /><span class="mandatory"></span>:</label>
-	<div class="col-sm-2 add-margin text-center">
-		<form:input class="form-control patternvalidation"
-			data-pattern="number" maxlength="50" id="caseNumber"
-			required="required" path="caseNumber" /></div>
-	<div class="col-sm-1 add-margin text-center">
-		<form:select path="wpYear" data-first-option="false" id="wpYear"
-			cssClass="form-control">
+	<div class="col-sm-3 add-margin text-left">
+		<form:input class="form-control patternvalidation" data-pattern="number" maxlength="50" id="caseNumber"
+					required="required" path="caseNumber" style="width: 59%;display: inline;"/>
+		<form:select path="wpYear" data-first-option="false" id="wpYear" cssClass="form-control"
+					 style="width: 35%;display: inline;">
 			<form:option value="">
 				<spring:message code="lbls.select" />
 			</form:option>
@@ -167,8 +165,7 @@
 				code="lbl.previouscaseNumber" /><span class="mandatory"></span>:</label>
 		<div class="col-sm-3 add-margin" id="personsdiv">
 			<form:input class="form-control patternvalidation"
-				placeholder="InCase of appeal,review petition"
-				data-pattern="alphanumericwithspecialcharacters" maxlength="50"
+				data-pattern="number" maxlength="20"
 				id="appealNum" path="appealNum" />
 			<form:errors path="appealNum" cssClass="add-margin error-msg" />
 		</div>
