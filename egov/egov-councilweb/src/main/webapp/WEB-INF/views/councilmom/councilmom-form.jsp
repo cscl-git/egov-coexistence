@@ -141,7 +141,7 @@
 											name="meetingMOMs[${counter.index}].itemNumber"
 											value="${mom.itemNumber}" />
 										</td>
-										<td><c:out value="${mom.preamble.department}" /></td>
+										<td><c:out value="${mom.preamble.departmentName}" /></td>
 										<td><c:out value="${mom.preamble.preambleNumber}" /></td>
 										<td><span class="more"><c:out
 													value="${mom.preamble.gistOfPreamble}"/><br>

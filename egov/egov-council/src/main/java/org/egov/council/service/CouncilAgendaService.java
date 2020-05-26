@@ -65,6 +65,7 @@ import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -151,10 +152,15 @@ public class CouncilAgendaService extends PersistenceService<CouncilAgenda, Long
             criteria.add(Restrictions.eq("committeeType", councilAgenda.getCommitteeType()));
     if (councilAgenda.getFromDate() != null && councilAgenda.getToDate() != null) {
         criteria.add(Restrictions.between("councilAgenda.createdDate", councilAgenda.getFromDate(),DateUtils.addDays(councilAgenda.getToDate(),1)));
+    }else if (councilAgenda.getFromDate() != null && councilAgenda.getToDate() == null) {
+        criteria.add(Restrictions.ge("councilAgenda.createdDate", councilAgenda.getFromDate()));
+    }else if (councilAgenda.getFromDate() == null && councilAgenda.getToDate() != null) {
+        criteria.add(Restrictions.le("councilAgenda.createdDate", DateUtils.addDays(councilAgenda.getToDate(), 1)));
     }
     if (null != councilAgenda.getAgendaNumber())
         criteria.add(Restrictions.ilike("councilAgenda.agendaNumber", councilAgenda.getAgendaNumber(),MatchMode.ANYWHERE));
 
+    criteria.addOrder(Order.desc("councilAgenda.lastModifiedDate"));
     return criteria;
     }
 

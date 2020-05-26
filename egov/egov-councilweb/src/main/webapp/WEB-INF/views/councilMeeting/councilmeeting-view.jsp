@@ -159,7 +159,7 @@
 									varStatus="counter">
 									<tr>
 										<td class="text-center">${mom.itemNumber}</td>
-										<td><c:out value="${mom.preamble.department}" /></td>
+										<td><c:out value="${mom.preamble.departmentName}" /></td>
 										<td class="text-center"><c:out value="${mom.agenda.agendaNumber}" /></td>
 										<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
 										<td><span class="more"><c:out

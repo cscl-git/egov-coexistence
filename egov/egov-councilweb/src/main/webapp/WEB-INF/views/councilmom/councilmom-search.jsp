@@ -127,11 +127,12 @@
 			id="resultTable">
 			<thead>
 				<tr>
+					<th><spring:message code="lbl.serial.no" /></th>
 					<th><spring:message code="lbl.meeting.type" /></th>
 					<th><spring:message code="lbl.meeting.number" /></th>
-					<th><spring:message code="lbl.meeting.date" />
-					<th><spring:message code="lbl.meeting.place" /></th>
+					<th><spring:message code="lbl.meeting.date" /></th>
 					<th><spring:message code="lbl.meeting.time" /></th>
+					<th><spring:message code="lbl.meeting.place" /></th>
 					<th><spring:message code="lbl.view" /></th>
 					<th>&nbsp;</th>
 				</tr>

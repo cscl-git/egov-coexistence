@@ -67,7 +67,9 @@
 			id="resultTable">
 			<thead>
 				<tr>
-					<th><spring:message code="lbl.meeting.date" />
+					<th><spring:message code="lbl.serial.no" /></th>
+					<th><spring:message code="lbl.meeting.number" /></th>
+					<th><spring:message code="lbl.meeting.date" /></th>
 					<th><spring:message code="lbl.meeting.type" /></th>
 					<th><spring:message code="lbl.total.committe.members" /></th>
 					<th><spring:message code="lbl.no.commit.mem.present" /></th>

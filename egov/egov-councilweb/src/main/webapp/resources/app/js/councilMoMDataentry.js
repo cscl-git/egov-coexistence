@@ -55,7 +55,7 @@ String.prototype.compose = (function (){
 	   }
 }());
 
-var emptyRow = '<tr><td colspan="9" id="emptyRow" class="text-center">No preamble item available</td></tr>';
+var emptyRow = '<tr><td colspan="9" id="emptyRow" class="text-center">No agenda item available</td></tr>';
 var tbody = $('#preambleTable').children('tbody');
 //var table = tbody.find('tr').length == 0 ? $('#preambleTable tbody').append(emptyRow) : $('#preambleTable');
 var table = tbody.length ? tbody : $('#preambleTable');
@@ -68,7 +68,6 @@ if ($('#autoPreambleNoGenEnabled').val() == "true") {
 			+ '<td><div class="input-group"><textarea class="form-control textarea-content" required="required" name="meeting.meetingMOMs[{{idx}}].preamble.gistOfPreamble" maxlength="10000"  value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Preamble - GIST of Preamble"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'
 			+ '<td><input type="text" class="form-control text-left patternvalidation validnum" required="required" name="meeting.meetingMOMs[{{idx}}].resolutionNumber" {{readonly}}  value="{{resolutionNumberTextBoxValue}}"/></td>'
 			+ '<td><div class="input-group"><textarea class="form-control textarea-content addorremoverequired" required="required" name="meeting.meetingMOMs[{{idx}}].resolutionDetail" maxlength="5000" value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Preamble Resolution - Resolution comments"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'
-			+ '<td><input type="text" class="form-control text-left patternvalidation text-right" name="meeting.meetingMOMs[{{idx}}].preamble.sanctionAmount" {{readonly}} onkeypress="return ((event.keyCode == 8 ||event.charCode == 8) || (event.charCode >= 48 && event.charCode <= 57))" value="{{amountTextBoxValue}}"/></td>'
 			+ '<td><select name="meeting.meetingMOMs[{{idx}}].resolutionStatus" class="form-control addorremoverequired" required="required"><option value="">Loading...</option></select></td>'
 			+ '<td></a>&nbsp;<button type="button" class="fa fa-trash-o delete" style="font-size:20px;color:red" ></button></td>'
 			+ '</tr>';
@@ -80,7 +79,6 @@ if ($('#autoPreambleNoGenEnabled').val() == "true") {
 			+ '<td><div class="input-group"><textarea class="form-control textarea-content" required="required" name="meeting.meetingMOMs[{{idx}}].preamble.gistOfPreamble" maxlength="10000"  value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Preamble - GIST of Preamble"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'
 			+ '<td><input type="text" class="form-control text-left patternvalidation validnum" required="required" name="meeting.meetingMOMs[{{idx}}].resolutionNumber" {{readonly}}  value="{{resolutionNumberTextBoxValue}}"/></td>'
 			+ '<td><div class="input-group"><textarea class="form-control textarea-content addorremoverequired" required="required" name="meeting.meetingMOMs[{{idx}}].resolutionDetail" maxlength="5000" value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Preamble Resolution - Resolution comments"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'
-			+ '<td><input type="text" class="form-control text-left patternvalidation text-right" name="meeting.meetingMOMs[{{idx}}].preamble.sanctionAmount" {{readonly}} onkeypress="return ((event.keyCode == 8 ||event.charCode == 8) || (event.charCode >= 48 && event.charCode <= 57))" value="{{amountTextBoxValue}}"/></td>'
 			+ '<td><select name="meeting.meetingMOMs[{{idx}}].resolutionStatus" class="form-control addorremoverequired" required="required"><option value="">Loading...</option></select></td>'
 			+ '<td></a>&nbsp;<button type="button" class="fa fa-trash-o delete" style="font-size:20px;color:red" ></button></td>'
 			+ '</tr>';
@@ -130,7 +128,7 @@ function validateUniquePreambleNumber(idx, preambleNo) {
 							if (preambleNum && preambleNum === preambleNo) {
 								$('#preambleTable tbody tr:eq(' + idx + ')')
 										.find('.numberval').val('');
-								bootbox.alert("Duplicate Preamble Number.Please enter different Preamble number");
+								bootbox.alert("Duplicate Agenda Number.Please enter different Agenda number");
 								return false;
 							}
 						});
@@ -302,12 +300,12 @@ $('#buttonSubmit').click(function(e) {
 	validateMeetingNumber();
 	var nonUniqueAgenda=validateAgendaNumber($('#agendaNumber').val());
 	if($('#emptyRow').length){
-		bootbox.alert("Atleast one preamble item should be added into agenda");
+		bootbox.alert("Atleast one agenda item should be added into agenda");
 		e.preventDefault();
 	}
 	var tbody = $("#preambleTable tbody");
 	 if(tbody.children().length == 0) {
-		bootbox.alert("Atleast one preamble item should be added into agenda to proceed");
+		bootbox.alert("Atleast one agenda item should be added into agenda to proceed");
 		e.preventDefault();
 	}
 	 if($('#agendaNumber').val()!=""){

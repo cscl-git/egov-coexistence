@@ -142,17 +142,17 @@ function callAjaxSearch() {
 							{
 								"sExtends" : "xls",
 								"mColumns": [0,1,2,3,4,5,6,7],
-								"sTitle" : "Council Preamble wardwise Report"
+								"sTitle" : "Agenda Report"
 							},
 							{
 								"sExtends" : "pdf",
 								"mColumns": [0,1,2,3,4,5,6,7],
 								"sPdfMessage" : "Report generated on "
 										+ currentDate + "",
-								"sTitle" : "Council Preamble wardwise Report"
+								"sTitle" : "Agenda Report"
 							}, {
 								"sExtends" : "print",
-								"sTitle" : "Council Preamble wardwise Report"
+								"sTitle" : "Agenda Report"
 							} ]
 				},
 				"aaSorting" : [],
@@ -163,13 +163,7 @@ function callAjaxSearch() {
 				    },
 					"sClass" : "text-left"
 				}, {
-					"data" : "ward","width": "30%",
-					"sClass" : "text-left"
-				}, {
 					"data" : "department", 
-					"sClass" : "text-left"
-				}, {
-					"data" : "preambleType",
 					"sClass" : "text-left"
 				}, {
 					"data" : "gistOfPreamble", "width": "40%",
@@ -177,9 +171,6 @@ function callAjaxSearch() {
 				}, {
 					"data" : "createdDate",
 					"sClass" : "text-left"
-				}, {
-					"data" : "preambleUsedInAgenda",
-					"sClass" : "text-center"
 				}, {
 					"data" : "meetingDate",
 					"sClass" : "text-left"

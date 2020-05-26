@@ -48,16 +48,20 @@
 
 package org.egov.council.web.controller;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.egov.council.entity.CommitteeType;
+import org.egov.council.entity.CouncilAgenda;
 import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.es.CouncilMeetingDetailsSearchRequest;
 import org.egov.council.entity.es.CouncilMeetingDetailsSearchResult;
 import org.egov.council.entity.es.CouncilMeetingIndex;
 import org.egov.council.service.CommitteeTypeService;
+import org.egov.council.service.CouncilAgendaService;
 import org.egov.council.service.CouncilMeetingService;
 import org.egov.council.service.CouncilPreambleService;
 import org.egov.council.service.es.CouncilMeetingIndexService;
+import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.council.web.adaptor.CouncilMeetingDetailsReportJsonAdaptor;
 import org.egov.council.web.adaptor.CouncilPreambleJsonAdaptor;
 import org.egov.infra.admin.master.entity.Boundary;
@@ -67,6 +71,8 @@ import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.utils.ApplicationConstant;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
@@ -82,6 +88,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static org.egov.council.utils.constants.CouncilConstants.REVENUE_HIERARCHY_TYPE;
 import static org.egov.council.utils.constants.CouncilConstants.WARD;
@@ -105,10 +112,13 @@ public class CouncilReportsController {
 	@Autowired
 	private CouncilMeetingIndexService councilMeetingIndexService;
 	@Autowired
-        private CommitteeTypeService committeeTypeService;
-	
+    private CommitteeTypeService committeeTypeService;
+	@Autowired
+    protected EgovMasterDataCaching masterDataCache;	
 	@Autowired
 	private CouncilMeetingService councilMeetingService;
+	@Autowired
+	private CouncilAgendaService councilAgendaService;
 	
 	@ModelAttribute("committeeType") public List<CommitteeType> getCommitteTypeList() {
             return committeeTypeService.getActiveCommiteeType();
@@ -122,7 +132,7 @@ public class CouncilReportsController {
 		return boundaryService.getActiveBoundariesByBndryTypeNameAndHierarchyTypeName(WARD, REVENUE_HIERARCHY_TYPE);
 	}
 
-	@RequestMapping(value = "/preamblewardwise/search", method = RequestMethod.GET)
+	@RequestMapping(value = "/preamblewardwise/search", method = RequestMethod.POST)
 	public String getSearchView(Model model) {
 		model.addAttribute("councilPreamble", new CouncilPreamble());
 		return COUNCILPREAMBLE_WARDWISE_SEARCH;
@@ -136,12 +146,13 @@ public class CouncilReportsController {
 		}
 		List<CouncilPreamble> searchResultList = councilPreambleService
 				.searchPreambleForWardwiseReport(councilPreamble);
+		updateDepartment(searchResultList);
 		return  new StringBuilder("{\"data\":")
                         .append(toJSON(searchResultList, CouncilPreamble.class, CouncilPreambleJsonAdaptor.class)).append("}")
                         .toString();
 	}
 	
-    @RequestMapping(value = "/meetingdetails/search", method = RequestMethod.GET)
+    @RequestMapping(value = "/meetingdetails/search", method = RequestMethod.POST)
     public String getMeetingDetails(Model model) {
             model.addAttribute("searchRequest", new CouncilMeetingDetailsSearchRequest());
             return COUNCILMEETING_DETAILS_SEARCH;
@@ -186,5 +197,20 @@ public class CouncilReportsController {
         return  new StringBuilder("{\"data\":")
                 .append(toJSON(searchResultFomatted, CouncilMeetingDetailsSearchResult.class, CouncilMeetingDetailsReportJsonAdaptor.class)).append("}")
                 .toString();
+    }
+    
+    private void updateDepartment(List<CouncilPreamble> finalResultList) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	finalResultList.stream().forEach(council->{
+	    	if(deptMap.containsKey(council.getDepartment())) {
+	    		council.setDepartment(deptMap.get(council.getDepartment()));
+			}
+	    	if(CouncilConstants.PREAMBLEUSEDINAGENDA.equalsIgnoreCase(council.getStatus().getCode())) {
+	    		List<CouncilAgenda> councilAgendaList = councilAgendaService.findByAgendaNo(council.getPreambleNumber());
+	        	if(!CollectionUtils.isEmpty(councilAgendaList)) {
+	        		council.setStatus(councilAgendaList.get(0).getStatus());
+	        	}
+	    	}
+    	});
     }
 }

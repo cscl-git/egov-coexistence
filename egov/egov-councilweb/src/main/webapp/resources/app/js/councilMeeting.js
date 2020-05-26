@@ -99,56 +99,64 @@ function callAjaxSearch() {
 						           {"sExtends" : "print"}]
 				},
 				aaSorting: [],				
-				columns : [ { 
-"data" : "meetingType", "sClass" : "text-left"} ,{ 
-"data" : "meetingNumber", "sClass" : "text-left"} ,{ 
-"data" : "meetingDate", "sClass" : "text-left"},{
-"data" : "meetingLocation", "sClass" : "text-left"},{
-"data" : "meetingTime", "sClass" : "text-left"},{
-"data" : "meetingStatus", "sClass" : "text-left", "title": "Meeting Status"}
-,{ "data" : null, "target":-1, "sClass" : "text-left", "title": "Action",
-	
-    sortable: false,
-    "render": function ( data, type, row, meta ) {
-        var mode = $('#mode').val();
-        if(mode == 'edit'){
-          	 return '<button type="button" class="btn btn-xs btn-secondary edit"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit</button>';
-        }else{
-        	 if(row.meetingStatus=="MOM FINALISED"){
-        		 return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>&nbsp;&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMom"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Resolution</button>';
-        	 }else        	
-          	     return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>';
-         }
-    }
-}
-,{ "data": "id", "visible":false }
-]				
-			});
+				columns : [ 
+						{
+							 "data":null,
+							 "sClass" : "text-center",
+				        	   render: function (data, type, row, meta) {
+				        	        return meta.row + meta.settings._iDisplayStart + 1;
+			                },   
+				        },
+						{ 
+						"data" : "meetingType", "sClass" : "text-left"} ,{ 
+						"data" : "meetingNumber", "sClass" : "text-left"} ,{ 
+						"data" : "meetingDate", "sClass" : "text-left"},{
+						"data" : "meetingTime", "sClass" : "text-left"},{
+						"data" : "meetingLocation", "sClass" : "text-left"},{
+						"data" : "meetingStatus", "sClass" : "text-left", "title": "Meeting Status"}
+						,{ "data" : null, "target":-1, "sClass" : "text-left", "title": "Action",
+							
+						    sortable: false,
+						    "render": function ( data, type, row, meta ) {
+						        var mode = $('#mode').val();
+						        if(mode == 'edit'){
+						          	 return '<button type="button" class="btn btn-xs btn-secondary edit"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit</button>';
+						        }else{
+						        	 if(row.meetingStatus=="MOM FINALISED"){
+						        		 return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>&nbsp;&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMom"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Resolution</button>';
+						        	 }else        	
+						          	     return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>';
+						         }
+						    }
+						}
+						,{ "data": "id", "visible":false }
+						]				
+				});
 			}
 
 
 
 $("#resultTable").on('click','tbody tr td  .view',function(event) {
-	var id = reportdatatable.fnGetData($(this).parent().parent(),7);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
 	//window.open('/services/council/agenda/'+ $('#mode').val() +'/'+id,'','width=800, height=600,scrollbars=yes');
 	window.open('/services/council/councilmom/'+ $('#mode').val() +'/'+id,'','width=800, height=600,scrollbars=yes');
 	
 });
 
 $("#resultTable").on('click','tbody tr td  .edit',function(event) {
-	var id = reportdatatable.fnGetData($(this).parent().parent(),7);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
 	//window.open('/services/council/agenda/'+ $('#mode').val() +'/'+id,'','width=800, height=600,scrollbars=yes');
 	window.open('/services/council/councilmeeting/'+ $('#mode').val() +'/'+id,'','width=800, height=600,scrollbars=yes');
 	
 });
 
 $("#resultTable").on('click','tbody tr td  .generateMom',function(event) {
-	var id = reportdatatable.fnGetData($(this).parent().parent(),7);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
 	window.open('/services/council/councilmeeting/downloadfile'+'/'+id,'','width=800, height=600,scrollbars=yes');
 	
 });
 $("#resultTable").on('click','tbody tr td  .generateMeeting',function(event) {
-	var id = reportdatatable.fnGetData($(this).parent().parent(),7);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
 	window.open('/services/council/councilmeeting/generateagenda/'+'/'+id,'','width=800, height=600,scrollbars=yes');
 	
 });

@@ -97,6 +97,7 @@ import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -259,9 +260,15 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
         if (councilMeeting.getFromDate() != null && councilMeeting.getToDate() != null) {
             criteria.add(Restrictions.between("meetingDate", councilMeeting.getFromDate(),
                     DateUtils.addDays(councilMeeting.getToDate(), 1)));
+        }else if (councilMeeting.getFromDate() != null && councilMeeting.getToDate() == null) {
+            criteria.add(Restrictions.ge("meetingDate", councilMeeting.getFromDate()));
+        }else if (councilMeeting.getFromDate() == null && councilMeeting.getToDate() != null) {
+            criteria.add(Restrictions.le("meetingDate", DateUtils.addDays(councilMeeting.getToDate(), 1)));
         }
         if(councilMeeting.getMeetingType()!=null)
             criteria.add(Restrictions.eq("meetingType", councilMeeting.getMeetingType()));
+        criteria.addOrder(Order.asc("meetingDate"));
+        
         return criteria;
     }
     @Transactional

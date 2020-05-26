@@ -76,6 +76,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.MOMResolutionNumberGenerator;
@@ -236,6 +237,7 @@ public class CouncilMomController  extends GenericWorkFlowController{
         if (councilMeeting != null) {
             sortMeetingMomByItemNumber(councilMeeting);
             model.addAttribute("autoResolutionNoGenEnabled", isAutoResolutionNoGenEnabled());
+            updateDepartment(councilMeeting);
             model.addAttribute(COUNCIL_MEETING, councilMeeting);
             if(null == councilMeeting.getState()) {
 	            model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
@@ -391,6 +393,7 @@ public class CouncilMomController  extends GenericWorkFlowController{
     public String result(@PathVariable("id") final Long id, Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
         sortMeetingMomByItemNumber(councilMeeting);
+        updateDepartment(councilMeeting);
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
         return COUNCILMOM_RESULT;
     }
@@ -410,6 +413,7 @@ public class CouncilMomController  extends GenericWorkFlowController{
 
             sortMeetingMomByItemNumber(councilMeeting);
         }
+        updateDepartment(councilMeeting);
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
 
         return COUNCILMOM_VIEW;
@@ -602,4 +606,17 @@ public class CouncilMomController  extends GenericWorkFlowController{
 									new String[] { councilMeeting.getMeetingNumber() ,approver.concat("~").concat(designation) }, null);
 		return message;
 	}
+    
+    private void updateDepartment(CouncilMeeting councilMeeting) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	if(!CollectionUtils.isEmpty(councilMeeting.getMeetingMOMs())) {
+    		councilMeeting.getMeetingMOMs().stream().forEach(mom ->{
+		    	if(deptMap.containsKey(mom.getPreamble().getDepartment())) {
+		    		mom.getPreamble().setDepartmentName(deptMap.get(mom.getPreamble().getDepartment()));
+				}else {
+					mom.getPreamble().setDepartmentName(mom.getPreamble().getDepartment());
+				}
+    		});
+    	}
+    }
 }

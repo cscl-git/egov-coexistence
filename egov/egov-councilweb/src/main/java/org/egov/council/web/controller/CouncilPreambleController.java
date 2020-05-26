@@ -598,6 +598,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
     	if(deptMap.containsKey(councilPreamble.getDepartment())) {
     		councilPreamble.setDepartmentName(deptMap.get(councilPreamble.getDepartment()));
+		}else {
+			councilPreamble.setDepartmentName(councilPreamble.getDepartment());
 		}
     	if(CouncilConstants.PREAMBLEUSEDINAGENDA.equalsIgnoreCase(councilPreamble.getStatus().getCode())) {
     		List<CouncilAgenda> councilAgendaList = councilAgendaService.findByAgendaNo(councilPreamble.getPreambleNumber());

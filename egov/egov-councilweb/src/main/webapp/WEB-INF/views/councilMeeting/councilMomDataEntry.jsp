@@ -115,7 +115,7 @@
 								class="mandatory"></span></th>
 							<th width="10%"><spring:message code="lbl.comments" /><span
 								class="mandatory"></span></th>
-							<th width="10%"><spring:message code="lbl.amount" /></th>
+							<%-- <th width="10%"><spring:message code="lbl.amount" /></th> --%>
 							<th width="10%"><spring:message code="lbl.status" /><span
 								class="mandatory"></span></th>
 							<th width="15%"><spring:message code="lbl.action" /></th>
@@ -128,13 +128,17 @@
 			</div>
 		</div>
 	</div>
-		<%@ include file="upload-dataentry-documents.jsp"%>
-	
 	<div class="form-group">
 		<div class="text-center">
 			<button type="button" id="add-preamble" class='btn btn-primary'>
 				<spring:message code='lbl.additem' />
 			</button>
+		</div>
+	</div>
+	<%@ include file="upload-dataentry-documents.jsp"%>
+	
+	<div class="form-group">
+		<div class="text-center">
 			<button type='button' class='btn btn-primary' id="buttonSubmit">
 				<spring:message code='lbl.save' />
 			</button>

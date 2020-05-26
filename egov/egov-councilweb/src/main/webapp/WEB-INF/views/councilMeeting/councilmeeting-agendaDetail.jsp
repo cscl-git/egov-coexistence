@@ -96,7 +96,7 @@
 											<td><span class="more"><c:out
 														value="${mom.preamble.gistOfPreamble}" /></span></td>
 											<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
-											<td><c:out value="${mom.preamble.department}" /></td>
+											<td><c:out value="${mom.preamble.departmentName}" /></td>
 										</tr>
 									</c:forEach>
 								</c:when>

@@ -47,6 +47,7 @@
  */
 package org.egov.council.service;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.WordUtils;
 import org.egov.council.entity.CouncilAgendaDetails;
 import org.egov.council.entity.CouncilMeeting;
@@ -57,7 +58,9 @@ import org.egov.infra.reporting.engine.ReportOutput;
 import org.egov.infra.reporting.engine.ReportRequest;
 import org.egov.infra.reporting.engine.ReportService;
 import org.egov.infra.reporting.util.ReportUtil;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -78,6 +81,8 @@ public class CouncilReportService {
 
     @Autowired
     private CityService cityService;
+    @Autowired
+    protected EgovMasterDataCaching masterDataCache;
 
     public byte[] generatePDFForAgendaDetails(final CouncilMeeting councilMeeting) {
         if (councilMeeting != null) {
@@ -86,6 +91,7 @@ public class CouncilReportService {
                     .getAgendaDetails();
             agendaDetailsList.sort((final CouncilAgendaDetails f1, final CouncilAgendaDetails f2) -> f1.getItemNumber()
                     .compareTo(f2.getItemNumber()));
+            updateDepartment(agendaDetailsList);
             agendaDetails.put("agendaList", agendaDetailsList);
             ReportRequest reportInput = new ReportRequest(AGENDA, agendaDetails, buildReportParameters(councilMeeting));
             reportInput.setReportFormat(ReportFormat.RTF);
@@ -139,4 +145,16 @@ public class CouncilReportService {
         return reportService.createReport(reportRequest);
     }
 
+    private void updateDepartment(List<CouncilAgendaDetails> agendaDetailsList) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	if(!CollectionUtils.isEmpty(agendaDetailsList)) {
+    		agendaDetailsList.stream().forEach(agenda ->{
+		    	if(deptMap.containsKey(agenda.getPreamble().getDepartment())) {
+		    		agenda.getPreamble().setDepartmentName(deptMap.get(agenda.getPreamble().getDepartment()));
+				}else {
+					agenda.getPreamble().setDepartmentName(agenda.getPreamble().getDepartment());
+				}
+    		});
+    	}
+    }
 }

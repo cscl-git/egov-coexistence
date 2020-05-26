@@ -69,6 +69,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.CouncilMeetingNumberGenerator;
@@ -78,6 +79,7 @@ import org.egov.council.entity.CouncilAgenda;
 import org.egov.council.entity.CouncilAgendaDetails;
 import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.CouncilMeetingType;
+import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.MeetingAttendence;
 import org.egov.council.entity.MeetingMOM;
 import org.egov.council.service.CommitteeTypeService;
@@ -94,9 +96,11 @@ import org.egov.council.web.adaptor.MeetingAttendanceJsonAdaptor;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.FileUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -173,6 +177,8 @@ public class CouncilMeetingController {
     private CouncilCommitteeMemberService committeeMemberService;
     @Autowired
     private CouncilMeetingTypeService councilMeetingTypeService;
+    @Autowired
+    protected EgovMasterDataCaching masterDataCache;
 
     @ModelAttribute("committeeType")
     public List<CommitteeType> getCommitteTypeList() {
@@ -224,6 +230,7 @@ public class CouncilMeetingController {
     private void buildMeetingMomByUsingAgendaDetails(final CouncilMeeting councilMeeting, CouncilAgenda councilAgenda) {
         Long itemNumber = Long.valueOf(1);
         for (CouncilAgendaDetails councilAgendaDetail : councilAgenda.getAgendaDetails()) {
+        	updateDepartment(councilAgendaDetail.getPreamble());
             MeetingMOM meetingMom = new MeetingMOM();
             meetingMom.setMeeting(councilMeeting);
             meetingMom.setAgenda(councilAgendaDetail.getAgenda());
@@ -285,6 +292,7 @@ public class CouncilMeetingController {
     public String edit(@PathVariable("id") final Long id, final Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
         councilMeetingService.sortMeetingMomByItemNumber(councilMeeting);
+        updateDepartment(councilMeeting);
         model.addAttribute("autoMeetingNoGenEnabled", true);
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
 
@@ -325,6 +333,7 @@ public class CouncilMeetingController {
     @RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
     public String view(@PathVariable("id") final Long id, Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+        updateDepartment(councilMeeting);
         councilMeetingService.sortMeetingMomByItemNumber(councilMeeting);
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
         return COUNCILMEETING_VIEW;
@@ -333,6 +342,7 @@ public class CouncilMeetingController {
     @RequestMapping(value = "/result/{id}", method = RequestMethod.GET)
     public String result(@PathVariable("id") final Long id, Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+        updateDepartment(councilMeeting);
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
         model.addAttribute("commiteemembelist", councilMeeting.getCommitteeType().getCommiteemembers());
         return COUNCILMEETING_RESULT;
@@ -588,6 +598,7 @@ public class CouncilMeetingController {
     public ResponseEntity<byte[]> printAgendaDetails(@PathVariable("id") final Long id) {
         byte[] reportOutput;
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+        
         reportOutput = councilReportService.generatePDFForAgendaDetails(councilMeeting);
 
         final HttpHeaders headers = new HttpHeaders();
@@ -600,5 +611,27 @@ public class CouncilMeetingController {
     public Boolean isAutoMeetingNoGenEnabled() {
         return councilPreambleService.autoGenerationModeEnabled(
                 CouncilConstants.MODULE_FULLNAME, MEETING_NUMBER_AUTO);
+    }
+    
+    private void updateDepartment(CouncilPreamble councilPreamble) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	if(deptMap.containsKey(councilPreamble.getDepartment())) {
+    		councilPreamble.setDepartmentName(deptMap.get(councilPreamble.getDepartment()));
+		}else {
+			councilPreamble.setDepartmentName(councilPreamble.getDepartment());
+		}
+    }
+    
+    private void updateDepartment(CouncilMeeting councilMeeting) {
+    	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	if(!CollectionUtils.isEmpty(councilMeeting.getMeetingMOMs())) {
+    		councilMeeting.getMeetingMOMs().stream().forEach(mom ->{
+		    	if(deptMap.containsKey(mom.getPreamble().getDepartment())) {
+		    		mom.getPreamble().setDepartmentName(deptMap.get(mom.getPreamble().getDepartment()));
+				}else {
+					mom.getPreamble().setDepartmentName(mom.getPreamble().getDepartment());
+				}
+    		});
+    	}
     }
 }
