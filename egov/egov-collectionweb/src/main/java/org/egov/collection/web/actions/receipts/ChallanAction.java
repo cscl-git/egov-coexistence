@@ -759,7 +759,7 @@ public class ChallanAction extends BaseFormAction {
 		}
 
 		receiptHeader.setStatus(collectionsUtil.getStatusForModuleAndCode(CollectionConstants.MODULE_NAME_RECEIPTHEADER,
-				CollectionConstants.RECEIPT_STATUS_CODE_APPROVED));
+				CollectionConstants.RECEIPT_STATUS_CODE_PENDING));
 
 		// recon flag should be set as false when the receipt is actually
 		// created against the challan
@@ -838,7 +838,7 @@ public class ChallanAction extends BaseFormAction {
 		System.out.println("zzzzzzzz");
 		receiptHeader.setTotalAmount(totalAmt);
 		receiptHeader.getChallan().setStatus(collectionsUtil.getStatusForModuleAndCode(
-				CollectionConstants.MODULE_NAME_CHALLAN, CollectionConstants.CHALLAN_STATUS_CODE_CREATED));
+				CollectionConstants.MODULE_NAME_CHALLAN, CollectionConstants.CHALLAN_STATUS_CODE_VALIDATED));
 		receiptHeader.getChallan().setService(receiptHeader.getService());
 		//System.out.println(
 			//	"receiptHeader.getChallan().getService().getId() :" + receiptHeader.getChallan().getService().getId());
