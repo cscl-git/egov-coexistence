@@ -61,7 +61,7 @@
 	</div>
 </form:form>
 <div class="row display-hide report-section">
-	<div class="col-md-12 table-header text-left">Court Search Result</div>
+	<div class="col-md-12 table-header text-left">Library Search Result</div>
 	<div class="col-md-12 form-group report-table-container">
 		<table class="table table-bordered table-hover multiheadertbl"
 			id="resultTable">

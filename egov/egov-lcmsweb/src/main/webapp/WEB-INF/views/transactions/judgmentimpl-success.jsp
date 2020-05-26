@@ -201,11 +201,5 @@
 					<jsp:include page="appealdocuments-view.jsp"></jsp:include>
 				</c:when>
 			</c:choose>
-
-			<div class="form-group text-center">
-				<a onclick="self.close()" class="btn btn-default"
-					href="javascript:void(0)"><spring:message code="lbl.close" /></a>
-
-			</div>
 		</div>
 </form:form>

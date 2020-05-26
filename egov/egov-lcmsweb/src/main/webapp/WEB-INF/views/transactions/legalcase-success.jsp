@@ -441,12 +441,6 @@
 				</div>
 			</div>
 			<jsp:include page="documentdetails-view.jsp"></jsp:include>
-			<div class="form-group">
-				<div class="text-center">
-					<a href="javascript:void(0)" class="btn btn-default"
-						onclick="self.close()"><spring:message code="lbl.close" /></a>
-				</div>
-			</div>
 		</div>
 	</div>
 </form:form>

@@ -67,8 +67,7 @@
 	
 	<div class="form-group">
 		<div class="text-center">
-		<button type="submit" class='btn btn-primary' id="buttonSubmit"><spring:message code="lbl.submit"/></button>
-			<button type='button' class='btn btn-default' id="btnclose"><spring:message code='lbl.close' />
+			<button type="submit" class='btn btn-primary' id="buttonSubmit"><spring:message code="lbl.submit"/></button>
 		</div>
 	</div>
 </form:form>

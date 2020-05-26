@@ -71,7 +71,7 @@ jQuery(document).ready(
 		});
 $('#searchapp').keyup(function(){
 	tableContainer.fnFilter(this.value);
-	});
+});
 
 function submitForm() {
 
@@ -152,13 +152,15 @@ function submitForm() {
 								if (full.casestatus == 'LCCREATED'
 										|| full.casestatus == 'HEARING' || full.casestatus == 'INTERIM_STAY' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Judgment</option><option value="2">Add/Edit Defending Counsel</option><option value="10">Edit para wise remarks/Counter filing date</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="7">Interim Order</option><option value="8">Close Case</option></select>');
-									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Judgment</option><option value="2">Add/Edit Defending Counsel</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="8">Close Case</option></select>');
+									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Create Judgement</option><option value="2">Add/Edit Defending Counsel</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="8">Close Case</option></select>');
 								} else if (full.casestatus == 'JUDGMENT' && !full.legalViewAccess) {
-									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option><option value="11">Judgment Implementation</option></select>');
+									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option><option value="11">Judgment Implementation</option></select>');
+									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option></select>');
 								} else if (full.casestatus == 'CLOSED' && !full.legalViewAccess) {
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="9">Edit Close Case</option></select>');
 								} else if (full.casestatus == 'JUDGEMENT_IMPL' && !full.legalViewAccess) {
-									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="12">Edit Judgment Implementation</option><option value="8">Close Case</option></select>');
+									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="12">Edit Judgment Implementation</option><option value="8">Close Case</option></select>');
+									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="8">Close Case</option></select>');
 								}
 							}
 						} ],

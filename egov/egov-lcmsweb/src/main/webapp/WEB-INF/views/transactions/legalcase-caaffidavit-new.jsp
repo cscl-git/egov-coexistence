@@ -73,8 +73,6 @@
 			<form:button type="button" id="buttonid" class="btn btn-primary">
 				<spring:message code="lbl.submit" />
 			</form:button>
-			<button type='button' class='btn btn-default' id="btnclose">
-				<spring:message code='lbl.close' />
 		</div>
 	</div>
 </form:form>

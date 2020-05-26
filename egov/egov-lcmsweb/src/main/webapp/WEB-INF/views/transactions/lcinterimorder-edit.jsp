@@ -75,9 +75,8 @@
 		<div class="text-center">
 			<button type='submit' class='btn btn-primary' id="buttonSubmit">
 				<spring:message code='lbl.update' />
-			</button>
-			<button type='button' class='btn btn-default' id="btnclose"><spring:message code='lbl.close' />
-			 <button type="button" class="btn btn-default" id="buttonBack" onclick="goback()"><spring:message code="lbl.back"/></button>
+			</button>			
+			<button type="button" class="btn btn-default" id="buttonBack" onclick="goback()"><spring:message code="lbl.back"/></button>
 		</div>
 	</div>
 </form:form>
