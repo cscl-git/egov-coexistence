@@ -1,6 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<%@ tag body-content="empty" dynamic-attributes="true" isELIgnored="false" %>
+<%@ attribute name="id" required="true"%>
+<%@ attribute name="fields" required="true"%>
+<%@ attribute name="url" required="true"%>
 
-<!--
+<%--
   ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
   ~    accountability and the service delivery of the government  organizations.
   ~
@@ -46,31 +49,18 @@
   ~
   ~   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
   ~
-  -->
+  --%>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:security="http://www.springframework.org/schema/security"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans
-  http://www.springframework.org/schema/beans/spring-beans.xsd
-  http://www.springframework.org/schema/security
-  http://www.springframework.org/schema/security/spring-security.xsd" default-lazy-init="true">
+<script>
 
-	<bean id="securityFilterChain" name="securityFilterChain" class="org.springframework.security.web.FilterChainProxy">
-	<constructor-arg>
-		<list>
-		<security:filter-chain pattern="/resources/**" filters="none" />
-		<security:filter-chain pattern="/error/**" filters="none" />
-		<security:filter-chain pattern="/index.jsp" filters="none" />
-		<security:filter-chain pattern="/javascript/**" filters="none" />
-		<security:filter-chain pattern="/reports/**" filters="none" />
-		<security:filter-chain pattern="/timeseriesreports/**" filters="none" />
-		<security:filter-chain pattern="/application/view/" filters="none" />
-		<security:filter-chain pattern="/ajax/getposition" filters="none" />
-		<security:filter-chain pattern="/**"   filters="concurrentSessionFilter,securityContextPersistenceFilter,logoutFilter,		authenticationProcessingFilter,securityContextHolderAwareRequestFilter,rememberMeAuthenticationFilter,anonymousAuthenticationFilter,
-		exceptionTranslationFilter,filterSecurityInterceptor" />
-		</list>
-	</constructor-arg>
-	</bean>
-</beans>
+ ${id}SuccessHandler=function(req,res){
+    dom.get("${id}").value = res.results[0].Text;
+}
+ ${id}FailureHandler=function(){
+  alert('Unable to load ${id}');
+}
 
+function populate${id}(params){
+    makeJSONCall(${fields},'${pageContext.request.contextPath}/${url}',params, ${id}SuccessHandler, ${id}FailureHandler) ;
+}
+</script>
