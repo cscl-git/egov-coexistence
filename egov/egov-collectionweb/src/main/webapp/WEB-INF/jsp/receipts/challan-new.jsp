@@ -261,14 +261,9 @@ function validate(obj){
              document.getElementById("challan_error_area").innerHTML+='<s:text name="challan.error.payeename" />'+ "<br>";
              valid=false;
          }
-	 	 if(null != document.getElementById('serviceCategoryId') && document.getElementById('serviceCategoryId').value == -1){
+	 	 if((document.getElementById('serviceCategoryid') == null)  || (null != document.getElementById('serviceCategoryid') && document.getElementById('serviceCategoryid').value == -1)){
 
              document.getElementById("challan_error_area").innerHTML+='<s:text name="error.select.service.category" />'+ "<br>";
-             valid=false;
-         }
-         if(null != document.getElementById('serviceId') && document.getElementById('serviceId').value == -1){
-
-             document.getElementById("challan_error_area").innerHTML+='<s:text name="error.select.service.type" />'+ "<br>";
              valid=false;
          }
 		 
@@ -383,7 +378,7 @@ var makeBillDetailTable = function() {
 		var billDetailColumns = [ 
 			{key:"accounthead", label:'Account Head <span class="mandatory"/>',formatter:createLongTextFieldFormatter(VOUCHERDETAILLIST,".accounthead",VOUCHERDETAILTABLE)},				
 			{key:"glcode",label:'Account Code ', formatter:createTextFieldFormatter(VOUCHERDETAILLIST,".glcodeDetail","text",VOUCHERDETAILTABLE)},
-			{key:"rate", label:'Rate',formatter:createRateFieldFormatter(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()",VOUCHERDETAILTABLE)},
+			//{key:"rate", label:'Rate',formatter:createRateFieldFormatter(VOUCHERDETAILLIST,".rateDetail","updateRateDetailJV()",VOUCHERDETAILTABLE)},
 			{key:"creditamount",label:'Amount (Rs.)', formatter:createAmountFieldFormatter(VOUCHERDETAILLIST,".creditAmountDetail","updateCreditAmount()",VOUCHERDETAILTABLE)},
 			{key:"financialYearId",label:'Financial Year <span class="mandatory"/>', formatter:createDropdownFormatterFYear(VOUCHERDETAILLIST,'<s:property value="%{currentFinancialYearId}"/>'),  dropdownOptions:fYearOptions},
 			{key:'Add',label:'Add',formatter:createAddImageFormatter("${pageContext.request.contextPath}")},
@@ -620,7 +615,7 @@ function populateServiceType(selected){
     }
 	 </s:iterator>
 	 if(!isServiceTypeExist){
-		 loadFinDetails(this);
+		 //loadFinDetails(this);
 	 }
 }
 function addServiceTypeDropdown(tableId){
@@ -633,7 +628,7 @@ function addServiceTypeDropdown(tableId){
     cell2.className='bluebox';
     cell2.width="50%";
     cell1.innerHTML = '<s:text name="miscreceipt.service" /><span class="mandatory"/>';
-    cell2.innerHTML = '<select name="serviceId" id="serviceId" onchange="loadFinDetails(this)"/>';
+    cell2.innerHTML = '<select name="serviceId" id="serviceId"/>';
 	document.getElementById('serviceId').options.length=0;
 	document.getElementById('serviceId').options[0]= new Option('--------Choose--------','0');
 
@@ -750,7 +745,7 @@ function addServiceTypeDropdown(tableId){
   			</s:else>
   			  <s:if test="%{shouldShowHeaderField('department')}">
 		   <td width="21%" class="bluebox2"><s:text name="challan.department"/><s:if test="%{isFieldMandatory('department')}"><span class="mandatory"/></s:if></td>
-		  <td width="24%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="id" listValue="name"  /> </td>
+		  <td width="24%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptId}"/> </td>
 	       </s:if>
 		   <s:else>
   			<td class="bluebox2" colspan="2"></td>
@@ -836,7 +831,7 @@ function addServiceTypeDropdown(tableId){
 		     If page is opened from inbox -->
 			<s:if test="%{model.id==null || (sourcePage=='inbox' && !hasActionMessages()) || (actionName=='CHALLAN_MODIFY' && hasErrors()) || (actionName=='CHALLAN_VALIDATE' && hasErrors())}" >
 			<s:iterator value="%{validActions}">
-				<s:submit type="submit" cssClass="buttonsubmit" value="%{description}" id="%{name}" name="actionButton" onclick="document.challan.actionName.value='%{name}';document.challan.action='challan-save.action'; return validate(this);"/>
+				<s:submit type="submit" cssClass="buttonsubmit" value="Save" id="%{name}" name="actionButton" onclick="document.challan.actionName.value='%{name}';document.challan.action='challan-save.action'; return validate(this);"/>
 		    </s:iterator>	
 	    </s:if>
 	   

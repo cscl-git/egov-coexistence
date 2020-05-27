@@ -119,9 +119,30 @@
 						<div class="col-xs-3 add-margin">
 							<spring:message code="lbl.judgmentdetails" />
 						</div>
-						<div class="col-sm-3 add-margin view-content">
+						<div class="col-sm-9 add-margin view-content">
 							${judgment.judgmentDetails}</div>
-
+					</div>
+					<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+							<spring:message code="lbl.is.department.acted" />
+						</div>
+						<div class="col-sm-3 add-margin view-content">
+							<c:choose>
+								<c:when test="${judgment.isDepartmentActed == 'true'}">
+									<c:out value="YES" />
+								</c:when> 
+								<c:otherwise>
+									<c:out value="NO" />
+								</c:otherwise>
+							</c:choose>
+						</div>
+					</div>
+					<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+							<spring:message code="lbl.action.details" />
+						</div>
+						<div class="col-sm-9 add-margin view-content">
+							${judgment.departmentActionDetails}</div>
 					</div>
 					<c:choose>
 						<c:when test="${judgment.judgmentType.name == 'Enquiry'}">
@@ -181,11 +202,6 @@
 		</div>
 		</div>
 		 <jsp:include page="judgmentdocuments-view.jsp"/> 
-		<div class="row text-center">
-			<div class="add-margin">
-				<a href="javascript:void(0)" class="btn btn-default"
-					onclick="self.close()">Close</a>
-			</div>
-		</div>
+		
 		
 </form:form>

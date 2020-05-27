@@ -47,7 +47,7 @@
   --%>
 
 <div class="panel-heading">
-	<div class="panel-title">View Past Hearings</div>
+	<div class="panel-title">View Hearings</div>
 </div>
 <c:choose>
 	<c:when test="${hearingsList.isEmpty()}">
@@ -70,7 +70,7 @@
 							code="lbl.additionallawyer" /></th>
 					<th align="center" colspan="1" class="text-center"><spring:message
 							code="lbl.standingcounsel" /></th>
-					<th align="center" colspan="1" class="text-center">Position-Employee</th>
+					<th align="center" colspan="1" class="text-center">Department-Employee</th>
 					<th colspan="1" class="text-center"><spring:message
 							code="lbl.edit" /></th>
 				</tr>
@@ -111,10 +111,7 @@
 								<c:when test="${not empty hearings.employeeHearingList}">
 									<c:forEach items="${hearings.employeeHearingList}"
 										var="employeeHearingList" varStatus="counter">
-
-										<c:out value="${employeeHearingList.employee.name}"></c:out>- <c:out
-											value="${employeeHearingList.employee.username}"></c:out>
-
+										<c:out value="${employeeHearingList.employeeName}"></c:out><br/>
 									</c:forEach>
 								</c:when>
 							</c:choose>

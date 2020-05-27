@@ -163,7 +163,7 @@ import net.sf.jasperreports.engine.JRException;
         @Result(name = "before_salary_search", location = "chequeAssignment-before_salary_search.jsp"),
         @Result(name = "searchRtgsResult", location = "chequeAssignment-searchRtgsResult.jsp"),
         @Result(name = "surrendersearch", location = "chequeAssignment-surrendersearch.jsp"),
-        @Result(name = "searchremittance", location = "chequeAssignment-seacreaterchremittance.jsp"),
+        @Result(name = "searchremittance", location = "chequeAssignment-searchremittance.jsp"),
         @Result(name = "searchpayment", location = "chequeAssignment-searchpayment.jsp"),
         @Result(name = "surrendercheques", location = "chequeAssignment-surrendercheques.jsp"),
         @Result(name = "rtgsSearch", location = "chequeAssignment-rtgsSearch.jsp"),

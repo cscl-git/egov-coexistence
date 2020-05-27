@@ -201,8 +201,6 @@
 					onclick="goback()">
 					<spring:message code="lbl.back" />
 				</button>
-				<a href="javascript:void(0)" class="btn btn-default"
-					onclick="self.close()">Close</a>
 			</div>
 		</div>
 	</div>

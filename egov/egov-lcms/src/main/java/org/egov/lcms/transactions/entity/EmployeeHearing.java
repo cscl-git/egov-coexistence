@@ -54,6 +54,7 @@ import org.hibernate.envers.AuditOverride;
 import org.hibernate.envers.AuditOverrides;
 import org.hibernate.envers.Audited;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -65,6 +66,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 
 import static org.egov.lcms.transactions.entity.EmployeeHearing.SEQ_EGLC_EMPHEARING;
 
@@ -82,36 +84,21 @@ public class EmployeeHearing extends AbstractAuditable {
     @GeneratedValue(generator = SEQ_EGLC_EMPHEARING, strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @ManyToOne
-    @Valid
-    @JoinColumn(name = "employee")
+    @NotNull
+    @Column(name = "employeeid")
     @Audited
-    private Employee employee;
+    private Long employeeId;
+    
+    @NotNull
+    @Column(name = "employeename")
+    @Audited
+    private String employeeName;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY)
     @Valid
     @JoinColumn(name = "hearing")
     @Audited
     private Hearings hearing;
-
-    @Transient
-    private String empPosName;
-
-    public Employee getEmployee() {
-        return employee;
-    }
-
-    public void setEmployee(final Employee employee) {
-        this.employee = employee;
-    }
-
-    public Hearings getHearing() {
-        return hearing;
-    }
-
-    public void setHearing(final Hearings hearing) {
-        this.hearing = hearing;
-    }
 
     @Override
     public Long getId() {
@@ -122,13 +109,28 @@ public class EmployeeHearing extends AbstractAuditable {
     public void setId(final Long id) {
         this.id = id;
     }
-
-    public String getEmpPosName() {
-        return empPosName;
+    
+    public Long getEmployeeId() {
+        return employeeId;
     }
 
-    public void setEmpPosName(final String empPosName) {
-        this.empPosName = empPosName;
+    public void setEmployeeId(final Long employeeId) {
+        this.employeeId = employeeId;
     }
 
+    public Hearings getHearing() {
+        return hearing;
+    }
+
+    public void setHearing(final Hearings hearing) {
+        this.hearing = hearing;
+    }
+ 
+    public String getEmployeeName() {
+		return employeeName;
+	}
+
+	public void setEmployeeName(String employeeName) {
+		this.employeeName = employeeName;
+	}
 }

@@ -204,6 +204,15 @@ public class Judgment extends AbstractAuditable {
     @Column(name = "certifiedmemofwddate")
     @Audited
     private Date certifiedMemoFwdDate;
+    
+    @Column(name = "isdepartmentacted")
+    @Audited
+    private Boolean isDepartmentActed;
+    
+    @Length(max = 1024)
+    @Column(name = "departmentactiondetails")
+    @Audited
+    private String departmentActionDetails;
 
     @Override
     public Long getId() {
@@ -419,5 +428,21 @@ public class Judgment extends AbstractAuditable {
         }
         return errors;
     }
+
+	public Boolean getIsDepartmentActed() {
+		return isDepartmentActed;
+	}
+
+	public void setIsDepartmentActed(Boolean isDepartmentActed) {
+		this.isDepartmentActed = isDepartmentActed;
+	}
+
+	public String getDepartmentActionDetails() {
+		return departmentActionDetails;
+	}
+
+	public void setDepartmentActionDetails(String departmentActionDetails) {
+		this.departmentActionDetails = departmentActionDetails;
+	}
 
 }

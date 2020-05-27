@@ -56,8 +56,8 @@
 	<div class="col-md-12">
 
 		<div class="form-group">
-			<label class="col-sm-3 control-label text-right">Standing
-				Counsel:<span class="mandatory"></span>:
+			<label class="col-sm-3 control-label text-right">
+				<spring:message code="lbl.standingcons" /><span class="mandatory"></span>:
 			</label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="standingCouncilName" type="text"
@@ -72,8 +72,8 @@
 							value="${advocate.name }" /> </a>
 				</c:forEach>
 			</div>
-			<label class="col-sm-2 control-label text-right">Assigned
-				Date:<span class="mandatory"></span>:
+			<label class="col-sm-2 control-label text-right">
+				<spring:message code="lbl.assigned.date" /><span class="mandatory"></span>:
 			</label>
 			<div class="col-sm-3 add-margin">
 				<form:input path="assignedToDate" class="form-control datepicker"
@@ -84,8 +84,9 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="col-sm-3 control-label text-right">Date on
-				which Vakalaat filed:</label>
+			<label class="col-sm-3 control-label text-right">
+				<spring:message code="lbl.date.vakalaat.filed" />:
+			</label>
 			<div class="col-sm-3 add-margin">
 				<form:input path="vakalatDate" class="form-control datepicker"
 					title="Please enter a valid date" pattern="\d{1,2}/\d{1,2}/\d{4}"
@@ -95,8 +96,9 @@
 			</div>
 		</div>
 		<div class="form-group">
-			<label class="col-sm-3 control-label text-right" id="persons">Is
-				Senior Standing Counsel Required:</label>
+			<label class="col-sm-3 control-label text-right" id="persons">
+				<spring:message code="lbl.senior.defending.counsel.required" />:
+			</label>
 			<div class="col-sm-3 add-margin">
 				<form:checkbox id="isSeniorAdvocate" name="isSeniorAdvocate"
 					value="${isSeniorAdvocate}" path="isSeniorAdvocate"
@@ -105,8 +107,8 @@
 			</div>
 		</div>
 		<div id="seniordov1" class="form-group">
-			<label class="col-sm-3 control-label text-right">Senior
-				Standing Counsel<span class="mandatory"></span>:
+			<label class="col-sm-3 control-label text-right">
+				<spring:message code="lbl.senior.defending.counsel" /><span class="mandatory"></span>:
 			</label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="seniorAdvocateName" type="text"
@@ -119,8 +121,9 @@
 				</c:forEach>
 			</div>
 			<div class="form-group" id="seniordov3">
-				<label class="col-sm-2 control-label text-right">Assigned
-					On:</label>
+				<label class="col-sm-2 control-label text-right">
+					<spring:message code="lbl.assignedon" />:
+				</label>
 				<div class="col-sm-3 add-margin">
 					<form:input path="assignedToDateForSenior"
 						class="form-control datepicker" title="Please enter a valid date"
@@ -131,7 +134,7 @@
 				</div>
 			</div>
 		</div>
-		<div id="seniordov2" class="form-group">
+		<%-- <div id="seniordov2" class="form-group">
 			<label class="col-sm-3 control-label text-right">Order Date<span
 				class="mandatory"></span>:
 			</label>
@@ -151,39 +154,26 @@
 					required="required" path="orderNumber" />
 				<form:errors path="orderNumber" cssClass="add-margin error-msg" />
 			</div>
-		</div>
-
-
-
+		</div> --%>
 	</div>
 </div>
 
-
-
-
-
 <script>
-function enableSeniorDetails()
-{
-	  var elm = document.getElementById('isSeniorAdvocate');
-if(elm.checked)
-{
-		    $("#seniordov1").show(); 
-		    $("#seniordov2").show(); 
-		    $("#seniordov3").show(); 
-   
-}
-else
-{
-	$("#seniorAdvocateName").val('');
-	$("#assignedtodateForsenior").val('');
-	$("#orderDate").val('');
-	$("#orderNumber").val('');
-	 $("#seniordov1").hide(); 
-	    $("#seniordov2").hide(); 
-	    $("#seniordov3").hide(); 
-	    
-}
-  
+function enableSeniorDetails(){
+	var elm = document.getElementById('isSeniorAdvocate');
+	if(elm.checked){
+	    $("#seniordov1").show(); 
+	    //$("#seniordov2").show(); 
+	    $("#seniordov3").show();   
+	}
+	else{
+		$("#seniorAdvocateName").val('');
+		$("#assignedtodateForsenior").val('');
+		//$("#orderDate").val('');
+		//$("#orderNumber").val('');
+		$("#seniordov1").hide(); 
+	    //$("#seniordov2").hide(); 
+	    $("#seniordov3").hide(); 	    
+	}  
 }
 </script>

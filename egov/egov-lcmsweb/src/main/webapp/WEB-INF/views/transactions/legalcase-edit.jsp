@@ -79,9 +79,6 @@
 					<button type='submit' class='btn btn-primary' id="buttonSubmit">
 						<spring:message code='lbl.update' />
 					</button>
-					<button type="button" class="btn btn-default" id="btnclose">
-						<spring:message code="lbl.close" />
-					</button>
 				</div>
 			</div>
 

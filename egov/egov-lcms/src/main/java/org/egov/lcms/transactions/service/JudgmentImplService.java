@@ -49,7 +49,9 @@ package org.egov.lcms.transactions.service;
 
 import org.egov.commons.EgwStatus;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.lcms.masters.entity.enums.ImplementationFailure;
+import org.egov.lcms.masters.entity.vo.AttachedDocument;
 import org.egov.lcms.transactions.entity.Appeal;
 import org.egov.lcms.transactions.entity.AppealDocuments;
 import org.egov.lcms.transactions.entity.Contempt;
@@ -63,8 +65,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -74,9 +74,10 @@ import java.util.Set;
 
 @Service
 @Transactional(readOnly = true)
-public class JudgmentImplService {
-
-    private final JudgmentImplRepository judgmentImplRepository;
+public class JudgmentImplService extends PersistenceService<JudgmentImpl, Long>{
+	
+	@Autowired
+    private JudgmentImplRepository judgmentImplRepository;
 
     @Autowired
     private AppealDocumentsRepository appealDocumentsRepository;
@@ -93,14 +94,18 @@ public class JudgmentImplService {
     @Autowired
     private LegalCaseSmsService legalCaseSmsService;
 
-    @Autowired
-    public JudgmentImplService(final JudgmentImplRepository judgmentImplRepository) {
-        this.judgmentImplRepository = judgmentImplRepository;
+    public JudgmentImplService() {
+        super(JudgmentImpl.class);
     }
-
+    
+    public JudgmentImplService(Class<JudgmentImpl> type) {
+		super(type);
+	}
+    
     @Transactional
-    public JudgmentImpl persist(final JudgmentImpl judgmentImpl, final MultipartFile[] files) throws IOException {
+    public JudgmentImpl persist(final JudgmentImpl judgmentImpl, final List<AttachedDocument> files) throws IOException {
         persistAppealOrContempt(judgmentImpl);
+        applyAuditing(judgmentImpl);
         final JudgmentImpl savedjudgmentImpl = judgmentImplRepository.save(judgmentImpl);
         if (judgmentImpl.getImplementationFailure() != null
                 && judgmentImpl.getImplementationFailure().toString().equals(ImplementationFailure.Appeal.toString())) {
@@ -114,7 +119,7 @@ public class JudgmentImplService {
     }
 
     @Transactional
-    public void saveOrUpdate(final JudgmentImpl judgmentImpl, final MultipartFile[] files)
+    public void saveOrUpdate(final JudgmentImpl judgmentImpl, final List<AttachedDocument> files)
             throws IOException, ParseException {
         persist(judgmentImpl, files);
         if (judgmentImpl.getJudgment().getImplementByDate() == null)
@@ -128,8 +133,8 @@ public class JudgmentImplService {
         final ReportStatus reportStatus = null;
         judgmentImpl.getJudgment().getLegalCase().setReportStatus(reportStatus);
         judgmentImpl.getJudgment().getLegalCase().setNextDate(judgmentImpl.getDateOfCompliance());
-        legalCaseSmsService.sendSmsToOfficerInchargeForJudgmentImpl(judgmentImpl);
-        legalCaseSmsService.sendSmsToStandingCounselForJudgmentImpl(judgmentImpl);
+        //legalCaseSmsService.sendSmsToOfficerInchargeForJudgmentImpl(judgmentImpl);
+        //legalCaseSmsService.sendSmsToStandingCounselForJudgmentImpl(judgmentImpl);
         legalCaseService.persistLegalCaseIndex(judgmentImpl.getJudgment().getLegalCase(), null,
                 judgmentImpl.getJudgment(), judgmentImpl, null);
         legalCaseService.save(judgmentImpl.getJudgment().getLegalCase());
@@ -166,22 +171,21 @@ public class JudgmentImplService {
         return judgmentImplAppealDOc;
     }
 
-    public List<AppealDocuments> getDocumentDetails(final JudgmentImpl judgmentImpl, final MultipartFile[] files)
+    public List<AppealDocuments> getDocumentDetails(final JudgmentImpl judgmentImpl, final List<AttachedDocument> files)
             throws IOException {
         final List<AppealDocuments> documentDetailsList = new ArrayList<>();
 
-        if (files != null)
-            for (int i = 0; i < files.length; i++)
-                if (!files[i].isEmpty()) {
-                    final AppealDocuments applicationDocument = new AppealDocuments();
-                    applicationDocument.setAppeal(judgmentImpl.getAppeal().get(0));
-                    applicationDocument.setDocumentName(LcmsConstants.APPEAL_DOCUMENTNAME);
-                    applicationDocument.setSupportDocs(
-                            fileStoreService.store(files[i].getInputStream(), files[i].getOriginalFilename(),
-                                    files[i].getContentType(), LcmsConstants.MODULE_NAME));
-                    documentDetailsList.add(applicationDocument);
-
-                }
+        if (null != files) {
+            for (AttachedDocument attachedDocument:files) {
+                final AppealDocuments applicationDocument = new AppealDocuments();
+                applicationDocument.setAppeal(judgmentImpl.getAppeal().get(0));
+                applicationDocument.setDocumentName(LcmsConstants.APPEAL_DOCUMENTNAME);
+                applicationDocument.setSupportDocs(
+                        fileStoreService.store(attachedDocument.getFileStream(), attachedDocument.getFileName(),
+                        		attachedDocument.getMimeType(), LcmsConstants.MODULE_NAME));
+                documentDetailsList.add(applicationDocument);
+            }
+        }
         return documentDetailsList;
     }
 

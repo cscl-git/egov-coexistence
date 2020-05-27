@@ -119,9 +119,6 @@
 				<button type="button" class="btn btn-default" id="buttonBack">
 					<spring:message code="lbl.back" />
 				</button>
-				<a href="javascript:void(0)" class="btn btn-default"
-					onclick="self.close()">Close</a>
-
 			</div>
 		</div>
 </form:form>

@@ -45,27 +45,26 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-$(document).ready(function() {
-	
-	
-	 $("#hearingsTbl tbody tr:gt(2)").each(function( index ) {
+$(document).ready(function() {	
+	$("#hearingsTbl tbody tr:gt(2)").each(function( index ) {
 		 $(this).find('a').hide();
-	    });
-	 $("#employeeDetails").find("*").attr("disabled", "disabled");
-	
-	$('#buttonid').click(function(){
-	if(!validateHearingDate())
-	{
-	return false;
-	}else{
-		$("#employeeDetails").find("*").removeAttr('disabled');
-		document.forms["hearingsform"].submit();
-	}
-	
-	$("#employeeDetails").find("*").removeAttr('disabled');
-	$("#employeeDetails").find("*").prop('disabled', false);
 	});
-	var assignPosition = new Bloodhound({
+	$("#employeeDetails").find("*").attr("disabled", "disabled");	
+	$('#buttonid').click(function(){
+		if(!validateHearingDate()){
+			return false;
+		}else{
+			$("#employeeDetails").find("*").removeAttr('disabled');
+			document.forms["hearingsform"].submit();
+		}	
+		$("#employeeDetails").find("*").removeAttr('disabled');
+		$("#employeeDetails").find("*").prop('disabled', false);
+	});
+	
+	getDepartments();
+	getDesignations();
+	
+	/*var assignPosition = new Bloodhound({
 		datumTokenizer : function(datum) {
 			return Bloodhound.tokenizers
 					.whitespace(datum.value);
@@ -82,7 +81,6 @@ $(document).ready(function() {
 					return {
 						name : position,
 						value : position
-
 					};
 				});
 			}
@@ -98,8 +96,35 @@ $(document).ready(function() {
 		displayKey : 'name',
 		source : assignPosition.ttAdapter()
 	});
-	typeaheadWithEventsHandling(typeaheadobj, '#positionEmpId'); 
+	typeaheadWithEventsHandling(typeaheadobj, '#positionEmpId'); */
 	
+	$('#department').change(function(){
+		var designation=$('#designation').val();
+		if(designation!=""){
+			var department=$(this).val();
+			if(department!=""){
+				getEmployees();
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	});
+	
+	$('#designation').change(function(){
+		var department=$('#department').val();
+		if(department!=""){
+			var designation=$(this).val();
+			if(designation!=""){
+				getEmployees();
+			}else{
+				return false;
+			}
+		}else{
+			return false;
+		}
+	});
 	
 	$('#btnclose').click(function(){
 		bootbox.confirm({
@@ -157,18 +182,16 @@ $(document).ready(function() {
 	});
 	$("#addid").click(function(){
 		addEmployee();
-	});
-	
-		
+	});		
 });
 var count = $("#employeeDetails tbody  tr").length -1;
-function addEmployee()
-{     
-	if( $("#positionEmpName").val() !=''){
+function addEmployee(){     
+	if( $("#employee").val() !=''){
 		var $tableBody = $('#employeeDetails').find("tbody"),
 	    $trLast = $tableBody.find("tr:last");
 	 	$trNew = $trLast.clone();
-		$trLast.find('input').val($("#positionEmpName").val());
+		$trLast.find('input[type=text]').val($("#employee option:selected").text());
+		$trLast.find('input[type=hidden]').val($("#employee").val());
 		count++;
 		$trNew.find("input").each(function(){
 	        $(this).attr({
@@ -177,13 +200,77 @@ function addEmployee()
 	        });
 	    });
 		$trLast.after($trNew);
-		$("#positionEmpName").val("") ;
+		$("#employee").val("") ;
 	}
 }
+
+function getEmployees(){
+	var department=$('#department').val();
+	var designation=$('#designation').val();
+	$.ajax({
+		url: "/services/lcms/ajax/getEmployeesByDeptAndDesig",		
+		type: "GET",
+		data: {
+			'deptId' : department,
+			'desgnId' : designation
+		},
+		dataType: "json",
+		success: function (response) {
+		    console.log("success"+response);
+			$('#employee').empty();
+			$('#employee').append($("<option value=''>Select</option>"));
+			$.each(response, function(key, value) {
+				$('#employee').append($('<option>').text(value).attr('value', key));
+			});
+		}, 
+		error: function (response) {
+			console.log("failed");
+		}
+	});
+}
+
+function getDepartments(){
+	$.ajax({
+		url: "/services/lcms/ajax/getDepartments",		
+		type: "GET",
+		dataType: "json",
+		success: function (response) {
+		    console.log("success"+response);
+			$('#department').empty();
+			$('#department').append($("<option value=''>Select</option>"));
+			$.each(response, function(key, value) {
+				$('#department').append($('<option>').text(value).attr('value', key));
+			});
+		}, 
+		error: function (response) {
+			console.log("failed");
+		}
+	});
+}
+
+function getDesignations(){
+	$.ajax({
+		url: "/services/lcms/ajax/getDesignations",		
+		type: "GET",
+		dataType: "json",
+		success: function (response) {
+		    console.log("success"+response);
+			$('#designation').empty();
+			$('#designation').append($("<option value=''>Select</option>"));
+			$.each(response, function(key, value) {
+				$('#designation').append($('<option>').text(value).attr('value', key));
+			});
+		}, 
+		error: function (response) {
+			console.log("failed");
+		}
+	});
+}
+
 function edit(hearingId){    
 	var url = '/services/lcms/hearing/edit/'+hearingId
 	window.location = url;
-   }
+}
 $('#createnewhearings').click(function() {
 	var lcNumber = $('#lcNumber').val();
 	var url = '/services/lcms/hearing/new/?lcNumber='+lcNumber;
@@ -193,17 +280,17 @@ $('#createnewhearings').click(function() {
 });
 
 function validateHearingDate() {
-var hearingdate = $('#hearingDate').val();
-var casedate = $('#caseDate').val();
-var casedate1 = new Date(casedate);
-var casedate=( casedate1.getDate()+ '/' + (casedate1.getMonth() + 1) + '/' + casedate1.getFullYear());
-if (compareDate(hearingdate, casedate) == 1) {
-bootbox.alert("Hearing date should be greater than case date.");
-$(this).val("");
-return false;
-} else {
-return true;
-}
+	var hearingdate = $('#hearingDate').val();
+	var casedate = $('#caseDate').val();
+	var casedate1 = new Date(casedate);
+	var casedate=( casedate1.getDate()+ '/' + (casedate1.getMonth() + 1) + '/' + casedate1.getFullYear());
+	if (compareDate(hearingdate, casedate) == 1) {
+		bootbox.alert("Hearing date should be greater than case date.");
+		$(this).val("");
+		return false;
+	} else {
+		return true;
+	}
 }
 
 function compareDate(dt1, dt2) {
@@ -218,7 +305,4 @@ function compareDate(dt1, dt2) {
 	: (eval(dt2[0]) < eval(dt1[0])) ? -1
 	: 0;
 	return ret;
-	}
-			
-	
-				
+}

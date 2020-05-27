@@ -121,6 +121,9 @@
 						</s:else>
 						{key:"reappropriation_amount",label:'Total <br/>Reappropriation Amount',className:"budgetSearch"},
 						{key:"approved_amount",label:'Total <br/>Approved Amount',className:"budgetSearch"},
+						{key:"reappropriation_amount",label:'Total <br/>Reappropriation Amount',className:"budgetSearch"},
+						{key:"planning_percent",label:'Planning Percentage',className:"budgetSearch"},
+						{key:"quarter_percent",label:'Quarter Percentage',className:"budgetSearch"},
 						{key:"comment",label:'Comments',className:"budgetSearch"},
 						/* {key:"document",label:'Documents',className:"budgetSearch"} */
 				];
@@ -190,6 +193,8 @@
 							</s:else>
 							"reappropriation_amount":'<s:property value="approvedReAppropriationsTotal.setScale(2).toString()"/>',
 							"approved_amount":'<s:property value="%{calculateTotal(#p)}"/>',
+							"planning_percent":'<s:property value="planningPercent"/>',
+							"quarter_percent":'<s:property value="quarterpercent"/>',
 							"comment":'<s:property value="comment"/>',
 							/* "document":'<input type="submit" class="buttonsubmit" value="View" onclick="'+'viewDocumentManager(<s:property value="#p.documentNumber"/>);return false;"/>' */
 						});

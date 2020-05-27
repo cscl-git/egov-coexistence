@@ -47,6 +47,7 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.lcms.transactions.entity.Hearings;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.HearingsService;
@@ -75,10 +76,13 @@ public class HearingsController {
 
     @Autowired
     private HearingsService hearingsService;
+    
+    @Autowired
+    MicroserviceUtils microserviceUtils;
 
     @Autowired
     private LegalCaseService legalCaseService;
-
+    
     @RequestMapping(value = "/new/", method = RequestMethod.GET)
     public String newForm(@ModelAttribute("hearings") final Hearings hearings, final Model model,
             @RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request) {
@@ -106,7 +110,7 @@ public class HearingsController {
             return "hearings-new";
         }
         hearings.setLegalCase(legalCase);
-        hearingsService.persist(hearings);
+        hearingsService.persistHearings(hearings);
         redirectAttrs.addFlashAttribute(HEARINGS, hearings);
         model.addAttribute("message", "Hearing created successfully.");
         model.addAttribute(LcmsConstants.MODE, "create");
@@ -125,7 +129,5 @@ public class HearingsController {
         model.addAttribute(HEARINGS, hearings);
         model.addAttribute("hearingsList", hearingsList);
         return "hearings-list";
-
     }
-
 }

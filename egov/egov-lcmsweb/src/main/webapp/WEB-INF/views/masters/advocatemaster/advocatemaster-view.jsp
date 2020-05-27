@@ -193,10 +193,4 @@
 			</div>
 		</div>
 	</div>
-	<div class="row text-center">
-		<div class="add-margin">
-			<a href="javascript:void(0)" class="btn btn-default"
-				onclick="self.close()">Close</a>
-		</div>
-	</div>
 </div>

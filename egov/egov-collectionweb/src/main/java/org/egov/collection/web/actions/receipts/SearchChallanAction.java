@@ -137,7 +137,7 @@ public class SearchChallanAction extends BaseFormAction {
             params.add("%" + getChallanNumber().toUpperCase() + "%");
         }
         if (getDepartmentId() != -1) {
-            criteria.append(getJoinOperand(criteria)).append(" receipt.receiptMisc.department.id = ? ");
+            criteria.append(getJoinOperand(criteria)).append(" receipt.receiptMisc.department = ? ");
             params.add(getDepartmentId());
         }
         if (getStatus() != -1) {
@@ -177,7 +177,18 @@ public class SearchChallanAction extends BaseFormAction {
         return SUCCESS;
     }
 
-    private String getJoinOperand(final StringBuilder criteria) {
+    private String getDepartmentName(String department) {
+    	String name="";
+    	//Department dept=
+		return null;
+	}
+
+	private String s(String department) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	private String getJoinOperand(final StringBuilder criteria) {
         return StringUtils.isBlank(criteria.toString()) ? "" : " and ";
     }
 

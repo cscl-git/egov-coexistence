@@ -601,7 +601,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     	{
     		vw=new BudgetReAppropriationView();
     		vw.setBudgetDetail(bd);
-    		vw.setChangeRequestType("Addition");
+    		//vw.setChangeRequestType("Addition");
     		budgetReAppropriationList.add(vw);
     	}
             loadData(budgetReAppropriationList);
@@ -623,7 +623,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     	{
     		vw=new BudgetReAppropriationView();
     		vw.setBudgetDetail(bd);
-    		vw.setChangeRequestType("Addition");
+    		//vw.setChangeRequestType("Addition");
     		budgetReAppropriationList.add(vw);
     	}
     	//Updating the ExecutingDepartment in BudgetReAppropriation
@@ -644,7 +644,7 @@ public class BudgetReAppropriationAction extends BaseFormAction {
     	{
     		vw=new BudgetReAppropriationView();
     		vw.setBudgetDetail(bd);
-    		vw.setChangeRequestType("Addition");
+    		//vw.setChangeRequestType("Addition");
     		budgetReAppropriationList.add(vw);
     	}
             loadData(budgetReAppropriationList);

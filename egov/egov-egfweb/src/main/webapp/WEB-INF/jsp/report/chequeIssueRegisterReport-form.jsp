@@ -167,12 +167,8 @@ function getVoucherNumber(vhid){
 
 function printCheque(id)
 {
-	var chequeFormat=document.getElementById('chequeFormatId').value;
-	if(chequeFormat == "" || chequeFormat == null){
-		bootbox.alert("This bank account is not attached to any cheque formats");
-		return false;
-	} 
-	window.open('/EGF/payment/chequeAssignmentPrint-generateChequeFormat.action?instrumentHeader='+id,'Search','resizable=yes,scrollbars=yes,left=300,top=40,width=900, height=700');
+	
+	window.open('/services/EGF/payment/chequeAssignmentPrint-generateChequeFormat.action?instrumentHeader='+id,'Search','resizable=yes,scrollbars=yes,left=300,top=40,width=900, height=700');
 }
 
 </script>

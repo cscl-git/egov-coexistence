@@ -48,6 +48,7 @@
 package org.egov.lcms.transactions.service;
 
 import org.egov.commons.EgwStatus;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.lcms.transactions.entity.LegalCaseDisposal;
 import org.egov.lcms.transactions.entity.ReportStatus;
 import org.egov.lcms.transactions.repository.LegalCaseDisposalRepository;
@@ -63,7 +64,7 @@ import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
-public class LegalCaseDisposalService {
+public class LegalCaseDisposalService extends PersistenceService<LegalCaseDisposal, Long>{
 
     @Autowired
     private LegalCaseDisposalRepository legalCaseDisposalRepository;
@@ -76,18 +77,31 @@ public class LegalCaseDisposalService {
 
     @Autowired
     private LegalCaseService legalCaseService;
+    
+    public LegalCaseDisposalService() {
+        super(LegalCaseDisposal.class);
+    }
+    
+    public LegalCaseDisposalService(Class<LegalCaseDisposal> type) {
+		super(type);
+	}
 
     @Transactional
-    public LegalCaseDisposal persist(final LegalCaseDisposal legalCaseDisposal) throws ParseException {
+    public LegalCaseDisposal persist(final LegalCaseDisposal legalCaseDisposal){
         legalCaseDisposal.getLegalCase().setNextDate(legalCaseDisposal.getDisposalDate());
         final EgwStatus statusObj = legalCaseUtil.getStatusForModuleAndCode(LcmsConstants.MODULE_TYPE_LEGALCASE,
                 LcmsConstants.LEGALCASE_STATUS_CLOSED);
         legalCaseDisposal.getLegalCase().setStatus(statusObj);
         final ReportStatus reportStatus = null;
         legalCaseDisposal.getLegalCase().setReportStatus(reportStatus);
-        legalCaseSmsService.sendSmsToOfficerInchargeForCloseCase(legalCaseDisposal);
-        legalCaseSmsService.sendSmsToStandingCounselForCloseCase(legalCaseDisposal);
-        legalCaseService.persistLegalCaseIndex(legalCaseDisposal.getLegalCase(), null, null, null, legalCaseDisposal);
+        //legalCaseSmsService.sendSmsToOfficerInchargeForCloseCase(legalCaseDisposal);
+        //legalCaseSmsService.sendSmsToStandingCounselForCloseCase(legalCaseDisposal);
+        try {
+			legalCaseService.persistLegalCaseIndex(legalCaseDisposal.getLegalCase(), null, null, null, legalCaseDisposal);
+		} catch (ParseException e) {
+			e.printStackTrace();
+		}
+        applyAuditing(legalCaseDisposal);
         return legalCaseDisposalRepository.save(legalCaseDisposal);
     }
 

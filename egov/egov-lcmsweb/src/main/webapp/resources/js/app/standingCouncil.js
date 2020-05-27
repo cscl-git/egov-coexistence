@@ -46,34 +46,28 @@
  *
  */
 
-jQuery(document).ready(function($)
-{
-	if($('#seniourAdvisRequired').val() == 'false')
-	{
-			    $("#seniordov1").hide(); 
-			    $("#seniordov2").hide(); 
-			    $("#seniordov3").hide();
-	}
-	else{
+jQuery(document).ready(function($){
+	if($('#seniourAdvisRequired').val() == 'false'){
+	    $("#seniordov1").hide(); 
+	    //$("#seniordov2").hide(); 
+	    $("#seniordov3").hide();
+	}else{
 		$("#isSeniorAdvocate").prop("checked", true);
-	  var elm = document.getElementById('isSeniorAdvocate');
-	  if(elm.checked)
-	{
-			    $("#seniordov1").show(); 
-			    $("#seniordov2").show();
-			    $("#seniordov3").show();
-	}
-	else
-	{
-		 $("#seniordov1").hide(); 
-		    $("#seniordov2").hide();
-		     $("#seniordov3").show();
+		var elm = document.getElementById('isSeniorAdvocate');
+		if(elm.checked){
+		    $("#seniordov1").show(); 
+		    //$("#seniordov2").show();
+		    $("#seniordov3").show();
+		}else{
+			$("#seniordov1").hide(); 
+		    //$("#seniordov2").hide();
+		    $("#seniordov3").show();
 		    dom.get('seniorAdvocateName').value="";
-			  dom.get('assignedtodateForsenior').value="";
-		      dom.get('orderDate').value="";
-		      dom.get("orderNumber").value="";
+		    dom.get('assignedtodateForsenior').value="";
+	        //dom.get('orderDate').value="";
+	        //dom.get("orderNumber").value="";
+		}
 	}
-}
 	
 	$("#subitstandingcouncil").click(function(event){
 		 var elm = document.getElementById('isSeniorAdvocate');
@@ -90,11 +84,8 @@ jQuery(document).ready(function($)
 			  $('#orderNumber').removeAttr('required');
 		  }
 		$('#legalCaseAdvocateform :not([type=submit])').prop('disabled',false);
-		document.forms[0].submit;
-		
-	});
-    
-	
+		document.forms[0].submit;		
+	});	
 });
 
 

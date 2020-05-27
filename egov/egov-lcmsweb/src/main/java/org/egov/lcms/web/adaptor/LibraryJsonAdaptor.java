@@ -9,7 +9,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 
-public class LibraryJsonAdaptor  implements JsonSerializer<Library>{
+public class LibraryJsonAdaptor implements JsonSerializer<Library>{
 
 	@Override
 	public JsonElement serialize(final Library library, final Type type, final JsonSerializationContext jsc) {
@@ -34,5 +34,4 @@ public class LibraryJsonAdaptor  implements JsonSerializer<Library>{
         }
         return jsonObject;
 	}
-
 }

@@ -47,13 +47,21 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.lcms.masters.entity.vo.AttachedDocument;
 import org.egov.lcms.transactions.entity.AppealDocuments;
 import org.egov.lcms.transactions.entity.Judgment;
 import org.egov.lcms.transactions.entity.JudgmentImpl;
@@ -119,7 +127,11 @@ public class JudgmentImplController {
     public String create(@Valid @ModelAttribute("judgmentImpl") final JudgmentImpl judgmentImpl,
             final BindingResult errors, final RedirectAttributes redirectAttrs,
             @RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request,
-            @RequestParam("file") final MultipartFile[] files, final Model model) throws IOException, ParseException {
+            final Model model) throws IOException, ParseException {
+    	List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         final Judgment judgment = judgmentService.findByLCNumber(lcNumber);
         if (errors.hasErrors()) {
             model.addAttribute("judgment", judgment);
@@ -127,7 +139,20 @@ public class JudgmentImplController {
             return "judgmentimpl-new";
         } else
             judgmentImpl.setJudgment(judgment);
-        judgmentImplService.saveOrUpdate(judgmentImpl, files);
+        
+        if(uploadedFiles!=null) {
+            for (int i = 0; i < uploadedFiles.length; i++) {
+                Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+                byte[] fileBytes = Files.readAllBytes(path);
+                ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+                AttachedDocument attachedDocument = new AttachedDocument();
+                attachedDocument.setFileStream(bios);
+                attachedDocument.setFileName(fileName[i]);
+                attachedDocument.setMimeType(contentType[i]);
+                attachedDocuments.add(attachedDocument);
+            }
+        }
+        judgmentImplService.saveOrUpdate(judgmentImpl, attachedDocuments);
         if (judgmentImpl.getImplementationFailure() != null
                 && judgmentImpl.getImplementationFailure().toString().equals("Appeal")) {
             final JudgmentImpl newjudgmentImpl = getAppealDocuments(judgmentImpl);

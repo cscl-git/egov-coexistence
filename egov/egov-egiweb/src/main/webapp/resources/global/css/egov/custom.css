@@ -1518,9 +1518,11 @@ label.error {
   background-image: none;
   text-align: center;
 }
-.page-container .main-content .yui-skin-sam .yui-dt th {
+.page-container .main-content .yui-skin-sam .yui-dt th, .yui-skin-sam .yui-dt th a {
   color: #ffffff;
   background: #265988;
+  vertical-align: middle;
+  font-weight: normal;
 }
 .page-container .main-content .yui-skin-sam .yui-dt td {
   border-right: 1px solid #E9E9E9;
@@ -2092,7 +2094,7 @@ footer.main a {
 }
 
 .tab-content {
-    margin-top: 100px;
+    margin-top:30px;
     position: absolute;
     width: 95%;
     

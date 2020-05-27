@@ -47,6 +47,9 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.lcms.masters.entity.vo.AttachedDocument;
 import org.egov.lcms.masters.service.JudgmentTypeService;
 import org.egov.lcms.transactions.entity.Judgment;
 import org.egov.lcms.transactions.entity.LegalCase;
@@ -66,8 +69,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping("/judgment")
@@ -107,8 +117,13 @@ public class JudgmentController {
     @RequestMapping(value = "/new/", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute("judgment") final Judgment judgment, final BindingResult errors,
             final RedirectAttributes redirectAttrs, @RequestParam("lcNumber") final String lcNumber,
-            @RequestParam("file") final MultipartFile[] files, final HttpServletRequest request, final Model model)
+            final HttpServletRequest request, final Model model)
             throws IOException, ParseException {
+    	List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
+        
         final LegalCase legalcase = getLegalCase(lcNumber, request);
         if (errors.hasErrors()) {
             prepareNewForm(model);
@@ -116,7 +131,20 @@ public class JudgmentController {
             return "judgment-new";
         } else
             judgment.setLegalCase(legalcase);
-        judgmentService.persist(judgment, files);
+        
+        if(uploadedFiles!=null) {
+            for (int i = 0; i < uploadedFiles.length; i++) {
+                Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+                byte[] fileBytes = Files.readAllBytes(path);
+                ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+                AttachedDocument attachedDocument = new AttachedDocument();
+                attachedDocument.setFileStream(bios);
+                attachedDocument.setFileName(fileName[i]);
+                attachedDocument.setMimeType(contentType[i]);
+                attachedDocuments.add(attachedDocument);
+            }
+        }
+        judgmentService.persist(judgment, attachedDocuments);
         model.addAttribute(LcmsConstants.MODE, "view");
         redirectAttrs.addFlashAttribute(JUDGMENT, judgment);
         model.addAttribute("message", "Judgment Created successfully.");

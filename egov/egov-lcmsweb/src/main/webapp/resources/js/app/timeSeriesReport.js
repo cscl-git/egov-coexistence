@@ -197,7 +197,7 @@ function callAjaxBydrillDownReport(aggregatedByValues,monthh,yearr) {
 	$('#reportgeneration-header').show();
 	$.ajax({
 		type: "GET",
-		url: "/lcms/timeseriesreports/drilldownreportresult",
+		url: "/services/lcms/timeseriesreports/drilldownreportresult",
 		cache: true,
 		dataType: "json",
 		data:{'aggregatedBy' :aggregatedBy,
