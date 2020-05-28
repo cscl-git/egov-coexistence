@@ -1376,7 +1376,20 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
     }
 
     private String getConsumerCode(ReceiptHeader receiptHeader) {
-        return receiptHeader.getServiceCategory() + "-" + receiptHeader.getService() + "-" + String.valueOf(new Date().getTime());
+    	String category=null;
+    	if(receiptHeader.getServiceCategory() != null)
+    	{
+    		category= receiptHeader.getServiceCategory();
+    	}
+    	else if(receiptHeader.getService() != null)
+    	{
+    			String categoryList[]=receiptHeader.getService().split("\\.");
+    			if(categoryList.length >= 1)
+    			{
+    				category=categoryList[0];
+    			}
+    	}
+    	return category + "-" + receiptHeader.getService() + "-" + String.valueOf(new Date().getTime());
     }
 
     public Date getDataEntryCutOffDate() {
