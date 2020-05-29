@@ -1208,7 +1208,14 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         demand.setConsumerCode(consumerCode);
         demand.setConsumerType(CollectionConstants.MISCELLANEOUS_RECEIPT);
         demand.setBusinessService(receiptHeader.getService());
-        demand.setMinimumAmountPayable(receiptHeader.getTotalcramount());
+        if(receiptHeader.getTotalcramount() != null)
+        {
+        	demand.setMinimumAmountPayable(receiptHeader.getTotalcramount());
+        }
+        else
+        {
+        	demand.setMinimumAmountPayable(receiptHeader.getTotalAmount());
+        }
         demand.setDemandDetails(new ArrayList<>());
         TaxPeriod tp = microserviceUtils.getTaxPeriodsByService(receiptHeader.getService());
         if (tp != null) {
@@ -1225,6 +1232,19 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                     dd.setTenantId(demand.getTenantId());
                     dd.setTaxHeadMasterCode(rd.getTaxheadCode());
                     demand.getDemandDetails().add(dd);
+                }
+                else if (rd.getAccounthead() != null)
+                {
+                	String taxHead=microserviceUtils.getTaxHeadCode(rd.getAccounthead().getGlcode());
+                	if(taxHead != null && !taxHead.isEmpty())
+                	{
+                		dd = new DemandDetail();
+                        dd.setTaxAmount(rd.getCramount());
+                        // dd.setCollectionAmount(rd.getCramount());
+                        dd.setTenantId(demand.getTenantId());
+                        dd.setTaxHeadMasterCode(taxHead);
+                        demand.getDemandDetails().add(dd);
+                	}
                 }
             }
 

@@ -422,6 +422,30 @@ public class MicroserviceUtils {
         }
         return null;
     }
+    
+    public String getTaxHeadCode(String code) {
+        FilterRequest filterReq = new FilterRequest();
+        List<String> taxHeads=new ArrayList<String>();
+        String taxHead=null;
+        try {
+            if(!StringUtils.isEmpty(code) && code != null ){
+                filterReq.setGlcode(code);
+            }
+            JSONArray mdmObj = getFinanceMdmsByModuleNameAndMasterDetails("FinanceModule", "TaxHeadMasterGlCodeMapping", filterReq);
+            mdmObj.stream().forEach(obj ->{
+                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
+                taxHeads.add(lhm.get("taxhead").toString());
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(taxHeads != null && !taxHeads.isEmpty())
+        {
+        	taxHead=taxHeads.get(0);
+        }
+        
+        return taxHead;
+    }
 
     public Department getDepartmentByCode(String departmentCode) {
 
@@ -515,6 +539,9 @@ public class MicroserviceUtils {
                         }).collect(Collectors.toList());
                 masterDetail.setFilter("[?(@.code IN " + codes + ")]");
             }
+            
+            if(null != filter.getGlcode())
+                masterDetail.setFilter("[?(@.glcode=='" + filter.getGlcode() + "')]");
         }
         ModuleDetail moduleDetail = new ModuleDetail();
         moduleDetail.setMasterDetails(Arrays.asList(masterDetail));
@@ -1687,6 +1714,8 @@ class FilterRequest {
     private Short pageSize;
 
     private Short pageNumber;
+    
+    private String glcode;
 
     public List<Long> getId() {
         return id;
@@ -1767,6 +1796,17 @@ class FilterRequest {
     public void setPageNumber(Short pageNumber) {
         this.pageNumber = pageNumber;
     }
+
+	public String getGlcode() {
+		return glcode;
+	}
+
+	public void setGlcode(String glcode) {
+		this.glcode = glcode;
+	}
+    
+    
+    
     
     
 }

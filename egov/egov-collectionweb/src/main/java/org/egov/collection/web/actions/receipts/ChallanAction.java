@@ -185,8 +185,8 @@ public class ChallanAction extends BaseFormAction {
 	private Boolean cardAllowed = Boolean.TRUE;
 	private Boolean chequeAllowed = Boolean.TRUE;
 	private Boolean ddAllowed = Boolean.TRUE;
-	private Boolean bankAllowed = Boolean.TRUE;
-	private Boolean onlineAllowed = Boolean.TRUE;
+	private Boolean bankAllowed = Boolean.FALSE;
+	private Boolean onlineAllowed = Boolean.FALSE;
 
 	/**
 	 * An instance of <code>InstrumentHeader</code> representing the cash instrument
@@ -373,27 +373,34 @@ public class ChallanAction extends BaseFormAction {
 
 			if (receiptHeader == null) {
 				receiptHeader = new ReceiptHeader();
-				errors.add(new ValidationError(getText("challan.notfound.message"),
+				/*errors.add(new ValidationError(getText("challan.notfound.message"),
 						"No Valid Challan Found. Please check the challan number."));
-				throw new ValidationException(errors);
+				throw new ValidationException(errors);*/
+				addActionError("No Valid Challan Found. Please check the challan number.");
 			}
 
 			if (CollectionConstants.CHALLAN_STATUS_CODE_CANCELLED
 					.equals(receiptHeader.getChallan().getStatus().getCode())) {
-				errors.add(new ValidationError(getText("challan.cancel.receipt.error"),
-						"Challan is cancelled. Cannot create Receipt for Challan."));
-				throw new ValidationException(errors);
+				/*
+				 * errors.add(new ValidationError(getText("challan.cancel.receipt.error"),
+				 * "Challan is cancelled. Cannot create Receipt for Challan.")); throw new
+				 * ValidationException(errors);
+				 */
+				addActionError("No Valid Challan Found. Please check the challan number.");
 			}
 
 			if (CollectionConstants.RECEIPT_STATUS_CODE_PENDING.equals(receiptHeader.getStatus().getCode())) {
 				loadReceiptDetails();
 				//setCollectionModesNotAllowed();
 			} else {
-				errors.add(new ValidationError(
-						getText("challanreceipt.created.message", new String[] { receiptHeader.getReceiptnumber() }),
-						"Receipt Already Created For this Challan. Receipt Number is "
-								+ receiptHeader.getReceiptnumber()));
-				throw new ValidationException(errors);
+				/*
+				 * errors.add(new ValidationError( getText("challanreceipt.created.message", new
+				 * String[] { receiptHeader.getReceiptnumber() }),
+				 * "Receipt Already Created For this Challan. Receipt Number is " +
+				 * receiptHeader.getReceiptnumber())); throw new ValidationException(errors);
+				 */
+				addActionError("Receipt Already Created For this Challan. Receipt Number is "
+						+ receiptHeader.getReceiptnumber());
 			}
 		}
 
@@ -492,12 +499,16 @@ public class ChallanAction extends BaseFormAction {
 							CollectionConstants.RECEIPT_STATUS_CODE_TO_BE_SUBMITTED));
 			receiptHeader.setCreatedBy(collectionsUtil.getLoggedInUser().getId());
 			receiptHeader.setCreatedDate(new Date());
+			
 
 			if (setInstrument) {
 				receiptInstrList = populateInstrumentDetails();
 				setInstrument = false;
 			}
-
+			if(receiptInstrList != null && !receiptInstrList.isEmpty())
+			{
+				receiptHeader.setModOfPayment(receiptInstrList.get(0).getInstrumentType().getType());
+			}
 			receiptHeader.setReceiptInstrument(new HashSet(receiptInstrList));
 
 			BigDecimal debitAmount = BigDecimal.ZERO;
@@ -505,10 +516,14 @@ public class ChallanAction extends BaseFormAction {
 			for (final ReceiptDetail receiptDetail : receiptHeader.getReceiptDetails())
 				debitAmount = debitAmount.add(receiptDetail.getCramount());
 
-			DebitAccountHeadDetailsService debitAccountHeadService = (DebitAccountHeadDetailsService) beanProvider
-					.getBean(collectionsUtil.getBeanNameForDebitAccountHead());
-			receiptHeader.addReceiptDetail(debitAccountHeadService.addDebitAccountHeadDetails(debitAmount,
-					receiptHeader, chequeInstrumenttotal, cashOrCardInstrumenttotal, instrumentTypeCashOrCard));
+			/*
+			 * DebitAccountHeadDetailsService debitAccountHeadService =
+			 * (DebitAccountHeadDetailsService) beanProvider
+			 * .getBean(collectionsUtil.getBeanNameForDebitAccountHead());
+			 * receiptHeader.addReceiptDetail(debitAccountHeadService.
+			 * addDebitAccountHeadDetails(debitAmount, receiptHeader, chequeInstrumenttotal,
+			 * cashOrCardInstrumenttotal, instrumentTypeCashOrCard));
+			 */
 
 			if (chequeInstrumenttotal != null && chequeInstrumenttotal.compareTo(BigDecimal.ZERO) != 0)
 				receiptHeader.setTotalAmount(chequeInstrumenttotal);
