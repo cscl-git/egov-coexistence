@@ -1677,6 +1677,14 @@ label.error {
   height:34px;
 }
 
+.btn-default-master {
+  color: #ffffff;
+  background-color: #fe7a51;
+  border-color: #fe7a51;
+  width: auto;
+  height:34px;
+}
+
 .btn-primary {
   color: #ffffff;
   background-color: #fe7a51;
