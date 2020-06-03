@@ -4,7 +4,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
 
-<form:form name="auditForm" role="form" method="post" action="create" modelAttribute="auditDetail" id="auditDetail" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
+<form:form name="auditForm" role="form" method="post" action="save" modelAttribute="auditDetail" id="auditDetail" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	<div class="panel-title text-center" style="color: green;">
 	       <c:out value="${message}"/>
 	        <br/>
@@ -21,8 +21,6 @@
                               data-tabidx=0><spring:message code="lbl.header" text="Header"/></a></li>
         <li><a data-toggle="tab" href="#checklist" data-tabidx=1><spring:message
                 code="lbl.checklist" text="CheckList"/> </a></li>
-        <li><a data-toggle="tab" href="#billDetails" data-tabidx=1><spring:message
-                code="lbl.bill" text="Bill Details"/> </a></li>
     </ul>
     <div class="tab-content">
     	<div class="tab-pane fade in active" id="auditheader">
@@ -49,11 +47,28 @@
 				<div class="col-sm-3 add-margin">
 					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="auditType" path="auditType" readonly="true" value="Pre-Audit" />
 				</div>
+				<label class="col-sm-2 control-label text-right"><spring:message code="lbl.billDetails"  text="Bill Details"/>
+				</label>
+				<div class="col-sm-3 add-margin">
+					<a href="#" id="sourceLink" onclick=" return openSource('${billSource}');">View Bill</a>
+				</div>
     		</div>
     	</div>
+    	<input type="hidden" nanme="billId" id="billId" value="${auditDetail.billId}"/>
     	<jsp:include page="billdocument-upload.jsp"/>
     	</div>
     	<div class="tab-pane fade" id="checklist">
+    	<jsp:include page="audit-checklist.jsp"/>
     	</div>
+    	 <jsp:include page="commonworkflowmatrix-audit.jsp"/>
+        <div class="buttonbottom" align="center">
+            <jsp:include page="commonworkflowmatrix-button.jsp"/>
+        </div>
     </div>
+    
 </form:form>
+<script
+        src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
+<script
+        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+        

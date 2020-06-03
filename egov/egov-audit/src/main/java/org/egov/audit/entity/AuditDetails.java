@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -12,14 +14,18 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.egov.commons.EgwStatus;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.EgBillregistermis;
 
 @Entity
 @Table(name = "AUDIT_DETAILS")
@@ -50,6 +56,17 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@ManyToOne
     @JoinColumn(name = "billid")
     private EgBillregister egBillregister;
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditCheckList.class)
+	private List<AuditCheckList> checkList=new ArrayList<AuditCheckList>();
+	@Transient
+	private String approvalDepartment;
+	@Transient
+    private String approvalComent;
+	@Transient
+    private User approver;
+	@Transient
+    private Date approvedOn;
 	
 	@Override
 	public String getStateDetails() {
@@ -139,6 +156,46 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 
 	public void setEgBillregister(EgBillregister egBillregister) {
 		this.egBillregister = egBillregister;
+	}
+
+	public List<AuditCheckList> getCheckList() {
+		return checkList;
+	}
+
+	public void setCheckList(List<AuditCheckList> checkList) {
+		this.checkList = checkList;
+	}
+
+	public String getApprovalDepartment() {
+		return approvalDepartment;
+	}
+
+	public void setApprovalDepartment(String approvalDepartment) {
+		this.approvalDepartment = approvalDepartment;
+	}
+
+	public String getApprovalComent() {
+		return approvalComent;
+	}
+
+	public void setApprovalComent(String approvalComent) {
+		this.approvalComent = approvalComent;
+	}
+
+	public User getApprover() {
+		return approver;
+	}
+
+	public void setApprover(User approver) {
+		this.approver = approver;
+	}
+
+	public Date getApprovedOn() {
+		return approvedOn;
+	}
+
+	public void setApprovedOn(Date approvedOn) {
+		this.approvedOn = approvedOn;
 	}
 
 	
