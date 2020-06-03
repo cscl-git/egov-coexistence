@@ -46,101 +46,131 @@
  */
 package org.egov.council.service;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.CouncilPreamble;
-import org.egov.eis.entity.Assignment;
 import org.egov.eis.service.AssignmentService;
 import org.egov.eis.service.EisCommonService;
-import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
-import org.egov.pims.commons.Position;
+import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Transactional(readOnly = true)
 public class CouncilThirdPartyService {
+	
+	private static final Logger LOG = LoggerFactory.getLogger(CouncilThirdPartyService.class);
     private static final String DEPARTMENT = "department";
     @Autowired
     private EisCommonService eisCommonService;
     @Autowired
     private AssignmentService assignmentService;
+    @Autowired
+    private EgovMasterDataCaching masterDataCache;
+    @Autowired
+    private MicroserviceUtils microserviceUtils;
 
-    public List<HashMap<String, Object>> getHistory(final CouncilPreamble councilPreamble) {
-        User userObject;
-        Assignment primaryAssignment;
+    public List<HashMap<String, Object>> getHistory(final Object obj) {
         final List<HashMap<String, Object>> historyTable = new ArrayList<>();
-        final State workflowState = councilPreamble.getState();
+        State workflowState = null;
         final HashMap<String, Object> workFlowHistory = new HashMap<>();
+        List<StateHistory> historyList = new ArrayList<StateHistory>();
+        if(obj instanceof CouncilPreamble) {
+        	workflowState = ((CouncilPreamble)obj).getState();
+        	historyList = ((CouncilPreamble)obj).getStateHistory();
+        }else if(obj instanceof CouncilMeeting) {
+        	workflowState = ((CouncilMeeting)obj).getState();
+        	historyList = ((CouncilMeeting)obj).getStateHistory();
+        }
+        
         if (null != workflowState) {
-            if (null != councilPreamble.getStateHistory() && !councilPreamble.getStateHistory().isEmpty()) {
-                Collections.reverse(councilPreamble.getStateHistory());
+            if (!CollectionUtils.isEmpty(historyList)) {
+                Collections.reverse(historyList);
             }
 
-            for (final StateHistory stateHistory : councilPreamble.getStateHistory()) {
+            Map<String,String> departmentMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+            Map<Long,EmployeeInfo> userMap = new HashMap<Long, EmployeeInfo>();
+            
+            workFlowHistory.put("date", workflowState.getDateInfo());
+            try {
+            	if(!userMap.containsKey(workflowState.getLastModifiedBy())) {
+            		EmployeeInfo info = microserviceUtils.getEmployeeById(workflowState.getLastModifiedBy());
+            		if(null != info) {
+            			userMap.put(workflowState.getLastModifiedBy(), info);
+                	}
+            	}
+            	EmployeeInfo emp = userMap.get(workflowState.getLastModifiedBy());
+            	workFlowHistory.put("updatedBy",emp.getUser().getUserName()+"::"+emp.getUser().getName());
+            	
+            }catch(Exception e) {
+            	LOG.error("No user found with id "+workflowState.getLastModifiedBy());
+            }
+            workFlowHistory.put("status", workflowState.getValue());
+            try {
+            	if(!userMap.containsKey(workflowState.getOwnerPosition())) {
+            		EmployeeInfo info = microserviceUtils.getEmployeeById(workflowState.getOwnerPosition());
+            		if(null != info) {
+            			userMap.put(workflowState.getOwnerPosition(), info);
+                	}
+            	}
+            	EmployeeInfo emp = userMap.get(workflowState.getOwnerPosition());
+            	workFlowHistory.put("user",emp.getUser().getUserName()+"::"+emp.getUser().getName());
+            	workFlowHistory.put(DEPARTMENT,departmentMap.get(emp.getAssignments().get(0).getDepartment()));
+            }catch(Exception e) {
+            	LOG.error("No user found with id "+workflowState.getOwnerPosition());
+            }
+            
+            workFlowHistory.put("comments", workflowState.getComments() != null ? workflowState.getComments() : "");
+            historyTable.add(workFlowHistory);
+            
+            for (final StateHistory stateHistory : historyList) {
                 final HashMap<String, Object> historyMap = new HashMap<>();
                 historyMap.put("date", stateHistory.getDateInfo());
-                historyMap.put("comments", stateHistory.getComments());
-				/*
-				 * historyMap.put("updatedBy", stateHistory.getLastModifiedBy().getUsername() +
-				 * "::" + stateHistory.getLastModifiedBy().getName());
-				 */
-                historyMap.put("status", stateHistory.getValue());
-                final Position owner = null;//stateHistory.getOwnerPosition();
-                userObject = null;//stateHistory.getOwnerUser();
-                if (null != userObject) {
-                    historyMap.put("user", userObject.getUsername() + "::" + userObject.getName());
-                    historyMap.put(DEPARTMENT,
-                            null != eisCommonService.getDepartmentForUser(userObject.getId()) ? eisCommonService
-                                    .getDepartmentForUser(userObject.getId()).getName() : "");
-                } else if (null != owner && null != owner.getDeptDesig()) {
-                    primaryAssignment=assignmentService.getPrimaryAssignmentForPositon(owner.getId());
-                    if(primaryAssignment!=null) {
-                        userObject=primaryAssignment.getEmployee();
-                    } else{
-                        userObject = eisCommonService.getUserForPosition(owner.getId(), new Date());
-                    }   
-                    historyMap
-                            .put("user", null != userObject.getUsername() ? userObject.getUsername() + "::" + userObject.getName()
-                                    : "");
-                    historyMap.put(DEPARTMENT, null != owner.getDeptDesig().getDepartment() ? owner.getDeptDesig()
-                            .getDepartment().getName() : "");
+                try {
+                	if(!userMap.containsKey(stateHistory.getLastModifiedBy())) {
+                		EmployeeInfo info = microserviceUtils.getEmployeeById(stateHistory.getLastModifiedBy());
+                		if(null != info) {
+                			userMap.put(stateHistory.getLastModifiedBy(), info);
+                    	}
+                	}
+                	EmployeeInfo emp = userMap.get(stateHistory.getLastModifiedBy());
+                	historyMap.put("updatedBy",emp.getUser().getUserName()+"::"+emp.getUser().getName());
+                	
+                }catch(Exception e) {
+                	LOG.error("No user found with id "+stateHistory.getLastModifiedBy());
                 }
+                historyMap.put("status", stateHistory.getValue());
+                try {
+                	if(!userMap.containsKey(stateHistory.getOwnerPosition())) {
+                		EmployeeInfo info = microserviceUtils.getEmployeeById(stateHistory.getOwnerPosition());
+                		if(null != info) {
+                			userMap.put(stateHistory.getOwnerPosition(), info);
+                    	}
+                	}
+                	EmployeeInfo emp = userMap.get(stateHistory.getOwnerPosition());
+                	historyMap.put("user",emp.getUser().getUserName()+"::"+emp.getUser().getName());
+                	historyMap.put(DEPARTMENT,departmentMap.get(emp.getAssignments().get(0).getDepartment()));
+                }catch(Exception e) {
+                	LOG.error("No user found with id "+stateHistory.getOwnerPosition());
+                }
+                historyMap.put("comments", stateHistory.getComments() != null ? stateHistory.getComments() : "");
+                
                 historyTable.add(historyMap);
             }
-
-            workFlowHistory.put("date", workflowState.getDateInfo());
-            workFlowHistory.put("comments", workflowState.getComments() != null ? workflowState.getComments() : "");
-            //workFlowHistory.put("updatedBy",
-            //        workflowState.getLastModifiedBy().getUsername() + "::" + workflowState.getLastModifiedBy().getName());
-            workFlowHistory.put("status", workflowState.getValue());
-            final Position ownerPosition = null;//workflowState.getOwnerPosition();
-            userObject = null;//workflowState.getOwnerUser();
-            if (null != userObject) {
-                workFlowHistory.put("user", userObject.getUsername() + "::" + userObject.getName());
-                workFlowHistory.put(DEPARTMENT,
-                        null != eisCommonService.getDepartmentForUser(userObject.getId()) ? eisCommonService
-                                .getDepartmentForUser(userObject.getId()).getName() : "");
-            } else if (null != ownerPosition && null != ownerPosition.getDeptDesig()) {
-                primaryAssignment = assignmentService.getPrimaryAssignmentForPositon(ownerPosition.getId());
-                if (primaryAssignment != null) {
-                    userObject = primaryAssignment.getEmployee();
-                } else {
-                    userObject = eisCommonService.getUserForPosition(ownerPosition.getId(), new Date());
-                }
-                workFlowHistory.put("user",
-                        null != userObject.getUsername() ? userObject.getUsername() + "::" + userObject.getName() : "");
-                workFlowHistory.put(DEPARTMENT, null != ownerPosition.getDeptDesig().getDepartment() ? ownerPosition
-                        .getDeptDesig().getDepartment().getName() : "");
-            }
-            historyTable.add(workFlowHistory);
         }
         return historyTable;
     }

@@ -54,7 +54,14 @@
 <div class="row">
 	<div class="panel panel-primary" data-collapsed="0">
 		<div class="panel-heading">
-			<div class="panel-title">Create Preamble</div>
+			<div class="panel-title">
+				<c:if test="${currentState == 'NEW'}">
+					<spring:message code="title.councilagenda.create"/>
+				</c:if>
+				<c:if test="${currentState != 'NEW'}">
+					<spring:message code="title.councilagenda.update"/>
+				</c:if>
+			</div>
 		</div>
 		<div class="panel-body">
 			<div class="form-group">
@@ -92,12 +99,12 @@
 						<form:option value="">
 							<spring:message code="lbl.select" />
 						</form:option>
-						<form:options items="${departments}" itemValue="id"
+						<form:options items="${departments}" itemValue="code"
 							itemLabel="name" />
 					</form:select>
 					<form:errors path="department" cssClass="error-msg" />
 				</div>
-				<label class="col-sm-2 control-label text-right"><spring:message
+				<!-- <label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.amount" /></label>
 				<div class="col-sm-3 add-margin">
 					<form:input path="sanctionAmount"
@@ -109,6 +116,23 @@
 				<a
 					onclick="window.open('${URL}','name','width=800, height=600,scrollbars=yes')">Click
 					here to Check Budget</a>
+				 -->
+			</div>
+			<div class="form-group">
+				<label class="col-sm-2 control-label text-right"><spring:message
+						code="lbl.committeetype" /> <span class="mandatory"></span> </label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="committeeType" id="committeeType"
+						required="required" cssClass="form-control"
+						cssErrorClass="form-control error">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:options items="${committeeType}" itemValue="id"
+							itemLabel="name" />
+					</form:select>
+					<form:errors path="committeeType" cssClass="error-msg" />
+				</div>
 			</div>
 			<div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
@@ -162,7 +186,7 @@
 					</c:choose>
 				</div>
 
-				<label class="col-sm-2 control-label text-right"><spring:message
+				<!-- <label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.ward.no" /></label>
 				<div class="col-sm-3 add-margin">
 					<select name="wards" multiple id="wards" size="7"
@@ -176,11 +200,17 @@
 				</div>
 				<input type="hidden" name="wardsHiddenIds" id="wardsHdnIds"
 					class="wardsHdnIds">
-			
+			 -->
 			</div>
-			<div>Note: After getting the council preamble prepared and
+			<!-- <div>Note: After getting the council preamble prepared and
 				approved by the head of the section, the same should be uploaded
-				here and forward to the competent authority for further action</div>
+				here and forward to the competent authority for further action</div>-->
 		</div>
 	</div>
 </div>
+
+<style>
+#attachments{
+	color:#333;
+}
+</style>

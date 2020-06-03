@@ -75,9 +75,12 @@ public class CouncilRouter extends AbstractAuditable {
     @GeneratedValue(generator = SEQ_EGCNCL_ROUTER, strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @ManyToOne
+    //@ManyToOne
+    //@JoinColumn(name = "department")
+    //private Department department;
+    
     @JoinColumn(name = "department")
-    private Department department;
+    private String department;
 
     @JoinColumn(name = "type")
     private PreambleTypeEnum type;
@@ -90,7 +93,7 @@ public class CouncilRouter extends AbstractAuditable {
         return id;
     }
 
-    public Department getDepartment() {
+    public String getDepartment() {
         return department;
     }
 
@@ -102,7 +105,7 @@ public class CouncilRouter extends AbstractAuditable {
         this.id = id;
     }
 
-    public void setDepartment(Department department) {
+    public void setDepartment(String department) {
         this.department = department;
     }
 

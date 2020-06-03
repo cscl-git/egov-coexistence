@@ -88,12 +88,17 @@
 	<table>
 		<tr>
 			<td>
-		<c:forEach items="${validActionList}" var="validButtons">
-				<form:button type="submit" id="${validButtons}" class="btn btn-primary workflow-submit"  value="${validButtons}" onclick="validateWorkFlowApprover('${validButtons}');">
-						<c:out value="${validButtons}" /> </form:button>
-			</c:forEach>
-				<input type="button" name="button2" id="button2" value="Close"
-				class="btn btn-default" onclick="window.close();" /></td>
+				<c:forEach items="${validActionList}" var="validButtons">
+					<form:button type="submit" id="${validButtons}" class="btn btn-primary workflow-submit"  value="${validButtons}" onclick="validateWorkFlowApprover('${validButtons}');">
+						<c:out value="${validButtons}" /> 
+					</form:button>
+				</c:forEach>
+				<c:if test="${(currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState))
+								|| (stateType!= 'null' && 'CouncilMeeting'.equalsIgnoreCase(stateType))}">
+					<input type="button" name="button2" id="button2" value="Close"
+					class="btn btn-default" onclick="window.close();" />
+				</c:if> 
+			</td>
 		</tr>
 	</table>
 </div>

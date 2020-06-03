@@ -61,7 +61,8 @@
     <context:component-scan base-package="org.egov.council.web">
         <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
     </context:component-scan>
-
+    <bean id="masterDataCache" class="org.egov.infstr.utils.EgovMasterDataCaching" lazy-init="false"/>
+	
     <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
         <property name="maxUploadSize" value="73400320"/>
         <property name="maxInMemorySize" value="${max.file.inmemory.size}"/>

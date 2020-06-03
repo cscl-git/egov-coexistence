@@ -102,7 +102,7 @@
 									varStatus="counter">
 									<tr>
 										<td align="center" width="5%">${counter.count}</td>
-										<td width="14%"><c:out value="${contact.preamble.department.name}" /></td>
+										<td width="14%"><c:out value="${contact.preamble.department}" /></td>
 										<td width="10%"><c:out value="${contact.preamble.preambleNumber}" /></td>
 										<td><span class="more"><c:out
 													value="${contact.preamble.gistOfPreamble}" /></span></td>

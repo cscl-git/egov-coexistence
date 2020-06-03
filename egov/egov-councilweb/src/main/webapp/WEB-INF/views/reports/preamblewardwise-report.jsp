@@ -66,12 +66,9 @@
 			<thead>
 				<tr>
 					<th><spring:message code="lbl.serial.no" /></th>
-					<th><spring:message code="lbl.ward" /></th>
 					<th><spring:message code="lbl.department" /></th>
-					<th><spring:message code="lbl.PreambleType" /></th>
 					<th><spring:message code="lbl.gistofpreamble" /></th>
 					<th><spring:message code="lbl.dateofcreation" /></th>
-					<th><spring:message code="lbl.used.in.agenda" /></th>
 					<th><spring:message code="lbl.meeting.date"/>
 					<th><spring:message code="lbl.meeting.type"/>
 					<th><spring:message code="lbl.status"/></th>

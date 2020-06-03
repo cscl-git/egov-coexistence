@@ -92,11 +92,16 @@ public class CouncilPreamble extends StateAware {
     @GeneratedValue(generator = SEQ_COUNCILPREAMBLE, strategy = GenerationType.SEQUENCE)
     private Long id;
 
+    //@NotNull
+    //@ManyToOne
+    //@JoinColumn(name = "department", nullable = false)
+    //private Department department;
+    
     @NotNull
-    @ManyToOne
-    @JoinColumn(name = "department", nullable = false)
-    private Department department;
-
+    @JoinColumn(name = "department")
+    private String department;
+    
+    
     @Column(name = "preambleNumber", unique = true)
     @Length(max = 25)
     private String preambleNumber;
@@ -154,13 +159,25 @@ public class CouncilPreamble extends StateAware {
     private Date toDate;
 
     @Transient
-    private Long approvalDepartment;
-
+    private CommitteeType committeeType;
+    
     @Transient
-    private String approvalComent;
+    private String approvalDepartment;
+    
+    @Transient
+    private String approvalDesignation;
 
     @Transient
     private Long approvalPosition;
+    
+    @Transient
+    private String approvalComent;
+    
+    @Transient
+    private String departmentName;
+    
+    @Transient
+    private EgwStatus displayStatus;
     
     @Column
     private String statusMessage;
@@ -175,11 +192,11 @@ public class CouncilPreamble extends StateAware {
         this.id = id;
     }
 
-    public Department getDepartment() {
+    public String getDepartment() {
         return department;
     }
 
-    public void setDepartment(Department department) {
+    public void setDepartment(String department) {
         this.department = department;
     }
 
@@ -257,14 +274,14 @@ public class CouncilPreamble extends StateAware {
 
     @Override
     public String getStateDetails() {
-        return String.format("Preamble Number %s ", preambleNumber);
+        return String.format("Agenda Number %s ", preambleNumber);
     }
 
-    public Long getApprovalDepartment() {
+    public String getApprovalDepartment() {
         return approvalDepartment;
     }
 
-    public void setApprovalDepartment(Long approvalDepartment) {
+    public void setApprovalDepartment(String approvalDepartment) {
         this.approvalDepartment = approvalDepartment;
     }
 
@@ -348,5 +365,37 @@ public class CouncilPreamble extends StateAware {
     public void setStatusMessage(String statusMessage) {
         this.statusMessage = statusMessage;
     }
+
+	public String getApprovalDesignation() {
+		return approvalDesignation;
+	}
+
+	public void setApprovalDesignation(String approvalDesignation) {
+		this.approvalDesignation = approvalDesignation;
+	}
+
+	public CommitteeType getCommitteeType() {
+		return committeeType;
+	}
+
+	public void setCommitteeType(CommitteeType committeeType) {
+		this.committeeType = committeeType;
+	}
+
+	public String getDepartmentName() {
+		return departmentName;
+	}
+
+	public void setDepartmentName(String departmentName) {
+		this.departmentName = departmentName;
+	}
+
+	public EgwStatus getDisplayStatus() {
+		return displayStatus;
+	}
+
+	public void setDisplayStatus(EgwStatus displayStatus) {
+		this.displayStatus = displayStatus;
+	}
     
 }

@@ -86,43 +86,50 @@ function callAjaxSearch() {
 				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
 				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
 				"oTableTools" : {
-					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [{"sExtends" : "xls"},
 						           {"sExtends" :"pdf"},
 						           {"sExtends" : "print"}]
 				},
 				aaSorting: [],				
-				columns : [ { 
-"data" : "meetingType", "sClass" : "text-left"} ,{ 
-"data" : "meetingNumber", "sClass" : "text-left"} ,{ 
-"data" : "meetingDate", "sClass" : "text-left"},{
-"data" : "meetingLocation", "sClass" : "text-left"},{
-"data" : "meetingTime", "sClass" : "text-left"}
-,{ "data" : null, "sClass" : "text-center", "target":-1,
-	
-    sortable: false,
-    "render": function ( data, type, full, meta ) {
-    	 var mode = $('#mode').val();
-       	 if(mode == 'edit')
-           	 return '<button type="button" class="btn btn-xs btn-secondary edit"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit</button>';
-            else
-           	return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>';
-        }
-}
-,{ "data": "id", "visible":false }
-]				
+				columns : [
+							{
+								 "data":null,
+								 "sClass" : "text-center",
+					        	   render: function (data, type, row, meta) {
+					        	        return meta.row + meta.settings._iDisplayStart + 1;
+				                },   
+					        },
+							{ 
+							"data" : "meetingType", "sClass" : "text-left"} ,{ 
+							"data" : "meetingNumber", "sClass" : "text-left"} ,{ 
+							"data" : "meetingDate", "sClass" : "text-left"},{
+							"data" : "meetingTime", "sClass" : "text-left"},{
+							"data" : "meetingLocation", "sClass" : "text-left"},{ 
+							"data" : null, "sClass" : "text-center", "target":-1,								
+							    sortable: false,
+							    "render": function ( data, type, full, meta ) {
+							    	 var mode = $('#mode').val();
+							       	 if(mode == 'edit')
+							           	 return '<button type="button" class="btn btn-xs btn-secondary edit"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit</button>';
+							            else
+							           	return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>';
+							    }
+							},{ 
+							"data": "id", "visible":false }
+						]				
 			});
-			}
+		}
 
 
 
 $("#resultTable").on('click','tbody tr td  .view',function(event) {
-	var id = reportdatatable.fnGetData($(this).parent().parent(),6);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),7);
 	window.open('/services/council/councilmom/'+ $('#mode').val() + '/'+id,'','width=800, height=600,scrollbars=yes');
 });
 
 $("#resultTable").on('click','tbody tr td  .edit',function(event) {
-	var id = reportdatatable.fnGetData($(this).parent().parent(),6);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),7);
 	window.open('/services/council/councilmom/new' + '/'+id,'','width=800, height=600,scrollbars=yes');
 	
 });

@@ -58,6 +58,7 @@ import org.egov.council.repository.es.CouncilMeetingIndexRepository;
 import org.egov.infra.admin.master.entity.City;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.utils.DateUtils;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
@@ -66,6 +67,7 @@ import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortOrder;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
@@ -197,6 +199,12 @@ public class CouncilMeetingIndexService {
         if (searchRequest.getFrom() != null && searchRequest.getTo() != null){
             boolQuery = boolQuery.filter(QueryBuilders.rangeQuery("meetingDate")
                     .from(searchRequest.getFrom())
+                    .to(searchRequest.getTo()));
+        }else if (searchRequest.getFrom() != null && searchRequest.getTo() == null) {
+        	boolQuery = boolQuery.filter(QueryBuilders.rangeQuery("meetingDate")
+                    .from(searchRequest.getFrom()));
+        }else if (searchRequest.getFrom() == null && searchRequest.getTo() != null) {
+        	boolQuery = boolQuery.filter(QueryBuilders.rangeQuery("meetingDate")
                     .to(searchRequest.getTo()));
         }
         if (StringUtils.isNotBlank(searchRequest.getCommitteeType()))

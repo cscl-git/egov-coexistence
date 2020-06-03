@@ -62,4 +62,12 @@
         <constructor-arg index="0" ref="councilPreamblePersistenceService"/>
     </bean>
     
+    <bean id="councilMeetingPersistenceService" parent="abstractPersistenceService">
+        <constructor-arg name="type" value="org.egov.council.entity.CouncilMeeting" />
+    </bean>
+
+    <bean id="CouncilMeetingInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+        <constructor-arg index="0" ref="councilMeetingPersistenceService"/>
+    </bean>
+    
 </beans>

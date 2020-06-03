@@ -59,7 +59,7 @@
 	enctype="multipart/form-data">
 	<%@ include file="councilpreamble-editform.jsp"%>
 	<div class="panel panel-primary" data-collapsed="0">
-		<jsp:include page="applicationhistory-view.jsp"></jsp:include>
+		<jsp:include page="../workflow/applicationhistory-view.jsp" />
 	</div>
 	<form:hidden path="" id="wfStatus" name="wfStatus" />
 	<form:hidden path="" id="workFlowAction" name="workFlowAction" />

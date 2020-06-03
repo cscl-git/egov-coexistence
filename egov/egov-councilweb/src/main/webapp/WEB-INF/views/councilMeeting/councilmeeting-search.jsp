@@ -67,11 +67,12 @@
 			id="resultTable">
 			<thead>
 				<tr>
+					<th><spring:message code="lbl.serial.no" /></th>
 					<th><spring:message code="lbl.meeting.type" /></th>
 					<th><spring:message code="lbl.meeting.number" /></th>
-					<th><spring:message code="lbl.meeting.date"/>
-					<th><spring:message code="lbl.meeting.place"/></th>
+					<th><spring:message code="lbl.meeting.date"/></th>
 					<th><spring:message code="lbl.meeting.time"/></th>
+					<th><spring:message code="lbl.meeting.place"/></th>
 					<th><spring:message code="lbl.view"/></th>
 					<th>&nbsp;</th>
 				</tr>
@@ -86,9 +87,12 @@
 			e.preventDefault();
 		}
 	});
-	
-	
 </script>
+<style>
+#resultTable .view{
+	width: 110px;
+}
+</style>
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/global/css/bootstrap/bootstrap-datepicker.css' context='/services/egi'/>" />
 	<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>"/>

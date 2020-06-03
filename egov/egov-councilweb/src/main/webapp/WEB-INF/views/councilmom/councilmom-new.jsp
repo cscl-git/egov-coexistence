@@ -66,15 +66,33 @@
 		<div class="tab-content">
 			<div class="tab-pane fade in active" id="councilmom">
 				<%@ include file="councilmom-form.jsp"%>
+				
+				<c:if test="${currentState!= 'null' && 'NEW'.equalsIgnoreCase(currentState)}">
+					<div class="form-group">
+						<div class="text-center">
+							<button type="button" id="add-sumoto" class='btn btn-primary' style="width:175px"><spring:message code='lbl.AddSumoto'/></button>
+						</div>
+					</div>
+				</c:if>
+				<c:if test="${currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState)
+										&& !'Closed'.equalsIgnoreCase(currentState)}">
+					<div class="panel panel-primary" data-collapsed="0">
+						<jsp:include page="../workflow/applicationhistory-view.jsp" />
+					</div>
+				</c:if>
 				<div class="form-group">
 					<div class="text-center">
-						<button type='button' class='btn btn-primary' id="buttonSubmit">
-							<spring:message code='lbl.update' />
-						</button>
-						<button type="button" id="add-sumoto" class='btn btn-primary'><spring:message code='lbl.AddSumoto'/></button>
-						<button type="button" id="buttonFinalSubmit" class='btn btn-primary'><spring:message code='lbl.resolutionpdf'/></button>
-						<a href='javascript:void(0)' class='btn btn-default'
-							onclick='self.close()'><spring:message code='lbl.close' /></a>
+						<c:if test="${currentState!= 'null' && !'Closed'.equalsIgnoreCase(currentState)}">
+							<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
+							<div class="buttonbottom" align="center">
+								<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
+							</div>
+						</c:if>
+						<c:if test="${currentState!= 'null' && 'Closed'.equalsIgnoreCase(currentState)}">
+							<button type="button" id="buttonFinalSubmit" class='btn btn-primary' style="width:230px"><spring:message code='lbl.resolutionpdf'/></button>
+							<a href='javascript:void(0)' class='btn btn-default'
+								onclick='self.close()'><spring:message code='lbl.close' /></a>
+						</c:if>
 					</div>
 				</div>
 			</div>
@@ -85,7 +103,19 @@
 	</div>
 
 </form:form>
-
+<style>
+.nav-tabs{
+	z-index: 0;
+	position: relative;
+}
+.tab-content {
+    margin-top: 0px;
+}
+.form-horizontal .form-group {
+    margin-right: 0px;
+    margin-left: 0px;
+}
+</style>
 <script
 	src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>"></script>
 <script

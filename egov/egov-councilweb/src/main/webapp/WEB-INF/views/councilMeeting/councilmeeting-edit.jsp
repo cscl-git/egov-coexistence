@@ -73,10 +73,11 @@
 						<thead>
 							<tr>
 								<th align="center"><spring:message code="lbl.serial.number" /></th>
-								<th><spring:message code="lbl.gistofpreamble" /></th>
-								<th width="7%"><spring:message code="lbl.agenda.number" /></th>
-								<th width="9%"><spring:message code="lbl.preamble.number" /></th>
 								<th width="14%"><spring:message code="lbl.department" /></th>
+								<th width="7%"><spring:message code="lbl.agenda.number" /></th>
+								<th><spring:message code="lbl.gistofpreamble" /></th>
+								<%-- <th width="9%"><spring:message code="lbl.preamble.number" /></th> --%>
+								
 							</tr>
 						</thead>
 						<tbody>
@@ -86,12 +87,12 @@
 										varStatus="counter">
 										<tr>
 											<td align="center">${mom.itemNumber}</td>
-											<td><span class="more"><c:out
-														value="${mom.preamble.gistOfPreamble}" /></span></td>
+											<td><c:out value="${mom.preamble.departmentName}" /></td>
 											<td class="text-center"><c:out
 													value="${mom.agenda.agendaNumber}" /></td>
-											<td><c:out value="${mom.preamble.preambleNumber}" /></td>
-											<td><c:out value="${mom.preamble.department.name}" /></td>
+											<td><span class="more"><c:out
+														value="${mom.preamble.gistOfPreamble}" /></span></td>
+											<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
 										</tr>
 									</c:forEach>
 								</c:when>

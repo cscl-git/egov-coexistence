@@ -63,7 +63,6 @@ import static org.egov.council.utils.constants.CouncilConstants.RESOLUTION_APPRO
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -83,17 +82,22 @@ import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.repository.CouncilMeetingRepository;
 import org.egov.council.repository.CouncilMoMRepository;
 import org.egov.council.repository.MeetingAttendanceRepository;
+import org.egov.council.service.workflow.MeetingMomWorkflowCustomImpl;
 import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.eis.service.EisCommonService;
-import org.egov.infra.admin.master.entity.User;
-import org.egov.infra.admin.master.service.UserService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.User;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infra.utils.StringUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
@@ -103,12 +107,16 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional(readOnly = true)
-public class CouncilMeetingService {
+public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Long> {
 
     private static final String STATUS_DOT_CODE = "status.code";
-    private final CouncilMeetingRepository councilMeetingRepository;
-    private final MeetingAttendanceRepository meetingAttendanceRepository;
     
+    @Autowired
+    private CouncilMeetingRepository councilMeetingRepository;
+    @Autowired
+    private MeetingAttendanceRepository meetingAttendanceRepository;
+    @Autowired
+    private MeetingMomWorkflowCustomImpl meetingMomWorkflowCustomImpl;
     @PersistenceContext
     private EntityManager entityManager;
     @Autowired
@@ -117,19 +125,22 @@ public class CouncilMeetingService {
     private CouncilMoMRepository councilMoMRepository;
     @Autowired
     private EisCommonService eisCommonService;
-    @Autowired
-    private UserService userService;
+    //@Autowired
+    //private UserService userService;
     @Autowired
     private FileStoreService fileStoreService;
     @Autowired
     private AutonumberServiceBeanResolver autonumberServiceBeanResolver;
-
     @Autowired
-    public CouncilMeetingService(CouncilMeetingRepository councilMeetingRepository,
-            MeetingAttendanceRepository meetingAttendance) {
-        this.councilMeetingRepository = councilMeetingRepository;
-        this.meetingAttendanceRepository = meetingAttendance;
-    }
+    private MicroserviceUtils microserviceUtils;
+    
+    public CouncilMeetingService(final Class<CouncilMeeting> councilMeeting) {
+		super(councilMeeting);
+	}
+    
+    public CouncilMeetingService() {
+  		super(CouncilMeeting.class);
+  	}
 
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -137,11 +148,33 @@ public class CouncilMeetingService {
 
     @Transactional
     public CouncilMeeting create(final CouncilMeeting councilMeeting) {
+    	applyAuditing(councilMeeting);
         return councilMeetingRepository.save(councilMeeting);
     }
 
     @Transactional
+    public CouncilMeeting update(final CouncilMeeting councilMeeting, Long approvalPosition, String approvalComment,
+            String workFlowAction) {
+    	 if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
+    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
+                     workFlowAction);
+    	
+    	 applyAuditing(councilMeeting);
+    	 for(MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
+    		if(null != meetingMOM.getPreamble()) {
+    			applyAuditing(meetingMOM.getPreamble());
+    		}
+    	 }
+    	 applyAuditing(councilMeeting.getState());
+    	 return councilMeetingRepository.save(councilMeeting);
+    }
+    
+    @Transactional
     public CouncilMeeting update(final CouncilMeeting councilMeeting) {
+    	applyAuditing(councilMeeting);
+    	for(MeetingAttendence attendance : councilMeeting.getMeetingAttendence()) {
+    		applyAuditing(attendance);
+    	}
         return councilMeetingRepository.save(councilMeeting);
     }
     
@@ -227,9 +260,15 @@ public class CouncilMeetingService {
         if (councilMeeting.getFromDate() != null && councilMeeting.getToDate() != null) {
             criteria.add(Restrictions.between("meetingDate", councilMeeting.getFromDate(),
                     DateUtils.addDays(councilMeeting.getToDate(), 1)));
+        }else if (councilMeeting.getFromDate() != null && councilMeeting.getToDate() == null) {
+            criteria.add(Restrictions.ge("meetingDate", councilMeeting.getFromDate()));
+        }else if (councilMeeting.getFromDate() == null && councilMeeting.getToDate() != null) {
+            criteria.add(Restrictions.le("meetingDate", DateUtils.addDays(councilMeeting.getToDate(), 1)));
         }
         if(councilMeeting.getMeetingType()!=null)
             criteria.add(Restrictions.eq("meetingType", councilMeeting.getMeetingType()));
+        criteria.addOrder(Order.asc("meetingDate"));
+        
         return criteria;
     }
     @Transactional
@@ -253,18 +292,33 @@ public class CouncilMeetingService {
                     if (agendaDetails != null && agendaDetails.getPreamble() != null
                             && agendaDetails.getPreamble().getState() != null
                             && agendaDetails.getPreamble().getState().getOwnerPosition() != null) {
-                        usersListResult.add(eisCommonService
+                    	
+                    	/*usersListResult.add(eisCommonService
                                 .getUserForPosition(agendaDetails.getPreamble().getState().getCreatedBy(),
                                         new Date()));
                         usersListResult.add(eisCommonService
                                 .getUserForPosition(agendaDetails.getPreamble().getState().getOwnerPosition(),
-                                        new Date()));
+                                        new Date()));*/
+                    	EmployeeInfo agendaApproverinfo = microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().getOwnerPosition());
+                    	if(null != agendaApproverinfo) {
+                    		usersListResult.add(agendaApproverinfo.getUser());
+                    	}
+                    	EmployeeInfo agendaCreatorinfo = microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().getCreatedBy());
+                    	if(null != agendaCreatorinfo) {
+                    		usersListResult.add(agendaCreatorinfo.getUser());
+                    	}
                     }
                 }
                 agendaNumber.add(mom.getAgenda().getAgendaNumber());
             }
         }
-        usersListResult.add(userService.getUserById(councilMeeting.getCreatedBy()));
+        
+        EmployeeInfo meetingCreatorinfo = microserviceUtils.getEmployeeById(councilMeeting.getCreatedBy());
+    	if(null != meetingCreatorinfo) {
+    		usersListResult.add(meetingCreatorinfo.getUser());
+    	}
+    	
+        //usersListResult.add(userService.getUserById(councilMeeting.getCreatedBy()));
         return new ArrayList<>(usersListResult);
     }
     

@@ -61,12 +61,12 @@ public interface CouncilRouterRepository extends JpaRepository<CouncilRouter, Lo
 
     CouncilRouter findById(Long id);
 
-    CouncilRouter findByTypeAndDepartment(@Param("type") PreambleTypeEnum type, @Param("department") Department department);
+    CouncilRouter findByTypeAndDepartment(@Param("type") PreambleTypeEnum type, @Param("department") String department);
 
     CouncilRouter findByType(@Param("type") PreambleTypeEnum type);
 
-    @Query(" from CouncilRouter c where c.department.id =:departmentId and c.type =:type and c.position.id =:positionId")
-    CouncilRouter findByAllParams(@Param("departmentId") Long departmentId, @Param("type") PreambleTypeEnum type,
+    @Query(" from CouncilRouter c where c.department =:departmentId and c.type =:type and c.position.id =:positionId")
+    CouncilRouter findByAllParams(@Param("departmentId") String departmentId, @Param("type") PreambleTypeEnum type,
             @Param("positionId") Long positionId);
 
 }

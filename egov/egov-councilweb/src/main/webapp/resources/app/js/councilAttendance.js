@@ -138,7 +138,7 @@ function callAjaxSearch() {
 				"aLengthMenu" : [[10,25,50,-1 ],[10,25,50,"All" ] ],
 				"autoWidth" : false,
 				"oTableTools" : {
-					"sSwfPath" : "../../../>${action}../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../>${action}../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [ 
 					               {
 						             "sExtends": "pdf",
@@ -157,7 +157,16 @@ function callAjaxSearch() {
 						             }],
 			},
 				aaSorting: [],				
-				columns : [ { 
+				columns : [ 
+					{
+						 "data":null,
+						 "sClass" : "text-center",
+			        	   render: function (data, type, row, meta) {
+			        	        return meta.row + meta.settings._iDisplayStart + 1;
+		                },   
+			        },			        
+					{ 
+			        "data" : "meetingNumber", "sClass" : "text-left"} ,{ 
 					"data" : "meetingDate", "sClass" : "text-left"},{ 
 					"data" : "meetingType", "sClass" : "text-left",
 					"render": function ( data, type, row, meta ) {
@@ -202,41 +211,41 @@ var isSubmit=false;
 $('#finalizeAttendanceBtn').click(
        function(e) {
 
-                   if(isSubmit) {
-                     return true;
-                   }
-
-                   if ($('form').valid()) {
-                       var chkbxLength = $('.councilcommitmem:checked').length;
-                       if(chkbxLength <= 0) {
-                           bootbox.alert('Please enter attendance details');
-                       } else {
-                           bootbox.confirm({
-                        	    message: "Information entered in this screen will not be modified once submitted,Please confirm yes to save",
-                        	    buttons: {
-                        	        confirm: {
-                        	            label: 'Yes',
-                        	            className: 'btn-primary'
-                        	        },
-                        	        cancel: {
-                        	            label: 'No',
-                        	            className: 'btn-danger'
-                        	        }
-                        	    },
-                        	    callback: function(result) {
-                                   if (result) {
-                                        var action = '/services/council/councilmeeting/attendance/finalizeattendance';
-                                            $('#councilMeetingform').attr('method', 'post');
-                                            $('#councilMeetingform').attr('action', action);
-                                            isSubmit=true;
-                                            $('#finalizeAttendanceBtn').trigger('click');
-                                   } else {
-                                       e.preventDefault();
-                                   }
-                               }
-                        	});
-                       }
+           if(isSubmit) {
+             return true;
            }
-           return false;
+
+           if ($('form').valid()) {
+               var chkbxLength = $('.councilcommitmem:checked').length;
+               if(chkbxLength <= 0) {
+                   bootbox.alert('Please enter attendance details');
+               } else {
+                   bootbox.confirm({
+                	    message: "Information entered in this screen will not be modified once submitted,Please confirm yes to save",
+                	    buttons: {
+                	        confirm: {
+                	            label: 'Yes',
+                	            className: 'btn-primary'
+                	        },
+                	        cancel: {
+                	            label: 'No',
+                	            className: 'btn-danger'
+                	        }
+                	    },
+                	    callback: function(result) {
+                           if (result) {
+                                var action = '/services/council/councilmeeting/attendance/finalizeattendance';
+                                    $('#councilMeetingform').attr('method', 'post');
+                                    $('#councilMeetingform').attr('action', action);
+                                    isSubmit=true;
+                                    $('#finalizeAttendanceBtn').trigger('click');
+                           } else {
+                               e.preventDefault();
+                           }
+                       }
+                	});
+               }
+           }
+   return false;
 });
 

@@ -56,31 +56,28 @@
 <form:form role="form" action="../updateimplimentaionstatus" modelAttribute="councilPreamble" id="councilPreambleform" cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	
-		<%@ include file="councilpreamble-view.jsp"%>
-		<div class="form-group" >
+	<%@ include file="councilpreamble-view.jsp"%>
+	<div class="form-group" >
 		<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.impl.status" /></label>
-				<div class="col-sm-3 add-margin">
-					<form:select path="implementationStatus" id="implementationStatus" 
-						cssClass="form-control" cssErrorClass="form-control error">
-						<form:option value="">
-							<spring:message code="lbl.select" />
-						</form:option>
-						<form:options items="${implementationStatus}"
-						itemValue="id" itemLabel="code"  />
-					</form:select>
-					<form:errors path="implementationStatus" cssClass="error-msg" />
-				</div>
-				</div>	
-				<input type="hidden" name="councilPreamble" value="${councilPreamble.id}" />	
-		<div class="form-group">
-		<div class="text-center">
+		<div class="col-sm-3 add-margin">
+			<form:select path="implementationStatus" id="implementationStatus" 
+				cssClass="form-control" cssErrorClass="form-control error">
+				<form:option value="">
+					<spring:message code="lbl.select" />
+				</form:option>
+				<form:options items="${implementationStatus}"
+				itemValue="id" itemLabel="code"  />
+			</form:select>
+			<form:errors path="implementationStatus" cssClass="error-msg" />
+		</div>
+		<div class="col-sm-3 add-margin">
 			<button type='submit' class='btn btn-primary' id="buttonSubmit">
 				<spring:message code='lbl.update' />
 			</button>
 		</div>
-	</div>
-	
-	</form:form>
-	<script
+	</div>	
+	<input type="hidden" name="councilPreamble" value="${councilPreamble.id}" />	
+</form:form>
+<script
 	src="<cdn:url value='/resources/app/js/councilPreambleHelper.js?rnd=${app_release_no}'/>"></script>

@@ -66,6 +66,7 @@
 			id="resultTable">
 			<thead>
 				<tr>
+					<th><spring:message code="lbl.serial.no" /></th>
 					<th><spring:message code="lbl.agendaNumber" /></th>
 					<th><spring:message code="lbl.committeetype" /></th>
 					<th><spring:message code="lbl.status"/>
@@ -97,8 +98,8 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/dataTables.tableTools.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/TableTools.min.js' context='/services/egi'/>"></script>
-<script type="text/javascript"
-	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.columnFilter.js' context='/services/egi'/>"></script>
+<%-- <script type="text/javascript"
+	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.columnFilter.js' context='/services/egi'/>"></script> --%>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/bootstrap/typeahead.bundle.js' context='/services/egi'/>"></script>
 <script

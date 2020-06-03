@@ -142,6 +142,18 @@ public class CouncilMeeting extends StateAware{
     private Set<FileStoreMapper> supportDocs = Collections.emptySet();
 
     private transient MultipartFile[] files;
+    
+    @Transient
+    private String approvalDepartment;
+    
+    @Transient
+    private String approvalDesignation;
+
+    @Transient
+    private Long approvalPosition;
+    
+    @Transient
+    private String approvalComent;
 
     public Long getId() {
         return id;
@@ -291,5 +303,37 @@ public class CouncilMeeting extends StateAware{
     public void setMeetingType(CouncilMeetingType meetingType) {
         this.meetingType = meetingType;
     }
+
+	public String getApprovalDepartment() {
+		return approvalDepartment;
+	}
+
+	public void setApprovalDepartment(String approvalDepartment) {
+		this.approvalDepartment = approvalDepartment;
+	}
+
+	public String getApprovalDesignation() {
+		return approvalDesignation;
+	}
+
+	public void setApprovalDesignation(String approvalDesignation) {
+		this.approvalDesignation = approvalDesignation;
+	}
+
+	public Long getApprovalPosition() {
+		return approvalPosition;
+	}
+
+	public void setApprovalPosition(Long approvalPosition) {
+		this.approvalPosition = approvalPosition;
+	}
+
+	public String getApprovalComent() {
+		return approvalComent;
+	}
+
+	public void setApprovalComent(String approvalComent) {
+		this.approvalComent = approvalComent;
+	}
 
 }

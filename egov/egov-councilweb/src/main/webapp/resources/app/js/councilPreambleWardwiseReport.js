@@ -137,22 +137,22 @@ function callAjaxSearch() {
 				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
 				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
 				"oTableTools" : {
-					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [
 							{
 								"sExtends" : "xls",
 								"mColumns": [0,1,2,3,4,5,6,7],
-								"sTitle" : "Council Preamble wardwise Report"
+								"sTitle" : "Agenda Report"
 							},
 							{
 								"sExtends" : "pdf",
 								"mColumns": [0,1,2,3,4,5,6,7],
 								"sPdfMessage" : "Report generated on "
 										+ currentDate + "",
-								"sTitle" : "Council Preamble wardwise Report"
+								"sTitle" : "Agenda Report"
 							}, {
 								"sExtends" : "print",
-								"sTitle" : "Council Preamble wardwise Report"
+								"sTitle" : "Agenda Report"
 							} ]
 				},
 				"aaSorting" : [],
@@ -163,13 +163,7 @@ function callAjaxSearch() {
 				    },
 					"sClass" : "text-left"
 				}, {
-					"data" : "ward","width": "30%",
-					"sClass" : "text-left"
-				}, {
 					"data" : "department", 
-					"sClass" : "text-left"
-				}, {
-					"data" : "preambleType",
 					"sClass" : "text-left"
 				}, {
 					"data" : "gistOfPreamble", "width": "40%",
@@ -177,9 +171,6 @@ function callAjaxSearch() {
 				}, {
 					"data" : "createdDate",
 					"sClass" : "text-left"
-				}, {
-					"data" : "preambleUsedInAgenda",
-					"sClass" : "text-center"
 				}, {
 					"data" : "meetingDate",
 					"sClass" : "text-left"

@@ -85,37 +85,45 @@ function callAjaxSearch() {
 				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
 				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
 				"oTableTools" : {
-					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [{"sExtends" : "xls"},
 						           {"sExtends" :"pdf"},
 						           {"sExtends" : "print"}]
 				},
 				aaSorting: [],				
-				columns : [ { 
-"data" : "meetingType", "sClass" : "text-left"} ,{ 
-"data" : "meetingNumber", "sClass" : "text-left"} ,{ 
-"data" : "meetingCreatedDate", "sClass" : "text-left"},{ 
-"data" : "meetingDate", "sClass" : "text-left"},{
-"data" : "meetingLocation", "sClass" : "text-left"},{
-"data" : "meetingTime", "sClass" : "text-left"},{
-"data" : "", "sClass" : "text-left",
-"render" : function(data, type, full) {
-    return '<textarea class="form-control"/>'
- } },{ "data" : null, "target":-1,
-	
-    sortable: false,
-    "render": function ( data, type, full, meta ) {
-          	return '<button type="button" class="btn btn-xs btn-secondary view"><span class="glyphicon glyphicon-tasks"></span>&nbsp;Send Sms</button>';
-    }
-}
-,{ "data": "id", "visible":false }
-]				
+				columns : [ 
+							{
+								 "data":null,
+								 "sClass" : "text-center",
+					        	   render: function (data, type, row, meta) {
+					        	        return meta.row + meta.settings._iDisplayStart + 1;
+				                },   
+					        },
+							{ 
+							"data" : "meetingType", "sClass" : "text-left"} ,{ 
+							"data" : "meetingNumber", "sClass" : "text-left"} ,{ 
+							"data" : "meetingDate", "sClass" : "text-left"},{
+							"data" : "meetingTime", "sClass" : "text-left"},{
+							"data" : "meetingLocation", "sClass" : "text-left"},{
+							"data" : "meetingCreatedDate", "sClass" : "text-left"},{ 
+							"data" : "", "sClass" : "text-left",
+								"render" : function(data, type, full) {
+								    return '<textarea class="form-control"/>'
+								 } },{ 
+							"data" : null, "target":-1,								
+							    sortable: false,
+							    "render": function ( data, type, full, meta ) {
+							          	return '<button type="button" class="btn btn-xs btn-secondary view"><span class="glyphicon glyphicon-tasks"></span>&nbsp;Send Sms</button>';
+							    }
+							},{ 
+							"data": "id", "visible":false }
+							]				
 			});
-			}
+	}
 
 $("#resultTable").on('click','tbody tr td  .view',function(event) {
 	var msg = $(this).parent().parent().find('textarea').val();
-	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
+	var id = reportdatatable.fnGetData($(this).parent().parent(),9);
 	
 	$.ajax({
 	   url: '/services/council/councilmeeting/sendsmsemail?id='+id+'&msg='+msg,

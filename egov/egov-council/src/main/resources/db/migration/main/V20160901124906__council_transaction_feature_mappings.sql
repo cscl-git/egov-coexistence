@@ -51,7 +51,7 @@ INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_featu
 
 			---------------------------Attendance Report----------------------------------
 
-INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_feature'),'Attendance Report','Attendance Report',(select id from eg_module  where name = 'Council Management'));
+--INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_feature'),'Attendance Report','Attendance Report',(select id from eg_module  where name = 'Council Management'));
 
 -----------------------------------------------------------ADDING FEATURE ENDS-------------------------------------------------------------
 
@@ -262,13 +262,13 @@ INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_actio
 
 ------------------------ Attendance Report -----------------
 	
-INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'Attendance Report') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'Attendance Report') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 
-INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'SearchAttendanceForMeeting') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'SearchAttendanceForMeeting') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 
-INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'ShowAttendanceSearchResult') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'ShowAttendanceSearchResult') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 
-INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'AttendanceAjaxSearch') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'AttendanceAjaxSearch') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 
 
 -----------------------------------------------------------ADDING FEATURE ROLE BEGINS----------------------------------------------------
@@ -385,9 +385,9 @@ INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role wher
 
 				------------------------ Attendance Report -----------------
 
-INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Super User') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Super User') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 
-INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Council Management Admin') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Council Management Admin') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 
-INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Council Clerk') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
+--INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Council Clerk') ,(select id FROM eg_feature WHERE name = 'Attendance Report'));
 

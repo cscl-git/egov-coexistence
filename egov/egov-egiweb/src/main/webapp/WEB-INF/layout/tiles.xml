@@ -54,16 +54,16 @@
 
     <definition name="base_layout" template="/WEB-INF/views/template/main.jsp">
         <put-attribute name="title" value=""/>
-        <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/>
+        <!-- <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/> -->
         <put-attribute name="body" value=""/>
-        <put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/>
+        <!-- <put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/> -->
     </definition>
 
     <definition name="error" template="/WEB-INF/views/template/error.jsp">
         <put-attribute name="page-title" value="title.error.page" cascade="true"/>
-        <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/>
+        <!-- <put-attribute name="header" value="/WEB-INF/views/template/header.jsp"/> -->
         <put-attribute name="body" value=""/>
-        <put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/>
+        <!-- <put-attribute name="footer" value="/WEB-INF/views/template/footer.jsp"/> -->
     </definition>
 
     <definition name="error/*" extends="error">
@@ -262,4 +262,8 @@
         <put-attribute name="page-title" value="title.feature.role.audit.report" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/admin/auditing/feature-role-change-audit-report.jsp"/>
     </definition>
+    <definition name="inbox-view" extends="base_layout">
+		<put-attribute name="page-title" value="lbl.tasks" cascade="true"/>
+		<put-attribute name="body" value="/WEB-INF/views/inbox/inbox.jsp"></put-attribute>
+	</definition>
 </tiles-definitions>

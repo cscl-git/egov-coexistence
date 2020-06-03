@@ -54,7 +54,7 @@
 <div class="row">
 	<div class="panel panel-primary" data-collapsed="0">
 		<div class="panel-heading">
-			<div class="panel-title">Create Preamble</div>
+			<div class="panel-title"><spring:message code="title.councilagenda.update"/></div>
 		</div>
 		<div class="panel-body">
 			<div class="form-group">
@@ -91,15 +91,15 @@
 				<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.department" /> : </label>
 				<div class="col-sm-3 add-margin">
-					${councilPreamble.department.name}</div>
+					${councilPreamble.department}</div>
 
-				<label class="col-sm-2 control-label text-right"><spring:message
+				<!-- <label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.amount" /> : </label>
 				<div class="col-sm-3 add-margin">
-					${councilPreamble.sanctionAmount}</div>
+					${councilPreamble.sanctionAmount}</div> -->
 
 			</div>
-			<div class="form-group">
+			<!-- <div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.ward.no" /> : </label>
 				<div class="col-sm-3 add-margin">
@@ -110,7 +110,7 @@
 						</c:forEach>
 					</div>
 				</div>
-			</div>
+			</div> -->
 
 			<div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
@@ -173,13 +173,13 @@
 					</c:choose>
 				</div>
 			</div>
-			<div>Note: After getting the council preamble prepared and
+			<!-- <div>Note: After getting the council preamble prepared and
 				approved by the head of the section, the same should be uploaded
-				here and forward to the competent authority for further action</div>
+				here and forward to the competent authority for further action</div> -->
 		</div>
 	</div>
 
-	<div class="panel panel-primary" data-collapsed="0">
+	<!-- <div class="panel panel-primary" data-collapsed="0">
 		<div class="panel-heading">
 			<div class="panel-title">Bidders Details</div>
 		</div>
@@ -223,5 +223,6 @@
 				</c:otherwise>
 			</c:choose>
 		</div>
-	</div>
+	</div> -->
+	
 </div>

@@ -1,4 +1,4 @@
-
+SELECT setval('"seq_eg_wf_matrix"',(SELECT MAX(ID) FROM eg_wf_matrix ));
 -- Workflow configuration for council preamble
 INSERT INTO eg_wf_types (id, module, type, link, createdby, createddate, lastmodifiedby, lastmodifieddate, enabled, grouped, typefqn, displayname, version) VALUES (nextval('seq_eg_wf_types'), (select id from eg_module where name = 'Council Management'), 'CouncilPreamble', '/council/councilpreamble/edit/:ID', 1, now(), 1, now(), 'Y', 'N', 'org.egov.council.entity.CouncilPreamble', 'CouncilPreamble', 0);
 

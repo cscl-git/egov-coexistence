@@ -76,7 +76,7 @@
 </head>
 <body class="page-body">
 <div class="page-container">
-    <tiles:insertAttribute name="header"/>
+    <%-- <tiles:insertAttribute name="header"/> --%>
     <div class="main-content">
         <div class="page-error-404">
             <div class="error-text">
@@ -89,7 +89,7 @@
             </div>
         </div>
     </div>
-    <tiles:insertAttribute name="footer"/>
+    <%-- <tiles:insertAttribute name="footer"/> --%>
 </div>
 <script>
     if (window.opener && window.opener !== window)

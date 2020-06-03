@@ -66,7 +66,7 @@ $(document).ready(function()
 				$('#approvalDesignation').empty();
 				$('#approvalDesignation').append($("<option value=''>Select from below</option>"));
 				$.each(response, function(index, value) {
-					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.id));
+					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.code));
 				});
 				
 			}, 
@@ -92,7 +92,8 @@ $(document).ready(function()
 				$('#approvalPosition').empty();
 				$('#approvalPosition').append($("<option value=''>Select from below</option>"));
 				$.each(response, function(index, value) {
-					$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));
+					//$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));
+					$('#approvalPosition').append($('<option>').text(value.userName).attr('value', value.positionId));
 				});
 				
 			}, 

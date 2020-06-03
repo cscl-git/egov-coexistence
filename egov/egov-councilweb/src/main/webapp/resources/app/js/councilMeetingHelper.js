@@ -90,9 +90,9 @@ function callAjaxSearch() {
 				"bDestroy" : true,
 				"autoWidth" : false,
 				"sDom" : "<'row'<'col-xs-12 hidden col-right'f>r>t<'row'<'col-xs-3'i><'col-xs-3 col-right'l><'col-xs-3 col-right'<'export-data'T>><'col-xs-3 text-right'p>>",
-				"aLengthMenu" : [ [ 10, 25, 50, -1 ], [ 10, 25, 50, "All" ] ],
+				"aLengthMenu" : [ [ 10, 25, 25, 25, -1 ], [ 10, 25, 25, 25, "All" ] ],
 				"oTableTools" : {
-					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [ {
 						"sExtends" : "xls"
 					}, {
@@ -103,6 +103,13 @@ function callAjaxSearch() {
 				},
 				aaSorting : [],
 				columns : [
+						{
+							 "data":null,
+							 "sClass" : "text-center",
+				        	   render: function (data, type, row, meta) {
+				        	        return meta.row + meta.settings._iDisplayStart + 1;
+			                },   
+				        },
 						{
 							"data" : "agendaNumber",
 							"sClass" : "text-center"
@@ -136,7 +143,7 @@ $("#resultTable").on(
 		'click',
 		'tbody tr td  .view',
 		function(event) {
-			var id = reportdatatable.fnGetData($(this).parent().parent(), 4);
+			var id = reportdatatable.fnGetData($(this).parent().parent(), 5);
 			window.open('/services/council/councilmeeting/new' + '/' + id, '',
 					'width=800, height=600,scrollbars=yes');
 

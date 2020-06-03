@@ -61,7 +61,7 @@ $(document).ready(function() {
 				"aLengthMenu" : [[10,25,50,-1 ],[10,25,50,"All" ] ],
 				"autoWidth" : false,
 				"oTableTools" : {
-					"sSwfPath" : "../../../../../../egi/resources/global/swf/copy_csv_xls_pdf.swf",
+					"sSwfPath" : "../../../../../../services/egi/resources/global/swf/copy_csv_xls_pdf.swf",
 					"aButtons" : [ 
 					               {
 						             "sExtends": "pdf",

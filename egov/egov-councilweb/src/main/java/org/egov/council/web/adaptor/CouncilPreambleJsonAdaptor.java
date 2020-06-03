@@ -55,14 +55,22 @@ import org.apache.commons.lang.StringEscapeUtils;
 import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.MeetingMOM;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.StringUtils;
+import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static org.egov.council.utils.constants.CouncilConstants.PREAMBLEUSEDINAGENDA;
 
+@Service
 public class CouncilPreambleJsonAdaptor implements JsonSerializer<CouncilPreamble> {
+	
 	@Override
 	public JsonElement serialize(final CouncilPreamble councilPreamble, final Type type,
 			final JsonSerializationContext jsc) {
@@ -71,8 +79,9 @@ public class CouncilPreambleJsonAdaptor implements JsonSerializer<CouncilPreambl
 		final JsonObject jsonObject = new JsonObject();
 		if (councilPreamble != null) {
 			jsonObject.addProperty("ward", councilPreamble.getWards().stream().map(Boundary::getName).collect(Collectors.joining(",")));
-			if (councilPreamble.getDepartment() != null)
-				jsonObject.addProperty("department", councilPreamble.getDepartment().getName());
+			if (councilPreamble.getDepartment() != null) {
+				jsonObject.addProperty("department", councilPreamble.getDepartment());
+			}
 			else
 				jsonObject.addProperty("department", StringUtils.EMPTY);
 			if (councilPreamble.getType() != null)
@@ -124,7 +133,7 @@ public class CouncilPreambleJsonAdaptor implements JsonSerializer<CouncilPreambl
 			else
 				jsonObject.addProperty("implementationStatus", "N/A");
 			if (councilPreamble.getStatus() != null)
-				jsonObject.addProperty("status", councilPreamble.getStatus().getCode());
+				jsonObject.addProperty("status", councilPreamble.getStatus().getDescription());
 			else
 				jsonObject.addProperty("status", StringUtils.EMPTY);
 

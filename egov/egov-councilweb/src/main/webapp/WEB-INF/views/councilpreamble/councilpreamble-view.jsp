@@ -57,12 +57,12 @@
 	<div class="col-md-12">
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
-				<div class="panel-title">Council Preamble</div>
+				<div class="panel-title"><spring:message code="title.agenda.view" /></div>
 			</div>
 			<div class="panel-body custom">
 				<div class="row add-border">
 					<div class="col-xs-3 add-margin">
-						<spring:message code="lbl.preamble.number" />
+						<spring:message code="lbl.agendaNumber" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
 						${councilPreamble.preambleNumber}</div>
@@ -70,19 +70,29 @@
 						<spring:message code="lbl.status" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.status.code}</div>
+						<c:choose>
+							<c:when test="${councilPreamble.displayStatus != null}">
+								${councilPreamble.displayStatus.description}
+							</c:when>
+							<c:otherwise>
+								${councilPreamble.status.description}
+							</c:otherwise>
+						</c:choose>
+					</div>
 				</div>
 				<div class="row add-border">
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.department" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.department.name}</div>
-					<div class="col-xs-3 add-margin">
+						${councilPreamble.departmentName}
+					</div>
+					
+					<!-- <div class="col-xs-3 add-margin">
 						<spring:message code="lbl.amount" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.sanctionAmount ne null ? councilPreamble.sanctionAmount:'N/A'}</div>		
+						${councilPreamble.sanctionAmount ne null ? councilPreamble.sanctionAmount:'N/A'}</div> -->		
 				</div>
 				<div class="row add-border">
 					<div class="col-xs-3 add-margin">
@@ -110,7 +120,7 @@
 						</c:choose>
 					</div>
 				</div>
-				<div class="row add-border">
+				<!-- <div class="row add-border">
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.ward" />
 					</div>
@@ -129,12 +139,12 @@
 					</div>
 					</c:otherwise>
 					</c:choose>
-				</div>
+				</div> -->
 			</div>
 
 		</div>
 		<div class="panel panel-primary" data-collapsed="0">
-			<jsp:include page="applicationhistory-view.jsp"></jsp:include>
+			<jsp:include page="../workflow/applicationhistory-view.jsp" />
 		</div>
 
 		<c:if test="${not councilPreamble.meetingMOMs.isEmpty()}">
@@ -189,12 +199,15 @@
 				</div>
 			</div>
 		</c:if>
-		<div class="text-center hide-close">
-			<div class="add-margin">
-				<a href="javascript:void(0)" class="btn btn-default"
-					onclick="self.close()">Close</a>
+		
+		<c:if test="${councilPreamble.status.code!= 'null' && !'CREATED'.equalsIgnoreCase(councilPreamble.status.code)}">
+			<div class="text-center hide-close">
+				<div class="add-margin">
+					<a href="javascript:void(0)" class="btn btn-default"
+						onclick="self.close()">Close</a>
+				</div>
 			</div>
-		</div>
+		</c:if>
 	</div>
 </div>
 

@@ -135,7 +135,7 @@ public class CouncilRouterService {
     }
     
     public void validateCouncilRouter(CouncilRouter councilRouter, BindingResult errors) {
-        CouncilRouter router = councilRouterRepository.findByAllParams(councilRouter.getDepartment().getId(),
+        CouncilRouter router = councilRouterRepository.findByAllParams(councilRouter.getDepartment(),
                 councilRouter.getType(), councilRouter.getPosition().getId());
         if (router != null && (councilRouter.getId() == null || councilRouter.getId() != router.getId())) {
             errors.reject("Duplicate entry", "Council Router is already exist");
