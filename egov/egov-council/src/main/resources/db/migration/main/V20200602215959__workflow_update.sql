@@ -32,7 +32,7 @@ INSERT INTO eg_wf_matrix (id,department,objecttype,currentstate,currentstatus,pe
 ,(nextval('seq_eg_wf_matrix'),'ANY','CouncilMeeting','Created','CREATED','Secretary approval pending','Municipal Secretary',NULL,'Secretary Approved','Commissioner approval pending','Commissioner','SECRETARYAPPROVED','Forward,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
 ,(nextval('seq_eg_wf_matrix'),'ANY','CouncilMeeting','Secretary Approved','SECRETARYAPPROVED','Commissioner approval pending','Commissioner',NULL,'Commissioner Approved','Mayor approval pending','Mayor','COMMISSIONERAPPROVED','Forward,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
 ,(nextval('seq_eg_wf_matrix'),'ANY','CouncilMeeting','Commissioner Approved','COMMISSIONERAPPROVED','Mayor approval pending','Mayor',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-(nextval('seq_eg_wf_matrix'),'ANY','CouncilMeeting','Rejected','REJECTED',NULL,'Superintendent','CouncilCommonWorkflow','Created','Approval pending','Municipal Secretary','CREATED','Forward',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','CouncilMeeting','Rejected','REJECTED',NULL,'Superintendent','CouncilCommonWorkflow','Created','Approval pending','Municipal Secretary','CREATED','Forward',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
 ;
 
 
@@ -51,7 +51,7 @@ INSERT INTO egw_status (id,moduletype,description,lastmodifieddate,code,order_id
 ,(nextval('seq_egw_status'),'CouncilMeeting','REJECTED',now(),'REJECTED',6)
 ,(nextval('seq_egw_status'),'CouncilMeeting','Agenda Branch Admin Approved',now(),'ABADMINAPPROVED',2)
 ,(nextval('seq_egw_status'),'CouncilMeeting','Secretray Approved',now(),'SECRETARYAPPROVED',3)
-(nextval('seq_egw_status'),'CouncilMeeting','Commissioner Approved',now(),'COMMISSIONERAPPROVED',4)
+,(nextval('seq_egw_status'),'CouncilMeeting','Commissioner Approved',now(),'COMMISSIONERAPPROVED',4)
 ;
 
 
