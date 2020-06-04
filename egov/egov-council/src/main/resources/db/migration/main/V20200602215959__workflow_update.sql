@@ -24,7 +24,7 @@ UPDATE eg_wf_matrix SET department='ANY', objecttype='CouncilPreamble', currents
 
 
 INSERT INTO eg_wf_matrix (id,department,objecttype,currentstate,currentstatus,pendingactions,currentdesignation,additionalrule,nextstate,nextaction,nextdesignation,nextstatus,validactions,fromqty,toqty,fromdate,todate,"version",enablefields,forwardenabled,smsemailenabled,nextref,rejectenabled) VALUES 
-(nextval('seq_eg_wf_matrix'),'ANY','CouncilPreamble','APPROVED','COMMISSIONERAPPROVED','Mayor approval pending','Mayor',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL);
+(nextval('seq_eg_wf_matrix'),'ANY','CouncilPreamble','Commissioner Approved','COMMISSIONERAPPROVED','Mayor approval pending','Mayor',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL);
 
 --For MOM workflow
 INSERT INTO eg_wf_matrix (id,department,objecttype,currentstate,currentstatus,pendingactions,currentdesignation,additionalrule,nextstate,nextaction,nextdesignation,nextstatus,validactions,fromqty,toqty,fromdate,todate,"version",enablefields,forwardenabled,smsemailenabled,nextref,rejectenabled) VALUES 

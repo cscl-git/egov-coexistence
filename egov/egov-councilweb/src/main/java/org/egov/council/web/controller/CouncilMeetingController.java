@@ -61,12 +61,19 @@ import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
 import static org.egov.council.utils.constants.CouncilConstants.getMeetingTimings;
 import static org.egov.infra.utils.JsonUtils.toJSON;
 
+import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -129,6 +136,7 @@ public class CouncilMeetingController {
     private static final String MEETING_NUMBER_AUTO = "MEETING_NUMBER_AUTO";
     private static final String APPLICATION_RTF = "application/rtf";
     private static final String DATA = "{ \"data\":";
+    private static final int BUFFER_SIZE = 4096;
     private static final String MSG_ATTENDANCE_ALREADY_FINALIZD = "msg.attendance.already.finalizd";
     private static final String COUNCIL_MEETING = "councilMeeting";
     private static final String MESSAGE = "message";
@@ -593,7 +601,7 @@ public class CouncilMeetingController {
                 .toString();
     }
 
-    @RequestMapping(value = "/generateagenda/{id}", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/generateagenda/{id}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity<byte[]> printAgendaDetails(@PathVariable("id") final Long id) {
         byte[] reportOutput;
@@ -606,6 +614,44 @@ public class CouncilMeetingController {
         headers.add("content-disposition", "inline;filename=meetingdetails.rtf");
         return new ResponseEntity<>(reportOutput, headers, HttpStatus.CREATED);
 
+    }*/
+    
+    @RequestMapping(value = "/generateagenda/{id}", method = RequestMethod.GET)
+    public void printAgendaDetails(@PathVariable("id") final Long id,
+    		final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+        byte[] reportOutput;
+        CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+        
+        reportOutput = councilReportService.generatePDFForAgendaDetails(councilMeeting);
+
+        final ServletContext context = request.getServletContext();
+        final InputStream inputStream = new ByteArrayInputStream(reportOutput);
+     
+        // set content attributes for the response
+        response.setContentType(APPLICATION_RTF);
+        response.setContentLength(reportOutput.length);
+
+        // set headers for the response
+        final String headerKey = "Content-Disposition";
+        final String headerValue = String.format("attachment; filename=\"%s\"", "meetingdetails.rtf");
+        response.setHeader(headerKey, headerValue);
+
+        // get output stream of the response
+        final OutputStream outStream = response.getOutputStream();
+
+        final byte[] buffer = new byte[BUFFER_SIZE];
+        int bytesRead = -1;
+
+        // write bytes read from the input stream into the output stream
+        try {
+			while ((bytesRead = inputStream.read(buffer)) != -1)
+			    outStream.write(buffer, 0, bytesRead);
+		} catch (IOException e) {
+			LOGGER.error("Unable to generate meeting doc",e);
+		}finally {
+			inputStream.close();
+	        outStream.close();
+		}
     }
     
     public Boolean isAutoMeetingNoGenEnabled() {
