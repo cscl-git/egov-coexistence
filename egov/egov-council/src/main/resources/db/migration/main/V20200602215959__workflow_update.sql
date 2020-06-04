@@ -8,7 +8,7 @@ ALTER TABLE egcncl_router ALTER COLUMN department TYPE varchar(30) USING departm
 	
 update eg_wf_types set link='/services/council/councilpreamble/edit/:ID',displayname='Agenda',lastmodifieddate=now() where type='CouncilPreamble';
 INSERT into eg_wf_types (id,"module","type",link,createdby,createddate,lastmodifiedby,lastmodifieddate,enabled,grouped,typefqn,displayname,"version") VALUES 
-(nextval('seq_eg_wf_types'),1745,'CouncilMeeting','/services/council/councilmom/new/:ID',1,'2020-04-30 17:58:24.198',1,'2020-05-11 01:55:15.600',true,false,'org.egov.council.entity.CouncilMeeting','MOM',0);
+(nextval('seq_eg_wf_types'),(select id from eg_module where name='Council MOM'),'CouncilMeeting','/services/council/councilmom/new/:ID',1,'2020-04-30 17:58:24.198',1,'2020-05-11 01:55:15.600',true,false,'org.egov.council.entity.CouncilMeeting','MOM',0);
 
 --For Agenda workflow
 delete from eg_wf_matrix as ewm where objecttype='CouncilPreamble' and currentstate='NEW' and additionalrule is null and pendingactions='Application Creation';
