@@ -153,8 +153,10 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             } else {
                 dataSource = new JRBeanArrayDataSource(new Object[]{reportData}, false);
             }
+            LOGGER.info("Jasper fillReport start->"+reportInput.getReportTemplate());
             JasperPrint jasperPrint = JasperFillManager.fillReport(getTemplate(reportInput.getReportTemplate()),
                     reportInput.getReportParams(), dataSource);
+            LOGGER.info("Jasper fillReport end->"+reportInput.getReportTemplate());
             return new ReportOutput(exportReport(reportInput, jasperPrint), reportInput);
         } catch (JRException | IOException e) {
             LOGGER.error(EXCEPTION_IN_REPORT_CREATION, e);

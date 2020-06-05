@@ -92,6 +92,12 @@
 #resultTable .view{
 	width: 110px;
 }
+#resultTable_wrapper table.table-bordered.dataTable td:last-child{
+	padding: 0 3px;
+}
+#resultTable_wrapper table.table-bordered.dataTable td:last-child button{
+	margin: 3px;
+}
 </style>
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/global/css/bootstrap/bootstrap-datepicker.css' context='/services/egi'/>" />

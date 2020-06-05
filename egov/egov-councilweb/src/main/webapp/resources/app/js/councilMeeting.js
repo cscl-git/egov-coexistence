@@ -157,7 +157,7 @@ $("#resultTable").on('click','tbody tr td  .generateMom',function(event) {
 });
 $("#resultTable").on('click','tbody tr td  .generateMeeting',function(event) {
 	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
-	window.open('/services/council/councilmeeting/generateagenda/'+'/'+id,'','width=800, height=600,scrollbars=yes');
+	window.open('/services/council/councilmeeting/generateagenda'+'/'+id,'','width=800, height=600,scrollbars=yes');
 	
 });
 

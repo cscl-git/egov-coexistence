@@ -96,6 +96,7 @@ public class ReportRequest {
         } else {
             this.reportFormat = ReportFormat.valueOf(REPORT_CONFIG.getProperty(this.reportTemplate, ReportFormat.PDF.name()));
         }
+        System.out.println("reportFormat:"+reportFormat);
     }
 
     public String getReportTemplate() {

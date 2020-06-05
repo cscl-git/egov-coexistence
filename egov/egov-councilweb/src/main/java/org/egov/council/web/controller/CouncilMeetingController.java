@@ -47,6 +47,8 @@
  */
 package org.egov.council.web.controller;
 
+import static java.lang.String.format;
+import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDAUSEDINMEETING;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_MODULENAME;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_APPROVED;
@@ -59,13 +61,21 @@ import static org.egov.council.utils.constants.CouncilConstants.MEETING_MODULENA
 import static org.egov.council.utils.constants.CouncilConstants.MODULE_NAME;
 import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
 import static org.egov.council.utils.constants.CouncilConstants.getMeetingTimings;
+import static org.egov.infra.utils.ApplicationConstant.CONTENT_DISPOSITION;
+import static org.egov.infra.utils.ApplicationConstant.CONTENT_DISPOSITION_ATTACH;
+import static org.egov.infra.utils.ApplicationConstant.CONTENT_DISPOSITION_INLINE;
+import static org.egov.infra.utils.ImageUtils.JPG_MIME_TYPE;
 import static org.egov.infra.utils.JsonUtils.toJSON;
+import static org.springframework.http.MediaType.parseMediaType;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -112,6 +122,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -564,6 +575,7 @@ public class CouncilMeetingController {
     @RequestMapping(value = "/downloadfile/{id}")
     @ResponseBody
     public ResponseEntity<InputStreamResource> download(@PathVariable("id") final Long id) {
+    	LOGGER.info("CouncilMeetingController->download");
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
         if (councilMeeting != null) {
             if (councilMeeting.getFilestore() != null) {
@@ -601,22 +613,39 @@ public class CouncilMeetingController {
                 .toString();
     }
 
-    /*@RequestMapping(value = "/generateagenda/{id}", method = RequestMethod.GET)
+    @RequestMapping(value = "/generateagenda/{id}")
     @ResponseBody
-    public ResponseEntity<byte[]> printAgendaDetails(@PathVariable("id") final Long id) {
-        byte[] reportOutput;
-        CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+    public ResponseEntity<InputStreamResource> printAgendaDetails(@PathVariable("id") final Long id) {
+    	LOGGER.info("CouncilMeetingController->printAgendaDetails");
+        try {
+	        CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+	        
+	        if(null != councilMeeting) {
+		        byte[] reportOutput = councilReportService.generatePDFForAgendaDetails(councilMeeting);
+		        LOGGER.info("CouncilMeetingController->printAgendaDetails->reportOutput size->"+reportOutput.length);
+		        return ResponseEntity
+		            .ok()
+		            .contentType(parseMediaType(defaultIfBlank(APPLICATION_RTF, JPG_MIME_TYPE)))
+		            .cacheControl(CacheControl.noCache())
+		            .contentLength(reportOutput.length)
+		            .header(CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_ATTACH,"meetingdetails.rtf")).
+		                    body(new InputStreamResource(new ByteArrayInputStream(reportOutput)));
+	        }else {
+	        	return ResponseEntity.notFound().build();
+	        }
+        }catch(Exception e) {
+        	LOGGER.error("Unable to download agenda", e);
+            return ResponseEntity.badRequest().build();
+        }
         
-        reportOutput = councilReportService.generatePDFForAgendaDetails(councilMeeting);
-
-        final HttpHeaders headers = new HttpHeaders();
+        /*final HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType(APPLICATION_RTF));
         headers.add("content-disposition", "inline;filename=meetingdetails.rtf");
-        return new ResponseEntity<>(reportOutput, headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(reportOutput, headers, HttpStatus.CREATED);*/
 
-    }*/
+    }
     
-    @RequestMapping(value = "/generateagenda/{id}", method = RequestMethod.GET)
+    /*@RequestMapping(value = "/generateagenda/{id}", method = RequestMethod.GET)
     public void printAgendaDetails(@PathVariable("id") final Long id,
     		final HttpServletRequest request, final HttpServletResponse response) throws IOException {
         byte[] reportOutput;
@@ -652,7 +681,7 @@ public class CouncilMeetingController {
 			inputStream.close();
 	        outStream.close();
 		}
-    }
+    }*/
     
     public Boolean isAutoMeetingNoGenEnabled() {
         return councilPreambleService.autoGenerationModeEnabled(
