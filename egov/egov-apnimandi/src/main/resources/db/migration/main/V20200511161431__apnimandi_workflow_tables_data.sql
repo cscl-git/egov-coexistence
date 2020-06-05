@@ -27,15 +27,15 @@ INSERT INTO eg_wf_matrix (id,department,objecttype,currentstate,currentstatus,pe
 ,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Resubmitted','RESUBMITTED','Sub Divisional Engineer approval pending','Sub Divisional Engineer',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL);
 
 INSERT INTO eg_wf_dept_desg_map (id,objecttype,currentstate,nextdepartment,nextdesignation,additionalrule,"version") VALUES 
-(nextval('eg_wf_dept_desg_map'),'ApnimandiContractor','Rejected','999','MS01',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','Rejected','999','MS01',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiContractor','NEW','999','MS01',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiContractor','Created','999','999',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiContractor','Approved By Junior Engineer','','',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','NEW','999','MS01',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','Created','','',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiContractor','Resubmitted','999','MS01',NULL,0)
-,(nextval('eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','Resubmitted',NULL,NULL,NULL,0);
+(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiContractor','Rejected','999','MS01',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','Rejected','999','MS01',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiContractor','NEW','999','MS01',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiContractor','Created','999','999',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiContractor','Approved By Junior Engineer','','',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','NEW','999','MS01',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','Created','','',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiContractor','Resubmitted','999','MS01',NULL,0)
+,(nextval('seq_eg_wf_dept_desg_map'),'ApnimandiCollectionDetails','Resubmitted',NULL,NULL,NULL,0);
 
 INSERT INTO eg_wf_types (id,"module","type",link,createdby,createddate,lastmodifiedby,lastmodifieddate,enabled,grouped,typefqn,displayname,"version") VALUES 
 (nextval('seq_eg_wf_types'),(select id from eg_module where "name"='Apnimandi'),'ApnimandiContractor','/services/apnimandi/contractor/workflow/view/:ID',1,now(),1,now(),true,false,'org.egov.apnimandi.transactions.entity.ApnimandiContractor','Contractor',0)
