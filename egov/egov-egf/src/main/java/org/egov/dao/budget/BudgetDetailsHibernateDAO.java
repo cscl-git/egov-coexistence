@@ -1367,6 +1367,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 		return result;
 	}
 
+    
 	private Date getEndDateRange(Map<String, Object> paramMap) {
 		Map<Integer,String> quarterMap=new HashMap<Integer,String>(); 
     	quarterMap.put(1, "1,3");
@@ -1390,7 +1391,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 	List<String> dates=Arrays.asList(quarterMap.get(month).split(","));
 	LOGGER.info("quarter range ::"+dates);
 	Calendar endDay=Calendar.getInstance();
-	endDay.set(Calendar.MONTH, Integer.parseInt(dates.get(0)));
+	endDay.set(Calendar.MONTH, Integer.parseInt(dates.get(1)));
 	endDay.set(Calendar.DAY_OF_MONTH, 1);
 	endDay.add(Calendar.DATE, -1);
 	result=endDay.getTime();

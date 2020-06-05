@@ -227,11 +227,11 @@ th.bluebgheadtd {
 				<input type="button" value="<s:text name='lbl.submit'/>" class="buttonsubmit"
 					onclick="return getData()" /> <input name="button" type="button"
 					class="buttonsubmit" id="button3" value="<s:text name='lbl.print'/>"
-					onclick="window.print()" />&nbsp;&nbsp; <input type="button"
+					onclick="window.print()" /> <input type="button"
 					value="<s:text name='lbl.view.all.minor.schedules'/>" class="buttonsubmit"
-					onclick="return showAllMinorSchedules()" /> &nbsp;&nbsp; <input
+					onclick="return showAllMinorSchedules()" style="width: 170px;" /> <input
 					type="button" value="<s:text name='lbl.view.all.schedules'/>" class="buttonsubmit"
-					onclick="return showAllSchedules()" /> &nbsp;&nbsp;
+					onclick="return showAllSchedules()" />
 			</div>
 			<div align="left" class="extracontent">
 				To print the report, please ensure the following settings:<br /> 1.

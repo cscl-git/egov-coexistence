@@ -77,6 +77,7 @@ public interface VoucherConstant {
     public static final String DETAILTYPEID = "detailtypeid";
     public static final String DETAILKEYID = "detailkeyid";
     public static final String FUNCTIONCODE = "functioncode";
+    public static final String BUDGETARYAPPNUMBER = "budgetaryAppnumber";
     public static final String FUNCTIONARYCODE = "functionarycode";
     public static final String SOURCEPATH = "sourcepath";
     public static final String REFERENCEDOC = "referencedocument";

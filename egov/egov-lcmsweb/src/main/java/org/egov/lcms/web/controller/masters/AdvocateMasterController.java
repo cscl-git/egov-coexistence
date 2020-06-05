@@ -201,7 +201,7 @@ public class AdvocateMasterController {
         final List<String> paymentModeList = new ArrayList<String>();
         paymentModeList.add("Cash");
         paymentModeList.add("Cheque");
-        paymentModeList.add("RTGS");
+        //paymentModeList.add("RTGS");
         return paymentModeList;
     }
 

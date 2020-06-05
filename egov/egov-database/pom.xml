@@ -114,10 +114,13 @@
                                     <directory>../egov-collection/src/main/resources/db/migration</directory>
                                 </resource>
                                 <resource>
+                                    <directory>../egov-lcms/src/main/resources/db/migration</directory>
+                                </resource>
+                                <resource>
                                     <directory>../egov-portal/src/main/resources/db/migration</directory>
                                 </resource>
                                 <resource>
-                                    <directory>../egov-lcms/src/main/resources/db/migration</directory>
+                                    <directory>../egov-apnimandi/src/main/resources/db/migration</directory>
                                 </resource>
                             </resources>
                         </configuration>

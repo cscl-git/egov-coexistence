@@ -279,7 +279,7 @@ public class RestServiceAuthFilter implements Filter {
         if(null!=tenantid && ""!=tenantid){
         String[] tenantParts = tenantid.split("\\.");
             if(tenantParts != null||tenantParts.length>1){
-                ApplicationThreadLocals.setTenantID(tenantParts[1]); 
+                ApplicationThreadLocals.setTenantID(tenantid); 
             }
         }
         

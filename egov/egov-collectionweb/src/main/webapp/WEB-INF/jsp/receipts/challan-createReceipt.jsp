@@ -379,9 +379,10 @@ function checkForCurrentDate(obj)
 
 function onBodyLoad()
 {
+	console.log("start");
 	<s:if test='%{model.id!=null && model.status.code=="PENDING" && model.challan.status.code=="VALIDATED"}'>
 		loadDropDownCodesBank();
-	
+	console.log("1");
 		// To hide delete button in cheque grid on page load
 		var chequetable=document.getElementById('chequegrid');
 		if(getControlInBranch(chequetable.rows[3],'addchequerow')!=null)
@@ -401,9 +402,13 @@ function onBodyLoad()
 		if(document.getElementById('challanDate').value!=""){
 			document.getElementById("challanDate").disabled=true;
 		}
+		console.log("2");
 		displayPaytModes();
+		console.log("3");
 		displayPaymentDetails();
+		console.log("4");
 		loadchequedetails();
+		console.log("5");
 	</s:if>
 }
 

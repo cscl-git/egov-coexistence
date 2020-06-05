@@ -756,6 +756,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         final Integer validUpto = Integer.valueOf(collectionsUtil.getAppConfigValue(
                 CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
                 CollectionConstants.APPCONFIG_VALUE_CHALLANVALIDUPTO));
+        System.out.println("persistChallan starts");
         final Challan challan = receiptHeader.getChallan();
         DateTime date = new DateTime(challan.getChallanDate());
         date = date.plusDays(validUpto);
@@ -765,9 +766,17 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
         challan.setReceiptHeader(receiptHeader);
         receiptHeader.setChallan(challan);
-        super.persist(receiptHeader);
+        try {
+        	//persistenceService.applyAuditing(receiptHeader);
+        	super.persist(receiptHeader);
+        }catch (Exception e) {
+			System.out.println("Error : "+e.getMessage());
+			e.printStackTrace();
+		}
+        
         LOGGER.info("Persisting challan with challan number " + challan.getChallanNumber());
         challanService.workflowtransition(receiptHeader.getChallan(), position, actionName, approvalRemarks);
+        System.out.println("persistChallan ends");
         return receiptHeader;
     }
 

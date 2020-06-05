@@ -49,17 +49,23 @@ package org.egov.eis.web.controller.workflow;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
+import org.egov.infra.workflow.matrix.service.WorkFlowDeptDesgMapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -67,12 +73,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 
 @Controller
 public abstract class GenericWorkFlowController {
-
+	private static final String CURRENT_STATE = "currentState";
+	private static final String ADDITIONALRULE = "additionalRule";
+	
     @Autowired
     protected CustomizedWorkFlowService customizedWorkFlowService;
 
     @Autowired
     protected DepartmentService departmentService;
+    
+    @Autowired
+    protected WorkFlowDeptDesgMapService workFlowDeptDesgMapService;
 
     @Autowired
     HttpServletRequest serRequest;
@@ -103,7 +114,52 @@ public abstract class GenericWorkFlowController {
     	{
     		System.out.println("Type  : "+model.getStateType());
     	}
-        prepareModel.addAttribute("approverDepartmentList", addAllDepartments());
+    	prepareWorkflow(prepareModel, model, container, false);
+    }
+    
+    /**
+     * @param prepareModel
+     * @param model
+     * @param container
+     * @param isWfDeptFromMap
+     */
+    protected void prepareWorkflow(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container, boolean isWfDeptFromMap) {
+
+    	if(isWfDeptFromMap) {
+    		List<Department> departments=null;
+    		String currentState = "";
+    		String additionalRule = "";
+    		String objectType= model.getStateType();
+
+    		if(prepareModel.containsAttribute(CURRENT_STATE)) {
+            	currentState = prepareModel.asMap().get(CURRENT_STATE).toString();
+            }
+    		if(prepareModel.containsAttribute(ADDITIONALRULE)) {
+    			additionalRule = prepareModel.asMap().get(ADDITIONALRULE).toString();
+            }
+    		
+    		List<WorkFlowDeptDesgMap> deptDesgMap = null;
+    		if(!StringUtils.isBlank(additionalRule)) {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
+    		}else {
+    			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentState(objectType, currentState);
+    		}
+    		if(!CollectionUtils.isEmpty(deptDesgMap)) {
+    			String deptCodes = deptDesgMap.stream().map(WorkFlowDeptDesgMap::getNextDepartment).collect(Collectors.joining(","));
+    			departments = getDepartmentsFromMs(deptCodes);
+    		}
+    		
+    		prepareModel.addAttribute("approverDepartmentList", departments);
+    	}else {
+    		prepareModel.addAttribute("approverDepartmentList", addAllDepartments());
+    	}
+    	populateActions(prepareModel, model, container);
+    }
+    
+    private void populateActions(final Model prepareModel, final StateAware model,
+            final WorkflowContainer container) {
+
         prepareModel.addAttribute("validActionList", getValidActions(model, container));
         prepareModel.addAttribute("nextAction", getNextAction(model, container));
 
@@ -169,4 +225,12 @@ public abstract class GenericWorkFlowController {
 
     }
 
+    public List<Department> getDepartmentsFromMs(String codes) {
+
+        List<Department> departments = microserviceUtils.getDepartments(codes);
+
+        return departments;
+
+    }
+    
 }

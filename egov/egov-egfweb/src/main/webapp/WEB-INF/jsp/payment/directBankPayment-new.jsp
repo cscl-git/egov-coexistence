@@ -453,6 +453,14 @@ function onSubmit()
 	}
 	else if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 		{
+		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+			{
+				if(document.getElementById("subLedgerlist[0].glcode.id") != null && document.getElementById("subLedgerlist[0].detailType.id") != "0" && document.getElementById("subLedgerlist[0].detailCode") != "" && document.getElementById("subLedgerlist[0].amount").value != "0.00")
+					{
+					bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+					 return false;
+					}
+			}
 		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
 		return true;
 		}
@@ -461,6 +469,14 @@ function onSubmit()
 			 return false;
 			}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckWarning){
+		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+		{
+			if(document.getElementById("subLedgerlist[0].glcode.id") != null && document.getElementById("subLedgerlist[0].detailType.id") != "0" && document.getElementById("subLedgerlist[0].detailCode") != "" && document.getElementById("subLedgerlist[0].amount").value != "0.00")
+				{
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
+				}
+		}
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
 			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
@@ -472,6 +488,14 @@ function onSubmit()
 			}
 		}
 	else{
+		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
+		{
+			if(document.getElementById("subLedgerlist[0].glcode.id") != null && document.getElementById("subLedgerlist[0].detailType.id") != "0" && document.getElementById("subLedgerlist[0].detailCode") != "" && document.getElementById("subLedgerlist[0].amount").value != "0.00")
+				{
+				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
+				 return false;
+				}
+		}
 		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
 		document.dbpform.submit();
 	}

@@ -1,3 +1,10 @@
+-----Inserting Accountdetailtype
+INSERT INTO accountdetailtype (id,"name",description,tablename,columnname,attributename,nbroflevels,full_qualified_name,createddate,lastmodifieddate,lastmodifiedby,"version",isactive,createdby) VALUES
+(nextval('seq_accountdetailtype'),'lawyer','Standing Counsel','eglc_advocate_master','id','advocate_master_id',1,'org.egov.lcms.masters.entity.AdvocateMaster','2020-04-15 00:00:00.000','2020-04-15 00:00:00.000',NULL,0,true,1);
+
+--EG_ROLE update
+update eg_role set internal=true where name in ('Super User');
+
 ALTER TABLE eglc_legalcase ADD COLUMN "isreappealofcase" BOOLEAN DEFAULT FALSE;
 ALTER TABLE eglc_legalcase ADD COLUMN "nodalofficer" VARCHAR(100);
 ALTER TABLE eglc_legalcase ADD COLUMN "nodalofficerdepartment" VARCHAR(100);
