@@ -8,20 +8,20 @@
 <link rel="stylesheet" href="<cdn:url value='/resources/global/js/jquery/plugins/datatables/responsive/css/datatables.responsive.css' context='/services/egi'/>"/>
 
 <div>
-
-		<table class="table table-bordered datatable" id="official_inbox">
-                        <thead>
-                        <tr>
-                            <th><spring:message code="lbl.created.date"/></th>
-                            <th><spring:message code="lbl.sender"/></th>
-                            <th><spring:message code="lbl.natureoftask"/></th>
-                            <th><spring:message code="lbl.status"/></th>
-                            <th><spring:message code="lbl.details"/></th>
-                            <th><spring:message code="lbl.elapsed.days"/></th>
-                            <th></th>
-                        </tr>
-                        </thead>
-                    </table>
+	<input type="hidden" name="moduleName" id="moduleName" value="${moduleName}"/>
+	<table class="table table-bordered datatable" id="official_inbox">
+		<thead>
+			<tr>
+			    <th><spring:message code="lbl.created.date"/></th>
+			    <th><spring:message code="lbl.sender"/></th>
+			    <th><spring:message code="lbl.natureoftask"/></th>
+			    <th><spring:message code="lbl.status"/></th>
+			    <th><spring:message code="lbl.details"/></th>
+			    <th><spring:message code="lbl.elapsed.days"/></th>
+			    <th></th>
+			</tr>
+        </thead>
+    </table>
 </div>
 <div class="modal fade history-inbox">
     <div class="modal-dialog history">

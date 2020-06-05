@@ -259,6 +259,7 @@
         <module>egov-lcms</module>
 	<module>egov-council</module>
         <module>egov-collection</module>
+        <module>egov-apnimandi</module>
         <module>egov-commonsweb</module>
         <module>egov-eisweb</module>
         <module>egov-egiweb</module>
@@ -266,6 +267,7 @@
         <module>egov-lcmsweb</module>
 	<module>egov-councilweb</module>
         <module>egov-collectionweb</module>
+        <module>egov-apnimandiweb</module>
         <module>egov-ear</module>
        
     </modules>
