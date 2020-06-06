@@ -83,7 +83,7 @@ import java.util.stream.Collectors;
 @Controller
 public class AjaxWorkFlowController {
 
-	private static final List<String> WF_DEPT_DESG_MAP = Arrays.asList("CouncilPreamble","MeetingMOM","CouncilMeeting");
+	private static final List<String> WF_DEPT_DESG_MAP = Arrays.asList("CouncilPreamble","MeetingMOM","CouncilMeeting","ApnimandiContractor","ApnimandiCollectionDetails");
 	
     @Autowired
     private CustomizedWorkFlowService customizedWorkFlowService;

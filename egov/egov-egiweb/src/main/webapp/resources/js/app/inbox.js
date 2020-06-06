@@ -31,7 +31,7 @@ $(document).ready(function () {
                 "sInfo": ""
             },
             "ajax": {
-                "url": "inbox/history?stateId=" + tableContainer1.dataTable().fnGetData($(this).parent().parent(), 7),
+                "url": "/services/egi/inbox/history?stateId=" + tableContainer1.dataTable().fnGetData($(this).parent().parent(), 7),
                 "dataSrc": ""
             },
             "columns": [
@@ -297,6 +297,7 @@ function clearnow() {
 
 //common ajax functions for worklist, drafts and notifications
 function worklist() {
+	var moduleName = $('#moduleName').val();
     tableContainer1 = $("#official_inbox");
     tableContainer1.DataTable({
         "sDom": "<'row'<'col-xs-12 hidden col-right'f>r>t<'row buttons-margin'<'col-md-5 col-xs-12'i><'col-md-3 col-xs-6'l><'col-md-4 col-xs-6 text-right'p>>",
@@ -305,7 +306,7 @@ function worklist() {
         "autoWidth": false,
         "aaSorting": [],
         "ajax": {
-            "url": "inbox/items?module=agenda",
+            "url": "/services/egi/inbox/items?module="+moduleName,
             "dataSrc": ""
         },
         "deferRender": true,
@@ -418,7 +419,7 @@ function drafts() {
         "aaSorting": [],
         "autoWidth": false,
         "ajax": {
-            "url": "inbox/draft",
+            "url": "/services/egi/inbox/draft",
             "dataSrc": ""
         },
         "deferRender": true,

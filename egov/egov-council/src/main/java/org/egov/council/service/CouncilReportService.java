@@ -117,7 +117,6 @@ public class CouncilReportService {
     }
 
     private Map<String, Object> buildReportParameters(final CouncilMeeting councilMeeting) {
-
         final StringBuilder meetingDateTimeLocation = new StringBuilder();
         final Map<String, Object> reportParams = new HashMap<>();
         reportParams.put("logoPath", cityService.getCityLogoURL());

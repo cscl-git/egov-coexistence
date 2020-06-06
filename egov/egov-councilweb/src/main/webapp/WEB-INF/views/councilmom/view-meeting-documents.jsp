@@ -70,7 +70,7 @@
 										<div class="file-viewer" data-toggle="tooltip"
 											data-placement="top" title="${file.fileName}">
 											<a class="download" target="_blank"
-												href="/egi/downloadfile?fileStoreId=${file.fileStoreId}&moduleName=COUNCIL"></a>
+												href="/services/egi/downloadfile?fileStoreId=${file.fileStoreId}&moduleName=COUNCIL"></a>
 											<c:choose>
 												<c:when test="${file.contentType eq 'application/pdf'}">
 													<i class="fa fa-file-pdf-o" aria-hidden="true"></i>

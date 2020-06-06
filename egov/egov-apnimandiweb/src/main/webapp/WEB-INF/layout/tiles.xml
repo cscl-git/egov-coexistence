@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE tiles-definitions PUBLIC
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+
+    <definition name="base_layout" template="/WEB-INF/views/template/main.jsp">
+        <put-attribute name="title" value="mChandigarh"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="dashboard_layout" template="/WEB-INF/views/template/dashboard.jsp">
+        <put-attribute name="title" value="Complaint Redressal Dashboard"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="error" template="/WEB-INF/views/template/error.jsp">
+        <put-attribute name="page-title" value="title.error.page" cascade="true"/>
+        <put-attribute name="body" value=""/>
+    </definition>
+
+    <definition name="error/*" extends="error">
+        <put-attribute name="body" value="/WEB-INF/views/error/{1}.jsp"/>
+    </definition>
+
+    <definition name="index" extends="base_layout">
+        <put-attribute name="body" value="/WEB-INF/views/index.jsp"/>
+    </definition>
+    
+    <definition name="contractor-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.new" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-new.jsp"/>
+    </definition>
+
+    <definition name="contractor-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-view.jsp"/>
+    </definition>
+
+    <definition name="contractor-edit" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-edit.jsp"/>
+    </definition>
+
+    <definition name="contractor-result" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.result" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-result.jsp"/>
+    </definition>
+
+    <definition name="contractor-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-search.jsp"/>
+    </definition>
+    
+    <definition name="contractor-wfview" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-wfview.jsp"/>
+    </definition>
+    
+    <definition name="contractor-terminate" extends="base_layout">
+        <put-attribute name="page-title" value="title.contractor.terminate" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/contractor-terminate.jsp"/>
+    </definition>     
+    
+    <definition name="apnimandicollection-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.new" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-new.jsp"/>
+    </definition>
+
+    <definition name="apnimandicollection-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-view.jsp"/>
+    </definition>
+
+    <definition name="apnimandicollection-edit" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-edit.jsp"/>
+    </definition>
+
+    <definition name="apnimandicollection-result" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.result" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-result.jsp"/>
+    </definition>
+
+    <definition name="apnimandicollection-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-search.jsp"/>
+    </definition>
+    
+    <definition name="apnimandicollection-wfview" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-wfview.jsp"/>
+    </definition>
+    
+    <definition name="apnimandicollection-receiptview" extends="base_layout">
+        <put-attribute name="page-title" value="title.apnimandicollection.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-receiptview.jsp"/>
+    </definition>
+</tiles-definitions>
