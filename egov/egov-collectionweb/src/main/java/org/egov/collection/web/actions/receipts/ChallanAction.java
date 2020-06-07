@@ -102,6 +102,7 @@ import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.BusinessService;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.utils.NumberUtil;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -499,8 +500,14 @@ public class ChallanAction extends BaseFormAction {
 							CollectionConstants.RECEIPT_STATUS_CODE_TO_BE_SUBMITTED));
 			receiptHeader.setCreatedBy(collectionsUtil.getLoggedInUser().getId());
 			receiptHeader.setCreatedDate(new Date());
+			EmployeeInfo empInfo =microserviceUtils.getEmployee(collectionsUtil.getLoggedInUser().getId(), null, null, null).get(0);
+            if (null != empInfo && empInfo.getUser().getUserName() != null)
+                receiptHeader.setCreatedUser(empInfo.getUser().getName());
 			
-
+            if(receiptHeader.getReceiptMisc().getDepartment() != null)
+            {
+            	receiptHeader.getReceiptMisc().setDepartment(getDepartmentName(receiptHeader.getReceiptMisc().getDepartment()));
+            }
 			if (setInstrument) {
 				receiptInstrList = populateInstrumentDetails();
 				setInstrument = false;
@@ -1666,6 +1673,19 @@ public class ChallanAction extends BaseFormAction {
 
 	public void setServiceIdText(String serviceIdText) {
 		this.serviceIdText = serviceIdText;
+	}
+	
+	private String getDepartmentName(String department) {
+    	String name="";
+    	List<Department> dept=masterDataCache.get("egi-department");
+    	for(Department dep :dept)
+    	{
+    		if(dep.getCode().equals(department))
+    		{
+    			name=dep.getName();
+    		}
+    	}
+		return name;
 	}
 
 }
