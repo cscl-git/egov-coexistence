@@ -41,7 +41,7 @@ public class ContractorsService extends PersistenceService<ApnimandiContractor, 
     private ContractorsRepository contractorsRepository;
 	
 	@Autowired
-    private DocumentsTypeMasterRepository documentTypeMasterRepository;
+    private DocumentsTypeMasterRepository documentsTypeMasterRepository;
 	
 	@Autowired
     private ContractorDocumentsRepository contractorDocumentsRepository;
@@ -123,7 +123,7 @@ public class ContractorsService extends PersistenceService<ApnimandiContractor, 
             	if(!isDocumentExist) {
 	                final ContractorDocument contractorDocument = new ContractorDocument();
 	                contractorDocument.setContractor(contractor);
-	                contractorDocument.setDocumentType(documentTypeMasterRepository.findByCode(attachedDocument.getDocumentCode()));
+	                contractorDocument.setDocumentType(documentsTypeMasterRepository.findByCode(attachedDocument.getDocumentCode()));
 	                contractorDocument.setFilestoreid(fileStoreService.store(attachedDocument.getFileStream(), attachedDocument.getFileName(),
 	                														 attachedDocument.getMimeType(), ApnimandiConstants.MODULE_NAME));
 	                contractorDocument.setReffileid(contractorDocument.getFilestoreid().getFileStoreId());

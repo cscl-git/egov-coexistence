@@ -21,10 +21,10 @@ import org.hibernate.validator.constraints.SafeHtml;
 @Entity
 @Table(name = "EGAM_DOCUMENTTYPE_MASTER")
 @Unique(id = "id", tableName = "EGAM_DOCUMENTTYPE_MASTER",columnName = { "code","documentType" },fields = { "code", "documentType" }, enableDfltMsg = true)
-@SequenceGenerator(name = DocumentTypeMaster.SEQ_DOCUMENT_TYPE, sequenceName = DocumentTypeMaster.SEQ_DOCUMENT_TYPE, allocationSize = 1)
+@SequenceGenerator(name = DocumentsTypeMaster.SEQ_DOCUMENT_TYPE, sequenceName = DocumentsTypeMaster.SEQ_DOCUMENT_TYPE, allocationSize = 1)
 @AuditOverrides({ @AuditOverride(forClass = AbstractAuditable.class, name = "lastModifiedBy"),
         @AuditOverride(forClass = AbstractAuditable.class, name = "lastModifiedDate") })
-public class DocumentTypeMaster extends AbstractAuditable{
+public class DocumentsTypeMaster extends AbstractAuditable{
 	
 	private static final long serialVersionUID = 1517694643078084884L;
 	public static final String SEQ_DOCUMENT_TYPE = "SEQ_EGAM_DOCUMENTTYPE_MASTER";

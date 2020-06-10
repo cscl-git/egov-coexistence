@@ -106,7 +106,7 @@ function callAjaxSearch() {
 				"className" : "text-right",
 				render : function(data, type, full) {
 					if(full.statusCode == "APPROVED"){
-						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Contractor</option><option value="2">Edit Contractor</option><option value="3">Terminate Contractor</option></select>');
+						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Contractor</option><option value="3">Terminate Contractor</option></select>');
 					}else if(full.statusCode == "REJECTED"){
 						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Contractor</option><option value="2">Edit Contractor</option></select>');
 					}else if(full.statusCode == "CONTRACTTERMINATED"){

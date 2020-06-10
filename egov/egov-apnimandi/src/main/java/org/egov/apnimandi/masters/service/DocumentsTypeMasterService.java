@@ -12,7 +12,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Metamodel;
 
-import org.egov.apnimandi.masters.entity.DocumentTypeMaster;
+import org.egov.apnimandi.masters.entity.DocumentsTypeMaster;
 import org.egov.apnimandi.masters.repository.DocumentsTypeMasterRepository;
 import org.egov.infstr.services.PersistenceService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
-public class DocumentsTypeMasterService extends PersistenceService<DocumentTypeMaster, Long>{
+public class DocumentsTypeMasterService extends PersistenceService<DocumentsTypeMaster, Long>{
 	
 	@Autowired
     private DocumentsTypeMasterRepository documentsTypeMasterRepository;
@@ -31,81 +31,81 @@ public class DocumentsTypeMasterService extends PersistenceService<DocumentTypeM
     private EntityManager entityManager;
     
     public DocumentsTypeMasterService() {
-        super(DocumentTypeMaster.class);
+        super(DocumentsTypeMaster.class);
     }
     
-	public DocumentsTypeMasterService(Class<DocumentTypeMaster> type) {
+	public DocumentsTypeMasterService(Class<DocumentsTypeMaster> type) {
 		super(type);
 	}
 	
 	@Transactional
-    public DocumentTypeMaster persist(final DocumentTypeMaster documentTypeMaster) {
-    	applyAuditing(documentTypeMaster);
-        return documentsTypeMasterRepository.save(documentTypeMaster);
+    public DocumentsTypeMaster persist(final DocumentsTypeMaster documentsTypeMaster) {
+    	applyAuditing(documentsTypeMaster);
+        return documentsTypeMasterRepository.save(documentsTypeMaster);
     }	
 	
-	public List<DocumentTypeMaster> getDocumentTypeList() {
+	public List<DocumentsTypeMaster> getDocumentTypeList() {
         return documentsTypeMasterRepository.findAll();
     }
 
-    public List<DocumentTypeMaster> getActiveDocumentTypeList() {
+    public List<DocumentsTypeMaster> getActiveDocumentTypeList() {
         return documentsTypeMasterRepository.findByActiveTrueOrderByOrdernumberAsc();
     }
 
-    public List<DocumentTypeMaster> findAll() {
+    public List<DocumentsTypeMaster> findAll() {
         return documentsTypeMasterRepository.findAll(new Sort(Sort.Direction.DESC, "id"));
     }
 
-    public DocumentTypeMaster findByCode(final String code) {
+    public DocumentsTypeMaster findByCode(final String code) {
         return documentsTypeMasterRepository.findByCode(code);
     }
 
-    public DocumentTypeMaster findOne(final Long id) {
+    public DocumentsTypeMaster findOne(final Long id) {
         return documentsTypeMasterRepository.findOne(id);
     }
 
-    public List<DocumentTypeMaster> search(final DocumentTypeMaster documentTypeMaster) {
+    public List<DocumentsTypeMaster> search(final DocumentsTypeMaster documentsTypeMaster) {
 
         final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        final CriteriaQuery<DocumentTypeMaster> createQuery = cb.createQuery(DocumentTypeMaster.class);
-        final Root<DocumentTypeMaster> documenttypemasters = createQuery.from(DocumentTypeMaster.class);
-        createQuery.select(documenttypemasters);
+        final CriteriaQuery<DocumentsTypeMaster> createQuery = cb.createQuery(DocumentsTypeMaster.class);
+        final Root<DocumentsTypeMaster> documentstypemasters = createQuery.from(DocumentsTypeMaster.class);
+        createQuery.select(documentstypemasters);
         final Metamodel model = entityManager.getMetamodel();
-        final javax.persistence.metamodel.EntityType<DocumentTypeMaster> documenttypeMasters = model.entity(DocumentTypeMaster.class);
+        final javax.persistence.metamodel.EntityType<DocumentsTypeMaster> documentstypeMasters = model.entity(DocumentsTypeMaster.class);
 
-        final List<DocumentTypeMaster> resultList;
+        final List<DocumentsTypeMaster> resultList;
         final List<Predicate> predicates = new ArrayList<>();
-        if (documentTypeMaster.getDocumentType() == null 
-        		&& documentTypeMaster.getCode() == null
-                && documentTypeMaster.getActive() == null)
+        if (documentsTypeMaster.getDocumentType() == null 
+        		&& documentsTypeMaster.getCode() == null
+                && documentsTypeMaster.getActive() == null)
             resultList = findAll();
         else {
-            if (documentTypeMaster.getCode() != null) {
-                final String code = "%" + documentTypeMaster.getCode().toLowerCase() + "%";
-                predicates.add(cb.isNotNull(documenttypemasters.get("code")));
+            if (documentsTypeMaster.getCode() != null) {
+                final String code = "%" + documentsTypeMaster.getCode().toLowerCase() + "%";
+                predicates.add(cb.isNotNull(documentstypemasters.get("code")));
                 predicates.add(cb.like(
-                        cb.lower(documenttypemasters.get(documenttypeMasters.getDeclaredSingularAttribute("code", String.class))), code));
+                        cb.lower(documentstypemasters.get(documentstypeMasters.getDeclaredSingularAttribute("code", String.class))), code));
             }
-            if (documentTypeMaster.getDocumentType() != null) {
-                final String documentType = "%" + documentTypeMaster.getDocumentType().toLowerCase() + "%";
-                predicates.add(cb.isNotNull(documenttypemasters.get("documentType")));
+            if (documentsTypeMaster.getDocumentType() != null) {
+                final String documentType = "%" + documentsTypeMaster.getDocumentType().toLowerCase() + "%";
+                predicates.add(cb.isNotNull(documentstypemasters.get("documentType")));
                 predicates.add(cb.like(
-                        cb.lower(documenttypemasters
-                                .get(documenttypeMasters.getDeclaredSingularAttribute("documentType", String.class))),
+                        cb.lower(documentstypemasters
+                                .get(documentstypeMasters.getDeclaredSingularAttribute("documentType", String.class))),
                         documentType));
             }
-            if (documentTypeMaster.getActive() != null)
-                if (documentTypeMaster.getActive())
+            if (documentsTypeMaster.getActive() != null)
+                if (documentsTypeMaster.getActive())
                     predicates.add(cb.equal(
-                            documenttypemasters.get(documenttypeMasters.getDeclaredSingularAttribute("active", Boolean.class)),
+                    		documentstypemasters.get(documentstypeMasters.getDeclaredSingularAttribute("active", Boolean.class)),
                             true));
                 else
                     predicates.add(cb.equal(
-                            documenttypemasters.get(documenttypeMasters.getDeclaredSingularAttribute("active", Boolean.class)),
+                    		documentstypemasters.get(documentstypeMasters.getDeclaredSingularAttribute("active", Boolean.class)),
                             false));
 
             createQuery.where(predicates.toArray(new Predicate[] {}));
-            final TypedQuery<DocumentTypeMaster> query = entityManager.createQuery(createQuery);
+            final TypedQuery<DocumentsTypeMaster> query = entityManager.createQuery(createQuery);
 
             resultList = query.getResultList();
         }

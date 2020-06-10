@@ -17,7 +17,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
-import org.egov.apnimandi.masters.entity.DocumentTypeMaster;
+import org.egov.apnimandi.masters.entity.DocumentsTypeMaster;
 import org.egov.apnimandi.masters.entity.ZoneMaster;
 import org.egov.apnimandi.masters.entity.vo.AttachedDocument;
 import org.egov.apnimandi.masters.service.DocumentsTypeMasterService;
@@ -165,9 +165,9 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 	        prepareWorkFlowOnLoad(model, apnimandiContractor);
 	        return APNIMANDI_CONTRACTOR_NEW;
 	    }
-		List<DocumentTypeMaster> documentTypeList = documentsTypeMasterService.getActiveDocumentTypeList();
+		List<DocumentsTypeMaster> documentTypeList = documentsTypeMasterService.getActiveDocumentTypeList();
 		List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();
-		for(DocumentTypeMaster documentType:documentTypeList) {
+		for(DocumentsTypeMaster documentType:documentTypeList) {
 			String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file_" + documentType.getCode());
 	        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file_" + documentType.getCode());
 	        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file_" + documentType.getCode());  
@@ -239,9 +239,9 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 	        model.addAttribute(APPLICATION_HISTORY, apnimandiThirdPartyService.getHistory(apnimandiContractor));
 	        return APNIMANDI_CONTRACTOR_EDIT;
 	    }
-		List<DocumentTypeMaster> documentTypeList = documentsTypeMasterService.getActiveDocumentTypeList();
+		List<DocumentsTypeMaster> documentTypeList = documentsTypeMasterService.getActiveDocumentTypeList();
 		List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();
-		for(DocumentTypeMaster documentType:documentTypeList) {
+		for(DocumentsTypeMaster documentType:documentTypeList) {
 			String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file_" + documentType.getCode());
 	        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file_" + documentType.getCode());
 	        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file_" + documentType.getCode());  

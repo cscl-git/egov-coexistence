@@ -47,7 +47,7 @@
 				<div class="form-group">
 					<label class="col-sm-2 control-label text-right"><spring:message
 							code="lbl.attachment" /> :<span class="mandatory"></span> </label>
-					<div class="col-sm-10 add-margin">
+					<div class="col-sm-8 add-margin">
 						<c:if test="${mode == 'edit'}">
 							<a href="/services/egi/downloadfile?fileStoreId=${library.filestoreid.fileStoreId}&moduleName=LCMS">${library.filestoreid.fileName }</a><br />
 							<input type="file" name="file" id="file1" onchange="isValidFile(this.id)">

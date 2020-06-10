@@ -2,14 +2,14 @@ package org.egov.apnimandi.masters.repository;
 
 import java.util.List;
 
-import org.egov.apnimandi.masters.entity.DocumentTypeMaster;
+import org.egov.apnimandi.masters.entity.DocumentsTypeMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface DocumentsTypeMasterRepository extends JpaRepository<DocumentTypeMaster, Long> {
+public interface DocumentsTypeMasterRepository extends JpaRepository<DocumentsTypeMaster, Long> {
 
-	DocumentTypeMaster findByCode(String code);
+	DocumentsTypeMaster findByCode(String code);
     
-    List<DocumentTypeMaster> findByActiveTrueOrderByOrdernumberAsc();
+    List<DocumentsTypeMaster> findByActiveTrueOrderByOrdernumberAsc();
 }
