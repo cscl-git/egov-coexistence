@@ -128,14 +128,14 @@
 										<%-- <td align="center"><c:out
 												value="${mom.agenda.agendaNumber}" /></td> --%>
 										<td width="10%"><c:out
-												value="${mom.preamble.preambleNumber}" /></td>
+												value="${mom.preamble.preambleNumber}" escapeXml="false"/></td>
 										<td width="30%"><span class="more"><c:out
 													value="${mom.resolutionDetail ne null?mom.resolutionDetail:'N/A'}" /></span></td>
 										<td width="10%"><c:out
 												value="${mom.resolutionStatus ne null?mom.resolutionStatus.code:'N/A'}" /></td>
 										<td><c:out value="${mom.resolutionNumber ne null?mom.resolutionNumber :'N/A'}"></c:out></td>
 										<td width="30%"><span class="more"><c:out
-													value="${mom.preamble.gistOfPreamble ne null?mom.preamble.gistOfPreamble:'N/A'}" />
+													value="${mom.preamble.gistOfPreamble ne null?mom.preamble.gistOfPreamble:'N/A'}"  escapeXml="false"/>
 													<br>
 													<c:out value="${mom.preamble.addtionalGistOfPreamble}"></c:out>
 													</span></td>

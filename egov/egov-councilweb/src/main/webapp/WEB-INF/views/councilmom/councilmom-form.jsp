@@ -144,7 +144,7 @@
 										<td><c:out value="${mom.preamble.departmentName}" /></td>
 										<td><c:out value="${mom.preamble.preambleNumber}" /></td>
 										<td><span class="more"><c:out
-													value="${mom.preamble.gistOfPreamble}"/><br>
+													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/><br>
 													<c:out value="${mom.preamble.addtionalGistOfPreamble}"></c:out>
 													</span></td>
 

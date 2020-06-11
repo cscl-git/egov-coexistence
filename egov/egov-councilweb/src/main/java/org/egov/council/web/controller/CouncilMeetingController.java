@@ -628,7 +628,7 @@ public class CouncilMeetingController {
 		            .contentType(parseMediaType(defaultIfBlank(APPLICATION_RTF, JPG_MIME_TYPE)))
 		            .cacheControl(CacheControl.noCache())
 		            .contentLength(reportOutput.length)
-		            .header(CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_ATTACH,"meetingdetails.rtf")).
+		            .header(CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_INLINE,"meetingdetails.rtf")).
 		                    body(new InputStreamResource(new ByteArrayInputStream(reportOutput)));
 	        }else {
 	        	return ResponseEntity.notFound().build();

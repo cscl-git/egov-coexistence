@@ -68,15 +68,6 @@
 
 </form:form>
 
-<script>
-	$('#buttonSubmit').click(function(e) {
-		if ($('form').valid()) {
-		} else {
-			e.preventDefault();
-		}
-	});
-</script>
-
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/app/css/council-style.css?rnd=${app_release_no}'/>" />
 <script type="text/javascript"
@@ -85,3 +76,25 @@
 	src="<cdn:url value='/resources/app/js/common-util-helper.js?rnd=${app_release_no}'/>"></script>
 <script
 	src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
+<script type="text/javascript"
+	src="<cdn:url value='/resources/app/js/ckeditor.js'/>"></script>
+<script type="text/javascript"
+	src="<cdn:url value='/resources/app/js/ckeditorload.js'/>"></script>
+
+<script>
+	$('#buttonSubmit').click(function(e) {
+		if ($('form').valid()) {
+		} else {
+			e.preventDefault();
+		}
+	});
+	$('.workflow-submit').click(function(e) {
+		var editorData = editor.getData();
+		console.log("editorData:"+editorData);
+		if(editorData.trim() === ''){
+			alert("Agenda details can not be blank.");
+			e.preventDefault();
+		}
+	});
+	
+</script>

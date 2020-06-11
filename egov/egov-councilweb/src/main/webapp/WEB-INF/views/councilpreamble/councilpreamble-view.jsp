@@ -87,7 +87,12 @@
 					<div class="col-sm-3 add-margin view-content">
 						${councilPreamble.departmentName}
 					</div>
-					
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.committeetype" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilPreamble.committeeType ne null ? councilPreamble.committeeType.name:'N/A'}
+					</div>
 					<!-- <div class="col-xs-3 add-margin">
 						<spring:message code="lbl.amount" />
 					</div>
@@ -98,7 +103,7 @@
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.gistofpreamble" />
 					</div>
-					<div class="col-sm-9 add-margin view-content">
+					<div class="col-sm-8 add-margin view-content">
 						${councilPreamble.gistOfPreamble}</div>
 				</div>
 				<div class="row add-border">

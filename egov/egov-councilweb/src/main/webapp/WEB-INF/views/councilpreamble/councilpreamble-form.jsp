@@ -65,25 +65,25 @@
 		</div>
 		<div class="panel-body">
 			<div class="form-group">
-				<c:if test="${!autoPreambleNoGenEnabled && currentState=='NEW'}">
-					<label class="col-sm-2 control-label text-right"><spring:message
-							code="lbl.preamble.number" /> <span class="mandatory"></span></label>
-					<div class="col-sm-3 add-margin">
-						<form:input path="preambleNumber" required="required"
-							id="preambleNumber"
-							class="form-control text-left patternvalidation" />
-						<form:errors path="preambleNumber" cssClass="error-msg" />
-					</div>
-				</c:if>
-
-				<c:if
-					test="${councilPreamble.preambleNumber!= null && !''.equalsIgnoreCase(councilPreamble.preambleNumber)}">
-					<label class="col-sm-2 control-label text-right"> <spring:message
-							code="lbl.preamble.number" />
-					</label>
-					<div class="col-sm-3 add-margin">
-						${councilPreamble.preambleNumber}</div>
-				</c:if>
+				<c:choose>
+    				<c:when test="${!autoPreambleNoGenEnabled && currentState=='NEW'}">
+						<label class="col-sm-2 control-label text-right"><spring:message
+								code="lbl.preamble.number" /> <span class="mandatory"></span></label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="preambleNumber" required="required"
+								id="preambleNumber"
+								class="form-control text-left patternvalidation" />
+							<form:errors path="preambleNumber" cssClass="error-msg" />
+						</div>
+					</c:when>    
+	    			<c:otherwise>
+						<label class="col-sm-2 control-label text-right"> <spring:message
+								code="lbl.preamble.number" />
+						</label>
+						<div class="col-sm-3 add-margin">
+							${councilPreamble.preambleNumber}</div>
+					</c:otherwise>  
+				</c:choose>
 
 				<input type="hidden" name="councilPreamble"
 					value="${councilPreamble.id}" />
@@ -93,16 +93,24 @@
 				<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.department" /> <span class="mandatory"></span></label>
 				<div class="col-sm-3 add-margin">
-					<form:select path="department" id="department"
-						cssClass="form-control" cssErrorClass="form-control error"
-						required="required">
-						<form:option value="">
-							<spring:message code="lbl.select" />
-						</form:option>
-						<form:options items="${departments}" itemValue="code"
-							itemLabel="name" />
-					</form:select>
-					<form:errors path="department" cssClass="error-msg" />
+					<c:choose>
+						<c:when test="${isAgendaAdmin && currentState=='NEW'}">
+							<form:select path="department" id="department"
+								cssClass="form-control" cssErrorClass="form-control error"
+								required="required">
+								<form:option value="">
+									<spring:message code="lbl.select" />
+								</form:option>
+								<form:options items="${departments}" itemValue="code"
+									itemLabel="name" />
+							</form:select>
+							<form:errors path="department" cssClass="error-msg" />
+						</c:when>    
+		    			<c:otherwise>
+							${councilPreamble.departmentName}
+							<form:hidden path="department"/>
+						</c:otherwise>  
+					</c:choose>
 				</div>
 				<!-- <label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.amount" /></label>
@@ -134,7 +142,7 @@
 					<form:errors path="committeeType" cssClass="error-msg" />
 				</div>
 			</div>
-			<div class="form-group">
+			<!-- <div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.gistofpreamble" /><span class="mandatory"></span></label>
 				<div class="col-sm-8 add-margin">
@@ -144,8 +152,17 @@
 						required="required" />
 					<form:errors path="gistOfPreamble" cssClass="error-msg" />
 				</div>
+			</div> -->
+			<div class="form-group">
+				<label class="col-sm-2 control-label text-right"><spring:message
+						code="lbl.gistofpreamble" /><span class="mandatory"></span></label>
+				<div class="col-sm-8 add-margin">
+					<form:errors path="gistOfPreamble" cssClass="error-msg" />
+					<textarea id="editor" name="editor">${councilPreamble.gistOfPreamble}</textarea>
+				</div>
 
 			</div>
+			
 			
 			<div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
@@ -155,7 +172,7 @@
 								data-id="1" class="filechange inline btn" />
 							<form:errors path="attachments" cssClass="error-msg" />
 				</div> --%>
-				<div class="col-sm-3 add-margin">
+				<div class="col-sm-8 add-margin">
 					<c:choose>
 						<c:when test="${councilPreamble.filestoreid != null}">
 
@@ -171,7 +188,7 @@
 
 							<a
 								href="/services/council/councilmember/downloadfile/${councilPreamble.filestoreid.fileStoreId}"
-								data-gallery> ${councilPreamble.filestoreid.fileName}</a>
+								data-gallery style="display:block"> ${councilPreamble.filestoreid.fileName}</a>
 							<small class="error-msg"><spring:message
 									code="lbl.mesg.document" /></small>
 						</c:when>
@@ -212,5 +229,8 @@
 <style>
 #attachments{
 	color:#333;
+}
+.ck-editor__editable_inline {
+    min-height: 300px;
 }
 </style>

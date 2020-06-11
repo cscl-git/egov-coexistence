@@ -62,6 +62,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -91,15 +92,19 @@ import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.Role;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.jfree.util.Log;
+import org.python.antlr.op.IsDerived;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -141,6 +146,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     private static final String COUNCILPREAMBLE_UPDATE_STATUS = "councilpreamble-update-status";
     private static final String COMMONERRORPAGE = "common-error-page";
     private static final String ADDITIONALRULE = "additionalRule";
+    private static final String IS_AGENDA_ADMIN = "isAgendaAdmin";
+    private static final String RICH_TEXT_EDITOR = "editor";
     
     
     private static final String COUNCILPREAMBLE_API_VIEW = "councilpreamble-viewnew";
@@ -171,6 +178,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     protected CommitteeTypeService committeeTypeService;
     @Autowired
     protected CouncilAgendaService councilAgendaService;
+    @Autowired
+    private SecurityUtils securityUtils;
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
@@ -211,10 +220,20 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     public String newForm(final Model model) {
         CouncilPreamble councilPreamble = new CouncilPreamble();
         councilPreamble.setType(PreambleType.GENERAL);
+        EmployeeInfo info = getEmployee();
+        model.addAttribute(IS_AGENDA_ADMIN, isAgendaAdmin(info));
+        
+        if(!isAgendaAdmin(info) && null != info 
+        		&& !CollectionUtils.isEmpty(info.getAssignments())) {
+        	councilPreamble.setDepartment(info.getAssignments().get(0).getDepartment());
+        	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+        	councilPreamble.setDepartmentName(deptMap.get(councilPreamble.getDepartment()));
+        }
         model.addAttribute("autoPreambleNoGenEnabled", isAutoPreambleNoGenEnabled());     
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
         model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
         model.addAttribute(CURRENT_STATE, "NEW");
+        
         prepareWorkFlowOnLoad(model, councilPreamble);
         return COUNCILPREAMBLE_NEW;
     }
@@ -234,12 +253,35 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                          final HttpServletRequest request,
                          final RedirectAttributes redirectAttrs,
                          @RequestParam String workFlowAction) {
+    	
+    	String editor="";
+        if (request.getParameter(RICH_TEXT_EDITOR) != null)
+        	editor = request.getParameter(RICH_TEXT_EDITOR);
+    	LOGGER.info("editor:"+request.getParameter("editor"));
+        councilPreamble.setGistOfPreamble(editor);
+    	
         validatePreamble(councilPreamble, errors);
         if (errors.hasErrors()) {
+        	 EmployeeInfo info = getEmployee();
+             model.addAttribute(IS_AGENDA_ADMIN, isAgendaAdmin(info));
+             
+             if(!isAgendaAdmin(info) && null != info 
+             		&& !CollectionUtils.isEmpty(info.getAssignments())) {
+             	councilPreamble.setDepartment(info.getAssignments().get(0).getDepartment());
+             	Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+             	councilPreamble.setDepartmentName(deptMap.get(councilPreamble.getDepartment()));
+             }
+             model.addAttribute("autoPreambleNoGenEnabled", isAutoPreambleNoGenEnabled());   
+             councilPreamble.setApprovalDepartment("");
+             councilPreamble.setApprovalDesignation("");
+             councilPreamble.setApprovalPosition(0l);
+             model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
+             model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+             model.addAttribute(CURRENT_STATE, "NEW");
             prepareWorkFlowOnLoad(model, councilPreamble);
             return COUNCILPREAMBLE_NEW;
         }
-
+        
         if (attachments != null && attachments.getSize() > 0) {
             try {
                 councilPreamble.setFilestoreid(fileStoreService.store(
@@ -266,6 +308,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         String approvalComment = "";
         String approverName = "";
         String nextDesignation = "";
+        
         if (request.getParameter(APPROVAL_COMENT) != null)
             approvalComment = request.getParameter(APPROVAL_COMENT);
         if (request.getParameter(WORK_FLOW_ACTION) != null)
@@ -324,6 +367,12 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     public String result(@PathVariable("id") final Long id, Model model) {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
         updateDepartment(councilPreamble);
+        try {
+        	//set committee type value
+        	councilPreamble.setCommitteeType(councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda().getCommitteeType());
+        }catch(Exception e) {
+        	Log.error("No agenda found with preambleid "+councilPreamble.getId());
+        }
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
         model.addAttribute(APPLICATION_HISTORY,
                 councilThirdPartyService.getHistory(councilPreamble));
@@ -519,6 +568,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         }catch(Exception e) {
         	Log.error("No agenda found with preambleid "+councilPreamble.getId());
         }
+        Map<String, String> deptMap = masterDataCache.getDepartmentMapMS(ApplicationConstant.DEPARTMENT_CACHE_NAME, ApplicationConstant.MODULE_GENERIC);
+    	councilPreamble.setDepartmentName(deptMap.get(councilPreamble.getDepartment()));
         
         model.addAttribute("stateType", councilPreamble.getClass()
                 .getSimpleName());
@@ -622,6 +673,29 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 	        	}
 	    	}
     	});
+    }
+    
+    private boolean isAgendaAdmin(EmployeeInfo info){
+    	boolean isAgendaAdmin= false;
+    	if(null != info) {
+			Optional<Role> adminRole = info.getUser().getRoles().stream()
+                    .filter(role -> CouncilConstants.ROLE_AGENDA_BRANCH_ADMIN.equals(role.getCode()))
+                    .findFirst();
+
+			if(adminRole.isPresent()) {
+				isAgendaAdmin = true;
+			}
+		}
+    	return isAgendaAdmin;
+    }
+    
+    private EmployeeInfo getEmployee(){
+    	final User user = securityUtils.getCurrentUser();
+    	if(null != user) {
+    		EmployeeInfo info = microserviceUtils.getEmployeeById(user.getId());
+	    	return info;
+    	}
+    	return null;
     }
 
 }
