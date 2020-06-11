@@ -579,6 +579,7 @@ public class BankAdviceReportAction extends BaseFormAction {
     @ValidationErrorPage(NEW)
     @Action(value = "/report/bankAdviceReport-exportPDFPex")
     public String exportPDFPex() {
+    	try {
     	preparePex();
         final Map<String, Object> reportParams = new HashMap<String, Object>();
         final StringBuffer letterContext = new StringBuffer();
@@ -603,6 +604,10 @@ public class BankAdviceReportAction extends BaseFormAction {
         final ReportOutput reportOutput = reportService.createReport(reportInput);
         if (reportOutput != null && reportOutput.getReportOutputData() != null)
             inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
 
         return "reportview";
     }

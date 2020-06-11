@@ -202,7 +202,7 @@ function printAdviceExcel(bank,bankbranch,bankaccount,instrumentnumber){
 		 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }
 
-function printAdviceExcelPex(){
+function printAdviceExcelPex(bank,bankbranch,bankaccount,instrumentnumber){
 	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="+
 	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
@@ -213,7 +213,7 @@ function printAdvicePdf(bank,bankbranch,bankaccount,instrumentnumber){
 	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 }
 
-function printAdvicePdfPex(){
+function printAdvicePdfPex(bank,bankbranch,bankaccount,instrumentnumber){
 	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="+
 	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	 window.open(url,'','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
