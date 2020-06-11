@@ -47,7 +47,7 @@ public class AuditService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(AuditService.class);
 	@Autowired
-	private final AuditRepository auditRepository;
+	private AuditRepository auditRepository;
 	private final ScriptService scriptExecutionService;
 	@Autowired
 	protected AppConfigValueService appConfigValuesService;
@@ -71,8 +71,7 @@ public class AuditService {
 	private ExpenseBillService expenseBillService;
 
 	@Autowired
-	public AuditService(final AuditRepository auditRepository, final ScriptService scriptExecutionService) {
-		this.auditRepository = auditRepository;
+	public AuditService(final ScriptService scriptExecutionService) {
 		this.scriptExecutionService = scriptExecutionService;
 	}
 

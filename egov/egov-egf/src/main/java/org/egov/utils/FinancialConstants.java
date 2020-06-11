@@ -455,6 +455,7 @@ public interface FinancialConstants {
 	public static final String EMPTY_STRING = "";
     public static final String INSTRUMENT_TYPE_PEX = "pex";
     public static final String MODEOFPAYMENT_PEX  = "pex";
+    public static final String CONTINGENCYBILL_PENDING_AUDIT = "Pending with Audit";
 
 	
 }

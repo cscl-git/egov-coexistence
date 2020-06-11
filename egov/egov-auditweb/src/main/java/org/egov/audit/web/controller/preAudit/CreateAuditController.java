@@ -72,9 +72,6 @@ import org.egov.audit.model.AuditDetail;
 import org.egov.audit.service.AuditService;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
-import org.egov.egf.budget.model.BudgetControlType;
-import org.egov.egf.expensebill.service.ExpenseBillService;
-import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -83,7 +80,6 @@ import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
-import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -134,14 +130,15 @@ public class CreateAuditController extends GenericWorkFlowController {
 	@Autowired
 	private AuditUtils auditUtils;
 
-	@RequestMapping(value = "/create/{billId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/create/{auditId}", method = RequestMethod.POST)
 	public String showNewForm(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
-			HttpServletRequest request, @PathVariable final String billId) {
+			HttpServletRequest request, @PathVariable final String auditId) {
 		LOGGER.info("Test");
 		AuditCheckList checklistDetail = null;
-		AuditDetails auditDetails = new AuditDetails();
-		EgBillregister bill = auditService.getBillDetails(Long.parseLong(billId));
-		model.addAttribute("billSource", "/services/EGF/expensebill/view/" + billId);
+		AuditDetails auditDetails = auditService.getById(Long.parseLong(auditId));
+		
+		EgBillregister bill = auditDetails.getEgBillregister();
+		model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
 		List<AppConfigValues> appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
 				"checklist_" + bill.getEgBillregistermis().getEgBillSubType().getName());
 		for (AppConfigValues value : appConfigValuesList) {

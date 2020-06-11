@@ -49,12 +49,15 @@ package org.egov.egf.web.controller.expensebill;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.repository.AuditRepository;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
@@ -62,18 +65,23 @@ import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.persistence.entity.AbstractAuditable;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.pims.commons.Position;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -86,6 +94,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 
 @Controller
 @RequestMapping(value = "/expensebill")
@@ -123,9 +132,13 @@ public class UpdateExpenseBillController extends BaseBillController {
     private CheckListService checkListService;
     @Autowired
     private MicroserviceUtils microServiceUtil;
+    @Autowired
+    private SecurityUtils securityUtils;
+    @Autowired
+	private AuditRepository auditRepository;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
-        super(appConfigValuesService);
+		super(appConfigValuesService);
     }
 
     @ModelAttribute(EG_BILLREGISTER)
@@ -251,8 +264,29 @@ public class UpdateExpenseBillController extends BaseBillController {
         } else {
             try {
                 if (null != workFlowAction)
+                {
                     updatedEgBillregister = expenseBillService.update(egBillregister, approvalPosition, approvalComment, null,
                             workFlowAction, mode, apporverDesignation);
+                    if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
+                    {
+                    	AuditDetails audit=new AuditDetails();
+                    	final User user = securityUtils.getCurrentUser();
+                    	Position owenrPos = new Position();
+                        owenrPos.setId(479L);
+                    	audit.setAudit_no("Audit001");
+                    	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments("")
+                        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
+                        .withNextAction("Pre Audit pending")
+                        .withNatureOfTask("Pre-Audit")
+                        .withCreatedBy(user.getId())
+                        .withtLastModifiedBy(user.getId());
+                    	applyAuditing(audit);
+                    	AuditDetails auditReg = auditRepository.save(audit);
+                		persistenceService.getSession().flush();
+                    }
+                }   
+                
             } catch (final ValidationException e) {
                 setDropDownValues(model);
                 model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
@@ -371,4 +405,14 @@ public class UpdateExpenseBillController extends BaseBillController {
 	public void setOriginalFiles(List<FileStoreMapper> originalFiles) {
 		this.originalFiles = originalFiles;
 	}*/
+    
+    public void applyAuditing(AbstractAuditable auditable) {
+		Date currentDate = new Date();
+		if (auditable.isNew()) {
+			auditable.setCreatedBy(ApplicationThreadLocals.getUserId());
+			auditable.setCreatedDate(currentDate);
+		}
+		auditable.setLastModifiedBy(ApplicationThreadLocals.getUserId());
+		auditable.setLastModifiedDate(currentDate);
+	}
 }
