@@ -102,7 +102,7 @@ function submitForm() {
 		var today = getdate();
 		$('#dailyBoardReportResult-header').show();
 		$('#reportgeneration-header').show();
-		$.get("/lcms/reports/dailyBoardReportresults/",$('#dailyboardreportForm').serialize())
+		$.get("/services/lcms/reports/dailyBoardReportresults/",$('#dailyboardreportForm').serialize())
 		.done(function(searchResult) {
 		console.log(JSON.stringify(searchResult));
 		oDataTable=oTable.DataTable({

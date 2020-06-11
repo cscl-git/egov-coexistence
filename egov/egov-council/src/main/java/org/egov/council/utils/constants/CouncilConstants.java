@@ -82,6 +82,8 @@ public class CouncilConstants {
     public static final String RESOLUTION_STATUS_ADJURNED = "ADJOURNED";
     public static final String RESOLUTION_STATUS_SANCTIONED = "SANCTIONED";
     public static final String RESOLUTION_STATUS_RECORDED = "RECORDED";
+    public static final String ROLE_AGENDA_CREATOR = "AGENDA_CREATOR";
+    public static final String ROLE_AGENDA_BRANCH_ADMIN = "AGENDA_BRANCH_ADMIN";
 
     public static final String APPROVED = "APPROVED";
     public static final String REJECTED = "REJECTED";

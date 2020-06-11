@@ -110,4 +110,11 @@
 	src="<cdn:url value='/resources/app/js/councilPreambleWardwiseReport.js?rnd=${app_release_no}'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/common-util-helper.js?rnd=${app_release_no}'/>"></script>
+<script
+	src="<cdn:url value='/resources/app/js/showMoreorLessContent.js?rnd=${app_release_no}'/>"></script>
 
+<style>
+.morecontent span {
+	display: none;
+}
+</style>

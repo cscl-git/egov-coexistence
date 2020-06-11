@@ -13,7 +13,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
-import org.egov.apnimandi.masters.entity.DocumentTypeMaster;
+import org.egov.apnimandi.masters.entity.DocumentsTypeMaster;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.hibernate.annotations.Fetch;
@@ -45,7 +45,7 @@ public class ContractorDocument extends AbstractAuditable{
     @NotNull
     @JoinColumn(name = "documenttype", nullable = false)
     @Audited
-    private DocumentTypeMaster documentType;
+    private DocumentsTypeMaster documentType;
     
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "filestoreid")
@@ -74,11 +74,11 @@ public class ContractorDocument extends AbstractAuditable{
 		this.contractor = contractor;
 	}
 
-	public DocumentTypeMaster getDocumentType() {
+	public DocumentsTypeMaster getDocumentType() {
 		return documentType;
 	}
 
-	public void setDocumentType(DocumentTypeMaster documentType) {
+	public void setDocumentType(DocumentsTypeMaster documentType) {
 		this.documentType = documentType;
 	}
 

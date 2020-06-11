@@ -168,7 +168,8 @@ function callAjaxSearch() {
 				}, {
 					"data" : "gistOfPreamble", "width": "40%",
 					"sClass" : "text-left"
-				}, {
+				},
+				{
 					"data" : "createdDate",
 					"sClass" : "text-left"
 				}, {

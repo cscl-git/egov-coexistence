@@ -49,6 +49,7 @@ package org.egov.council.service;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.WordUtils;
+import org.apache.log4j.Logger;
 import org.egov.council.entity.CouncilAgendaDetails;
 import org.egov.council.entity.CouncilMeeting;
 import org.egov.council.entity.MeetingMOM;
@@ -64,7 +65,6 @@ import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,6 +73,8 @@ import java.util.Map;
 @Transactional(readOnly = true)
 public class CouncilReportService {
 
+	private static final Logger LOGGER = Logger
+            .getLogger(CouncilReportService.class);
     private static final String AGENDA = "agenda";
     private static final String MEETINGMOM = "meetingMom";
 
@@ -120,6 +122,8 @@ public class CouncilReportService {
         final StringBuilder meetingDateTimeLocation = new StringBuilder();
         final Map<String, Object> reportParams = new HashMap<>();
         reportParams.put("logoPath", cityService.getCityLogoURL());
+        LOGGER.info("Report logo api url:"+reportParams.get("logoPath"));
+       
         reportParams.put("commiteeType", WordUtils.capitalize(councilMeeting.getCommitteeType().getName()));
         reportParams.put("meetingNumber", WordUtils.capitalize(councilMeeting.getMeetingNumber()));
         meetingDateTimeLocation.append(DateUtils.getDefaultFormattedDate(councilMeeting.getMeetingDate()));
@@ -153,6 +157,7 @@ public class CouncilReportService {
 				}else {
 					agenda.getPreamble().setDepartmentName(agenda.getPreamble().getDepartment());
 				}
+		
     		});
     	}
     }

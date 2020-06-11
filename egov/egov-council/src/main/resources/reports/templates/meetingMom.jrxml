@@ -16,14 +16,14 @@
 	<title>
 		<band height="191" splitType="Stretch">
 			<textField textAdjust="StretchHeight" isBlankWhenNull="true">
-				<reportElement x="100" y="13" width="455" height="33" uuid="c62d110f-2237-4e88-a1b5-0d9f40bc358a"/>
+				<reportElement x="127" y="13" width="366" height="28" uuid="c62d110f-2237-4e88-a1b5-0d9f40bc358a"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="Serif" size="20" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{cityName}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="100" y="48" width="455" height="28" uuid="4343c9c0-cf2d-4b36-b5a7-11b2fa411403"/>
+				<reportElement x="127" y="48" width="366" height="28" uuid="4343c9c0-cf2d-4b36-b5a7-11b2fa411403"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="13" isBold="true"/>
 				</textElement>

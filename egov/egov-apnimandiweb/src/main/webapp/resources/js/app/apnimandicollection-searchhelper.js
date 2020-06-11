@@ -34,6 +34,7 @@ function callAjaxSearch() {
 		},		
 		aaSorting: [],				
 		columns : [ 
+			{"data" : "id","visible": false, "searchable": false},
 			{
 				"data" : "zone",
 				"className" : "text-left"
@@ -72,20 +73,21 @@ function callAjaxSearch() {
 			{
 				"className" : "text-right",
 				render : function(data, type, full) {
-					if(full.statusCode == "APPROVED" || full.statusCode == "REJECTED"){
+					if(full.statusCode == "APPROVED"){
+						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Collection</option></select>');
+					}else if(full.statusCode == "REJECTED"){
 						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Collection</option><option value="2">Edit Collection</option></select>');
 					}else{
 						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Collection</option></select>');
 					}					
 				}
-			},
-			{"data" : "id","visible": false, "searchable": false }
+			}
 		]
 	});
 }
 
 $("#resultTable").on('change', 'tbody tr td .dropchange', function() {
-	var id = drillDowntableContainer.fnGetData($(this).parent().parent(),7);
+	var id = drillDowntableContainer.fnGetData($(this).parent().parent(),0);
 	if (this.value == 1) {
 		window.open('/services/apnimandi/collection/view/' + id,'','width=800, height=600');
 	}

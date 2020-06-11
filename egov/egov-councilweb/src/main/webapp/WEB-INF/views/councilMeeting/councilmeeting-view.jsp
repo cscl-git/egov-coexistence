@@ -163,7 +163,7 @@
 										<td class="text-center"><c:out value="${mom.agenda.agendaNumber}" /></td>
 										<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
 										<td><span class="more"><c:out
-													value="${mom.preamble.gistOfPreamble}" /></span></td>
+													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td>
 									</tr>
 								</c:forEach>
 							</c:when>
