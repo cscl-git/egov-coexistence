@@ -179,6 +179,11 @@ public class CommonAction extends BaseFormAction {
             " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null " +
             "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
             + FinancialConstants.MODEOFPAYMENT_RTGS + "' " + "GROUP BY ih.transactionNumber,ih.id order by ih.id desc";
+    private static final String RTGSPEXNUMBERSQUERY = "SELECT ih.id, ih.transactionNumber FROM InstrumentHeader ih, InstrumentVoucher iv, "
+            + "Paymentheader ph WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')" +
+            " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null " +
+            "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type IN ( '"
+            + FinancialConstants.MODEOFPAYMENT_RTGS + "' , '"+FinancialConstants.MODEOFPAYMENT_PEX +"') " + "GROUP BY ih.transactionNumber,ih.id order by ih.id desc";
     private Integer fundId;
     private Integer schemeId;
     private Integer department;
@@ -718,25 +723,6 @@ public class CommonAction extends BaseFormAction {
         new ArrayList<Object>();
         // rtgsNumber=;
         instrumentHeaderList = new ArrayList<InstrumentHeader>();
-        /*
-         * if(!StringUtils.isEmpty(query)) { strquery=
-         * "select appReq from ApplicationRequest appReq where upper(appReq.applicationNo) like '%'||?||'%' ";
-         * params.add(query.toUpperCase()); if(!StringUtils.isEmpty(citizenId)) { strquery = strquery +
-         * " and appReq.citizenDetails.id=? "; params.add(Long.parseLong(citizenId)); } applicationRequest =
-         * getPersistenceService().findAllBy(strquery,params.toArray()); }
-         */
-        /*
-         * try { queryStr= " FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "+
-         * "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')" +
-         * " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "+
-         * "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"+
-         * FinancialConstants.MODEOFPAYMENT_RTGS+"' "+" AND upper(ih.transactionNumber) like '%'||?||'%' "+
-         * "GROUP BY ih.transactionNumber,ih.id"; params.add(bankaccountId); params.add(rtgsNumber.toUpperCase());
-         * instrumentHeaderList= getPersistenceService().findAllBy(queryStr,params.toArray()); /*for(Object[] obj:resultList){
-         * InstrumentHeader ih = new InstrumentHeader(); ih = (InstrumentHeader) persistenceService.find(
-         * "from InstrumentHeader where id=?", (Long)obj[0]); instrumentHeaderList.add(ih); }
-         */
-        // instrumentHeaderList=new ArrayList<InstrumentHeader>();
         try {
             final Calendar calendar = Calendar.getInstance();
             calendar.get(Calendar.DATE);
@@ -748,6 +734,46 @@ public class CommonAction extends BaseFormAction {
 
             resultList = getPersistenceService()
                     .findAllBy(RTGSNUMBERSQUERY, bankaccountId);
+            for (final Object[] obj : resultList) {
+                InstrumentHeader ih = new InstrumentHeader();
+                ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", (Long) obj[0]);
+
+                instrumentHeaderList.add(ih);
+            }
+        } catch (final HibernateException e) {
+            LOGGER.error("Exception occured while getting bank account " + e.getMessage(),
+                    new HibernateException(e.getMessage()));
+        } catch (final Exception e) {
+            LOGGER.error("Exception occured while getting bank account " + e.getMessage(),
+                    new HibernateException(e.getMessage()));
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed ajaxLoadRTGSChequeFromBankAcc.");
+        return "instrument";
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Action(value = "/voucher/common-ajaxLoadRTGSPEXChequeFromBankAcc")
+    public String ajaxLoadRTGSPEXChequeFromBankAcc() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting ajaxLoadRTGSChequeFromBankAcc...");
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("CommonAction | ajaxLoadRTGSChequeFromBankAcc");
+        List<Object[]> resultList = new ArrayList<Object[]>();
+        new ArrayList<Object>();
+        // rtgsNumber=;
+        instrumentHeaderList = new ArrayList<InstrumentHeader>();
+        try {
+            final Calendar calendar = Calendar.getInstance();
+            calendar.get(Calendar.DATE);
+            calendar.add(Calendar.DATE, -7);
+            calendar.get(Calendar.DATE);
+            final Date date = calendar.getTime();
+            final SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yy");
+            final String date1 = sdf.format(date);
+
+            resultList = getPersistenceService()
+                    .findAllBy(RTGSPEXNUMBERSQUERY, bankaccountId);
             for (final Object[] obj : resultList) {
                 InstrumentHeader ih = new InstrumentHeader();
                 ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", (Long) obj[0]);
