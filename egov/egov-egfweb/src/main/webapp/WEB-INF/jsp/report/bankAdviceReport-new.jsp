@@ -90,6 +90,7 @@ table.its th {
 <body>
 	<s:form action="bankAdviceReport" name="bankAdviceReport"
 		theme="simple" method="post" onsubmit="javascript:doAfterSubmit()">
+		<s:hidden id="instrumentType" name="instrumentType" />
 		<span class="mandatory1"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<font style='color: red; font-weight: bold'>
@@ -97,7 +98,7 @@ table.its th {
 		</font>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="bank.advice.report" />
+				<s:text name="bank.advice.report.title" />
 			</div>
 
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
@@ -132,8 +133,8 @@ table.its th {
 							onChange="populateInstrumentNumber(this);" /></td>
 					<egov:ajaxdropdown id="instrumentnumber" fields="['Text','Value']"
 						dropdownId="instrumentnumber"
-						url="voucher/common-ajaxLoadRTGSChequeFromBankAcc.action" />
-					<td class="bluebox" width="10%">RTGS Number:<span
+						url="voucher/common-ajaxLoadRTGSPEXChequeFromBankAcc.action" />
+					<td class="bluebox" width="10%">RTGS/PEX Number:<span
 						class="bluebox"><span class="mandatory"></span></span></td>
 					<td class="bluebox"><s:select name="instrumentnumber.id"
 							id="instrumentnumber" list="dropdownData.chequeNumberList"
@@ -229,13 +230,28 @@ table.its th {
 			var bankbranch = document.getElementById("bankbranch").value;
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
-			var url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex')
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
 					+ bankbranch
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
 			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 			window.location.href = url;
 		}
@@ -244,13 +260,28 @@ table.its th {
 			var bankbranch = document.getElementById("bankbranch").value;
 			var bankaccount = document.getElementById("bankaccount").value;
 			var instrumentnumber = document.getElementById("instrumentnumber").value;
-			var url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="
+			var url = "";
+			if(document.getElementById("instrumentType").value == 'pex')
+				{
+				 url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
 					+ bankbranch
 					+ "&bankaccount.id="
 					+ bankaccount
 					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				 url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportExcel.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
 			// window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 			window.location.href = url;
 		}

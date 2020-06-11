@@ -91,6 +91,10 @@ Insert into EG_ACTION (id,name,url,queryparams,parentmodule,ordernumber,displayn
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;*/
+<<<<<<< HEAD
+SELECT setval('"seq_eg_role"',(SELECT MAX(ID) FROM eg_role ));
+=======
+>>>>>>> 5a4168d9a1213579f242c9eb457eae5b02b0f3b4
     
 INSERT INTO eg_role(id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (nextval('seq_eg_role'),'Remitter','Remitter',to_timestamp('2015-08-15 11:04:23.846601','null'),1,1,to_timestamp('2015-08-15 11:04:23.846601','null'),null);
 ------------------END---------------------
@@ -347,7 +351,7 @@ CREATE SEQUENCE seq_eg_wf_types
     NO MINVALUE
     NO MAXVALUE
     CACHE 1;
-Insert into eg_wf_types (id,module,type,link,createdby,createddate,lastmodifiedby,lastmodifieddate,groupyn,typefqn,displayname,version) values (nextval('seq_eg_wf_types'),(select id from eg_module where name='Collection'),'ReceiptHeader','/collection/receipts/collectionsWorkflow-listWorkflow.action?inboxItemDetails=:ID',1,now(),1,now(), 'N', 'org.egov.collection.entity.ReceiptHeader', 'Collections Receipt Header', 0 );
+--Insert into eg_wf_types (id,module,type,link,createdby,createddate,lastmodifiedby,lastmodifieddate,grouped,typefqn,displayname,version) values (nextval('seq_eg_wf_types'),(select id from eg_module where name='Collection'),'ReceiptHeader','/collection/receipts/collectionsWorkflow-listWorkflow.action?inboxItemDetails=:ID',1,now(),1,now(), 'N', 'org.egov.collection.entity.ReceiptHeader', 'Collections Receipt Header', 0 );
 -------------------END----------------------
 -------------------START--------------------
 Insert into EGW_STATUS (ID,MODULETYPE,DESCRIPTION,LASTMODIFIEDDATE,CODE,ORDER_ID) values (nextval('SEQ_EGW_STATUS'),'ReceiptHeader','To Be Submitted',to_date('22-11-09','DD-MM-RR'),'TO_BE_SUBMITTED',1);

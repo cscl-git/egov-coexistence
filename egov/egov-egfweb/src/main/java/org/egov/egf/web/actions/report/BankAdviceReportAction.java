@@ -128,6 +128,7 @@ public class BankAdviceReportAction extends BaseFormAction {
     private Long financialYearId;
     private String mode;
     private String heading;
+    private String instrumentType;
 
     public InputStream getInStream() {
         return inStream;
@@ -341,6 +342,8 @@ public class BankAdviceReportAction extends BaseFormAction {
             addFieldError("searchCriteria", "Please select all search criteria");
             return NEW;
         }
+        InstrumentHeader ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
+        instrumentType = ih.getInstrumentType().getType();
         bankAdviseResultList = getBankAdviceReportList();
         return NEW;
     }
@@ -831,5 +834,13 @@ public class BankAdviceReportAction extends BaseFormAction {
     public void setHeading(final String heading) {
         this.heading = heading;
     }
+
+	public String getInstrumentType() {
+		return instrumentType;
+	}
+
+	public void setInstrumentType(String instrumentType) {
+		this.instrumentType = instrumentType;
+	}
 
 }
