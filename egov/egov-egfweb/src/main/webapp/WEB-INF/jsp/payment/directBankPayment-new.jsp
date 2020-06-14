@@ -443,6 +443,11 @@ function onSubmit()
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
 	var noBalanceCheck='<s:text name="payment.none"/>';
+	if(document.getElementById("description") == null || document.getElementById("description").value =='')
+		{
+		bootbox.alert("<s:text name='msg.payment.narration.mandatory'/>");
+		 return false;
+		}
 	if (!validateForm_directBankPayment()) {
 		undoLoadingMask();
 		return false;
@@ -455,7 +460,7 @@ function onSubmit()
 		{
 		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
 			{
-				if(document.getElementById("subLedgerlist[0].glcode.id") != null && document.getElementById("subLedgerlist[0].detailType.id") != "0" && document.getElementById("subLedgerlist[0].detailCode") != "" && document.getElementById("subLedgerlist[0].amount").value != "0.00")
+				if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
 					{
 					bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
 					 return false;
@@ -471,7 +476,7 @@ function onSubmit()
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckWarning){
 		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
 		{
-			if(document.getElementById("subLedgerlist[0].glcode.id") != null && document.getElementById("subLedgerlist[0].detailType.id") != "0" && document.getElementById("subLedgerlist[0].detailCode") != "" && document.getElementById("subLedgerlist[0].amount").value != "0.00")
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
 				{
 				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
 				 return false;
@@ -490,7 +495,7 @@ function onSubmit()
 	else{
 		if(document.getElementById("modeOfPaymentrtgs").checked == true || document.getElementById("modeOfPaymentpex").checked == true)
 		{
-			if(document.getElementById("subLedgerlist[0].glcode.id") != null && document.getElementById("subLedgerlist[0].detailType.id") != "0" && document.getElementById("subLedgerlist[0].detailCode") != "" && document.getElementById("subLedgerlist[0].amount").value != "0.00")
+			if(document.getElementById("subLedgerlist[0].glcode.id") == null  || document.getElementById("subLedgerlist[0].glcode.id").value == '0' || document.getElementById("subLedgerlist[0].detailType.id") == null || document.getElementById("subLedgerlist[0].detailType.id").value == '0' ||  document.getElementById("subLedgerlist[0].detailCode") == null || document.getElementById("subLedgerlist[0].detailCode").value == ''  || document.getElementById("subLedgerlist[0].amount") == null  || document.getElementById("subLedgerlist[0].amount").value == '')
 				{
 				bootbox.alert("<s:text name='msg.sub.ledger.mandatory'/>");
 				 return false;
