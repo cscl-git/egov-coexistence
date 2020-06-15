@@ -151,6 +151,7 @@ import org.egov.infra.microservice.models.TransactionType;
 import org.egov.infra.microservice.models.UserInfo;
 import org.egov.infra.persistence.entity.enums.UserType;
 import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.web.support.ui.Inbox;
 import org.egov.infstr.utils.EgovMasterDataCaching;
@@ -391,11 +392,42 @@ public class MicroserviceUtils {
         return mdmObj;
     }
     
+    private Object getAgendaDeptCodes() {
+
+        HashMap mdmsObj = this.getAgendaMdmsObj();
+        if (mdmsObj != null)
+            return mdmsObj.get("departments");
+        return null;
+    }
+
+    private Object getAgendaDesginCodes() {
+
+        HashMap mdmsObj = this.getAgendaMdmsObj();
+        if (mdmsObj != null)
+            return mdmsObj.get("designation");
+        return null;
+    }
+    
+    private HashMap getAgendaMdmsObj() {
+        HashMap mdmObj = null;
+        List<ModuleDetail> moduleDetailsList = new ArrayList<>();
+        this.prepareModuleDetails(moduleDetailsList , "common-masters", "agenda-mapping", null, null, String.class);
+        Map postForObject = mapper.convertValue(this.getMdmsData(moduleDetailsList, true, null, null), Map.class);
+        if(postForObject != null){
+            mdmObj = mapper.convertValue(JsonPath.read(postForObject, "$.MdmsRes.common-masters.agenda-mapping[0]"),HashMap.class);
+        }
+        return mdmObj;
+    }
+    
     public List<Department> getDepartments() {
         return getDepartments(null);
     }
 
     public List<Department> getDepartments(String codes) {
+        return getDepartments(codes, ApplicationConstant.MODULE_FINANCE);
+    }
+    
+    public List<Department> getDepartments(String codes, String module) {
         List<Department> deptList = new ArrayList<>();
         FilterRequest filterReq = new FilterRequest();
         try {
@@ -404,8 +436,14 @@ public class MicroserviceUtils {
             }else if(!StringUtils.isEmpty(codes) && codes != null){
                 filterReq.setCode(codes);
             }else{
-                final String deptCodes = (String) this.getFinanceDeptCodes();
-                filterReq.setCodes(Arrays.asList(deptCodes.split(",")));
+                String deptCodes = null;
+                if(ApplicationConstant.MODULE_AGENDA.equalsIgnoreCase(module)) {
+                	deptCodes = (String) getAgendaDeptCodes();
+                }else if(ApplicationConstant.MODULE_FINANCE.equalsIgnoreCase(module)) {
+                	deptCodes = (String) getFinanceDeptCodes();
+                }
+                if(!StringUtils.isBlank(deptCodes))
+                	filterReq.setCodes(Arrays.asList(deptCodes.split(",")));
             }
             JSONArray mdmObj = getFinanceMdmsByModuleNameAndMasterDetails("common-masters", "Department", filterReq);
             mdmObj.stream().forEach(obj ->{
@@ -425,7 +463,7 @@ public class MicroserviceUtils {
 
     public Department getDepartmentByCode(String departmentCode) {
 
-        List<Department> deptlist = this.masterDataCache.get("egi-department");
+        List<Department> deptlist = this.masterDataCache.get(ApplicationConstant.DEPARTMENT_CACHE_NAME);
 
         Department sDepartment = null;
         if (null != deptlist && !deptlist.isEmpty()) {
@@ -457,31 +495,42 @@ public class MicroserviceUtils {
     }
 
     public List<Designation> getDesignation(String code) {
-            List<Designation> desgList = new ArrayList<>();
-            FilterRequest filterReq =new FilterRequest();
-            try {
-                if(!StringUtils.isEmpty(code) && code != null){
-                    filterReq.setCode(code);
-                }else{
-                    String desginCodes = (String) getFinanceDesginCodes();
-                    filterReq.setCodes(Arrays.asList(desginCodes.split(",")));
+        return getDesignation(code, ApplicationConstant.MODULE_FINANCE);
+    }
+    
+    public List<Designation> getDesignation(String code, String module) {
+        List<Designation> desgList = new ArrayList<>();
+        FilterRequest filterReq =new FilterRequest();
+        try {
+            if(!StringUtils.isEmpty(code) && code != null){
+                filterReq.setCode(code);
+            }else{
+                String desginCodes =null;
+                if(ApplicationConstant.MODULE_AGENDA.equalsIgnoreCase(module)) {
+                	desginCodes = (String) getAgendaDesginCodes();
+                }else if(ApplicationConstant.MODULE_FINANCE.equalsIgnoreCase(module)) {
+                	desginCodes = (String) getFinanceDesginCodes();
                 }
-                JSONArray mdmObj =  getFinanceMdmsByModuleNameAndMasterDetails("common-masters", "Designation", filterReq);
-                mdmObj.stream().forEach(obj ->{
-                    LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
-                    Designation designation = new Designation();
-                    designation.setCode(lhm.get("code").toString());
-                    designation.setName(lhm.get("name").toString());
-                    designation.setDescription(lhm.get("description").toString());
-                    designation.setActive((Boolean)lhm.get("active"));
-                    desgList.add(designation);
-                });
-                return desgList;
-            } catch (Exception e) {
-                e.printStackTrace();
+                
+                if(!StringUtils.isBlank(desginCodes))
+                	filterReq.setCodes(Arrays.asList(desginCodes.split(",")));
             }
-            return null;
-}
+            JSONArray mdmObj =  getFinanceMdmsByModuleNameAndMasterDetails("common-masters", "Designation", filterReq);
+            mdmObj.stream().forEach(obj ->{
+                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
+                Designation designation = new Designation();
+                designation.setCode(lhm.get("code").toString());
+                designation.setName(lhm.get("name").toString());
+                designation.setDescription(lhm.get("description").toString());
+                designation.setActive((Boolean)lhm.get("active"));
+                desgList.add(designation);
+            });
+            return desgList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
     
     public JSONArray getFinanceMdmsByModuleNameAndMasterDetails(String moduleName,String name, FilterRequest filter){
         String mdmsUrl = appConfigManager.getEgovMdmsSerHost() + this.mdmsSearchUrl;
@@ -699,14 +748,11 @@ public class MicroserviceUtils {
 
         final RestTemplate restTemplate = createRestTemplate();
 
-        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
         empUrl.append("?tenantId=" + getTenentId());
 
         if (empId != 0)
-            empUrl.append("&id=" + empId);
-
-        empUrl.append("&asOnDate" + dateFormat.format(new Date()));
+        	empUrl.append("&ids=" + empId);
 
         RequestInfo requestInfo = new RequestInfo();
         RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
@@ -1264,11 +1310,11 @@ public class MicroserviceUtils {
     }
     
     public void removeSession(String access_token, String sessionId) {
-        LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);
-        LOGGER.info("redisTemplate.hasKey(access_token))::: " + redisTemplate.hasKey(access_token));
-        //LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
+        LOGGER.info("Logout for authtoken : " + access_token +" and session : "+sessionId);        
         if (null != access_token && redisTemplate.hasKey(access_token)){
-            if (sessionId != null) {
+        	LOGGER.info("redisTemplate.hasKey(access_token))::: " + redisTemplate.hasKey(access_token));            
+            if (null != sessionId) {
+            	LOGGER.info("redisTemplate.hasKey(sessionId))::: " + redisTemplate.hasKey(sessionId));
             	redisTemplate.delete(sessionId);
             	LOGGER.info("spring:session:sessions:" + sessionId);
             	LOGGER.info("spring:session:sessions:expires:" + sessionId);

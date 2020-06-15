@@ -46,48 +46,34 @@
  *
  */
 
-package org.egov.infra.config.elasticsearch;
+package org.egov.infra.workflow.matrix.repository;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-@Configuration
-@EnableElasticsearchRepositories(basePackages = {"org.egov.**.repository.es", "org.egov.**.elasticsearch.repository"})
-public class ElasticSearchConfiguration {
-
-    @Value("${elasticsearch.cluster.name}")
-    private String clusterName;
-
-    @Value("#{'${elasticsearch.hosts}'.split(',')}")
-    private List<String> searchHosts;
-
-    @Value("${elasticsearch.port}")
-    private Integer searchPort;
-
-    private Client transportClient() {
-        Settings settings = Settings.settingsBuilder()
-                .put("cluster.name", clusterName).build();
-        Client client = TransportClient.builder().settings(settings).build();
-        searchHosts.forEach(host ->
-                ((TransportClient) client).addTransportAddress(
-                        new InetSocketTransportAddress(new InetSocketAddress(host, searchPort)))
-        );
-        return client;
-    }
-
-    @Bean
-    public ElasticsearchOperations elasticsearchTemplate() {
-        return new ElasticsearchTemplate(transportClient());
-    }
+public interface WorkFlowDeptDesgMapRepository extends JpaRepository<WorkFlowDeptDesgMap, Long> {
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentState(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState);
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState and additionalRule= :additionalRule")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRule(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState,
+                                                              @Param("additionalRule") String additionalRule);
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState and additionalRule= :additionalRule and nextdepartment = :nextdepartment")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRuleAndNextDept(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState,
+                                                              @Param("additionalRule") String additionalRule,
+                                                              @Param("nextdepartment") String nextdepartment);
+	
+	@Query("from WorkFlowDeptDesgMap map where objectType=:objectType and currentState= :currentState and nextdepartment = :nextdepartment")
+    List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndNextDept(@Param("objectType") String objectType,
+                                                              @Param("currentState") String currentState,
+                                                              @Param("nextdepartment") String nextdepartment);
 }

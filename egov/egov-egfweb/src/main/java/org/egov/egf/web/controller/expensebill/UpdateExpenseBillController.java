@@ -59,6 +59,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
@@ -136,6 +137,9 @@ public class UpdateExpenseBillController extends BaseBillController {
     private SecurityUtils securityUtils;
     @Autowired
 	private AuditRepository auditRepository;
+    
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
@@ -164,8 +168,11 @@ public class UpdateExpenseBillController extends BaseBillController {
         model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
         if (egBillregister.getState() != null)
             model.addAttribute("currentState", egBillregister.getState().getValue());
-        model.addAttribute("workflowHistory",
-                financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
+		/*
+		 * model.addAttribute("workflowHistory",
+		 * financialUtils.getHistory(egBillregister.getState(),
+		 * egBillregister.getStateHistory()));
+		 */
 
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
@@ -269,21 +276,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                             workFlowAction, mode, apporverDesignation);
                     if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
                     {
-                    	AuditDetails audit=new AuditDetails();
-                    	final User user = securityUtils.getCurrentUser();
-                    	Position owenrPos = new Position();
-                        owenrPos.setId(479L);
-                    	audit.setAudit_no("Audit001");
-                    	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
-                        .withComments("")
-                        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
-                        .withNextAction("Pre Audit pending")
-                        .withNatureOfTask("Pre-Audit")
-                        .withCreatedBy(user.getId())
-                        .withtLastModifiedBy(user.getId());
-                    	applyAuditing(audit);
-                    	AuditDetails auditReg = auditRepository.save(audit);
-                		persistenceService.getSession().flush();
+                    	populateauditWorkFlow(updatedEgBillregister);
                     }
                 }   
                 
@@ -324,7 +317,29 @@ public class UpdateExpenseBillController extends BaseBillController {
         }
     }
 
-    @RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
+    private void populateauditWorkFlow(EgBillregister updatedEgBillregister) {
+    	AuditDetails audit=new AuditDetails();
+    	final User user = securityUtils.getCurrentUser();
+    	Position owenrPos = new Position();
+        owenrPos.setId(479L);
+    	audit.setAudit_no("Audit001");
+    	audit.setType("Pre-Audit");
+    	audit.setEgBillregister(updatedEgBillregister);
+    	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode("Audit", "Created"));
+    	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
+        .withComments("")
+        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
+        .withNextAction("Pre Audit pending")
+        .withNatureOfTask("Pre-Audit")
+        .withCreatedBy(user.getId())
+        .withtLastModifiedBy(user.getId());
+    	applyAuditing(audit);
+    	AuditDetails auditReg = auditRepository.save(audit);
+		persistenceService.getSession().flush();
+		
+	}
+
+	@RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
     public String view(final Model model, @PathVariable String billId,
             final HttpServletRequest request) throws ApplicationException {
         if (billId.contains("showMode")) {

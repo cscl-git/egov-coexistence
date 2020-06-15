@@ -46,48 +46,41 @@
  *
  */
 
-package org.egov.infra.config.elasticsearch;
+package org.egov.infra.workflow.matrix.service;
 
-import java.net.InetSocketAddress;
 import java.util.List;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
+import org.egov.infra.workflow.matrix.repository.WorkFlowDeptDesgMapRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-@Configuration
-@EnableElasticsearchRepositories(basePackages = {"org.egov.**.repository.es", "org.egov.**.elasticsearch.repository"})
-public class ElasticSearchConfiguration {
+@Service
+@Transactional(readOnly = true)
+public class WorkFlowDeptDesgMapService {
 
-    @Value("${elasticsearch.cluster.name}")
-    private String clusterName;
+    @Autowired
+    private WorkFlowDeptDesgMapRepository workFlowDeptDesgMapRepository;
 
-    @Value("#{'${elasticsearch.hosts}'.split(',')}")
-    private List<String> searchHosts;
-
-    @Value("${elasticsearch.port}")
-    private Integer searchPort;
-
-    private Client transportClient() {
-        Settings settings = Settings.settingsBuilder()
-                .put("cluster.name", clusterName).build();
-        Client client = TransportClient.builder().settings(settings).build();
-        searchHosts.forEach(host ->
-                ((TransportClient) client).addTransportAddress(
-                        new InetSocketTransportAddress(new InetSocketAddress(host, searchPort)))
-        );
-        return client;
+    public WorkFlowDeptDesgMap getWorkFlowDeptDesgMapObjectbyId(Long id) {
+        return workFlowDeptDesgMapRepository.findOne(id);
+    }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentState(String objectType, String currentState){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentState(objectType, currentState);
+    }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRule(String objectType, String currentState, String additionalRule){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
+    }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndAddRuleAndNextDept(String objectType, String currentState, String additionalRule, String nextDepartment){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndAddRuleAndNextDept(objectType, currentState, additionalRule, nextDepartment);
+    }
+    
+    public List<WorkFlowDeptDesgMap> findByObjectTypeAndCurrentStateAndNextDept(String objectType, String currentState, String nextDepartment){
+    	return workFlowDeptDesgMapRepository.findByObjectTypeAndCurrentStateAndNextDept(objectType, currentState, nextDepartment);
     }
 
-    @Bean
-    public ElasticsearchOperations elasticsearchTemplate() {
-        return new ElasticsearchTemplate(transportClient());
-    }
 }

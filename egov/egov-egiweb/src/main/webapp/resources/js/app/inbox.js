@@ -1,54 +1,4 @@
-/*
- *    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
- *    accountability and the service delivery of the government  organizations.
- *
- *     Copyright (C) 2017  eGovernments Foundation
- *
- *     The updated version of eGov suite of products as by eGovernments Foundation
- *     is available at http://www.egovernments.org
- *
- *     This program is free software: you can redistribute it and/or modify
- *     it under the terms of the GNU General Public License as published by
- *     the Free Software Foundation, either version 3 of the License, or
- *     any later version.
- *
- *     This program is distributed in the hope that it will be useful,
- *     but WITHOUT ANY WARRANTY; without even the implied warranty of
- *     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *     GNU General Public License for more details.
- *
- *     You should have received a copy of the GNU General Public License
- *     along with this program. If not, see http://www.gnu.org/licenses/ or
- *     http://www.gnu.org/licenses/gpl.html .
- *
- *     In addition to the terms of the GPL license to be adhered to in using this
- *     program, the following additional terms are to be complied with:
- *
- *         1) All versions of this program, verbatim or modified must carry this
- *            Legal Notice.
- *            Further, all user interfaces, including but not limited to citizen facing interfaces, 
- *            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any 
- *            derived works should carry eGovernments Foundation logo on the top right corner.
- *
- *            For the logo, please refer http://egovernments.org/html/logo/egov_logo.png.
- *            For any further queries on attribution, including queries on brand guidelines, 
- *            please contact contact@egovernments.org
- *
- *         2) Any misrepresentation of the origin of the material is prohibited. It
- *            is required that all modified versions of this material be marked in
- *            reasonable ways as different from the original version.
- *
- *         3) This license does not grant any rights to any user of the program
- *            with regards to rights under trademark law for use of the trade names
- *            or trademarks of eGovernments Foundation.
- *
- *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
- *
- */
-
 $(document).ready(function () {
-    $('#new-pass').popover({trigger: "focus", placement: "bottom"});
-
     $(document).on("keydown", disableRefresh);
 
     preventBack();
@@ -63,69 +13,6 @@ $(document).ready(function () {
             $(this).children('ul').removeAttr('style');
             $(this).children('ul').hide();
         });
-
-    $('#feedback-form').on('submit', function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: 'home/feedback/sent',
-            type: 'GET',
-            data: {'subject': $("#subject").val(), 'message': $("#comment").val()},
-            success: function (data) {
-                bootbox.alert("Your feedback successfully submitted.");
-            },
-            error: function () {
-
-            }, complete: function () {
-                $('.add-feedback').modal('hide');
-            }
-        });
-
-    });
-
-    $('#password-form').on('submit', function (e) {
-        e.preventDefault();
-        $.ajax({
-            url: 'home/password/update',
-            type: 'GET',
-            data: {
-                'currentPwd': $("#old-pass").val(),
-                'newPwd': $("#new-pass").val(),
-                'retypeNewPwd': $("#retype-pass").val()
-            },
-            success: function (data) {
-                var msg = "";
-                if (data == "SUCCESS") {
-                    $("#old-pass").val("");
-                    $("#new-pass").val("");
-                    $("#retype-pass").val("");
-                    $('.change-password').modal('hide');
-                    bootbox.alert("Your password has been updated.");
-                    $('.pass-cancel').removeAttr('disabled');
-                    $('#pass-alert').hide();
-                } else if (data == "NEWPWD_UNMATCH") {
-                    msg = "New password you have entered does not match with retyped password.";
-                    $("#new-pass").val("");
-                    $("#retype-pass").val("");
-                    $('.change-password').modal('show');
-                } else if (data == "CURRPWD_UNMATCH") {
-                    msg = "Old password you have entered is incorrect.";
-                    $("#old-pass").val("");
-                    $('.change-password').modal('show');
-                } else if (data == "NEWPWD_INVALID") {
-                    msg = $('.password-error-msg').html();
-                    $("#new-pass").val("");
-                    $("#retype-pass").val("");
-                    $('.change-password').modal('show');
-                }
-                $('.password-error').html(msg).show();
-
-            },
-            error: function () {
-                bootbox.alert("Internal server error occurred, please try after sometime.");
-            }
-        });
-
-    });
 
     worklist();
 
@@ -162,25 +49,6 @@ $(document).ready(function () {
         e.stopPropagation();
     });
 
-    $('.workspace').click(function () {
-        $('.main-space').hide();
-        $('.workspace').removeClass('active');
-        clearnow();
-        $('#' + $(this).attr('data-work')).find('input').val('');
-        $(this).addClass('active');
-        if ($(this).attr('data-work') == 'worklist') {
-            focussedmenu = "worklist";
-            worklist();
-        } else if ($(this).attr('data-work') == 'drafts') {
-            focussedmenu = "drafts";
-            drafts();
-        } else if ($(this).attr('data-work') == 'notifications') {
-            focussedmenu = "notifications";
-            notifications();
-        }
-        $('#' + $(this).attr('data-work')).show();
-    });
-
     $('.search-table').keyup(function () {
         tableContainer1.dataTable().fnFilter(this.value);
     });
@@ -200,15 +68,6 @@ $(document).ready(function () {
                 tableContainer1.dataTable().fnGetData(this, 6) + '', 'width=900, height=700, top=300, left=150,scrollbars=yes');
             openedWindows.push(windowObjectReference);
             windowObjectReference.focus();
-        }
-    });
-
-    $('.check-password').blur(function () {
-        if (($('#new-pass').val() != "") && ($('#retype-pass').val() != "")) {
-            if ($('#new-pass').val() !== $('#retype-pass').val()) {
-                $('.password-error').show();
-                $('#retype-pass').addClass('error');
-            }
         }
     });
 
@@ -438,6 +297,7 @@ function clearnow() {
 
 //common ajax functions for worklist, drafts and notifications
 function worklist() {
+	var moduleName = $('#moduleName').val();
     tableContainer1 = $("#official_inbox");
     tableContainer1.DataTable({
         "sDom": "<'row'<'col-xs-12 hidden col-right'f>r>t<'row buttons-margin'<'col-md-5 col-xs-12'i><'col-md-3 col-xs-6'l><'col-md-4 col-xs-6 text-right'p>>",
@@ -446,7 +306,7 @@ function worklist() {
         "autoWidth": false,
         "aaSorting": [],
         "ajax": {
-            "url": "inbox",
+            "url": "/services/egi/inbox/items?module="+moduleName,
             "dataSrc": ""
         },
         "deferRender": true,
@@ -559,7 +419,7 @@ function drafts() {
         "aaSorting": [],
         "autoWidth": false,
         "ajax": {
-            "url": "inbox/draft",
+            "url": "/services/egi/inbox/draft",
             "dataSrc": ""
         },
         "deferRender": true,
@@ -656,11 +516,5 @@ function refreshnow(taskName, moduleName) {
 
 function inboxloadmethod() {
     clearnow();
-    if (focussedmenu == 'worklist') {
-        worklist();
-    } else if (focussedmenu == 'drafts') {
-        drafts();
-    } else if (focussedmenu == 'notifications') {
-        notifications();
-    }
+    worklist();
 }

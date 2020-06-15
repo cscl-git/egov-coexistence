@@ -2,7 +2,7 @@
  *    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
  *    accountability and the service delivery of the government  organizations.
  *
- *     Copyright (C) 2017  eGovernments Foundation
+ *     Copyright (C) 2018  eGovernments Foundation
  *
  *     The updated version of eGov suite of products as by eGovernments Foundation
  *     is available at http://www.egovernments.org
@@ -46,13 +46,9 @@
  *
  */
 
-package org.egov.infra.admin.master.entity;
+package org.egov.infra.workflow.matrix.entity;
 
-import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.persistence.entity.AbstractPersistable;
-import org.egov.infra.persistence.validator.annotation.Unique;
-import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
 
 import javax.persistence.Entity;
@@ -61,32 +57,54 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
-import java.util.Objects;
-
-import static org.egov.infra.admin.master.entity.Role.SEQ_ROLE;
+import javax.validation.constraints.NotNull;
+import static org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap.SEQ_WF_DEPT_DESG_MAP;
 
 @Entity
-@Unique(fields = "name", enableDfltMsg = true)
-@Table(name = "eg_role")
-@SequenceGenerator(name = SEQ_ROLE, sequenceName = SEQ_ROLE, allocationSize = 1)
-public class Role extends AbstractPersistable<Long> {
+@Table(name = "EG_WF_DEPT_DESG_MAP")
+@SequenceGenerator(name = SEQ_WF_DEPT_DESG_MAP, sequenceName = SEQ_WF_DEPT_DESG_MAP, allocationSize = 1)
+public class WorkFlowDeptDesgMap extends AbstractPersistable<Long> implements Cloneable {
 
-    public static final String SEQ_ROLE = "SEQ_EG_ROLE";
-    private static final long serialVersionUID = 7034114743461088547L;
+    public static final String SEQ_WF_DEPT_DESG_MAP = "SEQ_EG_WF_DEPT_DESG_MAP";
+    private static final long serialVersionUID = 4954386159285858993L;
     @Id
-    @GeneratedValue(generator = SEQ_ROLE, strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(generator = SEQ_WF_DEPT_DESG_MAP, strategy = GenerationType.SEQUENCE)
     private Long id;
 
-    @NotBlank
+    @NotNull
     @SafeHtml
-    @Length(max = 32)
-    private String name;
+    private String objectType;
 
     @SafeHtml
-    @Length(max = 150)
-    private String description;
+    private String currentState;
 
-    private boolean internal;
+    @SafeHtml
+    private String nextDepartment;
+    
+    @SafeHtml
+    private String nextDesignation;
+    
+    @SafeHtml
+    private String additionalRule;
+
+    public WorkFlowDeptDesgMap(String objectType, String currentState, String nextDepartment,
+			String nextDesignation, String additionalRule) {
+		super();
+		this.objectType = objectType;
+		this.currentState = currentState;
+		this.nextDepartment = nextDepartment;
+		this.nextDesignation = nextDesignation;
+		this.additionalRule= additionalRule;
+	}
+
+	public WorkFlowDeptDesgMap() {
+
+    }
+
+    @Override
+    public WorkFlowDeptDesgMap clone() {
+        return new WorkFlowDeptDesgMap(objectType, currentState, nextDepartment, nextDesignation, additionalRule);
+    }
 
     @Override
     public Long getId() {
@@ -98,47 +116,44 @@ public class Role extends AbstractPersistable<Long> {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
+    public String getObjectType() {
+        return objectType;
     }
 
-    public void setName(final String name) {
-        this.name = name;
+    public void setObjectType(final String objectType) {
+        this.objectType = objectType;
     }
 
-    public String getDescription() {
-        return description;
+    public String getCurrentState() {
+        return currentState;
     }
 
-    public void setDescription(final String description) {
-        this.description = description;
+    public void setCurrentState(final String currentState) {
+        this.currentState = currentState;
     }
 
-    public boolean isInternal() {
-        return internal;
+    public String getNextDepartment() {
+		return nextDepartment;
+	}
+
+	public void setNextDepartment(String nextDepartment) {
+		this.nextDepartment = nextDepartment;
+	}
+	
+    public String getNextDesignation() {
+        return nextDesignation;
     }
 
-    public void setInternal(final boolean internal) {
-        this.internal = internal;
+    public void setNextDesignation(final String nextDesignation) {
+        this.nextDesignation = nextDesignation;
     }
 
-    @Override
-    public String toString() {
-        return name;
-    }
+	public String getAdditionalRule() {
+		return additionalRule;
+	}
 
-    @Override
-    public boolean equals(final Object o) {
-        if (this == o)
-            return true;
-        if (o == null || getClass() != o.getClass())
-            return false;
-        final Role role = (Role) o;
-        return Objects.equals(getName(), role.getName());
-    }
+	public void setAdditionalRule(String additionalRule) {
+		this.additionalRule = additionalRule;
+	}
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(getName());
-    }
 }

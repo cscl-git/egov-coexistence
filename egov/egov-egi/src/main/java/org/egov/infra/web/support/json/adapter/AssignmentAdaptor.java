@@ -45,49 +45,24 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
+package org.egov.infra.web.support.json.adapter;
 
-package org.egov.infra.config.elasticsearch;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 
-import java.net.InetSocketAddress;
-import java.util.List;
+import java.lang.reflect.Type;
 
-import org.elasticsearch.client.Client;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.ElasticsearchTemplate;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
+import org.egov.infra.microservice.models.Assignment;
 
-@Configuration
-@EnableElasticsearchRepositories(basePackages = {"org.egov.**.repository.es", "org.egov.**.elasticsearch.repository"})
-public class ElasticSearchConfiguration {
+public class AssignmentAdaptor implements JsonSerializer<Assignment> {
 
-    @Value("${elasticsearch.cluster.name}")
-    private String clusterName;
-
-    @Value("#{'${elasticsearch.hosts}'.split(',')}")
-    private List<String> searchHosts;
-
-    @Value("${elasticsearch.port}")
-    private Integer searchPort;
-
-    private Client transportClient() {
-        Settings settings = Settings.settingsBuilder()
-                .put("cluster.name", clusterName).build();
-        Client client = TransportClient.builder().settings(settings).build();
-        searchHosts.forEach(host ->
-                ((TransportClient) client).addTransportAddress(
-                        new InetSocketTransportAddress(new InetSocketAddress(host, searchPort)))
-        );
-        return client;
-    }
-
-    @Bean
-    public ElasticsearchOperations elasticsearchTemplate() {
-        return new ElasticsearchTemplate(transportClient());
+    @Override
+    public JsonElement serialize(final Assignment assignment, final Type type, final JsonSerializationContext jsc) {
+        final JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("positionId", assignment.getPosition());
+        jsonObject.addProperty("userName", assignment.getEmployeeName());
+        return jsonObject;
     }
 }

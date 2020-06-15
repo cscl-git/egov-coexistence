@@ -46,15 +46,15 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private Date audit_sch_date;
 	private Date audit_comp_date;
 	private String audit_no;
-	private Long leadAuditiorEmpId;
+	private Long lead_auditor;
 	private String notes;
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
 	@ManyToOne
-    @JoinColumn(name = "statusid")
+    @JoinColumn(name = "status_id")
     private EgwStatus status;
 	@ManyToOne
-    @JoinColumn(name = "billid")
+    @JoinColumn(name = "bill_id")
     private EgBillregister egBillregister;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditCheckList.class)
@@ -118,13 +118,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 		this.audit_no = audit_no;
 	}
 
-	public Long getLeadAuditiorEmpId() {
-		return leadAuditiorEmpId;
-	}
-
-	public void setLeadAuditiorEmpId(Long leadAuditiorEmpId) {
-		this.leadAuditiorEmpId = leadAuditiorEmpId;
-	}
+	
 
 	public String getNotes() {
 		return notes;
@@ -196,6 +190,14 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 
 	public void setApprovedOn(Date approvedOn) {
 		this.approvedOn = approvedOn;
+	}
+
+	public Long getLead_auditor() {
+		return lead_auditor;
+	}
+
+	public void setLead_auditor(Long lead_auditor) {
+		this.lead_auditor = lead_auditor;
 	}
 
 	
