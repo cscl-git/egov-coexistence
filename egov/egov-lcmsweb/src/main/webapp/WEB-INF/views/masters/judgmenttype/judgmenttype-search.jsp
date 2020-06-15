@@ -58,15 +58,7 @@
 						<div class="panel-title">Search Judgment Type</div>
 					</div>
 					<div class="panel-body">
-						<div class="form-group">
-							<label class="col-sm-2 control-label text-right"><spring:message
-									code="lbl.code" /> :</label>
-							<div class="col-sm-3 add-margin">
-								<form:input path="code"
-									class="form-control text-left patternvalidation"
-									data-pattern="alphanumericwithspecialcharacters" maxlength="8" />
-								<form:errors path="code" cssClass="error-msg" />
-							</div>
+						<div class="form-group">							
 							<label class="col-sm-2 control-label text-right"><spring:message
 									code="lbl.judgmenttype" /> :</label>
 							<div class="col-sm-3 add-margin">
@@ -75,8 +67,6 @@
 									data-pattern="alphanumericwithspecialcharacterswithspace" maxlength="50" />
 								<form:errors path="name" cssClass="error-msg" />
 							</div>
-						</div>
-						<div class="form-group">
 							<label class="col-sm-2 control-label text-right"><spring:message
 									code="lbl.active" /> :</label>
 							<div class="col-sm-2 add-margin">
@@ -88,6 +78,17 @@
 								</form:select>
 							</div>
 							<input type="hidden" id="mode" name="mode" value="${mode}" />
+						</div>
+						<div class="form-group">
+							<label class="col-sm-2 control-label text-right" style="display: none;">
+								<spring:message code="lbl.code" /> :
+							</label>
+							<div class="col-sm-3 add-margin" style="display: none;">
+								<form:input path="code"
+									class="form-control text-left patternvalidation"
+									data-pattern="alphanumericwithspecialcharacters" maxlength="25" />
+								<form:errors path="code" cssClass="error-msg" />
+							</div>
 						</div>
 						<div class="form-group">
 							<div class="text-center">
@@ -109,7 +110,7 @@
 			id="resultTable">
 			<thead>
 				<tr>
-					<th><spring:message code="lbl.code" /></th>
+					<%-- <th><spring:message code="lbl.code" /></th> --%>
 					<th><spring:message code="lbl.judgmenttype" /></th>
 					<th><spring:message code="lbl.active" /></th>
 				</tr>

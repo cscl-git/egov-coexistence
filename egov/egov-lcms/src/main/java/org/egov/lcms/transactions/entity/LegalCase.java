@@ -280,15 +280,6 @@ public class LegalCase extends AbstractAuditable {
     @OneToMany(mappedBy = "legalCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BatchCase> batchCaseSet = new ArrayList<>(0);
 
-    // TODO:need to enable when we start work on PaperBook and ProcessRegister
-    // object
-    /*
-     * @OneToMany(mappedBy = "legalCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) private
-     * List<PaperBook> paperBookSet = new ArrayList<PaperBook>(0);
-     * @OneToMany(mappedBy = "legalCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true) private
-     * List<ProcessRegister> processRegisterSet = new ArrayList<ProcessRegister>(0);
-     */
-
     @OneToMany(mappedBy = "legalCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<LegalCaseMiscDetails> legalCaseMiscDetails = new ArrayList<>(0);
 
@@ -304,6 +295,9 @@ public class LegalCase extends AbstractAuditable {
 
     @Transient
     private List<Judgment> judgmentsBeanList = new ArrayList<>(0);
+    
+    @Transient
+    private String fileNumber;
 
     public List<ValidationError> validate() {
         final List<ValidationError> errors = new ArrayList<>();
@@ -974,6 +968,14 @@ public class LegalCase extends AbstractAuditable {
 
 	public void setEstimatePreparedBy(String estimatePreparedBy) {
 		this.estimatePreparedBy = estimatePreparedBy;
+	}
+
+	public String getFileNumber() {
+		return fileNumber;
+	}
+
+	public void setFileNumber(String fileNumber) {
+		this.fileNumber = fileNumber;
 	}
 
 }

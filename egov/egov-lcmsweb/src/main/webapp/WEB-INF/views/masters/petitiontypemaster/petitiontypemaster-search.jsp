@@ -72,9 +72,9 @@
 							</form:select>
 							<form:errors path="courtType" cssClass="error-msg" />
 						</div>
-						<label class="col-sm-2 control-label text-right"><spring:message
+						<label class="col-sm-2 control-label text-right" style="display: none;"><spring:message
 								code="lbl.code" /> :</label>
-						<div class="col-sm-3 add-margin">
+						<div class="col-sm-3 add-margin" style="display: none;">
 							<form:input path="code"
 								class="form-control text-left patternvalidation"
 								data-pattern="alphanumericwithspecialcharacterswithspace"
@@ -124,7 +124,7 @@
 			<thead>
 				<tr>
 					<th><spring:message code="lbl.courttype" /></th>
-					<th><spring:message code="lbl.code" /></th>
+					<%-- <th><spring:message code="lbl.code" /></th> --%>
 					<th><spring:message code="lbl.petitiontype" /></th>
 					<th><spring:message code="lbl.active" /></th>
 				</tr>

@@ -97,11 +97,11 @@ function callAjaxSearch() {
 				aaSorting: [],				
 				columns : [ { 
 					
-"data" : "courtType", "sClass" : "text-center"},{
-"data" : "code", "sClass" : "text-center"} ,{ 
+"data" : "courtType", "sClass" : "text-center"},{ 
 "data" : "petitionType", "sClass" : "text-center"} ,{ 
 "data" : "active", "sClass" : "text-center"},{ 
-"data" : "id","visible": false, "searchable": false }]				
+"data" : "code","visible": false, "searchable": false },{ 
+	"data" : "id","visible": false, "searchable": false }]				
 			});
 			}
 $("#resultTable").on('click','tbody tr',function(event) {

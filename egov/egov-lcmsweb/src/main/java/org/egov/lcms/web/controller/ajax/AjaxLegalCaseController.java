@@ -127,8 +127,7 @@ public class AjaxLegalCaseController {
             @ModelAttribute("legalcase") @RequestParam final String advocateName,
             @RequestParam final Boolean isSeniorAdvocate) {
 
-        return advocateMasterService.getAllAdvocatesByNameLikeAndIsSeniorAdvocate(advocateName.toUpperCase(),
-                isSeniorAdvocate);
+        return advocateMasterService.getAllAdvocatesByNameLikeAndIsSeniorAdvocate(advocateName, isSeniorAdvocate);
     }
 
     /*

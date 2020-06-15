@@ -211,11 +211,11 @@ public class LcmsConstants {
 
     public static final String COURTNAME = "Court Name";
     public static final String COURTTYPE = "Court Type";
-    public static final String CASECATEGORY = "Case Category";
+    public static final String CASETYPE = "Case Type";
     public static final String PETITIONTYPE = "Petition Type";
     public static final String OFFICERINCHRGE = "In charge officer";
     public static final String CASESTATUS = "Case Status";
-    public static final String STANDINGCOUNSEL = "Standing Counsel";
+    public static final String STANDINGCOUNSEL = "Defending Counsel";
     public static final String JUDGEMENTOUTCOME = "Judgment outcome";
     public static final String DUEPWRREPORT = "PWR due date";
     public static final String DUECAREPORT = "CA Due date";

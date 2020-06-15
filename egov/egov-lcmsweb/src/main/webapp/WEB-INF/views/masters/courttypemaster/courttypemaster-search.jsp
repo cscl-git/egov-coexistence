@@ -58,15 +58,7 @@
 					<div class="panel-title">Search Court Type</div>
 				</div>
 				<div class="panel-body">
-					<div class="form-group">
-						<label class="col-sm-2 control-label text-right"><spring:message
-								code="lbl.code" /> :</label>
-						<div class="col-sm-3 add-margin">
-							<form:input path="code"
-								class="form-control text-left patternvalidation"
-								data-pattern="alphanumericwithspecialcharacters" maxlength="8" />
-							<form:errors path="code" cssClass="error-msg" />
-						</div>
+					<div class="form-group">						
 						<label class="col-sm-2 control-label text-right"><spring:message
 								code="lbl.courttype" />: </label>
 						<div class="col-sm-3 add-margin">
@@ -75,11 +67,9 @@
 								data-pattern="alphanumericspecialcharacters" maxlength="100" />
 							<form:errors path="courtType" cssClass="error-msg" />
 						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-2 control-label text-right"><spring:message
-								code="lbl.active" />: </label> <input type="hidden" id="mode"
-							name="mode" value="${mode}" />
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.active" />: 
+						</label>
 						<div class="col-sm-2 add-margin">
 							<form:select path="active" id="active" cssClass="form-control"
 								cssErrorClass="form-control error">
@@ -87,6 +77,17 @@
 								<form:option value="false">NO</form:option>
 								<form:errors path="active" cssClass="error-msg" />
 							</form:select>
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-2 control-label text-right" style="display: none;">
+							<spring:message code="lbl.code" /> :
+						</label>
+						<div class="col-sm-3 add-margin" style="display: none;">
+							<form:input path="code"
+								class="form-control text-left patternvalidation"
+								data-pattern="alphanumericwithspecialcharacters" maxlength="25" />
+							<form:errors path="code" cssClass="error-msg" />
 						</div>
 					</div>
 					<input type="hidden" id="mode" name="mode" value="${mode}" />
@@ -110,7 +111,7 @@
 		<table class="table table-bordered" id="resultTable">
 			<thead>
 				<tr>
-					<th><spring:message code="lbl.code" /></th>
+					<%-- <th><spring:message code="lbl.code" /></th> --%>
 					<th><spring:message code="lbl.courttype" /></th>
 					<th><spring:message code="lbl.active" /></th>
 				</tr>

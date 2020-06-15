@@ -244,7 +244,7 @@ function callAjaxBydrillDownReport(aggregatedByValues,monthh,yearr) {
 				           {"title" : "S.no","sClass" : "text-left"}, 
 						{
 							"data" : "lcNumber",
-							"sTitle" : "Legal Case Number",
+							"sTitle" : "File Number",
 							"className" : "text-left",
 							"render" : function(data, type, full, meta) {
 								return '<a href="javascript:void(0);" onclick="openLegalCase(\''+ data +'\')">' + data + '</a>';

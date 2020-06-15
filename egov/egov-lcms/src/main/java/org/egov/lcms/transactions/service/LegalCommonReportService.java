@@ -180,7 +180,7 @@ public class LegalCommonReportService {
                 boolQuery.filter(QueryBuilders.matchQuery(COURTNAME, searchRequest.getAggregatedByValue()));
             if (searchRequest.getAggregatedBy().equals(LcmsConstants.PETITIONTYPE))
                 boolQuery.filter(QueryBuilders.matchQuery(PETITIONTYPE, searchRequest.getAggregatedByValue()));
-            else if (searchRequest.getAggregatedBy().equals(LcmsConstants.CASECATEGORY))
+            else if (searchRequest.getAggregatedBy().equals(LcmsConstants.CASETYPE))
                 boolQuery.filter(QueryBuilders.matchQuery(CASETYPE, searchRequest.getAggregatedByValue()));
             else if (searchRequest.getAggregatedBy().equals(LcmsConstants.CASESTATUS))
                 boolQuery.filter(QueryBuilders.matchQuery(CASESTATUS, searchRequest.getAggregatedByValue()));

@@ -137,7 +137,7 @@ public class GenericSubReportService {
                 aggregationField = COURTNAME;
             else if (genericSubReport.getAggregatedBy().equals(LcmsConstants.PETITIONTYPE))
                 aggregationField = PETITIONTYPE;
-            else if (genericSubReport.getAggregatedBy().equals(LcmsConstants.CASECATEGORY))
+            else if (genericSubReport.getAggregatedBy().equals(LcmsConstants.CASETYPE))
                 aggregationField = CASETYPE;
             else if (genericSubReport.getAggregatedBy().equals(LcmsConstants.CASESTATUS))
                 aggregationField = CASESTATUS;

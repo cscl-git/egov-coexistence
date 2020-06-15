@@ -58,9 +58,9 @@
 	<div class="row">
 		<div class="col-md-12">
 			<form:hidden id="mode" path="" value="${mode}" />
-			<input type="hidden" name="legalCase" value="${legalCase.id}" /> <input
-				type="hidden" name="pettempList" value="${pettempList}" /> <input
-				type="hidden" name="respoTempList" value="${respoTempList}" />
+			<input type="hidden" name="legalCase" value="${legalCase.id}" /> 
+			<input type="hidden" name="pettempList" value="${pettempList}" /> 
+			<input type="hidden" name="respoTempList" value="${respoTempList}" />
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="panel-heading">
 					<div class="panel-title">

@@ -65,6 +65,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Metamodel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @Transactional(readOnly = true)
@@ -156,5 +157,9 @@ public class JudgmentTypeService extends PersistenceService<JudgmentType, Long>{
             resultList = query.getResultList();
         }
         return resultList;
+    }
+    
+    public String generateCode() { 
+    	return "JT" + ThreadLocalRandom.current().nextInt(100000, 1000000);
     }
 }

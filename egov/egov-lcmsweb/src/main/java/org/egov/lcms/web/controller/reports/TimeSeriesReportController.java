@@ -85,7 +85,7 @@ public class TimeSeriesReportController {
         aggregatedByList.add(LcmsConstants.COURTNAME);
         aggregatedByList.add(LcmsConstants.PETITIONTYPE);
         aggregatedByList.add(LcmsConstants.CASESTATUS);
-        aggregatedByList.add(LcmsConstants.CASECATEGORY);
+        aggregatedByList.add(LcmsConstants.CASETYPE);
         aggregatedByList.add(LcmsConstants.COURTTYPE);
         aggregatedByList.add(LcmsConstants.OFFICERINCHRGE);
         aggregatedByList.add(LcmsConstants.STANDINGCOUNSEL);

@@ -137,14 +137,23 @@
 		</form:select>
 		<form:errors path="caseNumber" cssClass="add-margin error-msg" />
 	</div>
-	<c:if test="${mode == 'edit'}">
-		<label class="col-sm-2 control-label text-right"><spring:message
-				code="lbl.lcnumber" />:</label>
+	<c:if test="${mode != 'edit'}">
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.lcnumber" /><span class="mandatory"></span>:
+		</label>
 		<div class="col-sm-3 add-margin text-center">
-			<form:input class="form-control patternvalidation"
-				data-pattern="number" maxlength="50" id="lcNumber"
-				readonly="readonly" path="lcNumber" /></div>
+			<form:input class="form-control patternvalidation" data-pattern="address" maxlength="50" id="lcNumber" path="lcNumber" required="required"/>
+		</div>
 		<form:errors path="lcNumber" cssClass="add-margin error-msg" />
+	</c:if>
+	<c:if test="${mode == 'edit'}">
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.lcnumber" /><span class="mandatory"></span>:
+		</label>
+		<div class="col-sm-3 add-margin text-center">
+			<form:input class="form-control patternvalidation" data-pattern="address" maxlength="50" id="fileNumber" path="fileNumber" required="required"/>
+		</div>
+		<form:errors path="fileNumber" cssClass="add-margin error-msg" />
 	</c:if>
 </div>
 <div class="form-group">
@@ -175,15 +184,13 @@
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.title" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="caseTitle" id="caseTitle"
-			name="caseTitle" />
+		<form:textarea class="form-control" path="caseTitle" id="caseTitle" name="caseTitle" />
 		<form:errors path="caseTitle" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
 			code="lbl.prayer" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
-		<form:textarea class="form-control" maxlength="10000" id="prayer"
-			path="prayer" />
+		<form:textarea class="form-control" maxlength="10000" id="prayer" path="prayer" />
 		<form:errors path="prayer" cssClass="add-margin error-msg" />
 	</div>
 </div>
@@ -221,8 +228,7 @@
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.nodalofficer" />:</label>
 	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer"
-			path="nodalOfficer" data-pattern="address" />
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" />
 		<form:errors path="nodalOfficer" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right"><spring:message

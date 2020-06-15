@@ -65,6 +65,8 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Metamodel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @Transactional(readOnly = true)
@@ -86,7 +88,7 @@ public class CaseTypeMasterService extends PersistenceService<CaseTypeMaster, Lo
 
     @Transactional
     public CaseTypeMaster create(final CaseTypeMaster casetypeMaster) {
-    	applyAuditing(casetypeMaster);
+    	applyAuditing(casetypeMaster);    	
         return casetypeMasterRepository.save(casetypeMaster);
     }
 
@@ -163,5 +165,9 @@ public class CaseTypeMasterService extends PersistenceService<CaseTypeMaster, Lo
             resultList = query.getResultList();
         }
         return resultList;
+    }
+    
+    public String generateCode() { 
+    	return "CT" + ThreadLocalRandom.current().nextInt(100000, 1000000);
     }
 }

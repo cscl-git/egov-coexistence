@@ -67,11 +67,12 @@
 						</form:select>
 						<form:errors path="courtType" cssClass="error-msg" />
 					</div>
-					<label class="col-sm-2 control-label text-right"><spring:message
-							code="lbl.code" /> :<span class="mandatory"></span> </label>
-					<div class="col-sm-3 add-margin">
+					<label class="col-sm-2 control-label text-right" style="display:none;">
+						<spring:message code="lbl.code" /> :<span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin" style="display:none;">
 						<form:input path="code" class="form-control text-left aaa"
-							maxlength="25" required="required" />
+							maxlength="25"/>
 						<form:errors path="code" cssClass="error-msg" />
 					</div>
 
