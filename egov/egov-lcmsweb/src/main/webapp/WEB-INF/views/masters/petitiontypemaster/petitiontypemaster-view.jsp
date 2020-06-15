@@ -59,12 +59,14 @@
 							<spring:message code="lbl.courttype" />
 						</div>
 						<div class="col-sm-3 add-margin view-content">
-							${petitionTypeMaster.courtType.courtType}</div>
-						<div class="col-xs-3 add-margin">
+							${petitionTypeMaster.courtType.courtType}
+						</div>
+						<div class="col-xs-3 add-margin" style="display:none;">
 							<spring:message code="lbl.code" />
 						</div>
-						<div class="col-sm-3 add-margin view-content">
-							${petitionTypeMaster.code}</div>
+						<div class="col-sm-3 add-margin view-content" style="display:none;">
+							${petitionTypeMaster.code}
+						</div>
 					</div>
 					<div class="row add-border">
 						<div class="col-xs-3 add-margin">

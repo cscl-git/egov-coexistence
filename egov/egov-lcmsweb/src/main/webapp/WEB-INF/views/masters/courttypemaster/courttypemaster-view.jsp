@@ -55,10 +55,10 @@
 				</div>
 				<div class="panel-body custom">
 					<div class="row add-border">
-						<div class="col-xs-3 add-margin">
+						<div class="col-xs-3 add-margin" style="display:none;">
 							<spring:message code="lbl.code" />
 						</div>
-						<div class="col-sm-3 add-margin view-content">
+						<div class="col-sm-3 add-margin view-content" style="display:none;">
 							${courtTypeMaster.code}</div>
 						<div class="col-xs-3 add-margin">
 							<spring:message code="lbl.courttype" />

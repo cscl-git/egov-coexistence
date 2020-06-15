@@ -49,6 +49,7 @@ package org.egov.lcms.masters.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -170,5 +171,8 @@ public class CourtTypeMasterService extends PersistenceService<CourtTypeMaster, 
         }
         return resultList;
     }
-
+    
+    public String generateCode() { 
+    	return "COT" + ThreadLocalRandom.current().nextInt(100000, 1000000);
+    }
 }

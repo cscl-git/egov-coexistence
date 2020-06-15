@@ -66,6 +66,7 @@ import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Metamodel;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 @Transactional(readOnly = true)
@@ -177,5 +178,8 @@ public class PetitionTypeMasterService extends PersistenceService<PetitionTypeMa
     public List<PetitionTypeMaster> getActivePetitionTypes() {
         return petitionTypeMasterRepository.findByActiveTrueOrderByOrderNumberAsc();
     }
-
+    
+    public String generateCode() { 
+    	return "PT" + ThreadLocalRandom.current().nextInt(100000, 1000000);
+    }
 }

@@ -167,7 +167,7 @@ public class TimeSeriesReportService {
                 aggregationField = COURTNAME;
             else if (timeSeriesReportResult.getAggregatedBy().equals(LcmsConstants.PETITIONTYPE))
                 aggregationField = PETITIONTYPE;
-            else if (timeSeriesReportResult.getAggregatedBy().equals(LcmsConstants.CASECATEGORY))
+            else if (timeSeriesReportResult.getAggregatedBy().equals(LcmsConstants.CASETYPE))
                 aggregationField = CASETYPE;
             else if (timeSeriesReportResult.getAggregatedBy().equals(LcmsConstants.CASESTATUS))
                 aggregationField = CASESTATUS;

@@ -87,7 +87,9 @@ public class CaseTypeMasterController {
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
-        model.addAttribute(CASETYPEMASTER, new CaseTypeMaster());
+    	CaseTypeMaster caseTypeMaster = new CaseTypeMaster();
+    	caseTypeMaster.setCode(casetypeMasterService.generateCode());
+        model.addAttribute(CASETYPEMASTER, caseTypeMaster);
         return CASETYPEMASTER_NEW;
     }
 
@@ -95,6 +97,7 @@ public class CaseTypeMasterController {
     public String create(@Valid @ModelAttribute final CaseTypeMaster caseTypeMaster, final BindingResult errors,
             final Model model, final RedirectAttributes redirectAttrs) {
         if (errors.hasErrors()) {
+        	caseTypeMaster.setCode(casetypeMasterService.generateCode());
             return CASETYPEMASTER_NEW;
         }
         casetypeMasterService.create(caseTypeMaster);

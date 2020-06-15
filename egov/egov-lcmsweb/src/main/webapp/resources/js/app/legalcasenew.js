@@ -51,17 +51,9 @@ $(document).ready(function(){
 	
 	if(modeval=='edit'){
 		if(lcNumber !='')
-			$("#lcNumber").prop("disabled", true);
-			$("#finwpYear").hide(); 
-			/*$('#lcNumberType').prop("disabled", true);*/
-	}
-	/*
-		if(lcNumberType !='' && lcNumberType== 'MANUAL'){		
-			 $(".show-ManualLcNumber").show(); 
-		}else{
-			 $(".show-ManualLcNumber").hide(); 
-		}
-	*/	
+			//$("#lcNumber").prop("disabled", true);
+			$("#finwpYear").hide();
+	}	
     $("#petitionDetails tbody tr").each(function( index ) {
     	var $this = $(this);
         $this.find("select, button").prop("disabled", true);
@@ -74,7 +66,6 @@ $(document).ready(function(){
 		
 		var caseNumber =$('#caseNumber').val();
 		var lcnumber=$('#lcNumber').val();
-		/*var lcNumberType=$('#lcNumberType').val();*/
 		var mode=$('#mode').val();
 		if(mode=='create'){
 		if(caseNumber !="" && caseNumber !=null && ($('#wpYear').val() ==null || $('#wpYear').val() =='') )
@@ -82,19 +73,7 @@ $(document).ready(function(){
 			bootbox.alert("Select Case Number Year ");
 			return false;
 			}
-		}		
-		/*if(lcNumberType =='MANUAL' && mode =='create'){
-			if(lcnumber=="" ||  lcnumber ==null )
-			{
-				bootbox.alert("Please enter Legal Case Number");
-				return false;
-			}
-			if( lcnumber !=null && $('#finwpYear').val() =='' || $('#finwpYear').val() ==null)
-			{
-				bootbox.alert("Select Legal Case Number Year ");
-				return false;
-			}
-		}*/
+		}
 		if(mode=='create'){
 		  if($('#caseDate').val() != '' && $('#caseReceivingDate').val() != '' ){
 				var start = $('#caseDate').val();

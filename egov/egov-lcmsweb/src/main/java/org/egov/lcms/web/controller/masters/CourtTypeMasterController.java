@@ -49,6 +49,7 @@ package org.egov.lcms.web.controller.masters;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+
 import org.egov.lcms.masters.entity.CourtTypeMaster;
 import org.egov.lcms.masters.service.CourtTypeMasterService;
 import org.egov.lcms.web.adaptor.CourtTypeMasterJsonAdaptor;
@@ -87,7 +88,9 @@ public class CourtTypeMasterController {
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
-        model.addAttribute(COURTTYPEMASTER, new CourtTypeMaster());
+    	CourtTypeMaster courtTypeMaster = new CourtTypeMaster();
+    	courtTypeMaster.setCode(courtTypeMasterService.generateCode());
+        model.addAttribute(COURTTYPEMASTER, courtTypeMaster);
         return COURTTYPEMASTER_NEW;
     }
 
@@ -95,6 +98,7 @@ public class CourtTypeMasterController {
     public String create(@Valid @ModelAttribute final CourtTypeMaster courtTypeMaster, final BindingResult errors,
             final Model model, final RedirectAttributes redirectAttrs) {
         if (errors.hasErrors()) {
+        	courtTypeMaster.setCode(courtTypeMasterService.generateCode());
             return COURTTYPEMASTER_NEW;
         }
         courtTypeMasterService.create(courtTypeMaster);

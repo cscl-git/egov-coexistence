@@ -99,7 +99,7 @@ function submitForm() {
 				columns : [
 						{
 							"data" : "legalcaseno",
-							"sTitle" : "Legal Case Number",
+							"sTitle" : "File Number",
 							"className" : "text-right",
 							"render" : function(data, type, full, meta) {
 								return '<a href="javascript:void(0);" onclick="openLegalCase(\''+ data +'\')">' + data + '</a>';

@@ -80,11 +80,10 @@ function callAjaxSearch() {
 					"aButtons" : [ "xls", "pdf", "print" ]
 				},
 				aaSorting: [],				
-				columns : [ { 
-"data" : "code", "sClass" : "text-center"} ,{ 
+				columns : [{ 
 "data" : "courtType", "sClass" : "text-center"} ,{ 
 "data" : "active", "sClass" : "text-center"}
-,{ "data" : "id","visible": false, "searchable": false }]				
+,{ "data" : "code","visible": false, "searchable": false },{ "data" : "id","visible": false, "searchable": false }]				
 			});
 			}
 

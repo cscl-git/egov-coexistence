@@ -116,7 +116,7 @@ public class GenericSubReportController extends GenericLegalCaseController {
         aggregatedByList.add(LcmsConstants.CASESTATUS);
         aggregatedByList.add(LcmsConstants.OFFICERINCHRGE);
         aggregatedByList.add(LcmsConstants.JUDGEMENTOUTCOME);
-        aggregatedByList.add(LcmsConstants.CASECATEGORY);
+        aggregatedByList.add(LcmsConstants.CASETYPE);
         return aggregatedByList;
     }
 

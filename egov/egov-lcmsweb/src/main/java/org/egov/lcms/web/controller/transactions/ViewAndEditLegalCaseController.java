@@ -120,6 +120,7 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
             legalCase.setWpYear(casenumberyear[1]);
         legalCase.getBipartisanPetitionerDetailsList().addAll(legalCase.getPetitioners());
         legalCase.getBipartisanRespondentDetailsList().addAll(legalCase.getRespondents());
+        legalCase.setFileNumber(legalCase.getLcNumber());
         model.addAttribute(LcmsConstants.MODE, "edit");
         model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, legalCase.getIsReappealOfCase());
         return "legalcase-edit";
@@ -129,8 +130,27 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
     public String update(@ModelAttribute final LegalCase legalCase, @RequestParam("lcNumber") final String lcNumber,
             final BindingResult errors, final Model model,
             final RedirectAttributes redirectAttrs, final HttpServletRequest request) throws IOException, ParseException {
-        if (errors.hasErrors())
+    	
+    	final String caseNumber = legalCase.getCaseNumber() + "/" + legalCase.getWpYear();
+        final LegalCase validateCasenumber = legalCaseService.getLegalCaseByCaseNumber(caseNumber);
+        if (validateCasenumber != null) {
+        	if(legalCase.getId()!=validateCasenumber.getId()) {
+        		errors.reject("error.legalcase.casenumber");
+        	}
+        }
+            
+        final LegalCase validateFilenumber = legalCaseService.findByLcNumber(legalCase.getFileNumber());
+        if (validateFilenumber != null) {
+        	if(legalCase.getId()!=validateFilenumber.getId()) {
+        		errors.reject("error.legalcase.filenumber");
+        	}
+        }            
+    	
+        if (errors.hasErrors()) {
+        	model.addAttribute(LcmsConstants.MODE, "edit");
+            model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, legalCase.getIsReappealOfCase());
             return "legalcase-edit";
+        }
         
         List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();
         String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
@@ -147,7 +167,8 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
                 attachedDocument.setMimeType(contentType[i]);
                 attachedDocuments.add(attachedDocument);
             }
-        }        
+        }
+        legalCase.setLcNumber(legalCase.getFileNumber());
         legalCaseService.persist(legalCase, attachedDocuments);
         setDropDownValues(model);
         final LegalCase newlegalCase = getLegalCaseDocuments(legalCase);

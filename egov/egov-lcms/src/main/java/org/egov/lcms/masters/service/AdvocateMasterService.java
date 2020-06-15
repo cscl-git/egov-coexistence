@@ -61,6 +61,7 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.Metamodel;
 
+import org.apache.commons.lang.StringUtils;
 import org.egov.commons.Accountdetailkey;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.dao.AccountdetailkeyHibernateDAO;
@@ -144,7 +145,33 @@ public class AdvocateMasterService extends PersistenceService<AdvocateMaster, Lo
 
     public List<AdvocateMaster> getAllAdvocatesByNameLikeAndIsSeniorAdvocate(final String name,
             final Boolean isSeniorAdvocate) {
-        return advocateMasterRepository.findByNameContainingIgnoreCaseAndIsSeniorAdvocate(name, isSeniorAdvocate);
+        //return advocateMasterRepository.findByNameContainingIgnoreCaseAndIsSeniorAdvocate(name, isSeniorAdvocate);
+    	return findByNameLikeAndIsSeniorAdvocate(name, isSeniorAdvocate);
+    }
+    
+    public List<AdvocateMaster> findByNameLikeAndIsSeniorAdvocate(final String name, final Boolean isSeniorAdvocate) {
+        final CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        final CriteriaQuery<AdvocateMaster> createQuery = cb.createQuery(AdvocateMaster.class);
+        final Root<AdvocateMaster> advocateMasterObj = createQuery.from(AdvocateMaster.class);
+        createQuery.select(advocateMasterObj);
+        final Metamodel model = entityManager.getMetamodel();
+        final javax.persistence.metamodel.EntityType<AdvocateMaster> advocateMasters = model.entity(AdvocateMaster.class);
+
+        final List<AdvocateMaster> resultList;
+        final List<Predicate> predicates = new ArrayList<>();
+        if (StringUtils.isNotBlank(name)) {
+        	final String advocateName = "%" + name.toLowerCase() + "%";
+            predicates.add(cb.isNotNull(advocateMasterObj.get("name")));
+            predicates.add(cb.like(cb.lower(advocateMasterObj.get(advocateMasters.getDeclaredSingularAttribute("name", String.class))),advocateName));
+            predicates.add(cb.equal(advocateMasterObj.get(advocateMasters.getDeclaredSingularAttribute("isSenioradvocate", Boolean.class)),isSeniorAdvocate));
+            createQuery.where(predicates.toArray(new Predicate[] {}));
+            final TypedQuery<AdvocateMaster> query = entityManager.createQuery(createQuery);
+
+            resultList = query.getResultList();
+        }else {
+        	resultList = null;  
+        }
+        return resultList;
     }
 
     public AdvocateMaster findOne(final Long id) {

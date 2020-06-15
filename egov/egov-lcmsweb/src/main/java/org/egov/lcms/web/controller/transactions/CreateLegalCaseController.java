@@ -111,6 +111,9 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
         final LegalCase validateCasenumber = legalCaseService.getLegalCaseByCaseNumber(caseNumber);
         if (validateCasenumber != null)
             errors.reject("error.legalcase.casenumber");
+        final LegalCase validateFilenumber = legalCaseService.findByLcNumber(legalCase.getLcNumber());
+        if (validateFilenumber != null)
+            errors.reject("error.legalcase.filenumber");
         if (errors.hasErrors()) {
             model.addAttribute(LcmsConstants.MODE, "create");
             model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, false);
@@ -118,7 +121,7 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
             model.addAttribute("bipartisanPetitionerDetailsList", legalCase.getBipartisanPetitionerDetailsList());
             return "legalCase-newForm";
         }
-        legalCase.setLcNumber(legalCaseNumberGenerator.generateLegalCaseNumber());
+        //legalCase.setLcNumber(legalCaseNumberGenerator.generateLegalCaseNumber());
         if(uploadedFiles!=null) {
             for (int i = 0; i < uploadedFiles.length; i++) {
                 Path path = Paths.get(uploadedFiles[i].getAbsolutePath());

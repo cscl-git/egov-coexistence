@@ -96,7 +96,9 @@ public class PetitionTypeMasterController {
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
         prepareNewForm(model);
-        model.addAttribute(PETITIONTYPEMASTER, new PetitionTypeMaster());
+        PetitionTypeMaster petitionTypeMaster = new PetitionTypeMaster();
+        petitionTypeMaster.setCode(petitionTypeMasterService.generateCode());
+        model.addAttribute(PETITIONTYPEMASTER, petitionTypeMaster);
         return PETITIONTYPEMASTER_NEW;
     }
 
@@ -105,6 +107,7 @@ public class PetitionTypeMasterController {
             final Model model, final RedirectAttributes redirectAttrs) {
         if (errors.hasErrors()) {
             prepareNewForm(model);
+            petitionTypeMaster.setCode(petitionTypeMasterService.generateCode());
             return PETITIONTYPEMASTER_NEW;
         }
         petitionTypeMasterService.create(petitionTypeMaster);

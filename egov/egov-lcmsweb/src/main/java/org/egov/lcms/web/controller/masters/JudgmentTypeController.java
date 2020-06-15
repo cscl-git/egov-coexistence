@@ -90,7 +90,9 @@ public class JudgmentTypeController {
 
     @RequestMapping(value = "/new", method = RequestMethod.POST)
     public String newForm(final Model model) {
-        model.addAttribute(JUDGMENTTYPE, new JudgmentType());
+    	JudgmentType judgmentType = new JudgmentType();
+    	judgmentType.setCode(judgmentTypeService.generateCode());
+        model.addAttribute(JUDGMENTTYPE, judgmentType);
         return JUDGMENTTYPE_NEW;
     }
 
@@ -98,6 +100,7 @@ public class JudgmentTypeController {
     public String create(@Valid @ModelAttribute final JudgmentType judgmentType, final BindingResult errors,
             final Model model, final RedirectAttributes redirectAttrs) {
         if (errors.hasErrors()) {
+        	judgmentType.setCode(judgmentTypeService.generateCode());
             return JUDGMENTTYPE_NEW;
         }
         judgmentTypeService.persist(judgmentType);
