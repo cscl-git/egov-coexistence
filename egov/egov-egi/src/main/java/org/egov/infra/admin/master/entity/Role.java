@@ -49,6 +49,7 @@
 package org.egov.infra.admin.master.entity;
 
 import org.egov.infra.persistence.entity.AbstractAuditable;
+import org.egov.infra.persistence.entity.AbstractPersistable;
 import org.egov.infra.persistence.validator.annotation.Unique;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
@@ -68,7 +69,7 @@ import static org.egov.infra.admin.master.entity.Role.SEQ_ROLE;
 @Unique(fields = "name", enableDfltMsg = true)
 @Table(name = "eg_role")
 @SequenceGenerator(name = SEQ_ROLE, sequenceName = SEQ_ROLE, allocationSize = 1)
-public class Role extends AbstractAuditable {
+public class Role extends AbstractPersistable<Long> {
 
     public static final String SEQ_ROLE = "SEQ_EG_ROLE";
     private static final long serialVersionUID = 7034114743461088547L;

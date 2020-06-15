@@ -73,8 +73,13 @@ public class InboxController {
     @GetMapping(produces = APPLICATION_JSON_UTF8_VALUE)
     @ResponseBody
     public List<Inbox> showInbox() {
-    	System.out.println("Inbox");
         return inboxRenderServiceDelegate.getCurrentUserInboxItems();
+    }
+    
+    @GetMapping(value = "/items", produces = APPLICATION_JSON_UTF8_VALUE)
+    @ResponseBody
+    public List<Inbox> showInbox(@RequestParam String module) {
+        return inboxRenderServiceDelegate.getCurrentUserInboxItems(module);
     }
 
     @GetMapping(value = "/draft", produces = APPLICATION_JSON_UTF8_VALUE)
