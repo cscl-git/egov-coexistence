@@ -397,7 +397,7 @@ public class ReceiptAction extends BaseFormAction {
     
 
     private void getServiceCategoryList() {
-        List<BusinessService> businessService = microserviceUtils.getBusinessService("Finance");
+        List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
         for(BusinessService bs : businessService){
             String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
             String[] splitSerCode = bs.getCode().split(Pattern.quote("."));
@@ -1270,7 +1270,8 @@ public class ReceiptAction extends BaseFormAction {
                     }
 
                     receiptHeader.addInstrument(instrumentHeader);
-                    EmployeeInfo empInfo = this.microserviceUtils.getEmployeeById(Long.parseLong(receipt.getAuditDetails().getCreatedBy()));
+                    //EmployeeInfo empInfo = this.microserviceUtils.getEmployeeById(Long.parseLong(receipt.getAuditDetails().getCreatedBy()));
+                    EmployeeInfo empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
                     if (null != empInfo && empInfo.getUser().getUserName() != null)
                         receiptHeader.setCreatedUser(empInfo.getUser().getName());
                     // receiptHeaderList.add(receiptHeader);

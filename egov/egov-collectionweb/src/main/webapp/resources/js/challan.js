@@ -1673,7 +1673,7 @@ billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
 updateGrid(VOUCHERDETAILLIST,'creditAmountDetail',0,0);
 totalcramt = 0;          
 billDetailTableIndex = 1;
-for(i=0;i<res.results.length-1;i++){
+for(i=0;i<res.results.length;i++){
 	 billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
             "glcodeid":res.results[i].glcodeIdDetail,
             "glcode":res.results[i].glcodeDetail,

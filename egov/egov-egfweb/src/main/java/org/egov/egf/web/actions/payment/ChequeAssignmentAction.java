@@ -1216,11 +1216,11 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
                 PexNumberGenerator pexNumberGenerator = beanResolver.getAutoNumberServiceFor(PexNumberGenerator.class);
                 if (pexdate != null && pexdate.after(autoNoCutOffDate)) {
-                    pexNo = pexNumberGenerator.getNextNumber("PEX_RefNumber_" + finYearRange.replace('-', '_'));
+                    pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber_" + finYearRange.replace('-', '_'));
 
                     pexNo = new StringBuilder().append(pexNo).append("/").append(finYearRange).toString();
                 } else
-                    pexNo = pexNumberGenerator.getNextNumber("PEX_RefNumber");
+                    pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber");
                 
                 System.out.println("pexNo:: " +pexNo);
 
@@ -3106,11 +3106,11 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
                     PexNumberGenerator pexNumberGenerator = beanResolver.getAutoNumberServiceFor(PexNumberGenerator.class);
                     if (pexdate != null && pexdate.after(autoNoCutOffDate)) {
-                        pexNo = pexNumberGenerator.getNextNumber("PEX_RefNumber_" + finYearRange.replace('-', '_'));
+                        pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber_" + finYearRange.replace('-', '_'));
 
                         pexNo = new StringBuilder().append(pexNo).append("/").append(finYearRange).toString();
                     } else
-                        pexNo = pexNumberGenerator.getNextNumber("PEX_RefNumber");
+                        pexNo = pexNumberGenerator.getNextNumber("RTGS_RefNumber");
                     
                     System.out.println("pexNo:: " +pexNo);
 

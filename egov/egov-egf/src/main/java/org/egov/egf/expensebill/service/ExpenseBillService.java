@@ -477,7 +477,17 @@ public class ExpenseBillService {
                         null, additionalRule, currState, null);
 
                 if (stateValue.isEmpty())
-                    stateValue = wfmatrix.getNextState();
+                {
+                	if(designation.getName().equalsIgnoreCase("EXAMINOR") )
+                	{
+                		stateValue = wfmatrix.getNextState();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                    
+                }
 
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
@@ -514,7 +524,17 @@ public class ExpenseBillService {
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
                 if (stateValue.isEmpty())
-                    stateValue = wfmatrix.getNextState();
+                {
+                	if(designation.getName().equalsIgnoreCase("EXAMINOR") )
+                	{
+                		stateValue = wfmatrix.getNextState();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                    
+                }
 
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)

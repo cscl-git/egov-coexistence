@@ -54,10 +54,14 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.ReceiptHeader;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
+import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -80,6 +84,9 @@ public class SearchChallanAction extends BaseFormAction {
     private List<ReceiptHeader> results = new ArrayList<ReceiptHeader>(0);
     private String target = "new";
     private final static String sourcePage = "search";
+    @Autowired
+	@Qualifier("masterDataCache")
+	private EgovMasterDataCaching masterDataCache;
 
     @Override
     public Object getModel() {
@@ -167,6 +174,10 @@ public class SearchChallanAction extends BaseFormAction {
         queryString.append(StringUtils.isBlank(criteria.toString()) ? "" : " where ").append(criteria);
         queryString.append(whereString);
         results = getPersistenceService().findAllBy(queryString.toString(), params.toArray());
+        for(ReceiptHeader row:results)
+        {
+        	row.getReceiptMisc().setDepartment(getDepartmentName(row.getReceiptMisc().getDepartment()));
+        }
         if (results.size() > 500) {
             results.clear();
             throw new ValidationException(Arrays.asList(new ValidationError("searchchallan.changecriteria",
@@ -179,14 +190,17 @@ public class SearchChallanAction extends BaseFormAction {
 
     private String getDepartmentName(String department) {
     	String name="";
-    	//Department dept=
-		return null;
+    	List<Department> dept=masterDataCache.get("egi-department");
+    	for(Department dep :dept)
+    	{
+    		if(dep.getCode().equals(department))
+    		{
+    			name=dep.getName();
+    		}
+    	}
+		return name;
 	}
 
-	private String s(String department) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 
 	private String getJoinOperand(final StringBuilder criteria) {
         return StringUtils.isBlank(criteria.toString()) ? "" : " and ";

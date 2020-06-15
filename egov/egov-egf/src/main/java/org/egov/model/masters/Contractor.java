@@ -147,7 +147,7 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @OptionalPattern(regex = FinancialConstants.numericwithoutspecialchar, message = "Special Characters are not allowed in ESI No")
     private String esiNumber;
 
-    @NotNull
+    
     @Length(max = 250, message = "Maximum of 250 Characters allowed for GST Registered State")
     private String gstRegisteredState;
 

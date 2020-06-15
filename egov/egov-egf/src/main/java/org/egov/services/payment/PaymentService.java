@@ -1326,23 +1326,22 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     }
                     entity = getEntity(Integer.valueOf(obj[0].toString()), (Serializable) obj[1]);
 
-                    if (type.equals("Supplier") && (StringUtils.isBlank(entity.getTinno())
-                            || StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
+                    if (type.equals("Supplier") && (StringUtils.isBlank(entity.getBankname()) || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode()))) {
                         LOGGER.error("BankAccount,IFSC Code, Tin number is mandatory for RTGS Payment for "
                                 + entity.getName());
                         errors.add(new ValidationError("paymentMode",
-                                "BankName, BankAccount,IFSC Code, Tin number is mandatory for RTGS Assignment for "
+                                "BankName, BankAccount,IFSC Code are mandatory for payment instrument Assignment for "
                                         + bean.getVoucherNumber() + "\\n Party Name " + entity.getName()));
                         throw new ValidationException(errors);
-                    } else if (StringUtils.isBlank(entity.getPanno()) || StringUtils.isBlank(entity.getBankname())
+                    } else if (StringUtils.isBlank(entity.getBankname())
                             || StringUtils.isBlank(entity.getBankaccount())
                             || StringUtils.isBlank(entity.getIfsccode())) {
-                        LOGGER.error("Mandatory details for RTGS Assignment for " + bean.getVoucherNumber()
-                                + " for Party Name " + entity.getName() + " is missing missing");
+                        LOGGER.error("BankName, BankAccount,IFSC Code are mandatory for payment instrument Assignment for " + bean.getVoucherNumber()
+                        + " for Party Name " + entity.getName());
                         errors.add(new ValidationError("paymentMode",
-                                "Mandatory details for RTGS Assignment for " + bean.getVoucherNumber()
-                                        + " for Party Name " + entity.getName() + " is missing missing"));
+                                "BankName, BankAccount,IFSC Code are mandatory for payment instrument Assignment for " + bean.getVoucherNumber()
+                                        + " for Party Name " + entity.getName()));
                         throw new ValidationException(errors);
                     }
                 }

@@ -1208,7 +1208,14 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
         demand.setConsumerCode(consumerCode);
         demand.setConsumerType(CollectionConstants.MISCELLANEOUS_RECEIPT);
         demand.setBusinessService(receiptHeader.getService());
-        demand.setMinimumAmountPayable(receiptHeader.getTotalcramount());
+        if(receiptHeader.getTotalcramount() != null)
+        {
+        	demand.setMinimumAmountPayable(receiptHeader.getTotalcramount());
+        }
+        else
+        {
+        	demand.setMinimumAmountPayable(receiptHeader.getTotalAmount());
+        }
         demand.setDemandDetails(new ArrayList<>());
         TaxPeriod tp = microserviceUtils.getTaxPeriodsByService(receiptHeader.getService());
         if (tp != null) {
@@ -1225,6 +1232,19 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                     dd.setTenantId(demand.getTenantId());
                     dd.setTaxHeadMasterCode(rd.getTaxheadCode());
                     demand.getDemandDetails().add(dd);
+                }
+                else if (rd.getAccounthead() != null)
+                {
+                	String taxHead=microserviceUtils.getTaxHeadCode(rd.getAccounthead().getGlcode());
+                	if(taxHead != null && !taxHead.isEmpty())
+                	{
+                		dd = new DemandDetail();
+                        dd.setTaxAmount(rd.getCramount());
+                        // dd.setCollectionAmount(rd.getCramount());
+                        dd.setTenantId(demand.getTenantId());
+                        dd.setTaxHeadMasterCode(taxHead);
+                        demand.getDemandDetails().add(dd);
+                	}
                 }
             }
 
@@ -1376,7 +1396,20 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
     }
 
     private String getConsumerCode(ReceiptHeader receiptHeader) {
-        return receiptHeader.getServiceCategory() + "-" + receiptHeader.getService() + "-" + String.valueOf(new Date().getTime());
+    	String category=null;
+    	if(receiptHeader.getServiceCategory() != null)
+    	{
+    		category= receiptHeader.getServiceCategory();
+    	}
+    	else if(receiptHeader.getService() != null)
+    	{
+    			String categoryList[]=receiptHeader.getService().split("\\.");
+    			if(categoryList.length >= 1)
+    			{
+    				category=categoryList[0];
+    			}
+    	}
+    	return category + "-" + receiptHeader.getService() + "-" + String.valueOf(new Date().getTime());
     }
 
     public Date getDataEntryCutOffDate() {
