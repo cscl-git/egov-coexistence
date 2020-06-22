@@ -71,7 +71,7 @@ public class MSCommController {
 
 	@RequestMapping(value = "/rest/ClearToken", method = RequestMethod.POST)
     @ResponseBody
-    @CrossOrigin(origins = "*.chandigarhsmartcity.in", allowedHeaders = "*")	
+    @CrossOrigin(origins = {"https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")	
     private ResponseEntity logout(@RequestBody RequestInfoWrapper request,HttpServletRequest httpReq) {
     	try {
             String access_token = request.getRequestInfo().getAuthToken();
