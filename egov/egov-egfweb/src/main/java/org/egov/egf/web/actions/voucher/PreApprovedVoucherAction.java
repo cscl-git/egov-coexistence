@@ -729,9 +729,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 type = "default";
             //EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
             String empName=this.getEmployeeName(voucherHeader.getState().getOwnerPosition()) ;
+            String rejEmpName=this.getEmployeeName(voucherHeader.getState().getInitiatorPosition()) ;
             if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getText("pjv.voucher.rejected", new String[] {
-                		empName != null ? empName : "" }));
+                		rejEmpName != null ? rejEmpName : "" }));
             if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 addActionMessage(getText("pjv.voucher.approved", new String[] {
                 		empName != null ? empName : "" }));
@@ -943,6 +944,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             val = egBillregister.getEgBillregistermis().getNarration();
         else if ("billnumber".equals(name))
             val = egBillregister.getBillnumber();
+        else if ("budgetaryAppnumber".equals(name))
+            val = egBillregister.getEgBillregistermis().getBudgetaryAppnumber();
         return val;
     }
 

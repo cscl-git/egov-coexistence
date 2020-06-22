@@ -559,7 +559,7 @@ function drafts() {
         "aaSorting": [],
         "autoWidth": false,
         "ajax": {
-            "url": "inbox/draft",
+            "url": "/services/egi/inbox/draft",
             "dataSrc": ""
         },
         "deferRender": true,

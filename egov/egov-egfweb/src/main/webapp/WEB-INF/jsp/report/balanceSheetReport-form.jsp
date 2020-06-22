@@ -129,7 +129,7 @@ function showPreviousYearDetails(glcode)
 								<div>
 									<table width="100%" border="0" cellpadding="0" cellspacing="0">
 										<tr>
-											<th class="subheadsmallnew" colspan="16" bgcolor="#CCCCCC"><s:property
+											<th class="subheadsmallnew" colspan="16" bgcolor="#265988" style="color:#ffffff;"><s:property
 													value="ulbName" /><br /> <strong><s:text
 														name="report.balancesheet.schedule" /> <s:property
 														value="model.financialYear.finYearRange" /> <s:property

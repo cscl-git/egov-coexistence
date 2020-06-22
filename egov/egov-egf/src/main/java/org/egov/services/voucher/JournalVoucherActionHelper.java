@@ -240,8 +240,9 @@ public class JournalVoucherActionHelper {
                         .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withOwner(workflowBean.getApproverPositionId())
                         .withNextAction(wfmatrix.getNextAction())
-                        .withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
-                                ? info.getAssignments().get(0).getPosition() : null);
+                        .withInitiator(user.getId());
+                        //.withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
+                                //? info.getAssignments().get(0).getPosition() : null);
             } else if (voucherHeader.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 voucherHeader.transition().end().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())

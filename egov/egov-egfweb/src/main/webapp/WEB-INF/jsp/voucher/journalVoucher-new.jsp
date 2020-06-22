@@ -120,7 +120,8 @@
 
 						<tr>
 							<td style="width: 5%"></td>
-							<td class="greybox"><s:text name="voucher.narration" /></td>
+							<td class="greybox"><s:text name="voucher.narration" /><span
+								class="mandatory1">*</span></td>
 							<td class="greybox" colspan="3"><s:textarea id="narration"
 									name="description" cols="100" rows="3"
 									onblur="checkVoucherNarrationLen(this)" /></td>
@@ -270,6 +271,7 @@
 		var currDate = cDate.getDate()+"/"+(parseInt(cDate.getMonth())+1)+"/"+cDate.getYear();
 		var vhDate=document.getElementById('voucherDate').value;
 		var vhType=document.getElementById('vType').value;
+		var narration=document.getElementById('narration');
 
 		console.log(vhType);
 		
@@ -283,6 +285,12 @@
 			document.getElementById('voucherDate').focus();
 			return false;
 		}
+		if(narration == null || narration.value == '')
+			{
+			document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.narration'/> ";
+			document.getElementById('narration').focus();
+			return false;
+			}
 
 		var voucherdate = vhDate.substring(0, 2);
 	    var vouchermonth = vhDate.substring(3, 5);

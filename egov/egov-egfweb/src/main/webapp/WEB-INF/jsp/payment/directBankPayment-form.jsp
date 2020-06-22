@@ -158,7 +158,7 @@
 </s:if>
 <tr>
 	<td class="bluebox"></td>
-	<td class="bluebox"><s:text name="voucher.narration" /></td>
+	<td class="bluebox"><s:text name="voucher.narration" /><span class="mandatory1">*</span></td>
 	<td class="bluebox" colspan="3"><s:textarea name="description"
 			id="description" style="width:95%" /></td>
 </tr>

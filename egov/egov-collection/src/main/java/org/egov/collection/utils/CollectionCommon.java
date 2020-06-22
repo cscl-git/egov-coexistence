@@ -387,10 +387,17 @@ public class CollectionCommon {
                 }
 
             }
-        if (receiptType == CollectionConstants.RECEIPT_TYPE_BILL)
+        /*if (receiptType == CollectionConstants.RECEIPT_TYPE_BILL)
+        {
+        	System.out.println("receiptType : "+receiptType);
             reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsStream());
+        }
         else
-            reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsBytes());
+        {
+        	System.out.println("receiptType : "+receiptType);
+            //reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsBytes());
+        	reportParams.put(CollectionConstants.LOGO_PATH, cityService.getCityLogoAsStream());
+        } */  
         final ReportRequest reportInput = new ReportRequest(templateName, receiptList, reportParams);
 
         // Set the flag so that print dialog box is automatically opened

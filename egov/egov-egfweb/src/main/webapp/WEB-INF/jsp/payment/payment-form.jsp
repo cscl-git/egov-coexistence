@@ -323,7 +323,8 @@
 															<tr>
 																<td class="greybox">&nbsp;</td>
 																<td class="greybox" width="15%"><s:text
-																		name="payment.narration" /></td>
+																		name="payment.narration" /><span
+																		class="mandatory1">*</span></td>
 																<td class="greybox" colspan="4"><s:textarea
 																		name="description" id="description" cols="70" rows="4"
 																		onblur="checkLength(this)" /></td>
@@ -670,6 +671,12 @@
 				undoLoadingMask();
 				return false;
 			}
+			if(dom.get('description') == null || dom.get('description').value == '')
+				{
+					bootbox.alert("<s:text name='msg.please.select.voucher.narration'/>");
+					undoLoadingMask();
+					return false;
+				}
 			if(dom.get('billSubType').value!='TNEB')
 			{
 				if(dom.get('bankbranch').options[dom.get('bankbranch').selectedIndex].value==-1)

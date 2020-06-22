@@ -173,8 +173,7 @@ public class VoucherSearchUtil {
 			}
 			return voucherList;
 		} else
-			voucherList = persistenceService.findAllBy(" from CVoucherHeader vh where vh.status not in ("
-					+ statusExclude + ") " + sql + " order by vh.voucherNumber ");
+			voucherList = persistenceService.findAllBy(" from CVoucherHeader vh where vh.status is not null " + sql + " order by vh.voucherNumber ");
 		return voucherList;
 	}
 
@@ -231,7 +230,7 @@ public class VoucherSearchUtil {
 		statusExclude = statusExclude + "," + FinancialConstants.REVERSEDVOUCHERSTATUS.toString() + ","
 				+ FinancialConstants.REVERSALVOUCHERSTATUS;
 
-		final String finalQuery = " from CVoucherHeader vh where vh.status not in (" + statusExclude + ") " + sql1
+		final String finalQuery = " from CVoucherHeader vh where vh.status is not null " + sql1
 				+ "  ";
 
 		voucherList = persistenceService.findAllBy(finalQuery);
@@ -297,12 +296,12 @@ public class VoucherSearchUtil {
 		final List<Query> queryList = new ArrayList<Query>();
 		final String statusExclude = excludeVoucherStatus();
 		final String sql = voucherFilterQuery(voucherHeader, fromDate, toDate, mode);
-		final String sqlQuery = "from CVoucherHeader vh where vh.status not in (" + statusExclude + ") " + sql
+		final String sqlQuery = "from CVoucherHeader vh where vh.status is not null  " + sql
 				+ " order by vh.voucherNumber ,vh.voucherDate,vh.name ";
 		final Query query1 = persistenceService.getSession().createQuery(sqlQuery);
 		queryList.add(query1);
 		final Query query2 = persistenceService.getSession().createQuery(
-				"select count(*) from CVoucherHeader vh where vh.status not in (" + statusExclude + ") " + sql);
+				"select count(*) from CVoucherHeader vh where vh.status is not null " + sql);
 		queryList.add(query2);
 		return queryList;
 	}

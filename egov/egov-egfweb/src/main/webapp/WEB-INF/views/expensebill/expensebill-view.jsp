@@ -145,7 +145,7 @@
             <jsp:include page="expensebill-view-supporingDocs.jsp"/>
         </div>-->
         <c:if test="${!workflowHistory.isEmpty() && mode != 'readOnly'}">
-            <!--<jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>-->
+            <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
         </c:if>
         <c:if test="${mode != 'readOnly'}">
             <jsp:include page="../common/commonworkflowmatrix.jsp"/>

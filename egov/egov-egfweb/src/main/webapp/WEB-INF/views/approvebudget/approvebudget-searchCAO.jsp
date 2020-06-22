@@ -60,7 +60,7 @@
 			<div class="col-md-12">
 				<div class="panel panel-primary" data-collapsed="0">
 					<c:if test="${not empty message}">
-						<div id="message" class="success">
+						<div id="message" class="success" style="color: green;margin-top:15px;">
 							<spring:message code="${message}" />
 						</div>
 					</c:if>
