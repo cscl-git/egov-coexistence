@@ -11,16 +11,18 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
-import org.egov.infra.persistence.entity.AbstractPersistable;
+import org.egov.infra.persistence.entity.AbstractAuditable;
 
 @Entity
 @Table(name = "AUDIT_CHECKLIST")
 @SequenceGenerator(name = AuditCheckList.SEQ_AUDIT_CHECKLIST, sequenceName = AuditCheckList.SEQ_AUDIT_CHECKLIST, allocationSize = 1)
-public class AuditCheckList extends AbstractPersistable<Integer> implements java.io.Serializable{
+public class AuditCheckList extends AbstractAuditable implements java.io.Serializable{
 	
 	/**
 	 * 
@@ -31,7 +33,7 @@ public class AuditCheckList extends AbstractPersistable<Integer> implements java
 
     @Id
     @GeneratedValue(generator = SEQ_AUDIT_CHECKLIST, strategy = GenerationType.SEQUENCE)
-    private Integer id;
+    private Long id;
     
     private String checklist_description;
     
@@ -47,20 +49,13 @@ public class AuditCheckList extends AbstractPersistable<Integer> implements java
     @JoinColumn(name = "audit_id")
     private AuditDetails auditDetails;
     
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditCheckList", targetEntity = AuditChecklistHistory.class)
-	private AuditChecklistHistory checkList_history;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditCheckList", targetEntity = AuditChecklistHistory.class)
+	private List<AuditChecklistHistory> checkList_history;
+    
+    @Transient
+    private String checkListId;
     
 
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	protected void setId(Integer id) {
-		this.id = id;
-		
-	}
 
 	public String getChecklist_description() {
 		return checklist_description;
@@ -110,12 +105,32 @@ public class AuditCheckList extends AbstractPersistable<Integer> implements java
 		this.severity = severity;
 	}
 
-	public AuditChecklistHistory getCheckList_history() {
+
+	@Override
+	public Long getId() {
+		return id;
+	}
+
+	@Override
+	protected void setId(Long id) {
+		this.id=id;
+		
+	}
+
+	public List<AuditChecklistHistory> getCheckList_history() {
 		return checkList_history;
 	}
 
-	public void setCheckList_history(AuditChecklistHistory checkList_history) {
+	public void setCheckList_history(List<AuditChecklistHistory> checkList_history) {
 		this.checkList_history = checkList_history;
+	}
+
+	public String getCheckListId() {
+		return checkListId;
+	}
+
+	public void setCheckListId(String checkListId) {
+		this.checkListId = checkListId;
 	}
 
 }

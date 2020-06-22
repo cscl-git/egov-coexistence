@@ -105,7 +105,7 @@
 				<form:input path="" name ="function" id="function" class="form-control" placeholder="Type first 3 letters of Function name" required="required"/>
 			</c:if>
 			<form:hidden path="egBillregistermis.function" name="egBillregistermis.function" id="egBillregistermis.function" class="form-control table-input hidden-input cfunction"/>
-			<form:errors path="egBillregistermis.function" cssClass="add-margin error-msg" />
+			<!--<form:errors path="egBillregistermis.function" cssClass="add-margin error-msg" />-->
 		</div>
 				
 		<label class="col-sm-2 control-label text-right"><spring:message code="lbl.narration" text="Narration"/>

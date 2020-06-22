@@ -45,7 +45,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private String type;
 	private Date audit_sch_date;
 	private Date audit_comp_date;
-	private String audit_no;
+	private String auditno;
 	private Long lead_auditor;
 	private String notes;
 	@Transient
@@ -71,7 +71,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@Override
 	public String getStateDetails() {
 
-		 return getState().getComments().isEmpty() ? audit_no : audit_no + "-" + getState().getComments();
+		 return getState().getComments().isEmpty() ? auditno : auditno + "-" + getState().getComments();
 	}
 
 	@Override
@@ -110,13 +110,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 		this.audit_comp_date = audit_comp_date;
 	}
 
-	public String getAudit_no() {
-		return audit_no;
-	}
-
-	public void setAudit_no(String audit_no) {
-		this.audit_no = audit_no;
-	}
+	
 
 	
 
@@ -199,6 +193,15 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	public void setLead_auditor(Long lead_auditor) {
 		this.lead_auditor = lead_auditor;
 	}
+
+	public String getAuditno() {
+		return auditno;
+	}
+
+	public void setAuditno(String auditno) {
+		this.auditno = auditno;
+	}
+
 
 	
 

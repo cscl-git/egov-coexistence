@@ -370,8 +370,8 @@ public class ExpenseBillService {
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode())
-            if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
-                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
+            if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
+                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
             {
             	egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                 FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT));
@@ -480,7 +480,21 @@ public class ExpenseBillService {
                         null, additionalRule, currState, null);
 
                 if (stateValue.isEmpty())
-                    stateValue = wfmatrix.getNextState();
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING))
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
+                	}
+                    
+                }
+                
 
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
@@ -496,7 +510,7 @@ public class ExpenseBillService {
                         .withStateValue(stateValue).withDateInfo(currentDate.toDate())
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-            } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
+            } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
@@ -517,8 +531,20 @@ public class ExpenseBillService {
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
                 if (stateValue.isEmpty())
-                    stateValue = wfmatrix.getNextState();
-
+                {
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING))
+                	{
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                	else
+                	{
+                		stateValue = wfmatrix.getNextState();
+                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
+                	}
+                    
+                }
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)

@@ -24,21 +24,20 @@
         </div>
     <c:if test="${auditDetail.documentDetail != null &&  !auditDetail.documentDetail.isEmpty()}">
         <c:forEach items="${auditDetail.documentDetail }" var="documentDetials">
-            <a href="/services/audit/createAudit/downloadBillDoc?auditDetailsId=${auditDetail.id }&fileStoreId=${auditDetail.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+            <a href="/services/audit/createAudit/downloadBillDoc?auditDetailsId=${auditDetail.auditId}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
         </c:forEach>
     </c:if>
-   
+   <br>
     <input type="hidden" value="${fn:length(auditDetail.documentDetail)}" id="documentsSize">
         <div>
             <table width="100%">
-                <c:if test="${auditDetail.documentDetail.isEmpty()}">
                         <tbody>
                         <tr>
                             <td valign="top">
                                 <table id="uploadertbl" width="100%"><tbody>
                                 <tr id="row1">
                                     <td>
-                                        <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" class="padding-10">
+                                        <input type="file" name="file" id="file1" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-10">
                                     </td>
                                 </tr>
                                 </tbody></table>
@@ -50,7 +49,6 @@
                             </td>
                         </tr>
                         </tbody>
-                </c:if>
             </table>
         </div>
 </div>

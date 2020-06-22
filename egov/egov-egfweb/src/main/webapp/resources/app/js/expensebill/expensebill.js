@@ -972,7 +972,7 @@ function validateWorkFlowApprover(name) {
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').removeAttr('required');
 	}
-	if (button != null && button == 'Approve') {
+	if (button != null && button == 'Verify') {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Create And Approve') {

@@ -10,18 +10,18 @@ import javax.persistence.OneToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
-import org.egov.infra.persistence.entity.AbstractPersistable;
+import org.egov.infra.persistence.entity.AbstractAuditable;
 
 @Entity
 @Table(name = "AUDIT_CHECKLIST_HISTORY")
 @SequenceGenerator(name = AuditChecklistHistory.SEQ_AUDIT_CHECKLIST_HISTORY, sequenceName = AuditChecklistHistory.SEQ_AUDIT_CHECKLIST_HISTORY, allocationSize = 1)
-public class AuditChecklistHistory extends AbstractPersistable<Integer> implements java.io.Serializable{
+public class AuditChecklistHistory extends AbstractAuditable implements java.io.Serializable{
 
 	public static final String SEQ_AUDIT_CHECKLIST_HISTORY = "SEQ_AUDIT_CHECKLIST_HISTORY";
 	
 	@Id
     @GeneratedValue(generator = SEQ_AUDIT_CHECKLIST_HISTORY, strategy = GenerationType.SEQUENCE)
-    private Integer id;
+    private Long id;
 	
 	@OneToOne
     @JoinColumn(name = "checklist_id")
@@ -39,16 +39,7 @@ public class AuditChecklistHistory extends AbstractPersistable<Integer> implemen
     @JoinColumn(name = "audit_id")
     private AuditDetails auditDetails;
 	
-	@Override
-	public Integer getId() {
-		return id;
-	}
-
-	@Override
-	protected void setId(Integer id) {
-		this.id = id;
-		
-	}
+	
 
 	public AuditCheckList getAuditCheckList() {
 		return auditCheckList;
@@ -104,6 +95,18 @@ public class AuditChecklistHistory extends AbstractPersistable<Integer> implemen
 
 	public void setSeverity(String severity) {
 		this.severity = severity;
+	}
+
+	@Override
+	public Long getId() {
+		// TODO Auto-generated method stub
+		return id;
+	}
+
+	@Override
+	protected void setId(Long id) {
+		this.id=id;
+		
 	}
 
 }

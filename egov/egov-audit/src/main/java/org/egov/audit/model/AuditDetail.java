@@ -26,6 +26,9 @@ public class AuditDetail {
     private User approver;
     private Date approvedOn;
     private Long billId;
+    private Long auditId;
+    private String auditStatus;
+    private String workFlowAction;
 	
 	private String notes;
 	public Date getAuditScheduledDate() {
@@ -117,6 +120,24 @@ public class AuditDetail {
 	}
 	public void setBillId(Long billId) {
 		this.billId = billId;
+	}
+	public Long getAuditId() {
+		return auditId;
+	}
+	public void setAuditId(Long auditId) {
+		this.auditId = auditId;
+	}
+	public String getAuditStatus() {
+		return auditStatus;
+	}
+	public void setAuditStatus(String auditStatus) {
+		this.auditStatus = auditStatus;
+	}
+	public String getWorkFlowAction() {
+		return workFlowAction;
+	}
+	public void setWorkFlowAction(String workFlowAction) {
+		this.workFlowAction = workFlowAction;
 	}
 
 }

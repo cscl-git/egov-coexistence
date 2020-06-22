@@ -5,10 +5,20 @@
 	<table>
 		<tr>
 			<td id="actionButtons">
-				<c:if test="${mode != 'readOnly' }">
-					<c:forEach items="${validActionList}" var="validButtons">
-						<input type="submit" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"/>
-					</c:forEach>
+				<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
+						<input type="submit" id="sendToDept" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('department')" value="Send To Dept"/>
+						<input type="submit" id="sendToSO" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('sectionOfficer')" value="Send To SO"/>
+				</c:if>
+				<c:if test="${auditDetail.auditStatus == 'Pending with Department' }">
+						<input type="submit" id="sendToAud" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('auditor')" value="Send To Auditor"/>
+				</c:if>
+				<c:if test="${auditDetail.auditStatus == 'Pending with Section Officer' }">
+						<input type="submit" id="sendToAud" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('auditor')" value="Send To Auditor"/>
+						<input type="submit" id="sendToExaminer" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('examiner')" value="Send To Examiner"/>
+				</c:if>
+				<c:if test="${auditDetail.auditStatus == 'Pending with Examiner' }">
+						<input type="submit" id="sendToSO" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('sectionOfficer')" value="Send To SO"/>
+						<input type="submit" id="approve" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('approve')" value="Approve"/>
 				</c:if>
 				<input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />
 			</td>

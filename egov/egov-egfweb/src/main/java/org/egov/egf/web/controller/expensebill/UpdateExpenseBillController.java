@@ -66,6 +66,7 @@ import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
@@ -100,6 +101,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping(value = "/expensebill")
 public class UpdateExpenseBillController extends BaseBillController {
+	private static final String INITIATED_PRE_AUDIT = "Initiated Pre-Audit";
+
+	private static final String PRE_AUDIT = "Pre-Audit";
+
+	private static final String PRE_AUDIT_PENDING = "Pre Audit pending";
+
+	private static final String NEW = "NEW";
+
+	private static final String STRING = "::";
+
+	private static final String CREATED = "Created";
+
+	private static final String AUDIT2 = "Audit";
+
+	private static final String PRE = "Pre";
+
+	private static final String AUDIT001 = "Audit001";
+
 	private static final String SUPPORTING_DOCS = "supportingDocs";
 
     private static final String NET_PAYABLE_AMOUNT = "netPayableAmount";
@@ -140,6 +159,9 @@ public class UpdateExpenseBillController extends BaseBillController {
     
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
+    
+    @Autowired
+    protected AppConfigValueService appConfigValuesService;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
@@ -274,7 +296,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                 {
                     updatedEgBillregister = expenseBillService.update(egBillregister, approvalPosition, approvalComment, null,
                             workFlowAction, mode, apporverDesignation);
-                    if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
+                    if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
                     {
                     	populateauditWorkFlow(updatedEgBillregister);
                     }
@@ -320,21 +342,30 @@ public class UpdateExpenseBillController extends BaseBillController {
     private void populateauditWorkFlow(EgBillregister updatedEgBillregister) {
     	AuditDetails audit=new AuditDetails();
     	final User user = securityUtils.getCurrentUser();
+    	List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
     	Position owenrPos = new Position();
-        owenrPos.setId(479L);
-    	audit.setAudit_no("Audit001");
-    	audit.setType("Pre-Audit");
+    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+    	{
+    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+    	}
+    	else
+    	{
+    		owenrPos.setId(null);
+    	}
+    	audit.setAuditno(AUDIT001);
+    	audit.setType(PRE);
     	audit.setEgBillregister(updatedEgBillregister);
-    	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode("Audit", "Created"));
-    	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
-        .withComments("")
-        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
-        .withNextAction("Pre Audit pending")
-        .withNatureOfTask("Pre-Audit")
+    	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));
+    	audit.transition().start().withSenderName(user.getUsername() + STRING + user.getName())
+        .withComments(INITIATED_PRE_AUDIT)
+        .withStateValue(CREATED).withDateInfo(new Date()).withOwner(owenrPos)
+        .withNextAction(PRE_AUDIT_PENDING)
+        .withNatureOfTask(PRE_AUDIT)
         .withCreatedBy(user.getId())
         .withtLastModifiedBy(user.getId());
-    	applyAuditing(audit);
-    	AuditDetails auditReg = auditRepository.save(audit);
+    	applyAuditing(audit,updatedEgBillregister.getCreatedBy());
+    	 auditRepository.save(audit);
 		persistenceService.getSession().flush();
 		
 	}
@@ -421,13 +452,13 @@ public class UpdateExpenseBillController extends BaseBillController {
 		this.originalFiles = originalFiles;
 	}*/
     
-    public void applyAuditing(AbstractAuditable auditable) {
+    public void applyAuditing(AbstractAuditable auditable, Long createdBy) {
 		Date currentDate = new Date();
 		if (auditable.isNew()) {
-			auditable.setCreatedBy(ApplicationThreadLocals.getUserId());
+			auditable.setCreatedBy(createdBy);
 			auditable.setCreatedDate(currentDate);
 		}
-		auditable.setLastModifiedBy(ApplicationThreadLocals.getUserId());
+		auditable.setLastModifiedBy(createdBy);
 		auditable.setLastModifiedDate(currentDate);
 	}
 }
