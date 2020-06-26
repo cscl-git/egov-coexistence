@@ -32,7 +32,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 					<form:errors path="auditNumber" cssClass="add-margin error-msg" />
 				</div>
 				
-				<label class="col-sm-2 control-label text-left-audit"><spring:message code="lbl.schdauditdate"  text="Audit Scheduled Date"/>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.schdauditdate"  text="Audit Scheduled Date"/>
 				<span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
@@ -44,13 +44,13 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<form:input id="auditScheduledDate" path="auditScheduledDate" class="form-control datepicker" data-date-end-date="0d" readonly="true" required="required" placeholder="DD/MM/YYYY"/>
 				</c:if>
 				</div>
-				<label class="col-sm-2 control-label text-left-audit"><spring:message code="lbl.auditType"  text="Audit Type"/>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.auditType"  text="Audit Type"/>
 				<span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
 					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="auditType" path="auditType" readonly="true" />
 				</div>
-				<label class="col-sm-2 control-label text-left-audit"><spring:message code="lbl.billDetails"  text="Bill Details"/>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.billDetails"  text="Bill Details"/>
 				</label>
 				<div class="col-sm-3 add-margin">
 					<a href="#" id="sourceLink" onclick="return openSource('${billSource}');">View Bill</a>

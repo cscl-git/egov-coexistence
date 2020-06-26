@@ -494,16 +494,7 @@ public class ExpenseBillService {
                 	}
                     
                 }
-                	if(designation.getName().equalsIgnoreCase("EXAMINOR") )
-                	{
-                		stateValue = wfmatrix.getNextState();
-                	}
-                	else
-                	{
-                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
-                	}
                     
-                }
 
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
