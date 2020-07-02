@@ -94,12 +94,12 @@
 							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
-									pdf,</a> <a href="#"
-								onclick="generateReport('xls','<s:property value='%{instrumentHeaderId.id}'/>',
+									Page 1,</a> <a href="#"
+								onclick="generateReport('pdf1','<s:property value='%{instrumentHeaderId.id}'/>',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
-									xls</a> <s:if test='%{billSubType.equalsIgnoreCase("TNEB")}'>
+									Page 2</a> <s:if test='%{billSubType.equalsIgnoreCase("TNEB")}'>
 									<a href="#"
 										onclick="generateReport('text','<s:property value='%{instrumentHeaderId.id}'/>',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
@@ -158,7 +158,10 @@ function generateReport(type,instrumentnumber,bankaccount,bankbranch,bank){
 		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportExcelPex.action?bank.id="+
 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	}
-	
+	else if(type=='pdf1'){
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex1.action?bank.id="+
+			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	}
 	else{
 	 	 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportText.action?bank.id="+
 	 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;

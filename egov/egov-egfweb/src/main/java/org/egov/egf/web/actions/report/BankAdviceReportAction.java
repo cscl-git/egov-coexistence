@@ -47,6 +47,19 @@
  */
 package org.egov.egf.web.actions.report;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -79,18 +92,7 @@ import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @ParentPackage("egov")
 @Results({
@@ -603,8 +605,48 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("instrumentType", "PEX");
         reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
         final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        LOGGER.info("Datasource Added");
+        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
         reportParams.put("totalAmount", totalAmount);
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
+        reportInput.setReportFormat(ReportFormat.PDF);
+        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+        final ReportOutput reportOutput = reportService.createReport(reportInput);
+        if (reportOutput != null && reportOutput.getReportOutputData() != null)
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
+
+        return "reportview";
+    }
+    
+    @ValidationErrorPage(NEW)
+    @Action(value = "/report/bankAdviceReport-exportPDFPex1")
+    public String exportPDFPex1() {
+    	try {
+    	preparePex();
+        final Map<String, Object> reportParams = new HashMap<String, Object>();
+        final StringBuffer letterContext = new StringBuffer();
+        letterContext
+                .append("             I request you to transfer the amount indicated below through PEX duly debiting from the")
+                .append("  Current Account No: ")
+                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+                .append("  under your bank to the following bank accounts:");
+        reportParams.put("bankName", getBankName(bank.getId()));
+        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+        reportParams.put("letterContext", letterContext.toString());
+        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "PEX");
+        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        LOGGER.info("Datasource Added");
+        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
+        reportParams.put("totalAmount", totalAmount);
+        final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
         fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
@@ -846,5 +888,8 @@ public class BankAdviceReportAction extends BaseFormAction {
 	public void setInstrumentType(String instrumentType) {
 		this.instrumentType = instrumentType;
 	}
+	private static JRBeanCollectionDataSource getDataSource(List<BankAdviceReportInfo> subLedgerList) {
+        return new JRBeanCollectionDataSource(subLedgerList); 
+    }
 
 }

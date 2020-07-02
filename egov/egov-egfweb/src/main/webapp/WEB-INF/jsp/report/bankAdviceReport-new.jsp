@@ -195,8 +195,12 @@ table.its th {
 							</tr>
 							<tr>
 								<td align="center"><input type="button"
-									class="buttonsubmit" value="EXPORT PDF" id="exportpdf"
-									name="exportpdf" onclick="exportPDF();" /> <input
+									class="buttonsubmit" value="EXPORT PAGE 1" id="exportpdf"
+									name="exportpdf" onclick="exportPDF();" />
+									<input type="button"
+									class="buttonsubmit" value="EXPORT PAGE 2" id="exportpdf1"
+									name="exportpdf1" onclick="exportPDF1();" />
+									 <input
 									type="button" class="buttonsubmit" value="EXPORT EXCEL"
 									id="exportpdf" name="exportpdf" onclick="exportExcel();" /> <!-- 	<input type="button" class="buttonsubmit" value="EXPORT HTM" id="exporthtml" name="exportpdf" onclick="exportHtml();"/>-->
 								</td>
@@ -234,6 +238,36 @@ table.its th {
 			if (document.getElementById("instrumentType").value == 'pex')
 				{
 				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			else
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
+			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+			window.location.href = url;
+		}
+		function exportPDF1() {
+			var bank = document.getElementById("bank.id").value;
+			var bankbranch = document.getElementById("bankbranch").value;
+			var bankaccount = document.getElementById("bankaccount").value;
+			var instrumentnumber = document.getElementById("instrumentnumber").value;
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex')
+				{
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex1.action?bank.id="
 					+ bank
 					+ "&bankbranch.id="
 					+ bankbranch
