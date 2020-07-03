@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="595" pageHeight="842" columnWidth="505" leftMargin="72" rightMargin="18" topMargin="18" bottomMargin="18" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
 	<property name="ireport.zoom" value="1.366026910730141"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="144"/>
+	<property name="ireport.y" value="370"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -63,33 +63,13 @@
 			<pen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
-	<style name="table 3">
-		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 3_TH" mode="Opaque" backcolor="#F0F8FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 3_CH" mode="Opaque" backcolor="#BFE1FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 3_TD" mode="Opaque" backcolor="#FFFFFF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
 	<subDataset name="Table Dataset 1" uuid="8e076bb7-fa96-491a-808c-acec7e8cd8bf">
 		<field name="partyName" class="java.lang.String"/>
 		<field name="accountNumber" class="java.lang.String"/>
 		<field name="amount" class="java.math.BigDecimal"/>
 		<field name="ifscCode" class="java.lang.String"/>
 		<field name="bank" class="java.lang.String"/>
-		<variable name="totalAmt" class="java.lang.Integer" calculation="Sum">
+		<variable name="totalAmt" class="java.math.BigDecimal" calculation="Sum">
 			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 		</variable>
 	</subDataset>
@@ -103,7 +83,6 @@
 			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 		</variable>
 	</subDataset>
-	<subDataset name="Table Dataset 2" uuid="6991f24a-1b84-4a46-9533-3edde91712e2"/>
 	<parameter name="bankName" class="java.lang.String"/>
 	<parameter name="branchName" class="java.lang.String"/>
 	<parameter name="accountNumber" class="java.lang.String"/>
@@ -122,67 +101,89 @@
 	<field name="ifscCode" class="java.lang.String"/>
 	<field name="bank" class="java.lang.String"/>
 	<title>
-		<band height="403">
+		<band height="608">
 			<staticText>
-				<reportElement x="0" y="16" width="198" height="32" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
+				<reportElement x="0" y="50" width="198" height="32" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
 				<textElement>
-					<font size="11"/>
+					<font size="11" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[To
 The Manager,
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="48" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
+				<reportElement x="0" y="82" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
+				<textElement>
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="65" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
+				<reportElement x="0" y="99" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
+				<textElement>
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="37" y="101" width="167" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<reportElement x="37" y="135" width="167" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{chequeNumber}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="339" y="86" width="72" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle"/>
+				<reportElement x="339" y="120" width="72" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<text><![CDATA[Dated:]]></text>
 			</staticText>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="150" width="505" height="28" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
-				<textElement textAlignment="Justified" verticalAlignment="Middle"/>
+				<reportElement x="0" y="184" width="505" height="28" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
+				<textElement textAlignment="Justified" verticalAlignment="Middle">
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="418" y="86" width="87" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
+				<reportElement x="418" y="120" width="87" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
 				<box leftPadding="2"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA[$P{chequeDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="37" y="86" width="167" height="15" uuid="7dd4f65b-e4be-4bb1-9797-4d7af1500512"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle"/>
+				<reportElement x="37" y="120" width="167" height="15" uuid="7dd4f65b-e4be-4bb1-9797-4d7af1500512"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<text><![CDATA[Memo No. : ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="0" y="118" width="25" height="14" uuid="485485da-0fc3-48e8-93f9-d680be2a4d0e"/>
+				<reportElement x="0" y="152" width="25" height="14" uuid="485485da-0fc3-48e8-93f9-d680be2a4d0e"/>
+				<textElement>
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["Sir,"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="25" y="135" width="480" height="14" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
+				<reportElement x="25" y="169" width="480" height="14" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
+				<textElement>
+					<font pdfFontName="Times-Roman"/>
+				</textElement>
 				<textFieldExpression><![CDATA["SUB:   Transfer of Funds"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="0" width="504" height="15" uuid="9d65f83b-8dd5-4399-b9d0-0e6185a1a499"/>
+				<reportElement x="1" y="34" width="504" height="15" uuid="9d65f83b-8dd5-4399-b9d0-0e6185a1a499"/>
 				<textElement textAlignment="Center">
 					<font fontName="Times New Roman" size="12" isBold="true" isUnderline="true" pdfFontName="Times-Bold"/>
 				</textElement>
 				<text><![CDATA[MUNICIPAL CORPORATION OF CHANDIGARH]]></text>
 			</staticText>
 			<componentElement>
-				<reportElement key="table" style="table" positionType="Float" isPrintRepeatedValues="false" x="7" y="199" width="382" height="76" uuid="de00f23e-238d-4126-a9d1-363daf39378d"/>
+				<reportElement key="table" style="table" isPrintRepeatedValues="false" x="7" y="232" width="382" height="76" uuid="de00f23e-238d-4126-a9d1-363daf39378d"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
 					<datasetRun subDataset="Table Dataset 1" uuid="50f585b4-b227-4e8e-b6c4-dd979c0524ef">
 						<dataSourceExpression><![CDATA[$P{PEXReportDataSource}]]></dataSourceExpression>
@@ -206,9 +207,9 @@ The Manager,
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter style="table 1_CH" height="30" rowSpan="1"/>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="36" height="20" isPrintWhenDetailOverflows="true" uuid="93520df1-df1b-4750-b5e5-e91852866cd7"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="30" isPrintWhenDetailOverflows="true" uuid="93520df1-df1b-4750-b5e5-e91852866cd7"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -242,9 +243,9 @@ The Manager,
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter style="table 1_CH" height="30" rowSpan="1"/>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="71" height="20" isPrintWhenDetailOverflows="true" uuid="e22ce98f-126f-413d-92da-4d3934c43848"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="71" height="30" isPrintWhenDetailOverflows="true" uuid="e22ce98f-126f-413d-92da-4d3934c43848"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -259,10 +260,10 @@ The Manager,
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="58" uuid="fe1b7eee-8265-4685-abe6-90055fde39db">
+					<jr:column width="79" uuid="fe1b7eee-8265-4685-abe6-90055fde39db">
 						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="58" height="30" uuid="0b914d6f-2c94-42b1-a418-bf5b0e3fcc65"/>
+								<reportElement x="0" y="0" width="79" height="30" uuid="0b914d6f-2c94-42b1-a418-bf5b0e3fcc65"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -278,9 +279,9 @@ The Manager,
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter style="table 1_CH" height="30" rowSpan="1"/>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="58" height="20" isPrintWhenDetailOverflows="true" uuid="bc25f7a0-82f5-4110-a84d-88d91fc9a43d"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="79" height="30" isPrintWhenDetailOverflows="true" uuid="bc25f7a0-82f5-4110-a84d-88d91fc9a43d"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -298,7 +299,7 @@ The Manager,
 					<jr:column width="66" uuid="a328d947-d6cf-4b99-8b11-ef5c5b4b6d04">
 						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement positionType="Float" x="0" y="0" width="65" height="30" uuid="bb5892a0-b9ec-4f18-9173-e0719065994e"/>
+								<reportElement positionType="Float" x="0" y="0" width="66" height="30" uuid="bb5892a0-b9ec-4f18-9173-e0719065994e"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -314,9 +315,9 @@ The Manager,
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter style="table 1_CH" height="30" rowSpan="1"/>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="65" height="20" isPrintWhenDetailOverflows="true" uuid="7e5ad8ce-6054-4e3e-9766-7a1c864415a5"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="66" height="30" isPrintWhenDetailOverflows="true" uuid="7e5ad8ce-6054-4e3e-9766-7a1c864415a5"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -334,7 +335,7 @@ The Manager,
 					<jr:column width="78" uuid="4fcca572-2234-47d3-b284-acd09a239898">
 						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement x="0" y="0" width="77" height="30" uuid="7251b4f7-78d2-4d93-a65a-281e2f88b253"/>
+								<reportElement x="0" y="0" width="78" height="30" uuid="7251b4f7-78d2-4d93-a65a-281e2f88b253"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -350,9 +351,9 @@ The Manager,
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter style="table 1_CH" height="30" rowSpan="1"/>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="78" height="20" uuid="ad0cfded-dce1-44f0-9b07-68588b631b50"/>
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="78" height="30" uuid="ad0cfded-dce1-44f0-9b07-68588b631b50"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -394,9 +395,9 @@ The Manager,
 								<text><![CDATA[Total]]></text>
 							</staticText>
 						</jr:columnFooter>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="67" height="20" uuid="572f2807-11b5-4673-9d8c-332b776121ca"/>
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="67" height="30" uuid="572f2807-11b5-4673-9d8c-332b776121ca"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -430,7 +431,7 @@ The Manager,
 							</staticText>
 						</jr:columnHeader>
 						<jr:columnFooter height="30" rowSpan="1">
-							<textField>
+							<textField pattern="###0.00;-###0.00">
 								<reportElement style="table 1_CH" x="0" y="0" width="56" height="30" uuid="aca291c2-610a-4ff3-8434-4d13c33416a4"/>
 								<textElement textAlignment="Center">
 									<font size="9" pdfFontName="Times-Roman"/>
@@ -438,9 +439,9 @@ The Manager,
 								<textFieldExpression><![CDATA[$V{totalAmt}]]></textFieldExpression>
 							</textField>
 						</jr:columnFooter>
-						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+						<jr:detailCell style="table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="56" height="20" isPrintWhenDetailOverflows="true" uuid="8879904a-72cd-4427-9301-83f617cbfc9b"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="56" height="30" isPrintWhenDetailOverflows="true" uuid="8879904a-72cd-4427-9301-83f617cbfc9b"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -457,72 +458,68 @@ The Manager,
 					</jr:column>
 				</jr:table>
 			</componentElement>
-		</band>
-	</title>
-	<pageFooter>
-		<band height="275" splitType="Stretch">
 			<staticText>
-				<reportElement x="409" y="251" width="96" height="24" uuid="dc2f7c0c-498e-4b75-9053-ecd7f7540f16"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none">
-					<font size="9"/>
-				</textElement>
-				<text><![CDATA[2]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="386" y="2" width="119" height="59" uuid="d65cb76f-88c9-4173-bc88-068793f80c2e"/>
+				<reportElement positionType="Float" x="386" y="324" width="119" height="59" uuid="d65cb76f-88c9-4173-bc88-068793f80c2e"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Additional Commissioner,
 Municipal Corporation,
 Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="1" y="2" width="106" height="59" uuid="6d14e5f3-9e00-42bc-b444-2d3955f69811"/>
+				<reportElement positionType="Float" x="1" y="324" width="106" height="59" uuid="6d14e5f3-9e00-42bc-b444-2d3955f69811"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Chief Accounts Officer,
 Municipal Corporation,
 Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="365" y="67" width="100" height="13" uuid="f89cd956-ffcb-457e-ab74-ee012548cdd3"/>
+				<reportElement positionType="Float" x="365" y="389" width="100" height="13" uuid="f89cd956-ffcb-457e-ab74-ee012548cdd3"/>
 				<textElement>
-					<font size="9" pdfFontName="Helvetica"/>
+					<font size="9" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Dated :]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="42" y="80" width="450" height="14" uuid="898b84ec-827d-4256-8265-bebb879d4f3b"/>
+				<reportElement positionType="Float" x="42" y="402" width="450" height="14" uuid="898b84ec-827d-4256-8265-bebb879d4f3b"/>
 				<textElement>
-					<font size="9" pdfFontName="Helvetica"/>
+					<font size="9" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Copy of the above is forwarded to the followiing for information & necessary action.]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="7" y="66" width="100" height="14" uuid="e2698a70-cdef-4547-9090-9da335d2800b"/>
+				<reportElement positionType="Float" x="7" y="388" width="100" height="14" uuid="e2698a70-cdef-4547-9090-9da335d2800b"/>
 				<textElement>
-					<font size="9" pdfFontName="Helvetica"/>
+					<font size="9" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Endest No : ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="409" y="190" width="96" height="59" uuid="2e46a29a-1044-4fbb-bbfe-5db08f09989b"/>
+				<reportElement positionType="Float" x="409" y="520" width="96" height="59" uuid="2e46a29a-1044-4fbb-bbfe-5db08f09989b"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
+					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Chief Accounts Officer,
 Municipal Corporation,
 Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="25" y="174" width="467" height="16" uuid="692271df-b34d-4323-91ba-0aee81079769"/>
+				<reportElement positionType="Float" x="25" y="496" width="467" height="24" uuid="692271df-b34d-4323-91ba-0aee81079769"/>
 				<textElement>
-					<font size="9" pdfFontName="Helvetica"/>
+					<font size="9" pdfFontName="Times-Roman"/>
 				</textElement>
 				<text><![CDATA[Copies of the bill deduction vouchers are attached herewith for depositing the statutory liabilities with the respective authorities.]]></text>
 			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="389" y="584" width="96" height="24" uuid="dc2f7c0c-498e-4b75-9053-ecd7f7540f16"/>
+				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none">
+					<font size="9" pdfFontName="Times-Roman"/>
+				</textElement>
+				<text><![CDATA[2]]></text>
+			</staticText>
 		</band>
-	</pageFooter>
+	</title>
 </jasperReport>
