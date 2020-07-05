@@ -269,8 +269,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     @SuppressWarnings("deprecation")
     @Action(value = "/voucher/journalVoucherModify-update")
     public String update() {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("JournalVoucherModifyAction | updateVoucher | Start");
+            LOGGER.info("JournalVoucherModifyAction | updateVoucher | Start");
         target = "";
         loadSchemeSubscheme();
 
@@ -278,6 +277,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         if (voucherHeader.getId() == null)
             voucherHeader.setId(Long.valueOf(parameters.get(VHID)[0]));
         validateBeforeEdit(voucherHeader);
+        LOGGER.info("Validate");
         CVoucherHeader oldVh = voucherHeader;
         populateWorkflowBean();
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -291,9 +291,10 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
-
+        LOGGER.info("before Submit");
         try {
             if (!validateData(billDetailslist, subLedgerlist)) {
+            	LOGGER.info("edit");
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
                 target = "success";
@@ -315,6 +316,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                                 .getOwnerPosition()) }));
             }
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             resetVoucherHeader();
             voucherHeader = oldVh;
             setOneFunctionCenterValue();
@@ -324,6 +326,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             resetVoucherHeader();
             voucherHeader = oldVh;
             setOneFunctionCenterValue();
