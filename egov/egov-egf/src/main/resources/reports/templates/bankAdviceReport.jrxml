@@ -1,96 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<<<<<<< HEAD
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="595" pageHeight="842" columnWidth="505" leftMargin="72" rightMargin="18" topMargin="18" bottomMargin="18" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
-	<property name="ireport.zoom" value="1.366026910730141"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="264"/>
-	<style name="table">
-		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 1">
-		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 2">
-		<box>
-			<pen lineWidth="1.0" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 2_TH" mode="Opaque" backcolor="#F0F8FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 2_CH" mode="Opaque" backcolor="#BFE1FF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<style name="table 2_TD" mode="Opaque" backcolor="#FFFFFF">
-		<box>
-			<pen lineWidth="0.5" lineColor="#000000"/>
-		</box>
-	</style>
-	<subDataset name="Table Dataset 1" uuid="8e076bb7-fa96-491a-808c-acec7e8cd8bf">
-		<field name="partyName" class="java.lang.String"/>
-		<field name="accountNumber" class="java.lang.String"/>
-		<field name="amount" class="java.math.BigDecimal"/>
-		<field name="ifscCode" class="java.lang.String"/>
-		<field name="bank" class="java.lang.String"/>
-		<variable name="totalAmt" class="java.math.BigDecimal" calculation="Sum">
-			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
-		</variable>
-	</subDataset>
-	<subDataset name="detail2DS" uuid="f775a2ae-8b94-4709-9f97-ed12fba0e4b7">
-		<field name="partyName" class="java.lang.String"/>
-		<field name="accountNumber" class="java.lang.String"/>
-		<field name="amount" class="java.math.BigDecimal"/>
-		<field name="ifscCode" class="java.lang.String"/>
-		<field name="bank" class="java.lang.String"/>
-		<variable name="totalAmt" class="java.lang.Integer" calculation="Sum">
-			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
-		</variable>
-	</subDataset>
-=======
 <!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2-75c5e90a222ab406e416cbf590a5397028a52de3  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" printOrder="Horizontal" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="752" leftMargin="72" rightMargin="18" topMargin="18" bottomMargin="18" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
 	<property name="ireport.zoom" value="1.4641000000000006"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="972"/>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 	<parameter name="bankName" class="java.lang.String"/>
 	<parameter name="branchName" class="java.lang.String"/>
 	<parameter name="accountNumber" class="java.lang.String"/>
@@ -109,15 +22,9 @@
 	<field name="ifscCode" class="java.lang.String"/>
 	<field name="bank" class="java.lang.String"/>
 	<title>
-<<<<<<< HEAD
-		<band height="531">
-			<staticText>
-				<reportElement x="0" y="48" width="198" height="32" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
-=======
 		<band height="256" splitType="Stretch">
 			<staticText>
 				<reportElement x="0" y="39" width="198" height="32" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 				<textElement>
 					<font size="11" pdfFontName="Times-Roman"/>
 				</textElement>
@@ -126,44 +33,6 @@ The Manager,
 ]]></text>
 			</staticText>
 			<textField>
-<<<<<<< HEAD
-				<reportElement x="0" y="80" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
-				<textElement>
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="97" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
-				<textElement>
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="37" y="133" width="167" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{chequeNumber}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="339" y="118" width="72" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[Dated:]]></text>
-			</staticText>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="0" y="182" width="505" height="29" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
-				<textElement textAlignment="Justified" verticalAlignment="Middle">
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="418" y="118" width="87" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
-=======
 				<reportElement x="0" y="71" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
 				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
 			</textField>
@@ -188,7 +57,6 @@ The Manager,
 			</textField>
 			<textField>
 				<reportElement x="605" y="157" width="146" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 				<box leftPadding="2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font pdfFontName="Times-Roman"/>
@@ -196,30 +64,6 @@ The Manager,
 				<textFieldExpression><![CDATA[$P{chequeDate}]]></textFieldExpression>
 			</textField>
 			<staticText>
-<<<<<<< HEAD
-				<reportElement x="37" y="118" width="167" height="15" uuid="7dd4f65b-e4be-4bb1-9797-4d7af1500512"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[Memo No. : ]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="0" y="150" width="25" height="14" uuid="485485da-0fc3-48e8-93f9-d680be2a4d0e"/>
-				<textElement>
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA["Sir,"]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="25" y="167" width="480" height="14" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
-				<textElement>
-					<font pdfFontName="Times-Roman"/>
-				</textElement>
-				<textFieldExpression><![CDATA["SUB:   Transfer of Funds"]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="1" y="32" width="504" height="15" uuid="9d65f83b-8dd5-4399-b9d0-0e6185a1a499"/>
-=======
 				<reportElement x="37" y="134" width="363" height="21" uuid="7dd4f65b-e4be-4bb1-9797-4d7af1500512"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle"/>
 				<text><![CDATA[Memo No. : ]]></text>
@@ -234,7 +78,6 @@ The Manager,
 			</textField>
 			<staticText>
 				<reportElement x="1" y="11" width="751" height="20" uuid="9d65f83b-8dd5-4399-b9d0-0e6185a1a499"/>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 				<textElement textAlignment="Center">
 					<font fontName="Times New Roman" size="12" isBold="true" isUnderline="true" pdfFontName="Times-Bold"/>
 				</textElement>
@@ -486,40 +329,6 @@ The Manager,
 								</textElement>
 								<text><![CDATA[Party Amount
 ]]></text>
-<<<<<<< HEAD
-							</staticText>
-						</jr:columnHeader>
-						<jr:columnFooter height="30" rowSpan="1">
-							<textField pattern="###0.00;-###0.00">
-								<reportElement style="table 1_CH" x="0" y="0" width="56" height="30" uuid="aca291c2-610a-4ff3-8434-4d13c33416a4"/>
-								<textElement textAlignment="Center">
-									<font size="9" pdfFontName="Times-Roman"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$V{totalAmt}]]></textFieldExpression>
-							</textField>
-						</jr:columnFooter>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
-							<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="56" height="31" isPrintWhenDetailOverflows="true" uuid="8879904a-72cd-4427-9301-83f617cbfc9b"/>
-								<box>
-									<pen lineWidth="0.5"/>
-									<topPen lineWidth="0.5"/>
-									<leftPen lineWidth="0.5"/>
-									<bottomPen lineWidth="0.5"/>
-									<rightPen lineWidth="0.5"/>
-								</box>
-								<textElement textAlignment="Center" verticalAlignment="Middle">
-									<font size="9" pdfFontName="Times-Roman"/>
-								</textElement>
-								<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
-							</textField>
-						</jr:detailCell>
-					</jr:column>
-				</jr:table>
-			</componentElement>
-			<staticText>
-				<reportElement positionType="Float" x="1" y="338" width="106" height="59" uuid="8be49221-9ee1-4ff7-b37e-eb3216f27486"/>
-=======
 			</staticText>
 		</band>
 	</columnHeader>
@@ -676,7 +485,6 @@ Chandigarh]]></text>
 			</staticText>
 			<staticText>
 				<reportElement x="605" y="157" width="146" height="59" uuid="583dad8f-3531-47cb-b41d-98a94052f189"/>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
@@ -685,11 +493,7 @@ Municipal Corporation,
 Chandigarh]]></text>
 			</staticText>
 			<staticText>
-<<<<<<< HEAD
-				<reportElement positionType="Float" x="386" y="338" width="119" height="59" uuid="93195cee-1a0a-4554-920d-e72f4d15a537"/>
-=======
 				<reportElement positionType="Float" x="604" y="297" width="146" height="59" uuid="d6a1fe81-653c-46ff-8d0d-90450d03721e"/>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font size="9" isBold="false" isStrikeThrough="false" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
@@ -698,13 +502,6 @@ Municipal Corporation,
 Chandigarh]]></text>
 			</staticText>
 			<staticText>
-<<<<<<< HEAD
-				<reportElement positionType="FixRelativeToBottom" x="386" y="498" width="96" height="24" uuid="8341788f-b2fb-4cd2-b039-c7729e989f20"/>
-				<textElement textAlignment="Right" verticalAlignment="Bottom" markup="none">
-					<font size="9" pdfFontName="Times-Roman"/>
-				</textElement>
-				<text><![CDATA[1]]></text>
-=======
 				<reportElement positionType="Float" x="0" y="297" width="146" height="59" uuid="69bda2cd-b4c9-4178-975a-4200f9f67358"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font isBold="false" isStrikeThrough="false" pdfFontName="Helvetica-Bold" isPdfEmbedded="true"/>
@@ -1029,13 +826,7 @@ The Manager,
 				<textElement>
 					<font pdfFontName="Helvetica"/>
 				</textElement>
-				<text><![CDATA[Copies of the bill deduction vouchers are attached herewith for depositing the statutory liabilities with the respective authorities.]]></text>
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
 			</staticText>
 		</band>
 	</title>
 </jasperReport>
-<<<<<<< HEAD
-=======
-
->>>>>>> 2e0d528a86ea5a8be6301cbf7f4a5948a768254e
