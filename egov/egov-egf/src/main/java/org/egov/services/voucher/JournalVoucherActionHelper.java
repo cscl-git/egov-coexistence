@@ -153,13 +153,14 @@ public class JournalVoucherActionHelper {
             CVoucherHeader voucherHeader, VoucherTypeBean voucherTypeBean, WorkflowBean workflowBean, String totaldbamount)
             throws Exception {
         try {
+        	LOGGER.info("Inside edit");
             voucherHeader = voucherService.updateVoucherHeader(voucherHeader, voucherTypeBean);
-
+            LOGGER.info("after update");
             voucherService.deleteGLDetailByVHId(voucherHeader.getId());
             voucherHeader.getGeneralLedger().removeAll(voucherHeader.getGeneralLedger());
             final List<Transaxtion> transactions = voucherService.postInTransaction(billDetailslist, subLedgerlist,
                     voucherHeader);
-
+            LOGGER.info("1");
             Transaxtion txnList[] = new Transaxtion[transactions.size()];
             txnList = transactions.toArray(txnList);
             final SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
@@ -180,6 +181,7 @@ public class JournalVoucherActionHelper {
                 voucherHeader.setStatus(FinancialConstants.PREAPPROVEDVOUCHERSTATUS);
 
             }
+            LOGGER.info("2");
             voucherHeader = transitionWorkFlow(voucherHeader, workflowBean);
             voucherService.applyAuditing(voucherHeader.getState());
             voucherService.persist(voucherHeader);

@@ -1132,8 +1132,16 @@ function updatetotalAmount(){
 
 function updatetotalAmounts(){
 	var totalamount = 0;
+	var inputAmount= 0;
 	for(var index=0;index<billDetailTableIndex;index++){
-		var inputAmount=Math.abs(parseFloat(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value));
+		if(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail') == null || document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value == '' )
+			{
+			inputAmount=0;
+			}
+		else
+			{
+			inputAmount=Math.abs(parseFloat(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value));
+			}
 		if(document.getElementById('billCreditDetailslist['+index+'].amounttype') !=null){
 			var amountType = document.getElementById('billCreditDetailslist['+index+'].amounttype').innerText;
 			if(amountType.toLowerCase()=='credit'){

@@ -484,7 +484,13 @@ public class ChartOfAccounts {
 			if (voucherHeader.getVouchermis().getDepartmentcode() != null)
 				paramMap.put("deptid", voucherHeader.getVouchermis().getDepartmentcode());
 			if (txnObj.functionId != null && !txnObj.functionId.equals(""))
+			{
 				paramMap.put("functionid", Long.valueOf(txnObj.functionId));
+			}
+			else if(voucherHeader.getVouchermis() != null && voucherHeader.getVouchermis().getFunction() != null)
+			{
+				paramMap.put("functionid", voucherHeader.getVouchermis().getFunction().getId());
+			}
 			if (voucherHeader.getVouchermis().getFunctionary() != null)
 				paramMap.put("functionaryid", voucherHeader.getVouchermis().getFunctionary().getId());
 			if (voucherHeader.getVouchermis().getSchemeid() != null)

@@ -283,7 +283,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_RTGS, "RTGS");
         modeOfCollectionMap.put(FinancialConstants.MODEOFPAYMENT_PEX, "PEX");
         this.setPartialPayment("deduction");
-        setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_CASH);
+        setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_PEX);
         System.out.println("3");
     }
 
