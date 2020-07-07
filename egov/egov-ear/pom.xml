@@ -245,6 +245,11 @@
                             <artifactId>egov-councilweb</artifactId>
                             <contextRoot>/services/council</contextRoot>
                         </webModule>
+                        <webModule>
+                            <groupId>org.egov</groupId>
+                            <artifactId>egov-worksweb</artifactId>
+                            <contextRoot>/services/works</contextRoot>
+                        </webModule>
                  	      <webModule>
                             <groupId>org.egov</groupId>
                             <artifactId>egov-collectionweb</artifactId>

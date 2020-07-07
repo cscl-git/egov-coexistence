@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 public class TestController {
 	
 	
-	@RequestMapping(value = "/create}", method = RequestMethod.GET)
+	@RequestMapping(value = "/create}", method = RequestMethod.POST)
 	public String showNewFormGet(final Model model,
 			HttpServletRequest request) {
 		
