@@ -1,7 +1,6 @@
 <%@ tag body-content="empty" isELIgnored="false" pageEncoding="UTF-8" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn" %>
 <%--
   ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
   ~    accountability and the service delivery of the government  organizations.
@@ -55,10 +54,10 @@
         <div class="container-fluid">
             <div class="navbar-header col-md-10 col-xs-10">
                 <a class="navbar-brand" href="javascript:void(0);">
-                    <img src="<c:url value='/downloadfile/logo' context='/services/egi'/>" height="60">
+                    <img src="<c:url value='/downloadfile/logo' context='/egi'/>" height="60">
                     <div>
 						<span class="title2">
-						  Financial Management
+						  Works Management System
 						</span>
 
                     </div>
@@ -68,7 +67,9 @@
             <div class="nav-right-menu col-md-2 col-xs-2">
                 <ul class="hr-menu text-right">
                     <li class="ico-menu">
-                        
+                        <a href="http://www.egovernments.org" target="_blank">
+                            <img src="<cdn:url value='/resources/global/images/logo@2x.png' context='/egi'/>" title="Powered by eGovernments" height="20px">
+                        </a>
                     </li>
 
                 </ul>
@@ -77,6 +78,3 @@
         </div>
     </nav>
 </header>
-
-	
- 
