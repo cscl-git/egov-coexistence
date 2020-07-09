@@ -67,22 +67,38 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.audit.autonumber.AuditNumberGenerator;
 import org.egov.audit.entity.AuditCheckList;
 import org.egov.audit.entity.AuditChecklistHistory;
 import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.entity.AuditPostBillMpng;
 import org.egov.audit.model.AuditDetail;
+import org.egov.audit.model.PostAuditResult;
+import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditService;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
+import org.egov.commons.Fund;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.commons.service.FundService;
+import org.egov.egf.autonumber.VouchernumberGenerator;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.persistence.entity.AbstractAuditable;
+import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
+import org.egov.pims.commons.Position;
+import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -128,6 +144,30 @@ public class CreateAuditController extends GenericWorkFlowController {
 	
 	@Autowired
 	private AuditUtils auditUtils;
+	
+	@Autowired
+    private FundService fundService;
+	
+	@Autowired
+	@Qualifier("persistenceService")
+	private PersistenceService persistenceService;
+	 
+	private List<PostAuditResult>  resultSearchList = null;
+	
+	@Autowired
+    private SecurityUtils securityUtils;
+	
+	@Autowired
+    private ExpenseBillService expenseBillService;
+	
+	@Autowired
+	private AutonumberServiceBeanResolver beanResolver;
+	
+	@Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+	
+	@Autowired
+	private AuditRepository auditRepository;
 
 	
 	@RequestMapping(value = "/create/{auditId}", method = RequestMethod.GET)
@@ -453,28 +493,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		this.checkList = checkList;
 	}
 
-	/*
-	 * @RequestMapping(value = "/success", method = RequestMethod.GET) public String
-	 * showSuccessPage(@RequestParam("auditNumber") final String auditNumber, final
-	 * Model model, final HttpServletRequest request) { final String[] keyNameArray
-	 * = request.getParameter("approverDetails").split(","); Long id = 0L; String
-	 * approverName = ""; String nextDesign = ""; if (keyNameArray.length != 0 &&
-	 * keyNameArray.length > 0) if (keyNameArray.length == 1) id =
-	 * Long.parseLong(keyNameArray[0].trim()); else if (keyNameArray.length == 3) {
-	 * id = Long.parseLong(keyNameArray[0].trim()); approverName = keyNameArray[1];
-	 * } else { id = Long.parseLong(keyNameArray[0].trim()); approverName =
-	 * keyNameArray[1]; } if (id != null) model.addAttribute("approverName",
-	 * approverName);
-	 * 
-	 * final AuditDetails auditDetails = auditService.getByAudit_no(auditNumber);
-	 * 
-	 * final String message = getMessageByStatus(auditDetails, approverName,
-	 * nextDesign);
-	 * 
-	 * model.addAttribute("message", message);
-	 * 
-	 * return "audit-success"; }
-	 */
+	
 
 	private String getMessageByStatus(String workflowAction,AuditDetails audit) {
 		String message = "";
@@ -497,6 +516,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		else if(workflowAction.equalsIgnoreCase("approve"))
 		{
 			message="Audit No : "+audit.getAuditno()+" is approved";
+		}
+		else if(workflowAction.equalsIgnoreCase("post-audit-initiate"))
+		{
+			message="Selected Bills have been sent to Audit Branch for Post-Audit processing";
 		}
 		
 
@@ -532,6 +555,148 @@ public class CreateAuditController extends GenericWorkFlowController {
 		model.addAttribute("checkListDesc", checkListDesc);
 		
 			return "history";
+	}
+	
+	@RequestMapping(value = "/post/bill", method = RequestMethod.POST)
+	public String showPostBill(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			HttpServletRequest request) {
+		LOGGER.info("Post");
+		model.addAttribute("fundList",populateFundList());
+		model.addAttribute("auditDetail", auditDetail);
+		return "postAudit";
+	}
+	
+	private List<Fund> populateFundList()
+	{
+		List<Fund> fundList=new ArrayList<Fund>();
+		Fund fund=new Fund();
+		fund.setId(-1);
+		fund.setName("--Select--");
+		fundList.add(fund);
+		fundList.addAll(fundService.getByIsActive(true));
+		
+		return fundList;
+	}
+	
+	@RequestMapping(value = "/post/search",params="search",method = RequestMethod.POST)
+	public String search(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			final BindingResult resultBinder, 
+			final HttpServletRequest request) throws IOException {
+		LOGGER.info("Search");
+		final StringBuffer query = new StringBuffer(500);
+        query
+        .append(
+                "select br.expendituretype , br.billtype ,br.billnumber , br.billdate , br.billamount , br.passedamount ,egwstatus.description,billmis.sourcePath,")
+                .append(" br.id ,br.status.id,egwstatus.description ,br.state.id,br.lastModifiedBy.id ")
+                .append(
+                        " from EgBillregister br, EgBillregistermis billmis , EgwStatus egwstatus where   billmis.egBillregister.id = br.id and egwstatus.id = br.status.id  ")
+                        .append(" and br.expendituretype=? and egwstatus.code = 'Bill Payment Approved' ").append(
+                        		auditUtils
+                                .getBillDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
+                                .append(auditUtils.getBillMisQuery(auditDetail));
+        LOGGER.info("Query :: "+query.toString());
+        final List<Object[]> list = persistenceService.findAllBy(query.toString(),
+        		auditDetail.getExpenditureType());
+        PostAuditResult result = null;
+        if (list.size() != 0) {
+        	resultSearchList = new ArrayList<PostAuditResult>();
+
+            for (final Object[] object : list) {
+            	result = new PostAuditResult();
+            	result.setExpendituretype(object[0].toString());
+                String billtype = "";
+                if (object[1] != null)
+                    billtype = object[1].toString();
+                result.setBilltype(billtype);
+                result.setBillnumber(object[2].toString());
+                result.setBilldate(object[3].toString());
+                result.setBillamount(object[4].toString());
+                result.setPassedamount(object[5].toString());
+                result.setBillstatus(object[6].toString());
+                if (null != object[7])
+                	result.setSourcepath(object[7].toString());
+                else
+                	result.setSourcepath("/services/EGF/bill/billView-view.action?billId=" + object[8].toString());
+                resultSearchList.add(result);
+            }
+        }
+        auditDetail.setPostAuditResultList(resultSearchList);
+		model.addAttribute("fundList",populateFundList());
+		model.addAttribute("auditDetail", auditDetail);
+		return "postAudit";
+		
+	}
+	
+	@RequestMapping(value = "/post/search",params="save",method = RequestMethod.POST)
+	public String save(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			final BindingResult resultBinder, 
+			final HttpServletRequest request) throws IOException {
+		LOGGER.info("Save");
+		populateauditWorkFlow(auditDetail);
+		final String message = getMessageByStatus("post-audit-initiate",null);
+		model.addAttribute("message", message);
+
+		return "audit-success";
+		
+	}
+	
+	private void populateauditWorkFlow(AuditDetail auditDetail) {
+    	AuditDetails audit=new AuditDetails();
+    	final User user = securityUtils.getCurrentUser();
+    	List<AuditPostBillMpng> postBillMpngList=new ArrayList<AuditPostBillMpng>();
+    	AuditPostBillMpng postBillMpng=null;
+    	EgBillregister bill = null;
+    	String deptCode= "";
+    	for(PostAuditResult result : auditDetail.getPostAuditResultList())
+    	{
+    		if(result.getChecked())
+    		{	
+    			postBillMpng = new AuditPostBillMpng();
+    			 bill = expenseBillService.getByBillnumber(result.getBillnumber());
+    			 deptCode=bill.getEgBillregistermis().getDepartmentcode();
+    			postBillMpng.setEgBillregister(bill);
+    			postBillMpng.setAuditDetails(audit);
+    			applyAuditing(postBillMpng);
+    			postBillMpngList.add(postBillMpng);
+    		}
+    	}
+    	List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + deptCode);
+    	Position owenrPos = new Position();
+    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+    	{
+    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+    	}
+    	else
+    	{
+    		owenrPos.setId(null);
+    	}
+    	AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
+
+		final String postAuditNumber = v.getNextPostAuditNumber(deptCode);
+    	audit.setAuditno(postAuditNumber);
+    	audit.setType("Post-Audit");
+    	audit.setEgBillregister(null);
+    	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode("Audit", "Created"));
+    	audit.setPostBillMpng(postBillMpngList);
+    	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
+        .withComments("Initiated Post-Audit")
+        .withStateValue("Created").withDateInfo(new Date()).withOwner(owenrPos)
+        .withNextAction("Post Audit pending")
+        .withNatureOfTask("Post-Audit")
+        .withCreatedBy(user.getId())
+        .withtLastModifiedBy(user.getId());
+    	 applyAuditing(audit);
+    	 auditRepository.save(audit);
+    	 
+    	 for(AuditPostBillMpng row:postBillMpngList)
+    	 {
+    		 bill = expenseBillService.getById(row.getEgBillregister().getId());
+    		 bill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Pending with Post-Audit"));
+    		 expenseBillService.create(bill);
+    	 }
+		persistenceService.getSession().flush();
+		
 	}
 
 }

@@ -2,6 +2,7 @@ package org.egov.audit.utils;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -10,8 +11,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+import org.egov.audit.model.AuditDetail;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
@@ -21,7 +25,6 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.model.bills.DocumentUpload;
-import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -31,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class AuditUtils {
 	
+	private static final Logger LOGGER = Logger.getLogger(AuditUtils.class);
 	@Autowired
     private FileStoreService fileStoreService;
 	@Autowired
@@ -131,5 +135,45 @@ public class AuditUtils {
         }
         return historyTable;
     }
+	
+	public  String getBillDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" and br.billdate>='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateFrom))
+						.append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and br.billdate<='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateTo))
+						.append("'");
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing search instrument query");
+		}
+		return numDateQuery.toString();
+	}
+	
+	public String getBillMisQuery(final AuditDetail auditDetail) {
+
+		final StringBuffer misQuery = new StringBuffer(300);
+		EmployeeInfo ownerobj = null;
+		if (null != auditDetail) {
+			ownerobj= microserviceUtils.getEmployee(ApplicationThreadLocals.getUserId(), null, null, null).get(0);
+			Department department=microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+			if ( auditDetail.getFund() > 0)
+			{
+				misQuery.append(" and billmis.fund.id=")
+						.append(auditDetail.getFund());
+			}		
+			if (null != department.getCode() && !department.getCode().equals("-1")) {
+				misQuery.append(" and billmis.departmentcode='");
+				misQuery.append(department.getCode()+"'");
+			}
+		}
+		return misQuery.toString();
+
+	}
 
 }
