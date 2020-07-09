@@ -1026,7 +1026,7 @@ function calcualteNetpaybleAmount(){
 
 		if (null != document.getElementById("tempCreditDetails[" + count
 				+ "].rate") && document.getElementById("tempCreditDetails[" + count
-						+ "].rate") != 0) {
+						+ "].rate").value != 0) {
 			var val = document.getElementById("tempCreditDetails[" + count
 					+ "].rate").value;
 			if (val != "" && !isNaN(val)) {

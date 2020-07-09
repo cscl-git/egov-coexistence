@@ -207,7 +207,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_DIRECTBANK);
         modeOfPaymentMap = new LinkedHashMap<String, String>();
         modeOfPaymentMap.put(MDP_CHEQUE, getText(MDP_CHEQUE));
-//        modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
+        modeOfPaymentMap.put(MDP_CASH, getText(MDP_CASH));
         modeOfPaymentMap.put(MDP_RTGS, getText(MDP_RTGS));
         modeOfPaymentMap.put(MDP_PEX, getText(MDP_PEX));
 
@@ -902,7 +902,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.rejected", new String[] { this.getEmployeeName(paymentheader.getState()
-                    .getOwnerPosition()) }));
+                    .getInitiatorPosition()) }));
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("payment.voucher.approved", new String[] { this.getEmployeeName(paymentheader.getState()
                     .getOwnerPosition()) }));

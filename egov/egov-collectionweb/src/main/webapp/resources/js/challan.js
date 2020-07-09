@@ -987,10 +987,10 @@ function fillNeibrAfterSplitGlcode(obj)
 		document.getElementById('billDetailslist['+currRow+'].glcodeIdDetail').value=temp[2];
 		document.getElementById('billDetailslist['+currRow+'].glcodeDetail').value=temp[1];
 		check();
-		if(obj.value.includes("GST"))
+		/*if(obj.value.includes("GST"))
 		{
 		document.getElementById('billDetailslist['+currRow+'].rateDetail').style.visibility="visible";
-		}
+		}*/
 	}
 	else if(glcodeId==null || glcodeId=="")
 	{
@@ -1492,7 +1492,7 @@ function  populateService(serviceCategory){
 	populateserviceId({serviceCatId:serviceCategory.options[serviceCategory.selectedIndex].value});	
 }
 
-function loadFinDetails(service){
+/*function loadFinDetails(service){
 
 	var dept = dom.get('deptId').value;
 	var service = dom.get('serviceId').value;
@@ -1510,6 +1510,41 @@ function loadFinDetails(service){
 	var url3 = path+"/receipts/ajaxReceiptCreate-ajaxFinSubledgerByService.action";
 	makeJSONCall(["subledgerCode","glcodeId","detailTypeId","detailTypeName","detailCode","detailKeyId",
 	"detailKey","amount"],url3,{serviceId:service,deptId:dept},loadFinSubledgerSuccessHandler,loadFinSubledgerFailureHandler);
+}*/
+function loadFinDetails(service) {
+
+	var serviceCategory = dom.get('serviceCategoryid').value;
+	var service = dom.get('serviceId') != null ? dom.get('serviceId').value : -1;
+	var selectedService = dom.get('serviceId');
+	var path = '/services/collection';
+//	if (service != "-1" || dept != "-1") {
+//		var url1 = path
+//				+ "/receipts/ajaxReceiptCreate-ajaxFinMiscDtlsByService.action?serviceId="
+//				+ service + "&deptId=" + dept;
+//		var transaction = YAHOO.util.Connect.asyncRequest('POST', url1,
+//				loadMiscDetails, null);
+//	}
+
+	if (serviceCategory != -1 || service != "-1") {
+		service = service != -1 ? serviceCategory+"."+service : serviceCategory;
+		var url2 = path
+				+ "/receipts/ajaxReceiptCreate-ajaxTaxHeadMasterByService.action";
+		makeJSONCall([ "glcodeIdDetail", "accounthead",
+				"creditAmountDetail","amountType" ], url2, {
+			serviceId : service
+		}, loadFinAccSuccessHandler, loadFinAccFailureHandler);
+	}
+
+//	if (service != "-1" || dept != "-1") {
+//		var url3 = path
+//				+ "/receipts/ajaxReceiptCreate-ajaxFinSubledgerByService.action";
+//		makeJSONCall([ "subledgerCode", "glcodeId", "detailTypeId",
+//				"detailTypeName", "detailCode", "detailKeyId", "detailKey",
+//				"amount" ], url3, {
+//			serviceId : service,
+//			deptId : dept
+//		}, loadFinSubledgerSuccessHandler, loadFinSubledgerFailureHandler);
+//	}
 }
 
 var miscArray;
@@ -1638,7 +1673,7 @@ billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
 updateGrid(VOUCHERDETAILLIST,'creditAmountDetail',0,0);
 totalcramt = 0;          
 billDetailTableIndex = 1;
-for(i=0;i<res.results.length-1;i++){
+for(i=0;i<res.results.length;i++){
 	 billDetailsTable.addRow({SlNo:billDetailsTable.getRecordSet().getLength()+1,
             "glcodeid":res.results[i].glcodeIdDetail,
             "glcode":res.results[i].glcodeDetail,

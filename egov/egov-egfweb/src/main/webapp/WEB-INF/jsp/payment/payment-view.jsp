@@ -357,12 +357,12 @@ function openVoucher(vid)
 													</span>
 												</div>
 												<!-- <div class="tabbertab" id="viewtab"> -->
-													<h2>Cheque Details</h2>
+													<h3>Payment Details</h3>
 													<span>
 														<table align="center" border="0" cellpadding="0"
 															cellspacing="0" class="newtable">
 															<tr>
-																<td colspan="6"><div class="subheadsmallnew">Cheque
+																<td colspan="6"><div class="subheadsmallnew">Payment
 																		Details</div></td>
 															</tr>
 															<tr>
@@ -378,17 +378,25 @@ function openVoucher(vid)
 																					<th class="bluebgheadtdnew">Cheque Date
 																					</td>
 																				</s:if>
-																				<s:else>
+																				<s:if
+																					test="%{paymentheader.type == 'pex' || paymentheader.type == 'PEX' || paymentheader.type == 'Pex'}">
+																					<th class="bluebgheadtdnew">PEX Number
+																					</td>
+																					<th class="bluebgheadtdnew">PEX Date
+																					</td>
+																				</s:if>
+																				<s:if
+																					test="%{paymentheader.type == 'rtgs' || paymentheader.type == 'RTGS' || paymentheader.type == 'Rtgs' paymentheader.type == 'advice'}">
 																					<th class="bluebgheadtdnew">RTGS Number
 																					</td>
 																					<th class="bluebgheadtdnew">RTGS Date
 																					</td>
-																				</s:else>
+																				</s:if>
 																				<th class="bluebgheadtdnew">Party Code
 																				</td>
-																				<th class="bluebgheadtdnew">Cheque Amount(Rs)
+																				<th class="bluebgheadtdnew"> Amount(Rs)
 																				</td>
-																				<th class="bluebgheadtdnew">Cheque Status
+																				<th class="bluebgheadtdnew"> Status
 																				</td>
 																			</tr>
 																			<s:if test="%{instrumentHeaderList.size>0}">
@@ -429,8 +437,7 @@ function openVoucher(vid)
 																		</table>
 																		<s:if
 																			test="%{instrumentHeaderList==null || instrumentHeaderList.size==0}">
-																			<div class="bottom" align="center">No Cheque
-																				Details Found !</div>
+																			<div class="bottom" align="center">No Details Found !</div>
 																		</s:if>
 																	</div>
 																</td>

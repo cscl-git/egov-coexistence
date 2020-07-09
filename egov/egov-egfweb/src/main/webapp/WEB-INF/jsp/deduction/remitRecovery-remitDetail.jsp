@@ -205,6 +205,11 @@ function populateUser(){
 		   {
 		   document.getElementById('lblError').innerHTML='<s:text name="msg.please.select.bank.account.number"/>';
 		   return false;
+		   }
+		   if(document.getElementById('narration') == null || document.getElementById('narration').value == '')
+		   {
+			   document.getElementById('lblError').innerHTML='<s:text name="msg.payment.narration.mandatory"/>';
+			   return false;
 		   } 
 		  
 			return true;
@@ -431,7 +436,7 @@ else{
 																</tr>
 																<tr>
 																	<td class="greybox">&nbsp;</td>
-																	<td class="greybox"><s:text name="lbl.narration"/> </td>
+																	<td class="greybox"><s:text name="lbl.narration"/><span class="mandatory1">*</span> </td>
 																	<td class="greybox" colspan="4"><textarea
 																			name="description" id="narration" type="text"
 																			style="width: 580px;"></textarea></td>

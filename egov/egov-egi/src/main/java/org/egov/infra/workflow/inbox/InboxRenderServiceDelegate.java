@@ -229,7 +229,6 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     			&& WORKFLOW_MODULE_AUDIT_TYPES.contains(type)) {
     		return true;
     	}
-    	
     	return false;
     }
 

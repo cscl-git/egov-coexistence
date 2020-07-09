@@ -224,7 +224,7 @@ loadFinAccSuccessHandler = function(req, res) {
 	updateGridMisc(VOUCHERCREDITDETAILLIST, 'creditAmountDetail', 0, "0");
 	totalcramt = "0";
 	billDetailTableIndex = 1;
-	for (i = 0; i < res.results.length - 1; i++) {
+	for (i = 0; i < res.results.length ; i++) {
 		billCreditDetailsTable.addRow({
 			SlNo : billCreditDetailsTable.getRecordSet().getLength() + 1,
 			"glcodeid" : res.results[i].glcodeIdDetail,
@@ -251,10 +251,7 @@ loadFinAccSuccessHandler = function(req, res) {
 				amounttype);
 		updateSpanMisc(VOUCHERCREDITDETAILLIST, 'creditAmountDetailamountTypeLabel', i,
 				amountTypeSign);
-		if(res.results[i].accounthead.includes("GST"))
-    	{
-    		document.getElementById("billCreditDetailslist.["+i+"].rate").style.visibility='visible';
-    	}
+		
 		totalcramt = parseFloat(totalcramt)
 				+ parseFloat(res.results[i].creditAmountDetail);
 		if (totalcramt > 0) {

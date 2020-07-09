@@ -244,11 +244,11 @@ th.bluebgheadtd {
 				<s:submit key="<s:text name='lbl.submit'/>"  method="printBalanceSheetReport"
 					cssClass="buttonsubmit" onclick="return balanceSheetReportSubmit()" />
 				<input name="button" type="button" class="buttonsubmit" id="button3"
-					value="<s:text name='lbl.print'/>" onclick="window.print()" />&nbsp;&nbsp;  <input
+					value="<s:text name='lbl.print'/>" onclick="window.print()" /> <input
 					type="button" value="<s:text name='lbl.view.all.minor.schedules'/>" class="buttonsubmit" method="generateScheduleReport"
-					onclick="return showAllSchedules()" /> &nbsp;&nbsp; <input
+					onclick="return showAllSchedules()" style="width:170px;"/> <input
 					type="button" value="<s:text name='lbl.view.all.schedules'/>" class="buttonsubmit" method="generateScheduleReportDetailed"
-					onclick="return showAllSchedulesDetailed()" /> &nbsp;&nbsp;
+					onclick="return showAllSchedulesDetailed()" />
 
 
 			</div>

@@ -76,7 +76,7 @@ public class LocalDiskFileStoreServiceTest {
     private static Path tempFilePath = Paths.get(System.getProperty("user.home") + File.separator + "testtmpr");
     private LocalDiskFileStoreService diskFileService;
 
-    @AfterClass
+    //@AfterClass
     public static void afterTest() throws IOException {
         Files.deleteIfExists(tempFilePath);
         Path storePath = Paths.get(System.getProperty("user.home") + File.separator + "testfilestore");
@@ -159,7 +159,7 @@ public class LocalDiskFileStoreServiceTest {
         }
     }
 
-    @Test
+    //@Test
     public final void testUploadStreams() throws IOException {
         Set<InputStream> files = new HashSet<>();
         for (int no = 0; no < 10; no++) {

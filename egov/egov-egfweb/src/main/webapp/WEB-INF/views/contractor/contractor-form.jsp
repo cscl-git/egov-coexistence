@@ -108,17 +108,15 @@
 </div>
 
 <div class="form-group">
-	<label class="col-sm-2 control-label text-right" for="tinNumber"> <spring:message code="contractor.tinNo" text='GST/TIN No'/><span class="mandatory"></span> 
+	<label class="col-sm-2 control-label text-right" for="tinNumber"> <spring:message code="contractor.tinNo" text='GST/TIN No'/> 
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="tinNumber" id="tinNumber" minlength="15" maxlength="15" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
-		<form:errors path="tinNumber" cssClass="add-margin error-msg" />
+		<form:input path="tinNumber" id="tinNumber" minlength="15" maxlength="15" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
 	</div>
-	<label class="col-sm-2 control-label text-right" for="gstRegisteredState"> <spring:message code="contractor.gst.registered.state" text='GST registered State/UT'/><span class="mandatory"></span> 
+	<label class="col-sm-2 control-label text-right" for="gstRegisteredState"> <spring:message code="contractor.gst.registered.state" text='GST registered State/UT'/> 
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="gstRegisteredState" maxlength="250" id="gstRegisteredState" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
-		<form:errors path="gstRegisteredState" cssClass="add-margin error-msg" />
+		<form:input path="gstRegisteredState" maxlength="250" id="gstRegisteredState" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
 	</div>
 </div>
 
