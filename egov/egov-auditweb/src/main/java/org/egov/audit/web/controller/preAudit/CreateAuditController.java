@@ -52,9 +52,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -65,13 +62,12 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
-import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.audit.autonumber.AuditNumberGenerator;
 import org.egov.audit.entity.AuditCheckList;
 import org.egov.audit.entity.AuditChecklistHistory;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.entity.AuditPostBillMpng;
+import org.egov.audit.model.AuditBillDetails;
 import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.PostAuditResult;
 import org.egov.audit.repository.AuditRepository;
@@ -81,7 +77,6 @@ import org.egov.audit.utils.AuditUtils;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.FundService;
-import org.egov.egf.autonumber.VouchernumberGenerator;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
@@ -90,14 +85,15 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
-import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.Miscbilldetail;
 import org.egov.pims.commons.Position;
+import org.egov.services.payment.MiscbilldetailService;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -154,6 +150,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 	 
 	private List<PostAuditResult>  resultSearchList = null;
 	
+	private List<AuditDetails>  resultsDtlsList = null;
+	
 	@Autowired
     private SecurityUtils securityUtils;
 	
@@ -168,6 +166,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 	
 	@Autowired
 	private AuditRepository auditRepository;
+	
+	@Autowired
+    @Qualifier("miscbilldetailService")
+    private MiscbilldetailService miscbilldetailService;
 
 	
 	@RequestMapping(value = "/create/{auditId}", method = RequestMethod.GET)
@@ -177,17 +179,50 @@ public class CreateAuditController extends GenericWorkFlowController {
 		AuditCheckList checklistDetail = null;
 		List<AppConfigValues> appConfigValuesList =null;
 		checkList=new ArrayList<AuditCheckList>();
+		List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
+		AuditBillDetails billDetails=null;
 		AuditDetails auditDetails = auditService.getById(Long.parseLong(auditId));
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("auditDetails",Long.valueOf(auditId));
 		auditDetail.setDocumentDetail(documents);
 		auditDetail.setAuditNumber(auditDetails.getAuditno());
 		auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
 		auditDetail.setAuditType(auditDetails.getType());
-		EgBillregister bill = auditDetails.getEgBillregister();
+		EgBillregister bill = null;
 		auditDetail.setAuditId(Long.parseLong(auditId));
-		auditDetail.setBillId(bill.getId());
 		auditDetail.setAuditStatus(auditDetails.getStatus().getCode());
-		model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+		List<AuditPostBillMpng> billDetailsMpngLIst=null;
+		if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
+		{
+			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+			bill = auditDetails.getEgBillregister();
+			auditDetail.setBillId(bill.getId());
+		}
+		else
+		{
+			billDetailsMpngLIst=auditDetails.getPostBillMpng();
+			bill = billDetailsMpngLIst.get(0).getEgBillregister();
+			for(AuditPostBillMpng row : billDetailsMpngLIst)
+			{
+				List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
+	                    " from Miscbilldetail where billnumber = ? ",
+	                    row.getEgBillregister().getBillnumber());
+		        if (miscBillList.size() != 0) {
+
+		            for (Miscbilldetail misc : miscBillList) {
+		            	billDetails =new AuditBillDetails();
+		            	billDetails.setBillId(row.getEgBillregister().getId());
+		            	billDetails.setBillNumber(row.getEgBillregister().getBillnumber());
+		            	billDetails.setVoucherId(misc.getBillVoucherHeader().getId());
+		            	billDetails.setVoucherNumber(misc.getBillVoucherHeader().getVoucherNumber());
+		            	billDetails.setPaymentVoucherId(misc.getPayVoucherHeader().getId());
+		            	billDetails.setPaymentVoucherNumber(misc.getPayVoucherHeader().getVoucherNumber());
+		            	auditBillDetails.add(billDetails);
+		            }
+		        }
+			}
+			auditDetail.setAuditBillDetails(auditBillDetails);
+			
+		}
 		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Created") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Auditor") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Section Officer") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Examiner"))
 		{
 				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
@@ -698,5 +733,132 @@ public class CreateAuditController extends GenericWorkFlowController {
 		persistenceService.getSession().flush();
 		
 	}
+	
+
+	@RequestMapping(value = "/post/auditSearch", method = RequestMethod.POST)
+	public String auditSearch(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			HttpServletRequest request) {
+		LOGGER.info("Audit Search");
+		model.addAttribute("auditDetail", auditDetail);
+		return "auditSearch";
+	}
+	
+	@RequestMapping(value = "/post/searchResult",params="search",method = RequestMethod.POST)
+	public String searchResult(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			final BindingResult resultBinder, 
+			final HttpServletRequest request) throws IOException {
+		LOGGER.info("Search");
+		final StringBuffer query = new StringBuffer(500);
+        query
+        .append(
+                "select ad.id,ad.type,ad.audit_sch_date,ad.status.description from AuditDetails ad where ad.type = ? ")
+                .append(auditUtils
+                                .getAuditDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
+                                .append(auditUtils.getAuditMisQuery(auditDetail));
+        LOGGER.info("Query :: "+query.toString());
+        final List<Object[]> list = persistenceService.findAllBy(query.toString(),
+        		auditDetail.getAuditType());
+        AuditDetails result = null;
+        if (list.size() != 0) {
+        	resultsDtlsList = new ArrayList<AuditDetails>();
+
+            for (final Object[] object : list) {
+            	result = new AuditDetails();
+            	result.setId(Long.parseLong(object[0].toString()));
+            	result.setType(object[1].toString());
+            	result.setSchdDate(object[2].toString());
+            	result.setStatusDescription(object[3].toString());
+            	resultsDtlsList.add(result);
+            }
+        }
+        auditDetail.setAuditSearchList(resultsDtlsList);
+		model.addAttribute("fundList",populateFundList());
+		model.addAttribute("auditDetail", auditDetail);
+		return "auditSearch";
+		
+	}
+	
+	@RequestMapping(value = "/view/{auditId}", method = RequestMethod.POST)
+	public String view(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			HttpServletRequest request, @PathVariable final String auditId) {
+		LOGGER.info("Test");
+		AuditCheckList checklistDetail = null;
+		List<AppConfigValues> appConfigValuesList =null;
+		checkList=new ArrayList<AuditCheckList>();
+		String mode="view";
+		List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
+		AuditBillDetails billDetails=null;
+		AuditDetails auditDetails = auditService.getById(Long.parseLong(auditId));
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("auditDetails",Long.valueOf(auditId));
+		auditDetail.setDocumentDetail(documents);
+		auditDetail.setAuditNumber(auditDetails.getAuditno());
+		auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
+		auditDetail.setAuditType(auditDetails.getType());
+		EgBillregister bill = null;
+		auditDetail.setAuditId(Long.parseLong(auditId));
+		auditDetail.setAuditStatus("Pending with Examiner");
+		List<AuditPostBillMpng> billDetailsMpngLIst=null;
+		if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
+		{
+			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+			bill = auditDetails.getEgBillregister();
+			auditDetail.setBillId(bill.getId());
+		}
+		else
+		{
+			billDetailsMpngLIst=auditDetails.getPostBillMpng();
+			bill = billDetailsMpngLIst.get(0).getEgBillregister();
+			for(AuditPostBillMpng row : billDetailsMpngLIst)
+			{
+				List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
+	                    " from Miscbilldetail where billnumber = ? ",
+	                    row.getEgBillregister().getBillnumber());
+		        if (miscBillList.size() != 0) {
+
+		            for (Miscbilldetail misc : miscBillList) {
+		            	billDetails =new AuditBillDetails();
+		            	billDetails.setBillId(row.getEgBillregister().getId());
+		            	billDetails.setBillNumber(row.getEgBillregister().getBillnumber());
+		            	billDetails.setVoucherId(misc.getBillVoucherHeader().getId());
+		            	billDetails.setVoucherNumber(misc.getBillVoucherHeader().getVoucherNumber());
+		            	billDetails.setPaymentVoucherId(misc.getPayVoucherHeader().getId());
+		            	billDetails.setPaymentVoucherNumber(misc.getPayVoucherHeader().getVoucherNumber());
+		            	auditBillDetails.add(billDetails);
+		            }
+		        }
+			}
+			auditDetail.setAuditBillDetails(auditBillDetails);
+			
+		}
+		if(mode.equals("view"))
+		{
+				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
+						"checklist_" + bill.getEgBillregistermis().getEgBillSubType().getName());
+				for (AppConfigValues value : appConfigValuesList) {
+					checklistDetail = new AuditCheckList();
+					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
+					{
+						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,value.getValue(),"ID"));
+						checklistDetail.setSeverity(getAuditCheckList(auditDetails,value.getValue(),"Sev"));
+						checklistDetail.setStatus(getAuditCheckList(auditDetails,value.getValue(),"Stat"));
+					}
+					else
+					{
+						checklistDetail.setCheckListId("0");
+					}
+					checklistDetail.setChecklist_description(value.getValue());
+					checkList.add(checklistDetail);
+				}
+				auditDetail.setCheckList(checkList);
+		}
+		model.addAttribute("mode","view");
+		model.addAttribute("workflowHistory",
+				auditUtils.getHistory(auditDetails.getState(), auditDetails.getStateHistory()));
+		model.addAttribute("auditDetail", auditDetail);
+		model.addAttribute(STATE_TYPE, auditDetails.getClass().getSimpleName());
+		return "create";
+	}
+
+	
 
 }

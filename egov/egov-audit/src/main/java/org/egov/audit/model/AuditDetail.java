@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Transient;
 
 import org.egov.audit.entity.AuditCheckList;
+import org.egov.audit.entity.AuditDetails;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.model.bills.DocumentUpload;
 
@@ -35,6 +36,8 @@ public class AuditDetail {
     private Date billTo;
     private List<PostAuditResult> postAuditResultList=new ArrayList<PostAuditResult>();
     private int counter = 0;
+    private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
+    private List<AuditDetails> auditSearchList= new ArrayList<AuditDetails>();
 	
 	private String notes;
 	public Date getAuditScheduledDate() {
@@ -180,6 +183,18 @@ public class AuditDetail {
 	}
 	public void setCounter(int counter) {
 		this.counter = counter;
+	}
+	public List<AuditBillDetails> getAuditBillDetails() {
+		return auditBillDetails;
+	}
+	public void setAuditBillDetails(List<AuditBillDetails> auditBillDetails) {
+		this.auditBillDetails = auditBillDetails;
+	}
+	public List<AuditDetails> getAuditSearchList() {
+		return auditSearchList;
+	}
+	public void setAuditSearchList(List<AuditDetails> auditSearchList) {
+		this.auditSearchList = auditSearchList;
 	}
 	
 

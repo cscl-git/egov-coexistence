@@ -154,6 +154,24 @@ public class AuditUtils {
 		}
 		return numDateQuery.toString();
 	}
+	public  String getAuditDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" and ad.audit_sch_date>='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateFrom))
+						.append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and ad.audit_sch_date<='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateTo))
+						.append("'");
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing search instrument query");
+		}
+		return numDateQuery.toString();
+	}
 	
 	public String getBillMisQuery(final AuditDetail auditDetail) {
 
@@ -171,6 +189,21 @@ public class AuditUtils {
 				misQuery.append(" and billmis.departmentcode='");
 				misQuery.append(department.getCode()+"'");
 			}
+		}
+		return misQuery.toString();
+
+	}
+	
+	public String getAuditMisQuery(final AuditDetail auditDetail) {
+
+		final StringBuffer misQuery = new StringBuffer(300);
+		if (null != auditDetail) {
+			if ( auditDetail.getAuditNumber() != null)
+			{
+				misQuery.append(" and ad.auditno='")
+						.append(auditDetail.getAuditNumber()).append("'");
+			}		
+			
 		}
 		return misQuery.toString();
 

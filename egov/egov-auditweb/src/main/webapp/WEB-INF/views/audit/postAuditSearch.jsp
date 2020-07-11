@@ -67,19 +67,18 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
         <h3> Search Result</h3>
 	        <div class="panel panel-primary" data-collapsed="0">
 	        <form:hidden path="counter" id="counter" />
-	        	<div id="listid" style="display: block">
-				<table width="100%" align="center" cellpadding="0" cellspacing="0"
-					class="setborder" style="border-collapse: inherit;">
+	        <div style="padding: 0 15px;">
+				<table class="table table-bordered" id="searchResult">
 					<thead>
 					<tr>
-						<th class="bluebgheadtd"><s:text name="lbl.selectAll"/><input type="checkbox" id="selectAll" name="selectAll" onclick="checkAll(this)"></th>
-						<th class="bluebgheadtd"><s:text name="lbl.expenditure.type"/></th>
-						<th class="bluebgheadtd"><s:text name="lbl.bill.type"/></th>
-						<th class="bluebgheadtd"><s:text name="bill.search.billnumber"/></th>
-						<th class="bluebgheadtd"><s:text name="billDate"/></th>
-						<th class="bluebgheadtd"><s:text name="lbl.bill.amount"/></th>
-						<th class="bluebgheadtd"><s:text name="lbl.passed.amount"/></th>
-						<th class="bluebgheadtd"><s:text name="lbl.bill.status"/></th>
+						<th><spring:message code="lbl.selectAll" text="Select All"/><input type="checkbox" id="selectAll" name="selectAll" onclick="checkAll(this)"></th>
+						<th><spring:message code="lbl.expenditure.type" text="Expenditure Type"/></th>
+						<th><spring:message code="llbl.bill.type" text="Bill Type"/></th>
+						<th><spring:message code="bill.search.billnumber" text="Bill Number"/></th>
+						<th><spring:message code="lbl.bill.date" text="Bill Date"/></th>
+						<th><spring:message code="lbl.bill.amount" text="Bill Amount"/></th>
+						<th><spring:message code="lbl.passed.amount" text="Passed Amount"/></th>
+						<th><spring:message code="lbl.bill.status" text="Bill Status"/></th>
 					</tr>
 					</thead>
 `					 <c:if test="${auditDetail.postAuditResultList != null &&  !auditDetail.postAuditResultList.isEmpty()}">
@@ -126,7 +125,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 					No records found
 					</c:if>				
 				</table>
-			</div>
+				</div>
 			<br>
 			<br>
 			<c:if test="${auditDetail.postAuditResultList != null &&  !auditDetail.postAuditResultList.isEmpty()}">

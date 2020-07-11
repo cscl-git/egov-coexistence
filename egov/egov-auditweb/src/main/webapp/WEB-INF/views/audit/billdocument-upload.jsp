@@ -28,6 +28,7 @@
         </c:forEach>
     </c:if>
    <br>
+   <c:if test="${mode != 'view' }">
     <input type="hidden" value="${fn:length(auditDetail.documentDetail)}" id="documentsSize">
         <div>
             <table width="100%">
@@ -51,4 +52,5 @@
                         </tbody>
             </table>
         </div>
+        </c:if>
 </div>
