@@ -12,6 +12,7 @@ import org.egov.audit.entity.AuditPostBillMpng;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
@@ -69,6 +70,8 @@ public class AuditService {
 	private ExpenseBillService expenseBillService;
 	@Autowired
     private FinancialUtils financialUtils;
+	@Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
 
 	@Autowired
 	public AuditService(final ScriptService scriptExecutionService) {
