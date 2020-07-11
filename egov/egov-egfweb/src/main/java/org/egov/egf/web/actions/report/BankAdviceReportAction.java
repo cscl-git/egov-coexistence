@@ -79,6 +79,8 @@ import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -603,14 +605,68 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("instrumentType", "PEX");
         reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
         final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        LOGGER.info("Datasource Added");
+        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
         reportParams.put("totalAmount", totalAmount);
+        LOGGER.info("Jasper 1");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
+        LOGGER.info("Jasper 2");
         reportInput.setReportFormat(ReportFormat.PDF);
+        LOGGER.info("Jasper 3");
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+        LOGGER.info("Jasper 4");
         fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+        LOGGER.info("Jasper 5");
         final ReportOutput reportOutput = reportService.createReport(reportInput);
+        LOGGER.info("Jasper 6");
         if (reportOutput != null && reportOutput.getReportOutputData() != null)
             inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+        LOGGER.info("Jasper 7");
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
+
+        return "reportview";
+    }
+    
+    @ValidationErrorPage(NEW)
+    @Action(value = "/report/bankAdviceReport-exportPDFPex1")
+    public String exportPDFPex1() {
+    	try {
+    	preparePex();
+        final Map<String, Object> reportParams = new HashMap<String, Object>();
+        final StringBuffer letterContext = new StringBuffer();
+        letterContext
+                .append("             I request you to transfer the amount indicated below through PEX duly debiting from the")
+                .append("  Current Account No: ")
+                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+                .append("  under your bank to the following bank accounts:");
+        reportParams.put("bankName", getBankName(bank.getId()));
+        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+        reportParams.put("letterContext", letterContext.toString());
+        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "PEX");
+        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        LOGGER.info("Datasource Added");
+        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
+        reportParams.put("totalAmount", totalAmount);
+        LOGGER.info("Jasper 1");
+        final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
+        LOGGER.info("Jasper 2");
+        reportInput.setReportFormat(ReportFormat.PDF);
+        LOGGER.info("Jasper 3");
+        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+        LOGGER.info("Jasper 4");
+        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+        LOGGER.info("Jasper 5");
+        final ReportOutput reportOutput = reportService.createReport(reportInput);
+        LOGGER.info("Jasper 6");
+        if (reportOutput != null && reportOutput.getReportOutputData() != null)
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+        LOGGER.info("Jasper 7");
     	}
     	catch(Exception e) {
     		e.printStackTrace();
@@ -846,5 +902,9 @@ public class BankAdviceReportAction extends BaseFormAction {
 	public void setInstrumentType(String instrumentType) {
 		this.instrumentType = instrumentType;
 	}
+	
+	private static JRBeanCollectionDataSource getDataSource(List<BankAdviceReportInfo> subLedgerList) {
+        return new JRBeanCollectionDataSource(subLedgerList); 
+    }
 
 }

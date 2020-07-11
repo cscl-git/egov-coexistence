@@ -72,7 +72,7 @@ function resetPage(){
 				<td class="greybox" width="10%">Recovery Code:<span
 					class="mandatory1">*</span></td>
 				<td class="greybox"><s:select name="recovery" id="recovery"
-						list="dropdownData.recoveryList" listKey="id" listValue="type"
+						list="dropdownData.recoveryList" listKey="id" listValue="type+'-'+recoveryName"
 						headerKey="-1" headerValue="----Choose----" /></td>
 				<td class="greybox" width="10%">Fund:<span class="mandatory1">*</span></td>
 				<td class="greybox"><s:select name="fund" id="fund"

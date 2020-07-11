@@ -1356,13 +1356,13 @@ function disableSelectedRows()
 						<td colspan="2" class="modeofpayment"><strong><s:text
 									name="payment.mode" /><span class="mandatory1">*</span></strong> 
 							<input
-							name="paymentMode" id="paymentModecheque" checked="checked"
+							name="paymentMode" id="paymentModecheque" 
 							value="cheque" type="radio"><label
 							for="paymentModecheque"><s:text name="lbl.cheque"/> </label> 
 							<input name="paymentMode"
 							id="paymentModertgs" value="rtgs" type="radio"><label
 							for="paymentModertgs"><s:text name="lbl.rtgs"/></label>
-							<input name="paymentMode"
+							<input name="paymentMode" checked="checked"
 							id="paymentModepex" value="pex" type="radio"><label
 							for="paymentModepex">PEX</label></td>
 					</tr>

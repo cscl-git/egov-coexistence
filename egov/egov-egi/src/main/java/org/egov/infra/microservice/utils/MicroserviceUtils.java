@@ -1326,7 +1326,7 @@ public class MicroserviceUtils {
     }
 
     public void setExpire(String key) {
-        redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+        redisTemplate.expire(key, 90, TimeUnit.MINUTES);
     }
 
     public Object readFromRedis(String sessionId, String key) {
