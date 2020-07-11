@@ -117,7 +117,7 @@ public class UpdateExpenseBillController extends BaseBillController {
 
 	private static final String AUDIT2 = "Audit";
 
-	private static final String PRE = "Pre";
+	private static final String PRE = "Pre-Audit";
 
 	private static final String AUDIT001 = "Audit001";
 

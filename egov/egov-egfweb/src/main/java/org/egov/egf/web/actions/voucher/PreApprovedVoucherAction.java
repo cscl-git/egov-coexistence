@@ -1067,6 +1067,11 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                             Long.valueOf(gl.getFunctionId()))).getName());
                     temp.put("functionid", gl.getFunctionId());
                 }
+                else if (voucherHeader.getVouchermis() != null && voucherHeader.getVouchermis().getFunction() !=null && voucherHeader.getVouchermis().getFunction().getName() != null)
+                {
+                	temp.put(Constants.FUNCTION, voucherHeader.getVouchermis().getFunction().getName());
+                    temp.put("functionid", voucherHeader.getVouchermis().getFunction().getId());
+                }
                 coa = (CChartOfAccounts) getPersistenceService().find("from CChartOfAccounts where glcode=?",
                         gl.getGlcode());
                 temp.put("glcodeid", coa.getId());

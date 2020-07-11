@@ -226,6 +226,9 @@
                             <skip>false</skip>
                             <cleanDisabled>true</cleanDisabled>
                             <validateOnMigrate>${validateOnMigrate}</validateOnMigrate>
+                            <schemas>
+            					<schema>${chd-default-schema}</schema>
+        					</schemas>
                         </configuration>
                         <executions>
                             <execution>

@@ -227,7 +227,8 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         voucherHeader = preApprovedActionHelper.sendForApproval(voucherHeader, workflowBean);
         if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
             addActionMessage(getText("pjv.voucher.approved",
-                    new String[] { voucherService.getEmployeeNameForPositionId(voucherHeader.getState().getOwnerPosition()) }));
+                    new String[] {this.getEmployeeName(voucherHeader.getState()
+                            .getOwnerPosition())}));
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
             addActionMessage(getText("billVoucher.file.canceled"));
             if (!"JVGeneral".equalsIgnoreCase(voucherHeader.getName()))
@@ -268,8 +269,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     @SuppressWarnings("deprecation")
     @Action(value = "/voucher/journalVoucherModify-update")
     public String update() {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("JournalVoucherModifyAction | updateVoucher | Start");
+            LOGGER.info("JournalVoucherModifyAction | updateVoucher | Start");
         target = "";
         loadSchemeSubscheme();
 
@@ -277,6 +277,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
         if (voucherHeader.getId() == null)
             voucherHeader.setId(Long.valueOf(parameters.get(VHID)[0]));
         validateBeforeEdit(voucherHeader);
+        LOGGER.info("Validate");
         CVoucherHeader oldVh = voucherHeader;
         populateWorkflowBean();
         if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -290,9 +291,10 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
 
         removeEmptyRowsAccoutDetail(billDetailslist);
         removeEmptyRowsSubledger(subLedgerlist);
-
+        LOGGER.info("before Submit");
         try {
             if (!validateData(billDetailslist, subLedgerlist)) {
+            	LOGGER.info("edit");
                 voucherHeader = journalVoucherActionHelper.editVoucher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean, parameters.get("totaldbamount")[0]);
                 target = "success";
@@ -309,11 +311,12 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                 resetVoucherHeader();
 
             if (FinancialConstants.BUTTONFORWARD.equalsIgnoreCase(workflowBean.getWorkFlowAction())){
-                EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
                 addActionMessage(getText("pjv.voucher.approved",
-                        new String[] { employee != null ? employee.getUser().getName() : "" }));
+                        new String[] { this.getEmployeeName(voucherHeader.getState()
+                                .getOwnerPosition()) }));
             }
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             resetVoucherHeader();
             voucherHeader = oldVh;
             setOneFunctionCenterValue();
@@ -323,6 +326,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
             throw new ValidationException(errors);
         } catch (final Exception e) {
+        	e.printStackTrace();
             resetVoucherHeader();
             voucherHeader = oldVh;
             setOneFunctionCenterValue();
@@ -599,4 +603,9 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     public void setWorkflowBean(WorkflowBean workflowBean) {
         this.workflowBean = workflowBean;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

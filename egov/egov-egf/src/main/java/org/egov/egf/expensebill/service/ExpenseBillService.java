@@ -494,7 +494,6 @@ public class ExpenseBillService {
                 	}
                     
                 }
-                	
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
