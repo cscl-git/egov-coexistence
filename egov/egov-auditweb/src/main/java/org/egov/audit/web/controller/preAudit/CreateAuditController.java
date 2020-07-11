@@ -193,9 +193,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AuditPostBillMpng> billDetailsMpngLIst=null;
 		if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
 		{
-			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
 			bill = auditDetails.getEgBillregister();
 			auditDetail.setBillId(bill.getId());
+			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
 		}
 		else
 		{
@@ -751,7 +751,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		final StringBuffer query = new StringBuffer(500);
         query
         .append(
-                "select ad.id,ad.type,ad.audit_sch_date,ad.status.description from AuditDetails ad where ad.type = ? ")
+                "select ad.id,ad.auditno,ad.type,ad.audit_sch_date,ad.status.description from AuditDetails ad where ad.type = ? ")
                 .append(auditUtils
                                 .getAuditDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
                                 .append(auditUtils.getAuditMisQuery(auditDetail));
@@ -765,9 +765,10 @@ public class CreateAuditController extends GenericWorkFlowController {
             for (final Object[] object : list) {
             	result = new AuditDetails();
             	result.setId(Long.parseLong(object[0].toString()));
-            	result.setType(object[1].toString());
-            	result.setSchdDate(object[2].toString());
-            	result.setStatusDescription(object[3].toString());
+            	result.setAuditno(object[1].toString());
+            	result.setType(object[2].toString());
+            	result.setSchdDate(object[3].toString());
+            	result.setStatusDescription(object[4].toString());
             	resultsDtlsList.add(result);
             }
         }
@@ -778,7 +779,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		
 	}
 	
-	@RequestMapping(value = "/view/{auditId}", method = RequestMethod.POST)
+	@RequestMapping(value = "/view/{auditId}", method = RequestMethod.GET)
 	public String view(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
 			HttpServletRequest request, @PathVariable final String auditId) {
 		LOGGER.info("Test");
@@ -800,9 +801,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AuditPostBillMpng> billDetailsMpngLIst=null;
 		if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
 		{
-			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
 			bill = auditDetails.getEgBillregister();
 			auditDetail.setBillId(bill.getId());
+			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
 		}
 		else
 		{

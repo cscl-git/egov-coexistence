@@ -39,12 +39,12 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.audit.dateFrom"  text="Audit Date From"/>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billFrom" path="billFrom" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY"/>
+					<form:input id="billFrom" path="billFrom" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 				</div>
 				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.audit.dateTo"  text="Audit Date To"/>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billTo" path="billTo" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY"/>
+					<form:input id="billTo" path="billTo" class="form-control datepicker" data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
 				</div>
 				
     		</div>
