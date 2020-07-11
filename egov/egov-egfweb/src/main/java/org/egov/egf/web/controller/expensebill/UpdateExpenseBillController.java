@@ -56,6 +56,7 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.egov.audit.autonumber.AuditNumberGenerator;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.commons.CChartOfAccounts;
@@ -77,6 +78,7 @@ import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
@@ -162,6 +164,9 @@ public class UpdateExpenseBillController extends BaseBillController {
     
     @Autowired
     protected AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+	private AutonumberServiceBeanResolver beanResolver;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
@@ -354,7 +359,10 @@ public class UpdateExpenseBillController extends BaseBillController {
     	{
     		owenrPos.setId(null);
     	}
-    	audit.setAuditno(AUDIT001);
+    	AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
+
+		final String preAuditNumber = v.getNextPreAuditNumber(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
+    	audit.setAuditno(preAuditNumber);
     	audit.setType(PRE);
     	audit.setEgBillregister(updatedEgBillregister);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));

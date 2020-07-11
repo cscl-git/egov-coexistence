@@ -47,7 +47,24 @@
 			value="/WEB-INF/views/audit/audit-checklist-popup.jsp" />
 
 	</definition>
+	<definition name="postAudit" extends="base_layout">
 
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/postAuditSearch.jsp" />
+
+	</definition>
+	<definition name="auditSearch" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/auditSearch.jsp" />
+
+	</definition>
 
 
 

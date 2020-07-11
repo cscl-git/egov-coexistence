@@ -1,5 +1,8 @@
 package org.egov.audit.utils;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
+
 public class AuditConstants {
 	
 	public static final String FILESTORE_MODULECODE = "audit";
@@ -14,5 +17,7 @@ public class AuditConstants {
 	public static final String AUDIT_PENDING_WITH_EXAMINER ="Pending with Examiner";
 	public static final String AUDIT_SECTION_OFFICER = "audit_sec_officer";
 	public static final String AUDIT_EXAMINER = "audit_examiner";
+	public static final Locale LOCALE = new Locale("en", "IN");
+	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 
 }

@@ -21,11 +21,11 @@
 					</c:if>
 					<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 					<th ><spring:message code="lbl.checklist.auditcomments" text="Auditor Comments"/></th>
-					<th style="display:none;"><spring:message code="lbl.checklist.usercomments" text="User Comments"/></th>
+					<th style="display:none;"><spring:message code="lbl.checklist.usercomments" text="Department Comments"/></th>
 					</c:if>
 					<c:if test="${auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
 					<th style="display:none;"><spring:message code="lbl.checklist.auditcomments" text="Auditor Comments"/></th>
-					<th style="display:none;"><spring:message code="lbl.checklist.usercomments" text="User Comments"/></th>
+					<th style="display:none;"><spring:message code="lbl.checklist.usercomments" text="Department Comments"/></th>
 					</c:if>
 					<th><spring:message code="lbl.checklist.auditHistory" text="History"/></th>
 				</tr>

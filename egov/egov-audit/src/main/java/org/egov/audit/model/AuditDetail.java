@@ -7,6 +7,7 @@ import java.util.List;
 import javax.persistence.Transient;
 
 import org.egov.audit.entity.AuditCheckList;
+import org.egov.audit.entity.AuditDetails;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.model.bills.DocumentUpload;
 
@@ -29,6 +30,14 @@ public class AuditDetail {
     private Long auditId;
     private String auditStatus;
     private String workFlowAction;
+    private String expenditureType;
+    private int fund;
+    private Date billFrom;
+    private Date billTo;
+    private List<PostAuditResult> postAuditResultList=new ArrayList<PostAuditResult>();
+    private int counter = 0;
+    private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
+    private List<AuditDetails> auditSearchList= new ArrayList<AuditDetails>();
 	
 	private String notes;
 	public Date getAuditScheduledDate() {
@@ -139,5 +148,54 @@ public class AuditDetail {
 	public void setWorkFlowAction(String workFlowAction) {
 		this.workFlowAction = workFlowAction;
 	}
+	public String getExpenditureType() {
+		return expenditureType;
+	}
+	public void setExpenditureType(String expenditureType) {
+		this.expenditureType = expenditureType;
+	}
+	public Date getBillFrom() {
+		return billFrom;
+	}
+	public void setBillFrom(Date billFrom) {
+		this.billFrom = billFrom;
+	}
+	public Date getBillTo() {
+		return billTo;
+	}
+	public void setBillTo(Date billTo) {
+		this.billTo = billTo;
+	}
+	public int getFund() {
+		return fund;
+	}
+	public void setFund(int fund) {
+		this.fund = fund;
+	}
+	public List<PostAuditResult> getPostAuditResultList() {
+		return postAuditResultList;
+	}
+	public void setPostAuditResultList(List<PostAuditResult> postAuditResultList) {
+		this.postAuditResultList = postAuditResultList;
+	}
+	public int getCounter() {
+		return counter;
+	}
+	public void setCounter(int counter) {
+		this.counter = counter;
+	}
+	public List<AuditBillDetails> getAuditBillDetails() {
+		return auditBillDetails;
+	}
+	public void setAuditBillDetails(List<AuditBillDetails> auditBillDetails) {
+		this.auditBillDetails = auditBillDetails;
+	}
+	public List<AuditDetails> getAuditSearchList() {
+		return auditSearchList;
+	}
+	public void setAuditSearchList(List<AuditDetails> auditSearchList) {
+		this.auditSearchList = auditSearchList;
+	}
+	
 
 }

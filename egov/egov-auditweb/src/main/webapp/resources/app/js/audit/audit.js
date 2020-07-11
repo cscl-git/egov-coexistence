@@ -30,3 +30,18 @@ function setWorkFLowAction(name)
 function openSource(sourcepath){
 	window.open(sourcepath,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');  
 }
+
+function openBill(url){
+	window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');  
+}
+
+function openVoucher(vid)
+{
+	var url = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
+	window.open(url,'','width=900, height=700');
+}
+function openAudit(auditId)
+{
+	var url = "/services/audit/createAudit/view/"+ auditId;
+	window.open(url,'','width=900, height=700');
+}

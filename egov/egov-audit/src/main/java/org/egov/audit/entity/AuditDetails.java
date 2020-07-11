@@ -59,6 +59,10 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditCheckList.class)
 	private List<AuditCheckList> checkList=new ArrayList<AuditCheckList>();
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditPostBillMpng.class)
+	private List<AuditPostBillMpng> postBillMpng=new ArrayList<AuditPostBillMpng>();
+	
 	@Transient
 	private String approvalDepartment;
 	@Transient
@@ -67,6 +71,10 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
     private User approver;
 	@Transient
     private Date approvedOn;
+	@Transient
+	private String schdDate;
+	@Transient
+	private String statusDescription;
 	
 	@Override
 	public String getStateDetails() {
@@ -200,6 +208,30 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 
 	public void setAuditno(String auditno) {
 		this.auditno = auditno;
+	}
+
+	public List<AuditPostBillMpng> getPostBillMpng() {
+		return postBillMpng;
+	}
+
+	public void setPostBillMpng(List<AuditPostBillMpng> postBillMpng) {
+		this.postBillMpng = postBillMpng;
+	}
+
+	public String getSchdDate() {
+		return schdDate;
+	}
+
+	public void setSchdDate(String schdDate) {
+		this.schdDate = schdDate;
+	}
+
+	public String getStatusDescription() {
+		return statusDescription;
+	}
+
+	public void setStatusDescription(String statusDescription) {
+		this.statusDescription = statusDescription;
 	}
 
 

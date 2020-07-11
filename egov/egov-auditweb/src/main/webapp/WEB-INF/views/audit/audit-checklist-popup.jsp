@@ -16,7 +16,7 @@
 					<th><spring:message code="lbl.checklist.status" text="Status"/></th>
 					<th><spring:message code="lbl.checklist.severity" text="Severity"/></th>
 					<th><spring:message code="lbl.checklist.auditcomments" text="Auditor Comments"/></th>
-					<th><spring:message code="lbl.checklist.usercomments" text="User Comments"/></th>
+					<th><spring:message code="lbl.checklist.usercomments" text="Department Comments"/></th>
 				</tr>
 			</thead>
 			<tbody>

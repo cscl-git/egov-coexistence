@@ -8,9 +8,11 @@ import javax.persistence.PersistenceContext;
 
 import org.apache.log4j.Logger;
 import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.entity.AuditPostBillMpng;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
@@ -68,6 +70,8 @@ public class AuditService {
 	private ExpenseBillService expenseBillService;
 	@Autowired
     private FinancialUtils financialUtils;
+	@Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
 
 	@Autowired
 	public AuditService(final ScriptService scriptExecutionService) {
@@ -117,9 +121,22 @@ public class AuditService {
 		{
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_APPROVED_STATUS));
-			bill=savedAuditDetails.getEgBillregister();
-			bill.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                    FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
+			if(savedAuditDetails.getType().equals("Pre-Audit"))
+			{
+				bill=savedAuditDetails.getEgBillregister();
+				bill.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+	                    FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
+			}
+			else
+			{
+				for(AuditPostBillMpng row:savedAuditDetails.getPostBillMpng())
+		    	 {
+		    		 bill = expenseBillService.getById(row.getEgBillregister().getId());
+		    		 bill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+		    		 expenseBillService.create(bill);
+		    	 }
+			}
+			
 		}
 		
 		
@@ -156,6 +173,18 @@ public class AuditService {
 			LOGGER.info(" Create WorkFlow Transition Started  ...");
 		final User user = securityUtils.getCurrentUser();
 		final DateTime currentDate = new DateTime();
+		String actionName="";
+		String natureOfTask="";
+		if(auditDetails.getType() !=null && auditDetails.getType().equals("Pre-Audit"))
+		{
+			actionName = "Pre Audit pending";
+			natureOfTask = "Pre-Audit";
+		}
+		else
+		{
+			actionName = "Post Audit pending";
+			natureOfTask = "Post-Audit";
+		}
 		if(workFlowAction.equalsIgnoreCase("department"))
 		{
 			Position owenrPos = new Position();
@@ -163,8 +192,8 @@ public class AuditService {
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
 	        .withStateValue("Pending with Department").withDateInfo(new Date()).withOwner(owenrPos)
-	        .withNextAction("Pre Audit pending")
-	        .withNatureOfTask("Pre-Audit")
+	        .withNextAction(actionName)
+	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
 	        .withtLastModifiedBy(user.getId());
 		}
@@ -184,8 +213,8 @@ public class AuditService {
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
 	        .withStateValue("Pending with Section Officer").withDateInfo(new Date()).withOwner(owenrPos)
-	        .withNextAction("Pre Audit pending")
-	        .withNatureOfTask("Pre-Audit")
+	        .withNextAction(actionName)
+	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
 	        .withtLastModifiedBy(user.getId());
 		}
@@ -205,8 +234,8 @@ public class AuditService {
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
 	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos)
-	        .withNextAction("Pre Audit pending")
-	        .withNatureOfTask("Pre-Audit")
+	        .withNextAction(actionName)
+	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
 	        .withtLastModifiedBy(user.getId());
 		}
@@ -226,8 +255,8 @@ public class AuditService {
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
 	        .withStateValue("Pending with Examiner").withDateInfo(new Date()).withOwner(owenrPos)
-	        .withNextAction("Pre Audit pending")
-	        .withNatureOfTask("Pre-Audit")
+	        .withNextAction(actionName)
+	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
 	        .withtLastModifiedBy(user.getId());
 		}
@@ -236,8 +265,8 @@ public class AuditService {
 			auditDetails.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(comment)
             .withStateValue("Approved").withDateInfo(new Date())
-            .withNextAction("Pre-Audit Approved")
-            .withNatureOfTask("Pre-Audit");
+            .withNextAction(natureOfTask+" Approved")
+            .withNatureOfTask(natureOfTask);
 		}
 			LOGGER.info(" WorkFlow Transition Completed  ...");
 	}

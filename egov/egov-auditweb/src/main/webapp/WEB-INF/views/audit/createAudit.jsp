@@ -19,6 +19,10 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
                               data-tabidx=0><spring:message code="lbl.header" text="Header"/></a></li>
         <li><a data-toggle="tab" href="#checklist" data-tabidx=1><spring:message
                 code="lbl.checklist" text="CheckList"/> </a></li>
+         <c:if test="${auditDetail.auditType == 'Post-Audit' }">
+         <li><a data-toggle="tab" href="#billDetails" data-tabidx=2><spring:message
+                code="lbl.billDetails" text="Bill Details"/> </a></li>
+         </c:if>      
     </ul>
     <div class="tab-content">
     	<div class="tab-pane fade in active" id="auditheader">
@@ -50,11 +54,13 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<div class="col-sm-3 add-margin">
 					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="auditType" path="auditType" readonly="true" />
 				</div>
+				<c:if test="${auditDetail.auditType == 'Pre-Audit' }">
 				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.billDetails"  text="Bill Details"/>
 				</label>
 				<div class="col-sm-3 add-margin">
 					<a href="#" id="sourceLink" onclick="return openSource('${billSource}');">View Bill</a>
 				</div>
+				</c:if>
     		</div>
     	</div>
     	<form:hidden id="billId" path="billId" />
@@ -65,10 +71,16 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     	<div class="tab-pane fade" id="checklist">
     	<jsp:include page="audit-checklist.jsp"/>
     	</div>
+    	<c:if test="${auditDetail.auditType == 'Post-Audit' }">
+	    	<div class="tab-pane fade" id="billDetails">
+	    	<jsp:include page="audit-billDetails.jsp"/>
+    	</div>
+    	</c:if>
     	<jsp:include page="billdocument-upload.jsp"/>
     	<br>
     	<br>
     	<jsp:include page="commonworkflowhistory-view.jsp"/>
+    	<c:if test="${mode !='view' }">
     	<div class="show-row form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.comments" text="Comments"/></label>
 						<div class="col-sm-8 add-margin">
@@ -78,6 +90,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
         <div class="buttonbottom" align="center">
             <jsp:include page="commonworkflowmatrix-button.jsp"/>
         </div>
+        </c:if>
     </div>
     
 </form:form>
