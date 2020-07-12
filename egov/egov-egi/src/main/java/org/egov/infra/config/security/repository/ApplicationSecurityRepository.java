@@ -60,22 +60,21 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 
 		SecurityContext context = new SecurityContextImpl();;
 		CurrentUser cur_user= null;
+		String oldSessionId = null;
 		try {
 			
 			HttpServletRequest request = requestResponseHolder.getRequest();
 			HttpSession session = request.getSession();
 			LOGGER.info(" *** URI " + request.getRequestURL().toString());
+			String user_token = request.getParameter("auth_token");
+			String tenantid = request.getParameter("tenantId");
 			cur_user = (CurrentUser)this.microserviceUtils.readFromRedis(request.getSession().getId(), "current_user");
-			if (cur_user==null) {
+			LOGGER.info("curr user :: "+cur_user);
+			if (cur_user == null ) {
 				LOGGER.info(" ***  Session is not available in redis.... , trying to login");
-				/*if(request.getRequestURI().contains("/rest/")){
-				    return SecurityContextHolder.createEmptyContext();
-				}
-				else*/{
-//				    ApplicationThreadLocals.clearValues();
+				this.microserviceUtils.removeSessionFromRedis(user_token, session.getId());
 				 cur_user = new CurrentUser(this.getUserDetails(request));
 				this.microserviceUtils.savetoRedis(session.getId(), "current_user", cur_user);
-				}
 
 			}{
 			    String oldToken = (String)session.getAttribute(MS_USER_TOKEN);
@@ -85,7 +84,6 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 			    }
 			}
 			LOGGER.info(" ***  Session   found  in redis.... ," + request.getSession().getId());
-			
 			context.setAuthentication(this.prepareAuthenticationObj(request, cur_user));
 		} catch (Exception e) {
 			e.printStackTrace();

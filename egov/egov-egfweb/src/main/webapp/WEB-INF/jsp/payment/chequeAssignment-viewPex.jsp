@@ -99,17 +99,17 @@
 							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
-									Page 2</a> <s:if test='%{billSubType.equalsIgnoreCase("TNEB")}'>
-									<a href="#"
-										onclick="generateReport('text','<s:property value='%{instrumentHeaderId.id}'/>',
+									Page 2</a> <a href="#"
+								onclick="generateReport('pdf3','<s:property value='%{instrumentHeaderId.id}'/>',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
-							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Download
-										text</a>
-								</s:if> <!-- <a href="#" onclick="generateReport('xls','<s:property value='%{instrumentHeaderId.id}'/>',
+							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
+									Page 3</a> <a href="#"
+								onclick="generateReport('pdf4','<s:property value='%{instrumentHeaderId.id}'/>',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
-							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />');">Generate Excel</a> -->
+							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
+									Page 4</a>
 							</td>
 							<td></td>
 							<td></td>
@@ -160,6 +160,14 @@ function generateReport(type,instrumentnumber,bankaccount,bankbranch,bank){
 	}
 	else if(type=='pdf1'){
 		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex1.action?bank.id="+
+			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	}
+	else if(type=='pdf3'){
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex3.action?bank.id="+
+			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	}
+	else if(type=='pdf4'){
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex4.action?bank.id="+
 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	}
 	else{

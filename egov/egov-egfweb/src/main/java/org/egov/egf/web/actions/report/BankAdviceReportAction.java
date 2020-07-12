@@ -86,6 +86,7 @@ import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.utils.Constants;
+import org.egov.utils.EnglishNumberToWords;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
@@ -593,10 +594,9 @@ public class BankAdviceReportAction extends BaseFormAction {
         final Map<String, Object> reportParams = new HashMap<String, Object>();
         final StringBuffer letterContext = new StringBuffer();
         letterContext
-                .append("             I request you to transfer the amount indicated below through PEX duly debiting from the")
-                .append("  Current Account No: ")
+                .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
                 .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-                .append("  under your bank to the following bank accounts:");
+                .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
         reportParams.put("bankName", getBankName(bank.getId()));
         reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
         reportParams.put("letterContext", letterContext.toString());
@@ -608,6 +608,8 @@ public class BankAdviceReportAction extends BaseFormAction {
         LOGGER.info("Datasource Added");
         reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
         reportParams.put("totalAmount", totalAmount);
+        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
+        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -631,10 +633,9 @@ public class BankAdviceReportAction extends BaseFormAction {
         final Map<String, Object> reportParams = new HashMap<String, Object>();
         final StringBuffer letterContext = new StringBuffer();
         letterContext
-                .append("             I request you to transfer the amount indicated below through PEX duly debiting from the")
-                .append("  Current Account No: ")
-                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-                .append("  under your bank to the following bank accounts:");
+        .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+        .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
         reportParams.put("bankName", getBankName(bank.getId()));
         reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
         reportParams.put("letterContext", letterContext.toString());
@@ -646,6 +647,8 @@ public class BankAdviceReportAction extends BaseFormAction {
         LOGGER.info("Datasource Added");
         reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
         reportParams.put("totalAmount", totalAmount);
+        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
+        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -660,6 +663,86 @@ public class BankAdviceReportAction extends BaseFormAction {
 
         return "reportview";
     }
+    
+    @ValidationErrorPage(NEW)
+    @Action(value = "/report/bankAdviceReport-exportPDFPex3")
+    public String exportPDFPex3() {
+    	try {
+    	preparePex();
+        final Map<String, Object> reportParams = new HashMap<String, Object>();
+        final StringBuffer letterContext = new StringBuffer();
+        letterContext
+        .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+        .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
+        reportParams.put("bankName", getBankName(bank.getId()));
+        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+        reportParams.put("letterContext", letterContext.toString());
+        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "PEX");
+        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        LOGGER.info("Datasource Added");
+        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
+        reportParams.put("totalAmount", totalAmount);
+        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
+        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
+        final ReportRequest reportInput = new ReportRequest("bankAdviceReport3", subLedgerList, reportParams);
+        reportInput.setReportFormat(ReportFormat.PDF);
+        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+        final ReportOutput reportOutput = reportService.createReport(reportInput);
+        if (reportOutput != null && reportOutput.getReportOutputData() != null)
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
+
+        return "reportview";
+    }
+    
+    @ValidationErrorPage(NEW)
+    @Action(value = "/report/bankAdviceReport-exportPDFPex4")
+    public String exportPDFPex4() {
+    	try {
+    	preparePex();
+        final Map<String, Object> reportParams = new HashMap<String, Object>();
+        final StringBuffer letterContext = new StringBuffer();
+        letterContext
+        .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+        .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
+        reportParams.put("bankName", getBankName(bank.getId()));
+        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+        reportParams.put("letterContext", letterContext.toString());
+        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+        reportParams.put("instrumentType", "PEX");
+        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+        LOGGER.info("Datasource Added");
+        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
+        reportParams.put("totalAmount", totalAmount);
+        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
+        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
+        final ReportRequest reportInput = new ReportRequest("bankAdviceReport4", subLedgerList, reportParams);
+        reportInput.setReportFormat(ReportFormat.PDF);
+        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+        final ReportOutput reportOutput = reportService.createReport(reportInput);
+        if (reportOutput != null && reportOutput.getReportOutputData() != null)
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+    	}
+    	catch(Exception e) {
+    		e.printStackTrace();
+    	}
+
+        return "reportview";
+    }
+
+
 
     /*
      * @ValidationErrorPage(NEW)

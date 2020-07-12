@@ -98,14 +98,17 @@
 			<spring:message code="lbl.function"  text="Function"/>	<span class="mandatory"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
-			<c:if test="${egBillregister.egBillregistermis.function != null}">
+			<!--<c:if test="${egBillregister.egBillregistermis.function != null}">
 				<form:input path="" name ="function" id="function" class="form-control" placeholder="Type first 3 letters of Function name" required="required" value="${egBillregister.egBillregistermis.function.code} - ${egBillregister.egBillregistermis.function.name}"/>
 			</c:if>
 			<c:if test="${egBillregister.egBillregistermis.function == null}">
 				<form:input path="" name ="function" id="function" class="form-control" placeholder="Type first 3 letters of Function name" required="required"/>
-			</c:if>
-			<form:hidden path="egBillregistermis.function" name="egBillregistermis.function" id="egBillregistermis.function" class="form-control table-input hidden-input cfunction"/>
-			<!--<form:errors path="egBillregistermis.function" cssClass="add-margin error-msg" />-->
+			</c:if>-->
+			<form:select path="egBillregistermis.function" id="egBillregistermis.function"  required="required" class="form-control">
+				<form:option value="">-Select-</form:option>
+				<form:options items="${cFunctions}" itemValue="id" itemLabel="name"/>  
+				</form:select>
+			<!--<form:hidden path="egBillregistermis.function" name="egBillregistermis.function" id="egBillregistermis.function" class="form-control table-input hidden-input cfunction"/>-->
 		</div>
 				
 		<label class="col-sm-2 control-label text-right"><spring:message code="lbl.narration" text="Narration"/>
@@ -150,6 +153,20 @@
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input id="billEndDate" path="billEndDate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
+		</div>
+	</div>
+	<div class="form-group">
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.bill.sanction.number" text="Sanction Number"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" id="sanctionnumber" path="sanctionnumber" maxlength="50" />
+		</div>
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.bill.sanction.date" text="Sanction Date"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:input id="sanctiondate" path="sanctiondate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
 		</div>
 	</div>
 </div>

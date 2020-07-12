@@ -128,6 +128,8 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     private String approvalDepartment;
     @Transient
     private String approvalComent;
+    private Date sanctiondate;
+    private String sanctionnumber;
 
     public EgBillregister() {
     }
@@ -470,5 +472,21 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
 
 	public void setBillEndDate(Date billEndDate) {
 		this.billEndDate = billEndDate;
+	}
+
+	public Date getSanctiondate() {
+		return sanctiondate;
+	}
+
+	public void setSanctiondate(Date sanctiondate) {
+		this.sanctiondate = sanctiondate;
+	}
+
+	public String getSanctionnumber() {
+		return sanctionnumber;
+	}
+
+	public void setSanctionnumber(String sanctionnumber) {
+		this.sanctionnumber = sanctionnumber;
 	}
 }
