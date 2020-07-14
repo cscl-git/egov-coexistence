@@ -65,17 +65,14 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 			HttpServletRequest request = requestResponseHolder.getRequest();
 			HttpSession session = request.getSession();
 			LOGGER.info(" *** URI " + request.getRequestURL().toString());
+			String user_token = request.getParameter("auth_token");
 			cur_user = (CurrentUser)this.microserviceUtils.readFromRedis(request.getSession().getId(), "current_user");
-			if (cur_user==null) {
+			LOGGER.info("curr user :: "+cur_user);
+			if (cur_user == null ) {
 				LOGGER.info(" ***  Session is not available in redis.... , trying to login");
-				/*if(request.getRequestURI().contains("/rest/")){
-				    return SecurityContextHolder.createEmptyContext();
-				}
-				else*/{
-//				    ApplicationThreadLocals.clearValues();
+				this.microserviceUtils.removeSessionFromRedis(user_token, session.getId());
 				 cur_user = new CurrentUser(this.getUserDetails(request));
 				this.microserviceUtils.savetoRedis(session.getId(), "current_user", cur_user);
-				}
 
 			}{
 			    String oldToken = (String)session.getAttribute(MS_USER_TOKEN);
