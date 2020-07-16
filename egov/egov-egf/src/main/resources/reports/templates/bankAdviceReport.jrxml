@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="595" pageHeight="842" columnWidth="495" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
 	<property name="ireport.zoom" value="1.366026910730141"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="229"/>
+	<property name="ireport.y" value="384"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -197,38 +197,8 @@ The Manager,
 			</textField>
 		</band>
 	</pageFooter>
-	<lastPageFooter>
-		<band height="233">
-			<staticText>
-				<reportElement positionType="Float" x="14" y="64" width="139" height="74" uuid="b689bd27-2faf-4a98-bb7a-45654a2c1553"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom" markup="none">
-					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
-				</textElement>
-				<text><![CDATA[Chief Accounts Officer,
-Municipal Corporation,
-Chandigarh]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" x="328" y="64" width="167" height="74" uuid="59048ccb-c11f-4630-ac69-afaf1f0e467d"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom" markup="none">
-					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
-				</textElement>
-				<text><![CDATA[Additional Commissioner,
-Municipal Corporation,
-Chandigarh]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="465" y="213" width="12" height="20" uuid="73e516b5-6a04-40f9-b96c-85d2e0434321"/>
-				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"/"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report" isBlankWhenNull="true">
-				<reportElement x="478" y="213" width="7" height="20" uuid="33c5b9e6-6686-4678-88a0-ae6f179ebc15"/>
-				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-		</band>
-	</lastPageFooter>
 	<summary>
-		<band height="103">
+		<band height="340">
 			<componentElement>
 				<reportElement key="table" style="table" positionType="Float" isPrintRepeatedValues="false" x="1" y="11" width="469" height="76" uuid="de00f23e-238d-4126-a9d1-363daf39378d"/>
 				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
@@ -254,9 +224,9 @@ Chandigarh]]></text>
 ]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="36" height="31" isPrintWhenDetailOverflows="true" uuid="93520df1-df1b-4750-b5e5-e91852866cd7"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="43" isPrintWhenDetailOverflows="true" uuid="93520df1-df1b-4750-b5e5-e91852866cd7"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -290,9 +260,9 @@ Chandigarh]]></text>
 ]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="85" height="31" isPrintWhenDetailOverflows="true" uuid="e22ce98f-126f-413d-92da-4d3934c43848"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="85" height="43" isPrintWhenDetailOverflows="true" uuid="e22ce98f-126f-413d-92da-4d3934c43848"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -326,9 +296,9 @@ Chandigarh]]></text>
 ]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="118" height="31" isPrintWhenDetailOverflows="true" uuid="bc25f7a0-82f5-4110-a84d-88d91fc9a43d"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="118" height="43" isPrintWhenDetailOverflows="true" uuid="bc25f7a0-82f5-4110-a84d-88d91fc9a43d"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -362,9 +332,9 @@ Chandigarh]]></text>
 ]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="76" height="31" isPrintWhenDetailOverflows="true" uuid="7e5ad8ce-6054-4e3e-9766-7a1c864415a5"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="76" height="43" isPrintWhenDetailOverflows="true" uuid="7e5ad8ce-6054-4e3e-9766-7a1c864415a5"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -406,9 +376,9 @@ Chandigarh]]></text>
 ]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement x="0" y="0" width="90" height="31" uuid="572f2807-11b5-4673-9d8c-332b776121ca"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="90" height="43" isPrintWhenDetailOverflows="true" uuid="572f2807-11b5-4673-9d8c-332b776121ca"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -450,9 +420,9 @@ Chandigarh]]></text>
 ]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:detailCell style="table_TD" height="31" rowSpan="1">
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
 							<textField isStretchWithOverflow="true" pattern="###0.00" isBlankWhenNull="true">
-								<reportElement positionType="Float" x="0" y="0" width="92" height="31" isPrintWhenDetailOverflows="true" uuid="8879904a-72cd-4427-9301-83f617cbfc9b"/>
+								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="43" isPrintWhenDetailOverflows="true" uuid="8879904a-72cd-4427-9301-83f617cbfc9b"/>
 								<box>
 									<pen lineWidth="0.5"/>
 									<topPen lineWidth="0.5"/>
@@ -476,6 +446,24 @@ Chandigarh]]></text>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalAmountInWords}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="2" y="159" width="139" height="74" uuid="b689bd27-2faf-4a98-bb7a-45654a2c1553"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" markup="none">
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Chief Accounts Officer,
+Municipal Corporation,
+Chandigarh]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="316" y="159" width="167" height="74" uuid="59048ccb-c11f-4630-ac69-afaf1f0e467d"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom" markup="none">
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Additional Commissioner,
+Municipal Corporation,
+Chandigarh]]></text>
+			</staticText>
 		</band>
 	</summary>
 </jasperReport>
