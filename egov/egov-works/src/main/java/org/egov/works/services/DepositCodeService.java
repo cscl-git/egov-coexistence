@@ -93,11 +93,6 @@ public class DepositCodeService extends PersistenceService<DepositCode, Long> im
         return findAllByNamedQuery(WorksConstants.QUERY_GETACTIVEDEPOSITCODES);
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(final Integer accountdetailkey) throws ValidationException {
-
-        return null;
-    }
 
     @Override
     public List<DepositCode> validateEntityForRTGS(final List<Long> idsList) throws ValidationException {

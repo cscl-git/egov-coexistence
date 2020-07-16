@@ -55,7 +55,6 @@ import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
 import org.egov.works.abstractestimate.entity.AbstractEstimate;
 import org.egov.works.contractorbill.entity.ContractorBillRegister;
-import org.egov.works.models.contractorBill.AssetForBill;
 import org.egov.works.models.contractorBill.DeductionTypeForBill;
 import org.egov.works.models.contractorBill.StatutoryDeductionsForBill;
 import org.egov.works.models.contractorBill.WorkCompletionDetailInfo;
@@ -218,12 +217,6 @@ public interface ContractorBillService extends BaseService<ContractorBillRegiste
     public List<DeductionTypeForBill> getStandardDeductionSortedOrder(List<String> requiredOrder,
             List<DeductionTypeForBill> givenStandardList);
 
-    /**
-     * API will returns the AssetForBill list for a given bill Id
-     *
-     * @return List containing AssetForBill
-     */
-    public List<AssetForBill> getAssetForBill(Long billId);
 
     /**
      * API will returns the Advance adjustment amount for a given bill Id
@@ -337,15 +330,6 @@ public interface ContractorBillService extends BaseService<ContractorBillRegiste
             List<StatutoryDeductionsForBill> statutoryList, List<DeductionTypeForBill> standardDeductionList,
             List<EgBilldetails> customDeductionList, List<EgBilldetails> retentionMoneyDeductionList)
                     throws NumberFormatException, ApplicationException;
-
-    /**
-     * @param statutoryList ,standardDeductionList,customDeductionList,workOrderEstimateId ,workOrderId, id(billId)
-     * @return
-     */
-    public void setAllViewLists(Long id, Long workOrderId, Long workOrderEstimateId,
-            List<StatutoryDeductionsForBill> actionStatutorydetails, List<DeductionTypeForBill> standardDeductions,
-            List<EgBilldetails> customDeductions, List<EgBilldetails> retentionMoneyDeductions,
-            List<AssetForBill> accountDetailsForBill) throws NumberFormatException, ApplicationException;
 
     /**
      * Get the EgChecklists
@@ -491,7 +475,6 @@ public interface ContractorBillService extends BaseService<ContractorBillRegiste
 
     public Collection<EgBilldetails> getRetentionMoneyTypes(List<EgBilldetails> retentionMoneyDeductions);
 
-    public Collection<AssetForBill> getAssetAndAccountDetails(List<AssetForBill> accountDetailsForBill);
 
     public Collection<DeductionTypeForBill> getStandardDeductionTypes(List<DeductionTypeForBill> standardDeductions);
 }

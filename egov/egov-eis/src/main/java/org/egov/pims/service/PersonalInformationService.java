@@ -448,12 +448,7 @@ public List<EmployeeView> getListOfEmployeeViewBasedOnListOfDesignationAndOtherC
 		
 		return employeeList;
 	}
-	@Override
-	public List getAssetCodesForProjectCode(Integer accountdetailkey)
-			throws ValidationException {
-
-		return null;
-	}
+	
 	@Override
 	public List<? extends EntityType> validateEntityForRTGS(List<Long> idsList)
 			throws ValidationException {

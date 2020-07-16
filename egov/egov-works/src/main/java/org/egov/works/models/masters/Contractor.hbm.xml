@@ -118,9 +118,9 @@
 			<column name="MOBILE_NUMBER" length="10" />
 		</property>
 	</class>
-    <query name="GET_CONTRACTORS_BY_STATUS">
+    <!-- <query name="GET_CONTRACTORS_BY_STATUS">
     <![CDATA[
         select distinct cont from Contractor cont inner join cont.contractorDetails as cd where cd.status.description = ? 
     ]]>
-    </query>
+    </query> -->
 </hibernate-mapping>

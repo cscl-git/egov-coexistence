@@ -84,7 +84,7 @@ import java.util.Map;
 public class WorkOrderServiceImpl extends BaseServiceImpl<WorkOrder, Long> implements WorkOrderService {
     private static final Logger logger = Logger.getLogger(WorkOrderServiceImpl.class);
 
-    private PersistenceService<Contractor, Long> contractorService;
+    private PersistenceService<Contractor, Long> contractorService1;
     private WorksService worksService;
     private MeasurementBookService measurementBookService;
     private WorkOrderNumberGenerator workOrderNumberGenerators;
@@ -159,7 +159,7 @@ public class WorkOrderServiceImpl extends BaseServiceImpl<WorkOrder, Long> imple
         logger.info("-------------------------Inside getContractorsWithWO---------------------");
         List<Contractor> contractorList = null;
 
-        contractorList = contractorService.findAllByNamedQuery("getContractorsWithWO");
+        contractorList = contractorService1.findAllByNamedQuery("getContractorsWithWO");
 
         return contractorList;
     }
@@ -847,7 +847,7 @@ public class WorkOrderServiceImpl extends BaseServiceImpl<WorkOrder, Long> imple
     // }
 
     public void setContractorService(final PersistenceService<Contractor, Long> contractorService) {
-        this.contractorService = contractorService;
+        this.contractorService1 = contractorService;
     }
 
     public void setWorksService(final WorksService worksService) {
@@ -886,7 +886,7 @@ public class WorkOrderServiceImpl extends BaseServiceImpl<WorkOrder, Long> imple
         // Assuming that status is inserted using db script
         final String status = worksService.getWorksConfigValue("CONTRACTOR_STATUS");
         List<Contractor> contractorList = null;
-        contractorList = contractorService.findAllByNamedQuery("GET_All_CONTRACTORS", status);
+        contractorList = contractorService1.findAllByNamedQuery("GET_All_CONTRACTORS", status);
         return contractorList;
     }
 

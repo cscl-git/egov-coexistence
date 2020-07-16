@@ -47,12 +47,13 @@
  */
 package org.egov.works.web.controller.letterofacceptance;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.egov.egf.masters.services.ContractorService;
 import org.egov.works.letterofacceptance.entity.SearchRequestContractor;
 import org.egov.works.letterofacceptance.entity.SearchRequestLetterOfAcceptance;
 import org.egov.works.letterofacceptance.service.LetterOfAcceptanceService;
-import org.egov.works.master.service.ContractorService;
 import org.egov.works.milestone.entity.TrackMilestone;
 import org.egov.works.milestone.service.TrackMilestoneService;
 import org.egov.works.models.masters.Contractor;
@@ -76,8 +77,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @Controller
 @RequestMapping(value = "/letterofacceptance")
@@ -112,7 +113,7 @@ public class AjaxLetterOfAcceptanceController {
 
     @RequestMapping(value = "/ajaxcontractors-loa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody List<Contractor> findContractorsByCodeOrName(@RequestParam final String name) {
-        return contractorService.getContractorsByCodeOrName(name);
+        return /*contractorService.getContractorsByCodeOrName(name)*/null;
     }
 
     @RequestMapping(value = "/ajaxsearch-loa", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
@@ -200,7 +201,7 @@ public class AjaxLetterOfAcceptanceController {
     
     @RequestMapping(value = "/ajaxcontractorsbycode-loa", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     public @ResponseBody List<Contractor> findContractorsByCode(@RequestParam final String name) {
-        return contractorService.getContractorsByCode(name);
+        return /*contractorService.getContractorsByCode(name)*/null;
     }
 
     @RequestMapping(value = "/ajax-contractorsforloa", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)

@@ -1,4 +1,4 @@
-INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_feature'),'Upload Estimate Photograph','Upload Estimate Photograph',(select id from EG_MODULE where name = 'Works Management'));
+/*INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_feature'),'Upload Estimate Photograph','Upload Estimate Photograph',(select id from EG_MODULE where name = 'Works Management'));
 INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_feature'),'View Estimate Photograph','View Estimate Photograph',(select id from EG_MODULE where name = 'Works Management'));
 
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'UploadEstimatePhotographs') ,(select id FROM eg_feature WHERE name = 'Upload Estimate Photograph'));
@@ -38,3 +38,5 @@ INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role wher
 --rollback delete from eg_feature_action  where feature  = (select id FROM eg_feature WHERE name = 'View Estimate Photograph');
 --rollback delete from eg_feature  where id=(select id FROM eg_feature WHERE name = 'Upload Estimate Photograph');
 --rollback delete from eg_feature  where id=(select id FROM eg_feature WHERE name = 'View Estimate Photograph');
+* */
+*/

@@ -296,11 +296,6 @@ public class AdvocateMasterService extends PersistenceService<AdvocateMaster, Lo
         return advocateMasterRepository.findByNameLike(filterKey + "%");
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(final Integer accountdetailkey)
-            throws ValidationException {
-        return null;
-    }
 
     @Override
     public List<AdvocateMaster> validateEntityForRTGS(final List<Long> idsList) throws ValidationException {

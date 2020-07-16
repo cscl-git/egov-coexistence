@@ -181,13 +181,6 @@ public class ContractorService implements EntityTypeService {
         return contractorRepository.findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(filterKey + "%", filterKey + "%");
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(Integer accountdetailkey) throws ValidationException {
-        // TODO Auto-generated method stub
-       
-        
-        return null;
-    }
 
     @Override
     public List<? extends org.egov.commons.utils.EntityType> validateEntityForRTGS(List<Long> idsList)

@@ -51,7 +51,6 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
 import org.egov.works.lineestimate.entity.DocumentDetails;
-import org.egov.works.models.contractorBill.AssetForBill;
 import org.egov.works.models.contractorBill.DeductionTypeForBill;
 import org.egov.works.models.contractorBill.StatutoryDeductionsForBill;
 import org.egov.works.models.measurementbook.MBHeader;
@@ -92,9 +91,7 @@ public class ContractorBillRegister extends EgBillregister {
     @Temporal(TemporalType.DATE)
     private Date approvedDate;
 
-    @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "egbill", targetEntity = AssetForBill.class)
-    private List<AssetForBill> assetDetailsList = new LinkedList<AssetForBill>();
-
+    
     @OneToMany(orphanRemoval = true, cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "egbill", targetEntity = DeductionTypeForBill.class)
     private List<DeductionTypeForBill> deductionTypeList = new LinkedList<DeductionTypeForBill>();
 
@@ -149,17 +146,6 @@ public class ContractorBillRegister extends EgBillregister {
         return "Contractor Bill No: " + getBillnumber();
     }
 
-    public List<AssetForBill> getAssetDetailsList() {
-        return assetDetailsList;
-    }
-
-    public void setAssetDetailsList(final List<AssetForBill> assetDetailsList) {
-        this.assetDetailsList = assetDetailsList;
-    }
-
-    public void addAssetDetails(final AssetForBill assetForBill) {
-        assetDetailsList.add(assetForBill);
-    }
 
     public void addDeductionType(final DeductionTypeForBill deductionTypeForBill) {
         deductionTypeList.add(deductionTypeForBill);

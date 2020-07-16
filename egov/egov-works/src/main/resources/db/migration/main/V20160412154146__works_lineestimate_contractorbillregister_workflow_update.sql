@@ -7,7 +7,7 @@ UPDATE EG_WF_MATRIX SET additionalrule = null WHERE objecttype = 'LineEstimate' 
 ------ END : Update Line Estimate workflow  ---
 
 ------ START : Update Application types for workflow ---
-UPDATE eg_wf_types SET displayname = 'Contractor Bill' WHERE type = 'ContractorBillRegister';
+--UPDATE eg_wf_types SET displayname = 'Contractor Bill' WHERE type = 'ContractorBillRegister';
 ------ END : Update Application types for workflow ---
 
 --rollback UPDATE EG_WF_MATRIX SET additionalrule = 'NEWCONTRACTORBILLREGISTER' WHERE objecttype = 'ContractorBillRegister' and additionalrule = null;

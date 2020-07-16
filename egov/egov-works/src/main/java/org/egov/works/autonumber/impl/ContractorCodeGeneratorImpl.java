@@ -47,17 +47,17 @@
  */
 package org.egov.works.autonumber.impl;
 
+import java.io.Serializable;
+
+import org.egov.egf.masters.services.ContractorService;
 import org.egov.infra.persistence.utils.GenericSequenceNumberGenerator;
 import org.egov.infra.utils.StringUtils;
 import org.egov.works.autonumber.ContractorCodeGenerator;
-import org.egov.works.master.service.ContractorService;
 import org.egov.works.models.masters.Contractor;
 import org.egov.works.models.masters.ContractorDetail;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.io.Serializable;
 
 @Service
 public class ContractorCodeGeneratorImpl implements ContractorCodeGenerator {
@@ -76,8 +76,8 @@ public class ContractorCodeGeneratorImpl implements ContractorCodeGenerator {
                 .getNextSequence(CONTRACTOR_CODE_SEQ_PREFIX);
         if (validateGrade(contractorDetail) && !StringUtils.isBlank(contractorDetail.getCategory())
                 && !StringUtils.isBlank(contractor.getName()) && contractor.getName().length() >= 4) {
-            final String contractorClass = contractorService
-                    .getContractorClassShortName(contractorDetail.getGrade().getGrade());
+            final String contractorClass = /*contractorService
+                    .getContractorClassShortName(contractorDetail.getGrade().getGrade())*/null;
 
             return String.format("%s%s%s%04d", !StringUtils.isBlank(contractorClass) ? contractorClass : "",
                     contractorDetail.getCategory().substring(0, 1), contractor.getName().substring(0, 4),
@@ -88,8 +88,8 @@ public class ContractorCodeGeneratorImpl implements ContractorCodeGenerator {
                     contractor.getName().substring(0, 4), sequenceNumber);
         else if (validateGrade(contractorDetail) && !StringUtils.isBlank(contractor.getName())
                 && contractor.getName().length() >= 4) {
-            final String contractorClass = contractorService
-                    .getContractorClassShortName(contractorDetail.getGrade().getGrade());
+            final String contractorClass = /*contractorService
+                    .getContractorClassShortName(contractorDetail.getGrade().getGrade())*/null;
             return String.format("%s%s%04d", !StringUtils.isBlank(contractorClass) ? contractorClass : "",
                     contractor.getName().substring(0, 4), sequenceNumber);
         } else if (!StringUtils.isBlank(contractor.getName()) && contractor.getName().length() >= 4)

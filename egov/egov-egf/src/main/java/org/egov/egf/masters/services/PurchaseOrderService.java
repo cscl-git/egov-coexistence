@@ -253,11 +253,6 @@ public class PurchaseOrderService implements EntityTypeService {
         return purchaseOrderRepository.findByNameLikeIgnoreCaseOrOrderNumberLikeIgnoreCaseAndActive(filterKey + "%", filterKey + "%", true);
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(Integer accountdetailkey) throws ValidationException {
-
-        return null;
-    }
 
     @Override
     public List<? extends org.egov.commons.utils.EntityType> validateEntityForRTGS(List<Long> idsList)

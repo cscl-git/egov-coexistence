@@ -78,42 +78,42 @@ Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYN
 Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEstimateGISMapEdit' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksEstimateGISMapView','/estimate/abstractEstimate-maps.action','mapMode=view',(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksEstimateGISMapView','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEstimateGISMapEdit' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEstimateGISMapEdit' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksEstimateSubTypeAjax','/estimate/ajaxEstimate-subcategories.action',null,(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksEstimateSubTypeAjax','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEstimateSubTypeAjax' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEstimateSubTypeAjax' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksSaveContractorGradeMaster','/masters/contractorGrade-save.action',null,(select id from EG_MODULE where name = 'WorksContractorGradeMaster'),1,'WorksSaveContractorGradeMaster','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksSaveContractorGradeMaster' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksSaveContractorGradeMaster' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksEditContractorGradeMaster','/masters/contractorGrade-edit.action',null,(select id from EG_MODULE where name = 'WorksContractorGradeMaster'),1,'WorksEditContractorGradeMaster','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEditContractorGradeMaster' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksEditContractorGradeMaster' and contextroot = 'egworks'));
 
 update eg_action set url = '/masters/contractorGrade-searchGradeDetails.action' where name = 'WorksContractorGradeSearch';
 
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksAbstractEstimateSave','/estimate/abstractEstimate-save.action',null,(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksAbstractEstimateSave','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateSave' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateSave' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksAbstractEstimateBOQ','/estimate/abstractEstimate-viewBillOfQuantitiesXls.action','sourcepage=boqPDF',(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksAbstractEstimateBOQ','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateBOQ' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateBOQ' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksAbstractEstimatePDF','/estimate/abstractEstimatePDF.action',null,(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksAbstractEstimatePDF','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimatePDF' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimatePDF' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksAbstractEstimateSORSearchAjax','/masters/scheduleOfRateSearch-searchAjax.action',null,(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksAbstractEstimateSORSearchAjax','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateSORSearchAjax' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateSORSearchAjax' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksAbstractEstimateFindSORAjax','/masters/scheduleOfRateSearch-findSORAjax.action',null,(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksAbstractEstimateFindSORAjax','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateFindSORAjax' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateFindSORAjax' and contextroot = 'egworks'));
 
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksAbstractEstimateGetUOMFactor','/estimate/ajaxEstimate-getUOMFactor.action',null,(select id from EG_MODULE where name = 'WorksAbstractEstimate'),0,'WorksAbstractEstimateGetUOMFactor','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateGetUOMFactor' and contextroot = 'egworks'));
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksAbstractEstimateGetUOMFactor' and contextroot = 'egworks'));
 -------------------END-------------------
 
 ------------------START------------------
-Insert into EGW_STATUS (id,moduletype,description,lastmodifieddate,code,order_id) values (nextval('seq_egw_status'),'Contractor','Active',now(),'Active',1);
-Insert into EGW_STATUS (id,moduletype,description,lastmodifieddate,code,order_id) values (nextval('seq_egw_status'),'Contractor','Inactive',now(),'Inactive',2);
+--Insert into EGW_STATUS (id,moduletype,description,lastmodifieddate,code,order_id) values (nextval('seq_egw_status'),'Contractor','Active',now(),'Active',1);
+--Insert into EGW_STATUS (id,moduletype,description,lastmodifieddate,code,order_id) values (nextval('seq_egw_status'),'Contractor','Inactive',now(),'Inactive',2);
 Insert into EGW_STATUS (id,moduletype,description,lastmodifieddate,code,order_id) values (nextval('seq_egw_status'),'Contractor','Black-listed',now(),'Black-listed',3);
 Insert into EGW_STATUS (id,moduletype,description,lastmodifieddate,code,order_id) values (nextval('seq_egw_status'),'Contractor','Debarred',now(),'Debarred',4);
 -------------------END-------------------

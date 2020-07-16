@@ -112,11 +112,5 @@ public class FundingAgencyService extends PersistenceService<FundingAgency, Inte
         return null;
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(final Integer accountdetailkey)
-            throws ValidationException {
-
-        return null;
-    }
 
 }

@@ -164,10 +164,7 @@ public class DrawingOfficerService implements EntityTypeService {
         return drawingOfficerRepository.findByNameLikeIgnoreCaseOrCodeLikeIgnoreCase(filterKey + "%", filterKey + "%");
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(Integer accountdetailkey) throws ValidationException {
-        return null;
-    }
+    
 
     @Override
     public List<EntityType> validateEntityForRTGS(List<Long> idsList) throws ValidationException {

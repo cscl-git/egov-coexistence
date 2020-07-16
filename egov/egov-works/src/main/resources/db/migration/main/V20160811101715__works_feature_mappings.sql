@@ -51,7 +51,7 @@ INSERT INTO eg_feature(ID,NAME,DESCRIPTION,MODULE) VALUES (NEXTVAL('seq_eg_featu
 ------------------------------------ADDING FEATURE ACTION STARTS------------------------
 --Masters
 --contractor
-INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'WorksCreateContractor') ,(select id FROM eg_feature WHERE name = 'Create Contractor'));
+/*INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'WorksCreateContractor') ,(select id FROM eg_feature WHERE name = 'Create Contractor'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'WorksSaveContractor') ,(select id FROM eg_feature WHERE name = 'Create Contractor'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'WorksContractorSearch') ,(select id FROM eg_feature WHERE name = 'Modify Contractor'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'WorksContractorSearchResult') ,(select id FROM eg_feature WHERE name = 'Modify Contractor'));
@@ -448,3 +448,4 @@ INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role wher
 
 INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Super User') ,(select id FROM eg_feature WHERE name = 'Cancel Contractor Bill'));
 INSERT INTO eg_feature_role (ROLE, FEATURE) VALUES ((select id from eg_role where name = 'Works Administrator') ,(select id FROM eg_feature WHERE name = 'Cancel Contractor Bill'));
+*/

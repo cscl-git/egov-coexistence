@@ -135,28 +135,28 @@
 		</set>		
 	</class>
 	
-	<query name="getContractorsWithWO">
+	<!-- <query name="getContractorsWithWO">
 		<![CDATA[
      	select distinct wo.contractor from WorkOrder wo where wo.parent is null
     ]]>
-	</query>
-	<query name="getUniqueWO">
+	</query> -->
+	<!-- <query name="getUniqueWO">
 		<![CDATA[
      	select distinct wo from WorkOrder wo where wo.parent is null
     ]]>
-	</query>
+	</query> -->
 	
-	<query name="GET_All_CONTRACTORS">
+	<!-- <query name="GET_All_CONTRACTORS">
     <![CDATA[
         select distinct wo.contractor from WorkOrder wo join wo.contractor.contractorDetails as detail 
         where wo.parent is null and detail.status.description = ? and sysdate >= detail.validity.startDate 
         and (detail.validity.endDate is null or detail.validity.endDate >= sysdate )
     ]]> 
-     </query>
+     </query> -->
       
-    <query name="getApprovedContractorsWithWO">
+    <!-- <query name="getApprovedContractorsWithWO">
 		<![CDATA[
      	select distinct wo.contractor from WorkOrder wo where wo.parent is null and wo.egwStatus.code='APPROVED'
     ]]>
-	</query>
+	</query> -->
 </hibernate-mapping>

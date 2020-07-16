@@ -87,14 +87,16 @@ public interface EntityTypeService {
 	 */
 	public List<? extends EntityType> filterActiveEntities(String filterKey, int maxRecords, Integer accountDetailTypeId);
 
-	/**
-	 * Returns the list of Asset Codes linked to  accountdetailkey (projectCodeId).
-	 *         
-	 * @param accountdetailkey
-	 * @return List of filtered Asset Codes
-	 * @throws ValidationException
-	 */
-	public List getAssetCodesForProjectCode(Integer accountdetailkey) throws ValidationException;
+
+	
+   /**
+    *
+    * @param idsList
+    * @return
+    * @throws ValidationException
+    * will return entities for the given ids which are same as accountdetailkeyid
+    */
+   public List<? extends EntityType> getEntitiesById(List<Long> idsList) throws ValidationException;
 
 	/**
     *
@@ -104,13 +106,5 @@ public interface EntityTypeService {
     * returns only those which are invalid for RTGSPayment
     */
    public List<? extends EntityType> validateEntityForRTGS(List<Long> idsList) throws ValidationException;
-   /**
-    *
-    * @param idsList
-    * @return
-    * @throws ValidationException
-    * will return entities for the given ids which are same as accountdetailkeyid
-    */
-   public List<? extends EntityType> getEntitiesById(List<Long> idsList) throws ValidationException;
 
 }

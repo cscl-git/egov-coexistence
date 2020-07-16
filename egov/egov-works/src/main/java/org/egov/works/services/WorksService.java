@@ -61,7 +61,6 @@ import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.entity.Employee;
 import org.egov.eis.service.AssignmentService;
-import org.egov.eis.service.EmployeeService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.entity.User;
@@ -100,8 +99,6 @@ public class WorksService {
     private EgwStatusHibernateDAO egwStatusHibernateDAO;
     private PersistenceService persistenceService;
     private final SimpleDateFormat dateFormatter = new SimpleDateFormat("dd-MMM-yyyy", Locale.getDefault());
-    @Autowired
-    private EmployeeService employeeService;
     @Autowired
     private AssignmentService assignmentService;
     @Autowired
@@ -1084,7 +1081,6 @@ public class WorksService {
         // load the primary and secondary assignment departments of the logged in user
         final List<Assignment> assignmentsList = assignmentService
                 .getAllActiveEmployeeAssignmentsByEmpId(getCurrentLoggedInUserId());
-        employeeService.getEmployeeById(getCurrentLoggedInUserId());
         final List<Department> departmentList = new ArrayList<Department>();
         if (assignmentsList != null)
             for (final Assignment assignment : assignmentsList)

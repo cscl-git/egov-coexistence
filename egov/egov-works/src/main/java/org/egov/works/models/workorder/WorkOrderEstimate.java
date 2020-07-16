@@ -72,8 +72,7 @@ public class WorkOrderEstimate extends BaseModel {
     private double estimateWOAmount;
 
     private List<WorkOrderActivity> workOrderActivities = new LinkedList<WorkOrderActivity>();
-    @Valid
-    private List<AssetsForWorkOrder> assetValues = new LinkedList<AssetsForWorkOrder>();
+    
 
     private Set<Milestone> milestone = new HashSet<Milestone>();
 
@@ -134,17 +133,6 @@ public class WorkOrderEstimate extends BaseModel {
         this.workCompletionDate = workCompletionDate;
     }
 
-    public List<AssetsForWorkOrder> getAssetValues() {
-        return assetValues;
-    }
-
-    public void setAssetValues(final List<AssetsForWorkOrder> assetValues) {
-        this.assetValues = assetValues;
-    }
-
-    public void addAssetValue(final AssetsForWorkOrder assetValue) {
-        assetValues.add(assetValue);
-    }
 
     public Set<Milestone> getMilestone() {
         return milestone;

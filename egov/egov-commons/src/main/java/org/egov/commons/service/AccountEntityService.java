@@ -184,11 +184,6 @@ public class AccountEntityService implements EntityTypeService {
     }
 
     @Override
-    public List getAssetCodesForProjectCode(Integer accountdetailkey) throws ValidationException {
-        return null;
-    }
-
-    @Override
     public List<? extends EntityType> validateEntityForRTGS(List<Long> idsList) throws ValidationException {
 
         return null;

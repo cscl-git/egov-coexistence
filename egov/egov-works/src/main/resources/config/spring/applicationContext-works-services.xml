@@ -210,18 +210,6 @@
         <property name="persistenceService" ref="persistenceService" />
         <!-- <property name="genericDao" ref="genericDao" /> -->
     </bean>
-    <bean class="org.egov.works.services.impl.ContractorBillServiceImpl"
-          id="contractorBillService" scope="prototype">
-        <constructor-arg>
-            <bean parent="abstractPersistenceService">
-                <constructor-arg name="type" value="org.egov.model.bills.EgBillregister" />
-            </bean>
-        </constructor-arg>
-        <property name="genericService" ref="persistenceService" />
-        <property name="worksService" ref="worksService" />
-        <property name="tenderResponseService" ref="tenderResponseService" />
-        <property name="contractorAdvanceService" ref="contractorAdvanceService" />
-    </bean>
 
     <bean class="org.egov.works.services.impl.RevisionEstimateServiceImpl"
           id="revisionEstimateService" scope="prototype">
@@ -439,7 +427,7 @@
         <property name="persistenceService" ref="persistenceService" />
     </bean>
 
-    <bean id="contractorService" class="org.egov.works.master.service.ContractorService"/>
+    <bean id="contractorService" class="org.egov.egf.masters.services.ContractorService"/>
 
     <bean id="assetsForEstimateService" parent="abstractPersistenceService" scope="prototype">
         <constructor-arg name="type" value="org.egov.works.abstractestimate.entity.AssetsForEstimate" />

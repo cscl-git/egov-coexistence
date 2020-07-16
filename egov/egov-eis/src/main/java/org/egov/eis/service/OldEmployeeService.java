@@ -472,10 +472,6 @@ public class OldEmployeeService implements EntityTypeService {
         return employeeRepository.findByNameLikeOrCodeLike(filterKey + "%", filterKey + "%");
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(final Integer accountdetailkey) throws ValidationException {
-        return null;
-    }
 
     @Override
     public List<? extends EntityType> validateEntityForRTGS(final List<Long> idsList) throws ValidationException {

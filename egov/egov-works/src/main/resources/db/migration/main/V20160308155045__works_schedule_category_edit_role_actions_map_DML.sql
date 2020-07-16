@@ -1,6 +1,6 @@
 -- INSERT deposit code search action into EG_ACTION ---
 Insert into EG_ACTION (ID,NAME,URL,QUERYPARAMS,PARENTMODULE,ORDERNUMBER,DISPLAYNAME,ENABLED,CONTEXTROOT,VERSION,CREATEDBY,CREATEDDATE,LASTMODIFIEDBY,LASTMODIFIEDDATE,APPLICATION) values (NEXTVAL('SEQ_EG_ACTION'),'WorksScheduleCategoryEdit','/masters/scheduleCategory-edit.action',null,(select id from EG_MODULE where name = 'WorksScheduleCategoryMaster'),1,'WorksScheduleCategoryMaster','false','egworks',0,1,now(),1,now(),(select id from eg_module  where name = 'Works Management'));
-Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksScheduleCategoryEdit' and contextroot = 'egworks'));  
+--Insert into eg_roleaction (roleid, actionid) values ((select id from eg_role where name = 'Super User'),(select id from eg_action where name ='WorksScheduleCategoryEdit' and contextroot = 'egworks'));  
 
 update eg_action set url = '/masters/depositCode-newform.action' where name = 'Generate Deposit Code';
 update eg_action set url = '/masters/depositCode-search.action' where name = 'Search Deposit Code';
@@ -10,9 +10,9 @@ ALTER TABLE egw_depositcode ALTER COLUMN isactive TYPE boolean USING CASE isacti
 ALTER TABLE egw_depositcode ALTER COLUMN isactive SET DEFAULT true;
 
 ---INSERT DepositCode into ACCOUNTDETAILTYPE
-Insert into ACCOUNTDETAILTYPE (ID,NAME,DESCRIPTION,TABLENAME,COLUMNNAME,ATTRIBUTENAME,NBROFLEVELS,ISACTIVE,CREATED,LASTMODIFIED,MODIFIEDBY,FULL_QUALIFIED_NAME) values
-(NEXTVAL('seq_accountdetailtype'),'DEPOSITCODE','DEPOSITCODE','egw_depositcode','id','depositcode_id',1,true,
-now(),null,null,'org.egov.works.models.masters.DepositCode');
+--Insert into ACCOUNTDETAILTYPE (ID,NAME,DESCRIPTION,TABLENAME,COLUMNNAME,ATTRIBUTENAME,NBROFLEVELS,ISACTIVE,CREATED,LASTMODIFIED,MODIFIEDBY,FULL_QUALIFIED_NAME) values
+--(NEXTVAL('seq_accountdetailtype'),'DEPOSITCODE','DEPOSITCODE','egw_depositcode','id','depositcode_id',1,true,
+--now(),null,null,'org.egov.works.models.masters.DepositCode');
 
 --rollback delete from EG_ROLEACTION where roleid = (select id from eg_role where name = 'Super User') and actionid = (select id from eg_action where name ='WorksScheduleCategoryEdit' and contextroot = 'egworks');
 --rollback delete from EG_ACTION where name = 'WorksScheduleCategoryEdit' and contextroot = 'egworks';

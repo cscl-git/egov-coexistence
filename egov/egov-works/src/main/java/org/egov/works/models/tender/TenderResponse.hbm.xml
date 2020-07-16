@@ -134,12 +134,12 @@
     ]]>	
     </query>
       
-    <query name="getTenderFortenderIdCanceledWO">
+    <!-- <query name="getTenderFortenderIdCanceledWO">
 	<![CDATA[
 		select distinct tr from TenderResponse tr where tr.negotiationNumber = ? and tr.id in (select trc.tenderResponse.id from TenderResponseContractors trc where trc.contractor.id in 
 		(select wo.contractor.id from WorkOrder wo where wo.id = ? and wo.tenderNumber = ? and wo.contractor.id = ? and wo.packageNumber = ? ))
 	]]>	
-    </query>
+    </query> -->
     	
     <sql-query name="TenderNumberUniqueCheckForEdit">
      <![CDATA[

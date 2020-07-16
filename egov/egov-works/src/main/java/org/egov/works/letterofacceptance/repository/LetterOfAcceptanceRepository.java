@@ -85,10 +85,10 @@ public interface LetterOfAcceptanceRepository extends JpaRepository<WorkOrder, L
     List<String> findEstimateNumberForContractorBill(@Param("estimateNumber") String estimateNumber,
             @Param("workOrderStatus") String workOrderStatus, @Param("status") String status, @Param("billtype") String billtype);
 
-    @Query("select distinct(wo.contractor.name) from WorkOrder as wo where (upper(wo.contractor.name) like upper(:contractorname) or upper(wo.contractor.code) like upper(:contractorname)) and wo.egwStatus.code = :workOrderStatus and not exists (select distinct(cbr.workOrder) from ContractorBillRegister as cbr where wo.id = cbr.workOrder.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
+    /*@Query("select distinct(wo.contractor.name) from WorkOrder as wo where (upper(wo.contractor.name) like upper(:contractorname) or upper(wo.contractor.code) like upper(:contractorname)) and wo.egwStatus.code = :workOrderStatus and not exists (select distinct(cbr.workOrder) from ContractorBillRegister as cbr where wo.id = cbr.workOrder.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
     List<String> findContractorForContractorBill(@Param("contractorname") String contractorname,
             @Param("workOrderStatus") String workOrderStatus, @Param("status") String status,
-            @Param("billtype") String billtype);
+            @Param("billtype") String billtype);*/
 
     @Query("select distinct(cbr.workOrder.workOrderNumber) from ContractorBillRegister as cbr where upper(cbr.billstatus) != :status and cbr.billtype = :billtype")
     List<String> getDistinctNonCancelledWorkOrderNumbersByBillType(@Param("status") String billstatus,
@@ -104,8 +104,8 @@ public interface LetterOfAcceptanceRepository extends JpaRepository<WorkOrder, L
     @Query("select sum(br.billamount) from EgBillregister as br where br.workOrder.id = (select id from WorkOrder as wo where wo.workOrderNumber = :workOrderNumber and wo.egwStatus.code = :status) and br.billstatus != :billStatus")
     Double getGrossBillAmountOfBillsCreated(@Param("workOrderNumber") String workOrderNumber, @Param("status") String status, @Param("billStatus") String billstatus);
     
-    @Query("select distinct(wo.workOrderNumber) from WorkOrder as wo where wo.egwStatus.code = :workOrderStatus and not exists (select distinct(cbr.workOrder) from ContractorBillRegister as cbr where wo.id = cbr.workOrder.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
-    List<String> findWorkOrderNumbersToModifyLoa(@Param("workOrderStatus") String workOrderStatus, @Param("status") String status, @Param("billtype") String billtype);
+    //@Query("select distinct(wo.workOrderNumber) from WorkOrder as wo where wo.egwStatus.code = :workOrderStatus and not exists (select distinct(cbr.workOrder) from ContractorBillRegister as cbr where wo.id = cbr.workOrder.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
+    //List<String> findWorkOrderNumbersToModifyLoa(@Param("workOrderStatus") String workOrderStatus, @Param("status") String status, @Param("billtype") String billtype);
 
     @Query("select distinct(led.projectCode.code) from LineEstimateDetails as led  where upper(led.projectCode.code) like upper(:code) and exists (select distinct(wo.estimateNumber) from WorkOrder as wo where led.estimateNumber = wo.estimateNumber and egwStatus.code = :status)")
     List<String> findWorkIdentificationNumbersToSearchLOAToCancel(@Param("code") String code,
@@ -114,11 +114,11 @@ public interface LetterOfAcceptanceRepository extends JpaRepository<WorkOrder, L
     @Query("select distinct(wo.contractor.name) from WorkOrder as wo where upper(wo.contractor.name) like upper(:code) and wo.egwStatus.code = :status")
     List<String> findContractorsToSearchLOAToCancel(@Param("code") String code, @Param("status") String status);
     
-    @Query("select distinct(wo.estimateNumber) from WorkOrder as wo where wo.egwStatus.code = :workorderstatus and exists (select distinct(led.estimateNumber) from LineEstimateDetails as led  where led.lineEstimate.id = :lineestimateid and led.estimateNumber = wo.estimateNumber)")
-    List<String> findEstimateNumbersToSearchLOAToCancel(@Param("lineestimateid") Long linEstimateId, @Param("workorderstatus") String workOrderStatus);
+    //@Query("select distinct(wo.estimateNumber) from WorkOrder as wo where wo.egwStatus.code = :workorderstatus and exists (select distinct(led.estimateNumber) from LineEstimateDetails as led  where led.lineEstimate.id = :lineestimateid and led.estimateNumber = wo.estimateNumber)")
+    //List<String> findEstimateNumbersToSearchLOAToCancel(@Param("lineestimateid") Long linEstimateId, @Param("workorderstatus") String workOrderStatus);
     
-    @Query("select distinct(wo.workOrderNumber) from WorkOrder as wo where upper(wo.workOrderNumber) like upper(:workOrderNumber) and wo.egwStatus.code = :workOrderStatus and parent is null and not exists (select distinct(cbr.workOrderEstimate.workOrder) from ContractorBillRegister as cbr where wo.id = cbr.workOrderEstimate.workOrder.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
-    List<String> findDistinctWorkorderNumberToModifyLOA(@Param("workOrderNumber") final String workOrderNumber, @Param("workOrderStatus") String workOrderStatus, @Param("status") String status, @Param("billtype") String billtype);
+    //@Query("select distinct(wo.workOrderNumber) from WorkOrder as wo where upper(wo.workOrderNumber) like upper(:workOrderNumber) and wo.egwStatus.code = :workOrderStatus and parent is null and not exists (select distinct(cbr.workOrderEstimate.workOrder) from ContractorBillRegister as cbr where wo.id = cbr.workOrderEstimate.workOrder.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
+    //List<String> findDistinctWorkorderNumberToModifyLOA(@Param("workOrderNumber") final String workOrderNumber, @Param("workOrderStatus") String workOrderStatus, @Param("status") String status, @Param("billtype") String billtype);
 
     @Query("select distinct(woe.estimate.estimateNumber) from WorkOrderEstimate as woe where upper(woe.estimate.estimateNumber) like upper(:estimateNumber) and woe.workOrder.egwStatus.code = :workOrderStatus and woe.workOrder.parent is null and not exists (select distinct(cbr.workOrderEstimate) from ContractorBillRegister as cbr where woe.id = cbr.workOrderEstimate.id and upper(cbr.billstatus) != :status and cbr.billtype = :billtype)")
     List<String> findDistinctEstimateNumberToModifyLOA(@Param("estimateNumber") final String estimateNumber, @Param("workOrderStatus") String workOrderStatus, @Param("status") String status, @Param("billtype") String billtype);

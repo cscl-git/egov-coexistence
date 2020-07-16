@@ -1,5 +1,5 @@
 ------------------------------------ADDING FEATURE STARTS------------------------
-delete from eg_feature_action  where feature = (select id FROM eg_feature WHERE name = 'Cancel Contractor Bill');
+/*delete from eg_feature_action  where feature = (select id FROM eg_feature WHERE name = 'Cancel Contractor Bill');
 delete from eg_feature_action  where feature = (select id FROM eg_feature WHERE name = 'Cancel LOA');
 delete from eg_feature_action  where feature = (select id FROM eg_feature WHERE name = 'Cancel Milestone/Track Milestone');
 delete from eg_feature  where description = 'Modfiy an LOA' and name='Modfiy LOA';
@@ -171,3 +171,4 @@ INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_actio
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'AjaxSearchContractorBill') ,(select id FROM eg_feature WHERE name = 'Search Contractor Bill'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'WorksViewContractorBill') ,(select id FROM eg_feature WHERE name = 'Search Contractor Bill'));
 INSERT INTO eg_feature_action (ACTION, FEATURE) VALUES ((select id FROM eg_action  WHERE name = 'ContractorBillPDF') ,(select id FROM eg_feature WHERE name = 'Search Contractor Bill'));
+*/

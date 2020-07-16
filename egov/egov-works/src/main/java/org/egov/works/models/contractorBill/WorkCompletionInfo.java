@@ -180,14 +180,14 @@ public class WorkCompletionInfo {
     /**
      * @return workflow history
      */
-    public List<StateHistory<Position>> getWorkflowHistory() {
+    public List<StateHistory> getWorkflowHistory() {
         return workflowHistory;
     }
 
     /**
      * @set the history
      */
-    public void setWorkflowHistory(final List<StateHistory<Position>> workflowHistory) {
+    public void setWorkflowHistory(final List<StateHistory> workflowHistory) {
         this.workflowHistory = workflowHistory;
     }
 }

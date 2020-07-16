@@ -1,42 +1,13 @@
 ------------------START------------------
-CREATE TABLE egw_contractor
-(
-  id bigint NOT NULL,
-  code character varying(50) NOT NULL,
-  name character varying(100) NOT NULL,
-  correspondence_address character varying(250),
-  payment_address character varying(250),
-  contact_person character varying(100),
-  email character varying(100),
-  narration character varying(1024),
-  pan_number character varying(14),
-  tin_number character varying(14),
-  bank_id bigint,
-  ifsc_code character varying(15),
-  bank_account character varying(22),
-  pwd_approval_code character varying(50),
-  createdby bigint NOT NULL,
-  modifiedby bigint,
-  createddate timestamp without time zone NOT NULL,
-  modifieddate timestamp without time zone,
-  edit_enabled character(1) DEFAULT '1'::bpchar,
-  CONSTRAINT pk_contractor PRIMARY KEY (id),
-  CONSTRAINT unq_contractor UNIQUE (code),
-  CONSTRAINT fk_contractor_bank FOREIGN KEY (bank_id)
-      REFERENCES bank (id),
-  CONSTRAINT fk_contractor_createdby FOREIGN KEY (createdby)
-      REFERENCES eg_user (id),
-  CONSTRAINT fk_contractor_modifiedby FOREIGN KEY (modifiedby)
-      REFERENCES eg_user (id) 
-);
 
-CREATE INDEX idx_contractor_bank ON egw_contractor USING btree (bank_id);
 
-CREATE SEQUENCE SEQ_egw_contractor;
+--CREATE INDEX idx_contractor_bank ON egw_contractor USING btree (bank_id);
+
+--CREATE SEQUENCE SEQ_egw_contractor;
 -------------------END-------------------
 
 ------------------START------------------
-CREATE TABLE egw_contractor_detail
+/*CREATE TABLE egw_contractor_detail
 (
   id bigint NOT NULL,
   contractor_id bigint NOT NULL,
@@ -64,14 +35,14 @@ CREATE TABLE egw_contractor_detail
       REFERENCES eg_user (id),
   CONSTRAINT fk_contdtl_modifiedby FOREIGN KEY (modifiedby)
       REFERENCES eg_user (id) 
-);
+);*/
 
-CREATE INDEX idx_contdtl_grade ON egw_contractor_detail USING btree (contractor_grade_id);
-CREATE INDEX idx_contdtl_contractor ON egw_contractor_detail USING btree (contractor_id);
-CREATE INDEX idx_contdtl_department ON egw_contractor_detail USING btree (department_id);
-CREATE INDEX idx_contdtl_status ON egw_contractor_detail USING btree (status_id);
+--CREATE INDEX idx_contdtl_grade ON egw_contractor_detail USING btree (contractor_grade_id);
+--CREATE INDEX idx_contdtl_contractor ON egw_contractor_detail USING btree (contractor_id);
+--CREATE INDEX idx_contdtl_department ON egw_contractor_detail USING btree (department_id);
+--CREATE INDEX idx_contdtl_status ON egw_contractor_detail USING btree (status_id);
 
-CREATE SEQUENCE SEQ_egw_contractor_detail;
+--CREATE SEQUENCE SEQ_egw_contractor_detail;
 -------------------END-------------------
 
 ------------------START------------------
@@ -715,8 +686,8 @@ CREATE TABLE egw_estimate_assets
   CONSTRAINT pk_estimate_assets PRIMARY KEY (id),
   CONSTRAINT fk_estimateassets_estimate FOREIGN KEY (abstractestimate_id)
       REFERENCES egw_abstractestimate (id),
-  CONSTRAINT fk_estimateassets_asset FOREIGN KEY (asset_id)
-      REFERENCES egasset_asset (id),
+  --CONSTRAINT fk_estimateassets_asset FOREIGN KEY (asset_id)
+   --   REFERENCES egasset_asset (id),
   CONSTRAINT fk_estimateassets_createdby FOREIGN KEY (created_by)
       REFERENCES eg_user (id),
   CONSTRAINT fk_estimateassets_modifiedby FOREIGN KEY (modified_by)
@@ -1198,8 +1169,8 @@ CREATE TABLE egw_tender_response_quotes
   created_date timestamp without time zone NOT NULL,
   modified_date timestamp without time zone,
   CONSTRAINT pk_tender_response_quotes PRIMARY KEY (id),
-  CONSTRAINT fk_trq_contractor FOREIGN KEY (contractor_id)
-      REFERENCES egw_contractor (id),
+  --CONSTRAINT fk_trq_contractor FOREIGN KEY (contractor_id)
+   --  REFERENCES egw_contractor (id),
   CONSTRAINT fk_trq_tra FOREIGN KEY (tender_response_activity_id)
       REFERENCES egw_tender_response_activity (id),
   CONSTRAINT fk_trq_createdby FOREIGN KEY (created_by)
@@ -1226,8 +1197,8 @@ CREATE TABLE egw_tender_resp_contractors
   created_date timestamp without time zone NOT NULL,
   modified_date timestamp without time zone,
   CONSTRAINT pk_egw_tender_resp_contractors PRIMARY KEY (id),
-  CONSTRAINT fk_trc_contractor FOREIGN KEY (contractor_id)
-      REFERENCES egw_contractor (id),
+  --CONSTRAINT fk_trc_contractor FOREIGN KEY (contractor_id)
+     -- REFERENCES egw_contractor (id),
   CONSTRAINT fk_trc_tender_response FOREIGN KEY (tender_response_id)
       REFERENCES egw_tender_response (id),
   CONSTRAINT fk_trc_createdby FOREIGN KEY (created_by)
@@ -1273,9 +1244,9 @@ CREATE TABLE egw_workorder
   modifiedby bigint,
   createddate timestamp without time zone NOT NULL,
   modifieddate timestamp without time zone,
-  CONSTRAINT pk_workorder PRIMARY KEY (id),
-  CONSTRAINT fk_wo_contractor FOREIGN KEY (contractor_id)
-      REFERENCES egw_contractor (id),
+  CONSTRAINT pk_workorder1 PRIMARY KEY (id),
+  --CONSTRAINT fk_wo_contractor FOREIGN KEY (contractor_id)
+      --REFERENCES egw_contractor (id),
   CONSTRAINT fk_wo_preparedby FOREIGN KEY (preparedby)
       REFERENCES egeis_employee (id),
   CONSTRAINT fk_wo_eng_incharge1 FOREIGN KEY (engineer_incharge1)
@@ -1318,7 +1289,7 @@ CREATE TABLE egw_workorder_estimate
   modifiedby bigint,
   createddate timestamp without time zone NOT NULL,
   modifieddate timestamp without time zone,  
-  CONSTRAINT pk_workorder_estimate PRIMARY KEY (id),
+  CONSTRAINT pk_workorder_estimate1 PRIMARY KEY (id),
   CONSTRAINT fk_workorderest_workorder FOREIGN KEY (workorder_id)
       REFERENCES egw_workorder (id),
   CONSTRAINT fk_workorderest_estimate FOREIGN KEY (abstractestimate_id)
@@ -1379,8 +1350,8 @@ CREATE TABLE egw_workorder_assets
   modified_by bigint,
   modified_date timestamp without time zone,
   CONSTRAINT pk_wo_assets PRIMARY KEY (id),
-  CONSTRAINT fk_wo_assets_asset FOREIGN KEY (asset_id)
-      REFERENCES egasset_asset (id),
+  --CONSTRAINT fk_wo_assets_asset FOREIGN KEY (asset_id)
+  --    REFERENCES egasset_asset (id),
   CONSTRAINT fk_wo_assets_woe FOREIGN KEY (workorder_estimate_id)
       REFERENCES egw_workorder_estimate (id),
   CONSTRAINT fk_wo_assets_createdby FOREIGN KEY (created_by)
@@ -1508,8 +1479,8 @@ CREATE TABLE egw_contractorbill_assets
   created_date timestamp without time zone NOT NULL,
   modified_date timestamp without time zone,  
   CONSTRAINT pk_contractorbill_assets PRIMARY KEY (id),
-  CONSTRAINT fk_billassets_asset FOREIGN KEY (asset_id)
-      REFERENCES egasset_asset (id),
+  --CONSTRAINT fk_billassets_asset FOREIGN KEY (asset_id)
+   --   REFERENCES egasset_asset (id),
   CONSTRAINT fk_billassets_billregister FOREIGN KEY (billregister_id)
       REFERENCES eg_billregister (id),
   CONSTRAINT fk_billassets_coa FOREIGN KEY (coa_id)

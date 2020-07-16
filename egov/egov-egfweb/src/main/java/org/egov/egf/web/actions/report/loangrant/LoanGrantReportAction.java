@@ -176,7 +176,7 @@ public class LoanGrantReportAction extends LoanGrantBaseAction {
                 allAssetCodes = "";
                 List<String> assetCodeList = null;
                 try {
-                    assetCodeList = entityService.getAssetCodesForProjectCode(lg.getDetailKey());
+                    assetCodeList = null;//entityService.getAssetCodesForProjectCode(lg.getDetailKey());
                 } catch (final ValidationException e) {
                     if (LOGGER.isDebugEnabled())
                         LOGGER.debug("No Details Found Setting to Empty for asset codes");

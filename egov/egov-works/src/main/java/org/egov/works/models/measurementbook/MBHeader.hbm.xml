@@ -181,11 +181,11 @@
      	and  workOrderEstimate.estimate.parent.id= ?  
     ]]>
 	</query>
-	<query name="getAmountForApprovedRevisionWO">
+	<!-- <query name="getAmountForApprovedRevisionWO">
 		<![CDATA[
      	select sum(wo.workOrderAmount) from WorkOrder wo where wo.parent is not null and wo.egwStatus.code='APPROVED' and wo.parent.id=? 
     ]]>
-	</query>
+	</query> -->
 	<query name="getAllApprovedMBHeaders">
 		<![CDATA[
      		select distinct mbh from MBHeader mbh where mbh.egwStatus.code = ? and mbh.workOrder.id = ? and mbh.workOrderEstimate.estimate.id = ?

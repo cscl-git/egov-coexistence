@@ -57,7 +57,6 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.works.abstractestimate.entity.AbstractEstimate;
-import org.egov.works.abstractestimate.entity.AssetsForEstimate;
 import org.egov.works.models.estimate.ProjectCode;
 import org.egov.works.utils.WorksConstants;
 import org.egov.works.utils.WorksUtils;
@@ -74,8 +73,6 @@ import java.util.List;
 @Service
 public class ProjectCodeService extends PersistenceService<ProjectCode, Long> implements EntityTypeService {
 
-    @Autowired
-    private PersistenceService<AssetsForEstimate, Long> assetsForEstimateService;
 
     @Autowired
     private WorksUtils worksUtils;
@@ -105,36 +102,6 @@ public class ProjectCodeService extends PersistenceService<ProjectCode, Long> im
         return findPageBy(qry, 0, pageSize, param).getList();
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(final Integer accountDetailKey) throws ValidationException {
-
-        if (accountDetailKey == null || accountDetailKey <= 0)
-            throw new ValidationException(Arrays.asList(new ValidationError("projectcode.invalid",
-                    "Invalid Account Detail Key")));
-
-        final ProjectCode projectCode = find("from ProjectCode where id=?", accountDetailKey.longValue());
-
-        if (projectCode == null)
-            throw new ValidationException(Arrays.asList(new ValidationError("projectcode.doesnt.exist",
-                    "No Project Code exists for given Account Detail Key")));
-
-        if (projectCode.getEstimates() == null || projectCode.getEstimates().size() == 0)
-            throw new ValidationException(Arrays.asList(new ValidationError("projectcode.no.link.abstractEstimate",
-                    "Estimate is not linked with given Account Detail Key")));
-
-        final List<AbstractEstimate> estimates = new ArrayList<AbstractEstimate>(projectCode.getEstimates());
-
-        final List<AssetsForEstimate> assetValues = estimates.get(0).getAssetValues();
-
-        if (assetValues == null || assetValues.size() == 0)
-            return Collections.EMPTY_LIST;
-        else {
-            final List<String> assetCodes = new ArrayList<String>();
-            for (final AssetsForEstimate asset : assetValues)
-                assetCodes.add(asset.getAsset().getCode());
-            return assetCodes;
-        }
-    }
 
     public List<ProjectCode> getAllActiveProjectCodes(final int fundId, final Long functionId, final int functionaryId,
             final int fieldId, final int deptId) {
@@ -179,20 +146,6 @@ public class ProjectCodeService extends PersistenceService<ProjectCode, Long> im
         }
     }
 
-    public List getAssetListByProjectCode(final Long projectCodeId) throws NoSuchObjectException {
-        final List<String> assetCodeList = new ArrayList<String>();
-        final ProjectCode pc = find("from ProjectCode where id=?", projectCodeId);
-        if (pc == null)
-            throw new NoSuchObjectException("projectcode.notfound");
-        final List<AssetsForEstimate> assetsForEstimateList = assetsForEstimateService.findAllByNamedQuery(
-                "ASSETS_FOR_PROJECTCODE", projectCodeId);
-        if (assetsForEstimateList.isEmpty())
-            throw new NoSuchObjectException("assetsforestimate.projectcode.asset.notfound");
-        else
-            for (final AssetsForEstimate assetsForEstimate : assetsForEstimateList)
-                assetCodeList.add(assetsForEstimate.getAsset().getCode());
-        return assetCodeList;
-    }
 
     @Override
     public List<ProjectCode> validateEntityForRTGS(final List<Long> idsList) throws ValidationException {

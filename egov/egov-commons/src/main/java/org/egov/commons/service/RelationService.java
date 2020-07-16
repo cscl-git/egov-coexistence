@@ -94,12 +94,6 @@ public class RelationService extends PersistenceService<Relation, Integer> imple
 	       return entities;
 	}
 
-	@Override
-	public List getAssetCodesForProjectCode(Integer accountdetailkey)
-			throws ValidationException {
-
-		return null;
-	}
 	
 	public List<EntityType> getAllActiveEntities() {
 	      List<EntityType> entities=new ArrayList<EntityType>();

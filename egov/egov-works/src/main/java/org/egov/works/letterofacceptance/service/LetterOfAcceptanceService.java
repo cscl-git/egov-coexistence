@@ -170,9 +170,9 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> getApprovedWorkOrderByNumberToModifyLOA(final String name) {
-        return letterOfAcceptanceRepository.findDistinctWorkorderNumberToModifyLOA("%" + name + "%", WorksConstants.APPROVED,
+        return null/*letterOfAcceptanceRepository.findDistinctWorkorderNumberToModifyLOA("%" + name + "%", WorksConstants.APPROVED,
                 ContractorBillRegister.BillStatus.CANCELLED.toString(),
-                BillTypes.Final_Bill.toString());
+                BillTypes.Final_Bill.toString())*/;
     }
 
     @Transactional
@@ -366,8 +366,8 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> getApprovedContractorsForCreateContractorBill(final String contractorname) {
-        final List<String> results = letterOfAcceptanceRepository.findContractorForContractorBill("%" + contractorname + "%",
-                WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(), BillTypes.Final_Bill.toString());
+        final List<String> results = null/*letterOfAcceptanceRepository.findContractorForContractorBill("%" + contractorname + "%",
+                WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(), BillTypes.Final_Bill.toString())*/;
         return results;
     }
 
@@ -542,9 +542,9 @@ public class LetterOfAcceptanceService {
         // TODO Need TO handle in single query
         final List<String> estimateNumbers = lineEstimateDetailsRepository
                 .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName());
-        final List<String> workOrderNumbers = letterOfAcceptanceRepository.findWorkOrderNumbersToModifyLoa(
+        final List<String> workOrderNumbers = null /*letterOfAcceptanceRepository.findWorkOrderNumbersToModifyLoa(
                 WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(),
-                BillTypes.Final_Bill.toString());
+                BillTypes.Final_Bill.toString())*/;
         if (estimateNumbers.isEmpty())
             estimateNumbers.add("");
         if (workOrderNumbers.isEmpty())
@@ -672,9 +672,9 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> getEstimateNumbersToSearchLOAToCancel(final Long lineEstimateId) {
-        final List<String> estimateNumbers = letterOfAcceptanceRepository
+        final List<String> estimateNumbers =null/* letterOfAcceptanceRepository
                 .findEstimateNumbersToSearchLOAToCancel(lineEstimateId,
-                        WorksConstants.APPROVED.toString());
+                        WorksConstants.APPROVED.toString())*/;
         return estimateNumbers;
     }
     

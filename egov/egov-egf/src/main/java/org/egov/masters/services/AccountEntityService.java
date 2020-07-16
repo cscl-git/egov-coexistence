@@ -96,12 +96,7 @@ public class AccountEntityService extends PersistenceService<AccountEntity, Inte
 
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(final Integer accountdetailkey)
-            throws ValidationException {
-
-        return null;
-    }
+   
 
     @Override
     public List<EntityType> validateEntityForRTGS(final List<Long> idsList) throws ValidationException {

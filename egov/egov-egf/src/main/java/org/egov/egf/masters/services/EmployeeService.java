@@ -60,22 +60,17 @@ public class EmployeeService implements EntityTypeService {
         return employees;
     }
 
-    @Override
-    public List getAssetCodesForProjectCode(Integer accountdetailkey) throws ValidationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Override
-    public List<? extends EntityType> validateEntityForRTGS(List<Long> idsList) throws ValidationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     @Override
     public List<? extends EntityType> getEntitiesById(List<Long> idsList) throws ValidationException {
         // TODO Auto-generated method stub
         return null;
     }
+
+	@Override
+	public List<? extends EntityType> validateEntityForRTGS(List<Long> idsList) throws ValidationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

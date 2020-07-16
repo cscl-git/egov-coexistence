@@ -319,8 +319,8 @@ public class LineEstimateService {
     public List<LineEstimateDetails> searchLineEstimatesForLoa(
             final LineEstimateForLoaSearchRequest lineEstimateForLoaSearchRequest) {
 
-        final List<String> lineEstimateNumbers = lineEstimateDetailsRepository
-                .findEstimateNumbersToSearchLineEstimatesForLoa(WorksConstants.CANCELLED_STATUS);
+        final List<String> lineEstimateNumbers = null /*lineEstimateDetailsRepository
+                .findEstimateNumbersToSearchLineEstimatesForLoa(WorksConstants.CANCELLED_STATUS)*/;
 
         if (!lineEstimateNumbers.isEmpty()) {
             final Criteria criteria = entityManager.unwrap(Session.class).createCriteria(LineEstimateDetails.class)
@@ -373,8 +373,8 @@ public class LineEstimateService {
 
     public List<String> findEstimateNumbersForLoa(final String name) {
 
-        return lineEstimateDetailsRepository.findEstimateNumbersForLoa(
-                "%" + name + "%", LineEstimateStatus.TECHNICAL_SANCTIONED.toString(), WorksConstants.CANCELLED_STATUS);
+        return null /*lineEstimateDetailsRepository.findEstimateNumbersForLoa(
+                "%" + name + "%", LineEstimateStatus.TECHNICAL_SANCTIONED.toString(), WorksConstants.CANCELLED_STATUS)*/;
     }
 
     public List<String> findAdminSanctionNumbers(final String name) {
@@ -388,8 +388,8 @@ public class LineEstimateService {
 
     public List<String> findAdminSanctionNumbersForLoa(final String name) {
 
-        return lineEstimateDetailsRepository.findAdminSanctionNumbersForLoa(
-                "%" + name + "%", LineEstimateStatus.TECHNICAL_SANCTIONED.toString(), WorksConstants.CANCELLED_STATUS);
+        return /*lineEstimateDetailsRepository.findAdminSanctionNumbersForLoa(
+                "%" + name + "%", LineEstimateStatus.TECHNICAL_SANCTIONED.toString(), WorksConstants.CANCELLED_STATUS)*/null;
     }
 
     public List<String> findWorkIdentificationNumbersToSearchLineEstimatesForLoa(final String name) {
@@ -831,8 +831,8 @@ public class LineEstimateService {
     }
 
     public List<User> getCreatedByUsersForCancelLineEstimateByDepartment(final Long department) {
-        return lineEstimateDetailsRepository.findCreatedByForCancelLineEstimateByDepartment(department,
-                LineEstimateStatus.TECHNICAL_SANCTIONED.toString(), WorksConstants.APPROVED);
+        return null/*lineEstimateDetailsRepository.findCreatedByForCancelLineEstimateByDepartment(department,
+                LineEstimateStatus.TECHNICAL_SANCTIONED.toString(), WorksConstants.APPROVED)*/;
     }
 
     public List<LineEstimate> searchLineEstimatesToCancel(final LineEstimateSearchRequest lineEstimateSearchRequest) {

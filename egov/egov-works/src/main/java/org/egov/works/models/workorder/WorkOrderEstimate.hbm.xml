@@ -78,12 +78,6 @@
 			<key column="WORKORDER_ESTIMATE_ID" />
 			<one-to-many class="org.egov.works.models.measurementbook.MBHeader"  />
 		</set>
-		<list name="assetValues" cascade="all,delete-orphan">
-			<key column="WORKORDER_ESTIMATE_ID" not-null="true" />
-			<list-index column="wo_est_asset_index" />
-			<one-to-many
-				class="org.egov.works.models.workorder.AssetsForWorkOrder" />
-		</list>
 		<set name="milestone" inverse="true" >
 			<key column="WORKORDER_ESTIMATE_ID" />
 			<one-to-many class="org.egov.works.milestone.entity.Milestone"  />

@@ -202,12 +202,6 @@ public class AbstractEstimate extends StateAware implements Auditable {
     @Valid
     @OrderBy("id")
     @OneToMany(mappedBy = "abstractEstimate", fetch = FetchType.LAZY, cascade = CascadeType.ALL,
-            orphanRemoval = true, targetEntity = AssetsForEstimate.class)
-    private List<AssetsForEstimate> assetValues = new ArrayList<>();
-
-    @Valid
-    @OrderBy("id")
-    @OneToMany(mappedBy = "abstractEstimate", fetch = FetchType.LAZY, cascade = CascadeType.ALL,
             orphanRemoval = true, targetEntity = Activity.class)
     private List<Activity> activities = new ArrayList<>();
 
@@ -381,17 +375,6 @@ public class AbstractEstimate extends StateAware implements Auditable {
         overheadValues.add(overheadValue);
     }
 
-    public List<AssetsForEstimate> getAssetValues() {
-        return assetValues;
-    }
-
-    public void setAssetValues(final List<AssetsForEstimate> assetValues) {
-        this.assetValues = assetValues;
-    }
-
-    public void addAssetValue(final AssetsForEstimate assetValue) {
-        assetValues.add(assetValue);
-    }
 
     public List<FinancialDetail> getFinancialDetails() {
         return financialDetails;
@@ -473,7 +456,6 @@ public class AbstractEstimate extends StateAware implements Auditable {
         final List<ValidationError> validationErrors = new ArrayList<>();
         validationErrors.addAll(validateActivities());
         validationErrors.addAll(validateOverheads());
-        validationErrors.addAll(validateAssets());
         validationErrors.addAll(validateMultiYearEstimates());
         validationErrors.addAll(validateFinancialDetails());
 
@@ -502,13 +484,6 @@ public class AbstractEstimate extends StateAware implements Auditable {
         return validationErrors;
     }
 
-    public List<ValidationError> validateAssets() {
-        final List<ValidationError> validationErrors = new ArrayList<>();
-        for (final AssetsForEstimate assetValue : assetValues)
-            validationErrors.addAll(assetValue.validate());
-
-        return validationErrors;
-    }
 
     public List<ValidationError> validateMultiYearEstimates() {
         final List<ValidationError> validationErrors = new ArrayList<>();
