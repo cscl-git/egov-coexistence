@@ -99,7 +99,7 @@ public class AjaxWorkFlowController {
     
     @Autowired
     private WorkFlowDeptDesgMapService workFlowDeptDesgMapService;
-
+    
     @RequestMapping(value = "/ajaxWorkFlow-getDesignationsByObjectType", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
     @ResponseBody
     public List<Designation> getDesignationsByObjectType(

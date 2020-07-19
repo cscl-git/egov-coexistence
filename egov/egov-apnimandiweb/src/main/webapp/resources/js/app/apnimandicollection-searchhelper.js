@@ -33,8 +33,7 @@ function callAjaxSearch() {
 			"aButtons" : [ "xls", "pdf", "print" ]
 		},		
 		aaSorting: [],				
-		columns : [ 
-			{"data" : "id","visible": false, "searchable": false},
+		columns : [			
 			{
 				"data" : "zone",
 				"className" : "text-left"
@@ -81,13 +80,14 @@ function callAjaxSearch() {
 						return ('<select class="dropchange" id="additionconn"><option>Select action</option><option value="1">View Collection</option></select>');
 					}					
 				}
-			}
+			},
+			{"data" : "id","visible": false, "searchable": false},
 		]
 	});
 }
 
 $("#resultTable").on('change', 'tbody tr td .dropchange', function() {
-	var id = drillDowntableContainer.fnGetData($(this).parent().parent(),0);
+	var id = drillDowntableContainer.fnGetData($(this).parent().parent(),8);
 	if (this.value == 1) {
 		window.open('/services/apnimandi/collection/view/' + id,'','width=800, height=600');
 	}

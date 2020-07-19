@@ -22,6 +22,7 @@ CREATE TABLE egam_zone
   id bigint NOT NULL,
   code character varying(50)  NOT NULL,
   name character varying(100) NOT NULL,
+  roaddivision character varying(20),
   notes character varying(255),
   ordernumber numeric,
   active boolean NOT NULL,
@@ -62,13 +63,13 @@ INSERT INTO egam_documenttype_master(id, code, documenttype, notes, ordernumber,
 ,(nextval('seq_egam_documenttype_master'), 'POSSESSION_LETTER', 'Possession Letter', 'Possession Letterf',4,true,now(), now(),1,1,0)
 ,(nextval('seq_egam_documenttype_master'), 'SECURITY_DEPOSIT_PROOF', 'Security Deposit Proof', 'Security Deposit Proof',5,true,now(), now(),1,1,0);
 
-INSERT INTO egam_zone(id, code, name, notes, ordernumber, active, createddate, lastmodifieddate, createdby, lastmodifiedby, "version") VALUES
-(nextval('seq_egam_zone'), 'ZONE_A', 'Zone-A', 'Zone-A',1,true,now(), now(),1,1,0)
-,(nextval('seq_egam_zone'), 'ZONE_B', 'Zone-B', 'Zone-B',2,true,now(), now(),1,1,0)
-,(nextval('seq_egam_zone'), 'ZONE_C', 'Zone-C', 'Zone-C',3,true,now(), now(),1,1,0)
-,(nextval('seq_egam_zone'), 'ZONE_D', 'Zone-D', 'Zone-D',4,true,now(), now(),1,1,0)
-,(nextval('seq_egam_zone'), 'ZONE_E', 'Zone-E', 'Zone-E',5,true,now(), now(),1,1,0);
+INSERT INTO egam_zone(id, code, name, roaddivision, notes, ordernumber, active, createddate, lastmodifieddate, createdby, lastmodifiedby, "version") VALUES
+(nextval('seq_egam_zone'), 'ZONE_A', 'Zone-A', 'RD1', 'Zone-A',1,true,now(), now(),1,1,0)
+,(nextval('seq_egam_zone'), 'ZONE_B', 'Zone-B', 'RD3', 'Zone-B',2,true,now(), now(),1,1,0)
+,(nextval('seq_egam_zone'), 'ZONE_C', 'Zone-C', 'RD2', 'Zone-C',3,true,now(), now(),1,1,0)
+,(nextval('seq_egam_zone'), 'ZONE_D', 'Zone-D', 'RD1', 'Zone-D',4,true,now(), now(),1,1,0)
+,(nextval('seq_egam_zone'), 'ZONE_E', 'Zone-E', 'RD3', 'Zone-E',5,true,now(), now(),1,1,0);
 
 INSERT INTO egam_collection_type(id, code, name, notes, ordernumber, active, createddate, lastmodifieddate, createdby, lastmodifiedby, "version") VALUES
 (nextval('seq_egam_collection_type'), 'DAY_MARKET', 'Day Market', 'Day Market',1,true,now(), now(),1,1,0)
-,(nextval('seq_egam_collection_type'), 'APNIMANDI', 'Apnimandi', 'Apnimandi',2,true,now(), now(),1,1,0);
+,(nextval('seq_egam_collection_type'), 'APNI_MANDI', 'Apni Mandi', 'Apni Mandi',2,true,now(), now(),1,1,0);

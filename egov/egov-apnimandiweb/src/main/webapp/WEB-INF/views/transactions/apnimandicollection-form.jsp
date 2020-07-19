@@ -3,7 +3,7 @@
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
-					<spring:message code="lbl.contractor.details" />
+					<spring:message code="lbl.collection.details" />
 				</div>
 			</div>
 			<div class="panel-body">

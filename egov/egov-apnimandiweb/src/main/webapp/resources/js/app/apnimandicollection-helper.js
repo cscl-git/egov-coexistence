@@ -58,6 +58,7 @@ loadBankDetailSuccessHandler = function(response){
 	document.getElementById("branchName").value = response.BRANCH;
 	document.getElementById("bankCode").value = response.BANKCODE;
 }
+
 loadBankDetailFailureHandler = function(){
 	document.getElementById("bankName").value = "";
 	document.getElementById("branchName").value = "";
@@ -150,15 +151,18 @@ function loadAcountHeadDetails() {
 	resetAmountTables();
 	var serviceCategory = $('#serviceCategory').val();
 	var serviceType = $('#serviceType').val();
-	if(serviceCategory!=""&&serviceType!=""){
-		var path = '/services/collection';
-		var service = serviceCategory+"."+serviceType;
-		var ajaxurl = path + "/receipts/ajaxReceiptCreate-ajaxTaxHeadMasterByService.action";
+	var zoneid=$('#zone').val();
+	var collectionTypeId=$('#collectiontype').val();
+	if(serviceCategory!=""&&serviceType!=""&&zoneid!=""&&collectionTypeId!=""){
+		var ajaxurl = "/services/apnimandi/collection/ajax/getAccountHeads";
 		$.ajax({
 			url: ajaxurl,
 			type: "GET",
 			data: {
-				serviceId : service
+				serviceCategory : serviceCategory,
+				servicetype : serviceType,
+				zoneId : zoneid,
+				collectionTypeId : collectionTypeId
 			},
 			cache: false,
 			dataType: "json",
@@ -175,16 +179,16 @@ function loadAcountHeadDetails() {
 
 function loadFinAccSuccessHandler(res) {
 	acountHeadCount=0;
-	for (i = 0; i < res.ResultSet.Result.length; i++) {
+	for (i = 0; i < res.accountHeads.length; i++) {
 		if(i==0){
 			if(null != document.getElementById('apnimandiCollectionAmountDetails[0].accountHead')){
-				document.getElementById('apnimandiCollectionAmountDetails[0].accountHead').value=res.ResultSet.Result[i].accounthead;
+				document.getElementById('apnimandiCollectionAmountDetails[0].accountHead').value=res.accountHeads[i].name;
 			}
 			if(null != document.getElementById('apnimandiCollectionAmountDetails[0].glCodeIdDetail')){
-				document.getElementById('apnimandiCollectionAmountDetails[0].glCodeIdDetail').value=res.ResultSet.Result[i].glcodeIdDetail;
+				document.getElementById('apnimandiCollectionAmountDetails[0].glCodeIdDetail').value=res.accountHeads[i].code;
 			}
 			if(null != document.getElementById('apnimandiCollectionAmountDetails[0].amountType')){
-				document.getElementById('apnimandiCollectionAmountDetails[0].amountType').value=res.ResultSet.Result[i].amountType;
+				document.getElementById('apnimandiCollectionAmountDetails[0].amountType').value=res.accountHeads[i].isDebit;
 			}
 			if(null != document.getElementById('apnimandiCollectionAmountDetails[0].creditAmountDetail')){
 				document.getElementById('apnimandiCollectionAmountDetails[0].creditAmountDetail').value=0;
@@ -202,19 +206,19 @@ function loadFinAccSuccessHandler(res) {
 			inputText.setAttribute("class", "form-control patternvalidation text-left");
 			inputText.setAttribute("readonly", "readonly");
 			inputText.setAttribute("maxlength", "100");
-			inputText.setAttribute("value", res.ResultSet.Result[i].accounthead);			
+			inputText.setAttribute("value", res.accountHeads[i].name);			
 			td.appendChild(inputText);			
 			var inputHidden = document.createElement("input");
 			inputHidden.setAttribute("type", "hidden");
 			inputHidden.setAttribute("name", "apnimandiCollectionAmountDetails["+i+"].glCodeIdDetail");
 			inputHidden.setAttribute("id", "apnimandiCollectionAmountDetails["+i+"].glCodeIdDetail");
-			inputHidden.setAttribute("value", res.ResultSet.Result[i].glcodeIdDetail);
+			inputHidden.setAttribute("value", res.accountHeads[i].code);
 			td.appendChild(inputHidden);			
 			var inputHidden1 = document.createElement("input");
 			inputHidden1.setAttribute("type", "hidden");
 			inputHidden1.setAttribute("name", "apnimandiCollectionAmountDetails["+i+"].amountType");
 			inputHidden1.setAttribute("id", "apnimandiCollectionAmountDetails["+i+"].amountType");
-			inputHidden1.setAttribute("value", res.ResultSet.Result[i].amountType);
+			inputHidden1.setAttribute("value", res.accountHeads[i].isDebit);
 			td.appendChild(inputHidden1);
 			tr.appendChild(td);
 			
@@ -283,4 +287,32 @@ function updateTotalAmount(){
 	document.getElementById('totalcramount').value=totalamount;
 	document.getElementById('amount').value=totalamount;
 	$('#totalAmount').html(totalamount);
+}
+
+function getDepartmentByZone(){
+	var zoneid=$('#zone').val();
+	if(zoneid!=""){
+		$.ajax({
+			url: "/services/apnimandi/collection/ajax/getDepertmentsByZone",     
+			type: "GET",
+			data: {
+				objectType : $('#stateType').val(),
+				currentState : $('#currentState').val(),
+				zoneid : zoneid
+			},
+			dataType: "json",
+			success: function (response) {
+				console.log("success"+response);
+				$('#approvalDepartment').empty();
+				$('#approvalDepartment').append($("<option value=''>Select</option>"));
+				$.each(response.departments, function(index, value) {
+					$('#approvalDepartment').append($('<option>').text(value.name).attr('value', value.code));
+				});
+				$('#additionalRule').val(response.additionalRule);
+			}, 
+			error: function (response) {
+				console.log("failed");
+			}
+		});
+	}
 }

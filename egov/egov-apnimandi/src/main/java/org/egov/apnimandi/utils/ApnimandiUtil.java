@@ -4,24 +4,28 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import org.egov.apnimandi.utils.constants.ApnimandiConstants;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
-import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
+import org.egov.infra.workflow.matrix.service.WorkFlowDeptDesgMapService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.google.common.collect.ImmutableMap;
 
 @Service
 public class ApnimandiUtil {
@@ -31,6 +35,12 @@ public class ApnimandiUtil {
 	
 	@Autowired
     private SecurityUtils securityUtils;
+	
+	@Autowired
+    protected WorkFlowDeptDesgMapService workFlowDeptDesgMapService;
+
+    @Autowired
+    MicroserviceUtils microserviceUtils;
 	
 	@Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
     public EgwStatus getStatusForModuleAndCode(final String moduleName, final String statusCode) {
@@ -81,9 +91,19 @@ public class ApnimandiUtil {
     	}
     }
     
-//	public static void main(String[] args) {
-//		Date terminateDate = DateUtils.getDate("28-05-2020", "dd-MM-yyyy");
-//		Date toDate = DateUtils.getDate("29-05-2020", "dd-MM-yyyy");
-//		System.out.println("result : " + isTerminateDateGreaterThanEqualToValidToDate(terminateDate, toDate));
-//	}
+    public List<Department> getDepartmentsByZone(final String currentState, final String objectType, final String additionalRule){
+    	List<Department> departmentList = new ArrayList<Department>();    	
+    	List<WorkFlowDeptDesgMap> deptDesgMap = null;		
+    	if(!StringUtils.isBlank(additionalRule)) {
+			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentStateAndAddRule(objectType, currentState, additionalRule);
+		}else {
+			deptDesgMap = workFlowDeptDesgMapService.findByObjectTypeAndCurrentState(objectType, currentState);
+		}
+		
+		if(!CollectionUtils.isEmpty(deptDesgMap)) {
+			String deptCodes = deptDesgMap.stream().map(WorkFlowDeptDesgMap::getNextDepartment).collect(Collectors.joining(","));
+			departmentList = microserviceUtils.getDepartments(deptCodes);
+		}		
+        return departmentList;
+    }
 }
