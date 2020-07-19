@@ -53,6 +53,11 @@ public class ZoneMaster extends AbstractAuditable{
     @Min(1)
     @Max(1000)
     private Long ordernumber;
+    
+    @NotNull
+    @Length(max = 20)
+    @Audited
+    private String roadDivision;
 	
 	@Override
 	public Long getId() {
@@ -102,5 +107,13 @@ public class ZoneMaster extends AbstractAuditable{
 
 	public void setOrdernumber(Long ordernumber) {
 		this.ordernumber = ordernumber;
-	}   
+	}
+
+	public String getRoadDivision() {
+		return roadDivision;
+	}
+
+	public void setRoadDivision(String roadDivision) {
+		this.roadDivision = roadDivision;
+	}	
 }

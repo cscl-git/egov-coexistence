@@ -49,6 +49,9 @@ package com.exilant.exility.common;
 
 import org.apache.log4j.Logger;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -94,6 +97,5 @@ public class TestXMLLoading /* extends DefaultObject */{
         // XMLGenerator xg = XMLGenerator.getInstance();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Dumping using XML Generator");
-
     }
 }

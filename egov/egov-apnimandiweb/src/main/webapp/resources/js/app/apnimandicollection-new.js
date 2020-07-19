@@ -24,6 +24,7 @@ $('#collectiontype').change(function(){
 
 $('#zone').change(function(){
 	getContractorByZone();
+	getDepartmentByZone();
 });
 
 $('#collectionForMonth').change(function(){

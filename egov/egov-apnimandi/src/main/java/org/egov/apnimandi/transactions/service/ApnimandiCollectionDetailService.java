@@ -35,6 +35,7 @@ import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.Instrument;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.models.ReceiptResponse;
+import org.egov.infra.microservice.models.TaxHeadMaster;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.instrument.InstrumentHeader;
@@ -88,9 +89,6 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
 	
 	@Autowired
     private ApnimandiCollectionDetailsRepository apnimandiCollectionDetailsRepository;
-	
-	@Autowired
-    private ApnimandiCollectionAmountDetailsRepository apnimandiCollectionAmountDetailsRepository;
 	
 	@Autowired
     private ApnimandiCollectionDocumentRepository apnimandiCollectionDocumentRepository;
@@ -149,25 +147,14 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     		apnimandiCollectionWorkflowCustomImpl.createCommonWorkflowTransition(apnimandiCollectionDetails, approvalPosition, approvalComment, workFlowAction);
     	}
         applyAuditing(apnimandiCollectionDetails);
-        applyAuditing(apnimandiCollectionDetails.getState());
+        applyAuditing(apnimandiCollectionDetails.getState());        
+        prepareCollectionAmounts(apnimandiCollectionDetails, collectionAmountDetails);        
+        final List<ApnimandiCollectionDocument> apnimandiCollectionDocuments = getCollectionDocumentDetails(apnimandiCollectionDetails, files);        
         ApnimandiCollectionDetails savedApnimandiCollection = apnimandiCollectionDetailsRepository.save(apnimandiCollectionDetails);
-        
-        final List<ApnimandiCollectionDocument> apnimandiCollectionDocuments = getCollectionDocumentDetails(savedApnimandiCollection, files);
         if (!apnimandiCollectionDocuments.isEmpty()) {
-        	savedApnimandiCollection.setApnimandiCollectionDocuments(apnimandiCollectionDocuments);
+        	apnimandiCollectionDetails.setApnimandiCollectionDocuments(apnimandiCollectionDocuments);
         	persistCollectionDocuments(apnimandiCollectionDocuments);
         }
-        if(null!=collectionAmountDetails) {
-	        if(!collectionAmountDetails.isEmpty()) {
-	        	for (final ApnimandiCollectionAmountDetails collectionAmountDetail : collectionAmountDetails) {        		
-	        		collectionAmountDetail.setApnimandicollectiondetails(savedApnimandiCollection);
-	        		applyAuditing(collectionAmountDetail);
-	        	}
-	        	savedApnimandiCollection.setApnimandiCollectionAmountDetails(collectionAmountDetails);
-	        	persistCollectionAmounts(collectionAmountDetails);
-	        }
-        }
-        
         if (null != workFlowAction) {
         	if (ApnimandiConstants.APPROVE.equalsIgnoreCase(workFlowAction)) {
         		ReceiptResponse receiptResponse = new ReceiptResponse();
@@ -200,7 +187,7 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     	receiptHeader.setReasonForCancellation(StringUtils.EMPTY);
     	receiptHeader.setReceipttype(CollectionConstants.RECEIPT_TYPE_ADHOC);
     	receiptHeader.setReferenceDesc(apnimandiCollectionDetails.getComment());
-    	receiptHeader.setService(apnimandiCollectionDetails.getServiceCategory() + "." + apnimandiCollectionDetails.getServiceType());
+    	receiptHeader.setService(ApnimandiConstants.SERVICE_PREFIX + "_" + apnimandiCollectionDetails.getZone().getRoadDivision() + "." + apnimandiCollectionDetails.getServiceCategory());
     	receiptHeader.setServiceCategory(apnimandiCollectionDetails.getServiceCategory());
     	receiptHeader.setServiceIdText(StringUtils.EMPTY);
     	receiptHeader.setSource(Source.SYSTEM.toString());
@@ -309,11 +296,19 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         }
     }
     
-    public void persistCollectionAmounts(final List<ApnimandiCollectionAmountDetails> collectionAmountDetails) {
-        if (collectionAmountDetails != null && !collectionAmountDetails.isEmpty()) {
-            for (final ApnimandiCollectionAmountDetails collectionAmountDetail : collectionAmountDetails) {
-            	apnimandiCollectionAmountDetailsRepository.save(collectionAmountDetail);
-            }
+    private void prepareCollectionAmounts(final ApnimandiCollectionDetails apnimandiCollectionDetails, final List<ApnimandiCollectionAmountDetails> collectionAmountDetails) {        
+        if(null!=collectionAmountDetails) {
+	        if(!collectionAmountDetails.isEmpty()) {
+	        	if (apnimandiCollectionDetails.getApnimandiCollectionAmountDetails() != null && !apnimandiCollectionDetails.getApnimandiCollectionAmountDetails().isEmpty()) {
+	            	apnimandiCollectionDetails.getApnimandiCollectionAmountDetails().clear();
+	            	apnimandiCollectionDetailsRepository.flush();        	
+	            }	        	
+	        	for (final ApnimandiCollectionAmountDetails collectionAmountDetail : collectionAmountDetails) {        		
+	        		collectionAmountDetail.setApnimandicollectiondetails(apnimandiCollectionDetails);
+	        		applyAuditing(collectionAmountDetail);
+	        	}
+	        	apnimandiCollectionDetails.setApnimandiCollectionAmountDetails(collectionAmountDetails);    	        	
+	        }
         }
     }
     
@@ -555,5 +550,10 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryResult.setResultTransformer(new AliasToBeanResultTransformer(ApnimandiCollectionSearchResult.class));
         final List<ApnimandiCollectionSearchResult> collectionSearchList = queryResult.list();
         return collectionSearchList;
+    }
+    
+    public List<TaxHeadMaster> getAccountHeadMasterByService(String serviceId) {
+        List<TaxHeadMaster> accountHeadMasters = microserviceUtils.getTaxheadsByServiceCode(serviceId);
+        return accountHeadMasters;
     }
 }

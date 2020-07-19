@@ -38,10 +38,11 @@ public class ApnimandiConstants {
 	public static final String VALUE_KEY = "Value";
 	
 	public static final String DAY_MARKET = "DAY_MARKET";
-	public static final String APNIMANDI = "APNIMANDI";
+	public static final String APNI_MANDI = "APNI_MANDI";
 	
 	public static final String SERVICE_DAY_MARKET="DAY_MARKET";
-	public static final String SERVICE_APNIMANDI="APNIMANDI";
+	public static final String SERVICE_APNI_MANDI="APNI_MANDI";
+	public static final String SERVICE_PREFIX="APNI_MANDI_DAY_MARKET";
 	
 	public static final String SERVICE_TYPE_CONTRACTOR_SECURITY_FEE="CONTRACTOR_SECURITY_FEE";
 	public static final String SERVICE_TYPE_RENT_AMOUNT="RENT_AMOUNT";
@@ -50,11 +51,22 @@ public class ApnimandiConstants {
 	public static final String SERVICE_NAME_CONTRACTOR_SECURITY_FEE="Contractor Security Fee";
 	public static final String SERVICE_NAME_RENT_AMOUNT="Rent Amount";
 	public static final String SERVICE_NAME_COLLECTION_AMOUNT="Collection Amount";
+
+	public static final String GROUND_RENT_APNI_MANDI="GROUND_RENT_APNI_MANDI";
+	public static final String SECURITY_APNI_MANDI="SECURITY_APNI_MANDI";
+	public static final String CGST_UTGST_APNI_MANDI="CGST_UTGST_APNI_MANDI";
+	public static final String IGST_APNI_MANDI="IGST_APNI_MANDI";
+	public static final String PENALITIES_FINES_APNI_MANDI="PENALITIES_FINES_APNI_MANDI";
 	
-	public static final String DAY_MARKET_CONTRACTOR_SECURITY_FEE="DAY_MARKET_CONTRACTOR_SECURITY_FEE";
-	public static final String DAY_MARKET_RENT_AMOUNT_FEE="DAY_MARKET_RENT_AMOUNT_FEE";
-	public static final String DAY_MARKET_PENALTY_FEE="DAY_MARKET_PENALTY_FEE";
-	public static final String APNIMANDI_COLLECTION_AMOUNT="APNIMANDI_COLLECTION_AMOUNT";
+	public static final String GROUND_RENT_DAY_MARKET="GROUND_RENT_DAY_MARKET";
+	public static final String SECURITY_DAY_MARKET="SECURITY_DAY_MARKET";
+	public static final String CGST_UTGST_DAY_MARKET="CGST_UTGST_DAY_MARKET";
+	public static final String IGST_DAY_MARKET="IGST_DAY_MARKET";
+	public static final String PENALITIES_FINES_DAY_MARKET="PENALITIES_FINES_DAY_MARKET";
 	
-	public static final String KISSAN_MANDI="Kissan Mandi";
+	public static final String KISSAN_MANDI="Kissan Mandi";	
+	
+	public static final String RD1 = "RD1";
+    public static final String RD2 = "RD2";
+    public static final String RD3 = "RD3";
 }

@@ -45,62 +45,77 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-$(document).ready(function()
-{	
+$(document).ready(function(){	
 	$('#approvalDepartment').change(function(){
-		$.ajax({
-			url: "/services/eis/ajaxWorkFlow-getDesignationsByObjectType",     
-			type: "GET",
-			data: {
-				approvalDepartment : $('#approvalDepartment').val(),
-				departmentRule : $('#approvalDepartment').find("option:selected").text(),
-				type : $('#stateType').val(),
-				currentState : $('#currentState').val(),
-				amountRule : $('#amountRule').val(),
-				additionalRule : $('#additionalRule').val(),
-				pendingAction : $('#pendingActions').val()
-			},
-			dataType: "json",
-			success: function (response) {
-				console.log("success"+response);
-				$('#approvalDesignation').empty();
-				$('#approvalDesignation').append($("<option value=''>Select from below</option>"));
-				$.each(response, function(index, value) {
-					$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.code));
-				});
-				
-			}, 
-			error: function (response) {
-				alert('json fail');
-				console.log("failed");
-			}
-		});
-	});
-	
+		var appDepartment = $('#approvalDepartment').val();
+		if(appDepartment!=""){
+			$.ajax({
+				url: "/services/eis/ajaxWorkFlow-getDesignationsByObjectType",     
+				type: "GET",
+				data: {
+					approvalDepartment : $('#approvalDepartment').val(),
+					departmentRule : $('#approvalDepartment').find("option:selected").text(),
+					type : $('#stateType').val(),
+					currentState : $('#currentState').val(),
+					amountRule : $('#amountRule').val(),
+					additionalRule : $('#additionalRule').val(),
+					pendingAction : $('#pendingActions').val()
+				},
+				dataType: "json",
+				success: function (response) {
+					console.log("success"+response);
+					$('#approvalDesignation').empty();
+					$('#approvalDesignation').append($("<option value=''>Select</option>"));
+					$.each(response, function(index, value) {
+						$('#approvalDesignation').append($('<option>').text(value.name).attr('value', value.code));
+					});
+					
+				}, 
+				error: function (response) {
+					alert('json fail');
+					console.log("failed");
+				}
+			});
+		}else{
+			$('#approvalDesignation').empty();
+			$('#approvalDesignation').append($("<option value=''>Select</option>"));
+			$('#approvalDesignation').val("");
+			$('#approvalPosition').empty();
+			$('#approvalPosition').append($("<option value=''>Select</option>"));
+			$('#approvalPosition').val("");
+		}
+	});	
 	
 	$('#approvalDesignation').change(function(){
-		$.ajax({
-			url: "/services/eis/ajaxWorkFlow-positionsByDepartmentAndDesignation",     
-			type: "GET",
-			data: {
-				approvalDesignation : $('#approvalDesignation').val(),
-				approvalDepartment : $('#approvalDepartment').val()    
-			},
-			dataType: "json",
-			success: function (response) {
-				console.log("success"+response);
-				$('#approvalPosition').empty();
-				$('#approvalPosition').append($("<option value=''>Select from below</option>"));
-				$.each(response, function(index, value) {
-					//$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));
-					$('#approvalPosition').append($('<option>').text(value.userName).attr('value', value.positionId));
-				});
-				
-			}, 
-			error: function (response) {
-				console.log("failed");
-			}
-		});
+		var appDesignation = $('#approvalDesignation').val();
+		if(appDesignation!=""){
+			$.ajax({
+				url: "/services/eis/ajaxWorkFlow-positionsByDepartmentAndDesignation",     
+				type: "GET",
+				data: {
+					approvalDesignation : $('#approvalDesignation').val(),
+					approvalDepartment : $('#approvalDepartment').val()    
+				},
+				dataType: "json",
+				success: function (response) {
+					console.log("success"+response);
+					$('#approvalPosition').empty();
+					$('#approvalPosition').append($("<option value=''>Select</option>"));
+					$.each(response, function(index, value) {
+						//$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));
+						$('#approvalPosition').append($('<option>').text(value.userName).attr('value', value.positionId));
+					});
+					
+				}, 
+				error: function (response) {
+					console.log("failed");
+				}
+			});
+		}else{
+			$('#approvalPosition').empty();
+			$('#approvalPosition').append($("<option value=''>Select</option>"));
+			$('#approvalPosition').val("");
+		}
 	});
 	
 	$('#approvalPosition').change(function(){
@@ -108,9 +123,7 @@ $(document).ready(function()
 		var nextDesignation=$('#approvalPosition option:selected').text().split('/')[1];
 		$('#approverName').val(approvername);
 		$('#nextDesignation').val(nextDesignation);
-	});
-	
-	
+	});	
 });
 
 function callAlertForDepartment() {
@@ -128,4 +141,3 @@ function callAlertForDesignation() {
 		return false;
 	}
 }
-	

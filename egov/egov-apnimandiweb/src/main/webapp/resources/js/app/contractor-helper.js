@@ -160,4 +160,36 @@ $('#btnContractorAddNew').click(function(e) {
 	}
 	window.location = url;
 });
+
+function getDepartmentByZone(){
+	var zoneid=$('#zone').val();
+	if(zoneid!=""){
+		$.ajax({
+			url: "/services/apnimandi/contractor/ajax/getDepertmentsByZone",     
+			type: "GET",
+			data: {
+				objectType : $('#stateType').val(),
+				currentState : $('#currentState').val(),
+				zoneid : zoneid
+			},
+			dataType: "json",
+			success: function (response) {
+				console.log("success"+response);
+				$('#approvalDepartment').empty();
+				$('#approvalDepartment').append($("<option value=''>Select</option>"));
+				$.each(response.departments, function(index, value) {
+					$('#approvalDepartment').append($('<option>').text(value.name).attr('value', value.code));
+				});
+				$('#additionalRule').val(response.additionalRule);
+			}, 
+			error: function (response) {
+				console.log("failed");
+			}
+		});
+	}
+}
+
+$('#zone').change(function(){
+	getDepartmentByZone();
+});
 		

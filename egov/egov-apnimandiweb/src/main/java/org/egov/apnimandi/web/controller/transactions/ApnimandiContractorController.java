@@ -8,7 +8,6 @@ import java.nio.file.Paths;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -34,6 +33,7 @@ import org.egov.apnimandi.utils.constants.ApnimandiConstants;
 import org.egov.apnimandi.web.adaptor.ContractorJsonAdaptor;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.joda.time.DateTime;
@@ -72,6 +72,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
     private static final String WORK_FLOW_ACTION = "workFlowAction";
     private static final String APPROVAL_COMENT = "approvalComent";
     private static final String CURRENT_STATE = "currentState";
+    private static final String ADDITIONALRULE = "additionalRule";
     private static final String APPROVAL_NAME = "approverName";
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
     
@@ -122,6 +123,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
+        model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
         prepareWorkFlowOnLoad(model, apnimandiContractor);
         return APNIMANDI_CONTRACTOR_NEW;
     }
@@ -135,6 +137,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
+        model.addAttribute(ADDITIONALRULE, zone.getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiContractor);
         return APNIMANDI_CONTRACTOR_NEW;
     }
@@ -161,7 +164,8 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 	        model.addAttribute(EXISTING_APNIMANDI_CONTRACTOR_LIST, existingContractorList);	        
 	        model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
 	        model.addAttribute(MODE, MODE_CREATE);
-	        model.addAttribute(CURRENT_STATE, "NEW");
+	        model.addAttribute(CURRENT_STATE, "NEW");   
+	        model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiContractor);
 	        return APNIMANDI_CONTRACTOR_NEW;
 	    }
@@ -302,6 +306,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 		final ApnimandiContractor apnimandiContractor = contractorsService.findOne(id);
         prepareNewForm(model);
         model.addAttribute(CURRENT_STATE, apnimandiContractor.getState().getValue());
+        model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiContractor);
         model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
         model.addAttribute(MODE, MODE_VIEW);
@@ -315,6 +320,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 	        model.addAttribute(CURRENT_STATE, apnimandiContractor.getState().getValue());
+	        model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiContractor);
 	        model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
 	        model.addAttribute(MODE, MODE_VIEW);
@@ -467,4 +473,28 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 	private String getMessage(String messageLabel) {
 		return messageSource.getMessage(messageLabel, null, null);
 	}
+	
+	@RequestMapping(value = "/ajax/getDepertmentsByZone", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public void getDepertmentsByZone(@ModelAttribute("departments") @RequestParam final String currentState,
+            						 @RequestParam final String objectType, 
+            						 @RequestParam final Long zoneid,
+       								 final HttpServletResponse response) throws IOException {
+		JsonObject jsonObject = new JsonObject();
+		JsonArray departments = new JsonArray();
+		if(null != zoneid) {
+			ZoneMaster zone = zoneMasterService.findOne(zoneid);
+			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			depts.forEach(dept -> {
+				JsonObject department = new JsonObject();
+				department.addProperty("code", dept.getCode());
+				department.addProperty("name", dept.getName());
+				departments.add(department);
+			});
+		}
+		jsonObject.add("departments", departments);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
 }

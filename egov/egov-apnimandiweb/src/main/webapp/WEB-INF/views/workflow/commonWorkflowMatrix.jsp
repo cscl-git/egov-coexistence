@@ -20,7 +20,7 @@
 			</c:if> 
 			<form:hidden path="" id="currentDesignation" name="currentDesignation" value="${currentDesignation}"/>
 			<form:hidden path="" id="additionalRule" name="additionalRule" value="${additionalRule}"/>
-			<form:hidden  path="" id="amountRule" name="amountRule" value="${amountRule}"/>
+			<form:hidden path="" id="amountRule" name="amountRule" value="${amountRule}"/>
 			<form:hidden path="" id="workFlowDepartment" name="workFlowDepartment" value="${workFlowDepartment}"/>
 			<form:hidden path="" id="pendingActions" name="pendingActions" value="${pendingActions}"/>
 			<form:hidden path="" id="nextAction" name="nextAction" value="${nextAction}"/>

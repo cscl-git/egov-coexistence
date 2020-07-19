@@ -19,6 +19,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.apnimandi.masters.entity.ApnimandiCollectionType;
+import org.egov.apnimandi.masters.entity.ZoneMaster;
 import org.egov.apnimandi.masters.entity.vo.AttachedDocument;
 import org.egov.apnimandi.masters.service.ApnimaniCollectionTypeService;
 import org.egov.apnimandi.masters.service.ZoneMasterService;
@@ -35,6 +36,8 @@ import org.egov.apnimandi.utils.constants.ApnimandiConstants;
 import org.egov.apnimandi.web.adaptor.CollectionJsonAdaptor;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.TaxHeadMaster;
 import org.egov.infra.utils.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -71,6 +74,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
     private static final String WORK_FLOW_ACTION = "workFlowAction";
     private static final String APPROVAL_COMENT = "approvalComent";
     private static final String CURRENT_STATE = "currentState";
+    private static final String ADDITIONALRULE = "additionalRule";
     private static final String APPROVAL_NAME = "approverName";
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
     
@@ -120,6 +124,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
+        model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
         return APNIMANDI_COLLECTION_DETAILS_NEW;
     }
@@ -150,6 +155,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
 	        model.addAttribute(MODE, MODE_CREATE);
 	        model.addAttribute(CURRENT_STATE, "NEW");
+	        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
 	        return APNIMANDI_COLLECTION_DETAILS_NEW;
 	    }
@@ -326,6 +332,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		final ApnimandiCollectionDetails apnimandiCollectionDetails = apnimandiCollectionDetailService.findOne(id);
         prepareNewForm(model);
         model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
+        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_VIEW);
@@ -339,6 +346,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 	        model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
+	        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
 	        model.addAttribute(MODE, MODE_VIEW);
@@ -430,7 +438,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 				serviceType.addProperty(ApnimandiConstants.DISPLAY_KEY, ApnimandiConstants.SERVICE_NAME_RENT_AMOUNT);
 				serviceTypes.add(serviceType);				
 			}else {
-				jsonObject.addProperty("serviceCategory", ApnimandiConstants.SERVICE_APNIMANDI);
+				jsonObject.addProperty("serviceCategory", ApnimandiConstants.SERVICE_APNI_MANDI);
 				JsonObject serviceType = new JsonObject();
 				serviceType.addProperty(ApnimandiConstants.VALUE_KEY, ApnimandiConstants.SERVICE_TYPE_COLLECTION_AMOUNT);
 				serviceType.addProperty(ApnimandiConstants.DISPLAY_KEY, ApnimandiConstants.SERVICE_NAME_COLLECTION_AMOUNT);
@@ -443,6 +451,64 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         IOUtils.write(jsonObject.toString(), response.getWriter());
     }
+	
+	@RequestMapping(value = "/ajax/getAccountHeads", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody void getAccountHeads(@RequestParam final String serviceCategory,
+    										  @RequestParam final String servicetype,
+    										  @RequestParam final long zoneId,
+    										  @RequestParam final long collectionTypeId,
+    										  final HttpServletResponse response) throws IOException {
+		JsonObject jsonObject = new JsonObject();
+		JsonArray accountHeads = new JsonArray();
+		ZoneMaster zoneMaster = zoneMasterService.findOne(zoneId);
+		ApnimandiCollectionType apnimandiCollectionType = apnimaniCollectionTypeService.findOne(collectionTypeId);
+		
+		String serviceId = ApnimandiConstants.SERVICE_PREFIX + "_" + zoneMaster.getRoadDivision() + "." + serviceCategory;		
+		List<TaxHeadMaster> accountHeadMasters = apnimandiCollectionDetailService.getAccountHeadMasterByService(serviceId);
+		if(null!=accountHeadMasters) {
+			boolean isFound=false;
+			for(TaxHeadMaster accountHead :accountHeadMasters) {
+				isFound=false;
+				if(ApnimandiConstants.APNI_MANDI.equalsIgnoreCase(apnimandiCollectionType.getCode())) {
+					if(ApnimandiConstants.SERVICE_TYPE_CONTRACTOR_SECURITY_FEE.equalsIgnoreCase(servicetype)) {					
+						if((ApnimandiConstants.SECURITY_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
+							isFound=true;
+						}
+					}else if(ApnimandiConstants.SERVICE_TYPE_RENT_AMOUNT.equalsIgnoreCase(servicetype)) {
+						if((ApnimandiConstants.GROUND_RENT_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+							|| (ApnimandiConstants.PENALITIES_FINES_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+								|| (ApnimandiConstants.CGST_UTGST_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+									|| (ApnimandiConstants.IGST_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
+							isFound=true;
+						}
+					}
+				}else if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionType.getCode())) {
+					if(ApnimandiConstants.SERVICE_TYPE_CONTRACTOR_SECURITY_FEE.equalsIgnoreCase(servicetype)) {					
+						if((ApnimandiConstants.SECURITY_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
+							isFound=true;
+						}
+					}else if(ApnimandiConstants.SERVICE_TYPE_RENT_AMOUNT.equalsIgnoreCase(servicetype)) {
+						if((ApnimandiConstants.GROUND_RENT_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+							|| (ApnimandiConstants.PENALITIES_FINES_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+								|| (ApnimandiConstants.CGST_UTGST_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+									|| (ApnimandiConstants.IGST_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
+							isFound=true;
+						}
+					}
+				}
+				if(isFound) {
+					JsonObject accountHeadJson = new JsonObject();
+					accountHeadJson.addProperty("code", accountHead.getCode());
+					accountHeadJson.addProperty("name", accountHead.getName());
+					accountHeadJson.addProperty("isDebit", accountHead.getIsDebit());
+					accountHeads.add(accountHeadJson);
+				}							
+			}
+		}		
+		jsonObject.add("accountHeads", accountHeads);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        IOUtils.write(jsonObject.toString(), response.getWriter());
+	}
 	
 	@RequestMapping(value = "/ajaxsearch", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
     public @ResponseBody String ajaxsearch(final Model model, @ModelAttribute final ApnimandiCollectionDetails apnimandiCollectionDetails) {
@@ -471,4 +537,28 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	private String getMessage(String messageLabel) {
 		return messageSource.getMessage(messageLabel, null, null);
 	}
+	
+	@RequestMapping(value = "/ajax/getDepertmentsByZone", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public void getDepertmentsByZone(@ModelAttribute("departments") @RequestParam final String currentState,
+            						 @RequestParam final String objectType, 
+            						 @RequestParam final Long zoneid,
+       								 final HttpServletResponse response) throws IOException {
+		JsonObject jsonObject = new JsonObject();
+		JsonArray departments = new JsonArray();
+		if(null != zoneid) {
+			ZoneMaster zone = zoneMasterService.findOne(zoneid);
+			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			depts.forEach(dept -> {
+				JsonObject department = new JsonObject();
+				department.addProperty("code", dept.getCode());
+				department.addProperty("name", dept.getName());
+				departments.add(department);
+			});
+		}
+		jsonObject.add("departments", departments);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
 }

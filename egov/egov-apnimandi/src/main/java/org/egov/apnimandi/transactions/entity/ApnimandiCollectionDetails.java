@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -162,7 +163,7 @@ public class ApnimandiCollectionDetails extends StateAware{
     @Transient
     private String departmentName;
     
-	@OneToMany(mappedBy = "apnimandicollectiondetails", fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "apnimandicollectiondetails", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @NotAudited
     private List<ApnimandiCollectionAmountDetails> apnimandiCollectionAmountDetails = new ArrayList<ApnimandiCollectionAmountDetails>(0);
     
