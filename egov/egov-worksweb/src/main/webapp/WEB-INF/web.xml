@@ -51,7 +51,7 @@
          xmlns="http://xmlns.jcp.org/xml/ns/javaee"
          xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
 
-    <display-name>e-governments works web</display-name>
+    <display-name>eGov Works Management</display-name>
 
     <!-- The definition of the Root Spring Container shared by all Servlets and Filters -->
     <context-param>
@@ -67,21 +67,6 @@
         <param-value>erpApplicationContext</param-value>
     </context-param>
     <!-- Creates the Spring Container shared by all Servlets and Filters -->
-
-    <listener>
-
-        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-
-    </listener>
-
-    <!-- <listener>
-
-        <listener-class>org.egov.infra.web.listener.MDCLoggingCorrelationIDAssigner</listener-class>
-
-    </listener> -->
-
-
-
     <filter>
         <filter-name>CacheControlFilter</filter-name>
         <filter-class>org.egov.infra.web.filter.CacheControlFilter</filter-class>
@@ -226,11 +211,12 @@
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-
+    <listener>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
     <listener>
         <listener-class>org.egov.infra.web.listener.MDCLoggingCorrelationIDAssigner</listener-class>
     </listener>
-
     <!-- Listeners Ends Servlet Declaration Starts -->
     <servlet>
         <servlet-name>reportViewer</servlet-name>
@@ -301,6 +287,9 @@
     </jsp-config>
     <error-page>
         <error-code>500</error-code>
-        <location>/error/error.jsp</location>
+    </error-page>
+    <error-page>
+        <error-code>404</error-code>
+        <location>/error/404</location>
     </error-page>
 </web-app>
