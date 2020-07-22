@@ -170,8 +170,8 @@ public class CreateContractorBillController extends BaseBillController {
     @Autowired
     private AccountdetailtypeService accountdetailtypeService;
 
-    @Autowired
-    private WorkOrderService workOrderService;
+    //@Autowired
+    //private WorkOrderService workOrderService;
 
     public CreateContractorBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -241,8 +241,8 @@ public class CreateContractorBillController extends BaseBillController {
             egBillregister.getBillPayeedetails().clear();
             prepareBillDetailsForView(egBillregister);
             prepareValidActionListByCutOffDate(model);
-            model.addAttribute(CONTRACTOR_ID,
-                    workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
+            model.addAttribute(CONTRACTOR_ID,null
+                    /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()*/);
             return CONTRACTORBILL_FORM;
         } else {
             Long approvalPosition = 0l;
@@ -272,8 +272,8 @@ public class CreateContractorBillController extends BaseBillController {
                 egBillregister.getBillPayeedetails().clear();
                 prepareBillDetailsForView(egBillregister);
                 prepareValidActionListByCutOffDate(model);
-                model.addAttribute(CONTRACTOR_ID,
-                        workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
+                model.addAttribute(CONTRACTOR_ID, null
+                        /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()*/);
                 resultBinder.reject("", e.getErrors().get(0).getMessage());
                 return CONTRACTORBILL_FORM;
             }
@@ -312,7 +312,7 @@ public class CreateContractorBillController extends BaseBillController {
         Accountdetailtype contractorAccountdetailtype = accountdetailtypeService.findByName(CONTRACTOR);
         contractorAccountDetailTypeId = contractorAccountdetailtype.getId();
         String contractorAccountDetailTypeName = contractorAccountdetailtype.getName();
-        wo = workOrderService.getByOrderNumber(egBillregister.getWorkordernumber());
+        wo = null /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber())*/;
         for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
             details.setEgBillPaydetailes(new HashSet<>());
             check = false;

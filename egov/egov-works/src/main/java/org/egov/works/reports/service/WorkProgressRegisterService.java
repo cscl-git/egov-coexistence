@@ -82,10 +82,10 @@ public class WorkProgressRegisterService {
     private EntityManager entityManager;
 
     public List<String> findWorkIdentificationNumbersToSearchLineEstimatesForLoa(final String code) {
-        final List<String> workIdNumbers = lineEstimateDetailsRepository
+        final List<String> workIdNumbers = null /*lineEstimateDetailsRepository
                 .findWorkIdentificationNumbersToSearchWorkProgressRegister("%" + code + "%",
                         LineEstimateStatus.ADMINISTRATIVE_SANCTIONED.toString(),
-                        LineEstimateStatus.TECHNICAL_SANCTIONED.toString());
+                        LineEstimateStatus.TECHNICAL_SANCTIONED.toString())*/;
         return workIdNumbers;
     }
 

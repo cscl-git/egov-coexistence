@@ -394,9 +394,9 @@ public class LineEstimateService {
 
     public List<String> findWorkIdentificationNumbersToSearchLineEstimatesForLoa(final String name) {
 
-        return lineEstimateDetailsRepository
+        return null /*lineEstimateDetailsRepository
                 .findWorkIdentificationNumbersToSearchLineEstimatesForLoa("%" + name + "%",
-                        WorksConstants.CANCELLED_STATUS);
+                        WorksConstants.CANCELLED_STATUS)*/;
     }
 
     public List<LineEstimateForLoaSearchResult> searchLineEstimatesForLOA(
@@ -819,15 +819,15 @@ public class LineEstimateService {
     }
 
     public List<String> getEstimateNumberForDepartment(final Long departmentId) {
-        return lineEstimateDetailsRepository.findEstimateNumbersForDepartment(departmentId);
+        return null /*lineEstimateDetailsRepository.findEstimateNumbersForDepartment(departmentId)*/;
     }
 
     public List<String> getEstimateNumbersForWorkIdentificationNumber(final String workIdentificationNumber) {
-        return lineEstimateDetailsRepository.findEstimateNumbersForWorkIdentificationNumber(workIdentificationNumber);
+        return null /*lineEstimateDetailsRepository.findEstimateNumbersForWorkIdentificationNumber(workIdentificationNumber)*/;
     }
 
     public List<String> getEstimateNumbersForSpillOverFlag(final boolean spillOverFlag) {
-        return lineEstimateDetailsRepository.findEstimateNumbersForSpillOverFlag(spillOverFlag);
+        return null /*lineEstimateDetailsRepository.findEstimateNumbersForSpillOverFlag(spillOverFlag)*/;
     }
 
     public List<User> getCreatedByUsersForCancelLineEstimateByDepartment(final Long department) {
@@ -901,13 +901,13 @@ public class LineEstimateService {
     }
 
     public List<String> getEstimateNumbersForEstimatePhotograph(final String estimateNumber) {
-        return lineEstimateDetailsRepository.findEstimateNumbersForEstimatePhotograph("%" + estimateNumber + "%",
-                WorksConstants.CANCELLED_STATUS);
+        return null/*lineEstimateDetailsRepository.findEstimateNumbersForEstimatePhotograph("%" + estimateNumber + "%",
+                WorksConstants.CANCELLED_STATUS)*/;
     }
 
     public List<String> getWinForEstimatePhotograph(final String workIdentificationNumber) {
-        return lineEstimateDetailsRepository.findWorkIdentificationNumberForEstimatePhotograph(
-                "%" + workIdentificationNumber + "%", WorksConstants.CANCELLED_STATUS);
+        return null /*lineEstimateDetailsRepository.findWorkIdentificationNumberForEstimatePhotograph(
+                "%" + workIdentificationNumber + "%", WorksConstants.CANCELLED_STATUS)*/;
     }
 
     public List<LineEstimateDetails> searchLineEstimatesForEstimatePhotograph(

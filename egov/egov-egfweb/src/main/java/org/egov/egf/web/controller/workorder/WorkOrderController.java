@@ -94,8 +94,8 @@ public class WorkOrderController {
     @Autowired
     private FundService fundService;
 
-    @Autowired
-    private WorkOrderService workOrderService;
+    //@Autowired
+    //private WorkOrderService workOrderService;
 
     @Autowired
     private MicroserviceUtils microserviceUtils;
@@ -131,7 +131,7 @@ public class WorkOrderController {
             return NEW;
         }
 
-        workOrderService.create(workOrder);
+        //workOrderService.create(workOrder);
 
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.workOrder.success", null, null));
 
@@ -140,7 +140,7 @@ public class WorkOrderController {
 
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.POST)
     public String edit(@PathVariable("id") final Long id, final Model model) {
-        final WorkOrder workOrder = workOrderService.getById(id);
+        final WorkOrder workOrder = null /*workOrderService.getById(id)*/;
         List<EgBillregister> bills = egBillRegisterService.getBillsByWorkOrderNumber(workOrder.getOrderNumber());
         if (bills != null && !bills.isEmpty()) {
             workOrder.setEditAllFields(false);
@@ -159,14 +159,14 @@ public class WorkOrderController {
             prepareNewForm(model);
             return EDIT;
         }
-        workOrderService.update(workOrder);
+        //workOrderService.update(workOrder);
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.workOrder.success", null, null));
         return "redirect:/workorder/result/" + workOrder.getId() + "/view";
     }
 
     @RequestMapping(value = "/view/{id}", method = RequestMethod.POST)
     public String view(@PathVariable("id") final Long id, final Model model) {
-        final WorkOrder workOrder = workOrderService.getById(id);
+        final WorkOrder workOrder = null /*workOrderService.getById(id)*/;
         populateDepartmentName(workOrder);
         prepareNewForm(model);
         model.addAttribute("workOrder", workOrder);
@@ -187,7 +187,7 @@ public class WorkOrderController {
     @ResponseBody
     public String ajaxsearch(@PathVariable("mode") final String mode, final Model model,
             @ModelAttribute final WorkOrder workOrder) {
-        final List<WorkOrder> searchResultList = workOrderService.search(workOrder);
+        final List<WorkOrder> searchResultList = null /*workOrderService.search(workOrder)*/;
         return new StringBuilder("{ \"data\":").append(toSearchResultJson(searchResultList)).append("}").toString();
     }
 
@@ -199,7 +199,7 @@ public class WorkOrderController {
 
     @RequestMapping(value = "/result/{id}/{mode}", method = RequestMethod.GET)
     public String result(@PathVariable("id") final Long id, @PathVariable("mode") final String mode, final Model model) {
-        final WorkOrder workOrder = workOrderService.getById(id);
+        final WorkOrder workOrder = null /*workOrderService.getById(id)*/;
         populateDepartmentName(workOrder);
         model.addAttribute("workOrder", workOrder);
         model.addAttribute("mode", mode);

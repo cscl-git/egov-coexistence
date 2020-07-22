@@ -146,8 +146,8 @@ public class UpdateContractorBillController extends BaseBillController {
     private MicroserviceUtils microServiceUtil;
     @Autowired
     private ContractorService contractorService;
-    @Autowired
-    private WorkOrderService workOrderService;
+    //@Autowired
+    //private WorkOrderService workOrderService;
     @Autowired
     private AccountdetailtypeService accountdetailtypeService;
 
@@ -184,8 +184,8 @@ public class UpdateContractorBillController extends BaseBillController {
             model.addAttribute(CURRENT_STATE, egBillregister.getState().getValue());
         model.addAttribute(WORKFLOW_HISTORY,
                 financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
-        model.addAttribute(CONTRACTOR_ID,
-                workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
+        model.addAttribute(CONTRACTOR_ID,null
+                /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()*/);
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
         prepareBillDetailsForView(egBillregister);
@@ -275,8 +275,8 @@ public class UpdateContractorBillController extends BaseBillController {
                     if (details.getCreditamount() != null && details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
                         payeeDetail.setCreditAmount(details.getCreditamount());
                     payeeDetail.setAccountDetailTypeId(accountdetailtypeService.findByName(WORK_ORDER).getId());
-                    payeeDetail.setAccountDetailKeyId(
-                            workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getId().intValue());
+                    payeeDetail.setAccountDetailKeyId(null
+                            /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getId().intValue()*/);
                 } else if (contractorExist) {
                     payeeDetail = new EgBillPayeedetails();
                     payeeDetail.setEgBilldetailsId(details);
@@ -285,9 +285,9 @@ public class UpdateContractorBillController extends BaseBillController {
                     if (details.getCreditamount() != null && details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
                         payeeDetail.setCreditAmount(details.getCreditamount());
                     payeeDetail.setAccountDetailTypeId(accountdetailtypeService.findByName(CONTRACTOR).getId());
-                    payeeDetail.setAccountDetailKeyId(
-                            workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()
-                                    .intValue());
+                    payeeDetail.setAccountDetailKeyId(null
+                            /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()
+                                    .intValue()*/);
                 }
                 payeeDetail.setLastUpdatedTime(new Date());
                 details.getEgBillPaydetailes().add(payeeDetail);
@@ -360,13 +360,13 @@ public class UpdateContractorBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
-        model.addAttribute(CONTRACTOR_ID,
-                workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
+        model.addAttribute(CONTRACTOR_ID,null
+                /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()*/);
 
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
-            model.addAttribute(CONTRACTOR_ID,
-                    workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId());
+            model.addAttribute(CONTRACTOR_ID,null
+                    /*workOrderService.getByOrderNumber(egBillregister.getWorkordernumber()).getContractor().getId()*/);
             model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
             prepareWorkflow(model, egBillregister, new WorkflowContainer());
             model.addAttribute(APPROVAL_DESIGNATION, request.getParameter(APPROVAL_DESIGNATION));

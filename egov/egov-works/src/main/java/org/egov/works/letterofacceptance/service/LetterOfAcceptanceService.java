@@ -260,8 +260,8 @@ public class LetterOfAcceptanceService {
 
     public List<WorkOrder> searchLetterOfAcceptance(final SearchRequestLetterOfAcceptance searchRequestLetterOfAcceptance) {
         // TODO Need TO handle in single query
-        final List<String> estimateNumbers = lineEstimateDetailsRepository
-                .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName());
+        final List<String> estimateNumbers = null/*lineEstimateDetailsRepository
+                .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName())*/;
         if (estimateNumbers.isEmpty())
             estimateNumbers.add("");
         final Criteria criteria = entityManager.unwrap(Session.class).createCriteria(WorkOrder.class, "wo")
@@ -299,8 +299,8 @@ public class LetterOfAcceptanceService {
         if (estimateNumbers.isEmpty())
             estimateNumbers.add("");
         // TODO: replace fetching workorders by query with criteria alias
-        final List<String> workOrderNumbers = letterOfAcceptanceRepository.getDistinctNonCancelledWorkOrderNumbersByBillType(
-                ContractorBillRegister.BillStatus.CANCELLED.toString(), BillTypes.Final_Bill.toString());
+        final List<String> workOrderNumbers = null /*letterOfAcceptanceRepository.getDistinctNonCancelledWorkOrderNumbersByBillType(
+                ContractorBillRegister.BillStatus.CANCELLED.toString(), BillTypes.Final_Bill.toString())*/;
         final Criteria criteria = entityManager.unwrap(Session.class).createCriteria(WorkOrder.class, "wo")
                 .createAlias("contractor", "woc")
                 .createAlias("egwStatus", "status");
@@ -331,14 +331,14 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> getApprovedEstimateNumbersToModifyLOA(final String name) {
-        return letterOfAcceptanceRepository.findDistinctEstimateNumberToModifyLOA("%" + name + "%", WorksConstants.APPROVED,
+        return null /*letterOfAcceptanceRepository.findDistinctEstimateNumberToModifyLOA("%" + name + "%", WorksConstants.APPROVED,
                 ContractorBillRegister.BillStatus.CANCELLED.toString(),
-                BillTypes.Final_Bill.toString());
+                BillTypes.Final_Bill.toString())*/;
     }
 
     public List<String> findDistinctContractorsInWorkOrderByCodeOrName(final String name) {
-        final List<String> results = letterOfAcceptanceRepository
-                .findDistinctContractorByContractor_codeAndNameContainingIgnoreCase("%" + name + "%");
+        final List<String> results = null /*letterOfAcceptanceRepository
+                .findDistinctContractorByContractor_codeAndNameContainingIgnoreCase("%" + name + "%")*/;
         return results;
     }
 
@@ -352,16 +352,16 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> getApprovedWorkOrdersForCreateContractorBill(final String workOrderNumber) {
-        final List<String> results = letterOfAcceptanceRepository.findWorkOrderNumberForContractorBill(
+        final List<String> results = null /*letterOfAcceptanceRepository.findWorkOrderNumberForContractorBill(
                 "%" + workOrderNumber + "%", WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(),
-                BillTypes.Final_Bill.toString());
+                BillTypes.Final_Bill.toString())*/;
         return results;
 
     }
 
     public List<String> getApprovedEstimateNumbersForCreateContractorBill(final String estimateNumber) {
-        final List<String> results = letterOfAcceptanceRepository.findEstimateNumberForContractorBill("%" + estimateNumber + "%",
-                WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(), BillTypes.Final_Bill.toString());
+        final List<String> results = null/*letterOfAcceptanceRepository.findEstimateNumberForContractorBill("%" + estimateNumber + "%",
+                WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(), BillTypes.Final_Bill.toString())*/;
         return results;
     }
 
@@ -372,8 +372,8 @@ public class LetterOfAcceptanceService {
     }
 
     public Boolean validateContractorBillInWorkflowForWorkorder(final Long workOrderId) {
-        final List<String> results = letterOfAcceptanceRepository.getContractorBillInWorkflowForWorkorder(workOrderId,
-                ContractorBillRegister.BillStatus.CANCELLED.toString(), ContractorBillRegister.BillStatus.APPROVED.toString());
+        final List<String> results = null /*letterOfAcceptanceRepository.getContractorBillInWorkflowForWorkorder(workOrderId,
+                ContractorBillRegister.BillStatus.CANCELLED.toString(), ContractorBillRegister.BillStatus.APPROVED.toString())*/;
         if (results.isEmpty())
             return true;
         else
@@ -410,8 +410,8 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> findWorkIdentificationNumbersToCreateMilestone(final String code) {
-        final List<String> workIdNumbers = letterOfAcceptanceRepository
-                .findWorkIdentificationNumberToCreateMilestone("%" + code + "%");
+        final List<String> workIdNumbers = null /*letterOfAcceptanceRepository
+                .findWorkIdentificationNumberToCreateMilestone("%" + code + "%")*/;
         return workIdNumbers;
     }
 
@@ -491,7 +491,7 @@ public class LetterOfAcceptanceService {
     }
 
     public Double getGrossBillAmountOfBillsCreated(String workOrderNumber, String status, String billstatus) {
-        return letterOfAcceptanceRepository.getGrossBillAmountOfBillsCreated(workOrderNumber, status, billstatus);
+        return null/*letterOfAcceptanceRepository.getGrossBillAmountOfBillsCreated(workOrderNumber, status, billstatus)*/;
     }
 
     @Transactional
@@ -540,8 +540,8 @@ public class LetterOfAcceptanceService {
     public List<WorkOrder> searchLetterOfAcceptanceToModify(
             final SearchRequestLetterOfAcceptance searchRequestLetterOfAcceptance) {
         // TODO Need TO handle in single query
-        final List<String> estimateNumbers = lineEstimateDetailsRepository
-                .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName());
+        final List<String> estimateNumbers = null /*lineEstimateDetailsRepository
+                .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName())*/;
         final List<String> workOrderNumbers = null /*letterOfAcceptanceRepository.findWorkOrderNumbersToModifyLoa(
                 WorksConstants.APPROVED, ContractorBillRegister.BillStatus.CANCELLED.toString(),
                 BillTypes.Final_Bill.toString())*/;
@@ -593,16 +593,16 @@ public class LetterOfAcceptanceService {
                                 Restrictions.eq("woc.code", searchRequestLetterOfAcceptance.getContractor()).ignoreCase()));
             }
             if (searchRequestLetterOfAcceptance.getDepartmentName() != null) {
-                final List<String> estimateNumbers = lineEstimateDetailsRepository
-                        .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName());
+                final List<String> estimateNumbers = null /*lineEstimateDetailsRepository
+                        .findEstimateNumbersForDepartment(searchRequestLetterOfAcceptance.getDepartmentName())*/;
                 if (estimateNumbers.isEmpty())
                     estimateNumbers.add("");
                 criteria.add(Restrictions.in("estimateNumber", estimateNumbers));
             }
             if (searchRequestLetterOfAcceptance.getWorkIdentificationNumber() != null) {
-                final List<String> estimateNumbers = lineEstimateDetailsRepository
+                final List<String> estimateNumbers = null /*lineEstimateDetailsRepository
                         .findEstimateNumbersForWorkIdentificationNumber(searchRequestLetterOfAcceptance
-                                .getWorkIdentificationNumber());
+                                .getWorkIdentificationNumber())*/;
                 if (estimateNumbers.isEmpty())
                     estimateNumbers.add("");
                 criteria.add(Restrictions.in("estimateNumber", estimateNumbers));
@@ -615,16 +615,16 @@ public class LetterOfAcceptanceService {
     }
 
     public List<String> findWorkIdentificationNumbersToSearchLOAToCancel(final String code) {
-        final List<String> workIdNumbers = letterOfAcceptanceRepository
+        final List<String> workIdNumbers = null /*letterOfAcceptanceRepository
                 .findWorkIdentificationNumbersToSearchLOAToCancel("%" + code + "%",
-                        WorksConstants.APPROVED.toString());
+                        WorksConstants.APPROVED.toString())*/;
         return workIdNumbers;
     }
 
     public List<String> findContractorsToSearchLOAToCancel(final String code) {
-        final List<String> contractors = letterOfAcceptanceRepository
+        final List<String> contractors = null /*letterOfAcceptanceRepository
                 .findContractorsToSearchLOAToCancel("%" + code + "%",
-                        WorksConstants.APPROVED.toString());
+                        WorksConstants.APPROVED.toString())*/;
         return contractors;
     }
 
@@ -679,16 +679,16 @@ public class LetterOfAcceptanceService {
     }
     
     public List<String> getWorkOrderNumbersForViewEstimatePhotograph(final String workOrderNumber) {
-        final List<String> workOrderNumbers = letterOfAcceptanceRepository
+        final List<String> workOrderNumbers = null /*letterOfAcceptanceRepository
                 .findworkOrderNumbersToViewEstimatePhotograph("%" + workOrderNumber + "%",
-                        WorksConstants.APPROVED.toString());
+                        WorksConstants.APPROVED.toString())*/;
         return workOrderNumbers;
     }
 
     public List<String> getContractorsNamesForViewEstimatePhotograph(final String contractorName) {
-        final List<String> contractorNames = letterOfAcceptanceRepository
+        final List<String> contractorNames = null /*letterOfAcceptanceRepository
                 .findContractorsToViewEstimatePhotograph("%" + contractorName + "%",
-                        WorksConstants.APPROVED.toString());
+                        WorksConstants.APPROVED.toString())*/;
         return contractorNames;
     }
 

@@ -146,8 +146,8 @@ public class AjaxCommonController {
     @Autowired
     private PurchaseOrderService purchaseOrderService;
 
-    @Autowired
-    private WorkOrderService workOrderService;
+    //@Autowired
+    //private WorkOrderService workOrderService;
 
     @Autowired
     private MicroserviceUtils microserviceUtils;
@@ -180,14 +180,14 @@ public class AjaxCommonController {
     @ResponseBody
     public List<WorkOrder> getAllWorkOrdersByContractorId(@RequestParam("contractorId") final String contractorId)
             throws ApplicationException {
-        return workOrderService.getByContractorId(Long.parseLong(contractorId));
+        return null /*workOrderService.getByContractorId(Long.parseLong(contractorId))*/;
     }
 
     @RequestMapping(value = "/getworkorderbyordernumber", method = RequestMethod.GET)
     @ResponseBody
     public List<WorkOrder> getAllWorkOrderByOrderNumber(@RequestParam("orderNumber") final String orderNumber)
             throws ApplicationException {
-        WorkOrder wo = workOrderService.getByOrderNumber(orderNumber);
+        WorkOrder wo = null /*workOrderService.getByOrderNumber(orderNumber)*/;
         Department dept = microserviceUtils.getDepartmentByCode(wo.getDepartment());
         wo.setDescription(dept.getName());
         return Collections.singletonList(wo);

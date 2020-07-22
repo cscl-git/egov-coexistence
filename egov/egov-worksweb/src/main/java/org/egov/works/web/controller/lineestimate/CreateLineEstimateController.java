@@ -152,7 +152,7 @@ public class CreateLineEstimateController extends GenericWorkFlowController {
     @Autowired
     private BudgetControlTypeService budgetControlTypeService;
 
-    @RequestMapping(value = "/newform", method = RequestMethod.GET)
+    @RequestMapping(value = "/newform", method = RequestMethod.POST)
     public String showNewLineEstimateForm(@ModelAttribute("lineEstimate") final LineEstimate lineEstimate,
             final Model model) throws ApplicationException {
         model.addAttribute("hiddenfields", lineEstimateService.getLineEstimateHiddenFields());
