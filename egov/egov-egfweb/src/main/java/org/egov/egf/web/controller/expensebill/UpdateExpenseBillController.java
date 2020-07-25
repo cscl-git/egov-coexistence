@@ -47,7 +47,11 @@
  */
 package org.egov.egf.web.controller.expensebill;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -56,6 +60,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.audit.autonumber.AuditNumberGenerator;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.repository.AuditRepository;
@@ -248,6 +254,22 @@ public class UpdateExpenseBillController extends BaseBillController {
 
         String mode = "";
         EgBillregister updatedEgBillregister = null;
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+        List<DocumentUpload> list = new ArrayList<>();
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
+        if(uploadedFiles!=null)
+        for (int i = 0; i < uploadedFiles.length; i++) {
+
+            Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+            byte[] fileBytes = Files.readAllBytes(path);
+            ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+            DocumentUpload upload = new DocumentUpload();
+            upload.setInputStream(bios);
+            upload.setFileName(fileName[i]);
+            upload.setContentType(contentType[i]);
+            list.add(upload);
+        }
 
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
@@ -299,6 +321,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             try {
                 if (null != workFlowAction)
                 {
+                	egBillregister.setDocumentDetail(list);
                     updatedEgBillregister = expenseBillService.update(egBillregister, approvalPosition, approvalComment, null,
                             workFlowAction, mode, apporverDesignation);
                     if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
@@ -364,6 +387,7 @@ public class UpdateExpenseBillController extends BaseBillController {
 		final String preAuditNumber = v.getNextPreAuditNumber(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
     	audit.setAuditno(preAuditNumber);
     	audit.setType(PRE);
+    	audit.setDepartment(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
     	audit.setEgBillregister(updatedEgBillregister);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));
     	audit.transition().start().withSenderName(user.getUsername() + STRING + user.getName())
