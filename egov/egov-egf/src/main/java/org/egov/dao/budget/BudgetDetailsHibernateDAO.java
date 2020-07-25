@@ -1481,8 +1481,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             if (paramMap.get("financialyearid") != null)
                 financialyearid = (Long) paramMap.get("financialyearid");
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("deptCode " + deptCode + ",functionid " + functionid + ",functionaryid " + functionaryid
+                LOGGER.info("deptCode " + deptCode + ",functionid " + functionid + ",functionaryid " + functionaryid
                         + ",schemeid " + schemeid + ",subschemeid " + subschemeid + ",boundaryid " + boundaryid
                         + ",budgetheadids " + budgetHeadList + ",financialyearid " + financialyearid);
 
@@ -1506,8 +1505,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             else
                 finalquery = " from BudgetDetail bd where bd.budget.isbere='BE' " + query;
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("Final query=" + finalquery);
+                LOGGER.info("Final query=" + finalquery);
             // Query hibQuery =getCurrentSession().createQuery(finalquery);
             final Query hibQuery = getCurrentSession().createQuery(finalquery);
 
@@ -1521,9 +1519,11 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             else
                 return getApprovedAmt(bdList);
         } catch (final ValidationException v) {
+        	v.printStackTrace();
             LOGGER.error("Exp in getBudgetedAmtForYear==" + v.getErrors());
             throw new ValidationException(v.getErrors());
         } catch (final Exception e) {
+        	e.printStackTrace();
             LOGGER.error("Exp in getBudgetedAmtForYear==" + e.getMessage());
             throw new ValidationException(EMPTY_STRING, "Exp in getBudgetedAmtForYear==" + e.getMessage());
         }

@@ -170,9 +170,6 @@ public class ApplicationSecurityRepository implements SecurityContextRepository 
 			role.setName(roleReq.getName());
 			roles.add(role);
 		});
-
 		return user;
-
 	}
-	
 }

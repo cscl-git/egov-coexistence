@@ -541,6 +541,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			applyAuditing(existingVH);
 			update(existingVH);
 		} catch (final HibernateException e) {
+			e.printStackTrace();
 			LOGGER.error(e);
 			throw new HibernateException("Exception occured in voucher service while updating voucher header" + e);
 		} catch (final ApplicationRuntimeException e) {
