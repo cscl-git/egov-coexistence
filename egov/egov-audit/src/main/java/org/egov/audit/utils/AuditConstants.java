@@ -9,6 +9,7 @@ public class AuditConstants {
 	public static final String FILESTORE_MODULEOBJECT = "auditDetails";
 	public static final String AUDIT_CREATED_STATUS = "Created";
 	public static final String AUDIT_APPROVED_STATUS = "Approved";
+	public static final String AUDIT_REJECTED_STATUS = "Rejected";
 	public static final String WORKFLOWTYPE_PRE_AUDIT_DISPLAYNAME = "Pre-Audit";
 	public static final String AUDIT = "Audit";
 	public static final String AUDIT_PENDING_WITH_DEPARTMENT ="Pending with Department";
