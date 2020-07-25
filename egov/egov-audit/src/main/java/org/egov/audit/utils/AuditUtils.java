@@ -202,7 +202,12 @@ public class AuditUtils {
 			{
 				misQuery.append(" and ad.auditno='")
 						.append(auditDetail.getAuditNumber()).append("'");
-			}		
+			}
+			if(auditDetail.getDepartment() != null && !auditDetail.getDepartment().isEmpty())
+			{
+				misQuery.append(" and ad.department='")
+				.append(auditDetail.getDepartment()).append("'");
+			}
 			
 		}
 		return misQuery.toString();

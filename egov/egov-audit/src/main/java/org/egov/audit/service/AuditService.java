@@ -138,6 +138,26 @@ public class AuditService {
 			}
 			
 		}
+		else if(workFlowAction.equalsIgnoreCase("reject"))
+		{
+			final User user = securityUtils.getCurrentUser();
+	        final DateTime currentDate = new DateTime();
+			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+					AuditConstants.AUDIT_REJECTED_STATUS));
+			bill=savedAuditDetails.getEgBillregister();
+			bill.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                    FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
+			Position owenrPos = new Position();
+			owenrPos.setId(auditDetails.getCreatedBy());
+            bill.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(comment)
+                    .withStateValue("Rejected").withDateInfo(currentDate.toDate())
+                    .withOwner(owenrPos)
+                    .withNextAction("")
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
+                    .withCreatedBy(user.getId())
+                    .withtLastModifiedBy(user.getId());
+		}
 		
 		
 		createAuditWorkflowTransition(savedAuditDetails, workFlowAction,comment);
@@ -154,7 +174,7 @@ public class AuditService {
 		 
 
 		AuditDetails auditReg  = auditRepository.save(savedAuditDetails);
-		if(workFlowAction.equalsIgnoreCase("approve"))
+		if(workFlowAction.equalsIgnoreCase("approve") || workFlowAction.equalsIgnoreCase("reject"))
 		{
 			expenseBillService.create(bill);
 		}
@@ -266,6 +286,14 @@ public class AuditService {
             .withComments(comment)
             .withStateValue("Approved").withDateInfo(new Date())
             .withNextAction(natureOfTask+" Approved")
+            .withNatureOfTask(natureOfTask);
+		}
+		else if(workFlowAction.equalsIgnoreCase("reject"))
+		{
+			auditDetails.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+            .withComments(comment)
+            .withStateValue("Rejected").withDateInfo(new Date())
+            .withNextAction(natureOfTask+" Rejected")
             .withNatureOfTask(natureOfTask);
 		}
 			LOGGER.info(" WorkFlow Transition Completed  ...");

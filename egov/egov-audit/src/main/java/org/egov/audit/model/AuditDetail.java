@@ -9,6 +9,7 @@ import javax.persistence.Transient;
 import org.egov.audit.entity.AuditCheckList;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.microservice.models.Department;
 import org.egov.model.bills.DocumentUpload;
 
 public class AuditDetail {
@@ -38,6 +39,8 @@ public class AuditDetail {
     private int counter = 0;
     private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
     private List<AuditDetails> auditSearchList= new ArrayList<AuditDetails>();
+    private String department;
+    private List<Department> departments = new ArrayList<Department>();
 	
 	private String notes;
 	public Date getAuditScheduledDate() {
@@ -195,6 +198,18 @@ public class AuditDetail {
 	}
 	public void setAuditSearchList(List<AuditDetails> auditSearchList) {
 		this.auditSearchList = auditSearchList;
+	}
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+	public List<Department> getDepartments() {
+		return departments;
+	}
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
 	}
 	
 

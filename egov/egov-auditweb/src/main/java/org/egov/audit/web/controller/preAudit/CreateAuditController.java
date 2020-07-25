@@ -294,11 +294,11 @@ public class CreateAuditController extends GenericWorkFlowController {
 		LOGGER.info("Save");
 		AuditDetails auditDetails = null;
 		String workFlowAction=auditDetail.getWorkFlowAction();
-		if(auditDetail.getAuditStatus().equalsIgnoreCase("Created"))
+		if(auditDetail.getAuditStatus().equalsIgnoreCase("Created") && !workFlowAction.equalsIgnoreCase("reject"))
 		{
 			auditDetails = populateDetails(auditDetail);
 		}
-		else if(auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Department"))
+		else if(auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Department") && !workFlowAction.equalsIgnoreCase("reject"))
 		{
 			auditDetails = populateDetailsDept(auditDetail);
 		}
@@ -310,7 +310,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			auditDetails = populateDetailsSO(auditDetail);
 		}
-		else if(auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Section Officer") || auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Examiner"))
+		else if(workFlowAction.equalsIgnoreCase("reject") || auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Section Officer") || auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Examiner"))
 		{
 			 auditDetails = auditService.getById(auditDetail.getAuditId());
 		}
@@ -556,6 +556,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			message="Selected Bills have been sent to Audit Branch for Post-Audit processing";
 		}
+		else if(workflowAction.equalsIgnoreCase("approve"))
+		{
+			message="Audit No : "+audit.getAuditno()+" is rejected";
+		}
 		
 
 		return message;
@@ -712,6 +716,7 @@ public class CreateAuditController extends GenericWorkFlowController {
     	audit.setAuditno(postAuditNumber);
     	audit.setType("Post-Audit");
     	audit.setEgBillregister(null);
+    	audit.setDepartment(deptCode);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode("Audit", "Created"));
     	audit.setPostBillMpng(postBillMpngList);
     	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
@@ -739,6 +744,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	public String auditSearch(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
 			HttpServletRequest request) {
 		LOGGER.info("Audit Search");
+		auditDetail.setDepartments(this.getDepartmentsFromMs());
 		model.addAttribute("auditDetail", auditDetail);
 		return "auditSearch";
 	}

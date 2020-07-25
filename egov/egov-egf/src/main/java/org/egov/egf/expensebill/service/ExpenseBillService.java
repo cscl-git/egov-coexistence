@@ -347,6 +347,14 @@ public class ExpenseBillService {
                         additionalRule,
                         workFlowAction,approverDesignation);
             }
+            List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
+            final List<DocumentUpload> documentDetails;
+            documentDetails = financialUtils.getDocumentDetails(files, updatedegBillregister,
+                    FinancialConstants.FILESTORE_MODULEOBJECT);
+            if (!documentDetails.isEmpty()) {
+            	updatedegBillregister.setDocumentDetail(documentDetails);
+                persistDocuments(documentDetails);
+            }
             updatedegBillregister = expenseBillRepository.save(updatedegBillregister);
             persistenceService.getSession().flush();
             finDashboardService.publishEvent(FinanceEventType.billCreateOrUpdate, updatedegBillregister);

@@ -46,7 +46,14 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<div class="col-sm-3 add-margin">
 					<form:input id="billTo" path="billTo" class="form-control datepicker" data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
 				</div>
-				
+				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.department"  text="Department"/>
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="department" data-first-option="false" id="department" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${auditDetail.departments}" itemValue="id" itemLabel="name" />
+						</form:select>
+				</div>
     		</div>
     	</div>
     	
