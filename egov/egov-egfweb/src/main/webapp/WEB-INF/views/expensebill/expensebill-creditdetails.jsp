@@ -69,7 +69,7 @@
 		<tbody>
 			<tr id="creditdetailsrow">
 				<td>
-					<input type="text" id="tempCreditDetails[0].creditGlcode" name="tempCreditDetails[0].creditGlcode" class="form-control table-input creditDetailGlcode creditGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type first 3 letters of Account code" >
+					<input type="text" id="tempCreditDetails[0].creditGlcode" name="tempCreditDetails[0].creditGlcode" class="form-control table-input creditDetailGlcode creditGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code" >
 					<form:hidden path="" name="tempCreditDetails[0].glcode" id="tempCreditDetails[0].glcode" class="form-control table-input hidden-input creditaccountcode"/> 
 					<form:hidden path="" name="tempCreditDetails[0].glcodeid" id="tempCreditDetails[0].glcodeid"  class="form-control table-input hidden-input creditdetailid"/>
 					<form:hidden path="" name="tempCreditDetails[0].isSubLedger" id="tempCreditDetails[0].isSubLedger" class="form-control table-input hidden-input creditIsSubLedger"/>

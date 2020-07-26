@@ -123,7 +123,7 @@ $(document).ready(function(){
 $('#subLedgerCode').typeahead({
 		hint : true,
 		highlight : true,
-		minLength : 3
+		minLength : 1
 	}, {
 		displayKey : 'codeAndName',
 		source : entityName.ttAdapter()
@@ -225,7 +225,7 @@ function debitGlcode_initialize() {
    var dt = $('.debitGlcode').typeahead({
    	hint : true,
 		highlight : true,
-		minLength : 3
+		minLength : 1
 		
 	}, {		    
          displayKey: 'glcodesearch',
@@ -303,7 +303,7 @@ function creditGlcode_initialize() {
   var dt=$('.creditGlcode').typeahead({
   	hint : true,
 		highlight : true,
-		minLength : 3
+		minLength : 1
 		
 	}, {		    
         displayKey: 'glcodesearch',

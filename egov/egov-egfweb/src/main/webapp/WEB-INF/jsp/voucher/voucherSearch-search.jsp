@@ -195,6 +195,9 @@
 							<display:column title="Status" style="text-align:center;">
 								<s:property value="%{#attr.currentRowObject.status}" />
 							</display:column>
+							<display:column title="Pending With" style="text-align:center;">
+								<s:property value="%{#attr.currentRowObject.pendingWith}" />
+							</display:column>
 
 						</display:table></td>
 				<tr>
@@ -215,6 +218,7 @@
 							<th class="bluebgheadtd"><s:text name="lbl.department.name"/></th>
 							<th class="bluebgheadtd"><s:text name="lbl.amount"/></th>
 							<th class="bluebgheadtd"><s:text name="lbl.status"/></th>
+							<th class="bluebgheadtd"><s:text name="lbl.pending.with"/></th>
 							<!-- <th class="bluebgheadtd">Source</th> -->
 						</tr>
 						<c:set var="trclass" value="greybox" />
@@ -244,8 +248,8 @@
 									</s:text></td>
 								<td class="<c:out value="${trclass}"/>"><s:text
 										name="%{status}" /></td>
-								<!-- <td class="<c:out value="${trclass}"/>"><s:text
-										name="%{source}" /></td> -->
+								<td class="<c:out value="${trclass}"/>"><s:text
+										name="%{pendingWith}" /></td>
 								<c:choose>
 									<c:when test="${trclass=='greybox'}">
 										<c:set var="trclass" value="bluebox" />

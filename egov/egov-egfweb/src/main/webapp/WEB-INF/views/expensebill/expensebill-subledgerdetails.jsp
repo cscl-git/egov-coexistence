@@ -73,7 +73,7 @@
 				</label>
 				<div class="col-sm-3 add-margin">
 					<input type="hidden" name="detailkeyId" id="detailkeyId">
-					<input type="text" name="subLedgerCode" id="subLedgerCode" class="form-control" placeholder="Type first 3 letters of SubLedger name"  />
+					<input type="text" name="subLedgerCode" id="subLedgerCode" class="form-control" placeholder="Type any letters of SubLedger name"  />
 				</div>
 			</div>
 		</div>

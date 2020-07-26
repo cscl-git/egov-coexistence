@@ -347,6 +347,15 @@ public class ExpenseBillService {
                         additionalRule,
                         workFlowAction,approverDesignation);
             }
+            List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
+            final List<DocumentUpload> documentDetails;
+            documentDetails = financialUtils.getDocumentDetails(files, updatedegBillregister,
+                    FinancialConstants.FILESTORE_MODULEOBJECT);
+            if (!documentDetails.isEmpty()) {
+            	System.out.println("DOc Save");
+            	updatedegBillregister.setDocumentDetail(documentDetails);
+                persistDocuments(documentDetails);
+            }
             updatedegBillregister = expenseBillRepository.save(updatedegBillregister);
             persistenceService.getSession().flush();
             finDashboardService.publishEvent(FinanceEventType.billCreateOrUpdate, updatedegBillregister);
@@ -478,13 +487,16 @@ public class ExpenseBillService {
 
                 if (stateValue.isEmpty())
                 {
-                	if(designation.getName().equalsIgnoreCase("EXAMINOR") )
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING))
                 	{
-                		stateValue = wfmatrix.getNextState();
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
                 	}
                 	else
                 	{
-                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                		stateValue = wfmatrix.getNextState();
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                         //       FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
                 	}
                     
                 }
@@ -525,13 +537,16 @@ public class ExpenseBillService {
 
                 if (stateValue.isEmpty())
                 {
-                	if(designation.getName().equalsIgnoreCase("EXAMINOR") )
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING))
                 	{
-                		stateValue = wfmatrix.getNextState();
+                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
                 	}
                 	else
                 	{
-                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                		stateValue = wfmatrix.getNextState();
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
                 	}
                     
                 }
