@@ -845,6 +845,8 @@ public class GeneralLedgerReport {
             LOGGER.error("ERROR in getGeneralLedgerList " + ex.toString(), ex);
             throw taskExc;
         }
+        System.out.println("Db sum : "+txnDrSum);
+        System.out.println("Cr sum : "+txnCrSum);
         return dataList;
     }
 

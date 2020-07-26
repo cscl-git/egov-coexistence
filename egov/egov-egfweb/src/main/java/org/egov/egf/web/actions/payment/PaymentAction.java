@@ -226,6 +226,7 @@ public class PaymentAction extends BasePaymentAction {
     Date date;
     @Autowired
     private ChartOfAccounts chartOfAccounts;
+    private List<Bankbranch> bankBranchList = new ArrayList<Bankbranch>();
  
     public PaymentAction() {
         if (LOGGER.isDebugEnabled())
@@ -260,8 +261,15 @@ public class PaymentAction extends BasePaymentAction {
                     persistenceService.findAllBy(
                             "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
                             fund));
+            bankBranchList=persistenceService.findAllBy(
+                    "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                    fund);
         } else
-            addDropdownData("bankbranchList", Collections.EMPTY_LIST);
+        {
+        	addDropdownData("bankbranchList", Collections.EMPTY_LIST);
+        	bankBranchList=Collections.EMPTY_LIST;
+        }
+            
 
         if (parameters.get("functionSel") != null && !parameters.get("functionSel")[0].equals("-1")
                 && !parameters.get("functionSel")[0].equals(""))
@@ -2354,4 +2362,12 @@ public String getEmployeeName(Long empId){
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+
+public List<Bankbranch> getBankBranchList() {
+	return bankBranchList;
+}
+
+public void setBankBranchList(List<Bankbranch> bankBranchList) {
+	this.bankBranchList = bankBranchList;
+}
 }

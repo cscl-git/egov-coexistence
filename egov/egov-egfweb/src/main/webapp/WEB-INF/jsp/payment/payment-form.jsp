@@ -311,8 +311,9 @@
 																</tr>
 																<tr id="bankbalanceRow">
 																	<td class="bluebox">&nbsp;</td>
-																	<td class="bluebox">&nbsp;</td>
-																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text
+																				name="bank.onlinelink" /></td>
+																	<td class="bluebox"><a id="onlineLink" href="#" target="_blank" style="font-size: 15px;">Click</a></td>
 																	<td class="bluebox" width="15%"><strong><s:text
 																				name="payment.balance" />(Rs)</strong></td>
 																	<td class="bluebox" colspan="4"><s:textfield
@@ -548,6 +549,16 @@
 		var vFixedDecimal = 2;
 		function loadBankAccount(obj)
 		{
+			var selectedBranchId=document.getElementById('bankbranch').value;
+			document.getElementById("onlineLink").href='#';
+			<s:iterator value="bankBranchList">
+				var branchIdFromList='<s:property value="id"/>';
+				if(branchIdFromList == selectedBranchId)
+					{
+						var link = '<s:property value="bank.onlinelink"/>';
+						document.getElementById("onlineLink").href=link;
+					}
+			</s:iterator>
 			var fund = 0;
 			<s:if test="%{shouldShowHeaderField('fund')}">
 				fund = <s:property value="%{billregister.egBillregistermis.fund.id}"/>;

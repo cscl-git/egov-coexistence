@@ -47,7 +47,11 @@
  */
 package org.egov.egf.web.controller.expensebill;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +59,8 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
@@ -204,6 +210,23 @@ public class UpdateExpenseBillController extends BaseBillController {
 
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
+        String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+        List<DocumentUpload> list = new ArrayList<>();
+        UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+        String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
+        if(uploadedFiles!=null)
+        for (int i = 0; i < uploadedFiles.length; i++) {
+
+            Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+            byte[] fileBytes = Files.readAllBytes(path);
+            ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+            DocumentUpload upload = new DocumentUpload();
+            upload.setInputStream(bios);
+            upload.setFileName(fileName[i]);
+            System.out.println("File Name : "+fileName[i]);
+            upload.setContentType(contentType[i]);
+            list.add(upload);
+        }
 
         Long approvalPosition = 0l;
         String approvalComment = "";
@@ -250,6 +273,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
         } else {
             try {
+            	egBillregister.setDocumentDetail(list);
                 if (null != workFlowAction)
                     updatedEgBillregister = expenseBillService.update(egBillregister, approvalPosition, approvalComment, null,
                             workFlowAction, mode, apporverDesignation);
