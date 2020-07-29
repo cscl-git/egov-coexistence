@@ -93,6 +93,7 @@
             <type>war</type>
         </dependency>
 	    <dependency>
+	    <groupId>org.egov</groupId>
             <artifactId>egov-lcmsweb</artifactId>
             <version>${project.parent.version}</version>
             <type>war</type>
