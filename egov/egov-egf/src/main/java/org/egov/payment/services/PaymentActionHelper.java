@@ -66,6 +66,7 @@ import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.deduction.model.EgRemittance;
 import org.egov.deduction.model.EgRemittanceDetail;
@@ -73,6 +74,7 @@ import org.egov.deduction.model.EgRemittanceGl;
 import org.egov.deduction.model.EgRemittanceGldtl;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.service.AssignmentService;
 import org.egov.eis.service.PositionMasterService;
@@ -148,6 +150,11 @@ public class PaymentActionHelper {
     PositionMasterService positionMasterService;
     @Autowired
     FinanceDashboardService finDashboardService;
+    @Autowired
+    private ExpenseBillService expenseBillService;
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+    
 
     @Transactional
     public Paymentheader createDirectBankPayment(Paymentheader paymentheader, CVoucherHeader voucherHeader,
@@ -293,6 +300,7 @@ public class PaymentActionHelper {
 
     @Transactional
     public Paymentheader sendForApproval(Paymentheader paymentheader, WorkflowBean workflowBean){
+    	EgBillregister expenseBill = null;
 
         if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
                 && paymentheader.getState() == null)
@@ -306,7 +314,24 @@ public class PaymentActionHelper {
             paymentService.applyAuditing(paymentheader.getState());
         }
         paymentService.persist(paymentheader);
+        if(workflowBean.getWorkFlowAction().equals("Approve"))
+        {
+        	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
+                    " from Miscbilldetail where payVoucherHeader.id = ? ",
+                    paymentheader.getVoucherheader().getId());
+        	
+        	if(miscBillList !=null && !miscBillList.isEmpty())
+        	{
+        		for(Miscbilldetail row : miscBillList)
+        		{
+        			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
+        			 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+            		 expenseBillService.create(expenseBill);
+        		}
+        	}
+        }
         paymentService.getSession().flush();
+        persistenceService.getSession().flush();
         finDashboardService.billPaymentUpdatedAction(paymentheader);
         return paymentheader;
     }

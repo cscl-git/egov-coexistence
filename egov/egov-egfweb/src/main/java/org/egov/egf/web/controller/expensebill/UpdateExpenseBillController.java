@@ -53,6 +53,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -61,25 +62,36 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.audit.autonumber.AuditNumberGenerator;
+import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.repository.AuditRepository;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.persistence.entity.AbstractAuditable;
+import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.pims.commons.Position;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -96,6 +108,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping(value = "/expensebill")
 public class UpdateExpenseBillController extends BaseBillController {
+	private static final String INITIATED_PRE_AUDIT = "Initiated Pre-Audit";
+
+	private static final String PRE_AUDIT = "Pre-Audit";
+
+	private static final String PRE_AUDIT_PENDING = "Pre Audit pending";
+
+	private static final String NEW = "NEW";
+
+	private static final String STRING = "::";
+
+	private static final String CREATED = "Created";
+
+	private static final String AUDIT2 = "Audit";
+
+	private static final String PRE = "Pre-Audit";
+
+	private static final String AUDIT001 = "Audit001";
+
 	private static final String SUPPORTING_DOCS = "supportingDocs";
 
     private static final String NET_PAYABLE_AMOUNT = "netPayableAmount";
@@ -129,9 +159,22 @@ public class UpdateExpenseBillController extends BaseBillController {
     private CheckListService checkListService;
     @Autowired
     private MicroserviceUtils microServiceUtil;
+    @Autowired
+    private SecurityUtils securityUtils;
+    @Autowired
+	private AuditRepository auditRepository;
+    
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+    
+    @Autowired
+    protected AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+	private AutonumberServiceBeanResolver beanResolver;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
-        super(appConfigValuesService);
+		super(appConfigValuesService);
     }
 
     @ModelAttribute(EG_BILLREGISTER)
@@ -273,10 +316,17 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
         } else {
             try {
-            	egBillregister.setDocumentDetail(list);
                 if (null != workFlowAction)
+                {
+                	egBillregister.setDocumentDetail(list);
                     updatedEgBillregister = expenseBillService.update(egBillregister, approvalPosition, approvalComment, null,
                             workFlowAction, mode, apporverDesignation);
+                    if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
+                    {
+                    	populateauditWorkFlow(updatedEgBillregister);
+                    }
+                }   
+                
             } catch (final ValidationException e) {
                 setDropDownValues(model);
                 model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
@@ -315,7 +365,42 @@ public class UpdateExpenseBillController extends BaseBillController {
         }
     }
 
-    @RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
+    private void populateauditWorkFlow(EgBillregister updatedEgBillregister) {
+    	AuditDetails audit=new AuditDetails();
+    	final User user = securityUtils.getCurrentUser();
+    	List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
+    	Position owenrPos = new Position();
+    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+    	{
+    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+    	}
+    	else
+    	{
+    		owenrPos.setId(null);
+    	}
+    	AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
+
+		final String preAuditNumber = v.getNextPreAuditNumber(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
+    	audit.setAuditno(preAuditNumber);
+    	audit.setType(PRE);
+    	audit.setDepartment(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
+    	audit.setEgBillregister(updatedEgBillregister);
+    	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));
+    	audit.transition().start().withSenderName(user.getUsername() + STRING + user.getName())
+        .withComments(INITIATED_PRE_AUDIT)
+        .withStateValue(CREATED).withDateInfo(new Date()).withOwner(owenrPos)
+        .withNextAction(PRE_AUDIT_PENDING)
+        .withNatureOfTask(PRE_AUDIT)
+        .withCreatedBy(user.getId())
+        .withtLastModifiedBy(user.getId());
+    	applyAuditing(audit,updatedEgBillregister.getCreatedBy());
+    	 auditRepository.save(audit);
+		persistenceService.getSession().flush();
+		
+	}
+
+	@RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
     public String view(final Model model, @PathVariable String billId,
             final HttpServletRequest request) throws ApplicationException {
         if (billId.contains("showMode")) {
@@ -396,4 +481,14 @@ public class UpdateExpenseBillController extends BaseBillController {
 	public void setOriginalFiles(List<FileStoreMapper> originalFiles) {
 		this.originalFiles = originalFiles;
 	}*/
+    
+    public void applyAuditing(AbstractAuditable auditable, Long createdBy) {
+		Date currentDate = new Date();
+		if (auditable.isNew()) {
+			auditable.setCreatedBy(createdBy);
+			auditable.setCreatedDate(currentDate);
+		}
+		auditable.setLastModifiedBy(createdBy);
+		auditable.setLastModifiedDate(currentDate);
+	}
 }

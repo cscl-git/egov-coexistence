@@ -2146,3 +2146,12 @@ text-align: left;
 
 
 }
+
+label.col-sm-3.control-label.text-left-audit {
+    text-align: left!important;
+}
+
+.col-sm-2.col-xs-6.add-margin-audit {
+    width: 16%;
+    font-size: 12px;
+}

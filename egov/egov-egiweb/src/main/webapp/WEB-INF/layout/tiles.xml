@@ -262,4 +262,8 @@
         <put-attribute name="page-title" value="title.feature.role.audit.report" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/admin/auditing/feature-role-change-audit-report.jsp"/>
     </definition>
+    <definition name="inbox-view" extends="base_layout">
+		<put-attribute name="page-title" value="lbl.tasks" cascade="true"/>
+		<put-attribute name="body" value="/WEB-INF/views/inbox/inbox.jsp"></put-attribute>
+	</definition>
 </tiles-definitions>
