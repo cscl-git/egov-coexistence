@@ -259,6 +259,7 @@
         <module>egov-egf</module>
         <module>egov-audit</module>
         <module>egov-lcms</module>
+	      <module>egov-council</module>
         <module>egov-collection</module>
         <module>egov-commonsweb</module>
         <module>egov-eisweb</module>
@@ -266,6 +267,7 @@
         <module>egov-egfweb</module>
         <module>egov-auditweb</module>
         <module>egov-lcmsweb</module>
+	      <module>egov-councilweb</module>
         <module>egov-collectionweb</module>
         <module>egov-ear</module>
        

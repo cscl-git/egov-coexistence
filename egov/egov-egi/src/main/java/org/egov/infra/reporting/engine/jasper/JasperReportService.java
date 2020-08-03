@@ -64,12 +64,14 @@ import net.sf.jasperreports.engine.export.JRPdfExporter;
 import net.sf.jasperreports.engine.export.JRRtfExporter;
 import net.sf.jasperreports.engine.export.JRTextExporter;
 import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.ooxml.JRDocxExporter;
 import net.sf.jasperreports.engine.query.JRHibernateQueryExecuterFactory;
 import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.Exporter;
 import net.sf.jasperreports.export.ExporterConfiguration;
 import net.sf.jasperreports.export.ExporterOutput;
 import net.sf.jasperreports.export.SimpleCsvExporterConfiguration;
+import net.sf.jasperreports.export.SimpleDocxExporterConfiguration;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleHtmlExporterConfiguration;
 import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
@@ -104,6 +106,7 @@ import static org.egov.infra.reporting.engine.ReportFormat.PDF;
 import static org.egov.infra.reporting.engine.ReportFormat.RTF;
 import static org.egov.infra.reporting.engine.ReportFormat.TXT;
 import static org.egov.infra.reporting.engine.ReportFormat.XLS;
+import static org.egov.infra.reporting.engine.ReportFormat.DOCX;
 
 public class JasperReportService extends AbstractReportService<JasperReport> {
 
@@ -153,8 +156,10 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             } else {
                 dataSource = new JRBeanArrayDataSource(new Object[]{reportData}, false);
             }
+            LOGGER.info("Jasper fillReport start->"+reportInput.getReportTemplate());
             JasperPrint jasperPrint = JasperFillManager.fillReport(getTemplate(reportInput.getReportTemplate()),
                     reportInput.getReportParams(), dataSource);
+            LOGGER.info("Jasper fillReport end->"+reportInput.getReportTemplate());
             return new ReportOutput(exportReport(reportInput, jasperPrint), reportInput);
         } catch (JRException | IOException e) {
             LOGGER.error(EXCEPTION_IN_REPORT_CREATION, e);
@@ -229,6 +234,9 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
         } else if (CSV.equals(reportInput.getReportFormat())) {
             exporter = new JRCsvExporter();
             exporterConfiguration = new SimpleCsvExporterConfiguration();
+        } else if (DOCX.equals(reportInput.getReportFormat())) {
+            exporter = new JRDocxExporter();
+            exporterConfiguration = new SimpleDocxExporterConfiguration();
         } else {
             throw new ApplicationRuntimeException("Invalid report format [" + reportInput.getReportFormat() + "]");
         }

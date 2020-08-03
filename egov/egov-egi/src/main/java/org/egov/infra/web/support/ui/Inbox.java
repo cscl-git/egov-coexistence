@@ -90,7 +90,7 @@ public class Inbox {
         this.details = defaultIfBlank(stateAware.getStateDetails(), EMPTY);
         this.link = workflowTypes.getLink().replace(":ID", stateAware.myLinkId());
         this.moduleName = workflowTypes.getModule().getDisplayName();
-        this.createdDate = state.getLastModifiedDate();
+        this.createdDate = state.getCreatedDate();
         this.draft = state.isNew() && (state.getCreatedBy()==getUserId());
     }
 
