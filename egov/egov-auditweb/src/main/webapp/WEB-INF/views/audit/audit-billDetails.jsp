@@ -25,7 +25,7 @@
 			${status.index+1}
 			</td>
 			<td>
-			<a href="#" onclick="return openSource('${audit.billId}');" >${audit.billNumber }</a>
+			<a href="#" onclick="return openSource('/services/EGF/expensebill/view/'+'${audit.billId}');" >${audit.billNumber }</a>
 			</td>
 			<td>
 			<a href="#" onclick="return openVoucher('${audit.voucherId}');" >${audit.voucherNumber }</a>
