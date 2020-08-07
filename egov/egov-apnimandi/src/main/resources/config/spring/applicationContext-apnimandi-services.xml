@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd"
+       default-lazy-init="true">
+	
+	<context:component-scan base-package="org.egov.apnimandi" />
+
+	<bean id="apnimandiContractorPersistenceService" parent="abstractPersistenceService">
+        <constructor-arg name="type" value="org.egov.apnimandi.transactions.entity.ApnimandiContractor" />
+    </bean>
+
+    <bean id="ApnimandiContractorInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+        <constructor-arg index="0" ref="apnimandiContractorPersistenceService"/>
+    </bean>
+    
+    <bean id="apnimandiCollectionDetailsPersistenceService" parent="abstractPersistenceService">
+        <constructor-arg name="type" value="org.egov.apnimandi.transactions.entity.ApnimandiCollectionDetails" />
+    </bean>
+
+    <bean id="ApnimandiCollectionDetailsInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+        <constructor-arg index="0" ref="apnimandiCollectionDetailsPersistenceService"/>
+    </bean>
+</beans>

@@ -119,6 +119,9 @@
 				<resource>
                                     <directory>../egov-council/src/main/resources/db/migration</directory>
                                 </resource>
+								<resource>
+                                    <directory>../egov-apnimandi/src/main/resources/db/migration</directory>
+                                </resource>
                             </resources>
                         </configuration>
                     </execution>
