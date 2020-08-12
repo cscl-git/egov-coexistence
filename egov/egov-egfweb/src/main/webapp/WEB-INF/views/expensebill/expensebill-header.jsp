@@ -59,11 +59,9 @@
 		<c:choose>
 			<c:when test="${!billNumberGenerationAuto}">
 				<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billnumber" text="Bill Number"/>
-					<span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="billnumber" path="billnumber" maxlength="50" required="required" />
-					<form:errors path="billnumber" cssClass="add-margin error-msg" />
+					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="billnumber" path="billnumber" maxlength="50" readonly="true" />
 				</div>
 				
 				<label class="col-sm-2 control-label text-right"><spring:message code="lbl.billdate"  text="Bill Date"/>

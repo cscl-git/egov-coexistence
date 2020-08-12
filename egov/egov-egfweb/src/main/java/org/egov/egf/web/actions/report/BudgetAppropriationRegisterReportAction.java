@@ -269,8 +269,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             strQuery.append(getFundQuery("bmis1.fundid"));
             strQuery.append("  order by bdgApprNumber ");
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("BudgetAppropriationRegisterReportAction -- strQuery...." + strQuery);
+                LOGGER.info("BudgetAppropriationRegisterReportAction -- strQuery...." + strQuery);
 
             query = persistenceService.getSession().createSQLQuery(strQuery.toString())
                     .addScalar("bdgApprNumber")
@@ -305,8 +304,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             strsubQuery.append(getFundQuery("vh.fundid"));
             strsubQuery.append("  order by bdgApprNumber ");
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("BudgetAppropriationRegisterReportAction -- strsubQuery...." + strsubQuery);
+                LOGGER.info("BudgetAppropriationRegisterReportAction -- strsubQuery...." + strsubQuery);
 
             query = persistenceService.getSession().createSQLQuery(strsubQuery.toString())
                     .addScalar("bdgApprNumber")

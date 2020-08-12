@@ -68,24 +68,17 @@
 <div class="panel panel-primary" data-collapsed="0" style=" scrollable:true;">
     <div class="panel-heading">
         <div class="panel-title">
-            <c:if test="${mode != 'view' && mode != 'readOnly'}">
-                <spring:message code="lbl.upload.document" text="Upload Documents" />
-            </c:if>
-            <c:if test="${mode == 'view' || mode == 'readOnly' }">
-                <spring:message code="lbl.documents" text="Uploaded Documents"/>
-            </c:if>
+                <spring:message code="lbl.view.documents" text="Uploaded Documents"/>
         </div>
     <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
         <c:forEach items="${egBillregister.documentDetail }" var="documentDetials">
             <a href="/services/EGF/expensebill/downloadBillDoc?egBillRegisterId=${egBillregister.id }&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
         </c:forEach>
     </c:if>
-    <c:if test="${mode == 'view' && egBillregister.documentDetail.isEmpty()}">
-        <spring:message code="msg.no.documents" text="No Documents Attached"/>
-    </c:if>
+    
     </div>
     <input type="hidden" value="${fn:length(egBillregister.documentDetail)}" id="documentsSize">
-    <c:if test="${mode != 'view' && mode != 'readOnly' }">
+    <c:if test="${mode != 'readOnly' }">
         <div>
             <table width="100%">
                 <c:if test="${egBillregister.documentDetail.isEmpty()}">

@@ -41,7 +41,7 @@ INSERT INTO EG_ROLEACTION (ROLEID, ACTIONID) values ((select id from eg_role whe
 INSERT INTO EG_ROLEACTION (ROLEID, ACTIONID) values ((select id from eg_role where name LIKE 'Remitter') ,(select id FROM eg_action  WHERE name = 'ViewChallan' and contextroot='collection'));
 
 
-Insert into eg_wf_types (id,module,type,link,createdby,createddate,lastmodifiedby,lastmodifieddate,groupyn,typefqn,displayname,version) values (nextval('seq_eg_wf_types'),(select id from eg_module where name='Collection'),'Challan','/collection/receipts/challan-viewChallan.action?sourcePage=inbox&challanId=:ID',1,now(),1,now(), 'N', 'org.egov.collection.entity.Challan', 'Collections Challan', 0 );
+--Insert into eg_wf_types (id,module,type,link,createdby,createddate,lastmodifiedby,lastmodifieddate,groupyn,typefqn,displayname,version) values (nextval('seq_eg_wf_types'),(select id from eg_module where name='Collection'),'Challan','/collection/receipts/challan-viewChallan.action?sourcePage=inbox&challanId=:ID',1,now(),1,now(), 'N', 'org.egov.collection.entity.Challan', 'Collections Challan', 0 );
 
 INSERT INTO eg_script (id, name, type, createdby, createddate, lastmodifiedby, lastmodifieddate, script, startdate, enddate, version) 
 VALUES (nextval('seq_eg_script'), 'Challan.workflow.validactions', 'python',1, now(), 1, now(), 'transitions={''DEFAULT'':[''CHALLAN_NEW''],''CREATED'':[''CHALLAN_VALIDATE'',''CHALLAN_REJECT''],''CANCELLED'':[''''],''REJECTED'':[''CHALLAN_MODIFY'',''CHALLAN_CANCEL''],''VALIDATED'':['''']}  

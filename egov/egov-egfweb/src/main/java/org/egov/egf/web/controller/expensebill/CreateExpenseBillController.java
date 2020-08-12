@@ -68,6 +68,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.expensebill.service.ExpenseBillService;
@@ -76,6 +77,7 @@ import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
@@ -128,6 +130,8 @@ public class CreateExpenseBillController extends BaseBillController {
     private FileStoreService fileStoreService;
     @Autowired
     private FinancialUtils financialUtils;
+    @Autowired
+	private AutonumberServiceBeanResolver beanResolver;
     
     
 
@@ -174,6 +178,10 @@ public class CreateExpenseBillController extends BaseBillController {
       //User createdBy = new User();
      // createdBy.setId(ApplicationThreadLocals.getUserId());
       egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
+      ExpenseBillNumberGenerator v = beanResolver.getAutoNumberServiceFor(ExpenseBillNumberGenerator.class);
+
+		final String billNumber = v.getNextNumber(egBillregister);
+		egBillregister.setBillnumber(billNumber);
       if (StringUtils.isBlank(egBillregister.getExpendituretype()))
           egBillregister.setExpendituretype(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
 

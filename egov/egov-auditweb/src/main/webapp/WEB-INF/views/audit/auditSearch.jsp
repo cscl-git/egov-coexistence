@@ -49,9 +49,9 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.department"  text="Department"/>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:select path="department" data-first-option="false" id="department" class="form-control">
+					<form:select path="department" id="department" class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${auditDetail.departments}" itemValue="id" itemLabel="name" />
+							<form:options items="${auditDetail.departments}" itemValue="code" itemLabel="name" />
 						</form:select>
 				</div>
     		</div>

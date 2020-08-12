@@ -52,25 +52,7 @@
 	style='color: red; font-weight: bold'> <s:actionerror /> <s:fielderror />
 		<s:actionmessage /></font>
 </span>
-<%-- <table width="99%" border="0" cellspacing="0" cellpadding="0">
 
-	<tr>
-		<s:if test="%{fromDate!=null}">
-			<th class="bluebgheadtd" width="100%" colspan="7"><strong
-				style="font-size: 15px;">Deduction detailed report for <s:property
-						value="type" /> from <s:property value="fromDate" /> to <s:property
-						value="asOnDate" />
-			</strong></th>
-		</s:if>
-		<s:else>
-
-			<th class="bluebgheadtd" width="100%" colspan="7"><strong
-				style="font-size: 15px;">Deduction detailed report for <s:property
-						value="type" /> as on <s:property value="asOnDate" /></strong></th>
-			</td>
-		</s:else>
-	</tr>
-</table> --%>
 <s:if test="%{pendingTDS.size()>0}">
 	<br />
 	<table width="100%" border="0" cellspacing="0" cellpadding="0">

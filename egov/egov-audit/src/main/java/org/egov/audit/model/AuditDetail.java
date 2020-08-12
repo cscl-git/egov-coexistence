@@ -39,7 +39,7 @@ public class AuditDetail {
     private int counter = 0;
     private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
     private List<AuditDetails> auditSearchList= new ArrayList<AuditDetails>();
-    private String department;
+    private String department="";
     private List<Department> departments = new ArrayList<Department>();
 	
 	private String notes;

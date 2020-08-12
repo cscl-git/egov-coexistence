@@ -556,7 +556,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			message="Selected Bills have been sent to Audit Branch for Post-Audit processing";
 		}
-		else if(workflowAction.equalsIgnoreCase("approve"))
+		else if(workflowAction.equalsIgnoreCase("e"))
 		{
 			message="Audit No : "+audit.getAuditno()+" is rejected";
 		}

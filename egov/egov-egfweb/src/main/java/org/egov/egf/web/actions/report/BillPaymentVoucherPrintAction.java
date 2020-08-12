@@ -269,7 +269,7 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
             chequeNosList = new ArrayList<>();
             final Long id = Long.valueOf(parameters.get("id")[0]);
             paymentHeader = persistenceService.getSession().get(Paymentheader.class, id);
-            if (paymentHeader != null && paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS)) {
+            if (paymentHeader != null && (paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS) || paymentHeader.getType().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_PEX))) {
                 paymentMode = "rtgs";
                 voucher = paymentHeader.getVoucherheader();
                 if (voucher != null) {
@@ -306,10 +306,20 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
                             if (excludeChequeStatusses.contains(instrumentVoucher.getInstrumentHeaderId().getStatusId()
                                     .getDescription()))
                                 continue;
+                            
                             instrumentHeader = instrumentVoucher.getInstrumentHeaderId();
-                            chequeNumber = instrumentVoucher.getInstrumentHeaderId().getInstrumentNumber();
-                            chequeDate = Constants.DDMMYYYYFORMAT2.format(instrumentVoucher.getInstrumentHeaderId()
-                                    .getInstrumentDate());
+                            if(paymentMode.equalsIgnoreCase("pex") || paymentMode.equalsIgnoreCase("rtgs") )
+                            {
+                            	chequeNumber = instrumentVoucher.getInstrumentHeaderId().getTransactionNumber();
+                                chequeDate = Constants.DDMMYYYYFORMAT2.format(instrumentVoucher.getInstrumentHeaderId()
+                                        .getTransactionDate());
+                            }
+                            else
+                            {
+                            	chequeNumber = instrumentVoucher.getInstrumentHeaderId().getInstrumentNumber();
+                                chequeDate = Constants.DDMMYYYYFORMAT2.format(instrumentVoucher.getInstrumentHeaderId()
+                                        .getInstrumentDate());
+                            }
                             if (isInstrumentMultiVoucherMapped(instrumentVoucher.getInstrumentHeaderId().getId()))
                                 chequeNosList.add(chequeNumber + "-MULTIPLE");
                             else
@@ -374,14 +384,14 @@ public class BillPaymentVoucherPrintAction extends BaseFormAction {
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getCreditAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService, Integer.valueOf(voucher.getId()
                             .toString()), vd, egovCommon);
-                    voucherReport.setDepartment(departmentService.getDepartmentById( Long.parseLong(voucher.getVouchermis().getDepartmentcode())));
+                    voucherReport.setDepartment(departmentService.getDepartmentByCode( voucher.getVouchermis().getDepartmentcode()));
                     voucherReportList.add(voucherReport);
                 }
             for (final CGeneralLedger vd : voucher.getGeneralledger())
                 if (BigDecimal.ZERO.compareTo(BigDecimal.valueOf(vd.getDebitAmount().doubleValue())) == 0) {
                     final VoucherReport voucherReport = new VoucherReport(persistenceService, Integer.valueOf(voucher.getId()
                             .toString()), vd, egovCommon);
-                    voucherReport.setDepartment(departmentService.getDepartmentById( Long.parseLong(voucher.getVouchermis().getDepartmentcode())));
+                    voucherReport.setDepartment(departmentService.getDepartmentByCode( voucher.getVouchermis().getDepartmentcode()));
                     voucherReportList.add(voucherReport);
                 }
         }

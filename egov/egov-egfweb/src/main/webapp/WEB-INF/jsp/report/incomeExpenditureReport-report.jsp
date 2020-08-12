@@ -70,11 +70,13 @@ var callback = {
 		}
 function disableAsOnDate(){
 	if(document.getElementById('period').value != "Date"){
-		document.getElementById('asOndate').disabled = true;
+		document.getElementById('fromDate').disabled = true;
+		document.getElementById('toDate').disabled = true;
 		document.getElementById('financialYear').disabled = false;
 	}else{
 		document.getElementById('financialYear').disabled = true;
-		document.getElementById('asOndate').disabled = false;
+		document.getElementById('fromDate').disabled = false;
+		document.getElementById('toDate').disabled = false;
 	}
 }
 
@@ -92,8 +94,12 @@ function validateMandatoryFields(){
 			return false;
 		}
 	}
-	if(document.getElementById('period').value=="Date" && document.getElementById('asOndate').value==""){
-		bootbox.alert('<s:text name="msg.please.enter.as.onDate"/>');
+	if(document.getElementById('period').value=="Date" && document.getElementById('fromDate').value==""){
+		bootbox.alert('Please Enter From Date');
+		return false;
+	}
+	if(document.getElementById('period').value=="Date" && document.getElementById('toDate').value==""){
+		bootbox.alert('Please Enter To Date');
 		return false;
 	}
 	return true;
@@ -101,7 +107,7 @@ function validateMandatoryFields(){
 function getData(){
 	if(validateMandatoryFields()){
 		doLoadingMask();
-		var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.asOndate='+document.getElementById('asOndate').value+'&model.fund.id='+document.getElementById('fund').value;
+		var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value+'&model.fund.id='+document.getElementById('fund').value;
 		YAHOO.util.Connect.asyncRequest('POST', url, callback, null);
 		return true;
     }
@@ -168,34 +174,42 @@ th.bluebgheadtd {
 				</tr>
 				<tr>
 					<td class="greybox">&nbsp;</td>
-					<td class="greybox"><s:text name="report.asOnDate" />:</td>
-					<td class="greybox"><s:textfield name="asOndate" id="asOndate"
+					<td class="greybox"><s:text name="report.fromDate" />:</td>
+					<td class="greybox"><s:textfield name="fromDate" id="fromDate"
 							cssStyle="width:100px" /><a
-						href="javascript:show_calendar('incomeExpenditureReport.asOndate');"
+						href="javascript:show_calendar('incomeExpenditureReport.fromDate');"
 						style="text-decoration: none">&nbsp;<img
 							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)
 					</td>
+					<td class="greybox"><s:text name="report.toDate" />:</td>
+					<td class="greybox"><s:textfield name="toDate" id="toDate"
+							cssStyle="width:100px" /><a
+						href="javascript:show_calendar('incomeExpenditureReport.toDate');"
+						style="text-decoration: none">&nbsp;<img
+							src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)
+					</td>
+				</tr>
+				<tr>
+					<td class="bluebox">&nbsp;</td>
 					<td class="greybox"><s:text name="report.rupees" />:<span
 						class="mandatory1">*</span></td>
 					<td class="greybox"><s:select name="currency" id="currency"
 							list="#{'Rupees':'Rupees','Thousands':'Thousands','Lakhs':'Lakhs'}"
 							value="%{model.currency}" /></td>
-				</tr>
-				<tr>
-					<td class="bluebox">&nbsp;</td>
 					<td class="bluebox"><s:text name="report.department" />:</td>
 					<td class="bluebox"><s:select name="department"
 							id="department" list="dropdownData.departmentList" listKey="code"
 							listValue="name" headerKey="null" headerValue="%{getText('lbl.choose.options')}"
 							value="model.department.code" /></td>
+					
+				</tr>
+				<tr>
+					<td class="greybox">&nbsp;</td>
 					<td class="bluebox"><s:text name="report.fund" />:</td>
 					<td class="bluebox"><s:select name="fund" id="fund"
 							list="dropdownData.fundDropDownList" listKey="id"
 							listValue="name" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
 							value="model.fund.id" /></td>
-				</tr>
-				<tr>
-					<td class="greybox">&nbsp;</td>
 					<td class="greybox"><s:text name="report.function" />:</td>
 					<td class="greybox"><s:select name="function" id="function"
 							list="dropdownData.functionList" listKey="id" listValue="name"

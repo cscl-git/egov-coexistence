@@ -130,6 +130,19 @@ public class IncomeExpenditureService extends ReportService {
         ie = addBudgetDetails(ie);
         removeFundsWithNoDataIE(ie);
     }
+    
+    public void populateIEStatementNew(Statement ie) {
+        minorCodeLength = Integer.valueOf(getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
+        coaType.add('I');
+        coaType.add('E');
+        Date  fromDate = getFromDate(ie);
+        Date  toDate = getToDate(ie);
+        final String filterQuery = getFilterQuery(ie);
+        populateCurrentYearAmountPerFund(ie, filterQuery, toDate, fromDate, IE);
+        // populateSchedule(ie,IE);
+        ie = addBudgetDetails(ie);
+        removeFundsWithNoDataIE(ie);
+    }
 
     private Statement addBudgetDetails(final Statement ie) {
         final List<StatementResultObject> budgetForMajorCodes = getBudgetForMajorCodes(ie);
