@@ -32,8 +32,17 @@
 							${apnimandiCollectionDetails.zone.name}
 						</div>
 					</div>
+					<div class="form-group">
+						<div class="col-xs-3 add-margin text-right">
+							<spring:message code="lbl.site" /> :
+						</div>
+						<div class="col-sm-3 add-margin view-content">
+							${apnimandiCollectionDetails.site.name}
+						</div>
+					</div>
 					<form:hidden id="collectiontype" name="collectiontype" path="collectiontype"/>
 					<form:hidden id="zone" name="zone" path="zone"/>
+					<form:hidden id="site" name="site" path="site"/>
 					<input type="hidden" id="collectionTypeCode" name="collectionTypeCode" value="${collectionTypeCode}"/>
 					<input type="hidden" id="zoneId" name="zoneId" value="${zoneId}"/>
 				</c:if>
@@ -58,6 +67,17 @@
 								<form:options items="${zoneMasters}" itemValue="id" itemLabel="name" />
 							</form:select>
 							<form:errors path="zone" cssClass="error-msg" />
+						</div>
+					</div>
+					<div class="form-group">
+						<label class="col-sm-3 control-label text-left">
+							<spring:message code="lbl.site" /> <span class="mandatory"></span>:
+						</label>
+						<div class="col-sm-3 add-margin">
+							<form:select path="site" id="site" cssClass="form-control" cssErrorClass="form-control error">
+								<form:option value=""><spring:message code="lbl.select" /></form:option>
+							</form:select>
+							<form:errors path="site" cssClass="error-msg" />
 						</div>
 					</div>
 				</c:if>				

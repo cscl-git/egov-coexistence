@@ -103,6 +103,7 @@
 			<thead>
 				<tr>
 					<th><spring:message code="lbl.zone" /></th>
+					<th><spring:message code="lbl.site" /></th>
 					<th><spring:message code="lbl.collection.type" /></th>
 					<th><spring:message code="lbl.receipt.no" /></th>
 					<th><spring:message code="lbl.collection.month" /></th>

@@ -316,3 +316,28 @@ function getDepartmentByZone(){
 		});
 	}
 }
+
+function getSitesByZone(){
+	var zoneid=$('#zone').val();
+	if(zoneid!=""){
+		$.ajax({
+			url: "/services/apnimandi/collection/ajax/getSitesByZone",     
+			type: "GET",
+			data: {
+				zoneid : zoneid
+			},
+			dataType: "json",
+			success: function (response) {
+				console.log("success"+response);
+				$('#site').empty();
+				$('#site').append($("<option value=''>Select</option>"));
+				$.each(response.sites, function(index, value) {
+					$('#site').append($('<option>').text(value.name).attr('value', value.id));
+				});
+			}, 
+			error: function (response) {
+				console.log("failed");
+			}
+		});
+	}
+}

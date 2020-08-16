@@ -28,6 +28,11 @@ public class CollectionJsonAdaptor implements JsonSerializer<ApnimandiCollection
 	            else
 	                jsonObject.addProperty("zone", collection.getZoneName());
 	            
+	            if (collection.getApnimandiCollections().getSite() == null)
+	                jsonObject.addProperty("site", "");
+	            else
+	                jsonObject.addProperty("site", collection.getSiteName());
+	            
 	            if (collection.getApnimandiCollections().getStatus() == null) {
 	                jsonObject.addProperty("status", "");
 	                jsonObject.addProperty("statusCode", "");

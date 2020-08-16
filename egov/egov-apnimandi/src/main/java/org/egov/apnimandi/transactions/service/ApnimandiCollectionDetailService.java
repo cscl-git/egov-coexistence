@@ -486,9 +486,9 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     
     public List<ApnimandiCollectionSearchResult> search(final ApnimandiCollectionDetails apnimandiCollectionDetails) {
         final StringBuilder queryStr = new StringBuilder();
-        queryStr.append("select distinct collectionObj as apnimandiCollections, zoneMaster.name as zoneName, egwStatus.description as statusName");
-        queryStr.append(" from ApnimandiCollectionDetails collectionObj,EgwStatus egwStatus,ZoneMaster zoneMaster, ApnimandiCollectionType collType");
-        queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.collectiontype.id=collType.id");
+        queryStr.append("select distinct collectionObj as apnimandiCollections, zoneMaster.name as zoneName, siteMaster.name as siteName, egwStatus.description as statusName");
+        queryStr.append(" from ApnimandiCollectionDetails collectionObj,EgwStatus egwStatus,ZoneMaster zoneMaster, SiteMaster siteMaster, ApnimandiCollectionType collType");
+        queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.site.id=siteMaster.id and collectionObj.collectiontype.id=collType.id");
         getAppendQuery(apnimandiCollectionDetails, queryStr);
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
         queryResult = setParametersToQuery(apnimandiCollectionDetails, queryResult);

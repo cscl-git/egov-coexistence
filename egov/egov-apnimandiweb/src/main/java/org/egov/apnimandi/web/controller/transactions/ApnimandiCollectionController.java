@@ -19,9 +19,11 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.apnimandi.masters.entity.ApnimandiCollectionType;
+import org.egov.apnimandi.masters.entity.SiteMaster;
 import org.egov.apnimandi.masters.entity.ZoneMaster;
 import org.egov.apnimandi.masters.entity.vo.AttachedDocument;
 import org.egov.apnimandi.masters.service.ApnimaniCollectionTypeService;
+import org.egov.apnimandi.masters.service.SiteMasterService;
 import org.egov.apnimandi.masters.service.ZoneMasterService;
 import org.egov.apnimandi.reports.entity.ApnimandiCollectionSearchResult;
 import org.egov.apnimandi.reports.entity.ApnimandiContractorSearchResult;
@@ -100,6 +102,8 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
     private MessageSource messageSource;	
 	@Autowired 
 	private ApnimandiThirdPartyService apnimandiThirdPartyService;	
+	@Autowired
+	private SiteMasterService siteMasterService;
 	
 	private void prepareNewForm(final Model model) {
         model.addAttribute("apnimandiCollectionTypes", apnimaniCollectionTypeService.getActiveApnimandiCollectionTypeList());
@@ -330,6 +334,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	@RequestMapping(value = "/workflow/view/{id}", method = RequestMethod.GET)
     public String workflowView(@PathVariable("id") final Long id, final Model model) {
 		final ApnimandiCollectionDetails apnimandiCollectionDetails = apnimandiCollectionDetailService.findOne(id);
+		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
         prepareNewForm(model);
         model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
         model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
@@ -379,7 +384,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         		apnimandiCollectionDetails.setActive(true);
             }
         }
-        
+        apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
         apnimandiCollectionDetailService.persist(apnimandiCollectionDetails, null, null, approvalPosition, approvalComment, workFlowAction);
         if (null != workFlowAction) {
         	if (ApnimandiConstants.DELETE.equalsIgnoreCase(workFlowAction)) {
@@ -470,11 +475,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			for(TaxHeadMaster accountHead :accountHeadMasters) {
 				isFound=false;
 				if(ApnimandiConstants.APNI_MANDI.equalsIgnoreCase(apnimandiCollectionType.getCode())) {
-					if(ApnimandiConstants.SERVICE_TYPE_CONTRACTOR_SECURITY_FEE.equalsIgnoreCase(servicetype)) {					
-						if((ApnimandiConstants.SECURITY_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
-							isFound=true;
-						}
-					}else if(ApnimandiConstants.SERVICE_TYPE_RENT_AMOUNT.equalsIgnoreCase(servicetype)) {
+					if(ApnimandiConstants.SERVICE_TYPE_COLLECTION_AMOUNT.equalsIgnoreCase(servicetype)) {
 						if((ApnimandiConstants.GROUND_RENT_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 							|| (ApnimandiConstants.PENALITIES_FINES_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 								|| (ApnimandiConstants.CGST_UTGST_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
@@ -558,6 +559,28 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			});
 		}
 		jsonObject.add("departments", departments);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
+	
+	@RequestMapping(value = "/ajax/getSitesByZone", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public void getSitesByZone(@ModelAttribute("siteMaster") @RequestParam final Long zoneid,
+       								 final HttpServletResponse response) throws IOException {
+		JsonObject jsonObject = new JsonObject();
+		JsonArray sites = new JsonArray();
+		if(null != zoneid) {
+			ZoneMaster zone = zoneMasterService.findOne(zoneid);
+			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			List<SiteMaster> siteMasters =  siteMasterService.findByZone(zone);
+			siteMasters.forEach(siteMaster -> {
+				JsonObject site = new JsonObject();
+				site.addProperty("id", siteMaster.getId());
+				site.addProperty("name", siteMaster.getName());
+				sites.add(site);
+			});
+		}
+		jsonObject.add("sites", sites);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         IOUtils.write(jsonObject.toString(), response.getWriter());        
     }

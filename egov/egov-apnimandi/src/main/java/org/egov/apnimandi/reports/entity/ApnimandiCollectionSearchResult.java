@@ -4,6 +4,7 @@ import org.egov.apnimandi.transactions.entity.ApnimandiCollectionDetails;
 
 public class ApnimandiCollectionSearchResult {
 	private ApnimandiCollectionDetails apnimandiCollections;
+	private String siteName;
 	private String zoneName;
 	private String statusName;	
 	
@@ -25,4 +26,10 @@ public class ApnimandiCollectionSearchResult {
 	public void setStatusName(String statusName) {
 		this.statusName = statusName;
 	}
+	public String getSiteName() {
+		return siteName;
+	}
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
+	}	
 }

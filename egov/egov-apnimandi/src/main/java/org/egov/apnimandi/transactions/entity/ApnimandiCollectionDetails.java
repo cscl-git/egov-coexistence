@@ -22,6 +22,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.egov.apnimandi.masters.entity.ApnimandiCollectionType;
+import org.egov.apnimandi.masters.entity.SiteMaster;
 import org.egov.apnimandi.masters.entity.ZoneMaster;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.persistence.entity.AbstractAuditable;
@@ -54,6 +55,11 @@ public class ApnimandiCollectionDetails extends StateAware{
     @JoinColumn(name = "zone", nullable = false)
     @Audited
     private ZoneMaster zone;
+    
+    @ManyToOne
+    @JoinColumn(name = "site", nullable = false)
+    @Audited
+    private SiteMaster site;
     
     @NotNull
     @Audited
@@ -448,5 +454,13 @@ public class ApnimandiCollectionDetails extends StateAware{
 
 	public void setPaymentId(String paymentId) {
 		this.paymentId = paymentId;
+	}
+
+	public SiteMaster getSite() {
+		return site;
+	}
+
+	public void setSite(SiteMaster site) {
+		this.site = site;
 	}	
 }
