@@ -73,7 +73,7 @@
 						</div>
 					</div>
 
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<label class="col-sm-3 control-label text-left"><spring:message
 								code="lbl.consignmentdate" /> :</span> </label>
 						<div class="col-sm-3 add-margin">
@@ -82,8 +82,7 @@
 								data-inputmask="'mask': 'd/m/y'" />
 							<form:errors path="consignmentDate" cssClass="error-msg" />
 						</div>
-
-					</div>
+					</div> -->
 
 
 

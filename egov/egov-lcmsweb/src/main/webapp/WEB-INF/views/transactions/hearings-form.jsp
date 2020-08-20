@@ -72,7 +72,7 @@
 				</div>
 
 				<div class="form-group">
-					<label class="col-sm-2 control-label text-left"><spring:message
+					<!-- <label class="col-sm-2 control-label text-left"><spring:message
 							code="lbl.purposeofhearing" /> :<span class="mandatory"></span>
 					</label>
 					<div class="col-sm-3 add-margin">
@@ -81,9 +81,9 @@
 							data-pattern="alphanumericwithspecialcharacterswithspace"
 							maxlength="1024" required="required" />
 						<form:errors path="purposeofHearings" cssClass="error-msg" />
-					</div>
+					</div> -->
 
-					<label class="col-sm-3 control-label text-right"><spring:message
+					<label class="col-sm-2 control-label text-left"><spring:message
 							code="lbl.outcomeofhearing" /> :</label>
 					<div class="col-sm-3 add-margin">
 						<form:textarea path="hearingOutcome"
@@ -129,17 +129,15 @@
 							<spring:message code="lbl.department" /> :
 						</label>
 						<div class="col-sm-3 add-margin">
-							<select class="form-control" name="department" id="department">
-								<option value=""><spring:message code="lbls.select" /></option>
-							</select>
+							<input type="text" id="department" name="department" class="form-control text-left patternvalidation"
+								   data-pattern="alphanumericspecialcharacters" maxlength="100"/>
 						</div>
 						<label class="col-sm-2 control-label text-right">
 							<spring:message code="lbl.designation" /> :
 						</label>
 						<div class="col-sm-3 add-margin">
-							<select class="form-control" name="designation" id="designation">
-								<option value=""><spring:message code="lbls.select" /></option>
-							</select>
+							<input type="text" id="designation" name="designation" class="form-control text-left patternvalidation"
+								   data-pattern="alphanumericspecialcharacters" maxlength="100"/>
 						</div>					
 					</div>
 					<div class="form-group">
@@ -147,9 +145,15 @@
 							<spring:message code="lbl.employee" /> :
 						</label>
 						<div class="col-sm-3 add-margin">
-							<select class="form-control" name="employee" id="employee">
-								<option value=""><spring:message code="lbls.select" /></option>
-							</select>
+							<input id="employeeName" type="text" name="employeeName" class="form-control text-left patternvalidation"
+								   data-pattern="alphanumericspecialcharacters" maxlength="100"/>
+						</div>
+						<label class="col-sm-2 control-label text-right">
+							<spring:message code="lbl.contactnumber" /> :
+						</label>
+						<div class="col-sm-3 add-margin">
+							<input type="text" id="contactno" name="contactno" class="form-control text-left patternvalidation"
+								   data-pattern="number" maxlength="20"/>
 						</div>					
 					</div>
 					<div class="form-group text-center">
@@ -158,7 +162,10 @@
 					<table class="table table-striped table-bordered" id="employeeDetails">
 						<thead>
 							<tr>
-								<th class="text-center">Department-Employee</th>
+								<th class="text-center">Employee Name</th>
+								<th class="text-center">Department</th>
+								<th class="text-center">Designation</th>
+								<th class="text-center">Contact No.</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -168,8 +175,20 @@
 										var="positionTemplList" varStatus="counter">
 										<tr>
 											<td class="text-right">
-												<form:input path="positionTemplList[${counter.index}].employeeName" cssClass="form-control confValues"
+												<form:input path="positionTemplList[${counter.index}].employeeName" cssClass="form-control confValues empname"
 															value="${positionTemplList.employeeName}" id="positionTemplList[${counter.index}].employeeName" />
+											</td>
+											<td class="text-right">
+												<form:input path="positionTemplList[${counter.index}].department" cssClass="form-control confValues deptname"
+															value="${positionTemplList.department}" id="positionTemplList[${counter.index}].department" />
+											</td>
+											<td class="text-right">
+												<form:input path="positionTemplList[${counter.index}].designation" cssClass="form-control confValues desgname"
+															value="${positionTemplList.designation}" id="positionTemplList[${counter.index}].designation" />
+											</td>
+											<td class="text-right">
+												<form:input path="positionTemplList[${counter.index}].contactno" cssClass="form-control confValues contno"
+															value="${positionTemplList.contactno}" id="positionTemplList[${counter.index}].contactno" />
 											</td>
 										</tr>
 									</c:forEach>
@@ -177,8 +196,20 @@
 								<c:otherwise>
 									<tr>
 										<td>
-											<form:input type="text" path="positionTemplList[0].employeeName" cssClass="form-control" id="positionTemplList[0].employeeName" readonly="readonly"/>
-											<form:input type="hidden" path="positionTemplList[0].employeeId" cssClass="form-control" id="positionTemplList[0].employeeId" />
+											<form:input type="text" path="positionTemplList[0].employeeName" cssClass="form-control empname" 
+											id="positionTemplList[0].employeeName" readonly="readonly"/>									
+										</td>
+										<td>
+											<form:input type="text" path="positionTemplList[0].department" cssClass="form-control deptname" 
+											id="positionTemplList[0].department" readonly="readonly"/>									
+										</td>
+										<td>
+											<form:input type="text" path="positionTemplList[0].designation" cssClass="form-control desgname" 
+											id="positionTemplList[0].designation" readonly="readonly"/>										
+										</td>
+										<td>
+											<form:input type="text" path="positionTemplList[0].contactno" cssClass="form-control contno" 
+											id="positionTemplList[0].contactnoe" readonly="readonly"/>										
 										</td>
 										<td>
 											<span class="add-padding">

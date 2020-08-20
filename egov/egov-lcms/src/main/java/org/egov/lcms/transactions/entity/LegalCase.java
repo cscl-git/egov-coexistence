@@ -52,7 +52,9 @@ import org.egov.commons.EgwStatus;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.lcms.masters.entity.CaseTypeMaster;
+import org.egov.lcms.masters.entity.ConcernedBranchMaster;
 import org.egov.lcms.masters.entity.CourtMaster;
+import org.egov.lcms.masters.entity.CourtTypeMaster;
 import org.egov.lcms.masters.entity.PetitionTypeMaster;
 import org.egov.lcms.utils.constants.LcmsConstants;
 import org.egov.pims.commons.Position;
@@ -97,7 +99,7 @@ public class LegalCase extends AbstractAuditable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
-    @JoinColumn(name = "COURT", nullable = false)
+    @JoinColumn(name = "COURT")
     @Audited
     private CourtMaster courtMaster;
 
@@ -133,6 +135,21 @@ public class LegalCase extends AbstractAuditable {
     @Column(name = "appealnum")
     @Audited
     private String appealNum;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prevcourttype")
+    @Audited
+    private CourtTypeMaster prevCourtType;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "prevpetitiontype")
+    @Audited
+    private PetitionTypeMaster prevPetitionType;
+    
+    @Length(max = 4)
+    @Column(name = "prevcaseyear")
+    @Audited
+    private String prevCaseYear;
 
     @Length(max = 1024)
     @Audited
@@ -229,6 +246,13 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private String estimatePreparedBy;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "concernedbranch")
+    @Audited
+    private ConcernedBranchMaster concernedBranch;
+    
+    @Audited
+    private String concernedBranchEmail;    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reportstatus")
@@ -978,4 +1002,43 @@ public class LegalCase extends AbstractAuditable {
 		this.fileNumber = fileNumber;
 	}
 
+	public ConcernedBranchMaster getConcernedBranch() {
+		return concernedBranch;
+	}
+
+	public void setConcernedBranch(ConcernedBranchMaster concernedBranch) {
+		this.concernedBranch = concernedBranch;
+	}
+
+	public String getConcernedBranchEmail() {
+		return concernedBranchEmail;
+	}
+
+	public void setConcernedBranchEmail(String concernedBranchEmail) {
+		this.concernedBranchEmail = concernedBranchEmail;
+	}
+
+	public String getPrevCaseYear() {
+		return prevCaseYear;
+	}
+
+	public void setPrevCaseYear(String prevCaseYear) {
+		this.prevCaseYear = prevCaseYear;
+	}
+
+	public CourtTypeMaster getPrevCourtType() {
+		return prevCourtType;
+	}
+
+	public void setPrevCourtType(CourtTypeMaster prevCourtType) {
+		this.prevCourtType = prevCourtType;
+	}
+
+	public PetitionTypeMaster getPrevPetitionType() {
+		return prevPetitionType;
+	}
+
+	public void setPrevPetitionType(PetitionTypeMaster prevPetitionType) {
+		this.prevPetitionType = prevPetitionType;
+	}	
 }

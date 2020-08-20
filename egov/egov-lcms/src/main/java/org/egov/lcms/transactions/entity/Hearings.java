@@ -252,7 +252,7 @@ public class Hearings extends AbstractAuditable {
     public String getEmployeeHearing() {
         final StringBuilder tempStr = new StringBuilder();
         for (final EmployeeHearing temp : employeeHearingList)
-            if (temp.getEmployeeId() != null && null != temp.getEmployeeName())
+            if (null != temp.getEmployeeName())
                 if (tempStr.length() == 0)
                     tempStr.append(temp.getEmployeeName());
                 else

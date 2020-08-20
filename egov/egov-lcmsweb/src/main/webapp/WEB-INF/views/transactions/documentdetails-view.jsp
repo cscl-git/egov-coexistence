@@ -60,10 +60,12 @@
 		<div class="panel-title">
 		<c:choose>
 			<c:when test="${mode != 'view'}">
-			<spring:message code="lbl.documents" />
+				<%-- <spring:message code="lbl.documents" /> --%>
+				Interim Order
 			</c:when>
 			<c:otherwise>
-				<spring:message code="lbl.upload.document" />
+				<%-- <spring:message code="lbl.upload.document" /> --%>
+				Interim Order
 			</c:otherwise>
 		</c:choose>
 		</div>

@@ -95,7 +95,7 @@ public class BipartisanDetails extends AbstractAuditable {
     private LegalCase legalCase;
 
     @NotNull
-    @Length(max = 128)
+    @Length(max = 200)
     @Audited
     private String name;
 
