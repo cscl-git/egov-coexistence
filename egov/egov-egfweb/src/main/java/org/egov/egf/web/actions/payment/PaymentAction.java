@@ -227,6 +227,8 @@ public class PaymentAction extends BasePaymentAction {
     @Autowired
     private ChartOfAccounts chartOfAccounts;
     private List<Bankbranch> bankBranchList = new ArrayList<Bankbranch>();
+    private String firstsignatory="-1";
+    private String secondsignatory="-1";
  
     public PaymentAction() {
         if (LOGGER.isDebugEnabled())
@@ -1041,7 +1043,7 @@ public class PaymentAction extends BasePaymentAction {
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
-            paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean);
+            paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
             // sendForApproval();// this should not be called here as it is
             // public method which is called from jsp submit
@@ -2369,5 +2371,21 @@ public List<Bankbranch> getBankBranchList() {
 
 public void setBankBranchList(List<Bankbranch> bankBranchList) {
 	this.bankBranchList = bankBranchList;
+}
+
+public String getFirstsignatory() {
+	return firstsignatory;
+}
+
+public void setFirstsignatory(String firstsignatory) {
+	this.firstsignatory = firstsignatory;
+}
+
+public String getSecondsignatory() {
+	return secondsignatory;
+}
+
+public void setSecondsignatory(String secondsignatory) {
+	this.secondsignatory = secondsignatory;
 }
 }

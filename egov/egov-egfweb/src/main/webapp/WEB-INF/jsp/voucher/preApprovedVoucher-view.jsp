@@ -239,6 +239,13 @@
 				</table>
 			</div>
 		</s:if>
+		<s:if test="%{voucherHeader.documentMode=='VIEW'}">
+		<div align="center">
+				<jsp:include page="common-documentsView.jsp" />
+				</div>
+			</s:if>
+               
+		
 		<div id="wfHistoryDiv">
 			<s:if test="%{from=='Receipt'}">
 				<s:if test="%{receiptVoucher.state.id!=null}">

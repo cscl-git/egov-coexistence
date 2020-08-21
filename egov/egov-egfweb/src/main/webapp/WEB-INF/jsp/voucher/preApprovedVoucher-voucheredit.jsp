@@ -295,6 +295,9 @@ function validate(name,value){
 						<tr class="bluebox">
 							<a href="#" onclick="openSource()">Source</a>
 						</tr>
+						<tr class="bluebox">
+							<a href="#" onclick="openBudget()">Budget Details</a>
+						</tr>
 					</table>
 				</s:if>
 				<br />
@@ -327,7 +330,12 @@ function validate(name,value){
 			addGridRowsSL();
 			document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="80%"
 		</script>
-
+	<s:if test="%{voucherHeader.documentMode=='ADDVIEW'}">
+		      <div  align="center">
+				<jsp:include page="common-documentsView.jsp" />
+				<%--<jsp:include page="common-documentsUpload.jsp" />--%>
+				</div>
+			</s:if>
 				<s:if test='%{! wfitemstate.equalsIgnoreCase("END")}'>
 					<%@include file="workflowApproval.jsp"%>
 				</s:if>

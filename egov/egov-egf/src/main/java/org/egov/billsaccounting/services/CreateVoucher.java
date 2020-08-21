@@ -1113,7 +1113,7 @@ public class CreateVoucher {
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
 			final List<HashMap<String, Object>> accountcodedetails,
 			final List<HashMap<String, Object>> subledgerdetails) throws ApplicationRuntimeException {
-		CVoucherHeader vh;
+		CVoucherHeader vh = null;
 		Vouchermis mis;
 
 		if (LOGGER.isDebugEnabled())
@@ -1208,8 +1208,9 @@ public class CreateVoucher {
 			ve.printStackTrace();
 			throw new ValidationException(errors);
 		} catch (final Exception e) {
-			LOGGER.error(ERR, e);
-			throw new ApplicationRuntimeException(e.getMessage());
+			//LOGGER.error(ERR, e);
+			//throw new ApplicationRuntimeException(e.getMessage());
+			e.printStackTrace();
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("End | createVoucher API");
@@ -1454,14 +1455,14 @@ public class CreateVoucher {
 			LOGGER.debug("START | validateVoucherMIS");
 		// Validate Department.
 		if (headerdetails.containsKey(VoucherConstant.DEPARTMENTCODE)
-				&& null != headerdetails.get(VoucherConstant.DEPARTMENTCODE)) {
+				&& null != headerdetails.get(VoucherConstant.DEPARTMENTCODE) && !headerdetails.get(VoucherConstant.DEPARTMENTCODE).toString().isEmpty()) {
 			org.egov.infra.microservice.models.Department depList = microserviceUtils
 					.getDepartmentByCode(headerdetails.get(VoucherConstant.DEPARTMENTCODE).toString());
 			if (depList == null)
 				throw new ApplicationRuntimeException("not a valid Department");
 		}
 
-		if (null != headerdetails.get(VoucherConstant.FUNCTIONARYCODE)) {
+		if (null != headerdetails.get(VoucherConstant.FUNCTIONARYCODE) && !headerdetails.get(VoucherConstant.FUNCTIONARYCODE).toString().isEmpty()) {
 			final Functionary functionary = functionaryDAO.getFunctionaryByCode(
 					BigDecimal.valueOf(Long.valueOf(headerdetails.get(VoucherConstant.FUNCTIONARYCODE).toString())));
 			if (null == functionary)
@@ -1471,7 +1472,7 @@ public class CreateVoucher {
 		String fundCode = null;
 		Fund fund = null;
 		if (headerdetails.containsKey(VoucherConstant.FUNDCODE)
-				&& null != headerdetails.get(VoucherConstant.FUNDCODE)) {
+				&& null != headerdetails.get(VoucherConstant.FUNDCODE) && !headerdetails.get(VoucherConstant.FUNDCODE).toString().isEmpty()) {
 			fundCode = headerdetails.get(VoucherConstant.FUNDCODE).toString();
 			fund = fundDAO.fundByCode(fundCode);
 			if (null == fund)
@@ -1481,28 +1482,39 @@ public class CreateVoucher {
 		// validate Scheme
 		Scheme scheme = null;
 		if (headerdetails.containsKey(VoucherConstant.SCHEMECODE)
-				&& null != headerdetails.get(VoucherConstant.SCHEMECODE)) {
-			final String schemecode = headerdetails.get(VoucherConstant.SCHEMECODE).toString();
-			scheme = schemeDAO.getSchemeByCode(schemecode);
-			if (null == scheme)
-				throw new ApplicationRuntimeException("not a valid scheme");
-			if (!fund.getId().equals(scheme.getFund().getId()))
-				throw new ApplicationRuntimeException("This scheme does not belong to this fund");
+				&& null != headerdetails.get(VoucherConstant.SCHEMECODE) && !headerdetails.get(VoucherConstant.SCHEMECODE).toString().isEmpty()) {
+			 String schemecode = headerdetails.get(VoucherConstant.SCHEMECODE).toString();
+			schemecode=schemecode.replaceAll(" ", "");
+			System.out.println("scheme :"+schemecode+"X");
+			if(schemecode !=null && schemecode.length() > 0)
+			{
+				scheme = schemeDAO.getSchemeByCode(schemecode);
+				if (null == scheme)
+					throw new ApplicationRuntimeException("not a valid scheme");
+				if (!fund.getId().equals(scheme.getFund().getId()))
+					throw new ApplicationRuntimeException("This scheme does not belong to this fund");
+			}
+			
 		}
 		// validate subscheme
 		SubScheme subScheme = null;
 		if (headerdetails.containsKey(VoucherConstant.SUBSCHEMECODE)
-				&& null != headerdetails.get(VoucherConstant.SUBSCHEMECODE)) {
+				&& null != headerdetails.get(VoucherConstant.SUBSCHEMECODE) && !headerdetails.get(VoucherConstant.SUBSCHEMECODE).toString().isEmpty()) {
 			final String subSchemeCode = headerdetails.get(VoucherConstant.SUBSCHEMECODE).toString();
-			subScheme = subSchemeDAO.getSubSchemeByCode(subSchemeCode);
-			if (null == subScheme)
-				throw new ApplicationRuntimeException("not a valid subscheme");
-			if (!subScheme.getScheme().getId().equals(scheme.getId()))
-				throw new ApplicationRuntimeException("This subscheme does not belong to this scheme");
+			
+			if(subSchemeCode != null && !subSchemeCode.isEmpty())
+			{
+				subScheme = subSchemeDAO.getSubSchemeByCode(subSchemeCode);
+				if (null == subScheme)
+					throw new ApplicationRuntimeException("not a valid subscheme");
+				if (!subScheme.getScheme().getId().equals(scheme.getId()))
+					throw new ApplicationRuntimeException("This subscheme does not belong to this scheme");
+			}
+			
 		}
 		// validate fundsource
 		if (headerdetails.containsKey(VoucherConstant.FUNDSOURCECODE)
-				&& null != headerdetails.get(VoucherConstant.FUNDSOURCECODE)) {
+				&& null != headerdetails.get(VoucherConstant.FUNDSOURCECODE) && !headerdetails.get(VoucherConstant.FUNDSOURCECODE).toString().isEmpty()) {
 			final Fundsource fundsource = fundSourceDAO
 					.getFundSourceByCode(headerdetails.get(VoucherConstant.FUNDSOURCECODE).toString());
 			if (null == fundsource)
@@ -1510,7 +1522,7 @@ public class CreateVoucher {
 		}
 
 		if (headerdetails.containsKey(VoucherConstant.DIVISIONID)
-				&& null != headerdetails.get(VoucherConstant.DIVISIONID))
+				&& null != headerdetails.get(VoucherConstant.DIVISIONID) && !headerdetails.get(VoucherConstant.DIVISIONID).toString().isEmpty())
 			if (null == boundary
 					.getBoundaryById(Long.parseLong(headerdetails.get(VoucherConstant.DIVISIONID).toString())))
 				throw new ApplicationRuntimeException("not a valid divisionid");
@@ -1576,7 +1588,16 @@ public class CreateVoucher {
 			String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
 			cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
 			String vNumGenMode = null;
-
+			if(headerdetails.containsKey("firstsignatory")
+					&& null != headerdetails.get("firstsignatory"))
+			{
+				cVoucherHeader.setFirstsignatory(headerdetails.get("firstsignatory").toString());
+			}
+			if(headerdetails.containsKey("secondsignatory")
+					&& null != headerdetails.get("secondsignatory"))
+			{
+				cVoucherHeader.setSecondsignatory(headerdetails.get("secondsignatory").toString());
+			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
 				vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");

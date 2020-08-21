@@ -322,6 +322,22 @@
 																</tr>
 															</s:else>
 															<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text name="payment.firstsignatory" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><s:select name="firstsignatory"
+																	headerKey="-1" headerValue="Select First Signatory" value="%{firstsignatory}"
+																	list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F&A)':'Assistant Controller (F&A)'}"
+																			id="firstsignatory" />
+																	</td>
+																	<td class="bluebox" width="15%"><s:text name="payment.secondsignatory" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
+																	headerKey="-1" headerValue="Select Second Signatory"
+																	list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F&A)':'Assistant Controller (F&A)' ,'Section Officer':'Section Officer'}"
+																			id="secondsignatory" /></td>
+																</tr>
+															<tr>
 																<td class="greybox">&nbsp;</td>
 																<td class="greybox" width="15%"><s:text
 																		name="payment.narration" /><span
@@ -682,6 +698,28 @@
 				undoLoadingMask();
 				return false;
 			}
+			var firstsignatory='';
+			if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
+			{
+				bootbox.alert("Please select First Signatory");
+				undoLoadingMask();
+				return false;
+			}
+			else
+				{
+					firstsignatory=dom.get('firstsignatory').value;
+				}
+			var secondsignatory=''
+			if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
+			{
+				bootbox.alert("Please select Second Signatory");
+				undoLoadingMask();
+				return false;
+			}
+			else
+			{
+				secondsignatory=dom.get('secondsignatory').value;
+			}
 			if(dom.get('description') == null || dom.get('description').value == '')
 				{
 					bootbox.alert("<s:text name='msg.please.select.voucher.narration'/>");
@@ -729,7 +767,7 @@
 			if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 			{
 				billIdsToPaymentAmountsap('billList','billIdsToPaymentAmountsMapId');
-			 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action';
+			 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 			 document.forms[0].submit();
 			}
 			else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -741,7 +779,7 @@
 					 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 					 if (msg == true) {
 						 billIdsToPaymentAmountsMap('billList','billIdsToPaymentAmountsMapId');
-						 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action';
+						 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 						 document.forms[0].submit();
 					 } else {
 						 undoLoadingMask();
@@ -751,7 +789,7 @@
 			else
 			{
 				billIdsToPaymentAmountsMap('billList','billIdsToPaymentAmountsMapId');
-				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action';
+				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 				document.forms[0].submit();
 			}
 		}  

@@ -92,7 +92,7 @@ function calculateBillAmount(){
 	});
 	$("#expenseNetPayableAmount").html($("#netPayableAmount").val());
 	$("#expenseBillTotalDebitAmount").html(debitamount);
-	$("#expenseBillTotalCreditAmount").html(Number(Number(creditamount)-Number($("#netPayableAmount").val())));
+	$("#expenseBillTotalCreditAmount").html(Number(Number(creditamount)));
 	$("#billamount").val(billamount);
 }
 

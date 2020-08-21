@@ -385,6 +385,10 @@ public class ExpenseBillService {
                 FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT));
             	
             }
+			else if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
+                && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                    FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
             else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
@@ -441,14 +445,14 @@ public class ExpenseBillService {
     public void createExpenseBillRegisterWorkflowTransition(final EgBillregister egBillregister,
                                                             final Long approvalPosition, final String approvalComent, final String additionalRule,
                                                             final String workFlowAction,final String approvalDesignation) {
-        if (LOG.isDebugEnabled())
-            LOG.debug(" Create WorkFlow Transition Started  ...");
+            LOG.info(" Create WorkFlow Transition Started  ...");
         final User user = securityUtils.getCurrentUser();
         final DateTime currentDate = new DateTime();
         Assignment wfInitiator = null;
         Map<String, String> finalDesignationNames = new HashMap<>();
         final String currState = "";
         String stateValue = "";
+        System.out.println("desig********:"+approvalDesignation);
         if (null != egBillregister.getId())
 //            wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
         	wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
@@ -465,6 +469,10 @@ public class ExpenseBillService {
 //                wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
            Designation designation = this.getDesignationDetails(approvalDesignation);
+           if(designation != null)
+           {
+        	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());
+           }
            Position owenrPos = new Position();
            owenrPos.setId(approvalPosition);
 
@@ -502,6 +510,11 @@ public class ExpenseBillService {
                 	}
                     
                 }
+		if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            		
+            	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
@@ -538,9 +551,13 @@ public class ExpenseBillService {
 
                 if (stateValue.isEmpty())
                 {
-                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING))
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
                 	{
                 		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+                	}
+                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	{
+                		stateValue = "Pending With "+ designation.getName().toUpperCase();
                 	}
                 	else
                 	{
@@ -551,6 +568,11 @@ public class ExpenseBillService {
                 	}
                     
                 }
+				if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+            		
+            	}
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)

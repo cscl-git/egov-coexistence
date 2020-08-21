@@ -87,11 +87,11 @@
 </style>
     <form:form name="expenseBillForm" role="form" method="post" action="create" modelAttribute="egBillregister" id="egBillregister" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	
-    <div class="position_alert">
+  <!--   <div class="position_alert">
         <spring:message code="lbl.netpayable.amount" text="Net Payable Amount"/>
         : &#8377 <span id="expenseNetPayableAmount"><c:out
             value="${expenseNetPayableAmount}" default="0.0"></c:out></span>
-    </div>
+    </div> -->
     <div class="position_alert1">
         <spring:message code="lbl.total.debit.amount" text="Total Debit Amount"/>
         : &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
@@ -132,11 +132,13 @@
     <div class="tab-content">
         <div class="tab-pane fade in active" id="expensebillheader">
             <jsp:include page="expensebill-header.jsp"/>
-            <jsp:include page="expensebill-subledgerdetails.jsp"/>
+            
             <div class="panel panel-primary" data-collapsed="0">
+           
                 <jsp:include page="expensebill-debitdetails.jsp"/>
                 <jsp:include page="expensebill-creditdetails.jsp"/>
-                <jsp:include page="expensebill-netpayable.jsp"/>
+                 <jsp:include page="expensebill-subledgerdetails.jsp"/>
+               <jsp:include page="expensebill-netpayable.jsp"/> 
             </div>
             <jsp:include page="expensebill-accountdetails.jsp"/>
             <jsp:include page="expensebill-subledgeraccountdetails.jsp"/>

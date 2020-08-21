@@ -356,6 +356,7 @@ public interface FinancialConstants {
 	public static final String BUTTONSAVE = "Save";
 	public static final String BUTTONCANCEL = "Cancel";
 	public static final String BUTTONVERIFY = "Verify";
+	public static final String BUTTONSAVEASDRAFT = "SaveAsDraft";
 
 	public static final String WORKFLOW_STATE_NEW = "NEW";
 	public static final String WORKFLOW_STATE_APPROVED = "Approved";
@@ -458,6 +459,7 @@ public interface FinancialConstants {
     public static final String CONTINGENCYBILL_PENDING_AUDIT = "Pending with Audit";
     public static final String CONTINGENCYBILL_PENDING_FINANCE = "Pending with Finance";
     public static final String AUDIT_ = "audit_";
+    public static final String WORKFLOW_STATE_SAVEASDRAFT  = "SaveAsDraft";
 
 	
 }

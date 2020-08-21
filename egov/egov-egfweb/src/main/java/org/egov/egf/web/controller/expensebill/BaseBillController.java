@@ -208,9 +208,9 @@ public abstract class BaseBillController extends BaseVoucherController {
                     for (final CChartOfAccountDetail coaDetails : details.getChartOfAccounts().getChartOfAccountDetails())
                         if (payeeDetails.getAccountDetailTypeId() == coaDetails.getDetailTypeId().getId())
                             check = true;
-                    if (!check)
-                        resultBinder.reject("msg.expense.bill.subledger.mismatch",
-                                new String[] { details.getChartOfAccounts().getGlcode() }, null);
+                    //if (!check)
+                      //  resultBinder.reject("msg.expense.bill.subledger.mismatch",
+                        //        new String[] { details.getChartOfAccounts().getGlcode() }, null);
 
                 }
 

@@ -68,6 +68,7 @@ import org.egov.commons.CFiscalPeriod;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUpload;
 import org.egov.commons.EgModules;
 import org.egov.commons.EgfRecordStatus;
 import org.egov.commons.EgwStatus;
@@ -76,6 +77,7 @@ import org.egov.commons.dao.ChartOfAccountsDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.dao.VouchermisHibernateDAO;
+import org.egov.commons.repository.CommonDocumentUploadRepository;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.EgModulesService;
 import org.egov.commons.utils.EntityType;
@@ -89,6 +91,7 @@ import org.egov.egf.contract.model.VoucherResponse;
 import org.egov.egf.contract.model.VoucherSearchRequest;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.entity.Employee;
 import org.egov.eis.entity.EmployeeView;
@@ -214,6 +217,9 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	
 	@Autowired
         FinanceDashboardService finDashboardService;
+
+	  @Autowired
+	    private CommonDocumentUploadRepository documentUploadRepository;
 
 	public VoucherService(final Class<CVoucherHeader> voucherHeader) {
 		super(voucherHeader);
@@ -1199,6 +1205,8 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			egBilldetailes = prepareBillDetails(egBillregister, billDetailslist, subLedgerlist, voucherHeader,
 					egBilldetailes);
 			egBillregister.setEgBilldetailes(egBilldetailes);
+			
+		
 			egBillRegisterService.applyAuditing(egBillregister);
 			egBillRegisterService.persist(egBillregister);
 
@@ -1223,6 +1231,17 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		return egBillregister;
 
 	}
+
+	   public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+	        if (documentDetailsList != null && !documentDetailsList.isEmpty())
+	            for (final DocumentUpload doc : documentDetailsList)
+	                documentUploadRepository.save(doc);
+	    }
+
+	    public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
+	        return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
+	    }
+	    
 
 	/**
 	 * @description - update the bill register objects in the JV modify screen
@@ -1527,5 +1546,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 	public List<CVoucherHeader> getVoucherByServiceNameAndReferenceDocument( String serviceName, String referenceDocument) {
             return vmisHibernateDao.getRecentVoucherByServiceNameAndReferenceDoc(serviceName, referenceDocument);
         }
+	
+	    
 
 }

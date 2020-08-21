@@ -62,6 +62,9 @@ import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
 import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
+import org.egov.commons.service.ChartOfAccountsService;
+import org.egov.commons.service.FunctionService;
+import org.egov.commons.service.FundService;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.BudgetVarianceEntry;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -82,11 +85,13 @@ import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetGroup;
 import org.egov.model.payment.Paymentheader;
 import org.egov.services.budget.BudgetDetailService;
+import org.egov.services.budget.BudgetGroupService;
 import org.egov.services.budget.BudgetService;
 import org.egov.utils.BudgetAccountType;
 import org.egov.utils.BudgetDetailConfig;
 import org.egov.utils.Constants;
 import org.hibernate.FlushMode;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -148,6 +153,25 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     @Autowired
     @Qualifier("masterDataCache")
     private EgovMasterDataCaching masterDataCache;
+    
+    private String dept;
+    private String funds;
+    private String func;
+    private String accCode;
+    private String vtype;
+    
+    @Autowired
+    private FundService fundService;
+    @Autowired
+    private FunctionService functionService;
+    @Autowired
+    @Qualifier("chartOfAccountsService")
+    private ChartOfAccountsService chartOfAccountsService;
+    @Autowired
+    @Qualifier("budgetGroupService")
+    private BudgetGroupService budgetGroupService;
+    
+    private String vhId;
 
     @ValidationErrorPage(value = "form")
     @SkipValidation
@@ -220,11 +244,128 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     @SkipValidation
     @Action(value = "/report/budgetVarianceReport-loadData")
     public String loadData() {
+    	System.out.println(" dept::"+ dept);
+    	System.out.println("funds  :::"+funds);
+    	System.out.println("func ::::"+func);
+    	System.out.println("accCode ::::"+accCode);
+    	System.out.println("asOnDate :::"+asOnDate);
+    	System.out.println("vtype :::"+vtype);
+    	String result="form";
+    	if(vtype.equals("jv"))
+        {
+        	budgetDetail.setExecutingDepartment(dept);
+        	budgetDetail.setFund(fundService.findOne(Integer.parseInt(funds)));
+        	budgetDetail.setFunction(functionService.findOne(Long.parseLong(func)));
+        	BudgetGroup budgrp=budgetGroupService.getBudgetGroup((chartOfAccountsService.getByGlCode(accCode)).getId());
+        	budgetDetail.setBudgetGroup(budgrp);
+        	result="results";
+        }
+    	else if(vtype.equals("jvw"))
+    	{
+    		String department=getDepartment(Long.parseLong(vhId));
+    		budgetDetail.setExecutingDepartment(department);
+    		String function = getFunction(Long.parseLong(vhId));
+    		budgetDetail.setFunction(functionService.findOne(Long.parseLong(function)));
+    		String fund=getFundDetails(Long.parseLong(vhId));
+    		budgetDetail.setFund(fundService.findOne(Integer.parseInt(fund)));
+    		String acCode=getAcCode(Long.parseLong(vhId));
+    		BudgetGroup budgrp=budgetGroupService.getBudgetGroup((chartOfAccountsService.getByGlCode(acCode)).getId());
+        	budgetDetail.setBudgetGroup(budgrp);
+    	}
         populateData();
-        return "form";
+        return result;
     }
 
-    public boolean shouldShowHeaderField(final String fieldName) {
+    private String getAcCode(Long vhId) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String acCode="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select gl.glcode,gl.glcodeid from generalledger gl where gl.debitamount not in (0) and gl.voucherheaderid =:voucherHeaderId");
+    	    query.setLong("voucherHeaderId", vhId);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		acCode= element[0].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return acCode;
+	}
+
+
+	private String getFundDetails(Long vhId) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String fund="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vh.name,vh.fundid from voucherheader vh where vh.id=:voucherHeaderId");
+    	    query.setLong("voucherHeaderId", vhId);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		fund= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return fund;
+	}
+
+	private String getDepartment(Long vhId) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String dept="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vmis.departmentcode,vmis.functionid from vouchermis vmis where vmis.voucherheaderid=:voucherHeaderId");
+    	    query.setLong("voucherHeaderId", vhId);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		dept= element[0].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return dept;
+	}
+    private String getFunction(Long vhId) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String func="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vmis.departmentcode,vmis.functionid from vouchermis vmis where vmis.voucherheaderid=:voucherHeaderId");
+    	    query.setLong("voucherHeaderId", vhId);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		func= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return func;
+	}
+
+
+	public boolean shouldShowHeaderField(final String fieldName) {
         return (headerFields.contains(fieldName) || gridFields.contains(fieldName)) && mandatoryFields.contains(fieldName);
     }
 
@@ -312,6 +453,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 
     @ReadOnly
     private void populateData() {
+    	System.out.println("1");
         final CFinancialYear financialYear = financialYearDAO.getFinancialYearByDate(asOnDate);
         final boolean hasApprovedReForYear = budgetService.hasApprovedReForYear(financialYear.getId());
         if (hasApprovedReForYear) {
@@ -323,6 +465,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
                 "budget.isActiveBudget=true and budget.status.code='Approved' and budget.financialYear.id="
                 + financialYear.getId()
                 + getMiscQuery() + " order by budget.name,budgetGroup.name");
+        System.out.println("2");
         if (budgetVarianceEntries == null)
             budgetVarianceEntries = new ArrayList<BudgetVarianceEntry>();
         for (final BudgetDetail budgetDetail : result) {
@@ -360,15 +503,27 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     private String getMiscQuery() {
         final StringBuilder query = new StringBuilder();
         if (budgetDetail.getExecutingDepartment() != null && !"".equals(budgetDetail.getExecutingDepartment()))
-            query.append(" and executingDepartment='").append(budgetDetail.getExecutingDepartment()).append("' ");
+        {
+        	System.out.println("department : "+budgetDetail.getExecutingDepartment());
+        	query.append(" and executingDepartment='").append(budgetDetail.getExecutingDepartment()).append("' ");
+        }
         if (budgetDetail.getBudgetGroup() != null && budgetDetail.getBudgetGroup().getId() != null
                 && budgetDetail.getBudgetGroup().getId() != -1)
-            query.append(" and budgetGroup.id=").append(budgetDetail.getBudgetGroup().getId());
+        {
+        	System.out.println("budgetDetail.getBudgetGroup().getId() :: "+budgetDetail.getBudgetGroup().getId());
+        	query.append(" and budgetGroup.id=").append(budgetDetail.getBudgetGroup().getId());
+        }
         if (budgetDetail.getFunction() != null && budgetDetail.getFunction().getId() != null
                 && budgetDetail.getFunction().getId() != -1)
-            query.append(" and function.id=").append(budgetDetail.getFunction().getId());
+        {
+        	System.out.println("budgetDetail.getFunction().getId() :: "+budgetDetail.getFunction().getId());
+        	query.append(" and function.id=").append(budgetDetail.getFunction().getId());
+        }
         if (budgetDetail.getFund() != null && budgetDetail.getFund().getId() != null && budgetDetail.getFund().getId() != -1)
-            query.append(" and fund.id=").append(budgetDetail.getFund().getId());
+        {
+        	System.out.println("budgetDetail.getFund().getId() ::"+budgetDetail.getFund().getId());
+        	query.append(" and fund.id=").append(budgetDetail.getFund().getId());
+        }
         if (budgetDetail.getFunctionary() != null && budgetDetail.getFunctionary().getId() != null
                 && budgetDetail.getFunctionary().getId() != -1)
             query.append(" and functionary.id=").append(budgetDetail.getFunctionary().getId());
@@ -387,6 +542,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     }
 
     private void setQueryParams() {
+    	System.out.println("7");
         if (shouldShowHeaderField(Constants.EXECUTING_DEPARTMENT) && budgetDetail.getExecutingDepartment() != null
                 && budgetDetail.getExecutingDepartment() != "")
             queryParamMap.put("deptId", budgetDetail.getExecutingDepartment());
@@ -413,7 +569,9 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 
     private void populateActualData(final CFinancialYear financialYear) {
         final String fromDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getStartingDate());
+        System.out.println("4");
         if (budgetVarianceEntries != null && budgetVarianceEntries.size() != 0) {
+        	System.out.println("5");
             setQueryParams();
             final List<Object[]> resultForVoucher = budgetDetailService.fetchActualsForFYWithParams(fromDate, "'"
                     + Constants.DDMMYYYYFORMAT2.format(asOnDate) + "'", formMiscQuery("vmis", "gl", "vh"));
@@ -606,5 +764,53 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     public void setFund(Fund fund) {
         this.fund = fund;
     }
+
+	public String getDept() {
+		return dept;
+	}
+
+	public void setDept(String dept) {
+		this.dept = dept;
+	}
+
+	public String getFunds() {
+		return funds;
+	}
+
+	public void setFunds(String funds) {
+		this.funds = funds;
+	}
+
+	public String getFunc() {
+		return func;
+	}
+
+	public void setFunc(String func) {
+		this.func = func;
+	}
+
+	public String getAccCode() {
+		return accCode;
+	}
+
+	public void setAccCode(String accCode) {
+		this.accCode = accCode;
+	}
+
+	public String getVtype() {
+		return vtype;
+	}
+
+	public void setVtype(String vtype) {
+		this.vtype = vtype;
+	}
+
+	public String getVhId() {
+		return vhId;
+	}
+
+	public void setVhId(String vhId) {
+		this.vhId = vhId;
+	}
 
 }

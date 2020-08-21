@@ -73,11 +73,14 @@ import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
+import org.egov.egf.web.controller.microservice.FinanceController;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
@@ -132,6 +135,8 @@ public class CreateExpenseBillController extends BaseBillController {
     private FinancialUtils financialUtils;
     @Autowired
 	private AutonumberServiceBeanResolver beanResolver;
+	@Autowired
+    private MicroserviceUtils microserviceUtils;
     
     
 
@@ -226,7 +231,21 @@ public class CreateExpenseBillController extends BaseBillController {
             if (request.getParameter("approvalComent") != null)
                 approvalComment = request.getParameter("approvalComent");
             if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+            {
+            	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{            		
+            		approvalPosition =populatePosition();            		
+            	}
+            	else
                 approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+            }
+            else {
+            	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{            		
+            		approvalPosition =populatePosition();            		
+            	}
+            	
+            }
             if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
                 approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
             
@@ -237,6 +256,7 @@ public class CreateExpenseBillController extends BaseBillController {
                 savedEgBillregister = expenseBillService.create(egBillregister, approvalPosition, approvalComment, null, 
                         workFlowAction,approvalDesignation);
             } catch (ValidationException e) {
+            	e.printStackTrace();
                 setDropDownValues(model);
                 model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
                 prepareWorkflow(model, egBillregister, new WorkflowContainer());
@@ -250,7 +270,14 @@ public class CreateExpenseBillController extends BaseBillController {
                 resultBinder.reject("", e.getErrors().get(0).getMessage());
                 return EXPENSEBILL_FORM;
             }
-            final String approverName = String.valueOf(request.getParameter("approverName"));
+            String approverName =null;
+            if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+        	{        		
+        		approverName =populateEmpName();        		
+        	}
+        	else
+        		approverName = String.valueOf(request.getParameter("approverName"));
+           
             
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     savedEgBillregister.getState(), savedEgBillregister.getId(), approvalPosition,approverName);
@@ -312,6 +339,9 @@ public class CreateExpenseBillController extends BaseBillController {
                         new String[]{expenseBill.getBillnumber(), approverName, nextDesign,
                                 expenseBill.getEgBillregistermis().getBudgetaryAppnumber()},
                         null);
+            else if(expenseBill.getState().getValue()!=null && expenseBill.getState().getValue().equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+                message = messageSource.getMessage("msg.expense.bill.saveasdraft.success",
+                            new String[]{expenseBill.getBillnumber()}, null);
             else
                 message = messageSource.getMessage("msg.expense.bill.create.success",
                         new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
@@ -379,5 +409,31 @@ public class CreateExpenseBillController extends BaseBillController {
         egBillregister.setDocumentDetail(documentDetailsList);
         return egBillregister;
     }
+    
+    private Long populatePosition() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		pos=employs.get(0).getAssignments().get(0).getPosition();
+    		
+    	}
+    	
+		return pos;
+	}
+    private String populateEmpName() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	String empName=null;
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		//pos=employs.get(0).getAssignments().get(0).getPosition();
+    		empName=employs.get(0).getUser().getName();
+    		
+    	}
+		return empName;
+	}
 
 }

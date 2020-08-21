@@ -2414,3 +2414,79 @@ function deductionRateFormatter(tableName,columnName,type){
 		
 }
 
+
+function populateBudgetLink()
+{
+
+	var dept=document.getElementById('vouchermis.departmentid').value;
+	var fund=document.getElementById('fundId').value;
+	var func=document.getElementById('vouchermis.function').value;
+	var status=false;
+	var accCode;
+	if(fund == null || fund == -1 || fund == '-1')
+		{
+		bootbox.alert("Select Fund to view Budget Details");
+		status=true;
+		}
+	else if(dept == null || dept == -1 || dept == '-1')
+	{
+		bootbox.alert("Select Department to view Budget Details");
+		status=true;
+	}
+	else if(func == null || func == -1 || func == '-1')
+	{
+		bootbox.alert("Select Function to view Budget Details");
+		status=true;
+	}
+	var accStatus=false;
+	if(status == false)
+		{
+		for(i=0;i<=25;i++)
+		{
+			if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0' ||document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0.00'))
+			{
+				accStatus = false;
+			}
+			else if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0' && document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0.00'))
+			{
+				
+				if(document.getElementById('billDetailslist['+i+'].glcodeDetail') != null && document.getElementById('billDetailslist['+i+'].glcodeDetail').value != '')
+					{
+						accStatus = true;
+						 accCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
+						 break;
+					}
+			}
+		
+		}
+		}
+	
+	if(accStatus == false)
+		{
+		bootbox.alert("Select Account Code and debit amout to view Budget Details");
+		}
+	if(status == false && accStatus == true)
+		{
+		var today = new Date();
+		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=jv';
+		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+		}
+	
+	
+}
+
+function openBudget()
+{
+	var vhId=document.getElementById('vhid').value;
+	if(vhId != null && vhId != '')
+		{
+		var today = new Date();
+		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=jvw&vhId='+vhId;
+		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+		}
+
+}
+
+

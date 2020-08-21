@@ -356,7 +356,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
 
     private String getDepartmentQuery(final String string) {
         final String query = "";
-        if (department.getCode() != null && "-1".equals(department.getCode()))
+        if (department.getCode() != null )
             return " and " + string + " =:departmentcode ";
         return query;
     }
@@ -548,7 +548,8 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         {
             query.setLong("functionId", function.getId()) ; 
         }
-        if (department.getCode() != null && "-1".equals(department.getCode()))
+        System.out.println("dept :"+department.getCode());
+        if (department.getCode() != null )
         {
             query.setString("departmentcode", department.getCode()) ; 
         }
