@@ -72,6 +72,7 @@ import org.egov.commons.utils.EntityType;
 import org.egov.deduction.model.EgRemittanceDetail;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.TDSEntry;
+import org.egov.infra.admin.master.service.DepartmentService;
 //import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.exception.ApplicationException;
@@ -85,6 +86,7 @@ import org.egov.infra.utils.DateUtils;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.egov.model.deduction.DeductionReportBean;
 import org.egov.model.deduction.RemittanceBean;
 import org.egov.model.instrument.InstrumentVoucher;
 import org.egov.model.recoveries.Recovery;
@@ -92,11 +94,13 @@ import org.egov.services.deduction.RemitRecoveryService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 
 import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 
 @Results(value = {
@@ -104,13 +108,17 @@ import net.sf.jasperreports.engine.JRException;
                 "application/pdf", "contentDisposition", "no-cache;filename=DeductionDetailedReport.pdf" }),
         @Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
                 "application/xls", "contentDisposition", "no-cache;filename=DeductionDetailedReport.xls" }),
+        @Result(name = "deductionXLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+                "application/xls", "contentDisposition", "no-cache;filename=DeductionReport.xls" }),
         @Result(name = "summary-PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
                 "contentType", "application/pdf", "contentDisposition", "no-cache;filename=DeductionsRemittanceSummary.pdf" }),
         @Result(name = "summary-XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
                 "contentType", "application/xls", "contentDisposition", "no-cache;filename=DeductionsRemittanceSummary.xls" }),
         @Result(name = "results", location = "pendingTDSReport-results.jsp"),
+        @Result(name = "deductionResults", location = "pendingTDSReport-deductionResults.jsp"),
         @Result(name = "entities", location = "pendingTDSReport-entities.jsp"),
         @Result(name = "summaryForm", location = "pendingTDSReport-summaryForm.jsp"),
+        @Result(name = "deductionForm", location = "pendingTDSReport-deductionForm.jsp"),
         @Result(name = "reportForm", location = "pendingTDSReport-reportForm.jsp"),
         @Result(name = "summaryResults", location = "pendingTDSReport-summaryResults.jsp")
 })
@@ -155,6 +163,9 @@ public class PendingTDSReportAction extends BaseFormAction {
     @Autowired
     private Environment environment;
     
+    @Autowired
+    private DepartmentService departmentService;
+    
     public void setFinancialYearDAO(final FinancialYearHibernateDAO financialYearDAO) {
         this.financialYearDAO = financialYearDAO;
     }
@@ -174,6 +185,11 @@ public class PendingTDSReportAction extends BaseFormAction {
         return "summaryForm";
     }
 
+    @Action(value = "/report/pendingTDSReport-deductionReport")
+    public String deductionReport() throws Exception {
+        return "deductionForm";
+    }
+
     @Override
     public void prepare() {
         persistenceService.getSession().setDefaultReadOnly(true);
@@ -185,12 +201,27 @@ public class PendingTDSReportAction extends BaseFormAction {
 
         addDropdownData("recoveryList",
                 persistenceService.findAllBy(" from Recovery where isactive=true order by chartofaccounts.glcode"));
+        addDropdownData("recoveryListReport",
+                persistenceService.findAllBy(" from Recovery where isreport ='Y' and isactive=true order by chartofaccounts.glcode"));
     }
 
     @Action(value = "/report/pendingTDSReport-ajaxLoadData")
     public String ajaxLoadData() {
         populateData();
         return "results";
+    }
+
+    @Action(value = "/report/pendingTDSReport-ajaxLoadDeductionData")
+    public String ajaxLoadDeductionData() {
+    	try
+    	{
+    		populateData();
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+        
+        System.out.println("END");
+        return "deductionResults";
     }
 
     @Action(value = "/report/pendingTDSReport-ajaxLoadSummaryData")
@@ -515,6 +546,104 @@ public class PendingTDSReportAction extends BaseFormAction {
                 
             }
         }
+        if(pendingTDS !=null && !pendingTDS.isEmpty())
+        {
+        	for(RemittanceBean row:pendingTDS)
+            {
+        		
+            	if(row.getDetailKeyid() != null && row.getDetailKeyid() != 0 && row.getDetailTypeId() != null && row.getDetailTypeId() != 0)
+            	{
+            		row.setPartyName(getParty(row.getDetailKeyid()));
+            		if(row.getDetailTypeId() == 11 && row.getPartyName() != null && !row.getPartyName().isEmpty())
+            		{
+            			 List<Object[]> list = getSupplier(row.getPartyName());
+            			if(list != null && !list.isEmpty())
+            			{
+            				for (final Object[] element : list) {
+            					if(element[0] != null)
+                				{
+                					row.setPanNo(element[0].toString());
+                				}
+                				if(element[1] != null)
+                				{
+                					row.setGstNo(element[1].toString());
+                				}
+            				}
+            				
+            			}
+            		}
+            		else if(row.getDetailTypeId() == 12 && row.getPartyName() != null && !row.getPartyName().isEmpty())
+            		{
+            			List<Object[]> list = getContractor(row.getPartyName());
+            			if(list != null && !list.isEmpty())
+            			{
+            				for (final Object[] element : list) {
+            					if(element[0] != null)
+                				{
+                					row.setPanNo(element[0].toString());
+                				}
+                				if(element[1] != null)
+                				{
+                					row.setGstNo(element[1].toString());
+                				}
+            				}
+            			}
+            		}
+            	}
+            }
+        }
+    }
+
+    private List<Object[]> getSupplier(String suppName) {
+    	SQLQuery query =  null;
+    	List<Object[]> list = null;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select pannumber,tinnumber from egf_supplier where name=:suppName");
+    	    query.setString("suppName", suppName);
+    	     list = query.list();
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return list;
+	}
+    
+    private List<Object[]> getContractor(String contrName) {
+    	SQLQuery query =  null;
+    	List<Object[]> list = null;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select pannumber,tinnumber from egf_contractor where name=:contrName");
+    	    query.setString("contrName", contrName);
+    	     list = query.list();
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return list;
+	}
+
+	private String getParty(Integer dtlKey) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String partyName="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select acc.detailname,acc.detailtypeid from accountdetailkey acc where acc.detailkey=:detailKey");
+    	    query.setInteger("detailKey", dtlKey);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	System.out.println("list :"+rows.get(0));
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		partyName= element[0].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return partyName;
     }
 
     private TDSEntry createTdsForNonControlledTds(EgRemittanceDetail entry) {
@@ -707,6 +836,112 @@ public class PendingTDSReportAction extends BaseFormAction {
         return "XLS";
     }
 
+    @Action(value = "/report/pendingTDSReport-exportDeductionXls")
+    public String exportDeductionXls() throws JRException, IOException {
+        populateData();
+        List<DeductionReportBean> reportList=new ArrayList<DeductionReportBean>();
+        DeductionReportBean bean=null;
+        int i=1;
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+        populateHeadingAndNote(paramMap);
+        String jasperName=(String) paramMap.get("jasper");
+        System.out.println("jasper :"+jasperName);
+        if(pendingTDS != null && !pendingTDS.isEmpty())
+        {
+        	System.out.println("1 : "+pendingTDS.get(0).getDepartmentId());
+        	org.egov.infra.admin.master.entity.Department dept = departmentService.getDepartmentById(Long.parseLong(pendingTDS.get(0).getDepartmentId()));
+        	System.out.println("dept.getName() : "+dept.getName());
+        	for(RemittanceBean row:pendingTDS)
+            {
+        		System.out.println("3");
+        		bean =new DeductionReportBean();
+        		bean.setSlNo(i++);
+        		bean.setDivision(dept.getName());
+        		bean.setRecoveryCode(recovery.getRecoveryName());
+        		bean.setVoucherNo(row.getVoucherNumber());
+        		bean.setNameOfAgency(row.getPartyName());
+        		bean.setAmount(row.getAmount());
+        		bean.setGstNoOfAgency(row.getGstNo());
+        		bean.setPanNoOfAgency(row.getPanNumber());
+        		bean.setWorkDone(getNarration(row.getVoucherNumber()));
+        		reportList.add(bean);
+            }
+        }
+        System.out.println("4");
+        paramMap.put("labourCessDataSource",getDataSource(reportList));
+        final ReportRequest reportInput = new ReportRequest(jasperName, reportList, paramMap);
+        reportInput.setReportFormat(ReportFormat.XLS);
+        final ReportOutput reportOutput = reportService.createReport(reportInput);
+        inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+        System.out.println("END");
+        return "deductionXLS";
+    }
+
+    private String getNarration(String voucherNumber) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String desc="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vh.name,vh.description from voucherheader vh where vh.vouchernumber=:voucherNumber");
+    	    query.setString("voucherNumber", voucherNumber);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		desc= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return desc;
+	}
+
+	private void populateHeadingAndNote(Map<String, Object> paramMap) {
+		String recoveryCode=recovery.getChartofaccounts().getGlcode();
+		String heading="";
+		String note ="";
+		String fDate=Constants.DDMMYYYYFORMAT1.format(fromDate);
+		String tDate=Constants.DDMMYYYYFORMAT1.format(asOnDate);
+		String jasper="";
+		if(recoveryCode.equals("3502018"))
+		{
+			heading="Detail of Labour Cess for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
+			note="Note: The responsibility for work done lies with concerned Division.";
+			jasper="LaborCess";
+		}
+		else if(recoveryCode.equals("1408055"))
+		{
+			heading="Detail of Collection Charges for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
+			note="Note: The responsibility for work done lies with concerned Division.";
+			jasper="CollectionCharges";
+		}
+		else if(recoveryCode.equals("1405014"))
+		{
+			heading="Detail of Water Charges for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
+			note="Note: The responsibility for work done lies with concerned Division.";
+			jasper="WaterCharges";
+		}
+		else if(recoveryCode.equals("3502054") || recoveryCode.equals("3502055") || recoveryCode.equals("3502002"))
+		{
+			heading="Detail of TDS on GST for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
+			note="Note: The responsibility for work done & GST No. lies with concerned Division.";
+			jasper="TDSOnGST";
+		}
+		else if(recoveryCode.equals("3502007") || recoveryCode.equals("3502009") || recoveryCode.equals("3502010") || recoveryCode.equals("3502013"))
+		{
+			heading="Detail of Income Tax for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
+			note="Note: The responsibility for work done & PAN No. lies with concerned Division.";
+			jasper="IncomeTax";
+		}
+		paramMap.put("header",heading);
+        paramMap.put("note",note);
+        paramMap.put("jasper",jasper);
+		
+	}
+
     @Action(value = "/report/pendingTDSReport-exportSummaryXls")
     public String exportSummaryXls() throws JRException, IOException {
         populateSummaryData();
@@ -858,5 +1093,12 @@ public class PendingTDSReportAction extends BaseFormAction {
     public void setType(String type) {
         this.type = type;
     }
+    
+    
+    private static JRBeanCollectionDataSource getDataSource(List<DeductionReportBean> reportList) {
+        return new JRBeanCollectionDataSource(reportList); 
+    }
+    
+    
 
 }

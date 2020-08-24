@@ -169,4 +169,12 @@ public abstract class GenericWorkFlowController {
 
     }
 
+    public List<Department> getDepartmentsFromMs(String codes) {
+
+        List<Department> departments = microserviceUtils.getDepartments(codes);
+
+        return departments;
+
+    }
+    
 }

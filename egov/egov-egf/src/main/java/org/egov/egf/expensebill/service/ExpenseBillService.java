@@ -352,7 +352,6 @@ public class ExpenseBillService {
             documentDetails = financialUtils.getDocumentDetails(files, updatedegBillregister,
                     FinancialConstants.FILESTORE_MODULEOBJECT);
             if (!documentDetails.isEmpty()) {
-            	System.out.println("DOc Save");
             	updatedegBillregister.setDocumentDetail(documentDetails);
                 persistDocuments(documentDetails);
             }
@@ -439,14 +438,14 @@ public class ExpenseBillService {
     public void createExpenseBillRegisterWorkflowTransition(final EgBillregister egBillregister,
                                                             final Long approvalPosition, final String approvalComent, final String additionalRule,
                                                             final String workFlowAction,final String approvalDesignation) {
-        if (LOG.isDebugEnabled())
-            LOG.debug(" Create WorkFlow Transition Started  ...");
+            LOG.info(" Create WorkFlow Transition Started  ...");
         final User user = securityUtils.getCurrentUser();
         final DateTime currentDate = new DateTime();
         Assignment wfInitiator = null;
         Map<String, String> finalDesignationNames = new HashMap<>();
         final String currState = "";
         String stateValue = "";
+        System.out.println("desig********:"+approvalDesignation);
         if (null != egBillregister.getId())
 //            wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
         	wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
@@ -463,6 +462,10 @@ public class ExpenseBillService {
 //                wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
            Designation designation = this.getDesignationDetails(approvalDesignation);
+           if(designation != null)
+           {
+        	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());
+           }
            Position owenrPos = new Position();
            owenrPos.setId(approvalPosition);
 

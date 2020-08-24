@@ -53,6 +53,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +63,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
@@ -69,11 +71,15 @@ import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
-import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.persistence.entity.AbstractAuditable;
+import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
@@ -96,6 +102,24 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 @RequestMapping(value = "/expensebill")
 public class UpdateExpenseBillController extends BaseBillController {
+	private static final String INITIATED_PRE_AUDIT = "Initiated Pre-Audit";
+
+	private static final String PRE_AUDIT = "Pre-Audit";
+
+	private static final String PRE_AUDIT_PENDING = "Pre Audit pending";
+
+	private static final String NEW = "NEW";
+
+	private static final String STRING = "::";
+
+	private static final String CREATED = "Created";
+
+	private static final String AUDIT2 = "Audit";
+
+	private static final String PRE = "Pre-Audit";
+
+	private static final String AUDIT001 = "Audit001";
+
 	private static final String SUPPORTING_DOCS = "supportingDocs";
 
     private static final String NET_PAYABLE_AMOUNT = "netPayableAmount";
@@ -129,6 +153,18 @@ public class UpdateExpenseBillController extends BaseBillController {
     private CheckListService checkListService;
     @Autowired
     private MicroserviceUtils microServiceUtil;
+    @Autowired
+    private SecurityUtils securityUtils;
+    
+    
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
+    
+    @Autowired
+    protected AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+	private AutonumberServiceBeanResolver beanResolver;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -187,7 +223,13 @@ public class UpdateExpenseBillController extends BaseBillController {
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
             return "expensebill-update";
-        } else {
+        } 
+        else if (egBillregister.getState() != null
+                && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
+            model.addAttribute("mode", "edit");
+            return "expensebill-update";
+        }
+        else {
             model.addAttribute("mode", "view");
             if (egBillregister.getEgBillregistermis().getBudgetaryAppnumber() != null
                     && !egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()) {
@@ -242,8 +284,15 @@ public class UpdateExpenseBillController extends BaseBillController {
                 && request.getParameter(APPROVAL_POSITION) != null
                 && !request.getParameter(APPROVAL_POSITION).isEmpty())
             approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        
+       
+    	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{
+    		approvalPosition =populatePosition();    		
+    	}
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             apporverDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        System.out.println("Approval designation :: "+apporverDesignation);
 
         if (egBillregister.getState() != null
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
@@ -305,10 +354,16 @@ public class UpdateExpenseBillController extends BaseBillController {
                 approvalPosition = expenseBillService.getApprovalPositionByMatrixDesignation(
                         egBillregister, null, mode, workFlowAction);
 
-            final String approverName = String.valueOf(request.getParameter("approverName"));
+           // final String approverName = String.valueOf(request.getParameter("approverName"));
+            String approverName = String.valueOf(request.getParameter("approverName"));
+            if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+        	{
+        		
+        		approverName =populateEmpName();
+        		
+        	}
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
-            System.out.println("End : "+approverDetails);
 
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
                     + updatedEgBillregister.getBillnumber();
@@ -396,4 +451,40 @@ public class UpdateExpenseBillController extends BaseBillController {
 	public void setOriginalFiles(List<FileStoreMapper> originalFiles) {
 		this.originalFiles = originalFiles;
 	}*/
+    
+    public void applyAuditing(AbstractAuditable auditable, Long createdBy) {
+		Date currentDate = new Date();
+		if (auditable.isNew()) {
+			auditable.setCreatedBy(createdBy);
+			auditable.setCreatedDate(currentDate);
+		}
+		auditable.setLastModifiedBy(createdBy);
+		auditable.setLastModifiedDate(currentDate);
+	}
+	
+	private Long populatePosition() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microServiceUtil.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		pos=employs.get(0).getAssignments().get(0).getPosition();
+    		
+    	}
+    	//System.out.println("pos-----populatePosition---()----------------------"+pos);
+		return pos;
+	}
+    private String populateEmpName() {
+    	Long empId = ApplicationThreadLocals.getUserId();
+    	String empName=null;
+    	Long pos=null;
+    	List<EmployeeInfo> employs = microServiceUtil.getEmployee(empId, null,null, null);
+    	if(null !=employs && employs.size()>0 )
+    	{
+    		//pos=employs.get(0).getAssignments().get(0).getPosition();
+    		empName=employs.get(0).getUser().getName();
+    		
+    	}
+		return empName;
+	}
 }

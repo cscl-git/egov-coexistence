@@ -208,6 +208,42 @@ public class ChartOfAccountsService extends PersistenceService<CChartOfAccounts,
         }
     }
 
+    //this method is retuen to get combine data for credits #credits = already credit data + netpaybale data
+    
+    public List<CChartOfAccounts> getSubledgerAccountCodesForAccountDetailTypeAndSubledgers(
+            final Integer accountDetailTypeId, final String glcode) {
+        final List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                "EGF", CONTINGENCY_BILL_PURPOSE_IDS);
+        final List<Long> contingencyBillPurposeIds = new ArrayList<>();
+        for (final AppConfigValues av : configValuesByModuleAndKey)
+            contingencyBillPurposeIds.add(Long.valueOf(av.getValue()));
+
+        if (accountDetailTypeId == 0 || accountDetailTypeId == -1) {
+            final Query entitysQuery = getSession()
+                    .createQuery(
+                
+                    		"from CChartOfAccounts a where parentId IN (SELECT id FROM CChartOfAccounts WHERE (purposeId is null or purposeId not in (:ids))) AND a.isActiveForPosting=true and a.classification=4  and (glcode like :glcode or lower(name) like :name) order by a.id");
+
+                    		//" from CChartOfAccounts a where a.isActiveForPosting=true and a.classification=4 and size(a.chartOfAccountDetails) = 0 and (glcode like :glcode or lower(name) like :name) and (purposeId is null or purposeId not in (:ids)) order by a.id");
+            entitysQuery.setString(GLCODE, "%"+glcode + "%");
+            entitysQuery.setString("name", "%"+glcode.toLowerCase() + "%");
+            entitysQuery.setParameterList("ids", contingencyBillPurposeIds);
+            return entitysQuery.list();
+        } else {
+            final Query entitysQuery = getSession()
+                    .createQuery(
+                    		" from CChartOfAccounts  a LEFT OUTER JOIN  fetch a.chartOfAccountDetails  b where  b.detailTypeId.id=:accountDetailTypeId and a.isActiveForPosting=true and a.classification=4 and (a.glcode like :glcode or lower(a.name) like :name) and  purposeId  in (:ids) order by a.id");
+
+                    		//" from CChartOfAccounts  a LEFT OUTER JOIN  fetch a.chartOfAccountDetails  b where (size(a.chartOfAccountDetails) = 0 or b.detailTypeId.id=:accountDetailTypeId and a.isActiveForPosting=true and a.classification=4 and (a.glcode like :glcode or lower(a.name) like :name) and (purposeId is null or purposeId not in (:ids)) order by a.id");
+
+            entitysQuery.setInteger("accountDetailTypeId", accountDetailTypeId);
+            entitysQuery.setString(GLCODE, glcode + "%");
+            entitysQuery.setString("name", glcode.toLowerCase() + "%");
+            entitysQuery.setParameterList("ids", contingencyBillPurposeIds);
+            return entitysQuery.list();
+        }
+    }
+    
     public List<CChartOfAccounts> getAccountCodeByPurpose(final Integer purposeId) {
         final List<CChartOfAccounts> accountCodeList = new ArrayList<CChartOfAccounts>();
         try {
@@ -243,6 +279,54 @@ public class ChartOfAccountsService extends PersistenceService<CChartOfAccounts,
         return accountCodeList;
     }
 
+    
+    
+    public List<CChartOfAccounts> getAllAccountCode(final Integer purposeId, final String glcode) {
+        final List<CChartOfAccounts> accountCodeList = new ArrayList<CChartOfAccounts>();
+        try {
+            if (purposeId == null || purposeId.intValue() == 0)
+                throw new ApplicationException("Purpose Id is null or zero");
+            Query query = getSession().createQuery(
+                    " from EgfAccountcodePurpose purpose where purpose.id=" + purposeId + "");
+            if (query.list().isEmpty())
+                throw new ApplicationException("Purpose ID provided is not defined in the system");
+            query = getSession()
+                    .createQuery(
+                            " FROM CChartOfAccounts WHERE parentId IN (SELECT id FROM CChartOfAccounts WHERE parentId IN (SELECT id FROM CChartOfAccounts WHERE parentId IN (SELECT id FROM CChartOfAccounts WHERE purposeid=:purposeId))) and (glcode like :glcode or lower(name) like :name) AND classification=4 AND isActiveForPosting=true ");
+            query.setString(GLCODE, "%"+glcode + "%");
+            query.setString("name", "%"+glcode.toLowerCase() + "%");
+            query.setLong(PURPOSE_ID, purposeId);
+            accountCodeList.addAll(query.list());
+            query = getSession()
+                    .createQuery(
+                            " FROM CChartOfAccounts WHERE parentId IN (SELECT id FROM CChartOfAccounts WHERE parentId IN (SELECT id FROM CChartOfAccounts WHERE purposeid=:purposeId))and (glcode like :glcode or lower(name) like :name)  AND classification=4 AND isActiveForPosting=true ");
+            query.setString(GLCODE, "%"+glcode + "%");
+            query.setString("name", "%"+glcode.toLowerCase() + "%");
+            query.setLong(PURPOSE_ID, purposeId);
+            accountCodeList.addAll(query.list());
+            query = getSession()
+                    .createQuery(
+                            " FROM CChartOfAccounts WHERE parentId IN (SELECT id FROM CChartOfAccounts WHERE purposeid=:purposeId) and (glcode like :glcode or lower(name) like :name) AND classification=4 AND isActiveForPosting=true ");
+            query.setString(GLCODE, "%"+glcode + "%");
+            query.setString("name", "%"+glcode.toLowerCase() + "%");
+            query.setLong(PURPOSE_ID, purposeId);
+            accountCodeList.addAll(query.list());
+            query = getSession()
+                    .createQuery(
+                            " FROM CChartOfAccounts WHERE purposeid=:purposeId AND classification=4 and (glcode like :glcode or lower(name) like :name) AND isActiveForPosting=true ");
+            query.setString(GLCODE, "%"+glcode + "%");
+            query.setString("name", "%"+glcode.toLowerCase() + "%");
+            query.setLong(PURPOSE_ID, purposeId);
+            accountCodeList.addAll(query.list());
+        } catch (final Exception e) {
+            throw new ApplicationRuntimeException("Error occurred while getting Account Code by purpose", e);
+        }
+        return accountCodeList;
+    }
+
+    
+    
+    
     public List<CChartOfAccounts> getAccountCodeByPurposeName(final String purposeName) {
         final List<CChartOfAccounts> accountCodeList = new ArrayList<CChartOfAccounts>();
         try {
@@ -301,6 +385,52 @@ public class ChartOfAccountsService extends PersistenceService<CChartOfAccounts,
                     if (!coa.getChartOfAccountDetails().isEmpty())
                         for (final CChartOfAccountDetail coaDtl : coa.getChartOfAccountDetails())
                             if (coaDtl.getDetailTypeId() != null && coaDtl.getDetailTypeId().getId().equals(accountDetailType))
+                                netPayList.add(coa);
+                    netPayList.add(coa);
+                }
+
+        }
+        return new ArrayList<>(netPayList);
+    }
+    
+    
+    public List<CChartOfAccounts> getAllcreditsCodes(final Integer accountDetailType,final String glcode) {
+        final List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                "EGF", CONTINGENCY_BILL_PURPOSE_IDS);
+        final Set<CChartOfAccounts> netPayList = new HashSet<>();
+        List<CChartOfAccounts> accountCodeByPurpose = new ArrayList<>();
+        List<CChartOfAccounts> accountCodeforcredits = new ArrayList<>();
+        accountCodeforcredits=getSubledgerAccountCodesForAccountDetailTypeAndSubledgers(accountDetailType,glcode);
+        
+        for (final CChartOfAccounts cChartOfAccounts : accountCodeforcredits) {
+        	 netPayList.add(cChartOfAccounts);
+		}
+        
+        
+        for (int i = 0; i < configValuesByModuleAndKey.size(); i++) {
+            try {
+                accountCodeByPurpose = getAllAccountCode(Integer
+                        .valueOf(configValuesByModuleAndKey.get(i).getValue()), glcode);
+            } catch (final Exception e) {
+                // Ignore
+            }
+
+            if (accountDetailType == null || accountDetailType == 0) {
+            	 for (final CChartOfAccounts coa : accountCodeByPurpose) {
+                     if (!coa.getChartOfAccountDetails().isEmpty())
+                         for (final CChartOfAccountDetail coaDtl : coa.getChartOfAccountDetails())
+                             if (coaDtl.getDetailTypeId() != null)
+                                 netPayList.add(coa);
+                        netPayList.add(coa);
+                    
+                 }
+            	 
+            	 
+            } else
+                for (final CChartOfAccounts coa : accountCodeByPurpose) {
+                    if (!coa.getChartOfAccountDetails().isEmpty())
+                        for (final CChartOfAccountDetail coaDtl : coa.getChartOfAccountDetails())
+                            if (coaDtl.getDetailTypeId() != null)
                                 netPayList.add(coa);
                     netPayList.add(coa);
                 }

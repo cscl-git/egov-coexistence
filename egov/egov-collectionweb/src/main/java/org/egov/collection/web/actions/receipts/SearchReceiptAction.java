@@ -191,7 +191,7 @@ public class SearchReceiptAction extends SearchFormAction {
         // serviceClassMap.remove(CollectionConstants.SERVICE_TYPE_PAYMENT);
         // addDropdownData("serviceTypeList", Collections.EMPTY_LIST);
 //        addDropdownData("businessCategorylist", microserviceUtils.getBusinessCategories());
-        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService("Finance"));
+        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
         
         // addDropdownData("bankBranchList", collectionsUtil.getBankCollectionBankBranchList());
     }

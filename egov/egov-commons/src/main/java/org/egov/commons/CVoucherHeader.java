@@ -114,6 +114,11 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
     @Transient
     private List<CGeneralLedgerDetail> subLedgerDetails = new ArrayList<>();
+    @Transient
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
+  
+    @Transient
+    private String documentMode;
 
     @Transient
     private String partyName;
@@ -144,6 +149,9 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     
     @Transient
     private String fiscalName;
+    
+    private String firstsignatory;
+    private String secondsignatory;
     public CVoucherHeader() {
         // TODO Auto-generated constructor stub
     }
@@ -522,4 +530,36 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     public void setFiscalName(String fiscalName) {
         this.fiscalName = fiscalName;
     }
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public String getDocumentMode() {
+		return documentMode;
+	}
+
+	public void setDocumentMode(String documentMode) {
+		this.documentMode = documentMode;
+	}
 }

@@ -240,7 +240,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             }
         voucherHeader.reset();
         commonBean.reset();
-        commonBean.setModeOfPayment(MDP_CHEQUE);
+        commonBean.setModeOfPayment(MDP_PEX);
         voucherHeader.setVouchermis(new Vouchermis());
         // voucherHeader.getVouchermis().setDepartmentid((Department)paymentService.getAssignment().getDeptId());
         billDetailslist = new ArrayList<VoucherDetails>();
@@ -354,7 +354,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public void prepareNonBillPayment() {
         addDropdownData("bankList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
-        commonBean.setModeOfPayment(MDP_CHEQUE);
+        commonBean.setModeOfPayment(MDP_PEX);
     }
 
     @ValidationErrorPage(value = NEW)

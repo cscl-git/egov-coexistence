@@ -58,9 +58,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
+import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUpload;
+import org.egov.commons.utils.DocumentUtils;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -112,9 +117,63 @@ public class JournalVoucherActionHelper {
     @Autowired
     private MicroserviceUtils microserviceUtils;
 
+    @Autowired
+    private DocumentUtils docUtils;
     @Transactional
-    public CVoucherHeader createVoucher(List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist,
-            CVoucherHeader voucherHeader, VoucherTypeBean voucherTypeBean, WorkflowBean workflowBean) throws Exception {
+	public CVoucherHeader createVcouher(List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist,
+			CVoucherHeader voucherHeader, VoucherTypeBean voucherTypeBean, WorkflowBean workflowBean) {
+		// TODO Auto-generated method stub
+        try {
+            voucherHeader.setName(voucherTypeBean.getVoucherName());
+            voucherHeader.setType(voucherTypeBean.getVoucherType());
+            voucherHeader.setVoucherSubType(voucherTypeBean.getVoucherSubType());
+           
+            voucherHeader = createVoucherAndledger(billDetailslist, subLedgerlist, voucherHeader);
+            if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(" Journal Voucher Action | Bill create | voucher name = " + voucherTypeBean.getVoucherName());
+                voucherService.createBillForVoucherSubType(billDetailslist, subLedgerlist, voucherHeader, voucherTypeBean,
+                        new BigDecimal(voucherTypeBean.getTotalAmount()));
+            }
+            if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
+                    && voucherHeader.getState() == null) {
+                voucherHeader.setStatus(FinancialConstants.CREATEDVOUCHERSTATUS);
+            } 
+			else {
+                voucherHeader = transitionWorkFlow(voucherHeader, workflowBean);
+             
+                voucherService.applyAuditing(voucherHeader.getState());
+            }
+            voucherService.create(voucherHeader);
+        
+            
+        } catch (final ValidationException e) {
+
+            final List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
+            throw new ValidationException(errors);
+        } catch (final Exception e) {
+
+            final List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError("exp", e.getMessage()));
+            throw new ValidationException(errors);
+        }
+        return voucherHeader;
+    }
+   @Transactional
+   public void saveDocuments(CVoucherHeader voucherHeader)
+   {
+	   List<DocumentUpload> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
+       final List<DocumentUpload> documentDetails;
+       documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
+               CommonConstants.JOURNAL_VOUCHER_OBJECT);
+       if (!documentDetails.isEmpty()) {
+       	voucherHeader.setDocumentDetail(documentDetails);
+       	voucherService.persistDocuments(documentDetails);
+       }
+   }
+    /*public CVoucherHeader createVoucher(List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist,
+            CVoucherHeader voucherHeader, VoucherTypeBean voucherTypeBean, WorkflowBean workflowBean,List<DocumentUpload> documentList) throws Exception {
         try {
             voucherHeader.setName(voucherTypeBean.getVoucherName());
             voucherHeader.setType(voucherTypeBean.getVoucherType());
@@ -124,7 +183,7 @@ public class JournalVoucherActionHelper {
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug(" Journal Voucher Action | Bill create | voucher name = " + voucherTypeBean.getVoucherName());
                 voucherService.createBillForVoucherSubType(billDetailslist, subLedgerlist, voucherHeader, voucherTypeBean,
-                        new BigDecimal(voucherTypeBean.getTotalAmount()));
+                        new BigDecimal(voucherTypeBean.getTotalAmount()),documentList);
             }
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
                     && voucherHeader.getState() == null) {
@@ -146,7 +205,8 @@ public class JournalVoucherActionHelper {
             throw new ValidationException(errors);
         }
         return voucherHeader;
-    }
+    }*/
+
 
     @Transactional
     public CVoucherHeader editVoucher(List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist,
@@ -237,9 +297,16 @@ public class JournalVoucherActionHelper {
             if (null == voucherHeader.getState()) {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);
+                String ststeValue=wfmatrix.getNextState();
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
+                
+               
+                
                 voucherHeader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                       // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                        .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
                         .withOwner(workflowBean.getApproverPositionId())
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
@@ -255,10 +322,21 @@ public class JournalVoucherActionHelper {
                 }
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, voucherHeader.getCurrentState().getValue(), null);
+                String ststeValue=wfmatrix.getNextState();
+                Long owner = workflowBean.getApproverPositionId();
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                {
+                		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
+                		owner = populatePosition();
+                		
+                		
+                }
+                
                 voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
-                        .withOwner(workflowBean.getApproverPositionId())
+                        //.withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                        .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
+                        .withOwner(owner)
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -374,4 +452,26 @@ public class JournalVoucherActionHelper {
         return voucherHeader;
 
     }
+
+    private String populateEmpName() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		String name = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			name = employs.get(0).getAssignments().get(0).getEmployeeName();
+
+		}
+		return name;
+	}
+    
+    private Long populatePosition() {
+		Long empId = ApplicationThreadLocals.getUserId();
+		Long pos = null;
+		List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null, null, null);
+		if (null != employs && employs.size() > 0) {
+			pos = employs.get(0).getAssignments().get(0).getPosition();
+
+		}
+		return pos;
+	}
 }

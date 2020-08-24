@@ -193,7 +193,7 @@ public class RemitRecoveryService {
                 dateQry.append(" and vh.VOUCHERDATE <='" + Constants.DDMMYYYYFORMAT1.format(voucherHeader.getVoucherDate()) + "' ");
             query2.append("SELECT vh.NAME,  vh.VOUCHERNUMBER,  vh.VOUCHERDATE, egr.glamt, egr.ID, ");
             query2.append("(select  case when sum(egd.remittedamt) is null then 0 else sum(egd.remittedamt) end from EG_REMITTANCE_GL egr1,eg_remittance_detail egd,eg_remittance  eg,voucherheader vh where vh.status!=4 and  eg.PAYMENTVHID=vh.id and egd.remittanceid=eg.id and egd.REMITTANCEGLID=egr1.id  and egr1.id=egr.id) As col_7_0 , ");
-            query2.append("mis.departmentcode,mis.functionid  ");
+            query2.append("mis.departmentcode,mis.functionid , egr.glid ,vh.description ");
             query2.append("FROM VOUCHERHEADER vh,  VOUCHERMIS mis,  GENERALLEDGER gl,  EG_REMITTANCE_GL egr,  TDS recovery5_ ");
             query2.append("WHERE recovery5_.GLCODEID  =gl.GLCODEID AND gl.id=egr.glid and ");
             query2.append("vh.ID =gl.VOUCHERHEADERID AND mis.VOUCHERHEADERID  =vh.ID AND ");
@@ -471,6 +471,8 @@ public class RemitRecoveryService {
         final List<Object[]> list = searchSQLQuery.list();
         for (final Object[] element : list) {
             remitBean = new RemittanceBean();
+            try
+            {
             remitBean.setVoucherName(element[0].toString());
             remitBean.setVoucherNumber(element[1].toString());
             try {
@@ -498,6 +500,14 @@ public class RemitRecoveryService {
                 }
             }
             remitBean.setRemittance_gl_Id(Integer.valueOf(element[4].toString()));
+                if(element[9] != null)
+                {
+                	remitBean.setNaration(element[9].toString());
+                }
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+            
             listRemitBean.add(remitBean);
         }
     }

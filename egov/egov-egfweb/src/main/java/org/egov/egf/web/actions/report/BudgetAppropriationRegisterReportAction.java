@@ -246,7 +246,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and  gl.glcodeid =:glCodeId");
             strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
             strQuery.append(" and vh.voucherdate <=:strAODate");
-            strQuery.append(getFunctionQuery("vmis.functionid"));
+            strQuery.append(getFunctionQuery("gl.functionid"));
             strQuery.append(getDepartmentQuery("vmis.departmentcode"));
             strQuery.append(getFundQuery("vh.fundid"));
             strQuery.append(" ");
@@ -300,7 +300,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             strsubQuery.append(" and  ");
             strsubQuery.append(" (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
             strsubQuery.append(" and vh.voucherdate <=:strAODate");
-            strsubQuery.append(getFunctionQuery("vmis.functionid"));
+            strsubQuery.append(getFunctionQuery("gl.functionid"));
             strsubQuery.append(getDepartmentQuery("vmis.departmentcode"));
             strsubQuery.append(getFundQuery("vh.fundid"));
             strsubQuery.append("  order by bdgApprNumber ");
@@ -356,7 +356,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
 
     private String getDepartmentQuery(final String string) {
         final String query = "";
-        if (department.getCode() != null && "-1".equals(department.getCode()))
+        if (department.getCode() != null )
             return " and " + string + " =:departmentcode ";
         return query;
     }
@@ -548,7 +548,8 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         {
             query.setLong("functionId", function.getId()) ; 
         }
-        if (department.getCode() != null && "-1".equals(department.getCode()))
+        System.out.println("dept :"+department.getCode());
+        if (department.getCode() != null )
         {
             query.setString("departmentcode", department.getCode()) ; 
         }

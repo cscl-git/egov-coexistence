@@ -47,6 +47,7 @@
  */
 package org.egov.egf.web.actions.report;
 
+import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -59,6 +60,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
+import javax.imageio.ImageIO;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -74,6 +77,8 @@ import org.egov.commons.CFinancialYear;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.model.BankAdviceReportInfo;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.reporting.engine.ReportOutput;
@@ -90,6 +95,7 @@ import org.egov.utils.EnglishNumberToWords;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -162,7 +168,8 @@ public class BankAdviceReportAction extends BaseFormAction {
     private BigDecimal totalAmount = BigDecimal.ZERO;
     String countQuery = null;
     public List<BankAdviceReportInfo> bankAdviseResultList = new ArrayList<BankAdviceReportInfo>();
-
+    @Autowired
+    private AppConfigValueService appConfigValuesService;
     @Override
     public void prepare() {
         persistenceService.getSession().setDefaultReadOnly(true);
@@ -610,6 +617,48 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("totalAmount", totalAmount);
         reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
         reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
+        String firstsignatory="";
+        String secondsignatory="";
+        List<Object[]> list  =getSignatory(instrumentnumber.getId());
+        
+		  if(list != null && !list.isEmpty())
+		  {
+			  for(Object[] element : list) 
+			  {
+				  if(element[0] != null && !element[0].toString().isEmpty())
+				  {
+					  firstsignatory=element[0].toString();
+				  }
+				  else
+				  {
+					  firstsignatory="Additional Commissioner";
+				  }
+				  if(element[1] != null && !element[1].toString().isEmpty())
+				  {
+					  secondsignatory=element[1].toString();  
+				  }
+				  else
+				  {
+					  
+					  secondsignatory="Chief Accounts Officer";
+				  }
+				  
+				  
+			  }
+		  }
+		  else
+		  {
+			  firstsignatory="Additional Commissioner";
+			  secondsignatory="Chief Accounts Officer";
+		  }
+		  reportParams.put("primarySignatory",firstsignatory);
+		  reportParams.put("secondarySignatory",secondsignatory);
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -649,6 +698,49 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("totalAmount", totalAmount);
         reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
         reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
+        String firstsignatory="";
+        String secondsignatory="";
+        List<Object[]> list  =getSignatory(instrumentnumber.getId());
+        
+		  if(list != null && !list.isEmpty())
+		  {
+			  for(Object[] element : list) 
+			  {
+				  if(element[0] != null && !element[0].toString().isEmpty())
+				  {
+					  firstsignatory=element[0].toString();
+				  }
+				  else
+				  {
+					  firstsignatory="Additional Commissioner";
+				  }
+				  if(element[1] != null && !element[1].toString().isEmpty())
+				  {
+					  secondsignatory=element[1].toString();  
+				  }
+				  else
+				  {
+					  
+					  secondsignatory="Chief Accounts Officer";
+				  }
+				  
+				  
+			  }
+		  }
+		  else
+		  {
+			  firstsignatory="Additional Commissioner";
+			  secondsignatory="Chief Accounts Officer";
+		  }
+		  reportParams.put("primarySignatory",firstsignatory);
+		  reportParams.put("secondarySignatory",secondsignatory);
+		  
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -688,6 +780,49 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("totalAmount", totalAmount);
         reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
         reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
+        String firstsignatory="";
+        String secondsignatory="";
+        List<Object[]> list  =getSignatory(instrumentnumber.getId());
+        
+		  if(list != null && !list.isEmpty())
+		  {
+			  for(Object[] element : list) 
+			  {
+				  if(element[0] != null && !element[0].toString().isEmpty())
+				  {
+					  firstsignatory=element[0].toString();
+				  }
+				  else
+				  {
+					  firstsignatory="Additional Commissioner";
+				  }
+				  if(element[1] != null && !element[1].toString().isEmpty())
+				  {
+					  secondsignatory=element[1].toString();  
+				  }
+				  else
+				  {
+					  
+					  secondsignatory="Chief Accounts Officer";
+				  }
+				  
+				  
+			  }
+		  }
+		  else
+		  {
+			  firstsignatory="Additional Commissioner";
+			  secondsignatory="Chief Accounts Officer";
+		  }
+		  reportParams.put("primarySignatory",firstsignatory);
+		  reportParams.put("secondarySignatory",secondsignatory);
+		  
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport3", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -727,6 +862,49 @@ public class BankAdviceReportAction extends BaseFormAction {
         reportParams.put("totalAmount", totalAmount);
         reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
         reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
+        String firstsignatory="";
+        String secondsignatory="";
+        List<Object[]> list  =getSignatory(instrumentnumber.getId());
+        
+		  if(list != null && !list.isEmpty())
+		  {
+			  for(Object[] element : list) 
+			  {
+				  if(element[0] != null && !element[0].toString().isEmpty())
+				  {
+					  firstsignatory=element[0].toString();
+				  }
+				  else
+				  {
+					  firstsignatory="Additional Commissioner";
+				  }
+				  if(element[1] != null && !element[1].toString().isEmpty())
+				  {
+					  secondsignatory=element[1].toString();  
+				  }
+				  else
+				  {
+					  
+					  secondsignatory="Chief Accounts Officer";
+				  }
+				  
+				  
+			  }
+		  }
+		  else
+		  {
+			  firstsignatory="Additional Commissioner";
+			  secondsignatory="Chief Accounts Officer";
+		  }
+		  reportParams.put("primarySignatory",firstsignatory);
+		  reportParams.put("secondarySignatory",secondsignatory);
+		  
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport4", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -973,6 +1151,21 @@ public class BankAdviceReportAction extends BaseFormAction {
 	}
 	private static JRBeanCollectionDataSource getDataSource(List<BankAdviceReportInfo> subLedgerList) {
         return new JRBeanCollectionDataSource(subLedgerList); 
+    }
+	
+	private List<Object[]> getSignatory(Long insId) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	try
+    	{
+    		query = this.persistenceService.getSession().createSQLQuery("select vh.firstsignatory,vh.secondsignatory from voucherheader vh where vh.id in (select voucherheaderid from egf_instrumentvoucher egf where egf.instrumentheaderid =:instId)");
+    	    query.setLong("instId", insId);
+    	    rows = query.list();
+    	    
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return rows;
     }
 
 }

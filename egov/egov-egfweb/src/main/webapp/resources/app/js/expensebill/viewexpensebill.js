@@ -92,7 +92,7 @@ function calculateBillAmount(){
 	});
 	$("#expenseNetPayableAmount").html($("#netPayableAmount").val());
 	$("#expenseBillTotalDebitAmount").html(debitamount);
-	$("#expenseBillTotalCreditAmount").html(Number(Number(creditamount)-Number($("#netPayableAmount").val())));
+	$("#expenseBillTotalCreditAmount").html(Number(Number(creditamount)));
 	$("#billamount").val(billamount);
 }
 
@@ -128,4 +128,17 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	return true;
+}
+
+
+
+
+function openPaymentBudgetDetails()
+{
+	//var url = '<s:property value='%{getSourcePath()}' />';
+	var pId =document.getElementById('id').value;
+	var today = new Date();
+	var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+	var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=pv&vhId='+pId;
+	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 }
