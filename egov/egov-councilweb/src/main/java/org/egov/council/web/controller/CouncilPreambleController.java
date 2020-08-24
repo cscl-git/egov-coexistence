@@ -128,6 +128,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @RequestMapping("/councilpreamble")
 public class CouncilPreambleController extends GenericWorkFlowController {
     private static final String COUNCIL_COMMON_WORKFLOW = "CouncilCommonWorkflow";
+    private static final String COUNCIL_ABA_WORKFLOW = "CouncilABAWorkflow";
     private static final String PREAMBLE_NUMBER_AUTO = "PREAMBLE_NUMBER_AUTO";
     private static final String REDIRECT_COUNCILPREAMBLE_RESULT = "redirect:/councilpreamble/result/";
     private static final String MESSAGE2 = "message";
@@ -231,7 +232,11 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         }
         model.addAttribute("autoPreambleNoGenEnabled", isAutoPreambleNoGenEnabled());     
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
-        model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+        if(isAgendaAdmin(info)) {
+        	model.addAttribute(ADDITIONALRULE, COUNCIL_ABA_WORKFLOW);
+        }else {
+        	model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+        }
         model.addAttribute(CURRENT_STATE, "NEW");
         
         prepareWorkFlowOnLoad(model, councilPreamble);
@@ -261,8 +266,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         councilPreamble.setGistOfPreamble(editor);
     	
         validatePreamble(councilPreamble, errors);
+        EmployeeInfo info = getEmployee();
         if (errors.hasErrors()) {
-        	 EmployeeInfo info = getEmployee();
              model.addAttribute(IS_AGENDA_ADMIN, isAgendaAdmin(info));
              
              if(!isAgendaAdmin(info) && null != info 
@@ -276,7 +281,11 @@ public class CouncilPreambleController extends GenericWorkFlowController {
              councilPreamble.setApprovalDesignation("");
              councilPreamble.setApprovalPosition(0l);
              model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
-             model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+             if(isAgendaAdmin(info)) {
+             	model.addAttribute(ADDITIONALRULE, COUNCIL_ABA_WORKFLOW);
+             }else {
+            	 model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+             }
              model.addAttribute(CURRENT_STATE, "NEW");
             prepareWorkFlowOnLoad(model, councilPreamble);
             return COUNCILPREAMBLE_NEW;
@@ -299,9 +308,17 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 	        councilPreamble.setPreambleNumber(preamblenumbergenerator
 	                .getNextNumber(councilPreamble));
         }
-        councilPreamble.setStatus(egwStatusHibernateDAO
-                .getStatusByModuleAndCode(CouncilConstants.PREAMBLE_MODULENAME,
-                        CouncilConstants.PREAMBLE_STATUS_CREATED));
+        
+        if(isAgendaAdmin(info)) {
+        	councilPreamble.setStatus(egwStatusHibernateDAO
+                    .getStatusByModuleAndCode(CouncilConstants.PREAMBLE_MODULENAME,
+                            CouncilConstants.PREAMBLE_STATUS_ABA_APPROVED));
+         }else {
+        	 councilPreamble.setStatus(egwStatusHibernateDAO
+                     .getStatusByModuleAndCode(CouncilConstants.PREAMBLE_MODULENAME,
+                             CouncilConstants.PREAMBLE_STATUS_CREATED));
+         }
+        
         councilPreamble.setType(PreambleType.GENERAL);
 
         Long approvalPosition = 0l;
@@ -533,6 +550,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
         WorkflowContainer workFlowContainer = new WorkflowContainer();
         
+        EmployeeInfo info = getEmployee();
+        
         //Setting pending action based on owner
 		
         List<String> assignedDesignations = null;
@@ -559,7 +578,11 @@ public class CouncilPreambleController extends GenericWorkFlowController {
 		}
 		 
         if(CouncilConstants.REJECTED.equalsIgnoreCase(councilPreamble.getStatus().getCode())){
-            model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+        	if(isAgendaAdmin(info)) {
+            	model.addAttribute(ADDITIONALRULE, COUNCIL_ABA_WORKFLOW);
+            }else {
+            	model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+            }
         }
         
         try {
