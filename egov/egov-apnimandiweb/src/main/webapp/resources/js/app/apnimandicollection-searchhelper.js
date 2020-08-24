@@ -85,7 +85,7 @@ function callAjaxSearch() {
 					}					
 				}
 			},
-			{"data" : "id","visible": false, "searchable": false},
+			{"data" : "id","visible": false, "searchable": false}
 		]
 	});
 }

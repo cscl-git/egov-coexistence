@@ -66,6 +66,8 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
     private static final String APNIMANDI_CONTRACTOR_WF_VIEW = "contractor-wfview";
     private static final String APNIMANDI_CONTRACTOR_SEARCH = "contractor-search";
     private static final String APNIMANDI_CONTRACTOR_TERMINATE = "contractor-terminate";
+    private static final String DM_CONTRACTOR_BY_DATE = "contractor-by-date-range";
+    private static final String DM_CONTRACTOR_BY_ZONE = "contractor-by-zone";
     
     private static final String APPLICATION_HISTORY = "applicationHistory";
     private static final String APPROVAL_POSITION = "approvalPosition";
@@ -496,5 +498,36 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 		jsonObject.add("departments", departments);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
+	
+	@RequestMapping(value = "/dm-contractor-by-date-range", method = RequestMethod.POST)
+    public String dmContractorByDateRange(final Model model) {
+		final ApnimandiContractor apnimandiContractor = new ApnimandiContractor();
+        prepareNewForm(model);
+        model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
+        return DM_CONTRACTOR_BY_DATE;
+    }
+	
+	@RequestMapping(value = "/dm-contractor-by-zone", method = RequestMethod.POST)
+    public String dmContractorByZone(final Model model) {
+		final ApnimandiContractor apnimandiContractor = new ApnimandiContractor();
+        prepareNewForm(model);
+        model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
+        return DM_CONTRACTOR_BY_ZONE;
+    }
+	
+	@RequestMapping(value = "/ajax/dm-contractor-by-date-range", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String getDMContractorByDateRange(final Model model, @ModelAttribute final ApnimandiContractor apnimandiContractor) {
+		if(null==apnimandiContractor.getValidToDate()) {
+			apnimandiContractor.setValidToDate(DateUtils.today());
+		}
+        final List<ApnimandiContractorSearchResult> searchResultList = contractorsService.dmContractorReport(apnimandiContractor);
+        return new StringBuilder("{ \"data\":").append(toSearchResultJson(searchResultList)).append("}").toString();
+    }
+	
+	@RequestMapping(value = "/ajax/dm-contractor-by-zone", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String getDMContractorByZone(final Model model, @ModelAttribute final ApnimandiContractor apnimandiContractor) {
+        final List<ApnimandiContractorSearchResult> searchResultList = contractorsService.dmContractorReport(apnimandiContractor);
+        return new StringBuilder("{ \"data\":").append(toSearchResultJson(searchResultList)).append("}").toString();
     }
 }

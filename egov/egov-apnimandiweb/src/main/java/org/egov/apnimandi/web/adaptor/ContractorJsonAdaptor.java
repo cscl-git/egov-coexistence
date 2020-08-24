@@ -50,6 +50,17 @@ public class ContractorJsonAdaptor implements JsonSerializer<ApnimandiContractor
 	            	jsonObject.addProperty("validToDate", "");
 	            else 
 	            	jsonObject.addProperty("validToDate", dtFormat.format(contractor.getApnimandiContractor().getValidToDate()));
+	            
+	            if(contractor.getApnimandiContractor().getContractSignedOn()==null)
+	            	jsonObject.addProperty("contractSignedOn", "");
+	            else 
+	            	jsonObject.addProperty("contractSignedOn", dtFormat.format(contractor.getApnimandiContractor().getContractSignedOn()));
+	            
+	            if (contractor.getApnimandiContractor().getAadhaarNo() == null)
+	                jsonObject.addProperty("aadharNo", "");
+	            else
+	                jsonObject.addProperty("aadharNo", contractor.getApnimandiContractor().getAadhaarNo());
+	            
 	            jsonObject.addProperty("id", contractor.getApnimandiContractor().getId());
         	}
         }
