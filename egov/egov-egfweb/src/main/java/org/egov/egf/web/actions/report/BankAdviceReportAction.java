@@ -77,6 +77,8 @@ import org.egov.commons.CFinancialYear;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.model.BankAdviceReportInfo;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.reporting.engine.ReportOutput;
@@ -166,7 +168,8 @@ public class BankAdviceReportAction extends BaseFormAction {
     private BigDecimal totalAmount = BigDecimal.ZERO;
     String countQuery = null;
     public List<BankAdviceReportInfo> bankAdviseResultList = new ArrayList<BankAdviceReportInfo>();
-
+    @Autowired
+    private AppConfigValueService appConfigValuesService;
     @Override
     public void prepare() {
         persistenceService.getSession().setDefaultReadOnly(true);
@@ -650,10 +653,12 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  }
 		  reportParams.put("primarySignatory",firstsignatory);
 		  reportParams.put("secondarySignatory",secondsignatory);
-		  
-		  reportParams.put("headerImagePath","/services/egi/resources/erp2/images/header.JPG");
-		  reportParams.put("footerImagePath","/services/egi/resources/erp2/images/footer.JPG");
-		  reportParams.put("backgroundImgPath","/services/egi/resources/erp2/images/background.png");
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -730,9 +735,12 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  reportParams.put("primarySignatory",firstsignatory);
 		  reportParams.put("secondarySignatory",secondsignatory);
 		  
-		  reportParams.put("headerImagePath","/services/egi/resources/erp2/images/header.JPG");
-		  reportParams.put("footerImagePath","/services/egi/resources/erp2/images/footer.JPG");
-		  reportParams.put("backgroundImgPath","/services/egi/resources/erp2/images/background.png");
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -809,9 +817,12 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  reportParams.put("primarySignatory",firstsignatory);
 		  reportParams.put("secondarySignatory",secondsignatory);
 		  
-		  reportParams.put("headerImagePath","/home/ch-egov/FinanceData/header.JPG");
-		  reportParams.put("footerImagePath","/home/ch-egov/FinanceData/footer.JPG");
-		  reportParams.put("backgroundImgPath","/home/ch-egov/FinanceData/background.png");
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport3", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
@@ -887,20 +898,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  }
 		  reportParams.put("primarySignatory",firstsignatory);
 		  reportParams.put("secondarySignatory",secondsignatory);
-		  BufferedImage image1 = ImageIO.read(getClass().getResource("/home/ch-egov/FinanceData/header.JPG"));
-		  BufferedImage image2 = ImageIO.read(getClass().getResource("/home/ch-egov/FinanceData/footer.JPG"));
-		  BufferedImage image3 = ImageIO.read(getClass().getResource("/home/ch-egov/FinanceData/background.png"));
-			/*
-			 * reportParams.put("headerImagePath",
-			 * "/services/egi/resources/erp2/images/header.JPG");
-			 * reportParams.put("footerImagePath",
-			 * "/services/egi/resources/erp2/images/footer.JPG");
-			 * reportParams.put("backgroundImgPath",
-			 * "/services/egi/resources/erp2/images/background.png");
-			 */
-		  reportParams.put("headerImagePath",image1);
-		  reportParams.put("footerImagePath",image2);
-		  reportParams.put("backgroundImgPath",image3);
+		  
+		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	                "pexImagePath");
+	        final String imgPath = appList.get(0).getValue();
+		  reportParams.put("headerImagePath",imgPath+"header.JPG");
+		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
+		  reportParams.put("backgroundImgPath",imgPath+"background.png");
         final ReportRequest reportInput = new ReportRequest("bankAdviceReport4", subLedgerList, reportParams);
         reportInput.setReportFormat(ReportFormat.PDF);
         contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);

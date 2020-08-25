@@ -162,6 +162,10 @@ function onSubmit()
 						<tr class="bluebox">
 							<a href="#" onclick=" return openSource();">Source</a>
 						</tr>
+						
+					</table>
+					<table>
+						
 						<tr class="bluebox">
 							<a href="#" onclick="openBudget()">Budget Details</a>
 						</tr>

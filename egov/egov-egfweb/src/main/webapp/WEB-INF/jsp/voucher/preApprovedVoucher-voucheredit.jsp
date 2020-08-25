@@ -293,11 +293,14 @@ function validate(name,value){
 				<s:if test="%{type == finConstExpendTypeContingency}">
 					<table>
 						<tr class="bluebox">
+						<td>
 							<a href="#" onclick="openSource()">Source</a>
-						</tr>
-						<tr class="bluebox">
+						</td>
+						<td>
 							<a href="#" onclick="openBudget()">Budget Details</a>
+						</td>
 						</tr>
+						
 					</table>
 				</s:if>
 				<br />

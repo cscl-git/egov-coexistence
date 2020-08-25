@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.13.0.final using JasperReports Library version 6.13.0-46ada4d1be8f3c5985fd0b6146f3ed44caed6f05  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="612" pageHeight="1008" columnWidth="512" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
 	<property name="ireport.zoom" value="1.652892561983471"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="593"/>
+	<property name="ireport.y" value="302"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -108,7 +107,7 @@
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[To
-    The Manager,
+     The Manager,
 ]]></text>
 			</staticText>
 			<textField>
@@ -126,7 +125,7 @@
 				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="128" width="263" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
+				<reportElement x="20" y="128" width="243" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
@@ -140,9 +139,9 @@
 				<text><![CDATA[Dated : ]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="39" y="204" width="455" height="29" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
-				<textElement textAlignment="Justified" verticalAlignment="Middle">
-					<font fontName="Verdana" size="12"/>
+				<reportElement x="39" y="183" width="464" height="62" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
+				<textElement textAlignment="Justified" verticalAlignment="Top">
+					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
 			</textField>
@@ -155,14 +154,14 @@
 				<textFieldExpression><![CDATA[$P{chequeDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="180" width="470" height="20" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
+				<reportElement x="0" y="164" width="470" height="15" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA["SUB:   Transfer of Funds"]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="-3" y="144" width="42" height="18" uuid="b948cd40-2d89-48bf-847c-c752efa3301e"/>
+				<reportElement x="20" y="144" width="42" height="18" uuid="b948cd40-2d89-48bf-847c-c752efa3301e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
@@ -203,28 +202,28 @@
 		<band height="357">
 			<staticText>
 				<reportElement positionType="Float" x="8" y="70" width="139" height="36" uuid="f8ee65f5-8611-4006-bd30-c46298dd83a5"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom" markup="none">
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
 					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Municipal Corporation, Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="332" y="70" width="167" height="36" uuid="13a71011-c6e3-4d07-8b12-890a685381fe"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom" markup="styled">
+				<reportElement positionType="Float" x="313" y="70" width="127" height="36" uuid="13a71011-c6e3-4d07-8b12-890a685381fe"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="styled">
 					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Municipal Corporation, Chandigarh]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="8" y="44" width="139" height="26" uuid="201a98d9-d080-4a74-bf03-1fc7648ddbee"/>
+				<reportElement x="8" y="38" width="245" height="32" uuid="201a98d9-d080-4a74-bf03-1fc7648ddbee"/>
 				<textElement verticalAlignment="Bottom">
 					<font fontName="Verdana"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{secondarySignatory}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="333" y="44" width="165" height="24" uuid="1e3ffc3c-1ac7-4654-abb9-ec451184cb4c"/>
-				<textElement verticalAlignment="Bottom">
+				<reportElement x="313" y="38" width="189" height="32" uuid="1e3ffc3c-1ac7-4654-abb9-ec451184cb4c"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Verdana"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{primarySignatory}]]></textFieldExpression>

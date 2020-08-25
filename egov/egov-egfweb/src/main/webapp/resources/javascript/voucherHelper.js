@@ -2478,15 +2478,36 @@ function populateBudgetLink()
 
 function openBudget()
 {
-	var vhId=document.getElementById('vhid').value;
-	if(vhId != null && vhId != '')
+	var vId=document.getElementById('pId');
+	if(vId != null)
 		{
+		var vhId=vId.value;
+			if(vhId != null && vhId != '')
+			{
+			var today = new Date();
+			var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=bpw&vhId='+vhId;
+			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+			}
+		}
+	
+
+}
+
+function openBudgetDetails()
+{
+	var vhId='';
+	var vId=document.getElementById('billVoucherId0');
+	if(vId != null)
+	{
+		vhId=vId.value;
+	}
+	if(vhId != null && vhId != '')
+	{
 		var today = new Date();
 		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
 		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=jvw&vhId='+vhId;
 		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
-		}
-
-}
-
-
+	}
+	
+	}

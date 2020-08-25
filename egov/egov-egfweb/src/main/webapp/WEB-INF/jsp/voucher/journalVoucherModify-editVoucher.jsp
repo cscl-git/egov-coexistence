@@ -360,76 +360,7 @@ function validateAccDtls()
 		alert("return false");
 		return false;
 		}
-	 for(var j=0; j<rowIndexSubLedgLength;j++){
-		  var d = document.getElementById('subLedgerlist['+j+'].glcode.id')
-			if(null != d){
-				var subledgerSelAccCode = document.getElementById('subLedgerlist['+j+'].glcode.id').value;
-				var subledgerSelType = document.getElementById('subLedgerlist['+j+'].detailType.id').value;
-				var subledgerSelCode = document.getElementById('subLedgerlist['+j+'].detailCode').value;
-				var tempSubledgerSelAmount =document.getElementById('subLedgerlist['+j+'].amount').value;
-				if(tempSubledgerSelAmount == '')
-					{
-					tempSubledgerSelAmount = 0;
-					}
-				var subledgerSelAmount = parseFloat(tempSubledgerSelAmount);
-				
-				
-				
-				if(d.options.length > 1)
-					{
-					
-					 for(p=d.options.length-1;p>=0;p--)
-		                  {
-						   var accountCode =  d.options[p].text;
-							 if(subledgerSelAccCode != '0')
-								 {
-								   
-									 for (k = 0; k < rowIndexLength -1 ; k++) {
-											
-										var accountDtlsCode = document.getElementById('billDetailslist['+k+'].glcodeDetail').value;
-										if(accountCode == accountDtlsCode){
-											var debitAmount = parseFloat(document.getElementById('billDetailslist['+k+'].debitAmountDetail').value);
-											 var creditAmount = parseFloat(document.getElementById('billDetailslist['+k+'].creditAmountDetail').value);
-											 if(subledgerSelAmount != (debitAmount+creditAmount))
-											 {
-												 document.getElementById('lblError').innerHTML = "Total subledger amount is not matching for account code : "+ accountCode+" at row : "+(j+1);
-													
-													return false;
-											 }
-										}
-										
-									 }
-									
-								 											
-							 	 }
-							  if(subledgerSelAccCode == '0'){
-									 document.getElementById('lblError').innerHTML = "Subledger detail entry is missing for account code : "+accountCode;
-										return false;
-								 }
-								 if(subledgerSelType == '0')
-								 {
-									 document.getElementById('lblError').innerHTML = "Subledger detail entry is missing for account code : "+accountCode;
-										return false;
-								 }
-								 if(subledgerSelCode == '')
-								 {
-									 document.getElementById('lblError').innerHTML = "Subledger detail entry is missing for account code : "+accountCode;
-										return false;
-								 }
-								 if(subledgerSelAmount == '0')
-								 {
-									 document.getElementById('lblError').innerHTML = "Total subledger amount is not matching for account code : "+ accountCode+" at row : "+(j+1);
-										
-										return false;
-								 }
-					 }		
-					 
-		         }
-				
-		
-			
-			}
-	  }
+	 
 	
 	return true;
 }

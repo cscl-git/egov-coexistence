@@ -298,7 +298,7 @@ public class JournalVoucherActionHelper {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);
                 String ststeValue=wfmatrix.getNextState();
-                if (FinancialConstants.BUTTONSAVEASDRAFT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
                 
                
@@ -324,7 +324,7 @@ public class JournalVoucherActionHelper {
                         null, null, voucherHeader.getCurrentState().getValue(), null);
                 String ststeValue=wfmatrix.getNextState();
                 Long owner = workflowBean.getApproverPositionId();
-                if (FinancialConstants.BUTTONSAVEASDRAFT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
+                if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction()))
                 {
                 		ststeValue =FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT;
                 		owner = populatePosition();

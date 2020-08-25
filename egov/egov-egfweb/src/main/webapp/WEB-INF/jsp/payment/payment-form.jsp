@@ -327,16 +327,26 @@
 																		class="mandatory1">*</span></td>
 																	<td class="bluebox"><s:select name="firstsignatory"
 																	headerKey="-1" headerValue="Select First Signatory" value="%{firstsignatory}"
-																	list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F&A)':'Assistant Controller (F&A)'}"
+																	list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
 																			id="firstsignatory" />
 																	</td>
 																	<td class="bluebox" width="15%"><s:text name="payment.secondsignatory" /><span
 																		class="mandatory1">*</span></td>
 																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
 																	headerKey="-1" headerValue="Select Second Signatory"
-																	list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F&A)':'Assistant Controller (F&A)' ,'Section Officer':'Section Officer'}"
+																	list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
 																			id="secondsignatory" /></td>
 																</tr>
+																<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text name="payment.budgetDetails" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><a href="#" onclick="openBudgetDetails()"> Click</a>
+																	</td>
+																	<td class="bluebox" width="15%">&nbsp;</td>
+																	<td class="bluebox" colspan="4">&nbsp;</td>
+																</tr>
+																
 															<tr>
 																<td class="greybox">&nbsp;</td>
 																<td class="greybox" width="15%"><s:text

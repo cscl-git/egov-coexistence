@@ -311,50 +311,31 @@ public class JournalVoucherAction extends BaseVoucherAction
 
                     else
                     {
-                        message = "Voucher  "
-                                + voucherHeader.getVoucherNumber()
-                                + " Created Sucessfully"
-                                + "\\n"
-                                + "And "
-                                + getText("budget.recheck.sucessful", new String[] { voucherHeader.getVouchermis()
-                                        .getBudgetaryAppnumber() })
-                                + "\\n"
-                                + getText("pjv.voucher.approved",
-                                        new String[] { this.getEmployeeName(voucherHeader.getState()
-                                        		.getOwnerPosition()) });
+                    	if(voucherHeader.getState().getValue()!=null && voucherHeader.getState().getValue().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
+                    	{
+                    	message = "Voucher  " + voucherHeader.getVoucherNumber() + " Save As Draft Sucessfully" ;
+                    	target = "success";
+                    	}
+                    	else
+                    	{
+                    	                        message = "Voucher  "
+                    	                                + voucherHeader.getVoucherNumber()
+                    	                                + " Created Sucessfully"
+                    	                                + "\\n"
+                    	                                + "And "
+                    	                                + getText("budget.recheck.sucessful", new String[] { voucherHeader.getVouchermis()
+                    	                                        .getBudgetaryAppnumber() })
+                    	                                + "\\n"
+                    	                                + getText("pjv.voucher.approved",
+                    	                                        new String[] { this.getEmployeeName(voucherHeader.getState()
+                    	                                        .getOwnerPosition()) });
 
-                        target = "success";
+                    	                        target = "success";
+                    	}
 
                     }
                 }
-				// Added by satya start
-				if (voucherHeader.getVouchermis().getBudgetaryAppnumber() == null) {
-					  if(workFlowAction.equalsIgnoreCase("Save As Draft")) { message = "Voucher  "
-					  + voucherHeader.getVoucherNumber() + " saved as draft Sucessfully";
-					  target = "success";
-					  
-					  } else { message = "Voucher  " + voucherHeader.getVoucherNumber() +
-					  " saved as draft Created Sucessfully" + "\\n" +
-					  getText("pjv.voucher.approved", new String[] {
-					  this.getEmployeeName(voucherHeader.getState() .getOwnerPosition()) }); 
-					  target = "success";
-					  
-					  
-					  }
-					  
-					  } 
-			     else { message = "Voucher  " + voucherHeader.getVoucherNumber() +
-					  "saveAsDraft Created Sucessfully" + "\\n" + "And " +
-					  getText("budget.recheck.sucessful", new String[] {
-					  voucherHeader.getVouchermis() .getBudgetaryAppnumber() }) + "\\n" +
-					  getText(".voucher.saveAsDraft.created", new String[] {
-					  voucherHeader.getVoucherNumber(), " saved as draft " });
-					  
-					  target = "success";
-					  
-					  }
 				
-				// Added by Satya end
 
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug("JournalVoucherAction | create  | Success | message === " + message);

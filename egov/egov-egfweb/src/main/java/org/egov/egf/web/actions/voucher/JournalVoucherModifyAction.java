@@ -368,7 +368,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
                         new String[] { this.getEmployeeName(voucherHeader.getState()
                                 .getOwnerPosition()) }));
             }
-			if (FinancialConstants.BUTTONSAVEASDRAFT.equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
+			if ("Save As Draft".equalsIgnoreCase(workflowBean.getWorkFlowAction())){               
             	 addActionMessage(getText("msg.expense.bill.saveasdraft.success",
                          new String[] { voucherHeader.getVoucherNumber() }));
             }

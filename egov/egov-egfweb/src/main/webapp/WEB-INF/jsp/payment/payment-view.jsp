@@ -95,6 +95,18 @@ function openVoucher(vid)
 	var url = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
 	window.open(url,'','width=900, height=700');
 }
+function openBudgetDtls()
+{
+	vhId=document.getElementById('pId').value;
+	if(vhId != null && vhId != '')
+	{
+	var today = new Date();
+	var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+	var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=bpw&vhId='+vhId;
+	window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}
+	
+	}
 </script>
 
 </head>
@@ -261,6 +273,12 @@ function openVoucher(vid)
 																		name="comments" id="comments" cols="100" rows="3"
 																		onblur="checkLength(this)" value="%{getComments()}" /></td>
 															</tr>
+															<tr>
+																<td class="bluebox">&nbsp;</td>
+																<td class="bluebox"><strong>Budget Details</strong></td>
+																<td class="bluebox" colspan="4"><a href="#" onclick="openBudgetDtls('<s:property value='%{billVoucherHeader.id}'/>')">Click</a></td>
+															</tr>
+															
 														</table> 
 
 													</span>
@@ -456,7 +474,7 @@ function openVoucher(vid)
 				</table>
 			</div>
 			<div class="buttonbottom" id="buttondiv">
-				<s:hidden name="paymentid" value="%{paymentheader.id}" />
+				<s:hidden id="pId" name="paymentid" value="%{paymentheader.id}" />
 				<s:hidden name="actionname" id="actionName" value="%{action}" />
 				<s:hidden name="finanicalYearAndClosedPeriodCheckIsClosed" id="finanicalYearAndClosedPeriodCheckIsClosed" value="%{finanicalYearAndClosedPeriodCheckIsClosed}" />
 				<s:if test="%{mode!='view'}">

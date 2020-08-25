@@ -1208,10 +1208,10 @@ function validate(){
 		return false;
 	}
 	
-	if(debitamount != Number(Number(creditamount) + Number(netpayableamount))){
+	/*if(debitamount != Number(Number(creditamount) + Number(netpayableamount))){
 		bootbox.alert($.i18n.prop('msg.debit.and.credit.amount.is.not.matching'));
 		return false;
-	}
+	}*/
 	
 	if(debitamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
@@ -1461,3 +1461,43 @@ function amountConverter(amt) {
 	var formattedAmt = amt.toFixed(2);
 	return formattedAmt;
 }
+
+function populateBdgetDetails()
+{
+	var dept=document.getElementById('department').value;
+	var fund=document.getElementById('fund').value;
+	var func=document.getElementById('egBillregistermis.function').value;
+	var accCode='';
+	var status = false;
+	if(dept == null || dept == '')
+	{
+		bootbox.alert('Please select department to view budget details');
+		status = true;
+	}
+	else if(fund == null || fund == '')
+	{
+		bootbox.alert('Please select fund to view budget details');
+		status = true;
+	}
+	else if(func == null || func == '')
+	{
+		bootbox.alert('Please select fund to view budget details');
+		status = true;
+	}
+	if(status == false)
+	{
+		accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
+		var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
+		if(accCode == null || accCode == '' || amt == null || amt == '')
+		{
+			bootbox.alert('Please select Debit Account Code/Amount to view budget details');
+		}
+		else
+		{
+			var today = new Date();
+			var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
+			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+		}
+	}
+	}

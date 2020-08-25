@@ -47,7 +47,18 @@
  */
 package org.egov.egf.web.actions.report;
 
-import net.sf.jasperreports.engine.JRException;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -66,6 +77,7 @@ import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.FunctionService;
 import org.egov.commons.service.FundService;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.model.BudgetVarianceEntry;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
@@ -81,6 +93,8 @@ import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.egov.model.bills.EgBilldetails;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.BudgetDetail;
 import org.egov.model.budget.BudgetGroup;
 import org.egov.model.payment.Paymentheader;
@@ -95,17 +109,7 @@ import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.math.BigDecimal;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import net.sf.jasperreports.engine.JRException;
 
 @Results(value = {
         @Result(name = "results", location = "budgetVarianceReport-results.jsp"),
@@ -172,6 +176,10 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     private BudgetGroupService budgetGroupService;
     
     private String vhId;
+    
+    @Autowired
+    private ExpenseBillService expenseBillService;
+    
 
     @ValidationErrorPage(value = "form")
     @SkipValidation
@@ -251,7 +259,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     	System.out.println("asOnDate :::"+asOnDate);
     	System.out.println("vtype :::"+vtype);
     	String result="form";
-    	if(vtype.equals("jv"))
+    	if(vtype !=null && vtype.equals("jv"))
         {
         	budgetDetail.setExecutingDepartment(dept);
         	budgetDetail.setFund(fundService.findOne(Integer.parseInt(funds)));
@@ -260,7 +268,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
         	budgetDetail.setBudgetGroup(budgrp);
         	result="results";
         }
-    	else if(vtype.equals("jvw"))
+    	else if(vtype !=null && vtype.equals("jvw"))
     	{
     		String department=getDepartment(Long.parseLong(vhId));
     		budgetDetail.setExecutingDepartment(department);
@@ -271,12 +279,83 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     		String acCode=getAcCode(Long.parseLong(vhId));
     		BudgetGroup budgrp=budgetGroupService.getBudgetGroup((chartOfAccountsService.getByGlCode(acCode)).getId());
         	budgetDetail.setBudgetGroup(budgrp);
+        	result="results";
+    	}
+    	else if(vtype !=null && vtype.equals("bpw"))
+    	{
+    		vhId=getVoucherId(Long.parseLong(vhId));
+    		String department=getDepartment(Long.parseLong(vhId));
+    		budgetDetail.setExecutingDepartment(department);
+    		String function = getFunction(Long.parseLong(vhId));
+    		budgetDetail.setFunction(functionService.findOne(Long.parseLong(function)));
+    		String fund=getFundDetails(Long.parseLong(vhId));
+    		budgetDetail.setFund(fundService.findOne(Integer.parseInt(fund)));
+    		String acCode=getAcCode(Long.parseLong(vhId));
+    		BudgetGroup budgrp=budgetGroupService.getBudgetGroup((chartOfAccountsService.getByGlCode(acCode)).getId());
+        	budgetDetail.setBudgetGroup(budgrp);
+        	result="results";
+    	}
+    	else if (vtype !=null && vtype.equals("pv"))
+    	{
+    		EgBillregister eg=expenseBillService.getById(Long.parseLong(vhId));
+    		budgetDetail.setExecutingDepartment(eg.getEgBillregistermis().getDepartmentcode());
+    		budgetDetail.setFunction(functionService.findOne(eg.getEgBillregistermis().getFunction().getId()));
+    		budgetDetail.setFund(fundService.findOne(eg.getEgBillregistermis().getFund().getId()));
+    		Long glcodeId=0L;
+    		System.out.println("id ; "+eg.getId());
+    		for(EgBilldetails row :eg.getEgBilldetailes())
+    		{
+    			
+    			String amt = row.getDebitamount().toString();
+    			System.out.println("amt = "+amt);
+    			if(amt != null && amt != "" && !(amt.equalsIgnoreCase("0") || amt.equalsIgnoreCase("0.00")) )
+    			{
+    				glcodeId = row.getChartOfAccounts().getId();
+    				break;
+    			}
+    		}
+    		System.out.println("code :::"+glcodeId);
+    		BudgetGroup budgrp=budgetGroupService.getBudgetGroup(glcodeId);
+        	budgetDetail.setBudgetGroup(budgrp);
+        	result="results";
+    	}
+    	else if (vtype !=null && vtype.equals("pr"))
+    	{
+    		budgetDetail.setExecutingDepartment(dept);
+        	budgetDetail.setFund(fundService.findOne(Integer.parseInt(funds)));
+        	budgetDetail.setFunction(functionService.findOne(Long.parseLong(func)));
+        	BudgetGroup budgrp=budgetGroupService.getBudgetGroup(Long.parseLong(accCode));
+        	budgetDetail.setBudgetGroup(budgrp);
+        	result="results";
     	}
         populateData();
         return result;
     }
 
-    private String getAcCode(Long vhId) {
+    private String getVoucherId(Long vhId2) {
+    	
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String voucherId="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select p.type,p.voucherheaderid from paymentheader p where p.id =:phId ");
+    	    query.setLong("phId", vhId2);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		voucherId= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return voucherId;
+	}
+
+	private String getAcCode(Long vhId) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	String acCode="";
@@ -812,5 +891,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 	public void setVhId(String vhId) {
 		this.vhId = vhId;
 	}
+	
+	
 
 }
