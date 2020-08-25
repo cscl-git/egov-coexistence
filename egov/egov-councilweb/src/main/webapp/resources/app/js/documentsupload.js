@@ -70,8 +70,8 @@ $(document)
 										}
 
 										var fileInput = $(this);
-										var maxSize = 2097152; // file size in
-																// bytes(2MB)
+										var maxSize = 10485760; // file size in
+																// bytes(10MB)
 										var inMB = maxSize / 1024 / 1024;
 										if (fileInput.get(0).files.length) {
 											var fileSize = this.files[0].size; // in

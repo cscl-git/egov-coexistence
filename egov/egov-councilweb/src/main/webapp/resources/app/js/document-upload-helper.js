@@ -97,7 +97,7 @@ $(document).on('change','.files-upload-container input:file',function(e) {
 			return;
 		}
 		else if(isMaxLimitReached){
-			bootbox.alert('File size should not exceed 2 MB!');
+			bootbox.alert('File size should not exceed 10 MB!');
 			$(this).val('');
 			return;
 		}

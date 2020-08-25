@@ -49,6 +49,7 @@ package org.egov.council.service.workflow;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
@@ -61,6 +62,7 @@ import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.Role;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -162,7 +164,7 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                 || CouncilConstants.WF_ANONYMOUSPREAMBLE_STATE.equalsIgnoreCase(councilPreamble.getState().getValue())
                         && null == councilPreamble.getState().getPreviousOwner()) {
             // IF APPLICATION IS CREATED AND DIRECTLY FORWARDED TO MAYOR
-            if (CouncilConstants.DESIGNATION_MAYOR.equalsIgnoreCase("")) {
+            /*if (CouncilConstants.DESIGNATION_MAYOR.equalsIgnoreCase("")) {
                 wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, null,
                         CouncilConstants.WF_NEW_STATE, "Application Creation");
                 councilPreamble.setStatus(getStatusByPassingModuleAndCode(wfmatrix));
@@ -183,14 +185,19 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                 }
             } 
             // IF REJECTED APPLICATION GOT CANCELLED THEN TRANSITION OCCUR HERE
-            else if (CouncilConstants.CANCEL
+            else*/
+        	if (CouncilConstants.CANCEL
                     .equalsIgnoreCase(workFlowAction)) {
                 cancelworkflow(councilPreamble, approvalComent, user, currentDate);
             }            
             else {
-
-                wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, "CouncilCommonWorkflow",
-                        CouncilConstants.WF_NEW_STATE, null);
+            	if(isAgendaAdmin(getEmployee(user.getId()))) {
+            		wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, CouncilConstants.COUNCIL_ABA_WORKFLOW,
+	                        CouncilConstants.WF_NEW_STATE, null);
+            	}else {
+	                wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, CouncilConstants.COUNCIL_COMMON_WORKFLOW,
+	                        CouncilConstants.WF_NEW_STATE, null);
+            	}
                 councilPreamble.setStatus(getStatusByPassingModuleAndCode(wfmatrix));
                 if (null == councilPreamble.getState()
                         || CouncilConstants.REJECTED.equalsIgnoreCase(councilPreamble.getStatus().getCode())) {
@@ -304,8 +311,14 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                     .withOwner(wfInitiator != null ? wfInitiator.getPosition() : null)
                     .withNextAction(wfmatrix.getNextAction()).withNatureOfTask(CouncilConstants.NATURE_OF_WORK);
         } else {*/
-            wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, "CouncilCommonWorkflow",
+        
+        	if(isAgendaAdmin(getEmployee(councilPreamble.getState().getInitiatorPosition()))) {
+        		wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, CouncilConstants.COUNCIL_ABA_WORKFLOW,
                     CouncilConstants.WF_REJECT_STATE, null);
+        	}else {
+        		wfmatrix = councilPreambleWorkflowService.getWfMatrix(councilPreamble.getStateType(), null, null, CouncilConstants.COUNCIL_COMMON_WORKFLOW,
+                        CouncilConstants.WF_REJECT_STATE, null);
+        	}
             councilPreamble.transition().progressWithStateCopy()
                     .withSenderName(user.getUsername() + CouncilConstants.COLON_CONCATE + user.getName())
                     .withComments(approvalComent).withStateValue(CouncilConstants.WF_REJECT_STATE)
@@ -334,5 +347,41 @@ public class PreambleWorkflowCustomImpl implements PreambleWorkflowCustom {
                 .withStateValue(CouncilConstants.WF_ANONYMOUSPREAMBLE_STATE)
                 .withOwner(assignee).withNextAction(wfmatrix.getNextAction()).withDateInfo(new Date())
                 .withNatureOfTask(CouncilConstants.NATURE_OF_WORK).withInitiator(assignee);
+    }
+    
+    private EmployeeInfo getEmployee(Long userId){
+    	if(userId !=0) {
+    		EmployeeInfo info = microserviceUtils.getEmployeeById(userId);
+	    	return info;
+    	}
+    	return null;
+    }
+    
+    private boolean isAgendaAdmin(EmployeeInfo info){
+    	boolean isAgendaAdmin= false;
+    	if(null != info) {
+			Optional<Role> adminRole = info.getUser().getRoles().stream()
+                    .filter(role -> CouncilConstants.ROLE_AGENDA_BRANCH_ADMIN.equals(role.getCode()))
+                    .findFirst();
+
+			if(adminRole.isPresent()) {
+				isAgendaAdmin = true;
+			}
+		}
+    	return isAgendaAdmin;
+    }
+    
+    private boolean isAgendaAdmin(User user){
+    	boolean isAgendaAdmin= false;
+    	if(null != user) {
+			Optional<org.egov.infra.admin.master.entity.Role> adminRole = user.getRoles().stream()
+                    .filter(role -> CouncilConstants.ROLE_AGENDA_BRANCH_ADMIN.equals(role.getName()))
+                    .findFirst();
+
+			if(adminRole.isPresent()) {
+				isAgendaAdmin = true;
+			}
+		}
+    	return isAgendaAdmin;
     }
 }

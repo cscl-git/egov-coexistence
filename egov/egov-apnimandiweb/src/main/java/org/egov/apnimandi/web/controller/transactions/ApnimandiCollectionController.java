@@ -25,8 +25,10 @@ import org.egov.apnimandi.masters.entity.vo.AttachedDocument;
 import org.egov.apnimandi.masters.service.ApnimaniCollectionTypeService;
 import org.egov.apnimandi.masters.service.SiteMasterService;
 import org.egov.apnimandi.masters.service.ZoneMasterService;
+import org.egov.apnimandi.reports.entity.ApnimandiCollectionMISReport;
 import org.egov.apnimandi.reports.entity.ApnimandiCollectionSearchResult;
 import org.egov.apnimandi.reports.entity.ApnimandiContractorSearchResult;
+import org.egov.apnimandi.reports.entity.EstimatedIncomeReport;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionAmountDetails;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionDetails;
 import org.egov.apnimandi.transactions.entity.ApnimandiContractor;
@@ -36,6 +38,8 @@ import org.egov.apnimandi.transactions.service.ContractorsService;
 import org.egov.apnimandi.utils.ApnimandiUtil;
 import org.egov.apnimandi.utils.constants.ApnimandiConstants;
 import org.egov.apnimandi.web.adaptor.CollectionJsonAdaptor;
+import org.egov.apnimandi.web.adaptor.EstimatedIncomeJsonAdaptor;
+import org.egov.apnimandi.web.adaptor.MisCollectionJsonAdaptor;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.microservice.models.Department;
@@ -70,6 +74,10 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
     private static final String APNIMANDI_COLLECTION_DETAILS_WF_VIEW = "apnimandicollection-wfview";
     private static final String APNIMANDI_COLLECTION_DETAILS_SEARCH = "apnimandicollection-search";
     private static final String APNIMANDI_COLLECTION_RECEIPT_VIEW = "apnimandicollection-receiptview";
+    
+    private static final String DM_COLLECTION_SEARCH = "dm-collection-search";
+    private static final String AM_COLLECTION_SEARCH = "am-collection-search"; 
+    private static final String DMAM_INCOME_REPORT = "estimated-income-report"; 
     
     private static final String APPLICATION_HISTORY = "applicationHistory";
     private static final String APPROVAL_POSITION = "approvalPosition";
@@ -328,7 +336,6 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         prepareNewForm(model);
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         return APNIMANDI_COLLECTION_DETAILS_SEARCH;
-
     }
 	
 	@RequestMapping(value = "/workflow/view/{id}", method = RequestMethod.GET)
@@ -528,7 +535,8 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	public Object toSearchResultJson(final Object object) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(ApnimandiCollectionSearchResult.class, new CollectionJsonAdaptor()).create();
-        return gson.toJson(object);
+        String json = gson.toJson(object);
+        return json;
     }
 	
 	private String getMessage(String messageLabel,String designation,String approver) {
@@ -583,5 +591,102 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		jsonObject.add("sites", sites);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
+	
+	@RequestMapping(value = "/day-market-collection", method = RequestMethod.POST)
+    public String dmCollection(final Model model) {
+        return DM_COLLECTION_SEARCH;
+    }
+	
+	@RequestMapping(value = "/apni-mandi-collection", method = RequestMethod.POST)
+    public String amCollection(final Model model) {
+        return AM_COLLECTION_SEARCH;
+    }
+	
+	@RequestMapping(value = "/ajax/day-market-collection", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String dmCollectionsearch(@RequestParam final String fromDate,
+			  									   @RequestParam final String toDate) {
+		Date newFromDate=null;
+		Date newToDate=null;	
+		if(StringUtils.isNotEmpty(fromDate)) {
+			newFromDate = DateUtils.getDate(fromDate, "dd/MM/yyyy");
+		}		
+		if(StringUtils.isNotEmpty(toDate)) {
+			newToDate = DateUtils.getDate(toDate, "dd/MM/yyyy");
+		}else {
+			newToDate = DateUtils.today();
+		}	
+		if(null!=newFromDate && null!=newToDate) {
+			final List<ApnimandiCollectionMISReport> searchResultList = apnimandiCollectionDetailService.dmCollectionReport(newFromDate, newToDate);
+	        return new StringBuilder("{ \"data\":").append(toMISReportJson(searchResultList)).append("}")
+	                .toString();
+		}else {
+			return new StringBuilder("{ \"data\":").append("[]").append("}").toString();
+		}
+    }
+	
+	public Object toMISReportJson(final Object object) {
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		final Gson gson = gsonBuilder.registerTypeAdapter(ApnimandiCollectionMISReport.class, new MisCollectionJsonAdaptor()).create();
+		String json = gson.toJson(object);
+		return json;
+    }
+	
+	@RequestMapping(value = "/ajax/apni-mandi-collection", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String amCollectionsearch(@RequestParam final String fromDate,
+			  									   @RequestParam final String toDate) {
+		Date newFromDate=null;
+		Date newToDate=null;	
+		if(StringUtils.isNotEmpty(fromDate)) {
+			newFromDate = DateUtils.getDate(fromDate, "dd/MM/yyyy");
+		}		
+		if(StringUtils.isNotEmpty(toDate)) {
+			newToDate = DateUtils.getDate(toDate, "dd/MM/yyyy");
+		}else {
+			newToDate = DateUtils.today();
+		}	
+		if(null!=newFromDate && null!=newToDate) {
+			final List<ApnimandiCollectionMISReport> searchResultList = apnimandiCollectionDetailService.amCollectionReport(newFromDate, newToDate);
+	        return new StringBuilder("{ \"data\":").append(toMISReportJson(searchResultList)).append("}")
+	                .toString();
+		}else {
+			return new StringBuilder("{ \"data\":").append("[]").append("}").toString();
+		}
+    }
+	
+	@RequestMapping(value = "/estimated-income-report", method = RequestMethod.POST)
+    public String estimatedIncomeSearch(final Model model) {
+		model.addAttribute("apnimandiCollectionTypes", apnimaniCollectionTypeService.getActiveApnimandiCollectionTypeList());
+        return DMAM_INCOME_REPORT;
+    }	
+	
+	@RequestMapping(value = "/ajax/estimated-income-report", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String amCollectionsearch(@RequestParam final String collTypeCode,
+    											   @RequestParam final String fromDate,
+			  									   @RequestParam final String toDate) {
+		Date newFromDate=null;
+		Date newToDate=null;	
+		if(StringUtils.isNotEmpty(fromDate)) {
+			newFromDate = DateUtils.getDate(fromDate, "dd/MM/yyyy");
+		}		
+		if(StringUtils.isNotEmpty(toDate)) {
+			newToDate = DateUtils.getDate(toDate, "dd/MM/yyyy");
+		}else {
+			newToDate = DateUtils.today();
+		}	
+		if(null!=newFromDate && null!=newToDate) {
+			final List<EstimatedIncomeReport> searchResultList = apnimandiCollectionDetailService.estimatedIncomeReport(collTypeCode, newFromDate, newToDate);
+	        return new StringBuilder("{ \"data\":").append(toEIReportJson(searchResultList)).append("}")
+	                .toString();
+		}else {
+			return new StringBuilder("{ \"data\":").append("[]").append("}").toString();
+		}
+    }
+	
+	public Object toEIReportJson(final Object object) {
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		final Gson gson = gsonBuilder.registerTypeAdapter(EstimatedIncomeReport.class, new EstimatedIncomeJsonAdaptor()).create();
+		String json = gson.toJson(object);
+		return json;
     }
 }
