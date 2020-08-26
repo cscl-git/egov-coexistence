@@ -11,8 +11,8 @@
 		   id="wfContractorForm" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	<input type="hidden" id="mode"  name="mode" value="${mode}" />		
 	<input type="hidden" name="apnimandiContractor" value="${apnimandiContractor.id}" />	
-	<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
+	<jsp:include page="../workflow/dm-contractor-commonWorkflowMatrix.jsp" />
 	<div class="buttonbottom" align="center">
-		<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
+		<jsp:include page="../workflow/dm-contractor-commonWorkflowMatrix-button.jsp" />
 	</div>		
 </form:form>

@@ -263,9 +263,6 @@ public class ContractorsService extends PersistenceService<ApnimandiContractor, 
         if(null!=contractor.getZone()) {
         	queryStr.append(" and zoneMaster.id =:zoneid");
         }
-        if(StringUtils.isNotEmpty(contractor.getAadhaarNo())) {
-        	queryStr.append(" and conObj.aadhaarNo =:aadhaarNo");
-        }
         if(StringUtils.isNotEmpty(contractor.getName())) {
         	queryStr.append(" and lower(conObj.name) like :name");
         }
@@ -277,9 +274,6 @@ public class ContractorsService extends PersistenceService<ApnimandiContractor, 
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
         if(null!=contractor.getZone()) {
         	queryResult.setLong("zoneid", contractor.getZone().getId());
-        }
-        if(StringUtils.isNotEmpty(contractor.getAadhaarNo())) {
-        	queryResult.setString("aadhaarNo", contractor.getAadhaarNo());
         }
         if(StringUtils.isNotEmpty(contractor.getName())) {
         	queryResult.setParameter("name", '%'+contractor.getName().toLowerCase()+'%');

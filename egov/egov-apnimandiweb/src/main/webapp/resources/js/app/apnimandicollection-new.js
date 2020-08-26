@@ -17,6 +17,12 @@ $('#buttonSubmit').click(function(e) {
 });
 
 $('#collectiontype').change(function(){
+	var collectionTypeText=$("#collectiontype option:selected").text();
+	if(collectionTypeText == 'Day Market'){
+		showContractorList();
+	}else{
+		hideContractorList();
+	}
 	isCollectionForDayMarket();
 	getPaymentType();
 	resetAmountTables();

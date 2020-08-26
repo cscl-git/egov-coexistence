@@ -99,10 +99,6 @@ function callContractorReportByZone() {
 				"className" : "text-left"
 			},
 			{
-				"data" : "aadharNo",
-				"className" : "text-left"
-			},
-			{
 				"data" : "contractSignedOn",
 				"className" : "text-right"
 			},

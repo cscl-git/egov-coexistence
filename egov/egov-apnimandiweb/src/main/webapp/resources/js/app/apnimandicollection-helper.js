@@ -18,7 +18,8 @@ function getContractorList(zoneid, collectionMonth, collectionYear){
 				jQuery('#contractor').append($('<option>').text(obj.Text).attr('value', obj.Value));
 				count++;
 			});
-			if(count>0){
+			var collectionTypeText=$("#collectiontype option:selected").text();
+			if(collectionTypeText == 'Day Market'){
 				showContractorList();
 			}else{
 				hideContractorList();
@@ -27,7 +28,6 @@ function getContractorList(zoneid, collectionMonth, collectionYear){
 		error: function (response) {
 			jQuery('#contractor').html("");
 			jQuery('#contractor').append("<option value=''>Select</option>");
-			hideContractorList();
 		}
 	});	
 }

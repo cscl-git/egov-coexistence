@@ -30,16 +30,6 @@
 									data-pattern="alphabetwithspace" maxlength="100"/>
 						<form:errors path="name" cssClass="error-msg" />
 						</div>
-					</div>
-					<div class="form-group">
-						<label class="col-sm-2 control-label text-left">
-							<spring:message code="lbl.aadhaar.no" />:
-						</label>
-						<div class="col-sm-3 add-margin">
-							<form:input type="text" path="aadhaarNo" id="aadhaarNo" cssClass="form-control text-left patternvalidation"
-										data-pattern="number" maxlength="12"/>
-							<form:errors path="aadhaarNo" cssClass="error-msg" />
-						</div>
 					</div>					
 					<div class="form-group">
 						<div class="text-center">
@@ -66,7 +56,6 @@
 				<tr>
 					<th><spring:message code="lbl.zone" /></th>
 					<th><spring:message code="lbl.name" /></th>
-					<th><spring:message code="lbl.aadhaar.no" /></th> 
 					<th><spring:message code="lbl.contract.signed.on" /></th>
 					<th><spring:message code="lbl.valid.from.date" /></th>
 					<th><spring:message code="lbl.valid.to.date" /></th>
