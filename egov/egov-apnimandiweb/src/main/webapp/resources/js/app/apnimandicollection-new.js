@@ -60,13 +60,11 @@ $('#serviceType').change(function(){
 });
 
 function showContractorList(){
-	$('#contractor').attr('required', 'required');
 	$('#dvApnimandiContractor').show();
 }
 
 function hideContractorList(){
 	$('#contractor').val('');
-	$('#contractor').removeAttr('required');
 	$('#dvApnimandiContractor').hide();
 }
 

@@ -154,14 +154,14 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         if(receiptHeadCount==0) {
         	errors.reject("account.head.empty");
         }
-        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
-			if(null!=existingCollectionList) {
-				if(existingCollectionList.size()>0) {
-					errors.reject("collection.already.exist");
-				}
-			}
-        }
+//        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
+//			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
+//			if(null!=existingCollectionList) {
+//				if(existingCollectionList.size()>0) {
+//					errors.reject("collection.already.exist");
+//				}
+//			}
+//        }
 		if (errors.hasErrors()) {
 	        prepareNewForm(model);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
@@ -193,7 +193,11 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			collectionAmountDetails.add(collectionAmountDetail);
 		}
 		if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			if(null!=apnimandiCollectionDetails.getContractor()) {
+				apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			}else {
+				apnimandiCollectionDetails.setPayeeName("NA");
+			}
 		}
 		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
 		apnimandiCollectionDetails.setActive(false);
@@ -238,14 +242,14 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         if(receiptHeadCount==0) {
         	errors.reject("account.head.empty");
         }
-        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
-			if(null!=existingCollectionList) {
-				if(existingCollectionList.size()>0) {
-					errors.reject("collection.already.exist");
-				}
-			}
-        }
+//        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
+//			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
+//			if(null!=existingCollectionList) {
+//				if(existingCollectionList.size()>0) {
+//					errors.reject("collection.already.exist");
+//				}
+//			}
+//        }
 		if (errors.hasErrors()) {
 	        prepareNewForm(model);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
@@ -276,7 +280,11 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			}
 		}
 		if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			if(null!=apnimandiCollectionDetails.getContractor()) {
+				apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			}else {
+				apnimandiCollectionDetails.setPayeeName("NA");
+			}
 		}
 		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
 		apnimandiCollectionDetailService.persist(apnimandiCollectionDetails, attachedDocuments, collectionAmountDetails, null, null, StringUtils.EMPTY);

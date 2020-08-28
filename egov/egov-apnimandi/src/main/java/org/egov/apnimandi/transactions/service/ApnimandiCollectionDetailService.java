@@ -176,7 +176,8 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     	receiptHeader.setPaidBy(apnimandiCollectionDetails.getPayeeName());
     	receiptHeader.setPartPaymentAllowed(Boolean.FALSE);
     	if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-    		receiptHeader.setPayeeAddress(apnimandiCollectionDetails.getContractor().getAddress());
+    		if(null!=apnimandiCollectionDetails.getContractor())
+    			receiptHeader.setPayeeAddress(apnimandiCollectionDetails.getContractor().getAddress());
     	}else {
     		receiptHeader.setPayeeAddress("");
     	}    	
@@ -462,7 +463,9 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryStr.append(" and zoneMaster.id =:zoneid");
         queryStr.append(" and collectionObj.collectionForMonth =:collectionMonth");
         queryStr.append(" and collectionObj.collectionForYear =:collectionYear");
-        queryStr.append(" and conObj.id =:contid");
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryStr.append(" and conObj.id =:contid");
+        }
         queryStr.append(" and egwStatus.code <>:statuscode ");
         if(null!=apnimandiCollectionDetails.getId()) {
         	queryStr.append(" and collectionObj.id <>:id ");
@@ -472,7 +475,9 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryResult.setInteger("collectionMonth", apnimandiCollectionDetails.getCollectionForMonth());
         queryResult.setInteger("collectionYear", apnimandiCollectionDetails.getCollectionForYear());
         queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_DELETED);
-        queryResult.setLong("contid", apnimandiCollectionDetails.getContractor().getId());
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryResult.setLong("contid", apnimandiCollectionDetails.getContractor().getId());
+        }
         if(null!=apnimandiCollectionDetails.getId()) {
         	queryResult.setLong("id", apnimandiCollectionDetails.getId());
         }
@@ -535,12 +540,16 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryStr.append("select distinct collectionObj as apnimandiCollections, zoneMaster.name as zoneName, egwStatus.description as statusName");
         queryStr.append(" from ApnimandiCollectionDetails collectionObj,EgwStatus egwStatus,ZoneMaster zoneMaster,ApnimandiContractor apnimandiContractor");
         queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.contractor.id=apnimandiContractor.id");
-        queryStr.append(" and apnimandiContractor.id =:contractorId");
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryStr.append(" and apnimandiContractor.id =:contractorId");
+        }
         queryStr.append(" and collectionObj.collectionForMonth =:collectionMonth");
         queryStr.append(" and collectionObj.collectionForYear =:collectionYear");
         queryStr.append(" and egwStatus.code <>:statuscode ");
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-        queryResult.setLong("contractorId", apnimandiCollectionDetails.getContractor().getId());
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryResult.setLong("contractorId", apnimandiCollectionDetails.getContractor().getId());
+        }
         queryResult.setInteger("collectionMonth", apnimandiCollectionDetails.getCollectionForMonth());
         queryResult.setInteger("collectionYear", apnimandiCollectionDetails.getCollectionForYear());
         queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_DELETED);
@@ -561,15 +570,14 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryStr.append(", siteMaster.name as siteName");
         queryStr.append(", egwStatus.description as status");
         queryStr.append(", collType.name as collectionType");
-        queryStr.append(", cont.name as contractorName");        
-        queryStr.append(" from ApnimandiCollectionDetails collectionObj");
-        queryStr.append(", ZoneMaster zoneMaster");
-        queryStr.append(", SiteMaster siteMaster");
-        queryStr.append(", EgwStatus egwStatus");
-        queryStr.append(", ApnimandiCollectionType collType");
-        queryStr.append(", ApnimandiContractor cont");    
-        queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.site.id=siteMaster.id and collectionObj.collectiontype.id=collType.id and collectionObj.contractor.id=cont.id");
-        queryStr.append(" and collType.code =:collTypeCode");
+        queryStr.append(", (case when collectionObj.contractor is null then '' else cont.name end) as contractorName");       
+        queryStr.append(" from ApnimandiCollectionDetails collectionObj");        
+        queryStr.append(" inner join collectionObj.zone zoneMaster");
+        queryStr.append(" inner join collectionObj.site siteMaster");
+        queryStr.append(" inner join collectionObj.status egwStatus");
+        queryStr.append(" inner join collectionObj.collectiontype collType");
+        queryStr.append(" left join collectionObj.contractor cont");        
+        queryStr.append(" where collType.code =:collTypeCode");
         queryStr.append(" and (collectionObj.collectionDate >=:fromDate and collectionObj.collectionDate <=:toDate)");
         queryStr.append(" and egwStatus.code =:statuscode ");
         queryStr.append(" and collectionObj.active =:active ");        

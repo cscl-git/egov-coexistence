@@ -41,7 +41,7 @@ public class MisCollectionJsonAdaptor implements JsonSerializer<ApnimandiCollect
             }
             
             if (collection.getContractorName() == null) {
-                jsonObject.addProperty("contractor", "");
+                jsonObject.addProperty("contractor", "NA");
             } else {
                 jsonObject.addProperty("contractor", collection.getContractorName());
             }
