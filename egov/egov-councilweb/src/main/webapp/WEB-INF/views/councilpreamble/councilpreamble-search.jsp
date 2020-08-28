@@ -71,7 +71,6 @@
 					<th><spring:message code="lbl.serial.no" /></th>
 					<th><spring:message code="lbl.department" /></th>
 					<th><spring:message code="lbl.preamble.number" /></th>
-					<th><spring:message code="lbl.gistofpreamble" /></th>
 					<th><spring:message code="lbl.status" /></th>
 					<th><spring:message code="lbl.view" /></th>
 					<th>&nbsp;</th>

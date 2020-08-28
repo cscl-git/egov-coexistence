@@ -141,6 +141,13 @@ public class CouncilMeeting extends StateAware{
     @JoinTable(name = "egcncl_meeting_document", joinColumns = @JoinColumn(name = "meetingid"), inverseJoinColumns = @JoinColumn(name = "filestoreid"))
     private Set<FileStoreMapper> supportDocs = Collections.emptySet();
 
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "filestoreid")
+    private FileStoreMapper filestoreid;
+    
+    @Transient
+    private transient MultipartFile attachments;
+    
     private transient MultipartFile[] files;
     
     @Transient
@@ -335,5 +342,20 @@ public class CouncilMeeting extends StateAware{
 	public void setApprovalComent(String approvalComent) {
 		this.approvalComent = approvalComent;
 	}
+	
+	public FileStoreMapper getFilestoreid() {
+        return filestoreid;
+    }
 
+    public void setFilestoreid(FileStoreMapper filestoreid) {
+        this.filestoreid = filestoreid;
+    }
+    
+    public MultipartFile getAttachments() {
+        return attachments;
+    }
+
+    public void setAttachments(MultipartFile attachments) {
+        this.attachments = attachments;
+    }
 }

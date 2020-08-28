@@ -156,15 +156,16 @@ function callAjaxSearch() {
 				"fnRowCallback" : function(row, data, index) {
 					var mode = $('#mode').val();
 					if (mode == 'edit')
-						$('td:eq(4)',row).html(data.implementationStatus);				
+						$('td:eq(3)',row).html(data.implementationStatus);				
 					else
-						$('td:eq(4)',row).html(data.status);
+						$('td:eq(3)',row).html(data.status);
 					return row;
 				},
 				aaSorting : [],
 				columns : [
 						{
 							 "data":null,
+							 "width" : "6%",
 							 "sClass" : "text-center",
 				        	   render: function (data, type, row, meta) {
 				        	        return meta.row + meta.settings._iDisplayStart + 1;
@@ -172,22 +173,17 @@ function callAjaxSearch() {
 				        },
 						{
 							"data" : "department",
-							"width" : "15%",
+							"width" : "25%",
 							"sClass" : "text-left"
 						},
 						{
 							"data" : "preambleNumber",
-							"width" : "15%",
+							"width" : "25%",
 							"sClass" : "text-left"
-						},
-						{
-							"data" : "gistOfPreamble",
-							"width" : "40%",
-							"sClass" : "text-left"
-						},
+						},						
 						{
 							"data" : "status",
-							"width" : "15",
+							"width" : "25%",
 							"sClass" : "text-left"
 						},
 						{
@@ -265,10 +261,6 @@ function callAjaxSearchForAgendaPreamble() {
 							"sClass" : "text-left"
 						},
 						{
-							"data" : "gistOfPreamble",
-							"sClass" : "text-left"
-						},
-						{
 							"data" : null,
 							"target" : -1,
 
@@ -324,7 +316,7 @@ $("#resultTable").on(
 		'click',
 		'tbody tr td  .view',
 		function(event) {
-			var id = reportdatatable.fnGetData($(this).parent().parent(), 6);
+			var id = reportdatatable.fnGetData($(this).parent().parent(), 5);
 			window.open('/services/council/councilpreamble/' + $('#mode').val() + '/'
 					+ id, '', 'width=800, height=600,scrollbars=yes');
 
@@ -334,7 +326,7 @@ $("#resultTable").on(
 		'click',
 		'tbody tr td  .changeStatus',
 		function(event) {
-			var id = reportdatatable.fnGetData($(this).parent().parent(), 6);
+			var id = reportdatatable.fnGetData($(this).parent().parent(), 5);
 			window.open('/services/council/councilpreamble/updateimplimentaionstatus' + '/'
 					+ id, '', 'width=800, height=600,scrollbars=yes');
 

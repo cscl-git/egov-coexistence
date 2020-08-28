@@ -56,11 +56,11 @@
 	<div class="col-md-12">
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading custom_form_panel_heading">
-				<div class="panel-title">Upload Documents</div>
+				<div class="panel-title">Upload MOM Documents<span class="mandatory"></span></div>
 			</div>
 			<div class="panel-body custom">
 					<div class="col-sm-12 add-margin">
-						<div class="files-upload-container" data-file-max-size="2"
+						<div class="files-upload-container" data-file-max-size="10"
 							data-allowed-extenstion="doc,docx,xls,xlsx,rtf,pdf,txt,zip,jpeg,jpg,png,gif,tiff">
 							<div class="files-viewer">
 

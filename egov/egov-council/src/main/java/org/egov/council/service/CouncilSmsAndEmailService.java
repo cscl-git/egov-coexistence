@@ -47,6 +47,7 @@
  */
 package org.egov.council.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.egov.council.entity.CommitteeMembers;
 import org.egov.council.entity.CouncilMeeting;
@@ -132,7 +133,11 @@ public class CouncilSmsAndEmailService {
     }
 
     public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment) {
-        String emailId;
+    	sendEmail(councilMeeting, customMessage, attachment, null, null);
+    }
+    
+    public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment, String fileType, String fileName) {
+    	String emailId;
         Boolean emailEnabled = isEmailEnabled();
         if (emailEnabled) {
         	try {
@@ -141,7 +146,7 @@ public class CouncilSmsAndEmailService {
 	                emailId = committeeMembers.getCouncilMember().getEmailId();
 	                if (emailId != null) {
 	                    buildEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
-	                            attachment);
+	                            attachment, fileType, fileName);
 	                }
 	            }
 	        }catch(Exception e) {
@@ -152,7 +157,7 @@ public class CouncilSmsAndEmailService {
 	            for (User user : listOfUsers) {
 	                if (user.getEmailId() != null) {
 	                    buildEmailForMeetingForCouncilRoles(user.getUserName(), user.getEmailId(), councilMeeting, customMessage,
-	                            attachment);
+	                            attachment, fileType, fileName);
 	                }
 	            }
 	        }catch(Exception e) {
@@ -192,9 +197,14 @@ public class CouncilSmsAndEmailService {
         if (mobileNumber != null && smsMsg != null)
             sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
     }
-
+    
     public void buildEmailForMeeting(final String email, final String name, final CouncilMeeting councilMeeting,
             final String customMessage, final byte[] attachment) {
+    	buildEmailForMeeting(email, name, councilMeeting, customMessage, attachment, null,null);
+    }
+
+    public void buildEmailForMeeting(final String email, final String name, final CouncilMeeting councilMeeting,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
         String body;
         String subject;
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
@@ -205,7 +215,7 @@ public class CouncilSmsAndEmailService {
             subject = emailSubjectforEmailByCodeAndArgs("email.meeting.subject", name, councilMeeting);
         }
         if (email != null && body != null)
-            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment);
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
 
     /**
@@ -236,6 +246,12 @@ public class CouncilSmsAndEmailService {
     public void buildEmailForMeetingForCouncilRoles(final String userName, final String email,
             final CouncilMeeting councilMeeting,
             final String customMessage, final byte[] attachment) {
+    	buildEmailForMeetingForCouncilRoles(userName, email, councilMeeting, customMessage, attachment, null, null);
+    }
+    
+    public void buildEmailForMeetingForCouncilRoles(final String userName, final String email,
+            final CouncilMeeting councilMeeting,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
         String body;
         String subject;
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
@@ -248,7 +264,7 @@ public class CouncilSmsAndEmailService {
                     customMessage);
         }
         if (email != null && body != null)
-            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment);
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
 
     /**
@@ -321,10 +337,21 @@ public class CouncilSmsAndEmailService {
         notificationService.sendSMS(mobileNumber, smsBody);
     }
 
-    public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
+    /*public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
             final String emailSubject, final byte[] attachment) {
-        notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
+    	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
                 attachment);
+    }*/
+    
+    public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
+            final String emailSubject, final byte[] attachment, String fileType, String fileName) {
+        if(!StringUtils.isBlank(fileType) && !StringUtils.isBlank(fileName)) {
+        	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, fileType, fileName,
+                    attachment);
+        }else {
+        	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
+                    attachment);
+        }
     }
 
 }

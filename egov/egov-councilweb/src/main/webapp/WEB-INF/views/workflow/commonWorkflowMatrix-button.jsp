@@ -90,7 +90,7 @@
 			<td>
 				<c:forEach items="${validActionList}" var="validButtons">
 					<form:button type="submit" id="${validButtons}" class="btn btn-primary workflow-submit"  value="${validButtons}" onclick="validateWorkFlowApprover('${validButtons}');">
-						<c:out value="${validButtons}" /> 
+						<c:out value="${validButtons == 'Reject'?'Correction' :validButtons}" /> 
 					</form:button>
 				</c:forEach>
 				<c:if test="${(currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState))

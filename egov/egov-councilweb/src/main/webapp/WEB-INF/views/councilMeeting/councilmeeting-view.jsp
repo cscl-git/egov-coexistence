@@ -93,6 +93,21 @@
 					</div>
 					<div class="col-sm-3 add-margin view-content">
 						${councilMeeting.meetingTime}</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.document" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						<c:choose>
+							<c:when test="${councilMeeting.filestoreid != null}">
+								<a
+									href="/services/council/councilmeeting/download/${councilMeeting.filestoreid.fileStoreId}"
+									data-gallery target="_blank">${councilMeeting.filestoreid.fileName}</a>
+
+							</c:when>
+							<c:otherwise>
+								<spring:message code="msg.no.attach.found" />
+							</c:otherwise>
+						</c:choose>
 				</div>
 			</div>
 		</div>
@@ -146,10 +161,10 @@
 					<thead>
 						<tr>
 							<th align="center"><spring:message code="lbl.serial.no" /></th>
-							<th width="14%"><spring:message code="lbl.department" /></th>
-							<th width="7%"><spring:message code="lbl.agenda.number" /></th>
+							<th width="40%"><spring:message code="lbl.department" /></th>
+							<th width="40%"><spring:message code="lbl.agenda.number" /></th>
 							<%-- <th width="9%"><spring:message code="lbl.preamble.number" /></th> --%>
-							<th><spring:message code="lbl.gistofpreamble" /></th>
+							<%-- <th><spring:message code="lbl.gistofpreamble" /></th> --%>
 						</tr>
 					</thead>
 					<tbody>
@@ -162,8 +177,8 @@
 										<td><c:out value="${mom.preamble.departmentName}" /></td>
 										<td class="text-center"><c:out value="${mom.agenda.agendaNumber}" /></td>
 										<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
-										<td><span class="more"><c:out
-													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td>
+										<%-- <td><span class="more"><c:out
+													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td> --%>
 									</tr>
 								</c:forEach>
 							</c:when>

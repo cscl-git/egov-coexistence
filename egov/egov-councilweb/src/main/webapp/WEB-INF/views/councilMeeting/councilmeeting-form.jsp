@@ -120,6 +120,46 @@
 			</div>
 		</c:if>
 		<form:hidden path="id" id="id" value="${councilMeeting.id}" />
+		
+		<div class="form-group">
+			<label class="col-sm-3 control-label text-right"><spring:message
+						code="lbl.meeting.document" /><span class="mandatory"></span></label>
+			<div class="col-sm-8 add-margin">
+				<c:choose>
+					<c:when test="${councilMeeting.filestoreid != null}">
+	
+						<form:input path="attachments" type="file" id="attachments"
+							name="attachments" data-id="1"
+							class="filechange inline btn upload-file" />
+						<form:errors path="attachments" cssClass="error-msg" />
+	
+						<form:hidden path="filestoreid.id"
+							value="${councilMeeting.filestoreid.id}" />
+						<form:hidden path="filestoreid.fileStoreId"
+							value="${councilMeeting.filestoreid.fileStoreId}" />
+	
+						<a target="_blank"
+							href="/services/council/councilmember/downloadfile/${councilMeeting.filestoreid.fileStoreId}"
+							data-gallery style="display:block"> ${councilMeeting.filestoreid.fileName}</a>
+						<small class="error-msg"><spring:message
+								code="lbl.mesg.document" /></small>
+					</c:when>
+					<c:otherwise>
+						<form:input path="attachments" type="file" id="attachments"
+							name="attachments" required="true" data-id="1"
+							class="filechange inline btn upload-file" />
+						<small class="error-msg"><spring:message
+								code="lbl.mesg.document" /></small>
+						<form:errors path="attachments" cssClass="error-msg" />
+					</c:otherwise>
+				</c:choose>
+			</div>
+		</div>
 	</div>
 </div>
 
+<style>
+.filechange.btn:hover, .filechange.btn:focus{
+	color:#333;
+}
+</style>

@@ -87,6 +87,9 @@ public class CouncilAgenda extends StateAware {
     @JoinColumn(name = "committeeType")
     private CommitteeType committeeType;
 
+    @ManyToOne
+    @JoinColumn(name = "councilAgendaType")
+    private CouncilAgendaType councilAgendaType;
 
     @Column(name = "agendaNumber")
     private String agendaNumber;
@@ -180,5 +183,13 @@ public class CouncilAgenda extends StateAware {
             List<CouncilAgendaDetails> councilAgendaDetailsForUpdate) {
         this.councilAgendaDetailsForUpdate = councilAgendaDetailsForUpdate;
     }
+
+	public CouncilAgendaType getCouncilAgendaType() {
+		return councilAgendaType;
+	}
+
+	public void setCouncilAgendaType(CouncilAgendaType councilAgendaType) {
+		this.councilAgendaType = councilAgendaType;
+	}
 
 }

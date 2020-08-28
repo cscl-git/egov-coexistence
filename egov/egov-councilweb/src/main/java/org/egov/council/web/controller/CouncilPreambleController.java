@@ -78,12 +78,14 @@ import org.egov.council.autonumber.PreambleNumberGenerator;
 import org.egov.council.entity.CommitteeType;
 import org.egov.council.entity.CouncilAgenda;
 import org.egov.council.entity.CouncilAgendaDetails;
+import org.egov.council.entity.CouncilAgendaType;
 import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.enums.PreambleTypeEnum;
 import org.egov.council.service.BidderService;
 import org.egov.council.service.CommitteeTypeService;
 import org.egov.council.service.CouncilAgendaService;
+import org.egov.council.service.CouncilAgendaTypeService;
 import org.egov.council.service.CouncilPreambleService;
 import org.egov.council.service.CouncilThirdPartyService;
 import org.egov.council.utils.constants.CouncilConstants;
@@ -104,7 +106,6 @@ import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.jfree.util.Log;
-import org.python.antlr.op.IsDerived;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -181,6 +182,8 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     protected CouncilAgendaService councilAgendaService;
     @Autowired
     private SecurityUtils securityUtils;
+    @Autowired
+    protected CouncilAgendaTypeService councilAgendaTypeService;
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
@@ -212,6 +215,11 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         return committeeTypeService.getActiveCommiteeType();
     }
 
+    @ModelAttribute("councilAgendaType")
+    public List<CouncilAgendaType> getCouncilAgendaTypeList() {
+        return councilAgendaTypeService.getActiveCouncilAgendaTypes();
+    }
+    
     @ModelAttribute("implementationStatus")
     public List<EgwStatus> getImplementationStatusList() {
         return egwStatusHibernateDAO.getStatusByModule(IMPLEMENTATIONSTATUS);
@@ -262,7 +270,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     	String editor="";
         if (request.getParameter(RICH_TEXT_EDITOR) != null)
         	editor = request.getParameter(RICH_TEXT_EDITOR);
-    	LOGGER.info("editor:"+request.getParameter("editor"));
+    	//LOGGER.info("editor:"+request.getParameter("editor"));
         councilPreamble.setGistOfPreamble(editor);
     	
         validatePreamble(councilPreamble, errors);
@@ -360,6 +368,7 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     	councilAgenda.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
 				AGENDA_MODULENAME, AGENDA_STATUS_INWORKFLOW));
     	councilAgenda.setCommitteeType(councilPreamble.getCommitteeType());
+    	councilAgenda.setCouncilAgendaType(councilPreamble.getCouncilAgendaType());
     	councilAgenda.setAgendaNumber(councilPreamble.getPreambleNumber());
     	Long itemNumber = Long.valueOf(1);
     	List<CouncilAgendaDetails> councilAgendaDetailsList = new ArrayList<CouncilAgendaDetails>();
@@ -385,11 +394,15 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
         updateDepartment(councilPreamble);
         try {
-        	//set committee type value
-        	councilPreamble.setCommitteeType(councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda().getCommitteeType());
+        	CouncilAgenda agenda = councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda();
+        	if(null != agenda) {
+	        	councilPreamble.setCommitteeType(agenda.getCommitteeType());
+	        	councilPreamble.setCouncilAgendaType(agenda.getCouncilAgendaType());
+        	}
         }catch(Exception e) {
         	Log.error("No agenda found with preambleid "+councilPreamble.getId());
         }
+        
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
         model.addAttribute(APPLICATION_HISTORY,
                 councilThirdPartyService.getHistory(councilPreamble));
@@ -586,8 +599,11 @@ public class CouncilPreambleController extends GenericWorkFlowController {
         }
         
         try {
-        	//set committee type value
-        	councilPreamble.setCommitteeType(councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda().getCommitteeType());
+        	CouncilAgenda agenda = councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda();
+        	if(null != agenda) {
+	        	councilPreamble.setCommitteeType(agenda.getCommitteeType());
+	        	councilPreamble.setCouncilAgendaType(agenda.getCouncilAgendaType());
+        	}
         }catch(Exception e) {
         	Log.error("No agenda found with preambleid "+councilPreamble.getId());
         }
@@ -624,6 +640,15 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     public String view(@PathVariable("id") final Long id, Model model) {
         CouncilPreamble councilPreamble = councilPreambleService.findOne(id);
         updateDepartment(councilPreamble);
+        try {
+        	CouncilAgenda agenda = councilAgendaService.findByPreambleId(councilPreamble.getId()).getAgenda();
+        	if(null != agenda) {
+	        	councilPreamble.setCommitteeType(agenda.getCommitteeType());
+	        	councilPreamble.setCouncilAgendaType(agenda.getCouncilAgendaType());
+        	}
+        }catch(Exception e) {
+        	Log.error("No agenda found with preambleid "+councilPreamble.getId());
+        }
         model.addAttribute(COUNCIL_PREAMBLE, councilPreamble);
         model.addAttribute(APPLICATION_HISTORY,
                 councilThirdPartyService.getHistory(councilPreamble));

@@ -155,16 +155,18 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
     @Transactional
     public CouncilMeeting update(final CouncilMeeting councilMeeting, Long approvalPosition, String approvalComment,
             String workFlowAction) {
-    	 if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
-    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
-                     workFlowAction);
     	
-    	 applyAuditing(councilMeeting);
-    	 for(MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
+    	for(MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
     		if(null != meetingMOM.getPreamble()) {
     			applyAuditing(meetingMOM.getPreamble());
     		}
     	 }
+    	
+    	if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
+    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
+                     workFlowAction);
+    	
+    	 applyAuditing(councilMeeting);
     	 applyAuditing(councilMeeting.getState());
     	 return councilMeetingRepository.save(councilMeeting);
     }

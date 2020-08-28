@@ -113,7 +113,7 @@ function callAjaxSearch() {
 							"data" : null, "target":-1,								
 							    sortable: false,
 							    "render": function ( data, type, full, meta ) {
-							          	return '<button type="button" class="btn btn-xs btn-secondary view"><span class="glyphicon glyphicon-tasks"></span>&nbsp;Send Sms</button>';
+							          	return '<button type="button" class="btn btn-xs btn-secondary view"><span class="glyphicon glyphicon-tasks"></span>&nbsp;Send Sms & Email</button>';
 							    }
 							},{ 
 							"data": "id", "visible":false }
@@ -146,7 +146,7 @@ $("#resultTable").on('click','tbody tr td  .view',function(event) {
 		   console.log('data', data);
 			    if(data.success === true)
 			    {
-			    	bootbox.alert('SMS And Email Sent Successfully To All Committee Members!!!!');
+			    	bootbox.alert('SMS And Email Sent Successfully!!!!');
 			    }
 			    else
 			    	{

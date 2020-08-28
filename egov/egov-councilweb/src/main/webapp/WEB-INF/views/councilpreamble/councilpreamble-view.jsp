@@ -101,16 +101,15 @@
 				</div>
 				<div class="row add-border">
 					<div class="col-xs-3 add-margin">
-						<spring:message code="lbl.gistofpreamble" />
+						<spring:message code="lbl.agendatype" />
 					</div>
-					<div class="col-sm-8 add-margin view-content">
-						${councilPreamble.gistOfPreamble}</div>
-				</div>
-				<div class="row add-border">
-					<div class="col-md-3 col-xs-6 add-margin">
+					<div class="col-sm-3 add-margin view-content">
+						${councilPreamble.councilAgendaType ne null ? councilPreamble.councilAgendaType.name:'N/A'}
+					</div>
+					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.upload" />
 					</div>
-					<div class="col-md-3 col-xs-12 add-margin down-file view-content"
+					<div class="col-sm-3 add-margin down-file"
 						id="links">
 						<c:choose>
 							<c:when test="${councilPreamble.filestoreid != null}">
@@ -125,6 +124,14 @@
 						</c:choose>
 					</div>
 				</div>
+				<div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.gistofpreamble" />
+					</div>
+					<div class="col-sm-8 add-margin">
+						${councilPreamble.gistOfPreamble}</div>
+				</div>
+				
 				<!-- <div class="row add-border">
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.ward" />
