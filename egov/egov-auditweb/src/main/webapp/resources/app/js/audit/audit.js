@@ -23,6 +23,14 @@ function openHistory(auditId,checkListId){
 function setWorkFLowAction(name)
 {
 	console.log(name);
+	if(name =='sectionOfficer' && (document.getElementById('auditStatus').value == 'Created' || document.getElementById('auditStatus').value == 'Pending with Auditor'))
+		{
+			if (document.getElementById('leadAuditorEmpNo').value == '-1')
+				{
+					bootbox.alert("Please select the RSA employee");
+					return false;
+				}
+		}
 	document.getElementById('workFlowAction').value=name;
 	
 }

@@ -28,6 +28,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<form:option value="Expense">Expense</form:option>
 						<form:option value="Works">Works</form:option>
 						<form:option value="Purchase">Purchase</form:option>
+						<form:option value="Receipt">Receipt</form:option>
 					</form:select>
 				</div>
 				
@@ -129,6 +130,9 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 			<br>
 			<br>
 			<c:if test="${auditDetail.postAuditResultList != null &&  !auditDetail.postAuditResultList.isEmpty()}">
+			<br>
+			<jsp:include page="billdocument-upload.jsp"/>
+			<br>
 				<div class="buttonbottom" align="center">
 		        	<input type="submit" id="save" class="btn btn-primary btn-wf-primary" name="save"  value="Submit"/>
 		        </div>

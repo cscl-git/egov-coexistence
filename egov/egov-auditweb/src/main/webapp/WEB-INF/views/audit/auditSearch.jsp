@@ -54,6 +54,14 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 							<form:options items="${auditDetail.departments}" itemValue="code" itemLabel="name" />
 						</form:select>
 				</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.auditor"  text="Auditor"/>
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:select path = "leadAuditorEmpNo" id="leadAuditorEmpNo" class="form-control">
+                     <form:option value = "-1" label = "Select Auditor"/>
+                     <form:options items = "${auditDetail.auditEmployees}" itemValue="empCode" itemLabel="empName" />
+                  </form:select>
+				</div>
     		</div>
     	</div>
     	

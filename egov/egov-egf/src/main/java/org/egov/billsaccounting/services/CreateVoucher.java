@@ -1576,7 +1576,16 @@ public class CreateVoucher {
 			String voucherType = headerdetails.get(VoucherConstant.VOUCHERTYPE).toString();
 			cVoucherHeader.setType(headerdetails.get(VoucherConstant.VOUCHERTYPE).toString());
 			String vNumGenMode = null;
-
+			if(headerdetails.containsKey("firstsignatory")
+					&& null != headerdetails.get("firstsignatory"))
+			{
+				cVoucherHeader.setFirstsignatory(headerdetails.get("firstsignatory").toString());
+			}
+			if(headerdetails.containsKey("secondsignatory")
+					&& null != headerdetails.get("secondsignatory"))
+			{
+				cVoucherHeader.setSecondsignatory(headerdetails.get("secondsignatory").toString());
+			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
 				vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");
