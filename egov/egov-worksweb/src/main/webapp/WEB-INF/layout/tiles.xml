@@ -278,6 +278,41 @@
         <put-attribute name="page-title" value="lbl.viewestimatephotograph" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatephotograph/searchEstimatePhotograph-form.jsp"/>
     </definition>
+    
+    <definition name="boqDetails" extends="base_layout">
+        <put-attribute name="page-title" value="title.boqDetails.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/boqDetails.jsp"/>
+    </definition>
+    
+    <definition name="tender-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.tenderDetails.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/tender/tenderDetails.jsp"/>
+    </definition>
+    
+    <definition name="bg-security-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.bg.security.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/bgSecurity/bgSecurityForm.jsp"/>
+    </definition>
+    
+    <definition name="search-work-estimate-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.work.estimate.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/workestimate/searchworkestimate.jsp"/>
+    </definition>
+    
+    <definition name="estimatepreparationapproval-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/preparationapproval.jsp"/>
+    </definition>
+    
+    <definition name="estimate-detail-search-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatesearch/searchestimate.jsp"/>
+    </definition>
+    
+    <definition name="work-order-search-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.work.order.search.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatesearch/workordersearch.jsp"/>
+    </definition>
 
 </tiles-definitions>
 

@@ -1,5 +1,5 @@
 ---------------Create new Role--------------------
-INSERT INTO eg_role(id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (nextval('seq_eg_role'), 'Works Creator', 'Works Creator', now(), 1, 1, now(), 0);
+--INSERT INTO eg_role(id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (nextval('seq_eg_role'), 'Works Creator', 'Works Creator', now(), 1, 1, now(), 0);
 INSERT INTO eg_role(id, name, description, createddate, createdby, lastmodifiedby, lastmodifieddate, version) VALUES (nextval('seq_eg_role'), 'Works Approver', 'Works Approver', now(), 1, 1, now(), 0);
 
 ---------------Map the Action urls to the role--------------------
