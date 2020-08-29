@@ -136,7 +136,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
-        model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
+        //model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
         return APNIMANDI_COLLECTION_DETAILS_NEW;
     }
@@ -167,7 +167,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
 	        model.addAttribute(MODE, MODE_CREATE);
 	        model.addAttribute(CURRENT_STATE, "NEW");
-	        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
+	        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
 	        return APNIMANDI_COLLECTION_DETAILS_NEW;
 	    }
@@ -352,7 +352,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
         prepareNewForm(model);
         model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
-        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
+        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_VIEW);
@@ -366,7 +366,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 	        model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
-	        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
+	        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
 	        model.addAttribute(MODE, MODE_VIEW);
@@ -565,8 +565,9 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		JsonArray departments = new JsonArray();
 		if(null != zoneid) {
 			ZoneMaster zone = zoneMasterService.findOne(zoneid);
-			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
-			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			//jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			//List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, null);
 			depts.forEach(dept -> {
 				JsonObject department = new JsonObject();
 				department.addProperty("code", dept.getCode());
@@ -587,7 +588,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		JsonArray sites = new JsonArray();
 		if(null != zoneid) {
 			ZoneMaster zone = zoneMasterService.findOne(zoneid);
-			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			//jsonObject.addProperty("additionalRule", zone.getRoadDivision());
 			List<SiteMaster> siteMasters =  siteMasterService.findByZone(zone);
 			siteMasters.forEach(siteMaster -> {
 				JsonObject site = new JsonObject();

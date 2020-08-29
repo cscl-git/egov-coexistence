@@ -180,7 +180,7 @@ function getDepartmentByZone(){
 				$.each(response.departments, function(index, value) {
 					$('#approvalDepartment').append($('<option>').text(value.name).attr('value', value.code));
 				});
-				$('#additionalRule').val(response.additionalRule);
+				//$('#additionalRule').val(response.additionalRule);
 			}, 
 			error: function (response) {
 				console.log("failed");

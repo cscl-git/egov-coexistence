@@ -125,7 +125,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
-        model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
+        //model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
         prepareWorkFlowOnLoad(model, apnimandiContractor);
         return APNIMANDI_CONTRACTOR_NEW;
     }
@@ -139,7 +139,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
-        model.addAttribute(ADDITIONALRULE, zone.getRoadDivision());
+        //model.addAttribute(ADDITIONALRULE, zone.getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiContractor);
         return APNIMANDI_CONTRACTOR_NEW;
     }
@@ -167,7 +167,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 	        model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
 	        model.addAttribute(MODE, MODE_CREATE);
 	        model.addAttribute(CURRENT_STATE, "NEW");   
-	        model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
+	        //model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiContractor);
 	        return APNIMANDI_CONTRACTOR_NEW;
 	    }
@@ -308,7 +308,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 		final ApnimandiContractor apnimandiContractor = contractorsService.findOne(id);
         prepareNewForm(model);
         model.addAttribute(CURRENT_STATE, apnimandiContractor.getState().getValue());
-        model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
+        //model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiContractor);
         model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
         model.addAttribute(MODE, MODE_VIEW);
@@ -322,7 +322,7 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 	        model.addAttribute(CURRENT_STATE, apnimandiContractor.getState().getValue());
-	        model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
+	        //model.addAttribute(ADDITIONALRULE, apnimandiContractor.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiContractor);
 	        model.addAttribute(APNIMANDI_CONTRACTOR, apnimandiContractor);
 	        model.addAttribute(MODE, MODE_VIEW);
@@ -486,8 +486,9 @@ public class ApnimandiContractorController extends GenericWorkFlowController{
 		JsonArray departments = new JsonArray();
 		if(null != zoneid) {
 			ZoneMaster zone = zoneMasterService.findOne(zoneid);
-			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
-			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			//jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			//List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, null);
 			depts.forEach(dept -> {
 				JsonObject department = new JsonObject();
 				department.addProperty("code", dept.getCode());
