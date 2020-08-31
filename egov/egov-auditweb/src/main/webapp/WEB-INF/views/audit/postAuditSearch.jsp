@@ -28,6 +28,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<form:option value="Expense">Expense</form:option>
 						<form:option value="Works">Works</form:option>
 						<form:option value="Purchase">Purchase</form:option>
+						<form:option value="Receipt">Receipt</form:option>
 					</form:select>
 				</div>
 				

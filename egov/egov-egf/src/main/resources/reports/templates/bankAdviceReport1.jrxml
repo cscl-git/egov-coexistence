@@ -287,7 +287,7 @@
 							</staticText>
 						</jr:columnHeader>
 						<jr:detailCell style="table_TD" height="43" rowSpan="1">
-							<textField isBlankWhenNull="true">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="85" height="43" isPrintWhenDetailOverflows="true" uuid="e22ce98f-126f-413d-92da-4d3934c43848"/>
 								<box>
 									<pen lineWidth="0.5"/>

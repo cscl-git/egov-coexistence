@@ -69,6 +69,7 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.entity.AuditPostBillMpng;
 import org.egov.audit.model.AuditBillDetails;
 import org.egov.audit.model.AuditDetail;
+import org.egov.audit.model.AuditEmployee;
 import org.egov.audit.model.PostAuditResult;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditService;
@@ -85,6 +86,7 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -95,6 +97,7 @@ import org.egov.model.bills.Miscbilldetail;
 import org.egov.pims.commons.Position;
 import org.egov.services.payment.MiscbilldetailService;
 import org.egov.utils.FinancialConstants;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -171,6 +174,9 @@ public class CreateAuditController extends GenericWorkFlowController {
     @Qualifier("miscbilldetailService")
     private MiscbilldetailService miscbilldetailService;
 
+	@Autowired
+	private MicroserviceUtils microserviceUtils;
+
 	
 	@RequestMapping(value = "/create/{auditId}", method = RequestMethod.GET)
 	public String showNewFormGet(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
@@ -178,9 +184,22 @@ public class CreateAuditController extends GenericWorkFlowController {
 		LOGGER.info("Test");
 		AuditCheckList checklistDetail = null;
 		List<AppConfigValues> appConfigValuesList =null;
+		
 		checkList=new ArrayList<AuditCheckList>();
 		List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
 		AuditBillDetails billDetails=null;
+		List<AppConfigValues> appConfigValuesEmpList =null;
+		AuditEmployee emp=null;
+		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
+		appConfigValuesEmpList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"audit_sec_officer");
+		for (AppConfigValues value : appConfigValuesEmpList) {
+		 emp=new AuditEmployee();
+		 emp.setEmpCode(Long.parseLong(value.getValue()));
+		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
+		 auditEmployees.add(emp);
+		 }
+		auditDetail.setAuditEmployees(auditEmployees);
 		AuditDetails auditDetails = auditService.getById(Long.parseLong(auditId));
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("auditDetails",Long.valueOf(auditId));
 		auditDetail.setDocumentDetail(documents);
@@ -225,8 +244,17 @@ public class CreateAuditController extends GenericWorkFlowController {
 		}
 		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Created") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Auditor") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Section Officer") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Examiner"))
 		{
+			if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
+			{
 				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
 						"checklist_" + bill.getEgBillregistermis().getEgBillSubType().getName());
+			}
+			else
+			{
+				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
+						"checklist_postAudit");
+				
+			}
 				for (AppConfigValues value : appConfigValuesList) {
 					checklistDetail = new AuditCheckList();
 					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
@@ -234,6 +262,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,value.getValue(),"ID"));
 						checklistDetail.setSeverity(getAuditCheckList(auditDetails,value.getValue(),"Sev"));
 						checklistDetail.setStatus(getAuditCheckList(auditDetails,value.getValue(),"Stat"));
+						checklistDetail.setChecklist_date(getAuditCheckListDate(auditDetails,value.getValue(),"Date"));
 					}
 					else
 					{
@@ -287,6 +316,22 @@ public class CreateAuditController extends GenericWorkFlowController {
 		return res;
 	}
 
+	private Date getAuditCheckListDate(AuditDetails auditDetails, String value,String type) {
+		Date res=null;
+		for(AuditCheckList row:auditDetails.getCheckList())
+		{
+			if(value.equalsIgnoreCase(row.getChecklist_description()))
+			{
+				if(type.equals("Date"))
+				{
+					res=row.getChecklist_date();
+				}
+				
+			}
+		}
+		return res;
+	}
+
 	@RequestMapping(value = "/create/save", method = RequestMethod.POST)
 	public String save(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
 			final BindingResult resultBinder, 
@@ -335,7 +380,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			AuditDetails savedAuditDetails=null;
 			auditDetails.setDocumentDetail(list);
 			try {
-				savedAuditDetails = auditService.create(auditDetails,workFlowAction,auditDetail.getApprovalComent());
+				savedAuditDetails = auditService.create(auditDetails,workFlowAction,auditDetail.getApprovalComent(),auditDetail.getLeadAuditorEmpNo());
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -359,19 +404,22 @@ public class CreateAuditController extends GenericWorkFlowController {
 			{
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
+					if(checkListDb.getStatus().equalsIgnoreCase("Pass")) {
+						continue;
+					}
 					checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
 					checkListDb.setUser_comments("N/A");
 					checkListDb.setStatus(checkListUI.getStatus());
-					checkListDb.setSeverity(checkListUI.getSeverity());
+					checkListDb.setChecklist_date(checkListUI.getChecklist_date());
 					applyAuditing(checkListDb);
 					checkListHistoryList=new ArrayList<AuditChecklistHistory>();
 					checkListHistory=new AuditChecklistHistory();
 					checkListHistory.setAuditCheckList(checkListDb);
 					checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
+					checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
 					checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
 					checkListHistory.setUser_comments("N/A");
 					checkListHistory.setStatus(checkListUI.getStatus());
-					checkListHistory.setSeverity(checkListUI.getSeverity());
 					checkListHistory.setAuditDetails(auditDetails);
 					applyAuditing(checkListHistory);
 					checkListHistoryList.add(checkListHistory);
@@ -391,15 +439,22 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			for(AuditCheckList checkListUI : auditDetail.getCheckList())
 			{
+				
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
+					if(checkListDb.getStatus().equalsIgnoreCase("Pass"))
+					{
+						continue;
+					}
 					checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
 					checkListDb.setStatus(checkListUI.getStatus());
-					checkListDb.setSeverity(checkListUI.getSeverity());
+					//checkListDb.setSeverity(checkListUI.getSeverity());
+					checkListDb.setChecklist_date(checkListUI.getChecklist_date());
 					applyAuditing(checkListDb);
 					checkListHistoryList=new ArrayList<AuditChecklistHistory>();
 					checkListHistory=new AuditChecklistHistory();
 					checkListHistory.setAuditCheckList(checkListDb);
+					checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
 					checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
 					checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
 					checkListHistory.setStatus(checkListUI.getStatus());
@@ -423,6 +478,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 			{
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
+					if(checkListDb.getStatus().equalsIgnoreCase("Pass"))
+					{
+						continue;
+					}
 					checkListDb.setUser_comments(checkListUI.getUser_comments());
 					applyAuditing(checkListDb);
 					for(AuditChecklistHistory history : checkListDb.getCheckList_history())
@@ -452,6 +511,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			checkListHistoryList=new ArrayList<AuditChecklistHistory>();
 			checkListHistory=new AuditChecklistHistory();
 			checkListHistory.setAuditCheckList(row);
+			checkListHistory.setChecklist_date(row.getChecklist_date());
 			checkListHistory.setChecklist_description(row.getChecklist_description());
 			checkListHistory.setUser_comments(row.getUser_comments());
 			checkListHistory.setAuditor_comments(row.getAuditor_comments());
@@ -623,6 +683,18 @@ public class CreateAuditController extends GenericWorkFlowController {
 			final HttpServletRequest request) throws IOException {
 		LOGGER.info("Search");
 		final StringBuffer query = new StringBuffer(500);
+		List<Object[]> list= null;
+		List<Object[]> list1= null;
+		if(auditDetail.getExpenditureType().equalsIgnoreCase("Receipt"))
+		{
+			query
+	        .append(
+	                "select v.id,v.type,v.voucherNumber,v.voucherDate from CVoucherHeader v  where v.type =? and v.postAuditProcessing is null ")
+	        		.append(auditUtils
+                            .getReceiptDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo())).append(" and v.fundId.id ="+auditDetail.getFund());
+		}
+		else
+		{
         query
         .append(
                 "select br.expendituretype , br.billtype ,br.billnumber , br.billdate , br.billamount , br.passedamount ,egwstatus.description,billmis.sourcePath,")
@@ -633,13 +705,30 @@ public class CreateAuditController extends GenericWorkFlowController {
                         		auditUtils
                                 .getBillDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
                                 .append(auditUtils.getBillMisQuery(auditDetail));
+		}
+        
         LOGGER.info("Query :: "+query.toString());
-        final List<Object[]> list = persistenceService.findAllBy(query.toString(),
+        
+          list = persistenceService.findAllBy(query.toString(),
         		auditDetail.getExpenditureType());
         PostAuditResult result = null;
         if (list.size() != 0) {
+        	resultSearchList.clear();
         	resultSearchList = new ArrayList<PostAuditResult>();
-
+        	if(auditDetail.getExpenditureType().equalsIgnoreCase("Receipt"))
+        	{
+        		for (final Object[] object : list) {
+        			result = new PostAuditResult();
+        			result.setExpendituretype(object[1].toString());
+        			result.setBillnumber(object[2].toString());
+        			result.setBilldate(object[3].toString());
+        			result.setSourcepath("/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+object[0].toString());
+        			result.setBillamount(getReceiptAmount(object[0].toString()));
+        			resultSearchList.add(result);
+        		}
+        	}
+        	else
+        	{
             for (final Object[] object : list) {
             	result = new PostAuditResult();
             	result.setExpendituretype(object[0].toString());
@@ -659,6 +748,8 @@ public class CreateAuditController extends GenericWorkFlowController {
                 resultSearchList.add(result);
             }
         }
+            
+        }
         auditDetail.setPostAuditResultList(resultSearchList);
 		model.addAttribute("fundList",populateFundList());
 		model.addAttribute("auditDetail", auditDetail);
@@ -666,17 +757,49 @@ public class CreateAuditController extends GenericWorkFlowController {
 		
 	}
 	
+	private String getReceiptAmount(String vhId) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String amt="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select voucherheaderid,debitamount from generalledger g where g.voucherheaderid =:voucherHeaderId and g.debitamount <> 0");
+    	    query.setLong("voucherHeaderId", Long.parseLong(vhId));
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		amt= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return amt;
+	}
+
+
 	@RequestMapping(value = "/post/search",params="save",method = RequestMethod.POST)
-	public String save(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+	public String save1(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
 			final BindingResult resultBinder, 
-			final HttpServletRequest request) throws IOException {
+			final HttpServletRequest request,@RequestParam("file") MultipartFile[] files) throws IOException {
 		LOGGER.info("Save");
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		auditDetail.setDocumentDetail(list);
 		populateauditWorkFlow(auditDetail);
 		final String message = getMessageByStatus("post-audit-initiate",null);
 		model.addAttribute("message", message);
 
 		return "audit-success";
-		
 	}
 	
 	private void populateauditWorkFlow(AuditDetail auditDetail) {
@@ -686,6 +809,7 @@ public class CreateAuditController extends GenericWorkFlowController {
     	AuditPostBillMpng postBillMpng=null;
     	EgBillregister bill = null;
     	String deptCode= "";
+    	
     	for(PostAuditResult result : auditDetail.getPostAuditResultList())
     	{
     		if(result.getChecked())
@@ -727,8 +851,17 @@ public class CreateAuditController extends GenericWorkFlowController {
         .withCreatedBy(user.getId())
         .withtLastModifiedBy(user.getId());
     	 applyAuditing(audit);
-    	 auditRepository.save(audit);
-    	 
+    	 AuditDetails savedAuditDetails =auditRepository.save(audit);
+    	 List<DocumentUpload> files = auditDetail.getDocumentDetail() == null ? null
+ 				: auditDetail.getDocumentDetail();
+ 		final List<DocumentUpload> documentDetails;
+ 		documentDetails = auditUtils.getDocumentDetails(files, savedAuditDetails,
+				AuditConstants.FILESTORE_MODULEOBJECT);
+ 		if (!documentDetails.isEmpty()) {
+			savedAuditDetails.setDocumentDetail(documentDetails);
+			persistDocuments(documentDetails);
+		}
+ 		auditRepository.save(savedAuditDetails);
     	 for(AuditPostBillMpng row:postBillMpngList)
     	 {
     		 bill = expenseBillService.getById(row.getEgBillregister().getId());
@@ -745,6 +878,18 @@ public class CreateAuditController extends GenericWorkFlowController {
 			HttpServletRequest request) {
 		LOGGER.info("Audit Search");
 		auditDetail.setDepartments(this.getDepartmentsFromMs());
+		List<AppConfigValues> appConfigValuesEmpList =null;
+		AuditEmployee emp=null;
+		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
+		appConfigValuesEmpList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
+				"audit_auditor");
+		for (AppConfigValues value : appConfigValuesEmpList) {
+		 emp=new AuditEmployee();
+		 emp.setEmpCode(Long.parseLong(value.getValue()));
+		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
+		 auditEmployees.add(emp);
+		 }
+		auditDetail.setAuditEmployees(auditEmployees);
 		model.addAttribute("auditDetail", auditDetail);
 		return "auditSearch";
 	}
@@ -755,6 +900,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			final HttpServletRequest request) throws IOException {
 		LOGGER.info("Search");
 		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
         query
         .append(
                 "select ad.id,ad.auditno,ad.type,ad.audit_sch_date,ad.status.description from AuditDetails ad where ad.type = ? ")
@@ -762,10 +908,11 @@ public class CreateAuditController extends GenericWorkFlowController {
                                 .getAuditDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
                                 .append(auditUtils.getAuditMisQuery(auditDetail));
         LOGGER.info("Query :: "+query.toString());
-        final List<Object[]> list = persistenceService.findAllBy(query.toString(),
+          list = persistenceService.findAllBy(query.toString(),
         		auditDetail.getAuditType());
         AuditDetails result = null;
         if (list.size() != 0) {
+        	resultsDtlsList.clear();
         	resultsDtlsList = new ArrayList<AuditDetails>();
 
             for (final Object[] object : list) {
@@ -773,12 +920,32 @@ public class CreateAuditController extends GenericWorkFlowController {
             	result.setId(Long.parseLong(object[0].toString()));
             	result.setAuditno(object[1].toString());
             	result.setType(object[2].toString());
-            	result.setSchdDate(object[3].toString());
+            	if(object[3] != null)
+            	{
+            		result.setSchdDate(object[3].toString());
+            	}
+            	else
+            	{
+            		result.setSchdDate(null);
+            	}
             	result.setStatusDescription(object[4].toString());
             	resultsDtlsList.add(result);
             }
         }
         auditDetail.setAuditSearchList(resultsDtlsList);
+        auditDetail.setDepartments(this.getDepartmentsFromMs());
+		List<AppConfigValues> appConfigValuesEmpList =null;
+		AuditEmployee emp=null;
+		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
+		appConfigValuesEmpList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
+				"audit_auditor");
+		for (AppConfigValues value : appConfigValuesEmpList) {
+		 emp=new AuditEmployee();
+		 emp.setEmpCode(Long.parseLong(value.getValue()));
+		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
+		 auditEmployees.add(emp);
+		 }
+		auditDetail.setAuditEmployees(auditEmployees);
 		model.addAttribute("fundList",populateFundList());
 		model.addAttribute("auditDetail", auditDetail);
 		return "auditSearch";
@@ -788,7 +955,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	@RequestMapping(value = "/view/{auditId}", method = RequestMethod.GET)
 	public String view(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
 			HttpServletRequest request, @PathVariable final String auditId) {
-		LOGGER.info("Test");
+		LOGGER.info("View");
 		AuditCheckList checklistDetail = null;
 		List<AppConfigValues> appConfigValuesList =null;
 		checkList=new ArrayList<AuditCheckList>();
@@ -839,8 +1006,17 @@ public class CreateAuditController extends GenericWorkFlowController {
 		}
 		if(mode.equals("view"))
 		{
+			if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
+			{
 				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
 						"checklist_" + bill.getEgBillregistermis().getEgBillSubType().getName());
+			}
+			else
+			{
+				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
+						"checklist_postAudit");
+			}
+				
 				for (AppConfigValues value : appConfigValuesList) {
 					checklistDetail = new AuditCheckList();
 					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
@@ -866,6 +1042,15 @@ public class CreateAuditController extends GenericWorkFlowController {
 		return "create";
 	}
 
+	public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+		if (documentDetailsList != null && !documentDetailsList.isEmpty())
+			for (final DocumentUpload doc : documentDetailsList)
+				documentUploadRepository.save(doc);
+	}
 	
+	public String getEmployeeName(Long empId){
+	
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 
 }

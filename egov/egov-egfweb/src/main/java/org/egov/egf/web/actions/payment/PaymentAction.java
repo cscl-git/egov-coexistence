@@ -70,6 +70,8 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.billsaccounting.services.CreateVoucher;
+import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.Bankbranch;
 import org.egov.commons.CFunction;
@@ -185,6 +187,8 @@ public class PaymentAction extends BasePaymentAction {
     private List<PaymentBean> contingentList = null;
     private List<PaymentBean> salaryList = new ArrayList<PaymentBean>();
     private List<PaymentBean> pensionList = new ArrayList<PaymentBean>();
+    private List<HashMap<String, Object>> accountcodedetails = null;
+    private List<HashMap<String, Object>> subledgerdetails = null;
     private List<InstrumentHeader> instrumentHeaderList;
     private List<Paymentheader> paymentheaderList;
     private EgBillregister billregister;
@@ -1106,11 +1110,62 @@ public class PaymentAction extends BasePaymentAction {
     @Action(value = "/payment/payment-sendForApproval")
     public String sendForApproval() {
         if (LOGGER.isDebugEnabled())
+        	
             LOGGER.debug("Starting sendForApproval...");
+        try {
         if (paymentheader.getId() == null)
             paymentheader = getPayment();
         // this is to check if is not the create mode
+      
+     //   miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
+        
+        billList = paymentService.getMiscBillList(paymentheader);
+        
+        billregister = (EgBillregister) persistenceService.find(" from EgBillregister where id=?",
+                billList.get(0).getBillId());
+        cFunctionobj = (CFunction) persistenceService.find("from CFunction where id=?",
+                Long.valueOf(parameters.get("function")[0]));
+        Map<Long,BigDecimal> idToAmntMap = new HashMap<>();
         populateWorkflowBean();
+      
+       /* final String vdate = parameters.get("voucherdate")[0];
+        final Date paymentVoucherDate = DateUtils.parseDate(vdate, "dd/MM/yyyy");
+      
+        validateBillVoucherDate(billList, paymentVoucherDate);*/
+         paymentActionHelper.setbillRegisterFunction(billregister, cFunctionobj);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("StartingupdatePayment...");
+        populateWorkflowBean();
+        if (parameters.get("department") != null)
+            billregister.getEgBillregistermis().setDepartmentcode(parameters.get("department")[0]);
+        if (parameters.get("function") != null)
+            billregister.getEgBillregistermis()
+                    .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
+        /*final HashMap<String, Object> accdetailsMap = new HashMap<String, Object>();
+        accountcodedetails = new ArrayList<HashMap<String, Object>>();*/
+        final Bankaccount ba = (Bankaccount) persistenceService.find(" from Bankaccount where id = ? ",
+                Long.valueOf(parameters.get("bankaccount")[0]));
+        /*accdetailsMap.put(VoucherConstant.GLCODE, ba.getChartofaccounts().getGlcode());
+        accdetailsMap.put(VoucherConstant.NARRATION, ba.getChartofaccounts().getName());
+        accdetailsMap.put(VoucherConstant.DEBITAMOUNT, 0);
+        accdetailsMap.put(VoucherConstant.CREDITAMOUNT, parameters.get("grandTotal")[0]);
+        accountcodedetails.add(accdetailsMap);   */
+      
+        
+        voucherHeader = paymentheader.getVoucherheader();
+             
+        voucherHeader.setVoucherDate(formatter.parse(parameters.get(VoucherConstant.VOUCHERDATE)[0]));
+        voucherHeader.setDescription(parameters.get(VoucherConstant.DESCRIPTION)[0]);
+        voucherHeader.getVouchermis().setDepartmentcode(billregister.getEgBillregistermis().getDepartmentcode() );
+        voucherHeader.setDepartmentName(getMasterName("department"));
+        voucherHeader.getVouchermis().setDepartmentName(getMasterName("department"));
+        voucherHeader.getVouchermis().setFunction(billregister.getEgBillregistermis().getFunction());       
+        voucherHeader.setVouchermis(voucherHeader.getVouchermis());
+        paymentheader.setVoucherheader(voucherHeader);
+        paymentheader.setBankaccount(ba);
+        paymentheader.setPaymentAmount(new BigDecimal(parameters.get("grandTotal")[0]));
+        
+        
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
         paymentActionHelper.getPaymentBills(paymentheader);
         EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(paymentheader.getState().getOwnerPosition());
@@ -1132,7 +1187,35 @@ public class PaymentAction extends BasePaymentAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed sendForApproval.");
         populateDepartmentName();
+        if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
+        {
+        	 final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
+                     paymentheader.getVoucherheader().getFundId().getId());
+             addDropdownData("bankbranchList",
+                     persistenceService.findAllBy(
+                             "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                             fund));
+             bankBranchList=persistenceService.findAllBy(
+                     "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                     fund);
+        }
+         if (paymentheader.getBankaccount().getBankbranch().getId() != null
+                 && (!paymentheader.getBankaccount().getBankbranch().getId().equals("-1"))) {
+             addDropdownData("bankaccountList",
+                     persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                             Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId())));
+             bankaccountList =  persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                     Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId()));
+         }
+    
+         getBankBalance(String.valueOf(paymentheader.getBankaccount().getId()),formatter.format(paymentheader.getVoucherheader().getVoucherDate()), null, null, null);
+		
         setMode("view");
+        }
+        catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
         return VIEW;
     }
 
@@ -1148,12 +1231,14 @@ public class PaymentAction extends BasePaymentAction {
     public String view() {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting view...");
+        try {
         paymentheader = getPayment();
         /*
          * if (paymentheader.getState().getValue() != null && !paymentheader.getState().getValue().isEmpty() &&
          * paymentheader.getState().getValue().contains("Rejected")) { if (LOGGER.isDebugEnabled()) LOGGER.debug("Completed view."
          * ); return modify(); }
          */
+        
         miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
         getChequeInfo(paymentheader);
         if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("view"))
@@ -1167,12 +1252,46 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed view.");
         if(paymentheader.getVoucherheader().getVoucherDate()!=null) {
             Date voucherDate=paymentheader.getVoucherheader().getVoucherDate();
+
            if( chartOfAccounts.isClosedForPosting(sdf.format(voucherDate))){
                finanicalYearAndClosedPeriodCheckIsClosed=true;
            }
                    
             
         }
+         if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
+        {
+        	 final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
+                     paymentheader.getVoucherheader().getFundId().getId());
+             addDropdownData("bankbranchList",
+                     persistenceService.findAllBy(
+                             "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                             fund));
+             bankBranchList=persistenceService.findAllBy(
+                     "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                     fund);
+        }
+         if (paymentheader.getBankaccount().getBankbranch().getId() != null
+                 && (!paymentheader.getBankaccount().getBankbranch().getId().equals("-1"))) {
+             addDropdownData("bankaccountList",
+                     persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                             Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId())));
+             bankaccountList =  persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                     Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId()));
+         }
+         System.out.println("print bank id::"+paymentheader.getBankaccount().getBankbranch().getId());
+         System.out.println("print bank acc id::"+paymentheader.getBankaccount().getId())  ;  
+        
+		getBankBalance(String.valueOf(paymentheader.getBankaccount().getId()),formatter.format(paymentheader.getVoucherheader().getVoucherDate()), null, null, null);
+         /*balance = paymentService.getAccountBalance(paymentheader.getBankaccount().getId().toString(),
+        		 formatter.format(paymentheader.getVoucherheader().getVoucherDate()), paymentheader.getPaymentAmount(), paymentheader.getId(),
+                 paymentheader.getBankaccount().getChartofaccounts().getId());*/
+			System.out.println("print bank acc balance::"+balance)  ;	
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        
         return VIEW;
     }
 
@@ -1742,11 +1861,14 @@ public class PaymentAction extends BasePaymentAction {
 
     private void validateBillVoucherDate(List<PaymentBean> paymentList, Date paymentVoucherDate) {
         for (PaymentBean paymentBean : paymentList) {
+        	if(paymentBean.getBillVoucherDate()!=null)
+        	{
             if (paymentBean.getBillVoucherDate().after(paymentVoucherDate)) {
                 throw new ValidationException("voucherDate", getMessage("payment.voucherdate.validation",
                         new String[] { DateUtils.getDefaultFormattedDate(paymentVoucherDate) }));
             }
         }
+    }
     }
     
     public String getMasterName(String name){

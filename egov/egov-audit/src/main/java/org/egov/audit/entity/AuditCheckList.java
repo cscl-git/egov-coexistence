@@ -1,6 +1,7 @@
 package org.egov.audit.entity;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
@@ -44,6 +45,8 @@ public class AuditCheckList extends AbstractAuditable implements java.io.Seriali
     private String status;
     
     private String severity;
+    
+    private Date checklist_date;
     
     @ManyToOne
     @JoinColumn(name = "audit_id")
@@ -131,6 +134,14 @@ public class AuditCheckList extends AbstractAuditable implements java.io.Seriali
 
 	public void setCheckListId(String checkListId) {
 		this.checkListId = checkListId;
+	}
+
+	public Date getChecklist_date() {
+		return checklist_date;
+	}
+
+	public void setChecklist_date(Date checklist_date) {
+		this.checklist_date = checklist_date;
 	}
 
 }

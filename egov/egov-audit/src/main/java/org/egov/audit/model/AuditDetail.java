@@ -41,7 +41,7 @@ public class AuditDetail {
     private List<AuditDetails> auditSearchList= new ArrayList<AuditDetails>();
     private String department="";
     private List<Department> departments = new ArrayList<Department>();
-	
+    private List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
 	private String notes;
 	public Date getAuditScheduledDate() {
 		return auditScheduledDate;
@@ -210,6 +210,12 @@ public class AuditDetail {
 	}
 	public void setDepartments(List<Department> departments) {
 		this.departments = departments;
+	}
+	public List<AuditEmployee> getAuditEmployees() {
+		return auditEmployees;
+	}
+	public void setAuditEmployees(List<AuditEmployee> auditEmployees) {
+		this.auditEmployees = auditEmployees;
 	}
 	
 

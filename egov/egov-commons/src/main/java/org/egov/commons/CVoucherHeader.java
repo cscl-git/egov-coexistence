@@ -152,7 +152,16 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     
     private String firstsignatory;
     private String secondsignatory;
-    public CVoucherHeader() {
+    private String postauditprocessing;
+    public String getPostauditprocessing() {
+		return postauditprocessing;
+	}
+
+	public void setPostauditprocessing(String postauditprocessing) {
+		this.postauditprocessing = postauditprocessing;
+	}
+
+	public CVoucherHeader() {
         // TODO Auto-generated constructor stub
     }
 

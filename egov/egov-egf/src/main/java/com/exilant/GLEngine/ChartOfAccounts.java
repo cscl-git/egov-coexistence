@@ -317,8 +317,8 @@ public class ChartOfAccounts {
 		if (Double.parseDouble(txn.getDrAmount()) > 0 && Double.parseDouble(txn.getCrAmount()) > 0)
 			throw new TaskFailedException("Both Debit and Credit cannot be greater than Zero.");
 		// return false;
-		if (!isRequiredPresent(txn, glAcc))
-			return false;
+		//if (!isRequiredPresent(txn, glAcc))
+			//return false;
 		return true;
 	}
 

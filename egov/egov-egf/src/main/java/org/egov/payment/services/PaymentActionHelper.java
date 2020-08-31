@@ -159,10 +159,12 @@ public class PaymentActionHelper {
     @Transactional
     public Paymentheader createDirectBankPayment(Paymentheader paymentheader, CVoucherHeader voucherHeader,
             CVoucherHeader billVhId, CommonBean commonBean,
-            List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist, WorkflowBean workflowBean)
+            List<VoucherDetails> billDetailslist, List<VoucherDetails> subLedgerlist, WorkflowBean workflowBean,String firstsignatory,String secondsignatory)
     {
         try {
         	System.out.println("Part 1");
+        	voucherHeader.setFirstsignatory(firstsignatory);
+        	voucherHeader.setSecondsignatory(secondsignatory);
             voucherHeader = createVoucherAndledger(voucherHeader, commonBean, billDetailslist, subLedgerlist);
             System.out.println("Part 2");
             paymentheader = paymentService.createPaymentHeader(voucherHeader,
@@ -601,7 +603,14 @@ public class PaymentActionHelper {
         headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
         headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
         headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
-
+        if(voucherHeader.getFirstsignatory() != null && !voucherHeader.getFirstsignatory().isEmpty() && !voucherHeader.getFirstsignatory().equalsIgnoreCase("-1"))
+        {
+        	headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+        }
+        if(voucherHeader.getSecondsignatory() != null && !voucherHeader.getSecondsignatory().isEmpty() && !voucherHeader.getSecondsignatory().equalsIgnoreCase("-1"))
+        {
+        	headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        }
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)

@@ -456,7 +456,7 @@ public class ExpenseBillService {
         if (null != egBillregister.getId())
 //            wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
         	wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
-        if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+      /*  if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
             stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
             egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
@@ -464,7 +464,7 @@ public class ExpenseBillService {
                     .withOwner(wfInitiator.getPosition())
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-        } else {
+        } else {*/
 //            if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0)))
 //                wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
@@ -573,6 +573,17 @@ public class ExpenseBillService {
                 	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
             		
             	}
+				
+				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+		        }
+				else
+				{
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
@@ -580,6 +591,7 @@ public class ExpenseBillService {
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
             }
         }
+        
         if (LOG.isDebugEnabled())
             LOG.debug(" WorkFlow Transition Completed  ...");
     }

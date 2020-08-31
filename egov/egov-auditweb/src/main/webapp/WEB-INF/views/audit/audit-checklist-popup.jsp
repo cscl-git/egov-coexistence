@@ -1,3 +1,4 @@
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
@@ -14,7 +15,7 @@
 			<thead>
 				<tr>
 					<th><spring:message code="lbl.checklist.status" text="Status"/></th>
-					<th><spring:message code="lbl.checklist.severity" text="Severity"/></th>
+					<th><spring:message code="lbl.checklist.date" text="Date"/></th>
 					<th><spring:message code="lbl.checklist.auditcomments" text="Auditor Comments"/></th>
 					<th><spring:message code="lbl.checklist.usercomments" text="Department Comments"/></th>
 				</tr>
@@ -27,7 +28,7 @@
 				${audit.status}
 			</td>
 			<td>
-				${audit.severity}
+				${audit.checklist_date}
 			</td>
 			<td>
 				${audit.auditor_comments}

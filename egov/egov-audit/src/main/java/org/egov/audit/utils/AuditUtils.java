@@ -154,6 +154,26 @@ public class AuditUtils {
 		}
 		return numDateQuery.toString();
 	}
+	
+	
+	public  String getReceiptDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" and v.voucherDate>='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateFrom))
+						.append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and v.voucherDate<='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateTo))
+						.append("'");
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing search instrument query");
+		}
+		return numDateQuery.toString();
+	}
 	public  String getAuditDateQuery(final Date billDateFrom, final Date billDateTo) {
 		final StringBuffer numDateQuery = new StringBuffer();
 		try {
@@ -207,6 +227,11 @@ public class AuditUtils {
 			{
 				misQuery.append(" and ad.department='")
 				.append(auditDetail.getDepartment()).append("'");
+			}
+			if(auditDetail.getLeadAuditorEmpNo() != null && auditDetail.getLeadAuditorEmpNo() != -1)
+			{
+				misQuery.append(" and ad.lead_auditor=")
+				.append(auditDetail.getLeadAuditorEmpNo());
 			}
 			
 		}

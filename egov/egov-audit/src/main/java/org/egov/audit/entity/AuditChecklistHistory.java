@@ -1,5 +1,7 @@
 package org.egov.audit.entity;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -33,6 +35,7 @@ public class AuditChecklistHistory extends AbstractAuditable implements java.io.
     
     private String auditor_comments;
     private String severity;
+    private Date checklist_date;
     
     private String status;
     @ManyToOne
@@ -107,6 +110,14 @@ public class AuditChecklistHistory extends AbstractAuditable implements java.io.
 	protected void setId(Long id) {
 		this.id=id;
 		
+	}
+
+	public Date getChecklist_date() {
+		return checklist_date;
+	}
+
+	public void setChecklist_date(Date checklist_date) {
+		this.checklist_date = checklist_date;
 	}
 
 }

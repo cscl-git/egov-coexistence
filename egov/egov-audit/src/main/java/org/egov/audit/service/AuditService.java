@@ -91,10 +91,10 @@ public class AuditService {
 	}
 
 	@Transactional
-	public AuditDetails create(final AuditDetails auditDetails , final String workFlowAction, String comment) {
+	public AuditDetails create(final AuditDetails auditDetails , final String workFlowAction, String comment, Long leadEmpNo) {
 
 
-		final AuditDetails savedAuditDetails = auditRepository.save(auditDetails);
+		 AuditDetails savedAuditDetails = auditRepository.save(auditDetails);
 		EgBillregister bill=null;
 
 		if(workFlowAction.equalsIgnoreCase("department"))
@@ -160,7 +160,7 @@ public class AuditService {
 		}
 		
 		
-		createAuditWorkflowTransition(savedAuditDetails, workFlowAction,comment);
+		createAuditWorkflowTransition(savedAuditDetails, workFlowAction,comment,leadEmpNo);
 		List<DocumentUpload> files = auditDetails.getDocumentDetail() == null ? null
 				: auditDetails.getDocumentDetail();
 		final List<DocumentUpload> documentDetails;
@@ -189,7 +189,7 @@ public class AuditService {
 				documentUploadRepository.save(doc);
 	}
 
-	public void createAuditWorkflowTransition(final AuditDetails auditDetails,final String workFlowAction, String comment) {
+	public void createAuditWorkflowTransition(final AuditDetails auditDetails,final String workFlowAction, String comment, Long leadEmpNo) {
 			LOGGER.info(" Create WorkFlow Transition Started  ...");
 		final User user = securityUtils.getCurrentUser();
 		final DateTime currentDate = new DateTime();
@@ -222,7 +222,11 @@ public class AuditService {
 			List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
 	                FinancialConstants.MODULE_NAME_APPCONFIG, AuditConstants.AUDIT_SECTION_OFFICER);
 	    	Position owenrPos = new Position();
-	    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+	    	if(leadEmpNo != null)
+	    	{
+	    		owenrPos.setId(leadEmpNo);
+	    	}
+	    	else if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
 	    	{
 	    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
 	    	}
