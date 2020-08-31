@@ -229,11 +229,15 @@ public class ExpenseBillService {
         if (isBillNumberGenerationAuto())
             egBillregister.setBillnumber(getNextBillNumber(egBillregister));
 
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
         try {
             checkBudgetAndGenerateBANumber(egBillregister);
         } catch (final ValidationException e) {
             throw new ValidationException(e.getErrors());
         }
+    	}
+      
 
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 
@@ -267,9 +271,12 @@ public class ExpenseBillService {
             savedEgBillregister.getEgBillregistermis().setSourcePath(
                     "/services/EGF/expensebill/view/" + savedEgBillregister.getId().toString());
 
+
         EgBillregister egbillReg = expenseBillRepository.save(savedEgBillregister);
         persistenceService.getSession().flush();
         finDashboardService.publishEvent(FinanceEventType.billCreateOrUpdate, egbillReg);
+
+       
         return egbillReg;
     }
 
@@ -446,6 +453,8 @@ public class ExpenseBillService {
                                                             final Long approvalPosition, final String approvalComent, final String additionalRule,
                                                             final String workFlowAction,final String approvalDesignation) {
             LOG.info(" Create WorkFlow Transition Started  ...");
+            
+            try {
         final User user = securityUtils.getCurrentUser();
         final DateTime currentDate = new DateTime();
         Assignment wfInitiator = null;
@@ -518,7 +527,7 @@ public class ExpenseBillService {
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
-                        .withNextAction(wfmatrix.getNextAction())
+                        .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
@@ -546,9 +555,18 @@ public class ExpenseBillService {
                         && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
                     stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
 
+                //changes for forward after >save as draft
+                	/*if(egBillregister.getCurrentState().getValue().equalsIgnoreCase("SaveAsDraft")) {
+                		wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
+                        null, additionalRule, currState, null);
+                	}
+                	else {*/
+                
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
+                	//}
+                
                 if (stateValue.isEmpty())
                 {
                 	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
@@ -581,6 +599,7 @@ public class ExpenseBillService {
                     .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
                     .withNextAction(wfmatrix.getNextAction())
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+		        
 		        }
 				else
 				{
@@ -594,6 +613,7 @@ public class ExpenseBillService {
         
         if (LOG.isDebugEnabled())
             LOG.debug(" WorkFlow Transition Completed  ...");
+            }    catch(Exception e) {e.printStackTrace();}
     }
 
     public Long getApprovalPositionByMatrixDesignation(final EgBillregister egBillregister,

@@ -1115,43 +1115,34 @@ public class PaymentAction extends BasePaymentAction {
         try {
         if (paymentheader.getId() == null)
             paymentheader = getPayment();
-        // this is to check if is not the create mode
-      
-     //   miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
         
+        LOGGER.info("StartingupdatePayment...before populate workflowbean");
+        populateWorkflowBean();
         billList = paymentService.getMiscBillList(paymentheader);
-        
+        LOGGER.info("populate billlist");
         billregister = (EgBillregister) persistenceService.find(" from EgBillregister where id=?",
                 billList.get(0).getBillId());
+        LOGGER.info("populate billregister");
         cFunctionobj = (CFunction) persistenceService.find("from CFunction where id=?",
                 Long.valueOf(parameters.get("function")[0]));
-        Map<Long,BigDecimal> idToAmntMap = new HashMap<>();
-        populateWorkflowBean();
+        LOGGER.info("populate cFunctionobj");
       
-       /* final String vdate = parameters.get("voucherdate")[0];
-        final Date paymentVoucherDate = DateUtils.parseDate(vdate, "dd/MM/yyyy");
-      
-        validateBillVoucherDate(billList, paymentVoucherDate);*/
          paymentActionHelper.setbillRegisterFunction(billregister, cFunctionobj);
+         LOGGER.info("setbillRegisterFunction");
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("StartingupdatePayment...");
-        populateWorkflowBean();
+     
         if (parameters.get("department") != null)
             billregister.getEgBillregistermis().setDepartmentcode(parameters.get("department")[0]);
         if (parameters.get("function") != null)
             billregister.getEgBillregistermis()
                     .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
-        /*final HashMap<String, Object> accdetailsMap = new HashMap<String, Object>();
-        accountcodedetails = new ArrayList<HashMap<String, Object>>();*/
+        LOGGER.info("setbillRegisterFunction with dept and function");
         final Bankaccount ba = (Bankaccount) persistenceService.find(" from Bankaccount where id = ? ",
                 Long.valueOf(parameters.get("bankaccount")[0]));
-        /*accdetailsMap.put(VoucherConstant.GLCODE, ba.getChartofaccounts().getGlcode());
-        accdetailsMap.put(VoucherConstant.NARRATION, ba.getChartofaccounts().getName());
-        accdetailsMap.put(VoucherConstant.DEBITAMOUNT, 0);
-        accdetailsMap.put(VoucherConstant.CREDITAMOUNT, parameters.get("grandTotal")[0]);
-        accountcodedetails.add(accdetailsMap);   */
-      
         
+        LOGGER.info("getting bank account");
+        LOGGER.info("before set form data::"+paymentheader.getPaymentAmount());
         voucherHeader = paymentheader.getVoucherheader();
              
         voucherHeader.setVoucherDate(formatter.parse(parameters.get(VoucherConstant.VOUCHERDATE)[0]));
@@ -1165,8 +1156,9 @@ public class PaymentAction extends BasePaymentAction {
         paymentheader.setBankaccount(ba);
         paymentheader.setPaymentAmount(new BigDecimal(parameters.get("grandTotal")[0]));
         
-        
+        LOGGER.info("start sendForApproval::"+paymentheader.getPaymentAmount());
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
+       LOGGER.info("end sendForApproval::"+paymentheader.getPaymentAmount());
         paymentActionHelper.getPaymentBills(paymentheader);
         EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(paymentheader.getState().getOwnerPosition());
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
@@ -1186,6 +1178,7 @@ public class PaymentAction extends BasePaymentAction {
         
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed sendForApproval.");
+        LOGGER.info("Completed sendForApproval.");
         populateDepartmentName();
         if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
         {
@@ -1199,6 +1192,7 @@ public class PaymentAction extends BasePaymentAction {
                      "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
                      fund);
         }
+        LOGGER.info("populate bankBranchList after sendForApproval.");
          if (paymentheader.getBankaccount().getBankbranch().getId() != null
                  && (!paymentheader.getBankaccount().getBankbranch().getId().equals("-1"))) {
              addDropdownData("bankaccountList",
@@ -1207,13 +1201,46 @@ public class PaymentAction extends BasePaymentAction {
              bankaccountList =  persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
                      Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId()));
          }
-    
+         LOGGER.info("populate bankaccountList after sendForApproval.");
          getBankBalance(String.valueOf(paymentheader.getBankaccount().getId()),formatter.format(paymentheader.getVoucherheader().getVoucherDate()), null, null, null);
-		
+         LOGGER.info("populate available balance after sendForApproval.");
+         LOGGER.info("Completed sendForApproval.");
         setMode("view");
         }
         catch(Exception e)
         {
+        	 LOGGER.info("Error in sendForApproval."+e.getMessage());
+        	if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
+            {
+            	 final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
+                         paymentheader.getVoucherheader().getFundId().getId());
+                 addDropdownData("bankbranchList",
+                         persistenceService.findAllBy(
+                                 "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                                 fund));
+                 bankBranchList=persistenceService.findAllBy(
+                         "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                         fund);
+            }
+            LOGGER.info("populate bankaccountList after getting error sendForApproval.");
+
+             if (paymentheader.getBankaccount().getBankbranch().getId() != null
+                     && (!paymentheader.getBankaccount().getBankbranch().getId().equals("-1"))) {
+                 addDropdownData("bankaccountList",
+                         persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                                 Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId())));
+                 bankaccountList =  persistenceService.findAllBy(" from Bankaccount where bankbranch.id=? and isactive=true ",
+                         Integer.valueOf(paymentheader.getBankaccount().getBankbranch().getId()));
+             }
+             LOGGER.info("populate bankaccountList after getting error sendForApproval.");
+             try {
+				getBankBalance(String.valueOf(paymentheader.getBankaccount().getId()),formatter.format(paymentheader.getVoucherheader().getVoucherDate()), null, null, null);
+				LOGGER.info("populate available balance after getting error sendForApproval.");
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+    		
         	e.printStackTrace();
         }
         return VIEW;

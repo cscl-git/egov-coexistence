@@ -178,7 +178,7 @@ $('.btn-wf-primary').click(function(){
 	           
 	            return false;
 	           }
-	        if(validate()){
+	        if(true){
 	             
 	            deleteHiddenSubledgerRow();
 	            //$('approvalDesignation').attr('required', false);
@@ -1373,6 +1373,9 @@ function validateWorkFlowApprover(name) {
 	        $('#approvalDesignation').removeAttr('required');
 	        $('#approvalPosition').removeAttr('required');
 	        $('#approvalComent').removeAttr('required');
+	     
+	        $('#narration').removeAttr('required');
+	          $('#billSubType').removeAttr('required');
 	    }
 	if (button != null && button == 'Cancel') {
 		$('#approvalDepartment').removeAttr('required');

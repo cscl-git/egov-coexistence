@@ -763,12 +763,7 @@ function openBudgetDtls()
 
 		return false;
 		}
-		if(document.getElementById('function').value=='-1')
-		{
-		bootbox.alert("<s:text name='msg.please.select.function'/>");
 
-		return false;
-		}
 
 
 		if(document.getElementById('voucherdate').value=='')

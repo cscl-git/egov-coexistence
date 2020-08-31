@@ -311,6 +311,11 @@ public class UpdateExpenseBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
+        
+        populateBillDetails(egBillregister);
+        validateBillNumber(egBillregister, resultBinder);
+        validateLedgerAndSubledger(egBillregister, resultBinder);
+        
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
             model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
