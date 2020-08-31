@@ -460,31 +460,7 @@ public class MicroserviceUtils {
         }
         return null;
     }
-    
-    public String getTaxHeadCode(String code) {
-        FilterRequest filterReq = new FilterRequest();
-        List<String> taxHeads=new ArrayList<String>();
-        String taxHead=null;
-        try {
-            if(!StringUtils.isEmpty(code) && code != null ){
-                filterReq.setGlcode(code);
-            }
-            JSONArray mdmObj = getFinanceMdmsByModuleNameAndMasterDetails("FinanceModule", "TaxHeadMasterGlCodeMapping", filterReq);
-            mdmObj.stream().forEach(obj ->{
-                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
-                taxHeads.add(lhm.get("taxhead").toString());
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(taxHeads != null && !taxHeads.isEmpty())
-        {
-        	taxHead=taxHeads.get(0);
-        }
-        
-        return taxHead;
-    }
-
+  
     public Department getDepartmentByCode(String departmentCode) {
 
         List<Department> deptlist = this.masterDataCache.get(ApplicationConstant.DEPARTMENT_CACHE_NAME);
