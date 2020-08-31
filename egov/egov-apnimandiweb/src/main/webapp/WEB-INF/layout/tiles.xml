@@ -96,5 +96,31 @@
     <definition name="apnimandicollection-receiptview" extends="base_layout">
         <put-attribute name="page-title" value="title.apnimandicollection.view" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/transactions/apnimandicollection-receiptview.jsp"/>
+    </definition>    
+    
+    <definition name="dm-collection-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.dm.collection.report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/mis/dm-collection-search.jsp"/>
     </definition>
+    
+    <definition name="am-collection-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.am.collection.report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/mis/am-collection-search.jsp"/>
+    </definition>
+    
+    <definition name="contractor-by-date-range" extends="base_layout">
+        <put-attribute name="page-title" value="title.dm.contractor.report.date" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/mis/contractor-by-date-range.jsp"/>
+    </definition>
+    
+    <definition name="contractor-by-zone" extends="base_layout">
+        <put-attribute name="page-title" value="title.dm.contractor.report.zone" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/mis/contractor-by-zone.jsp"/>
+    </definition>
+    
+    <definition name="estimated-income-report" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimated.income.report" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/mis/estimated-income-report.jsp"/>
+    </definition>
+    
 </tiles-definitions>

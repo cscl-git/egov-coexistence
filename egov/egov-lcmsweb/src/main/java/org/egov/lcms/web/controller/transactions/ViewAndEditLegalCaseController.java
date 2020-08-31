@@ -61,6 +61,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
+import org.egov.lcms.masters.service.ConcernedBranchMasterService;
 import org.egov.lcms.masters.service.CourtMasterService;
 import org.egov.lcms.masters.service.PetitionTypeMasterService;
 import org.egov.lcms.transactions.entity.LegalCase;
@@ -93,6 +94,9 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
 
     @Autowired
     private LegalCaseUtil legalCaseUtil;
+    
+    @Autowired
+    private ConcernedBranchMasterService concernedBranchMasterService;
 
     @ModelAttribute
     private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
@@ -123,6 +127,7 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
         legalCase.setFileNumber(legalCase.getLcNumber());
         model.addAttribute(LcmsConstants.MODE, "edit");
         model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, legalCase.getIsReappealOfCase());
+        model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
         return "legalcase-edit";
     }
 
@@ -149,6 +154,7 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
         if (errors.hasErrors()) {
         	model.addAttribute(LcmsConstants.MODE, "edit");
             model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, legalCase.getIsReappealOfCase());
+            model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
             return "legalcase-edit";
         }
         

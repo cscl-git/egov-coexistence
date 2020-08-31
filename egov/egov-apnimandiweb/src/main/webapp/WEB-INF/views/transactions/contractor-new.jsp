@@ -12,9 +12,9 @@
 	<%@ include file="contractor-form.jsp"%>
 	<%@ include file="contractor-documentdetails.jsp"%>		
 	<input type="hidden" name="apnimandiContractor" value="${apnimandiContractor.id}" />
-	<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
+	<jsp:include page="../workflow/dm-contractor-commonWorkflowMatrix.jsp" />
 	<div class="buttonbottom" align="center">
-		<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
+		<jsp:include page="../workflow/dm-contractor-commonWorkflowMatrix-button.jsp" />
 	</div>		
 </form:form>
 

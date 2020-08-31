@@ -39,6 +39,10 @@ function callAjaxSearch() {
 				"className" : "text-left"
 			},
 			{
+				"data" : "site",
+				"className" : "text-left"
+			},
+			{
 				"data" : "type",
 				"className" : "text-left"
 			},
@@ -81,13 +85,13 @@ function callAjaxSearch() {
 					}					
 				}
 			},
-			{"data" : "id","visible": false, "searchable": false},
+			{"data" : "id","visible": false, "searchable": false}
 		]
 	});
 }
 
 $("#resultTable").on('change', 'tbody tr td .dropchange', function() {
-	var id = drillDowntableContainer.fnGetData($(this).parent().parent(),8);
+	var id = drillDowntableContainer.fnGetData($(this).parent().parent(),9);
 	if (this.value == 1) {
 		window.open('/services/apnimandi/collection/view/' + id,'','width=800, height=600');
 	}

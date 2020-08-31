@@ -106,7 +106,7 @@
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" path="aadhaarNo" id="aadhaarNo" cssClass="form-control text-left patternvalidation"
-									data-pattern="number" maxlength="12" required="required"/>
+									data-pattern="number" maxlength="4" required="required"/>
 						<form:errors path="aadhaarNo" cssClass="error-msg" />
 					</div>
 				</div>

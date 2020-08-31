@@ -20,6 +20,14 @@
 			</div>
 			<div class="panel-body custom">
 				<div class="col-xs-3 add-margin">
+					<spring:message code="lbl.site" />
+				</div>
+				<div class="col-sm-3 add-margin view-content">
+					${apnimandiCollectionDetails.site.name}
+				</div>
+			</div>
+			<div class="panel-body custom">
+				<div class="col-xs-3 add-margin">
 					<spring:message code="lbl.collection.month" />
 				</div>
 				<div class="col-sm-3 add-margin view-content">

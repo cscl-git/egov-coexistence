@@ -61,8 +61,8 @@ $(document).ready(function() {
 		$("#employeeDetails").find("*").prop('disabled', false);
 	});
 	
-	getDepartments();
-	getDesignations();
+	//getDepartments();
+	//getDesignations();
 	
 	/*var assignPosition = new Bloodhound({
 		datumTokenizer : function(datum) {
@@ -98,7 +98,7 @@ $(document).ready(function() {
 	});
 	typeaheadWithEventsHandling(typeaheadobj, '#positionEmpId'); */
 	
-	$('#department').change(function(){
+	/*$('#department').change(function(){
 		var designation=$('#designation').val();
 		if(designation!=""){
 			var department=$(this).val();
@@ -124,7 +124,7 @@ $(document).ready(function() {
 		}else{
 			return false;
 		}
-	});
+	});*/
 	
 	$('#btnclose').click(function(){
 		bootbox.confirm({
@@ -186,12 +186,14 @@ $(document).ready(function() {
 });
 var count = $("#employeeDetails tbody  tr").length -1;
 function addEmployee(){     
-	if( $("#employee").val() !=''){
+	if( $("#employeeName").val() !=''){
 		var $tableBody = $('#employeeDetails').find("tbody"),
 	    $trLast = $tableBody.find("tr:last");
 	 	$trNew = $trLast.clone();
-		$trLast.find('input[type=text]').val($("#employee option:selected").text());
-		$trLast.find('input[type=hidden]').val($("#employee").val());
+		$trLast.find('input.empname').val($("#employeeName").val());
+		$trLast.find('input.deptname').val($("#department").val());
+		$trLast.find('input.desgname').val($("#designation").val());
+		$trLast.find('input.contno').val($("#contactno").val());
 		count++;
 		$trNew.find("input").each(function(){
 	        $(this).attr({
@@ -200,11 +202,16 @@ function addEmployee(){
 	        });
 	    });
 		$trLast.after($trNew);
-		$("#employee").val("") ;
+		$("#employeeName").val("");
+		$("#department").val("")
+		$("#designation").val("")
+		$("#contactno").val("")
+	}else{
+		alert('please enter employee name');
 	}
 }
 
-function getEmployees(){
+/*function getEmployees(){
 	var department=$('#department').val();
 	var designation=$('#designation').val();
 	$.ajax({
@@ -265,7 +272,7 @@ function getDesignations(){
 			console.log("failed");
 		}
 	});
-}
+}*/
 
 function edit(hearingId){    
 	var url = '/services/lcms/hearing/edit/'+hearingId

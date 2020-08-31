@@ -18,7 +18,8 @@ function getContractorList(zoneid, collectionMonth, collectionYear){
 				jQuery('#contractor').append($('<option>').text(obj.Text).attr('value', obj.Value));
 				count++;
 			});
-			if(count>0){
+			var collectionTypeText=$("#collectiontype option:selected").text();
+			if(collectionTypeText == 'Day Market'){
 				showContractorList();
 			}else{
 				hideContractorList();
@@ -27,7 +28,6 @@ function getContractorList(zoneid, collectionMonth, collectionYear){
 		error: function (response) {
 			jQuery('#contractor').html("");
 			jQuery('#contractor').append("<option value=''>Select</option>");
-			hideContractorList();
 		}
 	});	
 }
@@ -308,7 +308,32 @@ function getDepartmentByZone(){
 				$.each(response.departments, function(index, value) {
 					$('#approvalDepartment').append($('<option>').text(value.name).attr('value', value.code));
 				});
-				$('#additionalRule').val(response.additionalRule);
+				//$('#additionalRule').val(response.additionalRule);
+			}, 
+			error: function (response) {
+				console.log("failed");
+			}
+		});
+	}
+}
+
+function getSitesByZone(){
+	var zoneid=$('#zone').val();
+	if(zoneid!=""){
+		$.ajax({
+			url: "/services/apnimandi/collection/ajax/getSitesByZone",     
+			type: "GET",
+			data: {
+				zoneid : zoneid
+			},
+			dataType: "json",
+			success: function (response) {
+				console.log("success"+response);
+				$('#site').empty();
+				$('#site').append($("<option value=''>Select</option>"));
+				$.each(response.sites, function(index, value) {
+					$('#site').append($('<option>').text(value.name).attr('value', value.id));
+				});
 			}, 
 			error: function (response) {
 				console.log("failed");

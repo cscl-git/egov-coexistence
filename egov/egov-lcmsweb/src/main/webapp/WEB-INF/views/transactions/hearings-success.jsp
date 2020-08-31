@@ -77,11 +77,11 @@
 
 					</div>
 					<div class="row add-border">
-						<div class="col-xs-3 add-margin">
+						<%-- <div class="col-xs-3 add-margin">
 							<spring:message code="lbl.purposeofhearing" />
 						</div>
 						<div class="col-sm-3 add-margin view-content">
-							${hearings.purposeofHearings}</div>
+							${hearings.purposeofHearings}</div> --%>
 						<div class="col-xs-3 add-margin">
 							<spring:message code="lbl.outcomeofhearing" />
 						</div>
@@ -111,7 +111,10 @@
 				id="employeeDetails">
 				<thead>
 					<tr>
-						<th class="text-center">Department-Employee</th>
+						<th class="text-center"><spring:message code="lbl.employee" /></th>
+						<th class="text-center"><spring:message code="lbl.department" /></th>
+						<th class="text-center"><spring:message code="lbl.designation" /></th>
+						<th class="text-center"><spring:message code="lbl.contactnumber" /></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -120,6 +123,15 @@
 						<tr>
 							<td class="text-left">
 								<c:out value="${employeeHearingList.employeeName}"></c:out>
+							</td>
+							<td class="text-left">
+								<c:out value="${employeeHearingList.department}"></c:out>
+							</td>
+							<td class="text-left">
+								<c:out value="${employeeHearingList.designation}"></c:out>
+							</td>
+							<td class="text-left">
+								<c:out value="${employeeHearingList.contactno}"></c:out>
 							</td>
 						</tr>
 					</c:forEach>

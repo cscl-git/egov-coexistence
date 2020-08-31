@@ -62,8 +62,8 @@
 				<tr>
 					<th colspan="1" class="text-center"><spring:message
 							code="lbl.hearingdate" /></th>
-					<th colspan="1" class="text-center"><spring:message
-							code="lbl.purposeofhearing" /></th>
+					<!-- <th colspan="1" class="text-center"><spring:message
+							code="lbl.purposeofhearing" /></th> -->
 					<th align="center" colspan="1" class="text-center"><spring:message
 							code="lbl.outcomeofhearing" /></th>
 					<th align="center" colspan="1" class="text-center"><spring:message
@@ -85,11 +85,11 @@
 						</div>
 					</td>
 
-					<td colspan="1">
+					<%-- <td colspan="1">
 						<div align="center">
 							<c:out value="${hearings.purposeofHearings}" />
 						</div>
-					</td>
+					</td> --%>
 					<td colspan="1">
 						<div align="center">
 							<c:out value="${hearings.hearingOutcome}" />

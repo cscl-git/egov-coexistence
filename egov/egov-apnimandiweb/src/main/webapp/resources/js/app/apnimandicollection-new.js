@@ -17,6 +17,12 @@ $('#buttonSubmit').click(function(e) {
 });
 
 $('#collectiontype').change(function(){
+	var collectionTypeText=$("#collectiontype option:selected").text();
+	if(collectionTypeText == 'Day Market'){
+		showContractorList();
+	}else{
+		hideContractorList();
+	}
 	isCollectionForDayMarket();
 	getPaymentType();
 	resetAmountTables();
@@ -25,6 +31,7 @@ $('#collectiontype').change(function(){
 $('#zone').change(function(){
 	getContractorByZone();
 	getDepartmentByZone();
+	getSitesByZone();
 });
 
 $('#collectionForMonth').change(function(){
@@ -53,13 +60,11 @@ $('#serviceType').change(function(){
 });
 
 function showContractorList(){
-	$('#contractor').attr('required', 'required');
 	$('#dvApnimandiContractor').show();
 }
 
 function hideContractorList(){
 	$('#contractor').val('');
-	$('#contractor').removeAttr('required');
 	$('#dvApnimandiContractor').hide();
 }
 

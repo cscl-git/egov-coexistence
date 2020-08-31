@@ -932,6 +932,30 @@ public class MicroserviceUtils {
         TaxHeadMasterResponse response = restTemplate.postForObject(url, reqWrapper, TaxHeadMasterResponse.class);
         return response.getTaxHeadMasters();
     }
+    
+    public String getTaxHeadCode(String code) {
+        FilterRequest filterReq = new FilterRequest();
+        List<String> taxHeads=new ArrayList<String>();
+        String taxHead=null;
+        try {
+            if(!StringUtils.isEmpty(code) && code != null ){
+                filterReq.setCode(code);
+            }
+            JSONArray mdmObj = getFinanceMdmsByModuleNameAndMasterDetails("FinanceModule", "TaxHeadMasterGlCodeMapping", filterReq);
+            mdmObj.stream().forEach(obj ->{
+                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
+                taxHeads.add(lhm.get("taxhead").toString());
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(taxHeads != null && !taxHeads.isEmpty())
+        {
+        	taxHead=taxHeads.get(0);
+        }
+        
+        return taxHead;
+    }
 
     public List<GlCodeMaster> getGlcodeMastersByService(String service) {
 

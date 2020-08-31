@@ -16,15 +16,15 @@ import javax.persistence.PersistenceContext;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.egov.apnimandi.masters.entity.vo.AttachedDocument;
+import org.egov.apnimandi.reports.entity.ApnimandiCollectionMISReport;
 import org.egov.apnimandi.reports.entity.ApnimandiCollectionSearchResult;
+import org.egov.apnimandi.reports.entity.EstimatedIncomeReport;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionAmountDetails;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionDetails;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionDocument;
-import org.egov.apnimandi.transactions.repository.ApnimandiCollectionAmountDetailsRepository;
 import org.egov.apnimandi.transactions.repository.ApnimandiCollectionDetailsRepository;
 import org.egov.apnimandi.transactions.repository.ApnimandiCollectionDocumentRepository;
 import org.egov.apnimandi.transactions.service.workflow.ApnimandiCollectionWorkflowCustomImpl;
-import org.egov.apnimandi.utils.ApnimandiUtil;
 import org.egov.apnimandi.utils.constants.ApnimandiConstants;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -73,9 +73,6 @@ import org.egov.commons.entity.Source;
 public class ApnimandiCollectionDetailService extends PersistenceService<ApnimandiCollectionDetails, Long>{
 	@Autowired
     private FileStoreService fileStoreService;
-	
-	@Autowired
-    private ApnimandiUtil apnimandiUtil;
 	
 	@Autowired
     private ApnimandiCollectionWorkflowCustomImpl apnimandiCollectionWorkflowCustomImpl;
@@ -179,7 +176,8 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     	receiptHeader.setPaidBy(apnimandiCollectionDetails.getPayeeName());
     	receiptHeader.setPartPaymentAllowed(Boolean.FALSE);
     	if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-    		receiptHeader.setPayeeAddress(apnimandiCollectionDetails.getContractor().getAddress());
+    		if(null!=apnimandiCollectionDetails.getContractor())
+    			receiptHeader.setPayeeAddress(apnimandiCollectionDetails.getContractor().getAddress());
     	}else {
     		receiptHeader.setPayeeAddress("");
     	}    	
@@ -465,7 +463,9 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryStr.append(" and zoneMaster.id =:zoneid");
         queryStr.append(" and collectionObj.collectionForMonth =:collectionMonth");
         queryStr.append(" and collectionObj.collectionForYear =:collectionYear");
-        queryStr.append(" and conObj.id =:contid");
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryStr.append(" and conObj.id =:contid");
+        }
         queryStr.append(" and egwStatus.code <>:statuscode ");
         if(null!=apnimandiCollectionDetails.getId()) {
         	queryStr.append(" and collectionObj.id <>:id ");
@@ -475,7 +475,9 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryResult.setInteger("collectionMonth", apnimandiCollectionDetails.getCollectionForMonth());
         queryResult.setInteger("collectionYear", apnimandiCollectionDetails.getCollectionForYear());
         queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_DELETED);
-        queryResult.setLong("contid", apnimandiCollectionDetails.getContractor().getId());
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryResult.setLong("contid", apnimandiCollectionDetails.getContractor().getId());
+        }
         if(null!=apnimandiCollectionDetails.getId()) {
         	queryResult.setLong("id", apnimandiCollectionDetails.getId());
         }
@@ -486,9 +488,9 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     
     public List<ApnimandiCollectionSearchResult> search(final ApnimandiCollectionDetails apnimandiCollectionDetails) {
         final StringBuilder queryStr = new StringBuilder();
-        queryStr.append("select distinct collectionObj as apnimandiCollections, zoneMaster.name as zoneName, egwStatus.description as statusName");
-        queryStr.append(" from ApnimandiCollectionDetails collectionObj,EgwStatus egwStatus,ZoneMaster zoneMaster, ApnimandiCollectionType collType");
-        queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.collectiontype.id=collType.id");
+        queryStr.append("select distinct collectionObj as apnimandiCollections, zoneMaster.name as zoneName, siteMaster.name as siteName, egwStatus.description as statusName");
+        queryStr.append(" from ApnimandiCollectionDetails collectionObj,EgwStatus egwStatus,ZoneMaster zoneMaster, SiteMaster siteMaster, ApnimandiCollectionType collType");
+        queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.site.id=siteMaster.id and collectionObj.collectiontype.id=collType.id");
         getAppendQuery(apnimandiCollectionDetails, queryStr);
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
         queryResult = setParametersToQuery(apnimandiCollectionDetails, queryResult);
@@ -538,12 +540,16 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
         queryStr.append("select distinct collectionObj as apnimandiCollections, zoneMaster.name as zoneName, egwStatus.description as statusName");
         queryStr.append(" from ApnimandiCollectionDetails collectionObj,EgwStatus egwStatus,ZoneMaster zoneMaster,ApnimandiContractor apnimandiContractor");
         queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.contractor.id=apnimandiContractor.id");
-        queryStr.append(" and apnimandiContractor.id =:contractorId");
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryStr.append(" and apnimandiContractor.id =:contractorId");
+        }
         queryStr.append(" and collectionObj.collectionForMonth =:collectionMonth");
         queryStr.append(" and collectionObj.collectionForYear =:collectionYear");
         queryStr.append(" and egwStatus.code <>:statuscode ");
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
-        queryResult.setLong("contractorId", apnimandiCollectionDetails.getContractor().getId());
+        if(null!=apnimandiCollectionDetails.getContractor()) {
+        	queryResult.setLong("contractorId", apnimandiCollectionDetails.getContractor().getId());
+        }
         queryResult.setInteger("collectionMonth", apnimandiCollectionDetails.getCollectionForMonth());
         queryResult.setInteger("collectionYear", apnimandiCollectionDetails.getCollectionForYear());
         queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_DELETED);
@@ -555,5 +561,86 @@ public class ApnimandiCollectionDetailService extends PersistenceService<Apniman
     public List<TaxHeadMaster> getAccountHeadMasterByService(String serviceId) {
         List<TaxHeadMaster> accountHeadMasters = microserviceUtils.getTaxheadsByServiceCode(serviceId);
         return accountHeadMasters;
+    }    
+    
+    public List<ApnimandiCollectionMISReport> dmCollectionReport(Date fromDate, Date toDate) {
+        final StringBuilder queryStr = new StringBuilder();
+        queryStr.append("select distinct collectionObj.id as id, collectionObj.collectionDate as collectionDate, collectionObj.collectionForMonth as month, collectionObj.collectionForYear as year, collectionObj.serviceType as amountType, collectionObj.amount as totalAmount");
+        queryStr.append(", zoneMaster.name as zoneName");
+        queryStr.append(", siteMaster.name as siteName");
+        queryStr.append(", egwStatus.description as status");
+        queryStr.append(", collType.name as collectionType");
+        queryStr.append(", (case when collectionObj.contractor is null then '' else cont.name end) as contractorName");       
+        queryStr.append(" from ApnimandiCollectionDetails collectionObj");        
+        queryStr.append(" inner join collectionObj.zone zoneMaster");
+        queryStr.append(" inner join collectionObj.site siteMaster");
+        queryStr.append(" inner join collectionObj.status egwStatus");
+        queryStr.append(" inner join collectionObj.collectiontype collType");
+        queryStr.append(" left join collectionObj.contractor cont");        
+        queryStr.append(" where collType.code =:collTypeCode");
+        queryStr.append(" and (collectionObj.collectionDate >=:fromDate and collectionObj.collectionDate <=:toDate)");
+        queryStr.append(" and egwStatus.code =:statuscode ");
+        queryStr.append(" and collectionObj.active =:active ");        
+        Query queryResult = getCurrentSession().createQuery(queryStr.toString());        
+        queryResult.setString("collTypeCode", ApnimandiConstants.DAY_MARKET);
+        queryResult.setDate("fromDate", fromDate);
+        queryResult.setDate("toDate", toDate);
+        queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_APPROVED);
+        queryResult.setBoolean("active", Boolean.TRUE);
+        queryResult.setResultTransformer(new AliasToBeanResultTransformer(ApnimandiCollectionMISReport.class));
+        final List<ApnimandiCollectionMISReport> collectionSearchList = queryResult.list();
+        return collectionSearchList;
+    }
+    
+    public List<ApnimandiCollectionMISReport> amCollectionReport(Date fromDate, Date toDate) {
+        final StringBuilder queryStr = new StringBuilder();
+        queryStr.append("select distinct collectionObj.id as id, collectionObj.collectionDate as collectionDate, collectionObj.collectionForMonth as month, collectionObj.collectionForYear as year, collectionObj.serviceType as amountType, collectionObj.amount as totalAmount");
+        queryStr.append(", zoneMaster.name as zoneName");
+        queryStr.append(", siteMaster.name as siteName");
+        queryStr.append(", egwStatus.description as status");
+        queryStr.append(", collType.name as collectionType");    
+        queryStr.append(" from ApnimandiCollectionDetails collectionObj");
+        queryStr.append(", ZoneMaster zoneMaster");
+        queryStr.append(", SiteMaster siteMaster");
+        queryStr.append(", EgwStatus egwStatus");
+        queryStr.append(", ApnimandiCollectionType collType");
+        queryStr.append(" where collectionObj.status.id=egwStatus.id and collectionObj.zone.id=zoneMaster.id and collectionObj.site.id=siteMaster.id and collectionObj.collectiontype.id=collType.id");
+        queryStr.append(" and collType.code =:collTypeCode");
+        queryStr.append(" and (collectionObj.collectionDate >=:fromDate and collectionObj.collectionDate <=:toDate)");
+        queryStr.append(" and egwStatus.code =:statuscode ");
+        queryStr.append(" and collectionObj.active =:active ");        
+        Query queryResult = getCurrentSession().createQuery(queryStr.toString());        
+        queryResult.setString("collTypeCode", ApnimandiConstants.APNI_MANDI);
+        queryResult.setDate("fromDate", fromDate);
+        queryResult.setDate("toDate", toDate);
+        queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_APPROVED);
+        queryResult.setBoolean("active", Boolean.TRUE);  
+        queryResult.setResultTransformer(new AliasToBeanResultTransformer(ApnimandiCollectionMISReport.class));
+        final List<ApnimandiCollectionMISReport> collectionSearchList = queryResult.list();
+        return collectionSearchList;
+    }
+    
+    public List<EstimatedIncomeReport> estimatedIncomeReport(String collectionTypeCode, Date fromDate, Date toDate) {
+        final StringBuilder queryStr = new StringBuilder();
+        queryStr.append(" select zoneMaster.name as zoneName, siteMaster.name as siteName, sum(coalesce(collectionObj.amount, 0)) as totalAmount");
+        queryStr.append(" from ApnimandiCollectionDetails collectionObj");
+        queryStr.append(" inner join collectionObj.zone zoneMaster");
+        queryStr.append(" inner join collectionObj.site siteMaster");
+        queryStr.append(" inner join collectionObj.status egwStatus");
+        queryStr.append(" inner join collectionObj.collectiontype collType");
+        queryStr.append(" where collType.code =:collTypeCode");
+        queryStr.append(" and (collectionObj.collectionDate >=:fromDate and collectionObj.collectionDate <=:toDate)");
+        queryStr.append(" and egwStatus.code =:statuscode ");
+        queryStr.append(" and collectionObj.active =:active ");
+        queryStr.append(" group by zoneMaster.name, siteMaster.name");                
+        Query queryResult = getCurrentSession().createQuery(queryStr.toString());        
+        queryResult.setString("collTypeCode", collectionTypeCode);
+        queryResult.setDate("fromDate", fromDate);
+        queryResult.setDate("toDate", toDate);
+        queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_APPROVED);
+        queryResult.setBoolean("active", Boolean.TRUE);  
+        queryResult.setResultTransformer(new AliasToBeanResultTransformer(EstimatedIncomeReport.class));
+        final List<EstimatedIncomeReport> collectionSearchList = queryResult.list();
+        return collectionSearchList;
     }
 }

@@ -58,7 +58,6 @@ import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.lcms.entity.es.LegalCaseDocument;
 import org.egov.lcms.masters.entity.AdvocateMaster;
-import org.egov.lcms.masters.entity.CourtMaster;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
 import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.service.es.LegalCaseDocumentService;

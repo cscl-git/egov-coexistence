@@ -85,14 +85,24 @@ public class EmployeeHearing extends AbstractAuditable {
     private Long id;
 
     @NotNull
-    @Column(name = "employeeid")
-    @Audited
-    private Long employeeId;
-    
-    @NotNull
     @Column(name = "employeename")
     @Audited
     private String employeeName;
+    
+    @NotNull
+    @Column(name = "department")
+    @Audited
+    private String department;
+    
+    @NotNull
+    @Column(name = "designation")
+    @Audited
+    private String designation;
+    
+    @NotNull
+    @Column(name = "contactno")
+    @Audited
+    private String contactno;
 
 	@ManyToOne(fetch = FetchType.LAZY)
     @Valid
@@ -109,15 +119,7 @@ public class EmployeeHearing extends AbstractAuditable {
     public void setId(final Long id) {
         this.id = id;
     }
-    
-    public Long getEmployeeId() {
-        return employeeId;
-    }
-
-    public void setEmployeeId(final Long employeeId) {
-        this.employeeId = employeeId;
-    }
-
+ 
     public Hearings getHearing() {
         return hearing;
     }
@@ -133,4 +135,28 @@ public class EmployeeHearing extends AbstractAuditable {
 	public void setEmployeeName(String employeeName) {
 		this.employeeName = employeeName;
 	}
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public String getDesignation() {
+		return designation;
+	}
+
+	public void setDesignation(String designation) {
+		this.designation = designation;
+	}
+
+	public String getContactno() {
+		return contactno;
+	}
+
+	public void setContactno(String contactno) {
+		this.contactno = contactno;
+	}	
 }

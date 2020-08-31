@@ -88,11 +88,7 @@
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.courtMaster.name}" />
-							</div>
-							<div class="col-xs-3 add-margin">Case Type</div>
-							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.caseTypeMaster.caseType}" />
-							</div>
+							</div>							
 						</div>
 						<div class="row add-border">
 							<div class="col-xs-3 add-margin">
@@ -126,7 +122,22 @@
 								<spring:message code="lbl.previouscaseNumber" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.appealNum}" />
+								<c:out value="${legalCase.appealNum}" />-<c:out value="${legalCase.prevCaseYear}" />
+							</div>
+						</div>
+						<div class="row add-border">
+							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.reappl.courttype" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.prevCourtType.courtType}" />
+							</div>
+
+							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.reappl.petitiontype" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.prevPetitionType.petitionType}" />
 							</div>
 						</div>
 						<div class="row add-border">
@@ -154,38 +165,40 @@
 									value="${legalCase.caseDate}" var="casedate" />
 								<c:out value="${casedate}" />
 							</div>
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.case.receivingdate" />
-							</div>
-							<div class="col-sm-3 add-margin view-content">
-								<fmt:formatDate pattern="dd/MM/yyyy"
-									value="${legalCase.caseReceivingDate}" var="casercdate" />
-								<c:out value="${casercdate}" />
-							</div>
-							<%-- <div class="col-xs-3 add-margin">
-								<spring:message code="lbl.caDue.date" />
-							</div>
-							<div class="col-sm-3 add-margin view-content">
-								<fmt:formatDate pattern="dd/MM/yyyy"
-									value="${legalCase.caDueDate}" var="caduedate" />
-								<c:out value="${caduedate}" />
-							</div> --%>
 						</div>
 						<div class="row add-border">
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.nodalofficer" />
-							</div>
-							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.nodalOfficer}" />
-							</div>
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.nodalofficer.department" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.nodalOfficerDepartment}" />
 							</div>
+							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.nodalofficer" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.nodalOfficer}" />
+							</div>							
 						</div>
 						<div class="row add-border">
+							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.concerned.branch" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.concernedBranch.concernedBranch}" />
+							</div>
+							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.concerned.branch.email" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.concernedBranchEmail}" />
+							</div>							
+						</div>
+						<div class="row add-border">
+							<div class="col-xs-3 add-margin"><spring:message code="lbl.casecatagory" /></div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.caseTypeMaster.caseType}" />
+							</div>
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.estimatepreparedby" />
 							</div>
@@ -193,42 +206,6 @@
 								<c:out value="${legalCase.estimatePreparedBy}" />
 							</div>
 						</div>
-						<%-- <div class="row add-border">
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.officerincharge" />
-							</div>
-							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.officerIncharge.name}" />
-							</div>
-
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.noticedate" />
-							</div>
-							<div class="col-sm-3 add-margin view-content">
-								<fmt:formatDate pattern="dd/MM/yyyy"
-									value="${legalCase.noticeDate}" var="noticeDate" />
-								<c:out value="${noticeDate}" />
-							</div>
-						</div> --%>
-						<%-- <div class="row add-border">
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.fieldbycarp" />
-							</div>
-							<div class="col-sm-3 add-margin view-content">
-								<c:choose>
-								<c:when test="${legalCase.isFiledByCorporation == 'true'}">
-									<c:out value="YES" />
-								</c:when> 
-								<c:otherwise>
-									<c:out value="NO" />
-								</c:otherwise>
-							</c:choose></div>
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.oldreferencenumber" />
-							</div>
-							<div class="col-sm-3 add-margin view-content">
-								${legalCase.oldReferenceNumber}</div>
-						</div> --%>
 					</div>
 				</div>
 			</div>

@@ -19,12 +19,16 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.apnimandi.masters.entity.ApnimandiCollectionType;
+import org.egov.apnimandi.masters.entity.SiteMaster;
 import org.egov.apnimandi.masters.entity.ZoneMaster;
 import org.egov.apnimandi.masters.entity.vo.AttachedDocument;
 import org.egov.apnimandi.masters.service.ApnimaniCollectionTypeService;
+import org.egov.apnimandi.masters.service.SiteMasterService;
 import org.egov.apnimandi.masters.service.ZoneMasterService;
+import org.egov.apnimandi.reports.entity.ApnimandiCollectionMISReport;
 import org.egov.apnimandi.reports.entity.ApnimandiCollectionSearchResult;
 import org.egov.apnimandi.reports.entity.ApnimandiContractorSearchResult;
+import org.egov.apnimandi.reports.entity.EstimatedIncomeReport;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionAmountDetails;
 import org.egov.apnimandi.transactions.entity.ApnimandiCollectionDetails;
 import org.egov.apnimandi.transactions.entity.ApnimandiContractor;
@@ -34,6 +38,8 @@ import org.egov.apnimandi.transactions.service.ContractorsService;
 import org.egov.apnimandi.utils.ApnimandiUtil;
 import org.egov.apnimandi.utils.constants.ApnimandiConstants;
 import org.egov.apnimandi.web.adaptor.CollectionJsonAdaptor;
+import org.egov.apnimandi.web.adaptor.EstimatedIncomeJsonAdaptor;
+import org.egov.apnimandi.web.adaptor.MisCollectionJsonAdaptor;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.microservice.models.Department;
@@ -69,6 +75,10 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
     private static final String APNIMANDI_COLLECTION_DETAILS_SEARCH = "apnimandicollection-search";
     private static final String APNIMANDI_COLLECTION_RECEIPT_VIEW = "apnimandicollection-receiptview";
     
+    private static final String DM_COLLECTION_SEARCH = "dm-collection-search";
+    private static final String AM_COLLECTION_SEARCH = "am-collection-search"; 
+    private static final String DMAM_INCOME_REPORT = "estimated-income-report"; 
+    
     private static final String APPLICATION_HISTORY = "applicationHistory";
     private static final String APPROVAL_POSITION = "approvalPosition";
     private static final String WORK_FLOW_ACTION = "workFlowAction";
@@ -100,6 +110,8 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
     private MessageSource messageSource;	
 	@Autowired 
 	private ApnimandiThirdPartyService apnimandiThirdPartyService;	
+	@Autowired
+	private SiteMasterService siteMasterService;
 	
 	private void prepareNewForm(final Model model) {
         model.addAttribute("apnimandiCollectionTypes", apnimaniCollectionTypeService.getActiveApnimandiCollectionTypeList());
@@ -124,7 +136,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
-        model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
+        //model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
         return APNIMANDI_COLLECTION_DETAILS_NEW;
     }
@@ -142,20 +154,20 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         if(receiptHeadCount==0) {
         	errors.reject("account.head.empty");
         }
-        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
-			if(null!=existingCollectionList) {
-				if(existingCollectionList.size()>0) {
-					errors.reject("collection.already.exist");
-				}
-			}
-        }
+//        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
+//			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
+//			if(null!=existingCollectionList) {
+//				if(existingCollectionList.size()>0) {
+//					errors.reject("collection.already.exist");
+//				}
+//			}
+//        }
 		if (errors.hasErrors()) {
 	        prepareNewForm(model);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
 	        model.addAttribute(MODE, MODE_CREATE);
 	        model.addAttribute(CURRENT_STATE, "NEW");
-	        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
+	        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
 	        return APNIMANDI_COLLECTION_DETAILS_NEW;
 	    }
@@ -181,7 +193,11 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			collectionAmountDetails.add(collectionAmountDetail);
 		}
 		if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			if(null!=apnimandiCollectionDetails.getContractor()) {
+				apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			}else {
+				apnimandiCollectionDetails.setPayeeName("NA");
+			}
 		}
 		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
 		apnimandiCollectionDetails.setActive(false);
@@ -226,14 +242,14 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         if(receiptHeadCount==0) {
         	errors.reject("account.head.empty");
         }
-        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
-			if(null!=existingCollectionList) {
-				if(existingCollectionList.size()>0) {
-					errors.reject("collection.already.exist");
-				}
-			}
-        }
+//        if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
+//			List<ApnimandiCollectionSearchResult> existingCollectionList = apnimandiCollectionDetailService.getAllExistedCollections(apnimandiCollectionDetails);
+//			if(null!=existingCollectionList) {
+//				if(existingCollectionList.size()>0) {
+//					errors.reject("collection.already.exist");
+//				}
+//			}
+//        }
 		if (errors.hasErrors()) {
 	        prepareNewForm(model);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
@@ -264,7 +280,11 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			}
 		}
 		if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionDetails.getCollectiontype().getCode())) {
-			apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			if(null!=apnimandiCollectionDetails.getContractor()) {
+				apnimandiCollectionDetails.setPayeeName(apnimandiCollectionDetails.getContractor().getSalutation() + " " + apnimandiCollectionDetails.getContractor().getName());
+			}else {
+				apnimandiCollectionDetails.setPayeeName("NA");
+			}
 		}
 		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
 		apnimandiCollectionDetailService.persist(apnimandiCollectionDetails, attachedDocuments, collectionAmountDetails, null, null, StringUtils.EMPTY);
@@ -324,15 +344,15 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         prepareNewForm(model);
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         return APNIMANDI_COLLECTION_DETAILS_SEARCH;
-
     }
 	
 	@RequestMapping(value = "/workflow/view/{id}", method = RequestMethod.GET)
     public String workflowView(@PathVariable("id") final Long id, final Model model) {
 		final ApnimandiCollectionDetails apnimandiCollectionDetails = apnimandiCollectionDetailService.findOne(id);
+		apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
         prepareNewForm(model);
         model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
-        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
+        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_VIEW);
@@ -346,7 +366,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		if (errors.hasErrors()) {
 			prepareNewForm(model);
 	        model.addAttribute(CURRENT_STATE, apnimandiCollectionDetails.getState().getValue());
-	        model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
+	        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
 	        model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
 	        model.addAttribute(MODE, MODE_VIEW);
@@ -379,7 +399,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         		apnimandiCollectionDetails.setActive(true);
             }
         }
-        
+        apnimandiCollectionDetails.setCollectionMonthName(ApnimandiUtil.getMonthFullName(apnimandiCollectionDetails.getCollectionForMonth()));
         apnimandiCollectionDetailService.persist(apnimandiCollectionDetails, null, null, approvalPosition, approvalComment, workFlowAction);
         if (null != workFlowAction) {
         	if (ApnimandiConstants.DELETE.equalsIgnoreCase(workFlowAction)) {
@@ -470,11 +490,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 			for(TaxHeadMaster accountHead :accountHeadMasters) {
 				isFound=false;
 				if(ApnimandiConstants.APNI_MANDI.equalsIgnoreCase(apnimandiCollectionType.getCode())) {
-					if(ApnimandiConstants.SERVICE_TYPE_CONTRACTOR_SECURITY_FEE.equalsIgnoreCase(servicetype)) {					
-						if((ApnimandiConstants.SECURITY_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
-							isFound=true;
-						}
-					}else if(ApnimandiConstants.SERVICE_TYPE_RENT_AMOUNT.equalsIgnoreCase(servicetype)) {
+					if(ApnimandiConstants.SERVICE_TYPE_COLLECTION_AMOUNT.equalsIgnoreCase(servicetype)) {
 						if((ApnimandiConstants.GROUND_RENT_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 							|| (ApnimandiConstants.PENALITIES_FINES_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 								|| (ApnimandiConstants.CGST_UTGST_APNI_MANDI + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
@@ -527,7 +543,8 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	public Object toSearchResultJson(final Object object) {
         final GsonBuilder gsonBuilder = new GsonBuilder();
         final Gson gson = gsonBuilder.registerTypeAdapter(ApnimandiCollectionSearchResult.class, new CollectionJsonAdaptor()).create();
-        return gson.toJson(object);
+        String json = gson.toJson(object);
+        return json;
     }
 	
 	private String getMessage(String messageLabel,String designation,String approver) {
@@ -548,8 +565,9 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		JsonArray departments = new JsonArray();
 		if(null != zoneid) {
 			ZoneMaster zone = zoneMasterService.findOne(zoneid);
-			jsonObject.addProperty("additionalRule", zone.getRoadDivision());
-			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			//jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			//List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, zone.getRoadDivision());
+			List<Department> depts =  apnimandiUtil.getDepartmentsByZone(currentState, objectType, null);
 			depts.forEach(dept -> {
 				JsonObject department = new JsonObject();
 				department.addProperty("code", dept.getCode());
@@ -560,5 +578,124 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		jsonObject.add("departments", departments);
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
+	
+	@RequestMapping(value = "/ajax/getSitesByZone", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public void getSitesByZone(@ModelAttribute("siteMaster") @RequestParam final Long zoneid,
+       								 final HttpServletResponse response) throws IOException {
+		JsonObject jsonObject = new JsonObject();
+		JsonArray sites = new JsonArray();
+		if(null != zoneid) {
+			ZoneMaster zone = zoneMasterService.findOne(zoneid);
+			//jsonObject.addProperty("additionalRule", zone.getRoadDivision());
+			List<SiteMaster> siteMasters =  siteMasterService.findByZone(zone);
+			siteMasters.forEach(siteMaster -> {
+				JsonObject site = new JsonObject();
+				site.addProperty("id", siteMaster.getId());
+				site.addProperty("name", siteMaster.getName());
+				sites.add(site);
+			});
+		}
+		jsonObject.add("sites", sites);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        IOUtils.write(jsonObject.toString(), response.getWriter());        
+    }
+	
+	@RequestMapping(value = "/day-market-collection", method = RequestMethod.POST)
+    public String dmCollection(final Model model) {
+        return DM_COLLECTION_SEARCH;
+    }
+	
+	@RequestMapping(value = "/apni-mandi-collection", method = RequestMethod.POST)
+    public String amCollection(final Model model) {
+        return AM_COLLECTION_SEARCH;
+    }
+	
+	@RequestMapping(value = "/ajax/day-market-collection", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String dmCollectionsearch(@RequestParam final String fromDate,
+			  									   @RequestParam final String toDate) {
+		Date newFromDate=null;
+		Date newToDate=null;	
+		if(StringUtils.isNotEmpty(fromDate)) {
+			newFromDate = DateUtils.getDate(fromDate, "dd/MM/yyyy");
+		}		
+		if(StringUtils.isNotEmpty(toDate)) {
+			newToDate = DateUtils.getDate(toDate, "dd/MM/yyyy");
+		}else {
+			newToDate = DateUtils.today();
+		}	
+		if(null!=newFromDate && null!=newToDate) {
+			final List<ApnimandiCollectionMISReport> searchResultList = apnimandiCollectionDetailService.dmCollectionReport(newFromDate, newToDate);
+	        return new StringBuilder("{ \"data\":").append(toMISReportJson(searchResultList)).append("}")
+	                .toString();
+		}else {
+			return new StringBuilder("{ \"data\":").append("[]").append("}").toString();
+		}
+    }
+	
+	public Object toMISReportJson(final Object object) {
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		final Gson gson = gsonBuilder.registerTypeAdapter(ApnimandiCollectionMISReport.class, new MisCollectionJsonAdaptor()).create();
+		String json = gson.toJson(object);
+		return json;
+    }
+	
+	@RequestMapping(value = "/ajax/apni-mandi-collection", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String amCollectionsearch(@RequestParam final String fromDate,
+			  									   @RequestParam final String toDate) {
+		Date newFromDate=null;
+		Date newToDate=null;	
+		if(StringUtils.isNotEmpty(fromDate)) {
+			newFromDate = DateUtils.getDate(fromDate, "dd/MM/yyyy");
+		}		
+		if(StringUtils.isNotEmpty(toDate)) {
+			newToDate = DateUtils.getDate(toDate, "dd/MM/yyyy");
+		}else {
+			newToDate = DateUtils.today();
+		}	
+		if(null!=newFromDate && null!=newToDate) {
+			final List<ApnimandiCollectionMISReport> searchResultList = apnimandiCollectionDetailService.amCollectionReport(newFromDate, newToDate);
+	        return new StringBuilder("{ \"data\":").append(toMISReportJson(searchResultList)).append("}")
+	                .toString();
+		}else {
+			return new StringBuilder("{ \"data\":").append("[]").append("}").toString();
+		}
+    }
+	
+	@RequestMapping(value = "/estimated-income-report", method = RequestMethod.POST)
+    public String estimatedIncomeSearch(final Model model) {
+		model.addAttribute("apnimandiCollectionTypes", apnimaniCollectionTypeService.getActiveApnimandiCollectionTypeList());
+        return DMAM_INCOME_REPORT;
+    }	
+	
+	@RequestMapping(value = "/ajax/estimated-income-report", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
+    public @ResponseBody String amCollectionsearch(@RequestParam final String collTypeCode,
+    											   @RequestParam final String fromDate,
+			  									   @RequestParam final String toDate) {
+		Date newFromDate=null;
+		Date newToDate=null;	
+		if(StringUtils.isNotEmpty(fromDate)) {
+			newFromDate = DateUtils.getDate(fromDate, "dd/MM/yyyy");
+		}		
+		if(StringUtils.isNotEmpty(toDate)) {
+			newToDate = DateUtils.getDate(toDate, "dd/MM/yyyy");
+		}else {
+			newToDate = DateUtils.today();
+		}	
+		if(null!=newFromDate && null!=newToDate) {
+			final List<EstimatedIncomeReport> searchResultList = apnimandiCollectionDetailService.estimatedIncomeReport(collTypeCode, newFromDate, newToDate);
+	        return new StringBuilder("{ \"data\":").append(toEIReportJson(searchResultList)).append("}")
+	                .toString();
+		}else {
+			return new StringBuilder("{ \"data\":").append("[]").append("}").toString();
+		}
+    }
+	
+	public Object toEIReportJson(final Object object) {
+		final GsonBuilder gsonBuilder = new GsonBuilder();
+		final Gson gson = gsonBuilder.registerTypeAdapter(EstimatedIncomeReport.class, new EstimatedIncomeJsonAdaptor()).create();
+		String json = gson.toJson(object);
+		return json;
     }
 }
