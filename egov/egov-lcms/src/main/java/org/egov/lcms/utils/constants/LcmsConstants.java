@@ -82,6 +82,7 @@ public class LcmsConstants {
     public static final String MONTH = "month(legalcase.casedate)";
     public static final String EGW_STATUS = "egwStatus";
     public static final String LEGALCASE = "legalCase";
+    public static final String CONCERNEDBRANCHLIST = "ConcernedBranchList";
     public static final String LEGAL_CASE_DEPARTMENT = "legalcaseDepartment";
     public static final String LEGAL_CASE_DEPARTMENT_AND_DEPARTMENT = "legalcaseDepartment.department";
     public static final String LEGAL_CASE_STATUS = "Legalcase.egwStatus";

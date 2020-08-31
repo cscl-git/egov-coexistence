@@ -67,7 +67,7 @@ public class ApnimandiContractor extends StateAware{
     private Date contractSignedOn;
     
     @NotNull
-    @Length(max = 15)
+    @Length(max = 4)
     @Audited
     private String aadhaarNo;
     

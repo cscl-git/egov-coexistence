@@ -52,6 +52,7 @@ import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.lcms.autonumber.LegalCaseNumberGenerator;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
+import org.egov.lcms.masters.service.ConcernedBranchMasterService;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.LegalCaseService;
 import org.egov.lcms.utils.constants.LcmsConstants;
@@ -84,6 +85,9 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
 
     @Autowired
     private LegalCaseService legalCaseService;
+    
+    @Autowired
+    private ConcernedBranchMasterService concernedBranchMasterService;
 
     @Autowired
     private LegalCaseNumberGenerator legalCaseNumberGenerator;
@@ -91,6 +95,7 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String newForm(@ModelAttribute final LegalCase legalcase, final Model model,
             final HttpServletRequest request) {
+    	model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
         model.addAttribute(LcmsConstants.LEGALCASE, legalcase);
         model.addAttribute(LcmsConstants.MODE, "create");
         model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, false);
@@ -115,6 +120,7 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
         if (validateFilenumber != null)
             errors.reject("error.legalcase.filenumber");
         if (errors.hasErrors()) {
+        	model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
             model.addAttribute(LcmsConstants.MODE, "create");
             model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, false);
             model.addAttribute("bipartisanRespondentDetailsList", legalCase.getBipartisanRespondentDetailsList());

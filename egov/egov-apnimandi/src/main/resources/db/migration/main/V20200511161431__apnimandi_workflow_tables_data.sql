@@ -17,17 +17,17 @@ INSERT INTO egw_status (id,moduletype,description,lastmodifieddate,code,order_id
 ;
 
 INSERT INTO eg_wf_matrix (id,department,objecttype,currentstate,currentstatus,pendingactions,currentdesignation,additionalrule,nextstate,nextaction,nextdesignation,nextstatus,validactions,fromqty,toqty,fromdate,todate,"version",enablefields,forwardenabled,smsemailenabled,nextref,rejectenabled) VALUES 
-(nextval('eg_wf_matrix'),'ANY','ApnimandiContractor','NEW',NULL,NULL,'Sub Divisional Engineer',NULL,'Created','Junior Engineer approval pending','Junior Engineer','SDCCREATED','Forward',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiContractor','Created','SDCCREATED','Junior Engineer approval pending','Junior Engineer',NULL,'END','END','','APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiContractor','Rejected','REJECTED',NULL,'Sub Divisional Engineer',NULL,'Resubmitted','Junior Engineer approval pending','Junior Engineer','RESUBMITTED','Forward,Delete',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','NEW',NULL,NULL,'Sub Divisional Clerk',NULL,'Created','Sub Divisional Engineer approval pending','Sub Divisional Engineer','AMCCREATED','Forward',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Created','AMCCREATED','Sub Divisional Engineer approval pending','Sub Divisional Engineer',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Rejected','REJECTED',NULL,'Sub Divisional Clerk',NULL,'Resubmitted','Sub Divisional Engineer approval pending','Sub Divisional Engineer','RESUBMITTED','Forward,Delete',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiContractor','Resubmitted','RESUBMITTED','Junior Engineer approval pending','Junior Engineer',NULL,'END','END','','APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
-,(nextval('eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Resubmitted','RESUBMITTED','Sub Divisional Engineer approval pending','Sub Divisional Engineer',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiContractor','NEW',NULL,NULL,'Sub Divisional Engineer',NULL,'Created','Junior Engineer approval pending','Junior Engineer','SDCCREATED','Forward',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiContractor','Created','SDCCREATED','Junior Engineer approval pending','Junior Engineer',NULL,'END','END','','APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiContractor','Rejected','REJECTED',NULL,'Sub Divisional Engineer',NULL,'Resubmitted','Junior Engineer approval pending','Junior Engineer','RESUBMITTED','Forward,Delete',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','NEW',NULL,NULL,'Sub Divisional Clerk',NULL,'Created','Sub Divisional Engineer approval pending','Sub Divisional Engineer','AMCCREATED','Forward',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Created','AMCCREATED','Sub Divisional Engineer approval pending','Sub Divisional Engineer',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Rejected','REJECTED',NULL,'Sub Divisional Clerk',NULL,'Resubmitted','Sub Divisional Engineer approval pending','Sub Divisional Engineer','RESUBMITTED','Forward,Delete',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiContractor','Resubmitted','RESUBMITTED','Junior Engineer approval pending','Junior Engineer',NULL,'END','END','','APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
+,(nextval('seq_eg_wf_matrix'),'ANY','ApnimandiCollectionDetails','Resubmitted','RESUBMITTED','Sub Divisional Engineer approval pending','Sub Divisional Engineer',NULL,'END','END',NULL,'APPROVED','Approve,Reject',NULL,NULL,'2016-04-01','2099-04-01',0,NULL,NULL,NULL,NULL,NULL)
 ;
 
-create sequence seq_eg_wf_dept_desg_map;
+SELECT setval('seq_eg_wf_dept_desg_map',(SELECT MAX(ID) FROM eg_wf_dept_desg_map ));
 
 INSERT INTO eg_wf_dept_desg_map (id,objecttype,currentstate,nextdepartment,nextdesignation,additionalrule,"version") VALUES 
 (nextval('seq_eg_wf_dept_desg_map'),'ApnimandiContractor','NEW','427','100','RD1',0)

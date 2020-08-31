@@ -76,11 +76,11 @@
 							<form:select path="statusCode" id="statusCode" cssClass="form-control" cssErrorClass="form-control error">
 								<form:option value=""><spring:message code="lbl.select" /></form:option>
 								<form:option value="AMCCREATED">Created</form:option>
-								<form:option value="APPROVED">Sub Divisional Engineer Approved</form:option>								
+								<form:option value="APPROVED">Approved</form:option>								
 								<form:option value="REJECTED">Rejected</form:option>
-								<form:option value="AMCREJECTED">Rejected By Initiator</form:option>
-								<form:errors path="statusCode" cssClass="error-msg" />
-							</form:select>							
+								<form:option value="RESUBMITTED">Re-Submitted</form:option>								
+							</form:select>
+							<form:errors path="statusCode" cssClass="error-msg" />							
 						</div>
 					</div>
 					<div class="form-group">

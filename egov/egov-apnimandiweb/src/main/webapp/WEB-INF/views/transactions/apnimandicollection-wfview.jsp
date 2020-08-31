@@ -11,8 +11,12 @@
 		   id="wfCollectionForm" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	<input type="hidden" id="mode"  name="mode" value="${mode}" />
 	<input type="hidden" name="apnimandiCollectionDetails" value="${apnimandiCollectionDetails.id}" />
-	<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
-	<div class="buttonbottom" align="center">
-		<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
-	</div>		
+	<c:if test="${apnimandiCollectionDetails.status.code ne 'APPROVED'}">
+		<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
+		<div class="buttonbottom" align="center">
+			<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
+		</div>
+	</c:if>
 </form:form>
+
+<script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>

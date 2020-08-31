@@ -62,8 +62,7 @@ $(document).ready(function(){
     	var $this = $(this);
         $this.find("select, button").prop("disabled", true);
     });
-    $(".btn-primary").click(function(event){
-		
+    $(".btn-primary").click(function(event){		
 		var caseNumber =$('#caseNumber').val();
 		var lcnumber=$('#lcNumber').val();
 		var mode=$('#mode').val();
@@ -464,11 +463,17 @@ $('#btnclose').click(function(){
 $('#reappealOfCase').click(function() {
 	$('#appealNum').val('');
 	if ($(this).is(':checked')) {
-		$('#previousCaseNo').show();
+		$('.reappealcase').show();
 		$('#appealNum').attr('required', 'required');
+		$('#prevCaseYear').attr('required', 'required');
+		$('#prevCourtType').attr('required', 'required');
+		$('#prevPetitionType').attr('required', 'required');
 	}else{
-		$('#previousCaseNo').hide();
+		$('.reappealcase').hide();
 		$('#appealNum').removeAttr('required');
+		$('#prevCaseYear').removeAttr('required');
+		$('#prevCourtType').removeAttr('required');
+		$('#prevPetitionType').removeAttr('required');
 	}
 });
 

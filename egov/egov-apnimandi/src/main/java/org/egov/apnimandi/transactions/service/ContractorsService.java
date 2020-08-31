@@ -254,4 +254,38 @@ public class ContractorsService extends PersistenceService<ApnimandiContractor, 
         final List<ApnimandiContractorSearchResult> searchResultList = getAllExistedContractorByZone(apnimandiContractor);
         return searchResultList;
     }
+    
+    public List<ApnimandiContractorSearchResult> dmContractorReport(final ApnimandiContractor contractor) {    	
+        final StringBuilder queryStr = new StringBuilder();
+        queryStr.append("select distinct conObj as apnimandiContractor, zoneMaster.name as zoneName, egwStatus.description as statusName");
+        queryStr.append(" from ApnimandiContractor conObj,EgwStatus egwStatus,ZoneMaster zoneMaster");
+        queryStr.append(" where conObj.status.id=egwStatus.id and conObj.zone.id=zoneMaster.id");
+        if(null!=contractor.getZone()) {
+        	queryStr.append(" and zoneMaster.id =:zoneid");
+        }
+        if(StringUtils.isNotEmpty(contractor.getName())) {
+        	queryStr.append(" and lower(conObj.name) like :name");
+        }
+        if(null!=contractor.getValidFromDate() && null!=contractor.getValidToDate()) {
+        	queryStr.append(" and ((conObj.validFromDate >=:fromDate and conObj.validFromDate <=:toDate) or (conObj.validToDate >=:fromDate and conObj.validToDate <=:toDate))");
+        }
+        queryStr.append(" and egwStatus.code <>:statuscode ");
+        queryStr.append(" and conObj.active =:active ");
+        Query queryResult = getCurrentSession().createQuery(queryStr.toString());
+        if(null!=contractor.getZone()) {
+        	queryResult.setLong("zoneid", contractor.getZone().getId());
+        }
+        if(StringUtils.isNotEmpty(contractor.getName())) {
+        	queryResult.setParameter("name", '%'+contractor.getName().toLowerCase()+'%');
+        } 
+        if(null!=contractor.getValidFromDate() && null!=contractor.getValidToDate()) {
+        	queryResult.setDate("fromDate", contractor.getValidFromDate());
+            queryResult.setDate("toDate", contractor.getValidToDate());
+        }
+        queryResult.setString("statuscode", ApnimandiConstants.APNIMANDI_STATUS_CONTRACTOR_DELETED);
+        queryResult.setBoolean("active", true);
+        queryResult.setResultTransformer(new AliasToBeanResultTransformer(ApnimandiContractorSearchResult.class));
+        final List<ApnimandiContractorSearchResult> contractorSearchList = queryResult.list();
+        return contractorSearchList;
+    }
 }

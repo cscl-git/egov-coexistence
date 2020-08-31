@@ -45,17 +45,12 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-$(document).ready(function(){
-	
-	
-	
+$(document).ready(function(){	
 	$('#courtType').change(function(){
 		loadPetitionTypes();
 		loadCourtNames();
-		 //loadPropertyPipeTypes();
- });
+	});
 	function loadPetitionTypes(){
-
         $.ajax({
 			url: "/services/lcms/legalcase/ajax-petitionTypeByCourtType",     
 			type: "GET",
@@ -74,11 +69,9 @@ $(document).ready(function(){
 			error: function (response) {
 				console.log("failed");
 			}
-		});
-		
+		});		
 	}
 	function loadCourtNames(){
-
         $.ajax({
 			url: "/services/lcms/legalcase/ajax-courtNameByCourtType",     
 			type: "GET",
@@ -97,9 +90,30 @@ $(document).ready(function(){
 			error: function (response) {
 				console.log("failed");
 			}
-		});
-		
+		});		
+	}	
+	$('#prevCourtType').change(function(){
+		loadPrevPetitionTypes();
+	});
+	function loadPrevPetitionTypes(){
+        $.ajax({
+			url: "/services/lcms/legalcase/ajax-petitionTypeByCourtType",     
+			type: "GET",
+			data: {
+				courtType: $('#prevCourtType').val()  
+			},
+			dataType: "json",
+			success: function (response) {
+			    console.log("success"+response);
+				$('#prevPetitionType').empty();
+				$('#prevPetitionType').append($("<option value=''>Select from below</option>"));
+				$.each(response, function(index, value) {
+					$('#prevPetitionType').append($('<option>').text(value.petitionType).attr('value', value.id))
+				});
+			}, 
+			error: function (response) {
+				console.log("failed");
+			}
+		});		
 	}
-	
-	
 });

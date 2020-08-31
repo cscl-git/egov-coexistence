@@ -10,9 +10,13 @@
 <form:form method="post" action="/services/apnimandi/contractor/workflow/update" modelAttribute="apnimandiContractor"
 		   id="wfContractorForm" class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
 	<input type="hidden" id="mode"  name="mode" value="${mode}" />		
-	<input type="hidden" name="apnimandiContractor" value="${apnimandiContractor.id}" />	
-	<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
-	<div class="buttonbottom" align="center">
-		<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
-	</div>		
+	<input type="hidden" name="apnimandiContractor" value="${apnimandiContractor.id}" />
+	<c:if test="${apnimandiContractor.status.code ne 'APPROVED'}">
+		<jsp:include page="../workflow/dm-contractor-commonWorkflowMatrix.jsp" />
+		<div class="buttonbottom" align="center">
+			<jsp:include page="../workflow/dm-contractor-commonWorkflowMatrix-button.jsp" />
+		</div>
+	</c:if>			
 </form:form>
+
+<script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>

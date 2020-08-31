@@ -126,13 +126,9 @@ public class HearingsService extends PersistenceService<Hearings, Long>{
     @Transactional
     public Hearings buildEmplyeeList(final Hearings hearings) {
         for (final EmployeeHearing hearingEmp : hearings.getPositionTemplList()) {
-            if (hearingEmp.getEmployeeId() != null) {
-                prepareEmployeeHearingList(hearings, hearingEmp.getEmployeeId(), hearingEmp.getEmployeeName(), hearingEmp);
-            }
             if (hearingEmp.getId() == null 
-            		&& hearingEmp.getEmployeeId() != null
                     && hearingEmp.getEmployeeName() != null) {
-                prepareEmployeeHearingList(hearings, hearingEmp.getEmployeeId(), hearingEmp.getEmployeeName(), hearingEmp);
+                prepareEmployeeHearingList(hearings, hearingEmp.getEmployeeName(), hearingEmp.getDepartment(), hearingEmp.getDesignation(), hearingEmp.getContactno() , hearingEmp);
             }
         }
         if (!hearings.getPositionTemplList().isEmpty()
@@ -147,11 +143,13 @@ public class HearingsService extends PersistenceService<Hearings, Long>{
         return hearings;
     }
 
-    private void prepareEmployeeHearingList(final Hearings hearings, final long empUserId, final String empUserName,
+    private void prepareEmployeeHearingList(final Hearings hearings, final String empUserName, final String department, final String designation, final String contactno,
             final EmployeeHearing hearingEmp) {
         hearingEmp.setHearing(hearings);
-        hearingEmp.setEmployeeId(empUserId);
         hearingEmp.setEmployeeName(empUserName);
+        hearingEmp.setDepartment(department);
+        hearingEmp.setDesignation(designation);
+        hearingEmp.setContactno(contactno);
         hearings.getEmployeeHearingList().add(hearingEmp);
     }
 

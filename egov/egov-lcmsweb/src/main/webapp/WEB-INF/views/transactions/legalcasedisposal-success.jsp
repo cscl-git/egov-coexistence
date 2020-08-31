@@ -82,7 +82,7 @@
 						</div>
 						<div class="col-sm-3 add-margin view-content">
 							${legalCaseDisposal.disposalDetails}</div>
-						<div class="col-xs-3 add-margin">
+						<%-- <div class="col-xs-3 add-margin">
 							<spring:message code="lbl.consignmentdate" />
 							:
 						</div>
@@ -90,7 +90,7 @@
 							<fmt:formatDate value="${legalCaseDisposal.consignmentDate}"
 								var="HD" pattern="dd/MM/yyyy" />
 							<c:out value="${HD}" />
-						</div>
+						</div> --%>
 
 					</div>
 

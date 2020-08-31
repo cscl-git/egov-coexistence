@@ -106,7 +106,7 @@
 				<c:if test="${ mode == 'edit'}">
 					<div class="form-group" id="dvApnimandiContractor">
 						<label class="col-sm-3 control-label text-left">
-							<spring:message code="lbl.contractor" /> <span class="mandatory"></span>:
+							<spring:message code="lbl.contractor" /> :
 						</label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="contractor" id="contractor" cssClass="form-control" cssErrorClass="form-control error">
@@ -120,7 +120,7 @@
 				<c:if test="${ mode != 'edit'}">
 					<div class="form-group" id="dvApnimandiContractor">
 						<label class="col-sm-3 control-label text-left">
-							<spring:message code="lbl.contractor" /> <span class="mandatory"></span>:
+							<spring:message code="lbl.contractor" /> :
 						</label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="contractor" id="contractor" cssClass="form-control" cssErrorClass="form-control error">
@@ -242,7 +242,7 @@
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input path="ifscCode" class="form-control text-left patternvalidation" id="ifscCode"
-									data-pattern="alphanumeric" maxlength="12" required="required" style="width: 80%;display:inline;"/>
+									data-pattern="alphanumeric" maxlength="12" required="required" style="width: 70%;display:inline;"/>
 						<form:errors path="ifscCode" cssClass="error-msg" />
 						<span class="searchBoxCls" style="border: 1px solid blue; padding: 5px 10px;">
 							<button type="button" onclick='findBankDetailsByIfsc()'><i class="fa fa-search"></i></button>
