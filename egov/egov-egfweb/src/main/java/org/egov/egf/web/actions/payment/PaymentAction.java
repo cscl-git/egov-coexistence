@@ -1118,14 +1118,17 @@ public class PaymentAction extends BasePaymentAction {
         
         LOGGER.info("StartingupdatePayment...before populate workflowbean");
         populateWorkflowBean();
-        billList = paymentService.getMiscBillList(paymentheader);
+        billList = paymentService.getMiscBillListForPaymentHeader(paymentheader);
         LOGGER.info("populate billlist");
+        LOGGER.info("print Bill Id:: "+ billList.get(0).getBillId());
+        
         billregister = (EgBillregister) persistenceService.find(" from EgBillregister where id=?",
                 billList.get(0).getBillId());
-        LOGGER.info("populate billregister");
+        LOGGER.info("populate billregister dept name ::"+billregister.getEgBillregistermis().getDepartmentName());
+        LOGGER.info("print function name:: "+parameters.get("function")[0]);
         cFunctionobj = (CFunction) persistenceService.find("from CFunction where id=?",
                 Long.valueOf(parameters.get("function")[0]));
-        LOGGER.info("populate cFunctionobj");
+        LOGGER.info("print name of cFunctionobj:: "+cFunctionobj.getName());
       
          paymentActionHelper.setbillRegisterFunction(billregister, cFunctionobj);
          LOGGER.info("setbillRegisterFunction");

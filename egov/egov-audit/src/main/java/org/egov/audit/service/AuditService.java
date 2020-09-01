@@ -9,6 +9,7 @@ import javax.persistence.PersistenceContext;
 import org.apache.log4j.Logger;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.entity.AuditPostBillMpng;
+import org.egov.audit.entity.AuditPostVoucherMpng;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
@@ -135,6 +136,14 @@ public class AuditService {
 		    		 bill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
 		    		 expenseBillService.create(bill);
 		    	 }
+				
+				for(AuditPostVoucherMpng row : savedAuditDetails.getPostVoucherMpng())
+				{
+					persistenceService
+		             .getSession()
+		             .createSQLQuery(
+		                     "update voucherheader set postauditprocessing = null where id =:vhId").setLong("vhId", row.getVoucherheader().getId()).executeUpdate();
+				}
 			}
 			
 		}
@@ -176,7 +185,10 @@ public class AuditService {
 		AuditDetails auditReg  = auditRepository.save(savedAuditDetails);
 		if(workFlowAction.equalsIgnoreCase("approve") || workFlowAction.equalsIgnoreCase("reject"))
 		{
+			if(bill != null)
+			{
 			expenseBillService.create(bill);
+			}
 		}
 		
 		persistenceService.getSession().flush();
@@ -195,6 +207,8 @@ public class AuditService {
 		final DateTime currentDate = new DateTime();
 		String actionName="";
 		String natureOfTask="";
+		
+		String expType="";
 		if(auditDetails.getType() !=null && auditDetails.getType().equals("Pre-Audit"))
 		{
 			actionName = "Pre Audit pending";
@@ -202,6 +216,15 @@ public class AuditService {
 		}
 		else
 		{
+			if(auditDetails.getPostVoucherMpng() != null && !auditDetails.getPostVoucherMpng().isEmpty())
+			{
+				expType="Receipt";
+			}
+			
+			if(auditDetails.getPostBillMpng() != null && !auditDetails.getPostBillMpng().isEmpty())
+			{
+				expType="Post";
+			}
 			actionName = "Post Audit pending";
 			natureOfTask = "Post-Audit";
 		}
@@ -244,8 +267,23 @@ public class AuditService {
 		}
 		else if(workFlowAction.equalsIgnoreCase("auditor"))
 		{
-			List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-	                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getEgBillregister().getEgBillregistermis().getDepartmentcode());
+			List<AppConfigValues> configValuesByModuleAndKey =null;
+			if(expType.equalsIgnoreCase("Receipt"))
+			{
+				configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+		                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getPostVoucherMpng().get(0).getVoucherheader().getVouchermis().getDepartmentcode());
+			}
+			else if(expType.equalsIgnoreCase("Post"))
+			{
+				configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+		                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getPostBillMpng().get(0).getEgBillregister().getEgBillregistermis().getDepartmentcode());
+			}
+			else
+			{
+				configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+		                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getEgBillregister().getEgBillregistermis().getDepartmentcode());
+			}
+			 
 	    	Position owenrPos = new Position();
 	    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
 	    	{

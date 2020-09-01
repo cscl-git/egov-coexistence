@@ -67,6 +67,7 @@ import org.egov.audit.entity.AuditCheckList;
 import org.egov.audit.entity.AuditChecklistHistory;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.entity.AuditPostBillMpng;
+import org.egov.audit.entity.AuditPostVoucherMpng;
 import org.egov.audit.model.AuditBillDetails;
 import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditEmployee;
@@ -75,6 +76,7 @@ import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditService;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
+import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.FundService;
@@ -210,6 +212,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetail.setAuditId(Long.parseLong(auditId));
 		auditDetail.setAuditStatus(auditDetails.getStatus().getCode());
 		List<AuditPostBillMpng> billDetailsMpngLIst=null;
+		List<AuditPostVoucherMpng> voucherDetailsMpngList=null;
 		if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
 		{
 			bill = auditDetails.getEgBillregister();
@@ -219,6 +222,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 		else
 		{
 			billDetailsMpngLIst=auditDetails.getPostBillMpng();
+			voucherDetailsMpngList=auditDetails.getPostVoucherMpng();
+			if(billDetailsMpngLIst != null && !billDetailsMpngLIst.isEmpty())
+			{
 			bill = billDetailsMpngLIst.get(0).getEgBillregister();
 			for(AuditPostBillMpng row : billDetailsMpngLIst)
 			{
@@ -240,6 +246,19 @@ public class CreateAuditController extends GenericWorkFlowController {
 		        }
 			}
 			auditDetail.setAuditBillDetails(auditBillDetails);
+			}
+			if(voucherDetailsMpngList != null && !voucherDetailsMpngList.isEmpty())
+			{
+				for(AuditPostVoucherMpng row : voucherDetailsMpngList)
+				{
+					billDetails =new AuditBillDetails();
+	            	billDetails.setVoucherId(row.getVoucherheader().getId());
+	            	billDetails.setVoucherNumber(row.getVoucherheader().getVoucherNumber());
+	            	auditBillDetails.add(billDetails);
+				}
+				auditDetail.setAuditBillDetails(auditBillDetails);
+			}
+			
 			
 		}
 		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Created") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Auditor") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Section Officer") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Examiner"))
@@ -598,7 +617,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		}
 		else if(workflowAction.equalsIgnoreCase("sectionOfficer"))
 		{
-			message="Audit No : "+audit.getAuditno()+" is sent to Section Officer for Verification";
+			message="Audit No : "+audit.getAuditno()+" is sent to RSA for Verification";
 		}
 		else if(workflowAction.equalsIgnoreCase("auditor"))
 		{
@@ -689,9 +708,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			query
 	        .append(
-	                "select v.id,v.type,v.voucherNumber,v.voucherDate from CVoucherHeader v  where v.type =? and v.postAuditProcessing is null ")
+	                "select v.id,v.type,v.voucherNumber,v.voucherDate from CVoucherHeader v  where v.type =? and v.postauditprocessing is null ")
 	        		.append(auditUtils
-                            .getReceiptDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo())).append(" and v.fundId.id ="+auditDetail.getFund());
+                            .getReceiptDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo())).append(" and v.fundId.id ="+auditDetail.getFund())
+	        		.append(auditUtils.getDeptQuery());
 		}
 		else
 		{
@@ -713,12 +733,13 @@ public class CreateAuditController extends GenericWorkFlowController {
         		auditDetail.getExpenditureType());
         PostAuditResult result = null;
         if (list.size() != 0) {
-        	resultSearchList.clear();
+        	//resultSearchList.clear();
         	resultSearchList = new ArrayList<PostAuditResult>();
         	if(auditDetail.getExpenditureType().equalsIgnoreCase("Receipt"))
         	{
         		for (final Object[] object : list) {
         			result = new PostAuditResult();
+        			result.setVoucherId(object[0].toString());
         			result.setExpendituretype(object[1].toString());
         			result.setBillnumber(object[2].toString());
         			result.setBilldate(object[3].toString());
@@ -790,6 +811,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
 				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				if(files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
 				upload.setFileName(files[i].getOriginalFilename());
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
@@ -809,11 +834,25 @@ public class CreateAuditController extends GenericWorkFlowController {
     	AuditPostBillMpng postBillMpng=null;
     	EgBillregister bill = null;
     	String deptCode= "";
-    	
+    	String type=auditDetail.getExpenditureType();
+    	List<AuditPostVoucherMpng> postVoucherMpngList=new ArrayList<AuditPostVoucherMpng>();
+    	AuditPostVoucherMpng postVoucherMpng = null;
+    	CVoucherHeader vh=null;
     	for(PostAuditResult result : auditDetail.getPostAuditResultList())
     	{
     		if(result.getChecked())
     		{	
+    			if(type.equalsIgnoreCase("Receipt"))
+    			{
+    				postVoucherMpng=new AuditPostVoucherMpng();
+    				deptCode=getReceipDeptCode(Long.parseLong(result.getVoucherId()));
+    				postVoucherMpng.setVoucherheader((CVoucherHeader) persistenceService.find("from CVoucherHeader where id=?",Long.parseLong(result.getVoucherId())));
+    				postVoucherMpng.setAuditDetails(audit);
+    				applyAuditing(postVoucherMpng);
+    				postVoucherMpngList.add(postVoucherMpng);
+    			}
+    			else
+    			{
     			postBillMpng = new AuditPostBillMpng();
     			 bill = expenseBillService.getByBillnumber(result.getBillnumber());
     			 deptCode=bill.getEgBillregistermis().getDepartmentcode();
@@ -821,6 +860,8 @@ public class CreateAuditController extends GenericWorkFlowController {
     			postBillMpng.setAuditDetails(audit);
     			applyAuditing(postBillMpng);
     			postBillMpngList.add(postBillMpng);
+    		}
+    			
     		}
     	}
     	List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
@@ -842,7 +883,14 @@ public class CreateAuditController extends GenericWorkFlowController {
     	audit.setEgBillregister(null);
     	audit.setDepartment(deptCode);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode("Audit", "Created"));
+    	if(type.equalsIgnoreCase("Receipt"))
+    	{
+    		audit.setPostVoucherMpng(postVoucherMpngList);
+    	}
+    	else
+    	{
     	audit.setPostBillMpng(postBillMpngList);
+    	}
     	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
         .withComments("Initiated Post-Audit")
         .withStateValue("Created").withDateInfo(new Date()).withOwner(owenrPos)
@@ -868,10 +916,40 @@ public class CreateAuditController extends GenericWorkFlowController {
     		 bill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Pending with Post-Audit"));
     		 expenseBillService.create(bill);
     	 }
+    	 for(AuditPostVoucherMpng row:postVoucherMpngList)
+    	 {
+    		 persistenceService
+             .getSession()
+             .createSQLQuery(
+                     "update voucherheader set postauditprocessing = 'Y' where id =:vhId").setLong("vhId", row.getVoucherheader().getId()).executeUpdate();
+    	 }
 		persistenceService.getSession().flush();
 		
 	}
 	
+
+	private String getReceipDeptCode(Long vhId) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String dept="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select  vm.voucherheaderid , vm.departmentcode from vouchermis vm where vm.voucherheaderid =:voucherHeaderId");
+    	    query.setLong("voucherHeaderId", vhId);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		dept= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return dept;
+	}
+
 
 	@RequestMapping(value = "/post/auditSearch", method = RequestMethod.POST)
 	public String auditSearch(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
@@ -912,7 +990,7 @@ public class CreateAuditController extends GenericWorkFlowController {
         		auditDetail.getAuditType());
         AuditDetails result = null;
         if (list.size() != 0) {
-        	resultsDtlsList.clear();
+        	//resultsDtlsList.clear();
         	resultsDtlsList = new ArrayList<AuditDetails>();
 
             for (final Object[] object : list) {

@@ -19,7 +19,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     	<h3>Post Audit</h3>
     	<div class="panel panel-primary" data-collapsed="0">
     		<div class="form-group" style="padding : 50px 20px 0;">
-    			<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.expType" text="Expenditure Type"/>
+    			<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.expType" text=" Type"/>
 					<span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
@@ -88,6 +88,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<tr>
 							<td>
 								<form:checkbox path="postAuditResultList[${status.index}].checked"/>
+								<form:hidden path="postAuditResultList[${status.index}].voucherId" id="postAuditResultList[${status.index}].voucherId"/>
 						    </td>
 							<td>
 								<form:hidden path="postAuditResultList[${status.index}].expendituretype" id="postAuditResultList[${status.index}].expendituretype"/>
@@ -130,6 +131,9 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 			<br>
 			<br>
 			<c:if test="${auditDetail.postAuditResultList != null &&  !auditDetail.postAuditResultList.isEmpty()}">
+			<br>
+			<jsp:include page="billdocument-upload.jsp"/>
+			<br>
 				<div class="buttonbottom" align="center">
 		        	<input type="submit" id="save" class="btn btn-primary btn-wf-primary" name="save"  value="Submit"/>
 		        </div>

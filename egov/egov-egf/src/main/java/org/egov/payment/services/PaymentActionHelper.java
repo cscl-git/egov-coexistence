@@ -346,6 +346,8 @@ public class PaymentActionHelper {
     @Transactional
     public EgBillregister setbillRegisterFunction(EgBillregister bill, CFunction function)
     {
+        LOGGER.info("populate EgBillregister mis"+bill.getEgBillregistermis());
+        LOGGER.info("populate cFunctionobj"+function.getName()); 
         bill.getEgBillregistermis().setFunction(function);
         return bill;
     }

@@ -239,4 +239,18 @@ public class AuditUtils {
 
 	}
 
+	public String getDeptQuery() {
+		final StringBuffer misQuery = new StringBuffer(300);
+		EmployeeInfo ownerobj = null;
+		ownerobj= microserviceUtils.getEmployee(ApplicationThreadLocals.getUserId(), null, null, null).get(0);
+		Department department=microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+		
+		if (null != department.getCode() && !department.getCode().equals("-1")) {
+			misQuery.append(" and v.id in (select vmis.voucherheaderid from Vouchermis vmis where vmis.departmentcode ='");
+			misQuery.append(department.getCode()+"')");
+		}
+		
+		return misQuery.toString();
+	}
+
 }

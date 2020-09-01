@@ -63,6 +63,9 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditPostBillMpng.class)
 	private List<AuditPostBillMpng> postBillMpng=new ArrayList<AuditPostBillMpng>();
 	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditPostVoucherMpng.class)
+	private List<AuditPostVoucherMpng> postVoucherMpng=new ArrayList<AuditPostVoucherMpng>();
+	
 	private String department;
 	@Transient
     private String approvalComent;
@@ -231,6 +234,14 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 
 	public void setDepartment(String department) {
 		this.department = department;
+	}
+
+	public List<AuditPostVoucherMpng> getPostVoucherMpng() {
+		return postVoucherMpng;
+	}
+
+	public void setPostVoucherMpng(List<AuditPostVoucherMpng> postVoucherMpng) {
+		this.postVoucherMpng = postVoucherMpng;
 	}
 
 

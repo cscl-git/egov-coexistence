@@ -12,6 +12,7 @@ public class PostAuditResult {
 	private String sourcepath;
 	private String ownerName;
 	private boolean checked;
+	private String voucherId;
 	
 	public String getExpendituretype() {
 		return expendituretype;
@@ -72,6 +73,12 @@ public class PostAuditResult {
 	}
 	public void setChecked(boolean checked) {
 		this.checked = checked;
+	}
+	public String getVoucherId() {
+		return voucherId;
+	}
+	public void setVoucherId(String voucherId) {
+		this.voucherId = voucherId;
 	}
 	
 }
