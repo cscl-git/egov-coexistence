@@ -132,6 +132,8 @@ public class UpdateExpenseBillController extends BaseBillController {
 
     private static final String EXPENSEBILL_VIEW = "expensebill-view";
 
+    private static final String EXPENSEBILL_UPDATE_WORKFLOW = "expensebill-update-Workflow";
+    
     private static final String NET_PAYABLE_ID = "netPayableId";
     @Autowired
     @Qualifier("persistenceService")
@@ -230,14 +232,14 @@ public class UpdateExpenseBillController extends BaseBillController {
             return "expensebill-update";
         }
         else {
-            model.addAttribute("mode", "view");
+            model.addAttribute("mode", "edit");
             if (egBillregister.getEgBillregistermis().getBudgetaryAppnumber() != null
                     && !egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()) {
                 budgetDetails = expenseBillService.getBudgetDetailsForBill(egBillregister);
             }
 
             model.addAttribute("budgetDetails", budgetDetails);
-            return EXPENSEBILL_VIEW;
+            return EXPENSEBILL_UPDATE_WORKFLOW;
         }
     }
 

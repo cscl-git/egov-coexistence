@@ -160,6 +160,17 @@ $('.btn-wf-primary').click(function(){
 		}else
 			return false;
 	 }
+	else if (button != null && (button == 'Reject')) {
+		if(!validateWorkFlowApprover(button))
+			return false;
+		if(!$("form").valid())
+			return false;
+		if(validate()){
+			deleteHiddenSubledgerRow();
+			return true;
+		}else
+			return false;
+	 }
 	   else if (button != null && (button == 'SaveAsDraft')) {
 	      
 	       if(!validateWorkFlowApprover(button))
@@ -1351,9 +1362,9 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Reject') {
-		$('#approvalDepartment').removeAttr('required');
-		$('#approvalDesignation').removeAttr('required');
-		$('#approvalPosition').removeAttr('required');
+		$('#approvalDepartment').attr('required', 'required');
+		$('#approvalDesignation').attr('required', 'required');
+		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').attr('required', 'required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {

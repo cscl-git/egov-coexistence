@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 4.7.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LaborCess" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="22ad9958-bef0-4c31-91ed-55916469a1f9">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
 	<style name="Table_TH" mode="Opaque" backcolor="#F0F8FF">
 		<box>
 			<pen lineWidth="0.5" lineColor="#000000"/>
@@ -101,8 +103,8 @@
 						</jr:columnHeader>
 						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="72" height="30" uuid="e5752274-a8ed-4c5f-a165-510e2818ed95"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="72" height="30" isPrintWhenDetailOverflows="true" uuid="e5752274-a8ed-4c5f-a165-510e2818ed95"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
@@ -122,8 +124,8 @@
 						</jr:columnHeader>
 						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="70" height="30" uuid="7ce0b7d3-7ae6-428f-86a4-c07cb537b3e2"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="30" isPrintWhenDetailOverflows="true" uuid="7ce0b7d3-7ae6-428f-86a4-c07cb537b3e2"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
@@ -143,8 +145,8 @@
 						</jr:columnHeader>
 						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="100" height="30" uuid="6e950660-f63f-4f67-b83e-fde4183617c2"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" uuid="6e950660-f63f-4f67-b83e-fde4183617c2"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
@@ -164,8 +166,8 @@
 						</jr:columnHeader>
 						<jr:columnFooter style="Table_CH" height="30"/>
 						<jr:detailCell style="Table_TD" height="30">
-							<textField isStretchWithOverflow="true">
-								<reportElement x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" uuid="0389a7c2-af88-4601-8cbd-d427639589ea"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" uuid="0389a7c2-af88-4601-8cbd-d427639589ea"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
@@ -193,8 +195,8 @@
 							</staticText>
 						</jr:columnFooter>
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="100" height="30" uuid="55606ac6-df3c-4519-8c28-cd6a36866f52"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" uuid="55606ac6-df3c-4519-8c28-cd6a36866f52"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
@@ -223,8 +225,8 @@ Amount]]></text>
 							</textField>
 						</jr:columnFooter>
 						<jr:detailCell style="Table_TD" height="30">
-							<textField>
-								<reportElement x="0" y="0" width="60" height="30" uuid="7283de0d-074a-4b1d-9488-fd4e8eef5c69"/>
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="30" isPrintWhenDetailOverflows="true" uuid="7283de0d-074a-4b1d-9488-fd4e8eef5c69"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>

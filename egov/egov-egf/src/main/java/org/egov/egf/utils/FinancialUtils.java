@@ -176,14 +176,14 @@ public class FinancialUtils {
 
         String approverDetails="";
         System.out.println("workflowAction :"+workFlowAction);
-        if (!FinancialConstants.BUTTONREJECT.toString().equalsIgnoreCase(workFlowAction))
+       
 //            approverDetails = id + ","
 //                    + getApproverName(approvalPosition) + ","
 //                    + (currentUserAssignment != null ? currentUserAssignment.getDesignation().getName() : "") + ","
 //                    + (nextDesign != null ? nextDesign : "");
             approverDetails = id + "," + approverName;
-        else
-            approverDetails = id + "," + getInitiatorName(state.getCreatedBy());
+       /* else
+            approverDetails = id + "," + getInitiatorName(state.getCreatedBy());*/
         
 //            approverDetails = id + ","
 //                    + getApproverName(state.getOwnerPosition()) + ","
