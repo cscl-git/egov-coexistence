@@ -84,25 +84,32 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
                     Arrays.asList("Forward"));
 	}
 
-	@RequestMapping(value = "/estimate", params = "estimate", method = RequestMethod.POST)
+	@RequestMapping(value = "/estimate", params = "Forward", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request,@RequestParam final String workFlowAction)
 			throws Exception {
 
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+		if (estimatePreparationApproval.getEstimateDt() != null || estimatePreparationApproval.getEstimateDt() != "") {
 		Date estimateDate = inputFormat.parse(estimatePreparationApproval.getEstimateDt());
 		estimatePreparationApproval.setEstimateDate(estimateDate);
+		}
 
+		if (estimatePreparationApproval.getDt() != null || estimatePreparationApproval.getDt() != "") {
 		Date date = inputFormat.parse(estimatePreparationApproval.getDt());
 		estimatePreparationApproval.setDate(date);
-
-		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
-		estimatePreparationApproval.setExecutingDivision(department);
+		}
+		Long department = null;
+		if (estimatePreparationApproval.getDepartment() != null || estimatePreparationApproval.getDepartment() != "") {
+			
 		
+		 department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+		}
 
 		String deptCode = "";
-		//AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
 	    String estimateNumber = v.getEstimateNumber(deptCode);
@@ -123,7 +130,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
             approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
         
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
-				.saveEstimatePreparationData(request, estimatePreparationApproval);
+				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
 		return "estimatepreparationapproval-form";
 
@@ -335,18 +342,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 	@RequestMapping(value = "/editdata", params = "editdata", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
 	@ResponseBody
-	/*
-	 * public String editEstimateData(
-	 * 
-	 * @ModelAttribute("estimatePreparationApproval") final
-	 * EstimatePreparationApproval estimatePreparationApproval, final Model
-	 * model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest
-	 * request) throws Exception {
-	 */
-
 	public String editEstimateData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final HttpServletRequest request) throws Exception {
+			final HttpServletRequest request,@RequestParam final String workFlowAction) throws Exception {
 
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date estimateDate = inputFormat.parse(estimatePreparationApproval.getEstimateDt());
@@ -359,7 +357,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimatePreparationApproval.setExecutingDivision(department);
 
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
-				.saveEstimatePreparationData(request, estimatePreparationApproval);
+				.saveEstimatePreparationData(request, estimatePreparationApproval,null,null,null,null);
 
 		return "estimatepreparationapproval-form";
 

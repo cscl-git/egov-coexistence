@@ -35,6 +35,8 @@
 	integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 	crossorigin="anonymous"></script>
 
+<script
+        src="<cdn:url value='/resources/app/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 
 <meta charset="UTF-8">
@@ -157,6 +159,15 @@ tr:hover {
 		method="post" action="estimate"
 		modelAttribute="estimatePreparationApproval"
 		id="estimatePreparationApproval" enctype="multipart/form-data">
+
+		<spring:hasBindErrors name="estimatePreparationApproval">
+			<div class="alert alert-danger"
+				style="margin-top: 20px; margin-bottom: 10px;">
+				<form:errors path="*" />
+				<br />
+			</div>
+		</spring:hasBindErrors>
+
 		<div class="card">
 			<div class="container">
 				<div class="row">
@@ -188,7 +199,7 @@ tr:hover {
 									code="lbl.estimate.preparation.executing.division" /></label>
 							<div class="col-md-6 block-colm">
 								<form:select path="department" id="department"
-									class="form-control">
+									class="form-control" required="required">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
@@ -208,24 +219,13 @@ tr:hover {
 									code="lbl.estimate.preparation.estimate.date" /></label>
 							<div class="col-md-6 block-colm">
 								<form:input type="date" class="form-control txtRight datepicker"
-									path="estimateDt" pattern="dd/MM/yyyy" />
+									path="estimateDt" pattern="dd/MM/yyyy" required="required" />
+								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
 					</div>
 
-					<!-- <div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.estimate.number" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="estimateNumber" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div> -->
 
 					<div class="col-md-6">
 						<div class="form-group">
@@ -471,7 +471,8 @@ tr:hover {
 									code="lbl.work.order.search.date" /></label>
 							<div class="col-md-6 block-colm">
 								<form:input type="date" class="form-control txtRight datepicker"
-									path="dt" pattern="dd/MM/yyyy" />
+									path="dt" pattern="dd/MM/yyyy" required="required" />
+								<form:errors path="dt" cssClass="add-margin error-msg" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -546,7 +547,6 @@ tr:hover {
 
 				<div class="row">
 					<div class="col-md-12">
-						<!-- <h4>BoQ Details</h4> -->
 						<button onclick="addFileInputField();" class="btn-info"
 							style="margin-bottom: 15px; float: right;" id="plus">+</button>
 					</div>
@@ -686,19 +686,7 @@ tr:hover {
 			document.getElementById("table").deleteRow(i);
 		}
 		
-		function getEstimateNo(){
-			var department = $("#department").val();
-			alert(department);
-			$.ajax({
-				type : "POST",
-				url : '/services/works/estimatePreparation/estimateNumber?department='+department,
-				
-				success : function(result) {
-						if (result.status == 'success') {}
-						else{}
-				}
-			});
-		}
+		
 	</script>
 
 </body>
