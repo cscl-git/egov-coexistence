@@ -269,19 +269,19 @@ tr:hover {
 									var="result" varStatus="status">
 									<tr>
 										<td><input type="hidden" class="form-control"
-											path="estimateList[${status.index}].estimatePreparationId"
-											id="estimateList[${status.index}].estimatePreparationId"
-											readonly="readonly" value="${result.estimatePreparationId}" />
+											path="estimateList[${status.index}].id"
+											id="estimateList[${status.index}].id"
+											readonly="readonly" value="${result.id}" />
 
 											<a class="btn btn-xs btn-secondary"
-											href="/services/works/estimatePreparation/view/${result.estimatePreparationId}"
+											href="/services/works/estimatePreparation/view/${result.id}"
 											target="popup"
-											onclick="window.open('/services/works/estimatePreparation/view/${result.estimatePreparationId}','popup','width=600,height=600,resizable=no'); return false;">
+											onclick="window.open('/services/works/estimatePreparation/view/${result.id}','popup','width=600,height=600,resizable=no'); return false;">
 												<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
 										</a> <a class="btn btn-xs btn-secondary"
-											href="/services/works/estimatePreparation/edit/${result.estimatePreparationId}"
+											href="/services/works/estimatePreparation/edit/${result.id}"
 											target="popup"
-											onclick="window.open('/services/works/estimatePreparation/edit/${result.estimatePreparationId}','popup','width=600,height=600,resizable=no'); return false;">
+											onclick="window.open('/services/works/estimatePreparation/edit/${result.id}','popup','width=600,height=600,resizable=no'); return false;">
 												<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;Edit
 										</a></td>
 										<td><form:hidden
@@ -300,10 +300,7 @@ tr:hover {
 												path="estimateList[${status.index}].estimateAmount"
 												id="estimateList[${status.index}].estimateAmount" />
 											${result.estimateAmount }</td>
-										<%-- <td><form:hidden
-												path="estimateList[${status.index}].estimatePreparationId"
-												id="estimateList[${status.index}].estimatePreparationId" />
-											${result.estimatePreparationId }</td> --%>
+										
 
 									</tr>
 								</c:forEach>

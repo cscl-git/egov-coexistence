@@ -291,9 +291,9 @@ tr:hover {
 												id="estimateList[${status.index}].estimateAmount" />
 											${result.estimateAmount }</td>
 										<td><form:hidden
-												path="estimateList[${status.index}].estimatePreparationId"
-												id="estimateList[${status.index}].estimatePreparationId" />
-											${result.estimatePreparationId }</td>
+												path="estimateList[${status.index}].id"
+												id="estimateList[${status.index}].id" />
+											${result.id }</td>
 
 									</tr>
 								</c:forEach>

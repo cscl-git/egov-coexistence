@@ -42,7 +42,7 @@ public class WorkEstimateService {
 	public List<EstimatePreparationApproval> searchBoqData(HttpServletRequest request, Long estimatePreparationId) {
 		// TODO Auto-generated method stub
 		List<EstimatePreparationApproval> boqDetailsList = estimatePreparationApprovalRepository
-				.findByEstimatePreparationId(estimatePreparationId);
+				.findById(estimatePreparationId);
 
 		// return boqDetailsList;
 		return boqDetailsList;
@@ -52,7 +52,7 @@ public class WorkEstimateService {
 	public List<EstimatePreparationApproval> searchData(Long estimatePreparationId) {
 		// TODO Auto-generated method stub
 		List<EstimatePreparationApproval> detailsList = estimatePreparationApprovalRepository
-				.findByEstimatePreparationId(estimatePreparationId);
+				.findById(estimatePreparationId);
 
 		return detailsList;
 	}
@@ -62,7 +62,7 @@ public class WorkEstimateService {
 		// TODO Auto-generated method stub
 		EstimatePreparationApproval estimatePreparationApproval = new EstimatePreparationApproval();
 		List<EstimatePreparationApproval> detailsList = estimatePreparationApprovalRepository
-				.findByEstimatePreparationId(estimatePreparationId);
+				.findById(estimatePreparationId);
 		for (int i = 0; i < detailsList.size(); i++) {
 			estimatePreparationApproval = detailsList.get(i);
 		}

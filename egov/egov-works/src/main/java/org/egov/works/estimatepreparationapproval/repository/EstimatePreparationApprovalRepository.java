@@ -19,5 +19,5 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 	List<EstimatePreparationApproval> findByIsCheckedAndEstimatePreparationId(boolean checked,
 			Long estimatePreparationId);*/
 
-	List<EstimatePreparationApproval> findByEstimatePreparationId(final Long estimatePreparationId);
+	List<EstimatePreparationApproval> findById(final Long id);
 }

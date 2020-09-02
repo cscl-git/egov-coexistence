@@ -12,14 +12,12 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import org.egov.commons.EgwStatus;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.works.boq.entity.BoQDetails;
@@ -27,7 +25,7 @@ import org.egov.works.boq.entity.BoQDetails;
 @Entity
 @Table(name = "txn_estimate_preparation")
 @SequenceGenerator(name = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, sequenceName = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, allocationSize = 1)
- public class EstimatePreparationApproval extends StateAware implements Serializable {
+public class EstimatePreparationApproval extends StateAware implements Serializable {
 
 	private static final long serialVersionUID = -4312140421386028968L;
 
@@ -113,9 +111,11 @@ import org.egov.works.boq.entity.BoQDetails;
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList;
 
-	/*@ManyToOne
-	@JoinColumn(name = "statusid")
-	private EgwStatus status;*/
+	/*
+	 * @ManyToOne
+	 * 
+	 * @JoinColumn(name = "statusid") private EgwStatus status;
+	 */
 
 	@Transient
 	private List<EstimatePreparationApproval> estimateList;
@@ -140,16 +140,25 @@ import org.egov.works.boq.entity.BoQDetails;
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
-	
+
 	@Transient
 	private String department = "";
-	
+
 	@Transient
 	private List<Department> departments = new ArrayList<Department>();
-	
+
 	@Transient
 	private String dt;
 
+	@Transient
+	private String approvalDepartment;
+	@Transient
+	private String approvalComent;
+
+	@Transient
+	private User approver;
+	@Transient
+	private Date approvedOn;
 
 	public Long getWorksWing() {
 		return worksWing;
@@ -415,13 +424,11 @@ import org.egov.works.boq.entity.BoQDetails;
 		this.boQDetailsList = boQDetailsList;
 	}
 
-	/*public EgwStatus getStatus() {
-		return status;
-	}
-
-	public void setStatus(EgwStatus status) {
-		this.status = status;
-	}*/
+	/*
+	 * public EgwStatus getStatus() { return status; }
+	 * 
+	 * public void setStatus(EgwStatus status) { this.status = status; }
+	 */
 
 	public String getDepartment() {
 		return department;
@@ -463,10 +470,40 @@ import org.egov.works.boq.entity.BoQDetails;
 
 	@Override
 	protected void setId(Long id) {
-		this.id=id;
-		
+		this.id = id;
+
 	}
 
+	public String getApprovalDepartment() {
+		return approvalDepartment;
+	}
 
+	public void setApprovalDepartment(String approvalDepartment) {
+		this.approvalDepartment = approvalDepartment;
+	}
+
+	public String getApprovalComent() {
+		return approvalComent;
+	}
+
+	public void setApprovalComent(String approvalComent) {
+		this.approvalComent = approvalComent;
+	}
+
+	public User getApprover() {
+		return approver;
+	}
+
+	public void setApprover(User approver) {
+		this.approver = approver;
+	}
+
+	public Date getApprovedOn() {
+		return approvedOn;
+	}
+
+	public void setApprovedOn(Date approvedOn) {
+		this.approvedOn = approvedOn;
+	}
 
 }

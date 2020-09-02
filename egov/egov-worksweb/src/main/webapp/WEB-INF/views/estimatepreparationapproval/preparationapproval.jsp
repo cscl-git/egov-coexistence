@@ -470,7 +470,7 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.work.order.search.date" /></label>
 							<div class="col-md-6 block-colm">
-									<form:input type="date" class="form-control txtRight datepicker"
+								<form:input type="date" class="form-control txtRight datepicker"
 									path="dt" pattern="dd/MM/yyyy" />
 							</div>
 							<div class="clearfix"></div>
@@ -616,17 +616,10 @@ tr:hover {
 		<div class="card">
 			<div class="container">
 				<div>
-					<p style="color: #4e799f; font-size: 25px;">Document upload</p>
+					<p style="color: #4e799f; font-size: 25px;">Documents</p>
 				</div>
 				<div class="row">
 					<jsp:include page="fileupload.jsp" />
-
-					<!-- <div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select"
-							value="Save Estimate Preparation & Approval" />
-					</div> -->
-
 				</div>
 			</div>
 		</div>
@@ -638,107 +631,11 @@ tr:hover {
 				<div>
 					<p style="color: #4e799f; font-size: 25px;">Approval Details</p>
 				</div>
-				<%-- 				<div class="row">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.approver.department" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="department" id="department"
-									class="form-control">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:options
-										items="${estimatePreparationApproval.departments}"
-										itemValue="code" itemLabel="name" />
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
+				<jsp:include page="../common/commonWorkflowMatrix.jsp" />
+				<div class="buttonbottom" align="center">
+					<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
+				</div>
 
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.approver.designation" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="worksWing" id="worksWing"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Building & Roads</form:option>
-									<form:option value="2">Public Health</form:option>
-									<form:option value="3">Horticulture & Electrical</form:option>
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.approver" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="worksWing" id="worksWing"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Building & Roads</form:option>
-									<form:option value="2">Public Health</form:option>
-									<form:option value="3">Horticulture & Electrical</form:option>
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-12">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-3 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.comments" /></label>
-							<div class="col-md-9 block-colm">
-								<form:textarea class="form-control txtRight" path="workName" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-				</div> --%>
-
-				<%-- <a class="btn btn-xs btn-secondary"
-					href="/services/council/councilpreamble/view/${contact.preamble.id}"
-					target="popup"
-					onclick="window.open('/services/council/councilpreamble/view/${contact.preamble.id}','popup','width=600,height=600,resizable=no'); return false;">
-					<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
-				</a> --%>
-				
-				<a class="btn btn-xs btn-secondary"
-					href="/services/works/workEstimate/workEstimateSearch"
-					target="popup" 
-					onclick="window.open('/services/works/workEstimate/workEstimateSearch','popup','width=600,height=600,resizable=no'); return false;">
-					<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
-				</a>
-
-			</div>
-		</div>
-
-		<br />
-
-		<div class="card">
-			<div class="container">
-		<jsp:include page="../common/commonworkflowmatrix-expensebill.jsp"/>
-        <div class="buttonbottom" align="center">
-            <jsp:include page="../common/commonworkflowmatrix-button.jsp"/>
-        </div>
 			</div>
 		</div>
 

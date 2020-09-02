@@ -158,7 +158,7 @@ tr:hover {
 		<div class="card">
 			<div class="container">
 				<div class="row">
-				<input type="hidden" name="estimatePreparationApproval" value="${estimatePreparationApproval.estimatePreparationId}" />
+				<input type="hidden" name="estimatePreparationApproval" value="${estimatePreparationApproval.id}" />
 				
 					<div class="col-md-6">
 						<div class="form-group">
