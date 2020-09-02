@@ -62,6 +62,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	WorkEstimateService workEstimateService;
 	
 	private static final String STATE_TYPE = "stateType";
+	private static final String APPROVAL_POSITION = "approvalPosition";
+
+    private static final String APPROVAL_DESIGNATION = "approvalDesignation";
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -84,7 +87,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "estimate", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
+			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request,@RequestParam final String workFlowAction)
 			throws Exception {
 
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -105,7 +108,20 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	    String estimateNumber = v.getEstimateNumber(deptCode);
 		estimatePreparationApproval.setEstimateNumber(estimateNumber);
 		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
-
+		//start of workflow
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
 				.saveEstimatePreparationData(request, estimatePreparationApproval);
 

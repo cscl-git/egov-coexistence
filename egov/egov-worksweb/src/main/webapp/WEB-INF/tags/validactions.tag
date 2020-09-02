@@ -1,7 +1,8 @@
-<%@ tag body-content="empty" isELIgnored="false" pageEncoding="UTF-8" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<%@ tag dynamic-attributes="true" isELIgnored="false"%>
+<%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld" %>  
+
+<%@ attribute name="formName" required="true" %>
+
 <%--
   ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
   ~    accountability and the service delivery of the government  organizations.
@@ -50,33 +51,14 @@
   ~
   --%>
 
-<header class="navbar navbar-fixed-top"><!-- set fixed position by adding class "navbar-fixed-top" -->
-    <nav class="navbar navbar-default navbar-custom navbar-fixed-top">
-        <div class="container-fluid">
-            <div class="navbar-header col-md-10 col-xs-10">
-                <a class="navbar-brand" href="javascript:void(0);">
-                    <img src="<c:url value='/downloadfile/logo' context='/services/egi'/>" height="60">
-                    <div>
-						<span class="title2">
-						  Financial Management
-						</span>
+<div class="buttonholderwk">
+<input type="hidden" name="actionName" id="actionName"/>	
+<s:iterator value="%{validActions}">
+  <s:submit type="submit" cssClass="buttonfinal" value="%{description}" id="%{name}" name="%{name}" method="moveEstimate" onclick="document.${formName}.actionName.value='%{name}'"/>
+</s:iterator>
 
-                    </div>
-                </a>
-            </div>
-
-            <div class="nav-right-menu col-md-2 col-xs-2">
-                <ul class="hr-menu text-right">
-                    <li class="ico-menu">
-                        
-                    </li>
-
-                </ul>
-            </div>
-
-        </div>
-    </nav>
-</header>
-
-	
- 
+<s:if test="%{model.id==null}">
+	  <input type="reset" class="buttonfinal" value="CLEAR" id="button" name="button"/>
+  </s:if>
+  <input type="button" class="buttonfinal" value="CLOSE" id="closeButton" name="closeButton" onclick="window.close();"/>
+</div>
