@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.workestimate.service.WorkEstimateService;
@@ -24,11 +26,16 @@ public class WorkEstimateController {
 
 	@Autowired
 	WorkEstimateService workEstimateService;
+	
+	@Autowired
+	public MicroserviceUtils microserviceUtils;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
 			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
+		
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 
 		return "search-work-estimate-form";
 	}
@@ -47,6 +54,9 @@ public class WorkEstimateController {
 		Date todate = inputFormat.parse(estimatePreparationApproval.getToDate());
 		estimatePreparationApproval.setToDt(todate);
 
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+		
 		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimateData(request,
 				estimatePreparationApproval);
 		approvalList.addAll(workEstimateDetails);
@@ -80,5 +90,10 @@ public class WorkEstimateController {
 		return "search-work-estimate-form";
 
 	}
+	
+	private List<Department> getDepartmentsFromMs() {
+        List<Department> departments = microserviceUtils.getDepartments();
+        return departments;
+    }
 
 }

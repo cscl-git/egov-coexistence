@@ -28,16 +28,15 @@ public class WorkEstimateService {
 
 		return workEstimateDetails;
 	}
-/*
-	@Transactional
-	public List<EstimatePreparationApproval> searchBoqData(HttpServletRequest request, boolean checked,
-			Long estimatePreparationId) {
-		List<EstimatePreparationApproval> boqDetailsList = estimatePreparationApprovalRepository
-				.findByIsCheckedAndEstimatePreparationId(checked, estimatePreparationId);
-
-		//return boqDetailsList;
-		return null;
-	}*/
+	/*
+	 * @Transactional public List<EstimatePreparationApproval>
+	 * searchBoqData(HttpServletRequest request, boolean checked, Long
+	 * estimatePreparationId) { List<EstimatePreparationApproval> boqDetailsList =
+	 * estimatePreparationApprovalRepository
+	 * .findByIsCheckedAndEstimatePreparationId(checked, estimatePreparationId);
+	 * 
+	 * //return boqDetailsList; return null; }
+	 */
 
 	@Transactional
 	public List<EstimatePreparationApproval> searchBoqData(HttpServletRequest request, Long estimatePreparationId) {
@@ -45,8 +44,29 @@ public class WorkEstimateService {
 		List<EstimatePreparationApproval> boqDetailsList = estimatePreparationApprovalRepository
 				.findByEstimatePreparationId(estimatePreparationId);
 
-		//return boqDetailsList;
+		// return boqDetailsList;
 		return boqDetailsList;
-		
+
+	}
+
+	public List<EstimatePreparationApproval> searchData(Long estimatePreparationId) {
+		// TODO Auto-generated method stub
+		List<EstimatePreparationApproval> detailsList = estimatePreparationApprovalRepository
+				.findByEstimatePreparationId(estimatePreparationId);
+
+		return detailsList;
+	}
+
+	@Transactional
+	public EstimatePreparationApproval searchEstimateData(Long estimatePreparationId) {
+		// TODO Auto-generated method stub
+		EstimatePreparationApproval estimatePreparationApproval = new EstimatePreparationApproval();
+		List<EstimatePreparationApproval> detailsList = estimatePreparationApprovalRepository
+				.findByEstimatePreparationId(estimatePreparationId);
+		for (int i = 0; i < detailsList.size(); i++) {
+			estimatePreparationApproval = detailsList.get(i);
+		}
+
+		return estimatePreparationApproval;
 	}
 }

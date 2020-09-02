@@ -313,6 +313,21 @@
         <put-attribute name="page-title" value="title.work.order.search.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatesearch/workordersearch.jsp"/>
     </definition>
+    
+    <definition name="search-estimate-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate.jsp"/>
+    </definition>
+    
+    <definition name="view-estimate-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/viewestimate.jsp"/>
+    </definition>
+    
+    <definition name="edit-estimate-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/editestimate.jsp"/>
+    </definition>
 
 </tiles-definitions>
 

@@ -14,7 +14,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-//import javax.ws.rs.QueryParam;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,16 +21,25 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.works.boq.entity.BoQDetails;
+//import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
+import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
+import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -41,13 +49,39 @@ public class EstimatePreparationApprovalController {
 	@Autowired
 	EstimatePreparationApprovalService estimatePreparationApprovalService;
 
+	@Autowired
+	private AutonumberServiceBeanResolver beanResolver;
+
+	@Autowired
+	public MicroserviceUtils microserviceUtils;
+
+	@Autowired
+	WorkEstimateService workEstimateService;
+
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
 
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+
 		return "estimatepreparationapproval-form";
 	}
+
+	/*@RequestMapping(value = "/estimateNumber", method = RequestMethod.POST)
+	public String estimateNumber(
+			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
+			String department, final Model model, HttpServletRequest request) {
+
+		String deptCode = "";
+		AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
+		deptCode = department;
+	    String estimateNumber = v.getEstimateNumber(deptCode);
+		estimatePreparationApproval.setEstimateNumber(estimateNumber);
+		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
+		//model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
+		return "estimatepreparationapproval-form";
+	}*/
 
 	@RequestMapping(value = "/estimate", params = "estimate", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
@@ -58,6 +92,21 @@ public class EstimatePreparationApprovalController {
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date estimateDate = inputFormat.parse(estimatePreparationApproval.getEstimateDt());
 		estimatePreparationApproval.setEstimateDate(estimateDate);
+
+		Date date = inputFormat.parse(estimatePreparationApproval.getDt());
+		estimatePreparationApproval.setDate(date);
+
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+		
+
+		String deptCode = "";
+		//AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
+		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
+		deptCode = estimatePreparationApproval.getDepartment();
+	    String estimateNumber = v.getEstimateNumber(deptCode);
+		estimatePreparationApproval.setEstimateNumber(estimateNumber);
+		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
 
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
 				.saveEstimatePreparationData(request, estimatePreparationApproval);
@@ -158,7 +207,7 @@ public class EstimatePreparationApprovalController {
 		} else {
 			// response = "Please choose a file.";
 		}
-
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
 
@@ -177,6 +226,129 @@ public class EstimatePreparationApprovalController {
 			throw new IllegalArgumentException("The specified file is not Excel file");
 		}
 		return workbook;
+	}
+
+	private List<Department> getDepartmentsFromMs() {
+		List<Department> departments = microserviceUtils.getDepartments();
+		return departments;
+	}
+
+	@RequestMapping(value = "/formnew", method = RequestMethod.POST)
+	public String showEstimateNewFormGet(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, HttpServletRequest request) {
+
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+
+		return "search-estimate-form";
+	}
+
+	@RequestMapping(value = "/workEstimateSearch", params = "workEstimateSearch", method = RequestMethod.POST)
+	public String searchWorkEstimateData(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, final HttpServletRequest request) throws Exception {
+		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
+
+		// Convert input string into a date
+		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date fromdate = inputFormat.parse(estimatePreparationApproval.getFromDate());
+		estimatePreparationApproval.setFromDt(fromdate);
+
+		Date todate = inputFormat.parse(estimatePreparationApproval.getToDate());
+		estimatePreparationApproval.setToDt(todate);
+
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+
+		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimateData(request,
+				estimatePreparationApproval);
+		approvalList.addAll(workEstimateDetails);
+		estimatePreparationApproval.setEstimateList(approvalList);
+
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+
+		return "search-estimate-form";
+
+	}
+
+	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
+	public String view(@PathVariable("id") final Long id, Model model) {
+
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+
+		for (int j = 0; j < estimateDetails.getNewBoQDetailsList().size(); j++) {
+			responseList = estimateDetails.getNewBoQDetailsList();
+		}
+		estimateDetails.setBoQDetailsList(responseList);
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+
+		return "view-estimate-form";
+	}
+
+	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+	public String edit(@PathVariable("id") final Long id, Model model) {
+
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+
+		for (int j = 0; j < estimateDetails.getNewBoQDetailsList().size(); j++) {
+			responseList = estimateDetails.getNewBoQDetailsList();
+		}
+
+		estimateDetails.setBoQDetailsList(responseList);
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+
+		String dt = estimateDetails.getDate().toString();
+		estimateDetails.setDt(dt);
+
+		String estimateDt = estimateDetails.getEstimateDate().toString();
+		estimateDetails.setEstimateDt(estimateDt);
+
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+
+		return "edit-estimate-form";
+	}
+
+	@RequestMapping(value = "/editdata", params = "editdata", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+	@ResponseBody
+	/*
+	 * public String editEstimateData(
+	 * 
+	 * @ModelAttribute("estimatePreparationApproval") final
+	 * EstimatePreparationApproval estimatePreparationApproval, final Model
+	 * model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest
+	 * request) throws Exception {
+	 */
+
+	public String editEstimateData(
+			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
+			final HttpServletRequest request) throws Exception {
+
+		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		Date estimateDate = inputFormat.parse(estimatePreparationApproval.getEstimateDt());
+		estimatePreparationApproval.setEstimateDate(estimateDate);
+
+		Date date = inputFormat.parse(estimatePreparationApproval.getDt());
+		estimatePreparationApproval.setDate(date);
+
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+
+		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
+				.saveEstimatePreparationData(request, estimatePreparationApproval);
+
+		return "estimatepreparationapproval-form";
+
 	}
 
 }

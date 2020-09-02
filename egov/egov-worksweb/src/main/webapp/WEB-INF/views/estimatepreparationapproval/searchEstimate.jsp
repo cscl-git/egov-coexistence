@@ -138,7 +138,7 @@ tr:hover {
 </head>
 <body>
 
-	<form:form name="search-work-estimate-form" role="form" method="post"
+	<form:form name="search-estimate-form" role="form" method="post"
 		action="workEstimateSearch" modelAttribute="workEstimateDetails"
 		id="workEstimateDetails">
 		<div class="card">
@@ -218,8 +218,7 @@ tr:hover {
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-									<form:options
-										items="${workEstimateDetails.departments}"
+									<form:options items="${workEstimateDetails.departments}"
 										itemValue="code" itemLabel="name" />
 								</form:select>
 							</div>
@@ -259,8 +258,7 @@ tr:hover {
 										code="lbl.estimate.preparation.work.status" /></th>
 								<th><spring:message
 										code="lbl.estimate.preparation.estimate.amount" /></th>
-								<th><spring:message
-										code="lbl.estimate.preparation.estimate.amount" /></th>
+
 							</tr>
 						</thead>
 						`
@@ -270,10 +268,22 @@ tr:hover {
 								<c:forEach items="${workEstimateDetails.estimateList}"
 									var="result" varStatus="status">
 									<tr>
-										<td><form:radiobutton
-												path="estimateList[${status.index}].checked"
-												id="estimateList[${status.index}].checked" name="radio1"
-												value="true" onclick="radioSelection(this)" /></td>
+										<td><input type="hidden" class="form-control"
+											path="estimateList[${status.index}].estimatePreparationId"
+											id="estimateList[${status.index}].estimatePreparationId"
+											readonly="readonly" value="${result.estimatePreparationId}" />
+
+											<a class="btn btn-xs btn-secondary"
+											href="/services/works/estimatePreparation/view/${result.estimatePreparationId}"
+											target="popup"
+											onclick="window.open('/services/works/estimatePreparation/view/${result.estimatePreparationId}','popup','width=600,height=600,resizable=no'); return false;">
+												<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
+										</a> <a class="btn btn-xs btn-secondary"
+											href="/services/works/estimatePreparation/edit/${result.estimatePreparationId}"
+											target="popup"
+											onclick="window.open('/services/works/estimatePreparation/edit/${result.estimatePreparationId}','popup','width=600,height=600,resizable=no'); return false;">
+												<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;Edit
+										</a></td>
 										<td><form:hidden
 												path="estimateList[${status.index}].workName"
 												id="estimateList[${status.index}].workName" />
@@ -290,10 +300,10 @@ tr:hover {
 												path="estimateList[${status.index}].estimateAmount"
 												id="estimateList[${status.index}].estimateAmount" />
 											${result.estimateAmount }</td>
-										<td><form:hidden
+										<%-- <td><form:hidden
 												path="estimateList[${status.index}].estimatePreparationId"
 												id="estimateList[${status.index}].estimatePreparationId" />
-											${result.estimatePreparationId }</td>
+											${result.estimatePreparationId }</td> --%>
 
 									</tr>
 								</c:forEach>
@@ -305,112 +315,14 @@ tr:hover {
 					</c:if>
 					</table>
 				</div>
-				<div class="vertical-center">
-					<input type="submit" id="save" class="btn-info" name="save"
-						value="Submit" />
-				</div>
 
-				<div style="padding: 0 15px;">
-					<table class="table table-bordered" id="searchResult">
-						<thead>
-							<tr>
-								<th><spring:message code="lbl.selectAll" text="Select All" />
-									<input type="checkbox" id="selectAll" name="selectAll"
-									onclick="checkAll(this)"></th>
 
-								<th><spring:message code="lbl.item.description" /></th>
-								<th><spring:message code="lbl.ref.dsr" /></th>
-								<th><spring:message code="lbl.unit" /></th>
-								<th><spring:message code="lbl.rate" /></th>
-								<th><spring:message code="lbl.quantity" /></th>
-								<th><spring:message code="lbl.amount" /></th>
 
-							</tr>
-						</thead>
-						`
-						<c:if
-							test="${workEstimateDetails.boQDetailsList != null &&  !workEstimateDetails.boQDetailsList.isEmpty()}">
-							<tbody>
-								<c:forEach items="${workEstimateDetails.boQDetailsList}"
-									var="result" varStatus="status">
-									<tr>
-										<td><form:checkbox
-												path="boQDetailsList[${status.index}].checkboxChecked" /></td>
-
-										<td><form:hidden
-												path="boQDetailsList[${status.index}].item_description"
-												id="boQDetailsList[${status.index}].item_description" />
-											${result.item_description }</td>
-										<td><form:hidden
-												path="boQDetailsList[${status.index}].ref_dsr"
-												id="boQDetailsList[${status.index}].ref_dsr" />
-											${result.ref_dsr }</td>
-										<td><form:hidden
-												path="boQDetailsList[${status.index}].unit"
-												id="boQDetailsList[${status.index}].unit" /> ${result.unit }</td>
-										<td><form:hidden
-												path="boQDetailsList[${status.index}].rate"
-												id="boQDetailsList[${status.index}].rate" /> ${result.rate }</td>
-										<td><form:hidden
-												path="boQDetailsList[${status.index}].quantity"
-												id="boQDetailsList[${status.index}].quantity" />
-											${result.quantity }</td>
-										<td><form:hidden
-												path="boQDetailsList[${status.index}].amount"
-												id="boQDetailsList[${status.index}].amount" />
-											${result.amount }</td>
-									</tr>
-								</c:forEach>
-							<tbody>
-						</c:if>
-						<c:if
-							test="${workEstimateDetails.boQDetailsList == null ||  workEstimateDetails.boQDetailsList.isEmpty()}">
-					No records found
-					</c:if>
-					</table>
-				</div>
 
 			</div>
 		</div>
 	</form:form>
 
-	<script type="text/javascript">
-		function checkAll(ele) {
-			var checkboxes = document.getElementsByTagName('input');
-			if (ele.checked) {
-				for (var i = 0; i < checkboxes.length; i++) {
-					if (checkboxes[i].type == 'checkbox') {
-						checkboxes[i].checked = true;
-					}
-				}
-			} else {
-				for (var i = 0; i < checkboxes.length; i++) {
-					console.log(i)
-					if (checkboxes[i].type == 'checkbox') {
-						checkboxes[i].checked = false;
-					}
-				}
-			}
-		}
-
-		function radioSelection(r) {
-			var selectedRow = r.parentNode.parentNode.rowIndex;
-			for (var i = 1; i < table.rows.length; i++) {
-				rIndex = i;
-				if (selectedRow == rIndex) {
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").value = true;
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").checked = true;
-				} else {
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").value = false;
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").checked = false;
-				}
-			}
-		}
-	</script>
 </body>
 </html>
 

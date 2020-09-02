@@ -152,14 +152,14 @@ tr:hover {
 
 </head>
 <body>
-
-	<form:form name="estimatepreparationapproval-form" role="form"
-		method="post" action="estimate"
-		modelAttribute="estimatePreparationApproval"
+	<form:form name="edit-estimate-form" role="form" method="post"
+		action="/services/works/estimatePreparation/editdata" modelAttribute="estimatePreparationApproval"
 		id="estimatePreparationApproval" enctype="multipart/form-data">
 		<div class="card">
 			<div class="container">
 				<div class="row">
+				<input type="hidden" name="estimatePreparationApproval" value="${estimatePreparationApproval.estimatePreparationId}" />
+				
 					<div class="col-md-6">
 						<div class="form-group">
 							<label for="inputPassword"
@@ -214,18 +214,18 @@ tr:hover {
 						</div>
 					</div>
 
-					<!-- <div class="col-md-6">
+					<div class="col-md-6">
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.estimate.preparation.estimate.number" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="estimateNumber" />
+								<form:input type="number" class="form-control txtRight"
+									path="estimateNumber" readonly="true" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
-					</div> -->
+					</div>
 
 					<div class="col-md-6">
 						<div class="form-group">
@@ -470,7 +470,7 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.work.order.search.date" /></label>
 							<div class="col-md-6 block-colm">
-									<form:input type="date" class="form-control txtRight datepicker"
+								<form:input type="date" class="form-control txtRight datepicker"
 									path="dt" pattern="dd/MM/yyyy" />
 							</div>
 							<div class="clearfix"></div>
@@ -529,231 +529,75 @@ tr:hover {
 							<div class="clearfix"></div>
 						</div>
 					</div>
-				</div>
-			</div>
-		</div>
 
-		<br />
+					<div style="padding: 0 15px;">
+						<table id="table" border="1" cellpadding="10">
+							<thead>
+								<tr>
+									<th><spring:message code="lbl.item.description" /></th>
+									<th><spring:message code="lbl.ref.dsr" /></th>
+									<th><spring:message code="lbl.unit" /></th>
+									<th><spring:message code="lbl.rate" /></th>
+									<th><spring:message code="lbl.quantity" /></th>
+									<th><spring:message code="lbl.amount" /></th>
 
-		<div class="card">
-			<div class="container">
-				<div>
-					<p style="color: #4e799f; font-size: 25px;">BoQ Upload</p>
-				</div>
-
-				<input type="file" name="file"> <input type="submit"
-					id="save" class="btn-info" name="save" value="Upload" />
-
-				<div class="row">
-					<div class="col-md-12">
-						<!-- <h4>BoQ Details</h4> -->
-						<button onclick="addFileInputField();" class="btn-info"
-							style="margin-bottom: 15px; float: right;" id="plus">+</button>
-					</div>
-				</div>
-
-				<!-- <div class="tab tab-1"> -->
-				<div>
-					<table id="table" border="1" cellpadding="10" style="width: 100%">
-						<thead>
-							<tr>
-								<th><spring:message code="lbl.item.description" /></th>
-								<th><spring:message code="lbl.ref.dsr" /></th>
-								<th><spring:message code="lbl.unit" /></th>
-								<th><spring:message code="lbl.rate" /></th>
-								<th><spring:message code="lbl.quantity" /></th>
-								<th><spring:message code="lbl.amount" /></th>
-								<th><spring:message code="lbl.action" /></th>
-							</tr>
-						</thead>
-						<tbody>
-							<c:forEach var="boq"
-								items="${estimatePreparationApproval.boQDetailsList}"
-								varStatus="status">
-								<tr id="detailsrow" class="repeat-address">
-									<td><form:input type="text"
-											path="boQDetailsList[${status.index}].item_description"
-											id="boQDetailsList[${status.index}].item_description"
-											required="required" class="form-control item_description"
-											maxlength="200"></form:input></td>
-									<td><form:input type="text"
-											path="boQDetailsList[${status.index}].ref_dsr"
-											id="boQDetailsList[${status.index}].ref_dsr"
-											required="required" class="form-control ref_dsr"
-											maxlength="200"></form:input></td>
-									<td><form:input type="text"
-											path="boQDetailsList[${status.index}].unit"
-											id="boQDetailsList[${status.index}].unit" required="required"
-											class="form-control unit" maxlength="200"></form:input></td>
-									<td><form:input type="number"
-											path="boQDetailsList[${status.index}].rate" step=".01"
-											id="boQDetailsList[${status.index}].rate" required="required"
-											class="form-control rate" onchange="valueChanged()"></form:input></td>
-									<td><form:input type="number"
-											path="boQDetailsList[${status.index}].quantity" step=".01"
-											id="boQDetailsList[${status.index}].quantity"
-											required="required" class="form-control quantity"
-											name="quantity" onchange="valueChanged()"></form:input></td>
-									<td><form:input type="number"
-											path="boQDetailsList[${status.index}].amount"
-											id="boQDetailsList[${status.index}].amount"
-											required="required" class="form-control amount"
-											maxlength="200" name="amount" readonly="true"></form:input></td>
-									<td>
-										<button onclick="deleteRow(this);" class="btn-info"
-											style="margin-bottom: 15px; float: left;" id="plus">-</button>
-									</td>
 								</tr>
-							</c:forEach>
-						</tbody>
-					</table>
-				</div>
-			</div>
-		</div>
-
-		<br />
-
-		<div class="card">
-			<div class="container">
-				<div>
-					<p style="color: #4e799f; font-size: 25px;">Document upload</p>
-				</div>
-				<div class="row">
-					<jsp:include page="fileupload.jsp" />
-
-					<!-- <div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select"
-							value="Save Estimate Preparation & Approval" />
-					</div> -->
-
-				</div>
-			</div>
-		</div>
-
-		<br />
-
-		<div class="card">
-			<div class="container">
-				<div>
-					<p style="color: #4e799f; font-size: 25px;">Approval Details</p>
-				</div>
-				<%-- 				<div class="row">
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.approver.department" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="department" id="department"
-									class="form-control">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:options
-										items="${estimatePreparationApproval.departments}"
-										itemValue="code" itemLabel="name" />
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.approver.designation" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="worksWing" id="worksWing"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Building & Roads</form:option>
-									<form:option value="2">Public Health</form:option>
-									<form:option value="3">Horticulture & Electrical</form:option>
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.approver" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="worksWing" id="worksWing"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Building & Roads</form:option>
-									<form:option value="2">Public Health</form:option>
-									<form:option value="3">Horticulture & Electrical</form:option>
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-12">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-3 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.comments" /></label>
-							<div class="col-md-9 block-colm">
-								<form:textarea class="form-control txtRight" path="workName" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-				</div> --%>
-
-				<%-- <a class="btn btn-xs btn-secondary"
-					href="/services/council/councilpreamble/view/${contact.preamble.id}"
-					target="popup"
-					onclick="window.open('/services/council/councilpreamble/view/${contact.preamble.id}','popup','width=600,height=600,resizable=no'); return false;">
-					<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
-				</a> --%>
-				
-				<a class="btn btn-xs btn-secondary"
-					href="/services/works/workEstimate/workEstimateSearch"
-					target="popup" 
-					onclick="window.open('/services/works/workEstimate/workEstimateSearch','popup','width=600,height=600,resizable=no'); return false;">
-					<i class="fa fa-eye" aria-hidden="true"></i>&nbsp;View
-				</a>
-
-			</div>
-		</div>
-
-		<br />
-
-		<div class="card">
-			<div class="container">
-
-				<div class="row">
-
-					<div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select" value="Forward" />
+							</thead>
+							`
+							<c:if
+								test="${estimatePreparationApproval.boQDetailsList != null &&  !estimatePreparationApproval.boQDetailsList.isEmpty()}">
+								<tbody>
+									<c:forEach
+										items="${estimatePreparationApproval.boQDetailsList}"
+										var="result" varStatus="status">
+										<tr id="detailsrow" class="repeat-address">
+											<td><form:input type="text"
+													path="boQDetailsList[${status.index}].item_description"
+													id="boQDetailsList[${status.index}].item_description"
+													required="required" class="form-control item_description"
+													maxlength="200"></form:input></td>
+											<td><form:input type="text"
+													path="boQDetailsList[${status.index}].ref_dsr"
+													id="boQDetailsList[${status.index}].ref_dsr"
+													required="required" class="form-control ref_dsr"
+													maxlength="200"></form:input></td>
+											<td><form:input type="text"
+													path="boQDetailsList[${status.index}].unit"
+													id="boQDetailsList[${status.index}].unit"
+													required="required" class="form-control unit"
+													maxlength="200"></form:input></td>
+											<td><form:input type="number"
+													path="boQDetailsList[${status.index}].rate" step=".01"
+													id="boQDetailsList[${status.index}].rate"
+													required="required" class="form-control rate"
+													onchange="valueChanged()"></form:input></td>
+											<td><form:input type="number"
+													path="boQDetailsList[${status.index}].quantity" step=".01"
+													id="boQDetailsList[${status.index}].quantity"
+													required="required" class="form-control quantity"
+													name="quantity" onchange="valueChanged()"></form:input></td>
+											<td><form:input type="number"
+													path="boQDetailsList[${status.index}].amount"
+													id="boQDetailsList[${status.index}].amount"
+													required="required" class="form-control amount"
+													maxlength="200" name="amount" readonly="true"></form:input>
+											</td>
+										</tr>
+									</c:forEach>
+								<tbody>
+							</c:if>
+							<c:if
+								test="${estimatePreparationApproval.boQDetailsList == null ||  estimatePreparationApproval.boQDetailsList.isEmpty()}">
+					No records found
+					</c:if>
+						</table>
 					</div>
 
 					<div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select"
+						<input type="submit" id="editdata" class="btn-info"
+							name="editdata" code="lbl.select"
 							value="Save Estimate Preparation & Approval" />
 					</div>
-
-					<div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select" value="Close" />
-					</div>
-
 
 				</div>
 			</div>
@@ -806,19 +650,12 @@ tr:hover {
 			document.getElementById("table").deleteRow(i);
 		}
 		
-		function getEstimateNo(){
-			var department = $("#department").val();
-			alert(department);
-			$.ajax({
-				type : "POST",
-				url : '/services/works/estimatePreparation/estimateNumber?department='+department,
-				
-				success : function(result) {
-						if (result.status == 'success') {}
-						else{}
-				}
-			});
-		}
+		$('#buttonSubmit').click(function(e) {
+			if ($('form').valid()) {
+			} else {
+				e.preventDefault();
+			}
+		});
 	</script>
 
 </body>

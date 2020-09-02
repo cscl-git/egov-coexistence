@@ -1,6 +1,7 @@
 package org.egov.works.estimatepreparationapproval.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -19,17 +20,18 @@ import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.egov.commons.EgwStatus;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.works.boq.entity.BoQDetails;
 
 @Entity
 @Table(name = "txn_estimate_preparation")
 @SequenceGenerator(name = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, sequenceName = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, allocationSize = 1)
-//public class EstimatePreparationApproval implements Serializable {
-public class EstimatePreparationApproval extends StateAware implements java.io.Serializable {
+ public class EstimatePreparationApproval implements Serializable {
+//public class EstimatePreparationApproval extends StateAware implements java.io.Serializable {
 
-	//private static final long serialVersionUID = 1L;
-	private static final long serialVersionUID= -4312140421386028968L;
+	// private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = -4312140421386028968L;
 
 	public static final String SEQ_ESTIMATE_PREPARATION = "SEQ_ESTIMATE_PREPARATION";
 
@@ -48,7 +50,7 @@ public class EstimatePreparationApproval extends StateAware implements java.io.S
 	private Date estimateDate;
 
 	@Column(name = "estimate_number")
-	private Long estimateNumber;
+	private String estimateNumber;
 
 	@Column(name = "work_location")
 	private String workLocation;
@@ -105,17 +107,17 @@ public class EstimatePreparationApproval extends StateAware implements java.io.S
 	private String agencyWorkOrder;
 
 	@Column(name = "date")
-	private String date;
+	private Date date;
 
 	@Column(name = "time_limit")
 	private String timeLimit;
 
 	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList;
-	
-	@ManyToOne
-    @JoinColumn(name = "statusid")
-    private EgwStatus status;
+
+	/*@ManyToOne
+	@JoinColumn(name = "statusid")
+	private EgwStatus status;*/
 
 	@Transient
 	private List<EstimatePreparationApproval> estimateList;
@@ -140,6 +142,15 @@ public class EstimatePreparationApproval extends StateAware implements java.io.S
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
+	
+	@Transient
+	private String department = "";
+	
+	@Transient
+	private List<Department> departments = new ArrayList<Department>();
+	
+	@Transient
+	private String dt;
 
 	public Long getEstimatePreparationId() {
 		return estimatePreparationId;
@@ -173,11 +184,11 @@ public class EstimatePreparationApproval extends StateAware implements java.io.S
 		this.estimateDate = estimateDate;
 	}
 
-	public Long getEstimateNumber() {
+	public String getEstimateNumber() {
 		return estimateNumber;
 	}
 
-	public void setEstimateNumber(Long estimateNumber) {
+	public void setEstimateNumber(String estimateNumber) {
 		this.estimateNumber = estimateNumber;
 	}
 
@@ -357,11 +368,11 @@ public class EstimatePreparationApproval extends StateAware implements java.io.S
 		this.agencyWorkOrder = agencyWorkOrder;
 	}
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
@@ -413,27 +424,61 @@ public class EstimatePreparationApproval extends StateAware implements java.io.S
 		this.boQDetailsList = boQDetailsList;
 	}
 
+	/*public EgwStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(EgwStatus status) {
+		this.status = status;
+	}*/
+
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public List<Department> getDepartments() {
+		return departments;
+	}
+
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
+	}
+
+	public String getDt() {
+		return dt;
+	}
+
+	public void setDt(String dt) {
+		this.dt = dt;
+	}
+
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
-	@Override
+/*	@Override
 	public String getStateDetails() {
 		// TODO Auto-generated method stub
-		return getState().getComments().isEmpty() ? billnumber : billnumber + "-" + getState().getComments();
+		// return getState().getComments().isEmpty() ? billnumber : billnumber + "-" +
+		// getState().getComments();
+		return null;
 	}
 
 	@Override
 	public Long getId() {
 		// TODO Auto-generated method stub
-		 return estimatePreparationId;
+		return estimatePreparationId;
 	}
 
 	@Override
 	protected void setId(Long id) {
 		// TODO Auto-generated method stub
 		this.estimatePreparationId = id;
-		
-	}
+
+	}*/
 
 }

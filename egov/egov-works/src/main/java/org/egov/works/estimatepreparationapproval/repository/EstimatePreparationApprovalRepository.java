@@ -13,7 +13,7 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 	@Query(" from EstimatePreparationApproval e where e.workCategory =:workCategory and e.estimateNumber =:estimateNumber and e.executingDivision =:executingDivision and e.estimateDate BETWEEN :fromDt AND :toDt")
 
 	List<EstimatePreparationApproval> findByAllParams(@Param("workCategory") Long workCategory,
-			@Param("estimateNumber") Long estimateNumber, @Param("executingDivision") Long executingDivision,
+			@Param("estimateNumber") String estimateNumber, @Param("executingDivision") Long executingDivision,
 			@Param("fromDt") Date fromDt, @Param("toDt") Date toDt);
 /*
 	List<EstimatePreparationApproval> findByIsCheckedAndEstimatePreparationId(boolean checked,
