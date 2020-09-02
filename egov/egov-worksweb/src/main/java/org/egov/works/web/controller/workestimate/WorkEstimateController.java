@@ -76,7 +76,7 @@ public class WorkEstimateController {
 		for (int i = 0; i < estimatePreparationApproval.getEstimateList().size(); i++) {
 			if (estimatePreparationApproval.getEstimateList().get(i).isChecked() == true) {
 				List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchBoqData(request,
-						estimatePreparationApproval.getEstimateList().get(i).getEstimatePreparationId());
+						estimatePreparationApproval.getEstimateList().get(i).getId());
 				
 				for(int j = 0; j<workEstimateDetails.size();j++ ) {
 					responseList= workEstimateDetails.get(j).getNewBoQDetailsList();
