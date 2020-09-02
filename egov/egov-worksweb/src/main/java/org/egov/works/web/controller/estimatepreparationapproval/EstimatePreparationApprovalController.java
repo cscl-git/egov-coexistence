@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -21,6 +22,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -44,7 +47,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Controller
 @RequestMapping(value = "/estimatePreparation")
-public class EstimatePreparationApprovalController {
+public class EstimatePreparationApprovalController extends GenericWorkFlowController {
 
 	@Autowired
 	EstimatePreparationApprovalService estimatePreparationApprovalService;
@@ -57,6 +60,8 @@ public class EstimatePreparationApprovalController {
 
 	@Autowired
 	WorkEstimateService workEstimateService;
+	
+	private static final String STATE_TYPE = "stateType";
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -64,24 +69,17 @@ public class EstimatePreparationApprovalController {
 			final Model model, HttpServletRequest request) {
 
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
-
+		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
+        prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
+        
 		return "estimatepreparationapproval-form";
 	}
 
-	/*@RequestMapping(value = "/estimateNumber", method = RequestMethod.POST)
-	public String estimateNumber(
-			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			String department, final Model model, HttpServletRequest request) {
-
-		String deptCode = "";
-		AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
-		deptCode = department;
-	    String estimateNumber = v.getEstimateNumber(deptCode);
-		estimatePreparationApproval.setEstimateNumber(estimateNumber);
-		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
-		//model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
-		return "estimatepreparationapproval-form";
-	}*/
+	private void prepareValidActionListByCutOffDate(Model model) {
+            model.addAttribute("validActionList",
+                    Arrays.asList("Forward"));
+	}
 
 	@RequestMapping(value = "/estimate", params = "estimate", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
@@ -228,7 +226,7 @@ public class EstimatePreparationApprovalController {
 		return workbook;
 	}
 
-	private List<Department> getDepartmentsFromMs() {
+	public List<Department> getDepartmentsFromMs() {
 		List<Department> departments = microserviceUtils.getDepartments();
 		return departments;
 	}

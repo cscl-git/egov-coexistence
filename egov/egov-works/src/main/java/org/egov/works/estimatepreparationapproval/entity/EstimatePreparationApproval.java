@@ -27,18 +27,16 @@ import org.egov.works.boq.entity.BoQDetails;
 @Entity
 @Table(name = "txn_estimate_preparation")
 @SequenceGenerator(name = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, sequenceName = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, allocationSize = 1)
- public class EstimatePreparationApproval implements Serializable {
-//public class EstimatePreparationApproval extends StateAware implements java.io.Serializable {
+ public class EstimatePreparationApproval extends StateAware implements Serializable {
 
-	// private static final long serialVersionUID = 1L;
 	private static final long serialVersionUID = -4312140421386028968L;
 
 	public static final String SEQ_ESTIMATE_PREPARATION = "SEQ_ESTIMATE_PREPARATION";
 
 	@Id
 	@GeneratedValue(generator = SEQ_ESTIMATE_PREPARATION, strategy = GenerationType.SEQUENCE)
-	@Column(name = "estimate_preparation_id")
-	private Long estimatePreparationId;
+	@Column(name = "id")
+	private Long id;
 
 	@Column(name = "works_wing")
 	private Long worksWing;
@@ -152,13 +150,6 @@ import org.egov.works.boq.entity.BoQDetails;
 	@Transient
 	private String dt;
 
-	public Long getEstimatePreparationId() {
-		return estimatePreparationId;
-	}
-
-	public void setEstimatePreparationId(Long estimatePreparationId) {
-		this.estimatePreparationId = estimatePreparationId;
-	}
 
 	public Long getWorksWing() {
 		return worksWing;
@@ -460,25 +451,22 @@ import org.egov.works.boq.entity.BoQDetails;
 		return serialVersionUID;
 	}
 
-/*	@Override
+	@Override
 	public String getStateDetails() {
-		// TODO Auto-generated method stub
-		// return getState().getComments().isEmpty() ? billnumber : billnumber + "-" +
-		// getState().getComments();
-		return null;
+		return getState().getComments().isEmpty() ? estimateNumber : estimateNumber + "-" + getState().getComments();
 	}
 
 	@Override
 	public Long getId() {
-		// TODO Auto-generated method stub
-		return estimatePreparationId;
+		return id;
 	}
 
 	@Override
 	protected void setId(Long id) {
-		// TODO Auto-generated method stub
-		this.estimatePreparationId = id;
+		this.id=id;
+		
+	}
 
-	}*/
+
 
 }

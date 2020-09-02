@@ -735,27 +735,10 @@ tr:hover {
 
 		<div class="card">
 			<div class="container">
-
-				<div class="row">
-
-					<div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select" value="Forward" />
-					</div>
-
-					<div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select"
-							value="Save Estimate Preparation & Approval" />
-					</div>
-
-					<div class="vertical-center">
-						<input type="submit" id="estimate" class="btn-info"
-							name="estimate" code="lbl.select" value="Close" />
-					</div>
-
-
-				</div>
+		<jsp:include page="../common/commonworkflowmatrix-expensebill.jsp"/>
+        <div class="buttonbottom" align="center">
+            <jsp:include page="../common/commonworkflowmatrix-button.jsp"/>
+        </div>
 			</div>
 		</div>
 
