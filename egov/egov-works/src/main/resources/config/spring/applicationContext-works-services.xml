@@ -449,4 +449,12 @@
     <bean id="ContractorBillRegisterInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
         <constructor-arg index="0" ref="ContractorBillRegisterPersistenceService"/>
     </bean>
+    
+    <bean id="estimatePreparationApprovalPersistenceService" parent="abstractPersistenceService">
+        <constructor-arg name="type" value="org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval" />
+    </bean>
+
+    <bean id="EstimatePreparationApprovalInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+        <constructor-arg index="0" ref="estimatePreparationApprovalPersistenceService"/>
+    </bean>
 </beans>
