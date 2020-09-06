@@ -311,8 +311,9 @@
 																</tr>
 																<tr id="bankbalanceRow">
 																	<td class="bluebox">&nbsp;</td>
-																	<td class="bluebox">&nbsp;</td>
-																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text
+																				name="bank.onlinelink" /></td>
+																	<td class="bluebox"><a id="onlineLink" href="#" target="_blank" style="font-size: 15px;">Click</a></td>
 																	<td class="bluebox" width="15%"><strong><s:text
 																				name="payment.balance" />(Rs)</strong></td>
 																	<td class="bluebox" colspan="4"><s:textfield
@@ -320,6 +321,32 @@
 																			readonly="true" style="text-align:right" /></td>
 																</tr>
 															</s:else>
+															<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text name="payment.firstsignatory" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><s:select name="firstsignatory"
+																	headerKey="-1" headerValue="Select First Signatory" value="%{firstsignatory}"
+																	list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+																			id="firstsignatory" />
+																	</td>
+																	<td class="bluebox" width="15%"><s:text name="payment.secondsignatory" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
+																	headerKey="-1" headerValue="Select Second Signatory"
+																	list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
+																			id="secondsignatory" /></td>
+																</tr>
+																<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox"><s:text name="payment.budgetDetails" /><span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><a href="#" onclick="openBudgetDetails()"> Click</a>
+																	</td>
+																	<td class="bluebox" width="15%">&nbsp;</td>
+																	<td class="bluebox" colspan="4">&nbsp;</td>
+																</tr>
+																
 															<tr>
 																<td class="greybox">&nbsp;</td>
 																<td class="greybox" width="15%"><s:text
@@ -548,6 +575,16 @@
 		var vFixedDecimal = 2;
 		function loadBankAccount(obj)
 		{
+			var selectedBranchId=document.getElementById('bankbranch').value;
+			document.getElementById("onlineLink").href='#';
+			<s:iterator value="bankBranchList">
+				var branchIdFromList='<s:property value="id"/>';
+				if(branchIdFromList == selectedBranchId)
+					{
+						var link = '<s:property value="bank.onlinelink"/>';
+						document.getElementById("onlineLink").href=link;
+					}
+			</s:iterator>
 			var fund = 0;
 			<s:if test="%{shouldShowHeaderField('fund')}">
 				fund = <s:property value="%{billregister.egBillregistermis.fund.id}"/>;
@@ -671,6 +708,28 @@
 				undoLoadingMask();
 				return false;
 			}
+			var firstsignatory='';
+			if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
+			{
+				bootbox.alert("Please select First Signatory");
+				undoLoadingMask();
+				return false;
+			}
+			else
+				{
+					firstsignatory=dom.get('firstsignatory').value;
+				}
+			var secondsignatory=''
+			if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
+			{
+				bootbox.alert("Please select Second Signatory");
+				undoLoadingMask();
+				return false;
+			}
+			else
+			{
+				secondsignatory=dom.get('secondsignatory').value;
+			}
 			if(dom.get('description') == null || dom.get('description').value == '')
 				{
 					bootbox.alert("<s:text name='msg.please.select.voucher.narration'/>");
@@ -718,7 +777,7 @@
 			if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 			{
 				billIdsToPaymentAmountsap('billList','billIdsToPaymentAmountsMapId');
-			 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action';
+			 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 			 document.forms[0].submit();
 			}
 			else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -730,7 +789,7 @@
 					 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 					 if (msg == true) {
 						 billIdsToPaymentAmountsMap('billList','billIdsToPaymentAmountsMapId');
-						 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action';
+						 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 						 document.forms[0].submit();
 					 } else {
 						 undoLoadingMask();
@@ -740,7 +799,7 @@
 			else
 			{
 				billIdsToPaymentAmountsMap('billList','billIdsToPaymentAmountsMapId');
-				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action';
+				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 				document.forms[0].submit();
 			}
 		}  

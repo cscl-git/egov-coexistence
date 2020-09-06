@@ -443,6 +443,28 @@ function onSubmit()
 	var balanceCheckMandatory='<s:text name="payment.mandatory"/>';
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
 	var noBalanceCheck='<s:text name="payment.none"/>';
+	var firstsignatory='';
+	if(document.getElementById('firstsignatory') == null || document.getElementById('firstsignatory').value == '-1')
+	{
+		bootbox.alert("Please select First Signatory");
+		undoLoadingMask();
+		return false;
+	}
+	else
+		{
+			firstsignatory=document.getElementById('firstsignatory').value;
+		}
+	var secondsignatory=''
+	if(document.getElementById('secondsignatory') == null || document.getElementById('secondsignatory').value == '-1')
+	{
+		bootbox.alert("Please select Second Signatory");
+		undoLoadingMask();
+		return false;
+	}
+	else
+	{
+		secondsignatory=document.getElementById('secondsignatory').value;
+	}
 	if(document.getElementById("description") == null || document.getElementById("description").value =='')
 		{
 		bootbox.alert("<s:text name='msg.payment.narration.mandatory'/>");
@@ -466,7 +488,7 @@ function onSubmit()
 					 return false;
 					}
 			}
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
+		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 		return true;
 		}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -484,7 +506,7 @@ function onSubmit()
 		}
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
-			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
+			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 			 document.dbpform.submit();
 			return true;
 		 } else {
@@ -501,7 +523,7 @@ function onSubmit()
 				 return false;
 				}
 		}
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action';
+		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 		document.dbpform.submit();
 	}
 		

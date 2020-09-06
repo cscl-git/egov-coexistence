@@ -184,6 +184,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
     Date date;
+    private String firstsignatory="-1";
+    private String secondsignatory="-1";
 
     public BigDecimal getBalance() {
         return balance;
@@ -240,7 +242,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             }
         voucherHeader.reset();
         commonBean.reset();
-        commonBean.setModeOfPayment(MDP_CHEQUE);
+        commonBean.setModeOfPayment(MDP_PEX);
         voucherHeader.setVouchermis(new Vouchermis());
         // voucherHeader.getVouchermis().setDepartmentid((Department)paymentService.getAssignment().getDeptId());
         billDetailslist = new ArrayList<VoucherDetails>();
@@ -293,7 +295,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 voucherHeader.setId(null);
                 populateWorkflowBean();
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
-                        commonBean, billDetailslist, subLedgerlist, workflowBean);
+                        commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
 
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
@@ -354,7 +356,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public void prepareNonBillPayment() {
         addDropdownData("bankList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
-        commonBean.setModeOfPayment(MDP_CHEQUE);
+        commonBean.setModeOfPayment(MDP_PEX);
     }
 
     @ValidationErrorPage(value = NEW)
@@ -1140,4 +1142,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
 }

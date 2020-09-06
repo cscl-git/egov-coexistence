@@ -177,9 +177,9 @@
 							<display:column title="Payment voucher number "
 								style="width:11%;text-align:center"
 								property="paymentVoucherNumber" />
-							<display:column title="Cheque No and Date"
+							<%--<display:column title="Cheque No and Date"
 								style="width:11%;text-align:center" property="chequeNumAndDate" />
-						  <%--  <display:column title="Remittance Payment voucher number"
+						    <display:column title="Remittance Payment voucher number"
 								style="width:11%;text-align:center" 	
 								property="remittanceVoucherNumber" />
 						 	<display:column title="Remittance Cheque No and Date"

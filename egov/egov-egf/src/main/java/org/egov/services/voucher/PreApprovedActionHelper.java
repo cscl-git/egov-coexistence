@@ -49,9 +49,12 @@ package org.egov.services.voucher;
 
 import com.exilant.exility.common.TaskFailedException;
 import org.egov.billsaccounting.services.CreateVoucher;
+import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.service.ExpenseBillService;
+import org.egov.commons.DocumentUpload;
+import org.egov.commons.utils.DocumentUtils;
 import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -112,6 +115,8 @@ public class PreApprovedActionHelper {
     @Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
+	@Autowired
+    private DocumentUtils docUtils;
     
     
     @Transactional
@@ -140,7 +145,6 @@ public class PreApprovedActionHelper {
     @Transactional
     public CVoucherHeader sendForApproval(CVoucherHeader voucherHeader, WorkflowBean workflowBean)
     {
-    	EgBillregister expenseBill = null;
         try {
 
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
@@ -154,23 +158,6 @@ public class PreApprovedActionHelper {
                 voucherService.applyAuditing(voucherHeader.getState());
             }
             voucherService.persist(voucherHeader);
-            if(workflowBean.getWorkFlowAction().equals("Approve"))
-            {
-            	List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
-                        " from Miscbilldetail where billVoucherHeader.id = ? ",
-                        voucherHeader.getId());
-            	
-            	if(miscBillList !=null && !miscBillList.isEmpty())
-            	{
-            		for(Miscbilldetail row : miscBillList)
-            		{
-            			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
-            			 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"));
-                		 expenseBillService.create(expenseBill);
-                		 persistenceService.getSession().flush();
-            		}
-            	}
-            }
 
         } catch (final ValidationException e) {
 
@@ -185,7 +172,18 @@ public class PreApprovedActionHelper {
         }
         return voucherHeader;
     }
-
+    @Transactional
+    public void saveDocuments(CVoucherHeader voucherHeader)
+    {
+ 	   List<DocumentUpload> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
+        final List<DocumentUpload> documentDetails;
+        documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
+                CommonConstants.JOURNAL_VOUCHER_OBJECT);
+        if (!documentDetails.isEmpty()) {
+        	voucherHeader.setDocumentDetail(documentDetails);
+        	voucherService.persistDocuments(documentDetails);
+        }
+    }
     private Boolean validateOwner(State state) {
 //        List<Position> positionsForUser = positionMasterService.getPositionsForEmployee(securityUtils.getCurrentUser().getId());
 //        return positionsForUser.contains(state.getOwnerPosition());

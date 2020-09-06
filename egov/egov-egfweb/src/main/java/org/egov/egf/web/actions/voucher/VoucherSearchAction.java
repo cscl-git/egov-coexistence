@@ -89,6 +89,7 @@ import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.EgBillregistermis;
+import org.egov.model.payment.Paymentheader;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
@@ -133,6 +134,7 @@ public class VoucherSearchAction extends BaseFormAction {
 	Map<String, List<String>> voucherNames;
 	private FinancialYearDAO financialYearDAO;
 	private Department deptImpl = new Department();
+	private Map<Long,String> paymentVoucherMap=new HashMap<Long,String>();
 
 	@Override
 	public Object getModel() {
@@ -293,6 +295,8 @@ public class VoucherSearchAction extends BaseFormAction {
 		else
 			list = voucherSearchUtil.search(voucherHeader, fromDate, toDate, showMode);
 		if (null == showMode || showMode.equals("")) {
+			paymentVoucherMap.clear();
+			populateVoucherMap(list);
 			for (final CVoucherHeader voucherheader : list) {
 				voucherMap = new HashMap<String, Object>();
 				final BigDecimal amt = voucherheader.getTotalAmount();
@@ -315,10 +319,33 @@ public class VoucherSearchAction extends BaseFormAction {
 
 				voucherMap.put("amount", amt.setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
 				voucherMap.put("status", getVoucherStatus(voucherheader.getStatus()));
+				if(!(voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() != null)
+				{
+					voucherMap.put("pendingWith", this.getEmployeeName(voucherheader.getState().getOwnerPosition()));
+				}
+				else if((voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() == null)
+				{
+					if(paymentVoucherMap.get(voucherheader.getId()) != null)
+					{
+						voucherMap.put("pendingWith", paymentVoucherMap.get(voucherheader.getId()));
+					}
+					else
+					{
+						voucherMap.put("pendingWith", "-");
+					}
+					
+				}
+				else
+				{
+					voucherMap.put("pendingWith", "-");
+				}
 				voucherList.add(voucherMap);
 			}
 			pagedResults.setList(voucherList);
 		} else
+		{
+			paymentVoucherMap.clear();
+			populateVoucherMap(list);
 			for (final CVoucherHeader voucherheader : list) {
 				if (voucherheader.getState() != null) {
 					final EgBillregistermis billMis = (EgBillregistermis) persistenceService
@@ -364,11 +391,60 @@ public class VoucherSearchAction extends BaseFormAction {
 					voucherMap.put("amount",
 							voucherheader.getTotalAmount().setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
 					voucherMap.put("status", getVoucherStatus(voucherheader.getStatus()));
+					if(!(voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() != null)
+					{
+						voucherMap.put("pendingWith", this.getEmployeeName(voucherheader.getState().getOwnerPosition()));
+					}
+					else if((voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() == null)
+					{
+						if(paymentVoucherMap.get(voucherheader.getId()) != null)
+						{
+							voucherMap.put("pendingWith", paymentVoucherMap.get(voucherheader.getId()));
+						}
+						else
+						{
+							voucherMap.put("pendingWith", "-");
+						}
+						
+					}
+					else
+					{
+						voucherMap.put("pendingWith", "-");
+					}
 					voucherList.add(voucherMap);
 				}
 			}
+	}
 		return SEARCH;
 	}
+
+	private void populateVoucherMap(List<CVoucherHeader> list) {
+		List<Long> vhIds=new ArrayList<Long>();
+		List<Paymentheader> paymentList =null;
+		for(CVoucherHeader vh:list)
+		{
+			if((vh.getName().equals("Remittance Payment") || vh.getName().equals("Bill Payment") || vh.getName().equals("Direct Bank Payment")))
+			{
+				vhIds.add(vh.getId());
+			}
+		}
+		if(vhIds!=null && !vhIds.isEmpty())
+		{
+			 paymentList = persistenceService.findAllByNamedQuery("getPaymentList",
+					vhIds);
+		}
+		if(paymentList!=null && !paymentList.isEmpty())
+		{
+			for(Paymentheader ph : paymentList)
+			{
+				if(ph.getState() != null)
+				{
+					paymentVoucherMap.put(ph.getVoucherheader().getId(),getEmployeeName(ph.getState().getOwnerPosition()));
+				}
+			}
+		}
+	}
+
 
 	private String getVoucherStatus(final int status) {
 		if (FinancialConstants.CREATEDVOUCHERSTATUS.equals(status))
@@ -565,6 +641,18 @@ public class VoucherSearchAction extends BaseFormAction {
 
 	public void setDeptImpl(final Department deptImpl) {
 		this.deptImpl = deptImpl;
+	}
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
+
+	public Map<Long, String> getPaymentVoucherMap() {
+		return paymentVoucherMap;
+	}
+
+	public void setPaymentVoucherMap(Map<Long, String> paymentVoucherMap) {
+		this.paymentVoucherMap = paymentVoucherMap;
 	}
 
 }

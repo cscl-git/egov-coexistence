@@ -226,6 +226,9 @@ public class PaymentAction extends BasePaymentAction {
     Date date;
     @Autowired
     private ChartOfAccounts chartOfAccounts;
+    private List<Bankbranch> bankBranchList = new ArrayList<Bankbranch>();
+    private String firstsignatory="-1";
+    private String secondsignatory="-1";
  
     public PaymentAction() {
         if (LOGGER.isDebugEnabled())
@@ -260,8 +263,15 @@ public class PaymentAction extends BasePaymentAction {
                     persistenceService.findAllBy(
                             "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
                             fund));
+            bankBranchList=persistenceService.findAllBy(
+                    "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
+                    fund);
         } else
+        {
             addDropdownData("bankbranchList", Collections.EMPTY_LIST);
+        	bankBranchList=Collections.EMPTY_LIST;
+        }
+            
 
         if (parameters.get("functionSel") != null && !parameters.get("functionSel")[0].equals("-1")
                 && !parameters.get("functionSel")[0].equals(""))
@@ -1033,7 +1043,7 @@ public class PaymentAction extends BasePaymentAction {
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
-            paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean);
+            paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
             // sendForApproval();// this should not be called here as it is
             // public method which is called from jsp submit
@@ -2354,4 +2364,28 @@ public String getEmployeeName(Long empId){
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+
+public List<Bankbranch> getBankBranchList() {
+	return bankBranchList;
+}
+
+public void setBankBranchList(List<Bankbranch> bankBranchList) {
+	this.bankBranchList = bankBranchList;
+}
+
+public String getFirstsignatory() {
+	return firstsignatory;
+}
+
+public void setFirstsignatory(String firstsignatory) {
+	this.firstsignatory = firstsignatory;
+}
+
+public String getSecondsignatory() {
+	return secondsignatory;
+}
+
+public void setSecondsignatory(String secondsignatory) {
+	this.secondsignatory = secondsignatory;
+}
 }

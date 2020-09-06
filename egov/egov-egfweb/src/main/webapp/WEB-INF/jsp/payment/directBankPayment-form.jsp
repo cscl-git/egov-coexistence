@@ -162,6 +162,21 @@
 	<td class="bluebox" colspan="3"><s:textarea name="description"
 			id="description" style="width:95%" /></td>
 </tr>
+<tr>
+	<td class="greybox"></td>
+	<td class="greybox"><s:text name="payment.firstsignatory" /><span
+		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:select name="firstsignatory" headerKey="-1"
+			headerValue="Select First Signatory" value="%{firstsignatory}"
+			list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+			id="firstsignatory" /></td>
+	<td class="greybox"><s:text name="payment.secondsignatory" /><span
+		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:select name="secondsignatory" headerKey="-1"
+			headerValue="Select Second Signatory"
+			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
+			id="secondsignatory" /></td>
+</tr>
 </table>
 <div id="budgetSearchGrid">
 	<div align="center">

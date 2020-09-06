@@ -155,9 +155,11 @@ public class BillRegisterReportAction extends SearchFormAction {
     @Autowired
     private EgovMasterDataCaching masterDataCache;
     
+    private Department deptImpl = new Department();
+    
     public BillRegisterReportAction() {
         voucherHeader.setVouchermis(new Vouchermis());
-        addRelatedEntity("vouchermis.departmentid", Department.class);
+        addRelatedEntity("vouchermis.departmentcode", String.class);
         addRelatedEntity("fundId", Fund.class);
         addRelatedEntity("vouchermis.schemeid", Scheme.class);
         addRelatedEntity("vouchermis.subschemeid", SubScheme.class);
@@ -249,6 +251,7 @@ public class BillRegisterReportAction extends SearchFormAction {
     public String billSearch() throws Exception {
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
+        voucherHeader.getVouchermis().setDepartmentcode(deptImpl.getCode());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | completeBill | start");
         isCompleteBillRegisterReport = true;
@@ -684,7 +687,7 @@ public class BillRegisterReportAction extends SearchFormAction {
 
         if (null != voucherHeader.getFundId())
             whereQuery.append(" and mis.fundid=" + voucherHeader.getFundId().getId());
-        if (null != voucherHeader.getVouchermis().getDepartmentcode())
+        if (null != voucherHeader.getVouchermis().getDepartmentcode() && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
             whereQuery.append(" and mis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode()+"'");
         if (null != voucherHeader.getVouchermis().getSchemeid())
             whereQuery.append(" and mis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId());
@@ -934,6 +937,14 @@ public class BillRegisterReportAction extends SearchFormAction {
 	    public void setTitleName(String titleName) {
 	        this.titleName = titleName;
 	    }
+
+		public Department getDeptImpl() {
+			return deptImpl;
+		}
+
+		public void setDeptImpl(Department deptImpl) {
+			this.deptImpl = deptImpl;
+		}
 
 	
 	

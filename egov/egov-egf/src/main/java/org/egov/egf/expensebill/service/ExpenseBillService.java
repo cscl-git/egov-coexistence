@@ -378,13 +378,10 @@ public class ExpenseBillService {
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode())
-            if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
-                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
-            {
-            	egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT));
-            	
-            }
+            if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
+                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
+                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                        FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
             else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
@@ -441,18 +438,18 @@ public class ExpenseBillService {
     public void createExpenseBillRegisterWorkflowTransition(final EgBillregister egBillregister,
                                                             final Long approvalPosition, final String approvalComent, final String additionalRule,
                                                             final String workFlowAction,final String approvalDesignation) {
-        if (LOG.isDebugEnabled())
-            LOG.debug(" Create WorkFlow Transition Started  ...");
+            LOG.info(" Create WorkFlow Transition Started  ...");
         final User user = securityUtils.getCurrentUser();
         final DateTime currentDate = new DateTime();
         Assignment wfInitiator = null;
         Map<String, String> finalDesignationNames = new HashMap<>();
         final String currState = "";
         String stateValue = "";
+        System.out.println("desig********:"+approvalDesignation);
         if (null != egBillregister.getId())
 //            wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
         	wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
-        if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+      /*  if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
             stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
             egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
@@ -460,11 +457,15 @@ public class ExpenseBillService {
                     .withOwner(wfInitiator.getPosition())
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-        } else {
+        } else {*/
 //            if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0)))
 //                wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
            Designation designation = this.getDesignationDetails(approvalDesignation);
+           if(designation != null)
+           {
+        	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());
+           }
            Position owenrPos = new Position();
            owenrPos.setId(approvalPosition);
 
@@ -496,12 +497,17 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                         //       FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 	}
                     
                 }
+		if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+
+            	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
@@ -516,7 +522,7 @@ public class ExpenseBillService {
                         .withStateValue(stateValue).withDateInfo(currentDate.toDate())
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-            } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
+            } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
@@ -545,19 +551,36 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 	}
                     
                 }
+				if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            	{
+                	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
+
+            	}
+				
+				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
                         .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
             }
+				else
+				{
+                egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                        .withComments(approvalComent)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withNextAction(wfmatrix.getNextAction())
+                        .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
         }
+        }
+        
         if (LOG.isDebugEnabled())
             LOG.debug(" WorkFlow Transition Completed  ...");
     }

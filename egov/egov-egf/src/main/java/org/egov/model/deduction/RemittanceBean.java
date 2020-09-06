@@ -87,6 +87,11 @@ public class RemittanceBean implements Predicate {
     private Date fromVhDate;
     private String departmentId;
     private Long functionId;
+    private String naration;
+    private String pName;
+    private Long generalLedId;
+    private String panNumber;
+    private String gstNo;
 
     public Long getFunctionId() {
         return functionId;
@@ -311,6 +316,46 @@ public class RemittanceBean implements Predicate {
     public void setRemittance_gl_Id(Integer remittance_gl_Id) {
         this.remittance_gl_Id = remittance_gl_Id;
     }
+
+	public String getNaration() {
+		return naration;
+	}
+
+	public void setNaration(String naration) {
+		this.naration = naration;
+	}
+
+	public String getpName() {
+		return pName;
+	}
+
+	public void setpName(String pName) {
+		this.pName = pName;
+	}
+
+	public Long getGeneralLedId() {
+		return generalLedId;
+	}
+
+	public void setGeneralLedId(Long generalLedId) {
+		this.generalLedId = generalLedId;
+	}
+
+	public String getGstNo() {
+		return gstNo;
+	}
+
+	public void setGstNo(String gstNo) {
+		this.gstNo = gstNo;
+	}
+
+	public String getPanNumber() {
+		return panNumber;
+	}
+
+	public void setPanNumber(String panNumber) {
+		this.panNumber = panNumber;
+	}
     
     
 

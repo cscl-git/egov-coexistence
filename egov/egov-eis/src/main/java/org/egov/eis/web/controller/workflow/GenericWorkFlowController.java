@@ -202,7 +202,7 @@ public abstract class GenericWorkFlowController {
         if (model == null || model.getId() == null || model.getCurrentState() == null
                 || model.getCurrentState().getValue().equals("Closed")
                 || model.getCurrentState().getValue().equals("END"))
-            validActions = Arrays.asList("Forward");
+            validActions = Arrays.asList("Forward","SaveAsDraft");
         else if (model.getCurrentState() != null)
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),

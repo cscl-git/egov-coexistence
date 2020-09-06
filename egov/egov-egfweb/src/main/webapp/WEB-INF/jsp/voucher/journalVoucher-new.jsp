@@ -70,7 +70,7 @@
 <body
 	onload="loadDropDownCodes();loadDropDownCodesFunction();onloadtask()">
 
-	<s:form action="journalVoucher" theme="simple" name="jvcreateform">
+	<s:form action="journalVoucher" theme="simple" name="jvcreateform"  enctype = "multipart/form-data">
 		<s:token />
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="Journal voucher Create" />
@@ -126,6 +126,12 @@
 									name="description" cols="100" rows="3"
 									onblur="checkVoucherNarrationLen(this)" /></td>
 						</tr>
+						<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox"><s:text name="budget.link" /><span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><a href="#" onClick="populateBudgetLink()">Click</a></td>
+						</tr>
 						</tr>
 					</table>
 				</div>
@@ -138,12 +144,15 @@
 				<div class="yui-skin-sam" align="center">
 					<div id="billDetailTable"></div>
 				</div>
+                <%-- <%@ include file='common-documentsUpload.jsp'%>    --%> 
+                
 				<script>
 		
 		makeVoucherDetailTable();
 		document.getElementById('billDetailTable').getElementsByTagName('table')[0].width="89%"
 	 </script>
 				<br />
+				
 				<div id="labelSL" align="center">
 					<table width="89%" border=0 id="labelid">
 						<th><s:text name="lbl.subledger.details"/> </th>
@@ -153,6 +162,7 @@
 				<div class="yui-skin-sam" align="center">
 					<div id="subLedgerTable"></div>
 				</div>
+				 
 				<script>
 			
 			makeSubLedgerTable();
@@ -160,7 +170,22 @@
 			document.getElementById('subLedgerTable').getElementsByTagName('table')[0].width="89%"
 		</script>
 				<br />
-				<div class="subheadsmallnew" /></div>
+				<div  align="center">
+				<jsp:include page="common-documentsUpload.jsp" />
+				</div>
+				<%--<div class="subheadsmallnew" /></div>
+				<div  align="center">
+					<table width="89%" border=0 id="labelid">
+						<th>File Details</th>
+						<tbody align="center">
+						<tr>
+					 <jsp:include page="common-documentsUpload.jsp" />
+						</tr>
+						</tbody>
+						
+					</table>
+				</div>--%>
+				
 				<s:hidden id="voucherDate" name="voucherDate" />
 				<s:hidden id="cutOffDate" name="cutOffDate" />
 				<%@ include file='../workflow/commonWorkflowMatrix.jsp'%>
@@ -261,11 +286,27 @@
 			return false;
 		}
 	}
+	function inAccountCodeArray(accountCode, accountCodeArray) {
+	    var length = accountCodeArray.length;
 	
+	    for(var i = 0; i < length; i++) {
+	    
+	        if(accountCodeArray[i] == accountCode)
+	        	{
+	        	
+	            return false;
+	            break;
+	        	}
+	    }
+	   
+	    return true;
+	}
 	function validateJV()
 	{
+
 	   //document.getElementById("buttonValue").value=btnval;
 		document.getElementById('lblError').innerHTML ="";
+		
 		var cDate = new Date();
 		
 		var currDate = cDate.getDate()+"/"+(parseInt(cDate.getMonth())+1)+"/"+cDate.getYear();
@@ -413,10 +454,97 @@
 				return false;
 			 }	
 			
+			var y =document.getElementById('billDetailTable').getElementsByTagName('tr');
+			var x =document.getElementById('subLedgerTable').getElementsByTagName('tr');
+			var totalDebitAmt= 0;
+			var totalCreditAmt = 0;
+			var accountCodeArray = new Array();		
+			var rowIndexLength = y.length - 2;
+			var rowIndexSubLedgLength = x.length - 2;
+			for (i = 0; i < rowIndexLength -1 ; i++) {
+			
+				  var debitAmt = document.getElementById('billDetailslist['+i+'].debitAmountDetail').value;
+				  var creditAmt = document.getElementById('billDetailslist['+i+'].creditAmountDetail').value;
+				  var accountCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
+				  if(debitAmt == '')
+					  {
+					  debitAmt = 0;
+					 
+					  }
+				  if(creditAmt == '')
+					  {
+						  creditAmt = 0;
+					 
+					  }
+				  debitAmt= parseFloat(debitAmt);
+				  creditAmt= parseFloat(creditAmt);
+				  if(accountCode == '')				  
+				    {
+					     document.getElementById('lblError').innerHTML ="Account code  is missing for credit or debit supplied field in account grid : "+(i+1);
+						return false;
+						
+				    }
+				  else
+				  {
+					  
+				 
+					  if(!inAccountCodeArray(accountCode,accountCodeArray))
+						  {
+						  document.getElementById('lblError').innerHTML ="Function is missing for the repeated account code,check account code : "+accountCode;
+							return false;
+						     
+						  }else{
+							 
+							  accountCodeArray.push(accountCode);
+						  }
+					  
+					  if(debitAmt > 0 && creditAmt >0)
+						  {
+						  				 
+						    document.getElementById('lblError').innerHTML = "One account can have only credit or debit for the account code :"+accountCode;
+							return false;
+						  }
+					  if(debitAmt == 0 && creditAmt == 0)
+						  {				 
+						    document.getElementById('lblError').innerHTML ="Enter debit/credit amount for the account code : "+accountCode;
+							return false;
+						  }
+					  if(debitAmt > 0 && creditAmt == 0)
+						  {
+							 
+							   totalDebitAmt = totalDebitAmt + debitAmt;						
+							  
+						  }
+					  if(creditAmt > 0 && debitAmt == 0)
+					      {
+						 
+						        totalCreditAmt = totalCreditAmt + creditAmt;		 
+					      
+						        
+					      }
+					 
+				  }
+				  
+
+				  
+				}
+
+			if(totalDebitAmt != totalCreditAmt)
+				{
+				document.getElementById('lblError').innerHTML = "Total Credit and Total Debit amount must be same";
+				return false;
+				}
+			
+			
+						
+				
+					
+			
 			//result =validateApproverUser(name,value);
 			
 	return true;
-}function loadBank(fund){
+}
+	function loadBank(fund){
 	}
 function onloadtask(){
 //autocompleteEntities1By20();
@@ -433,6 +561,7 @@ function onloadtask(){
 	}
 	//document.getElementById('vouchermis.function').style.display="none";
 	//document.getElementById('functionnametext').style.display="none";
+
 	var message = '<s:property value="message"/>';
 	if(message != null && message != '')
 		showMessage(message);
@@ -460,6 +589,7 @@ function showMessage(message){
 	//bootbox.alert(message);
 	bootbox.alert(message, function() {
 		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
+		var fileStoreId = '<s:property value="voucherHeader.documentDetail.fileStore.fileStoreId"/>';
 		document.forms[0].action = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+voucherHeaderId;
 		document.forms[0].submit(); 
 	});

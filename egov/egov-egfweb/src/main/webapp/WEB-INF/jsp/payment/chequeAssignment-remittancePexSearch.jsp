@@ -66,7 +66,7 @@
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">
-				<s:text name="rtgs.assignment.heading.search" />
+				<s:text name="pex.assignment.heading.search" />
 			</div>
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>

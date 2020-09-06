@@ -88,10 +88,10 @@
 </style>
 <form:form name="expenseBillForm" role="form" action="" modelAttribute="egBillregister" id="egBillregister"
            class="form-horizontal form-groups-bordered" enctype="multipart/form-data">
-    <div class="position_alert">
+   <!--  <div class="position_alert">
         <spring:message code="lbl.netpayable.amount" text="Net Payable Amount"/> : &#8377 <span id="expenseNetPayableAmount"><c:out
             value="${expenseNetPayableAmount}" default="0.0"></c:out></span>
-    </div>
+    </div> -->
     <div class="position_alert1">
         <spring:message code="lbl.total.debit.amount" text="Total Debit Amount"/> : &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
             value="${expenseBillTotalDebitAmount}" default="0.0"></c:out></span>
@@ -130,13 +130,13 @@
     <div class="tab-content">
         <div class="tab-pane fade in active" id="expensebillheader">
             <jsp:include page="expensebill-view-header.jsp"/>
-            <jsp:include page="expensebill-view-subledgerdetails.jsp"/>
+         <!--  <jsp:include page="expensebill-view-subledgerdetails.jsp"/> -->
             <jsp:include page="expensebill-view-accountdetails.jsp"/>
             <jsp:include page="expensebill-view-subledgeraccountdetails.jsp"/>
             <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
                 <jsp:include page="billdocument-upload.jsp"/>
             </c:if>
-            <%-- <jsp:include page="expensebill-budgetdetails.jsp"/> --%>
+           <!-- <jsp:include page="expensebill-budgetdetails.jsp"/> -->
         </div>
         <div class="tab-pane fade" id="checklist">
             <jsp:include page="expensebill-view-checklist.jsp"/>

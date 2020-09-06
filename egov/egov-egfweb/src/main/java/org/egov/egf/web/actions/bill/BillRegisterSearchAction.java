@@ -89,8 +89,7 @@ import java.util.Map;
  */
 @ParentPackage("egov")
 @Results({
-    @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp"),
-    @Result(name = BillRegisterSearchAction.POST, location = "billRegisterSearch-" + BillRegisterSearchAction.POST + ".jsp")
+    @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp")
 })
 public class BillRegisterSearchAction extends BaseFormAction {
     private static final long serialVersionUID = 1L;
@@ -170,13 +169,6 @@ public class BillRegisterSearchAction extends BaseFormAction {
             LOGGER.debug("BillRegisterSearchAction | newform | Start");
         return NEW;
     }
-    
-    @Action(value = "/bill/billRegisterSearch-postAudit")
-    public String postAudit() {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("BillRegisterSearchAction | postAudit | Start");
-        return NEW;
-    }
 
     @Action(value = "/bill/billRegisterSearch-search")
     public String search() {
@@ -206,8 +198,8 @@ public class BillRegisterSearchAction extends BaseFormAction {
             oWnerNamesList = getOwnersForWorkFlowState(stateIds);
 
         for (final Object[] owner : oWnerNamesList)
-            if (!stateIdAndOwnerNameMap.containsKey(getLongValue(owner[1])))
-                stateIdAndOwnerNameMap.put(getLongValue(owner[1]), getStringValue(owner[0]));
+            if (!stateIdAndOwnerNameMap.containsKey(getLongValue(owner[0])))
+                stateIdAndOwnerNameMap.put(getLongValue(owner[0]), this.getEmployeeName(getLongValue(owner[1])));
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Total number of bills found =: " + list.size());
 
@@ -256,8 +248,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private List<Object[]> getOwnersForWorkFlowState(final List<Long> stateIds)
     {
         List<Object[]> ownerNamesList = new ArrayList<Object[]>();
-        final String ownerNamesQueryStr = "select a.employee.username,bill.state.id from Assignment a,State state, EgBillregister bill"
-                + " where  bill.state.id=state.id and a.position.id = state.ownerPosition.id and bill.state.id in (:IDS)";
+        final String ownerNamesQueryStr = "select es.id,es.ownerPosition from State es where es.id in (:IDS)";
         int size = stateIds.size();
         if (size > 999)
         {
@@ -378,4 +369,9 @@ public class BillRegisterSearchAction extends BaseFormAction {
     private String getStringValue(final Object object) {
         return object != null ? object.toString() : "";
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

@@ -218,6 +218,7 @@
         <jsoup-version>1.10.3</jsoup-version>
         <jython-version>2.7.1b3</jython-version>
         <flyway-core-version>5.0.3</flyway-core-version>
+        <chd-default-schema>ch.chandigarh</chd-default-schema>
         <junit-version>4.12</junit-version>
         <mockito-all-version>1.10.19</mockito-all-version>
         <springockito-version>1.0.9</springockito-version>
@@ -256,7 +257,6 @@
         <module>egov-commons</module>
         <module>egov-eis</module>
         <module>egov-egf</module>
-        <module>egov-audit</module>
         <module>egov-lcms</module>
 	      <module>egov-council</module>
         <module>egov-collection</module>
@@ -265,13 +265,14 @@
         <module>egov-eisweb</module>
         <module>egov-egiweb</module>
         <module>egov-egfweb</module>
-        <module>egov-auditweb</module>
         <module>egov-lcmsweb</module>
 	      <module>egov-councilweb</module>
         <module>egov-collectionweb</module>
         <module>egov-apnimandiweb</module>
         <module>egov-ear</module>
+       
     </modules>
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -285,6 +286,7 @@
                     </exclusion>
                 </exclusions>
             </dependency>
+
             <!-- HIBERNATE DEPENDENCIES START -->
             <dependency>
                 <groupId>org.hibernate</groupId>

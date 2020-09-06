@@ -109,20 +109,17 @@
                                 </resource>
                                 <resource>
                                     <directory>../egov-egf/src/main/resources/db/migration</directory>
-                                </resource>
-                                <resource>
-                                    <directory>../egov-collection/src/main/resources/db/migration</directory>
-                                </resource>
-                                <resource>
-                                    <directory>../egov-lcms/src/main/resources/db/migration</directory>
-                                </resource>                                				
-                                <resource>
-                                    <directory>../egov-council/src/main/resources/db/migration</directory>
-                                </resource>
+                                </resource>                                
                                 <resource>
                                     <directory>../egov-portal/src/main/resources/db/migration</directory>
                                 </resource>
                                 <resource>
+                                    <directory>../egov-lcms/src/main/resources/db/migration</directory>
+                                </resource>
+								<resource>
+                                    <directory>../egov-council/src/main/resources/db/migration</directory>
+                                </resource>
+								<resource>
                                     <directory>../egov-apnimandi/src/main/resources/db/migration</directory>
                                 </resource>
                             </resources>
@@ -223,9 +220,12 @@
                             </dependency>
                         </dependencies>
                         <configuration>
-                            <skip>false</skip>
+                            <skip>true</skip>
                             <cleanDisabled>true</cleanDisabled>
                             <validateOnMigrate>${validateOnMigrate}</validateOnMigrate>
+                            <schemas>
+            					<schema>${chd-default-schema}</schema>
+        					</schemas>
                         </configuration>
                         <executions>
                             <execution>

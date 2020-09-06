@@ -47,7 +47,16 @@
  */
 package org.egov.egf.web.actions.voucher;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -60,7 +69,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.apache.struts2.ServletActionContext;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -68,12 +82,14 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.billsaccounting.services.BillsAccountingService;
 import org.egov.billsaccounting.services.VoucherConstant;
+import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUpload;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Relation;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
@@ -93,6 +109,7 @@ import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.StringUtils;
@@ -151,6 +168,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private SimpleWorkflowService<CVoucherHeader> voucherWorkflowService;
     protected WorkflowBean workflowBean = new WorkflowBean();
     protected EisCommonService eisCommonService;
+    private static final int BUFFER_SIZE = 4096;
     @Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
@@ -188,6 +206,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private final PreApprovedVoucher preApprovedVoucher = new PreApprovedVoucher();
     private List<PreApprovedVoucher> billDetailslist;
     private List<PreApprovedVoucher> subLedgerlist;
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
     private ContraJournalVoucher contraVoucher;
     private static final String ERROR = "error";
 
@@ -199,6 +218,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private static final String VOUCHERQUERYBYCGN = " from CVoucherHeader where cgn=?";
     private static final String ACCDETAILTYPEQUERY = " from Accountdetailtype where id=?";
     private static final String ACTIONNAME = "actionName";
+    private static final String FILESTOREID = "fileStoreId";
+    private InputStream inputStream;
+    private String fileName;
+    private String mimeType;
     private String values = "", from = "";
     private String methodName = "";
     private Integer departmentId;
@@ -207,6 +230,9 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private String voucherNumber;
     private Boolean displayVoucherNumber = true;
     private String action = "";
+    private File[] file;
+    private String[] fileContentType;
+	private String[] fileFileName;
     SimpleWorkflowService<ContraJournalVoucher> contraWorkflowService;
     private Map<String, Object> billDetails;
     private VoucherHelper voucherHelper;
@@ -224,10 +250,13 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private boolean finanicalYearAndClosedPeriodCheckIsClosed=false;
     SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
     Date date;
+    
     @Autowired
     FinanceDashboardService finDashboardService;
     @Autowired
     private ChartOfAccounts chartOfAccounts;
+    @Autowired
+    private FileStoreService fileStoreService;
 
     @Override
     public StateAware getModel() {
@@ -427,6 +456,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 			if (chartOfAccounts.isClosedForPosting(df.format(VoucherDate))) {
 				finanicalYearAndClosedPeriodCheckIsClosed = true;
 			}
+	
 		}
         /*
          * if (voucherHeader != null && voucherHeader.getState() != null) if (!validateOwner(voucherHeader.getState())) { final
@@ -435,7 +465,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
          */
         final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "pjv_saveasworkingcopy_enabled");
-        final String pjv_wc_enabled = appList.get(0).getValue();
+        String pjv_wc_enabled = appList.get(0).getValue();
 
         type = billsService.getBillTypeforVoucher(voucherHeader);
         if (null == type)
@@ -471,15 +501,57 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     ismodifyJv = true;
                 }
             }
+			
+			
+			if (voucherHeader.getState() != null && voucherHeader.getState().getValue().contains("SaveAsDraft"))
+            if (voucherHeader.getModuleId() == null) {
+                final EgBillregistermis billMis = (EgBillregistermis) persistenceService
+                        .find("from EgBillregistermis where voucherHeader.id=?", voucherHeader.getId());
+                if (billMis != null) {
+                    final State billWorkFlowState = billMis.getEgBillregister().getState();
+                    if (billWorkFlowState == null) {
+                        result = "editVoucher";
+                        ismodifyJv = true;
+                    }
+
+                } else if (voucherHeader.getName().equalsIgnoreCase(FinancialConstants.JOURNALVOUCHER_NAME_GENERAL)) {
+                    type = FinancialConstants.JOURNALVOUCHER_NAME_GENERAL;
+                    result = "editVoucher";
+                    ismodifyJv = true;
+                }
+            }
         // loadApproverUser(type);
+       			
         if (!ismodifyJv)
             if ("Y".equals(pjv_wc_enabled))
                 result = VOUCHEREDIT;
             else
+            {
+            	if(voucherHeader.getState().getValue() != null && voucherHeader.getState().getValue().equalsIgnoreCase("SaveAsDraft"))
+            		{
+            		result = VOUCHEREDIT;
+            		ismodifyJv = true;
+            		
+            		 pjv_wc_enabled="Y";
+            		}
+            	else
                 result = "voucherview";
+            }
+                
+			
+			
+			
+			
+			
         billRegister = (EgBillregister) persistenceService.find(
                 "select mis.egBillregister from EgBillregistermis mis where mis.voucherHeader.id=?",
                 voucherHeader.getId());
+		 voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY,
+                 Long.valueOf(parameters.get(VHID)[0]));
+         List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+         voucherHeader.setDocumentDetail(voucherDocList);
+         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
+		
 
         return result;
     }
@@ -517,13 +589,67 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         } else {
             voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY,
                     Long.valueOf(parameters.get(VHID)[0]));
+            List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+            voucherHeader.setDocumentDetail(voucherDocList);
+            voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_VIEW_MODE);
             from = FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL;
         }
         getMasterDataForBillVoucher();
         getHeaderMandateFields();
         return "view";
     }
+    @SkipValidation
+    @Action(value = "/voucher/preApprovedVoucher-downloadVoucherDoc", results = { @Result(name = "success", type = "stream",
+            params = {"contentType", "${mimeType}",
+             "inputName", "inputStream",
+                    "bufferSize", "4096",
+                    "contentDisposition","filename=\"${fileName}\"" }) })
+    public String downloadVoucherDoc() throws ApplicationException, IOException {
+    final ServletContext context = ServletActionContext.getServletContext();
+         final String fileStoreId = parameters.get("fileStoreId")[0];      
+         
+        final File downloadFile = fileStoreService.fetch(fileStoreId, FinancialConstants.FILESTORE_MODULECODE);
+       
+         inputStream = new FileInputStream(downloadFile);
+         
+         List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(Long.valueOf(parameters.get("voucherHeaderId")[0]), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+         voucherHeader.setDocumentDetail(voucherDocList);
 
+         for (final DocumentUpload doc : voucherHeader.getDocumentDetail())
+             if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
+             {
+                 fileName = doc.getFileStore().getFileName();
+                 mimeType = doc.getFileStore().getContentType();
+             }
+       
+         if (mimeType == null)
+             // set to binary type if MIME mapping not found
+             mimeType = "application/octet-stream";
+         return SUCCESS;
+
+         // set content attributes for the response
+        /* serResponse.setContentType(mimeType);
+         serResponse.setContentLength((int) downloadFile.length());
+
+         // set headers for the response
+         final String headerKey = "Content-Disposition";
+         final String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+         serResponse.setHeader(headerKey, headerValue);
+
+         // get output stream of the response
+         final OutputStream outStream = serResponse.getOutputStream();
+
+         final byte[] buffer = new byte[BUFFER_SIZE];
+         int bytesRead = -1;
+
+         // write bytes read from the input stream into the output stream
+         while ((bytesRead = inputStream.read(buffer)) != -1)
+             outStream.write(buffer, 0, bytesRead);
+
+         inputStream.close();
+         outStream.close();*/
+
+}
     /*
      * @SkipValidation public List<String> getValidActions() { if
      * (FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA.equals(parameters.get( "from")[0])) return null; else return null; }
@@ -721,10 +847,32 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             LOGGER.debug("voucher id=======" + parameters.get(VHID)[0]);
         methodName = "update";
         try {
+        	 File[] uploadedFiles = getFile();
+             String[] fileName = getFileFileName();
+             String[] contentType = getFileContentType();
+             if(uploadedFiles!=null)
+             {
+	                for (int i = 0; i < uploadedFiles.length; i++)
+	                {
+	
+	                    Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+	                    byte[] fileBytes = Files.readAllBytes(path);
+	                    ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+	                    DocumentUpload upload = new DocumentUpload();
+	                    upload.setInputStream(bios);
+	                    upload.setFileName(fileName[i]);
+	                    upload.setContentType(contentType[i]);
+	                    documentDetail.add(upload);
+	                }
+             }
+            
             voucherHeader = (CVoucherHeader) voucherService.findById(Long.parseLong(parameters.get(VHID)[0]), false);
             populateWorkflowBean();
             voucherHeader = preApprovedActionHelper.sendForApproval(voucherHeader, workflowBean);
+            voucherHeader.setDocumentDetail(documentDetail);
+            preApprovedActionHelper.saveDocuments(voucherHeader);
             type = billsService.getBillTypeforVoucher(voucherHeader);
+            
             if (null == type)
                 type = "default";
             //EmployeeInfo employee = microserviceUtils.getEmployeeByPositionId(voucherHeader.getState().getOwnerPosition());
@@ -1570,5 +1718,54 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public File[] getFile() {
+		return file;
+	}
+
+	public void setFile(File[] file) {
+		this.file = file;
+	}
+
+	public String[] getFileContentType() {
+		return fileContentType;
+	}
+
+	public void setFileContentType(String[] fileContentType) {
+		this.fileContentType = fileContentType;
+	}
+
+	public String[] getFileFileName() {
+		return fileFileName;
+	}
+
+	public void setFileFileName(String[] fileFileName) {
+		this.fileFileName = fileFileName;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+    
 
 }

@@ -278,7 +278,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @Transactional
     public Paymentheader createPayment(final Map<String, String[]> parameters, final List<PaymentBean> billList,
-            final EgBillregister billregister, WorkflowBean workflowBean)
+            final EgBillregister billregister, WorkflowBean workflowBean, String firstsignatory, String secondsignatory)
             throws ApplicationRuntimeException, ValidationException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting createPayment...");
@@ -302,6 +302,10 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             headerdetails.put(VoucherConstant.VOUCHERTYPE, "Payment");
             if (parameters.get(VoucherConstant.DESCRIPTION) != null)
                 headerdetails.put(VoucherConstant.DESCRIPTION, parameters.get(VoucherConstant.DESCRIPTION)[0]);
+            if (firstsignatory != null)
+                headerdetails.put("firstsignatory", firstsignatory);
+            if (secondsignatory != null)
+                headerdetails.put("secondsignatory", secondsignatory);
 
             if (parameters.get(VoucherConstant.VOUCHERDATE) != null
                     && !parameters.get(VoucherConstant.VOUCHERDATE)[0].equals(EMPTY_STRING))

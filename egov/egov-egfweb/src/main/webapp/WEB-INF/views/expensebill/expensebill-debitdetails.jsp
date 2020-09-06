@@ -72,7 +72,7 @@
 		<tbody>
 			<tr id="debitdetailsrow">
 				<td>
-					<input type="text" id="tempDebitDetails[0].debitGlcode" name="tempDebitDetails[0].debitGlcode" class="form-control table-input debitDetailGlcode debitGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type first 3 letters of Account code">
+					<input type="text" id="tempDebitDetails[0].debitGlcode" name="tempDebitDetails[0].debitGlcode" class="form-control table-input debitDetailGlcode debitGlcode"  data-errormsg="Account Code is mandatory!" data-idx="0" data-optional="0"   placeholder="Type any letters of Account code">
 					<form:hidden path="" name="tempDebitDetails[0].glcode" id="tempDebitDetails[0].glcode" class="form-control table-input hidden-input debitaccountcode"/> 
 					<form:hidden path="" name="tempDebitDetails[0].glcodeid" id="tempDebitDetails[0].glcodeid" class="form-control table-input hidden-input debitdetailid"/> 
 					<form:hidden path="" name="tempDebitDetails[0].isSubLedger" id="tempDebitDetails[0].isSubLedger" class="form-control table-input hidden-input debitIsSubLedger"/>
