@@ -71,6 +71,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.PreambleNumberGenerator;
@@ -155,16 +156,18 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
     @Transactional
     public CouncilMeeting update(final CouncilMeeting councilMeeting, Long approvalPosition, String approvalComment,
             String workFlowAction) {
-    	 if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
-    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
-                     workFlowAction);
     	
-    	 applyAuditing(councilMeeting);
-    	 for(MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
+    	for(MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
     		if(null != meetingMOM.getPreamble()) {
     			applyAuditing(meetingMOM.getPreamble());
     		}
     	 }
+    	
+    	if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
+    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
+                     workFlowAction);
+    	
+    	 applyAuditing(councilMeeting);
     	 applyAuditing(councilMeeting.getState());
     	 return councilMeetingRepository.save(councilMeeting);
     }
@@ -282,7 +285,7 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
      * @param councilMeeting
      * @return
      */
-    public List<User> getUserListForMeeting(CouncilMeeting councilMeeting) {
+    /*public List<User> getUserListForMeeting(CouncilMeeting councilMeeting) {
         Set<User> usersListResult = new HashSet<>();
         List<String> agendaNumber = new ArrayList<>();
         for (MeetingMOM mom : councilMeeting.getMeetingMOMs()) {
@@ -293,12 +296,8 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
                             && agendaDetails.getPreamble().getState() != null
                             && agendaDetails.getPreamble().getState().getOwnerPosition() != null) {
                     	
-                    	/*usersListResult.add(eisCommonService
-                                .getUserForPosition(agendaDetails.getPreamble().getState().getCreatedBy(),
-                                        new Date()));
-                        usersListResult.add(eisCommonService
-                                .getUserForPosition(agendaDetails.getPreamble().getState().getOwnerPosition(),
-                                        new Date()));*/
+                    	//usersListResult.add(eisCommonService.getUserForPosition(agendaDetails.getPreamble().getState().getCreatedBy(),new Date()));
+                        //usersListResult.add(eisCommonService.getUserForPosition(agendaDetails.getPreamble().getState().getOwnerPosition(),new Date()));
                     	EmployeeInfo agendaApproverinfo = microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().getOwnerPosition());
                     	if(null != agendaApproverinfo) {
                     		usersListResult.add(agendaApproverinfo.getUser());
@@ -319,6 +318,34 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
     	}
     	
         //usersListResult.add(userService.getUserById(councilMeeting.getCreatedBy()));
+        return new ArrayList<>(usersListResult);
+    }*/
+    
+    public List<User> getUserListForMeeting(CouncilMeeting councilMeeting) {
+        Set<User> usersListResult = new HashSet<>();
+        List<String> roles = new ArrayList<String>();
+        roles.add(CouncilConstants.ROLE_MEETING_SPECIAL_OFFICER);
+        roles.add(CouncilConstants.ROLE_MEETING_SENIOR_OFFICER);
+        roles.add(CouncilConstants.ROLE_MEETING_DEPARTMENT_USER);
+        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+    	if(!CollectionUtils.isEmpty(employees)) {
+    		for(EmployeeInfo info : employees) {
+    			usersListResult.add(info.getUser());
+    		}
+    	}
+        return new ArrayList<>(usersListResult);
+    }
+    
+    public List<User> getUserListForAgendaInvitation() {
+        Set<User> usersListResult = new HashSet<>();
+        List<String> roles = new ArrayList<String>();
+        roles.add(CouncilConstants.ROLE_MEETING_SENIOR_OFFICER);
+        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+    	if(!CollectionUtils.isEmpty(employees)) {
+    		for(EmployeeInfo info : employees) {
+    			usersListResult.add(info.getUser());
+    		}
+    	}
         return new ArrayList<>(usersListResult);
     }
     

@@ -460,7 +460,31 @@ public class MicroserviceUtils {
         }
         return null;
     }
-  
+    
+    public String getTaxHeadCode(String code) {
+        FilterRequest filterReq = new FilterRequest();
+        List<String> taxHeads=new ArrayList<String>();
+        String taxHead=null;
+        try {
+            if(!StringUtils.isEmpty(code) && code != null ){
+                filterReq.setGlcode(code);
+            }
+            JSONArray mdmObj = getFinanceMdmsByModuleNameAndMasterDetails("FinanceModule", "TaxHeadMasterGlCodeMapping", filterReq);
+            mdmObj.stream().forEach(obj ->{
+                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
+                taxHeads.add(lhm.get("taxhead").toString());
+            });
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if(taxHeads != null && !taxHeads.isEmpty())
+        {
+        	taxHead=taxHeads.get(0);
+        }
+        
+        return taxHead;
+    }
+
     public Department getDepartmentByCode(String departmentCode) {
 
         List<Department> deptlist = this.masterDataCache.get(ApplicationConstant.DEPARTMENT_CACHE_NAME);
@@ -769,6 +793,32 @@ public class MicroserviceUtils {
         else
             return null;
     }
+    
+    public List<EmployeeInfo> getEmployeesByRoles(List<String> roles) {
+
+        final RestTemplate restTemplate = createRestTemplate();
+
+        StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
+        empUrl.append("?tenantId=" + getTenentId());
+
+        if (!CollectionUtils.isEmpty(roles)){
+        	empUrl.append("&roles=" + String.join(",", roles));
+        }else {
+        	return null;
+        }
+
+        RequestInfo requestInfo = new RequestInfo();
+        RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
+
+        requestInfo.setAuthToken(getUserToken());
+        requestInfo.setTs(getEpochDate(new Date()));
+        reqWrapper.setRequestInfo(requestInfo);
+        EmployeeInfoResponse empResponse = restTemplate.postForObject(empUrl.toString(), reqWrapper, EmployeeInfoResponse.class);
+        if (empResponse.getEmployees() != null && !empResponse.getEmployees().isEmpty())
+            return empResponse.getEmployees();
+        else
+            return null;
+    }
 
     public List<Assignment> getAssignments(String department, String designation) {
         List<Assignment> assignmentList = new ArrayList<>();
@@ -907,30 +957,6 @@ public class MicroserviceUtils {
 
         TaxHeadMasterResponse response = restTemplate.postForObject(url, reqWrapper, TaxHeadMasterResponse.class);
         return response.getTaxHeadMasters();
-    }
-    
-    public String getTaxHeadCode(String code) {
-        FilterRequest filterReq = new FilterRequest();
-        List<String> taxHeads=new ArrayList<String>();
-        String taxHead=null;
-        try {
-            if(!StringUtils.isEmpty(code) && code != null ){
-                filterReq.setCode(code);
-            }
-            JSONArray mdmObj = getFinanceMdmsByModuleNameAndMasterDetails("FinanceModule", "TaxHeadMasterGlCodeMapping", filterReq);
-            mdmObj.stream().forEach(obj ->{
-                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
-                taxHeads.add(lhm.get("taxhead").toString());
-            });
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if(taxHeads != null && !taxHeads.isEmpty())
-        {
-        	taxHead=taxHeads.get(0);
-        }
-        
-        return taxHead;
     }
 
     public List<GlCodeMaster> getGlcodeMastersByService(String service) {

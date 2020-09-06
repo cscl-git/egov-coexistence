@@ -46,59 +46,77 @@
   ~
   --%>
 
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<script>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="lbl.agenda.invitation" />
+				</div>
+			</div>
+			<div class="panel-body custom">
+				<div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.number" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.meetingNumber}</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.agenda.invitation.message" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.message}</div>
+				</div>
+				<!-- <div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.date" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						<fmt:formatDate pattern="dd/MM/yyyy"
+							value="${councilAgendaInvitation.meetingDate}" />
+					</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.place" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.meetingLocation}</div>
+				</div> -->
+				<div class="row add-border">
+					<!-- <div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.time" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.meetingTime}</div> -->
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.document" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						<c:choose>
+							<c:when test="${councilAgendaInvitation.filestoreid != null}">
+								<a
+									href="/services/council/councilpreamble/downloadfile/${councilAgendaInvitation.filestoreid.fileStoreId}"
+									data-gallery target="_blank">${councilAgendaInvitation.filestoreid.fileName}</a>
 
+							</c:when>
+							<c:otherwise>
+								<spring:message code="msg.no.attach.found" />
+							</c:otherwise>
+						</c:choose>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 
-	function validateWorkFlowApprover(name) {
-		document.getElementById("workFlowAction").value=name;
-	    var approverPosId = document.getElementById("approvalPosition");
-	    /* if(approverPosId && approverPosId.value != -1) {
-			var approver = approverPosId.options[approverPosId.selectedIndex].text; 
-			document.getElementById("approverName").value= approver.split('~')[0];
-		}   */
-		var rejectbutton=document.getElementById("workFlowAction").value;
-		if(rejectbutton!=null && (rejectbutton=='Reject'||rejectbutton=='Cancel'|| rejectbutton=='Provide more info'))
-			{
-			$('#approvalDepartment').removeAttr('required');
-			$('#approvalDesignation').removeAttr('required');
-			$('#approvalPosition').removeAttr('required');
-			$('#approvalComent').attr('required', 'required');	
-			} 
-		else if (rejectbutton == 'Approve') {
-			$('#approvalDepartment').removeAttr('required');
-			$('#approvalDesignation').removeAttr('required');
-			$('#approvalPosition').removeAttr('required');
-			$('#approvalComent').removeAttr('required');
-		}
-		else if(rejectbutton == 'Forward'){
-			$('#approvalDepartment').attr('required', 'required');	
-			$('#approvalDesignation').attr('required', 'required');	
-			$('#approvalPosition').attr('required', 'required');	
-			$('#approvalComent').removeAttr('required');
-			}
-	   document.forms[0].submit;
-	   return true;
-	}
-</script>
-
-<div class="buttonbottom" align="center">
-	<table>
-		<tr>
-			<td>
-				<c:forEach items="${validActionList}" var="validButtons">
-					<form:button type="submit" id="${validButtons}" class="btn btn-primary workflow-submit"  value="${validButtons}" onclick="validateWorkFlowApprover('${validButtons}');">
-						<c:out value="${validButtons == 'Reject'?'Correction' :validButtons}" /> 
-					</form:button>
-				</c:forEach>
-				<c:if test="${(currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState))
-								|| (stateType!= 'null' && 'CouncilMeeting'.equalsIgnoreCase(stateType))}">
-					<input type="button" name="button2" id="button2" value="Close"
-					class="btn btn-default" onclick="window.close();" />
-				</c:if> 
-			</td>
-		</tr>
-	</table>
+<div class="row text-center">
+	<div class="add-margin">
+		<a href="javascript:void(0)" class="btn btn-default"
+			onclick="self.close()">Close</a>
+	</div>
 </div>

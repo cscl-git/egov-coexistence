@@ -47,6 +47,7 @@
  */
 package org.egov.council.service;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.egov.council.entity.CommitteeMembers;
 import org.egov.council.entity.CouncilMeeting;
@@ -130,9 +131,30 @@ public class CouncilSmsAndEmailService {
             buildCouncilSmsDetails(customMessage, councilMeeting);
         }
     }
+    
+    public void sendSmsForAgendaInvitation(String customMessage) {
+        Boolean smsEnabled = isSmsEnabled();
+
+        if (smsEnabled) {
+            try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage);
+	                }
+	            }
+            }catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to agenda invitation");
+            }
+        }
+    }
 
     public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment) {
-        String emailId;
+    	sendEmail(councilMeeting, customMessage, attachment, null, null);
+    }
+    
+    public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment, String fileType, String fileName) {
+    	String emailId;
         Boolean emailEnabled = isEmailEnabled();
         if (emailEnabled) {
         	try {
@@ -141,7 +163,7 @@ public class CouncilSmsAndEmailService {
 	                emailId = committeeMembers.getCouncilMember().getEmailId();
 	                if (emailId != null) {
 	                    buildEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
-	                            attachment);
+	                            attachment, fileType, fileName);
 	                }
 	            }
 	        }catch(Exception e) {
@@ -152,11 +174,28 @@ public class CouncilSmsAndEmailService {
 	            for (User user : listOfUsers) {
 	                if (user.getEmailId() != null) {
 	                    buildEmailForMeetingForCouncilRoles(user.getUserName(), user.getEmailId(), councilMeeting, customMessage,
-	                            attachment);
+	                            attachment, fileType, fileName);
 	                }
 	            }
 	        }catch(Exception e) {
 	        	LOGGER.error("Unable to send EMAIL to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
+	        }
+        }
+    }
+    
+    public void sendEmailForAgendaInvitation(String customMessage, final byte[] attachment, String fileType, String fileName) {
+        Boolean emailEnabled = isEmailEnabled();
+        if (emailEnabled) {
+        	try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getEmailId() != null) {
+	                	buildEmailForAgendaInvitation(user.getUserName(), user.getEmailId(), customMessage,
+	                            attachment, fileType, fileName);
+	                }
+	            }
+	        }catch(Exception e) {
+	        	LOGGER.error("Unable to send EMAIL to agenda invitation");
 	        }
         }
     }
@@ -192,9 +231,14 @@ public class CouncilSmsAndEmailService {
         if (mobileNumber != null && smsMsg != null)
             sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
     }
-
+    
     public void buildEmailForMeeting(final String email, final String name, final CouncilMeeting councilMeeting,
             final String customMessage, final byte[] attachment) {
+    	buildEmailForMeeting(email, name, councilMeeting, customMessage, attachment, null,null);
+    }
+
+    public void buildEmailForMeeting(final String email, final String name, final CouncilMeeting councilMeeting,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
         String body;
         String subject;
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
@@ -205,7 +249,7 @@ public class CouncilSmsAndEmailService {
             subject = emailSubjectforEmailByCodeAndArgs("email.meeting.subject", name, councilMeeting);
         }
         if (email != null && body != null)
-            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment);
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
 
     /**
@@ -232,10 +276,21 @@ public class CouncilSmsAndEmailService {
         if (mobileNumber != null && smsMsg != null)
             sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
     }
+    
+    public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
+            final String customMessage) {
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
+    }
 
     public void buildEmailForMeetingForCouncilRoles(final String userName, final String email,
             final CouncilMeeting councilMeeting,
             final String customMessage, final byte[] attachment) {
+    	buildEmailForMeetingForCouncilRoles(userName, email, councilMeeting, customMessage, attachment, null, null);
+    }
+    
+    public void buildEmailForMeetingForCouncilRoles(final String userName, final String email,
+            final CouncilMeeting councilMeeting,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
         String body;
         String subject;
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
@@ -248,7 +303,17 @@ public class CouncilSmsAndEmailService {
                     customMessage);
         }
         if (email != null && body != null)
-            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment);
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
+    }
+    
+    public void buildEmailForAgendaInvitation(final String userName, final String email,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
+        String body = customMessage;
+        String subject;
+        subject = emailSubjectforEmailByCodeAndArgs("email.council.agenda.invitation.subject");
+        body = customMessage;
+        if (email != null && body != null)
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
 
     /**
@@ -316,15 +381,32 @@ public class CouncilSmsAndEmailService {
                         String.valueOf(councilMeeting.getMeetingLocation()) },
                 LocaleContextHolder.getLocale());
     }
+    
+    public String emailSubjectforEmailByCodeAndArgs(final String code) {
+        final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
+        return councilMessageSource.getMessage(code,null,
+                LocaleContextHolder.getLocale());
+    }
 
     public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
         notificationService.sendSMS(mobileNumber, smsBody);
     }
 
-    public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
+    /*public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
             final String emailSubject, final byte[] attachment) {
-        notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
+    	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
                 attachment);
+    }*/
+    
+    public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
+            final String emailSubject, final byte[] attachment, String fileType, String fileName) {
+        if(!StringUtils.isBlank(fileType) && !StringUtils.isBlank(fileName)) {
+        	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, fileType, fileName,
+                    attachment);
+        }else {
+        	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
+                    attachment);
+        }
     }
 
 }

@@ -123,7 +123,8 @@ function callAjaxSearch() {
 						          	 return '<button type="button" class="btn btn-xs btn-secondary edit"><i class="fa fa-pencil" aria-hidden="true"></i>&nbsp;&nbsp;Edit</button>';
 						        }else{
 						        	 if(row.meetingStatus=="MOM FINALISED"){
-						        		 return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>&nbsp;&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMom"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Resolution</button>';
+						        		 //return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>&nbsp;&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMom"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Resolution</button>';
+						        		 return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>';
 						        	 }else        	
 						          	     return '<button type="button" class="btn btn-xs btn-secondary view"><i class="fa fa-eye" aria-hidden="true"></i>&nbsp;&nbsp;View</button>&nbsp;<button type="button" class="btn btn-xs btn-secondary generateMeeting"><i class="fa fa-print" aria-hidden="true"></i>&nbsp;&nbsp;Print Meeting Notice</button>';
 						         }
@@ -157,8 +158,8 @@ $("#resultTable").on('click','tbody tr td  .generateMom',function(event) {
 });
 $("#resultTable").on('click','tbody tr td  .generateMeeting',function(event) {
 	var id = reportdatatable.fnGetData($(this).parent().parent(),8);
+	//window.open('/services/council/councilmeeting/generateagenda'+'/'+id,'','width=800, height=600,scrollbars=yes');
 	window.open('/services/council/councilmeeting/generateagenda'+'/'+id,'','width=800, height=600,scrollbars=yes');
-	
 });
 
 $('#meetingLocation').on('mouseleave',function(){

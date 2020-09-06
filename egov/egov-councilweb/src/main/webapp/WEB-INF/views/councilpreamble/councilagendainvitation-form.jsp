@@ -52,26 +52,11 @@
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading">
 		<div class="panel-title">
-			<spring:message code="title.councilmeeting.details" />
+			<spring:message code="lbl.agenda.invitation" />
 		</div>
 	</div>
-	<input type="hidden" name="committeeType" id="committypeid" value="${councilMeeting.committeeType.id}"/>
 	<div class="panel-body">
-		<div class="form-group">
-				<label class="col-sm-3 control-label text-right"><spring:message
-						code="lbl.meeting.type" /><span class="mandatory"></span> </label>
-			<div class="col-sm-3 add-margin">
-				<form:select path="meetingType" id="meetingType"
-					cssClass="form-control" required="required"
-					cssErrorClass="form-control error">
-					<form:option value="">
-						<spring:message code="lbl.select" />
-					</form:option>
-					<form:options items="${meetingType}" itemValue="id"
-				itemLabel="name"/>
-				</form:select>
-				<form:errors path="meetingType" cssClass="error-msg" />
-			</div>
+		<!-- <div class="form-group">
 			<label class="col-sm-2 control-label text-right"><spring:message
 					code="lbl.meeting.date" /> <span class="mandatory"></span> </label>
 			<div class="col-sm-3 add-margin">
@@ -80,8 +65,6 @@
 					required="required" />
 				<form:errors path="meetingDate" cssClass="error-msg" />
 			</div>
-		</div>
-		<div class="form-group">
 			<label class="col-sm-3 control-label text-right"><spring:message
 					code="lbl.meeting.time" /> <span class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
@@ -95,7 +78,27 @@
 				</form:select>
 				<form:errors path="meetingTime" cssClass="error-msg" />
 			</div>
+		</div> -->
+		<div class="form-group">		
+			<label class="col-sm-3 control-label text-right"><spring:message
+					code="lbl.meeting.number" /> <span class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input path="meetingNumber" id="meetingNumber"
+					cssClass="form-control" required="required"
+					cssErrorClass="form-control error" />
+				<form:errors path="meetingNumber" cssClass="error-msg" />
+			</div>	
 			<label class="col-sm-2 control-label text-right"><spring:message
+					code="lbl.agenda.invitation.message" /><span class="mandatory"></span> </label>
+			<div class="col-sm-3 add-margin">
+				<form:textarea path="message" id="message" cols="8"
+					rows="4" class="form-control patternvalidation"
+					data-pattern="alphanumericwithspace" required="required"
+					minlength="5" maxlength="300" />
+
+				<form:errors path="message" cssClass="error-msg" />
+			</div>
+			<!-- <label class="col-sm-2 control-label text-right"><spring:message
 					code="lbl.meeting.place" /><span class="mandatory"></span> </label>
 			<div class="col-sm-3 add-margin">
 				<form:textarea path="meetingLocation" id="meetingLocation" cols="5"
@@ -104,29 +107,17 @@
 					minlength="5" maxlength="32" />
 
 				<form:errors path="meetingLocation" cssClass="error-msg" />
-			</div>
+			</div> -->
 		</div>
 
-		<c:if test="${!autoMeetingNoGenEnabled}">
-			<div class="form-group">
-				<label class="col-sm-3 control-label text-right"><spring:message
-						code="lbl.meeting.number" /> <span class="mandatory"></span></label>
-				<div class="col-sm-3 add-margin">
-					<form:input path="meetingNumber" id="meetingNumber"
-						cssClass="form-control" required="required"
-						cssErrorClass="form-control error" />
-					<form:errors path="meetingNumber" cssClass="error-msg" />
-				</div>
-			</div>
-		</c:if>
-		<form:hidden path="id" id="id" value="${councilMeeting.id}" />
+		<form:hidden path="id" id="id" value="${councilAgendaInvitation.id}" />
 		
 		<div class="form-group">
 			<label class="col-sm-3 control-label text-right"><spring:message
 						code="lbl.meeting.document" /><span class="mandatory"></span></label>
 			<div class="col-sm-8 add-margin">
 				<c:choose>
-					<c:when test="${councilMeeting.filestoreid != null}">
+					<c:when test="${councilAgendaInvitation.filestoreid != null}">
 	
 						<form:input path="attachments" type="file" id="attachments"
 							name="attachments" data-id="1"
@@ -134,13 +125,13 @@
 						<form:errors path="attachments" cssClass="error-msg" />
 	
 						<form:hidden path="filestoreid.id"
-							value="${councilMeeting.filestoreid.id}" />
+							value="${councilAgendaInvitation.filestoreid.id}" />
 						<form:hidden path="filestoreid.fileStoreId"
-							value="${councilMeeting.filestoreid.fileStoreId}" />
+							value="${councilAgendaInvitation.filestoreid.fileStoreId}" />
 	
 						<a target="_blank"
-							href="/services/council/councilmember/downloadfile/${councilMeeting.filestoreid.fileStoreId}"
-							data-gallery style="display:block"> ${councilMeeting.filestoreid.fileName}</a>
+							href="/services/council/councilmember/downloadfile/${councilAgendaInvitation.filestoreid.fileStoreId}"
+							data-gallery style="display:block"> ${councilAgendaInvitation.filestoreid.fileName}</a>
 						<small class="error-msg"><spring:message
 								code="lbl.mesg.document" /></small>
 					</c:when>

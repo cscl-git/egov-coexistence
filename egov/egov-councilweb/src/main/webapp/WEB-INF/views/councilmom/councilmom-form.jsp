@@ -117,7 +117,7 @@
 							<th align="center"><spring:message code="lbl.serial.no" /></th>
 							<th><spring:message code="lbl.department" /></th>
 							<th><spring:message code="lbl.preamble.number" /></th>
-							<th width="25%"><spring:message code="lbl.gistofpreamble" /></th>
+							<%-- <th width="25%"><spring:message code="lbl.gistofpreamble" /></th> --%>
 							<%-- <th width="20%"><spring:message code="lbl.bidders" /></th> --%>							
 							<th width="12%"><spring:message code="lbl.resolution" /><span
 								class="mandatory"></span></th>
@@ -143,10 +143,10 @@
 										</td>
 										<td><c:out value="${mom.preamble.departmentName}" /></td>
 										<td><c:out value="${mom.preamble.preambleNumber}" /></td>
-										<td><span class="more"><c:out
+										<%-- <td><span class="more"><c:out
 													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/><br>
 													<c:out value="${mom.preamble.addtionalGistOfPreamble}"></c:out>
-													</span></td>
+													</span></td> --%>
 
 
 										<%-- <td>
@@ -268,8 +268,7 @@
 							<th width="12%"><spring:message code="lbl.resolution" /><span
 								class="mandatory"></span></th>
 							<c:if test="${!autoResolutionNoGenEnabled}">
-								<th><spring:message code="lbl.resolutionNumber" /><span
-									class="mandatory"></span></th>
+								<th><spring:message code="lbl.preamble.number" /></th>
 							</c:if>
 							<th width="27%"><spring:message code="lbl.comments" /><span
 								class="mandatory"></span></th>

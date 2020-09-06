@@ -45,60 +45,10 @@
   ~   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
   ~
   --%>
-
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<script>
-
-
-	function validateWorkFlowApprover(name) {
-		document.getElementById("workFlowAction").value=name;
-	    var approverPosId = document.getElementById("approvalPosition");
-	    /* if(approverPosId && approverPosId.value != -1) {
-			var approver = approverPosId.options[approverPosId.selectedIndex].text; 
-			document.getElementById("approverName").value= approver.split('~')[0];
-		}   */
-		var rejectbutton=document.getElementById("workFlowAction").value;
-		if(rejectbutton!=null && (rejectbutton=='Reject'||rejectbutton=='Cancel'|| rejectbutton=='Provide more info'))
-			{
-			$('#approvalDepartment').removeAttr('required');
-			$('#approvalDesignation').removeAttr('required');
-			$('#approvalPosition').removeAttr('required');
-			$('#approvalComent').attr('required', 'required');	
-			} 
-		else if (rejectbutton == 'Approve') {
-			$('#approvalDepartment').removeAttr('required');
-			$('#approvalDesignation').removeAttr('required');
-			$('#approvalPosition').removeAttr('required');
-			$('#approvalComent').removeAttr('required');
-		}
-		else if(rejectbutton == 'Forward'){
-			$('#approvalDepartment').attr('required', 'required');	
-			$('#approvalDesignation').attr('required', 'required');	
-			$('#approvalPosition').attr('required', 'required');	
-			$('#approvalComent').removeAttr('required');
-			}
-	   document.forms[0].submit;
-	   return true;
-	}
-</script>
-
-<div class="buttonbottom" align="center">
-	<table>
-		<tr>
-			<td>
-				<c:forEach items="${validActionList}" var="validButtons">
-					<form:button type="submit" id="${validButtons}" class="btn btn-primary workflow-submit"  value="${validButtons}" onclick="validateWorkFlowApprover('${validButtons}');">
-						<c:out value="${validButtons == 'Reject'?'Correction' :validButtons}" /> 
-					</form:button>
-				</c:forEach>
-				<c:if test="${(currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState))
-								|| (stateType!= 'null' && 'CouncilMeeting'.equalsIgnoreCase(stateType))}">
-					<input type="button" name="button2" id="button2" value="Close"
-					class="btn btn-default" onclick="window.close();" />
-				</c:if> 
-			</td>
-		</tr>
-	</table>
-</div>
+<div class="alert alert-success" role="alert">
+	<strong>${message}</strong>
+</div><%@ include file="councilagendainvitation-view.jsp"%>

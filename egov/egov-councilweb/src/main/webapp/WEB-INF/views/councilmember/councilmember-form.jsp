@@ -100,10 +100,10 @@
 					<form:errors path="qualification" cssClass="error-msg" />
 				</div>
 				<label class="col-sm-2 control-label text-right toggle-madatory-caste"><spring:message
-						code="lbl.caste" /><span class="mandatory"></span></label>
+						code="lbl.caste" /></label>
 				<div class="col-sm-3 add-margin">
 					<form:select path="caste" id="caste"
-						cssClass="form-control" cssErrorClass="form-control error" required="required">
+						cssClass="form-control" cssErrorClass="form-control error">
 						<form:option value="">
 							<spring:message code="lbl.select" />
 						</form:option>
@@ -226,11 +226,10 @@
 					<form:errors path="electionDate" cssClass="error-msg" />
 				</div>
 				<label class="col-sm-2 control-label text-right toggle-madatory"><spring:message
-						code="lbl.oathdate" /> <span class="mandatory"></span> </label>
+						code="lbl.oathdate" /></label>
 				<div class="col-sm-3 add-margin">
 					<form:input type="text" cssClass="form-control dateval addremoverequired"
-						path="oathDate" id="oathDate" data-date-end-date="0d"
-						required="true" />
+						path="oathDate" id="oathDate" data-date-end-date="0d"/>
 					<form:errors path="oathDate" cssClass="error-msg" />
 				</div>
 			</div>

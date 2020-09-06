@@ -47,8 +47,7 @@
  */
 package org.egov.council.web.controller;
 
-import static java.lang.String.format;
-import static org.apache.commons.lang3.StringUtils.defaultIfBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDAUSEDINMEETING;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_MODULENAME;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_APPROVED;
@@ -61,19 +60,8 @@ import static org.egov.council.utils.constants.CouncilConstants.MEETING_MODULENA
 import static org.egov.council.utils.constants.CouncilConstants.MODULE_NAME;
 import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
 import static org.egov.council.utils.constants.CouncilConstants.getMeetingTimings;
-import static org.egov.infra.utils.ApplicationConstant.CONTENT_DISPOSITION;
-import static org.egov.infra.utils.ApplicationConstant.CONTENT_DISPOSITION_ATTACH;
-import static org.egov.infra.utils.ApplicationConstant.CONTENT_DISPOSITION_INLINE;
-import static org.egov.infra.utils.ImageUtils.JPG_MIME_TYPE;
 import static org.egov.infra.utils.JsonUtils.toJSON;
-import static org.springframework.http.MediaType.parseMediaType;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -81,9 +69,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -122,9 +108,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.CacheControl;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -137,6 +120,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
@@ -262,14 +246,28 @@ public class CouncilMeetingController {
 
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute final CouncilMeeting councilMeeting, final BindingResult errors,
+    					@RequestParam final MultipartFile attachments,
                          final Model model, final RedirectAttributes redirectAttrs, final HttpServletRequest request) {
 
-        validateCouncilMeeting(errors);
+        validateCouncilMeeting(councilMeeting, errors);
         if (errors.hasErrors()) {
             model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
             model.addAttribute(COUNCIL_MEETING, councilMeeting);
             return COUNCILMEETING_NEW;
         }
+        
+        if (attachments != null && attachments.getSize() > 0) {
+            try {
+            	councilMeeting.setFilestoreid(fileStoreService.store(
+                        attachments.getInputStream(),
+                        attachments.getOriginalFilename(),
+                        attachments.getContentType(),
+                        CouncilConstants.MODULE_NAME));
+            } catch (IOException e) {
+                LOGGER.error("Error in loading documents" + e.getMessage(), e);
+            }
+        }
+        
         if (councilMeeting.getStatus() == null)
             councilMeeting.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(COUNCILMEETING, APPROVED));
         if (isAutoMeetingNoGenEnabled()) {
@@ -291,8 +289,21 @@ public class CouncilMeetingController {
         	LOGGER.error("Unable to send SMS to for meeting number "+councilMeeting.getMeetingNumber());
         }
         try {
-        	councilSmsAndEmailService.sendEmail(councilMeeting, null,
-                councilReportService.generatePDFForAgendaDetails(councilMeeting));
+        	//Sent mail with of uploaded Meeting document
+            if(null != councilMeeting.getFilestoreid()) {
+            	Path file = fileStoreService.fetchAsPath(councilMeeting.getFilestoreid().getFileStoreId(), CouncilConstants.MODULE_NAME);
+        		try {
+    				byte[] data = Files.readAllBytes(file);
+    				String fileType = isBlank(councilMeeting.getFilestoreid().getContentType()) ? Files.probeContentType(file)
+                            : councilMeeting.getFilestoreid().getContentType();
+            		String fileName = councilMeeting.getFilestoreid().getFileName();
+            		councilSmsAndEmailService.sendEmail(councilMeeting, null, data,fileType, fileName);
+    			} catch (IOException e) {
+    				LOGGER.error("Error in sending email",e);
+    			}
+            }else {
+            	councilSmsAndEmailService.sendEmail(councilMeeting, null,councilReportService.generatePDFForAgendaDetails(councilMeeting));
+            }
         }catch(Exception e) {
         	LOGGER.error("Unable to send EMAIL of meeting number "+councilMeeting.getMeetingNumber());
         }
@@ -301,10 +312,12 @@ public class CouncilMeetingController {
         return REDIRECT_COUNCILMEETING_RESULT + councilMeeting.getId();
     }
 
-    private void validateCouncilMeeting(BindingResult errors) {
+    private void validateCouncilMeeting(final CouncilMeeting councilMeeting, BindingResult errors) {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingDate", "notempty.meeting.meetingDate");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingTime", "notempty.meeting.meetingTime");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingLocation", "notempty.meeting.committeeType");
+        if (councilMeeting.getAttachments().getSize() == 0 && councilMeeting.getFilestoreid() == null)
+            errors.rejectValue("attachments", "notempty.preamble.attachments");
     }
 
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
@@ -320,13 +333,27 @@ public class CouncilMeetingController {
 
     @RequestMapping(value = "/update", method = RequestMethod.POST)
     public String update(@Valid @ModelAttribute final CouncilMeeting councilMeeting, final BindingResult errors,
+    		 			@RequestParam final MultipartFile attachments,
                          final Model model, final RedirectAttributes redirectAttrs) {
-        validateCouncilMeeting(errors);
+        validateCouncilMeeting(councilMeeting, errors);
         if (errors.hasErrors()) {
             councilMeetingService.sortMeetingMomByItemNumber(councilMeeting);
             model.addAttribute("autoMeetingNoGenEnabled", true);
             return COUNCILMEETING_EDIT;
         }
+        
+        if (attachments != null && attachments.getSize() > 0) {
+            try {
+            	councilMeeting.setFilestoreid(fileStoreService.store(
+                        attachments.getInputStream(),
+                        attachments.getOriginalFilename(),
+                        attachments.getContentType(),
+                        CouncilConstants.MODULE_NAME));
+            } catch (IOException e) {
+                LOGGER.error("Error in loading documents" + e.getMessage(), e);
+            }
+        }
+        
         councilMeetingService.update(councilMeeting);
         redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilMeeting.success", null, null));
         return REDIRECT_COUNCILMEETING_RESULT + councilMeeting.getId();
@@ -425,8 +452,23 @@ public class CouncilMeetingController {
                                                           @RequestParam("msg") String msg, final Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
         councilSmsAndEmailService.sendSms(councilMeeting, msg);
-        councilSmsAndEmailService.sendEmail(councilMeeting, msg,
-                councilReportService.generatePDFForAgendaDetails(councilMeeting));
+               
+        //Sent mail with of uploaded Meeting document
+        if(null != councilMeeting.getFilestoreid()) {
+        	Path file = fileStoreService.fetchAsPath(councilMeeting.getFilestoreid().getFileStoreId(), CouncilConstants.MODULE_NAME);
+    		try {
+				byte[] data = Files.readAllBytes(file);
+				String fileType = isBlank(councilMeeting.getFilestoreid().getContentType()) ? Files.probeContentType(file)
+                        : councilMeeting.getFilestoreid().getContentType();
+        		String fileName = councilMeeting.getFilestoreid().getFileName();
+        		councilSmsAndEmailService.sendEmail(councilMeeting, msg, data,fileType, fileName);
+			} catch (IOException e) {
+				LOGGER.error("Error in sending email",e);
+			}
+        }else {
+        	councilSmsAndEmailService.sendEmail(councilMeeting, msg,councilReportService.generatePDFForAgendaDetails(councilMeeting));
+        }
+        
         return new StringBuilder("{ \"success\":true }").toString();
     }
 
@@ -603,6 +645,13 @@ public class CouncilMeetingController {
         return fileStoreUtils.fileAsResponseEntity(councilMeeting.getFilestore().getFileStoreId(),
                 MODULE_NAME, true);
     }
+    
+    @RequestMapping(value = "/download/{fileStoreId}")
+    @ResponseBody
+    public ResponseEntity<InputStreamResource> download(@PathVariable final String fileStoreId) {
+        return fileStoreUtils.fileAsResponseEntity(fileStoreId,
+                CouncilConstants.MODULE_NAME, false);
+    }
 
     @RequestMapping(value = "/attendance/ajaxsearch/{id}", method = RequestMethod.GET, produces = MediaType.TEXT_PLAIN_VALUE)
     @ResponseBody
@@ -621,7 +670,9 @@ public class CouncilMeetingController {
 	        CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
 	        
 	        if(null != councilMeeting) {
-		        byte[] reportOutput = councilReportService.generatePDFForAgendaDetails(councilMeeting);
+	        	return fileStoreUtils.fileAsResponseEntity(councilMeeting.getFilestoreid().getFileStoreId(),
+	                    CouncilConstants.MODULE_NAME, false);
+		        /*byte[] reportOutput = councilReportService.generatePDFForAgendaDetails(councilMeeting);
 		        LOGGER.info("CouncilMeetingController->printAgendaDetails->reportOutput size->"+reportOutput.length);
 		        return ResponseEntity
 		            .ok()
@@ -629,7 +680,7 @@ public class CouncilMeetingController {
 		            .cacheControl(CacheControl.noCache())
 		            .contentLength(reportOutput.length)
 		            .header(CONTENT_DISPOSITION, format(CONTENT_DISPOSITION_INLINE,"meetingdetails.rtf")).
-		                    body(new InputStreamResource(new ByteArrayInputStream(reportOutput)));
+		                    body(new InputStreamResource(new ByteArrayInputStream(reportOutput)));*/
 	        }else {
 	        	return ResponseEntity.notFound().build();
 	        }

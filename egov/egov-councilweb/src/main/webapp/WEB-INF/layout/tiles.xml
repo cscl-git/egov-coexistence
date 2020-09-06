@@ -175,6 +175,16 @@
         <put-attribute name="body" value="/WEB-INF/views/councilparty/councilparty-search.jsp"/>
     </definition>
 
+	<definition name="councilagendainvitation-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.agenda.invitation" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilpreamble/councilagendainvitation-new.jsp"/>
+    </definition>
+    
+    <definition name="councilagendainvitation-result" extends="base_layout">
+        <put-attribute name="page-title" value="title.agenda.invitation.result" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilpreamble/councilagendainvitation-result.jsp"/>
+    </definition>
+
     <definition name="councilpreamble-new" extends="base_layout">
         <put-attribute name="page-title" value="title.councilpreamble.new" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilpreamble/councilpreamble-new.jsp"/>

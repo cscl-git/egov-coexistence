@@ -62,10 +62,10 @@
 					<thead>
 						<tr>
 							<th align="center"><spring:message code="lbl.serial.no" /></th>
-							<th width="7%"><spring:message code="lbl.agenda.number" /></th>
-							<th><spring:message code="lbl.gistofpreamble" /></th>
+							<th width="40%"><spring:message code="lbl.agenda.number" /></th>
+							<%-- <th><spring:message code="lbl.gistofpreamble" /></th> --%>
 							<%-- <th width="9%"><spring:message code="lbl.preamble.number" /></th> --%>
-							<th width="14%"><spring:message code="lbl.department" /></th>
+							<th width="40%"><spring:message code="lbl.department" /></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -93,8 +93,8 @@
 											</td>
 											<td class="text-center"><c:out
 													value="${mom.agenda.agendaNumber}" /></td>
-											<td><span class="more"><c:out
-														value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td>
+											<%-- <td><span class="more"><c:out
+														value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td> --%>
 											<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
 											<td><c:out value="${mom.preamble.departmentName}" /></td>
 										</tr>

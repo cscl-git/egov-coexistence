@@ -47,6 +47,7 @@
  */
 package org.egov.council.web.controller;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.egov.council.utils.constants.CouncilConstants.APPROVED;
 import static org.egov.council.utils.constants.CouncilConstants.COUNCIL_RESOLUTION;
 import static org.egov.council.utils.constants.CouncilConstants.MEETINGRESOLUTIONFILENAME;
@@ -67,16 +68,21 @@ import static org.egov.council.utils.constants.CouncilConstants.WARD;
 import static org.egov.council.utils.constants.CouncilConstants.getMeetingTimings;
 import static org.egov.infra.utils.JsonUtils.toJSON;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.log4j.Logger;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.council.autonumber.MOMResolutionNumberGenerator;
@@ -107,9 +113,11 @@ import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.DateUtils;
+import org.egov.infra.utils.FileStoreUtils;
 import org.egov.infra.utils.FileUtils;
 import org.egov.infra.utils.StringUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -124,6 +132,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ValidationUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -135,6 +144,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.opensymphony.xwork2.FileManager;
 
 @Controller
 @RequestMapping("/councilmom")
@@ -160,6 +170,9 @@ public class CouncilMomController  extends GenericWorkFlowController{
     private static final String CURRENT_STATE = "currentState";
     private static final String ADDITIONALRULE = "additionalRule";
 
+    private static final Logger LOGGER = Logger
+            .getLogger(CouncilMomController.class);
+    
     @Autowired
     private EgwStatusHibernateDAO egwStatusHibernateDAO;
 
@@ -277,6 +290,8 @@ public class CouncilMomController  extends GenericWorkFlowController{
             final BindingResult errors, final Model model,
             final RedirectAttributes redirectAttrs,final HttpServletRequest request,
             @RequestParam String workFlowAction) {
+    	
+    	validateCouncilMOM(councilMeeting, errors);
         if (errors.hasErrors()) {
         	prepareWorkFlowOnLoad(model, councilMeeting);
         	if(null == councilMeeting.getCurrentState()) {
@@ -389,6 +404,12 @@ public class CouncilMomController  extends GenericWorkFlowController{
         return "redirect:/councilmom/result/" + councilMeeting.getId();
     }
 
+    private void validateCouncilMOM(final CouncilMeeting councilMeeting, BindingResult errors) {
+        if (councilMeeting.getFiles() == null || councilMeeting.getFiles().length == 0) {
+            errors.rejectValue("attachments", "notempty.mom.attachments");
+        }
+    }
+    
     @RequestMapping(value = "/result/{id}", method = RequestMethod.GET)
     public String result(@PathVariable("id") final Long id, Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
@@ -488,7 +509,7 @@ public class CouncilMomController  extends GenericWorkFlowController{
     @RequestMapping(value = "/generateresolution", method = RequestMethod.POST)
     public String generateResolutionnumber( final HttpServletRequest request,
             @Valid @ModelAttribute final CouncilMeeting councilMeeting) throws ParseException {
-        byte[] reportOutput;
+        byte[] reportOutput = null;
         final RestTemplate restTemplate = new RestTemplate();
         String response = null;
         EgwStatus resoulutionApprovedStatus = egwStatusHibernateDAO.getStatusByModuleAndCode(COUNCIL_RESOLUTION,
@@ -543,7 +564,7 @@ public class CouncilMomController  extends GenericWorkFlowController{
             }
         }
         councilMeeting.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(MEETING_MODULENAME, MOM_FINALISED));
-        for (MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
+        /*for (MeetingMOM meetingMOM : councilMeeting.getMeetingMOMs()) {
             if (meetingMOM.getPreamble().getId() != null && meetingMOM.getPreamble().getReferenceNumber() != null
                     && null == meetingMOM.getPreamble().getStatusMessage() &&  meetingMOM.getPreamble().getTypeOfPreamble().ordinal()==0) {
                 CouncilDataUpdateRequest councilDataUpdateRequest = new CouncilDataUpdateRequest();
@@ -576,17 +597,38 @@ public class CouncilMomController  extends GenericWorkFlowController{
 
             }
 
-        }
-        reportOutput = generateMomPdfByPassingMeeting(councilMeeting);
-        if (reportOutput != null) {
-            councilMeeting.setFilestore(fileStoreService.store(
-                    FileUtils.byteArrayToFile(reportOutput, MEETINGRESOLUTIONFILENAME, "rtf").toFile(), MEETINGRESOLUTIONFILENAME,
-                    APPLICATION_RTF, MODULE_NAME));
-        }
+        }*/
+        
         councilMeetingService.update(councilMeeting);
         councilMeetingIndexService.createCouncilMeetingIndex(councilMeeting);
         councilSmsAndEmailService.sendSms(councilMeeting, null);
-        councilSmsAndEmailService.sendEmail(councilMeeting, null, reportOutput);
+        
+        //Sent mail with of uploaded MOM document
+        if(!CollectionUtils.isEmpty(councilMeeting.getSupportDocs())) {
+        	for(FileStoreMapper fileStoreMapper : councilMeeting.getSupportDocs()) {
+        		Path file = fileStoreService.fetchAsPath(fileStoreMapper.getFileStoreId(), CouncilConstants.MODULE_NAME);
+        		try {
+					byte[] data = Files.readAllBytes(file);
+					String fileType = isBlank(fileStoreMapper.getContentType()) ? Files.probeContentType(file)
+	                        : fileStoreMapper.getContentType();
+	        		String fileName = fileStoreMapper.getFileName();
+	        		councilSmsAndEmailService.sendEmail(councilMeeting, null, data,fileType, fileName);
+				} catch (IOException e) {
+					LOGGER.error("Error in sending email",e);
+				}
+        		
+                break;
+        	}
+        }else {
+        	reportOutput = generateMomPdfByPassingMeeting(councilMeeting);
+            if (reportOutput != null) {
+                councilMeeting.setFilestore(fileStoreService.store(
+                        FileUtils.byteArrayToFile(reportOutput, MEETINGRESOLUTIONFILENAME, "rtf").toFile(), MEETINGRESOLUTIONFILENAME,
+                        APPLICATION_RTF, MODULE_NAME));
+            }
+        	councilSmsAndEmailService.sendEmail(councilMeeting, null, reportOutput);
+        }
+        
         return "forward:/councilmeeting/generateresolution/" + councilMeeting.getId();
     }
 

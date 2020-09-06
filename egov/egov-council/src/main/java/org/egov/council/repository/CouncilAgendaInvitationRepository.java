@@ -26,12 +26,12 @@
  *
  *         1) All versions of this program, verbatim or modified must carry this
  *            Legal Notice.
- *            Further, all user interfaces, including but not limited to citizen facing interfaces, 
- *            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any 
+ *            Further, all user interfaces, including but not limited to citizen facing interfaces,
+ *            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any
  *            derived works should carry eGovernments Foundation logo on the top right corner.
  *
  *            For the logo, please refer http://egovernments.org/html/logo/egov_logo.png.
- *            For any further queries on attribution, including queries on brand guidelines, 
+ *            For any further queries on attribution, including queries on brand guidelines,
  *            please contact contact@egovernments.org
  *
  *         2) Any misrepresentation of the origin of the material is prohibited. It
@@ -45,55 +45,18 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-$(document)
-		.ready(
-				function() {
 
-					var fileformatsinclude = [ 'doc', 'docx', 'xls', 'xlsx',
-							'rtf', 'pdf', 'jpeg', 'jpg', 'png', 'txt', 'zip',
-							'rar' ];
+package org.egov.council.repository;
 
-					$('.upload-file')
-							.change(
-									function(e) {
-										/* validation for file upload */
-										myfile = $(this).val();
-										var ext = myfile.split('.').pop();
-										if ($.inArray(ext.toLowerCase(),
-												fileformatsinclude) > -1) {
-											// do something
-										} else {
-											bootbox
-													.alert("Invalid file format. Please upload file in different format");
-											$(this).val('');
-											return false;
-										}
+import org.egov.council.entity.CouncilAgendaInvitation;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
-										var fileInput = $(this);
-										var maxSize = 10485760; // file size in
-																// bytes(10MB)
-										var inMB = maxSize / 1024 / 1024;
-										if (fileInput.get(0).files.length) {
-											var fileSize = this.files[0].size; // in
-																				// bytes
-											var charlen = (this.value
-													.split('/').pop().split(
-															'\\').pop()).length;
-											if (charlen > 50) {
-												bootbox
-														.alert('File length should not exceed 50 characters!');
-												fileInput.replaceWith(fileInput
-														.val('').clone(true));
-												return false;
-											} else if (fileSize > maxSize) {
-												bootbox
-														.alert('File size should not exceed '
-																+ inMB + ' MB!');
-												fileInput.replaceWith(fileInput
-														.val('').clone(true));
-												return false;
-											}
-										}
-									});
+@Repository
+public interface CouncilAgendaInvitationRepository extends JpaRepository<CouncilAgendaInvitation, Long> {
 
-				});
+	CouncilAgendaInvitation findByMeetingNumber(String meetingNumber);
+
+	CouncilAgendaInvitation findById(Long id);
+
+}

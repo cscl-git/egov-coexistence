@@ -93,8 +93,25 @@
 						<spring:message code="lbl.meeting.time" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilMeeting.meetingTime}</div>
+						${councilMeeting.meetingTime}
 					</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.document" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						<c:choose>
+							<c:when test="${councilMeeting.filestoreid != null}">
+								<a
+									href="/services/council/councilmeeting/download/${councilMeeting.filestoreid.fileStoreId}"
+									data-gallery target="_blank">${councilMeeting.filestoreid.fileName}</a>
+
+							</c:when>
+							<c:otherwise>
+								<spring:message code="msg.no.attach.found" />
+							</c:otherwise>
+						</c:choose>
+					</div>
+				</div>
 			</div>
 		</div>
 		<div class="panel panel-primary" data-collapsed="0">
@@ -114,7 +131,7 @@
 							<th><spring:message code="lbl.resolution" /></th>
 							<th><spring:message code="lbl.status" /></th>
 							<th><spring:message code="lbl.resolutionNumber" /></th>
-							<th><spring:message code="lbl.gistofpreamble" /></th>
+							<%-- <th><spring:message code="lbl.gistofpreamble" /></th> --%>
 						</tr>
 					</thead>
 					<tbody>
@@ -134,11 +151,11 @@
 										<td width="10%"><c:out
 												value="${mom.resolutionStatus ne null?mom.resolutionStatus.code:'N/A'}" /></td>
 										<td><c:out value="${mom.resolutionNumber ne null?mom.resolutionNumber :'N/A'}"></c:out></td>
-										<td width="30%"><span class="more"><c:out
+										<%-- <td width="30%"><span class="more"><c:out
 													value="${mom.preamble.gistOfPreamble ne null?mom.preamble.gistOfPreamble:'N/A'}"  escapeXml="false"/>
 													<br>
 													<c:out value="${mom.preamble.addtionalGistOfPreamble}"></c:out>
-													</span></td>
+													</span></td> --%>
 									</tr>
 								</c:forEach>
 							</c:when>
@@ -209,6 +226,8 @@
 		<button type="button" id="printAgenda" value="Print Agenda"
 			onclick="location.href='/services/council/councilmeeting/generateagenda/'+${councilMeeting.id};"
 			class='btn btn-primary' style="width:158px;">Print Meeting Notice</button>
+		<!-- <a href="/services/council/councilmeeting/download/${councilMeeting.filestoreid.fileStoreId}"
+				data-gallery target="_blank" style="width: 158px;">Print Meeting Notice</a>&nbsp;&nbsp; -->
 		<a href="javascript:void(0)" class="btn btn-default"
 			onclick="self.close()">Close</a>
 	</div>

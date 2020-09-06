@@ -150,7 +150,7 @@ if($('#autoResolutionNoGenEnabled').val()=="true") {
 				 '<td><select name="meetingMOMs[{{idx}}].preamble.department" class="form-control" required="required" > <option value="" >Loading...</option></select></td>'+
 				 '<td><div class="input-group"><textarea class="form-control textarea-content" required="required" name="meetingMOMs[{{idx}}].preamble.gistOfPreamble" maxlength="10000"  value="{{gistTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Sumoto Resolution - GIST of Sumoto Resolution"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'+
 				 '<td><select name="meetingMOMs[{{idx}}].resolutionStatus" class="form-control addorremoverequired" required="required"><option value="">Loading...</option></select></td>'+
-				 '<td><input type="text" class="form-control text-left patternvalidation validnum" required="required" name="meetingMOMs[{{idx}}].resolutionNumber" {{readonly}} value="{{resolutionnumberTextBoxValue}}"/></td>'+
+				 '<td><input type="text" class="form-control text-left patternvalidation validnum" name="meetingMOMs[{{idx}}].resolutionNumber" {{readonly}} value="{{resolutionnumberTextBoxValue}}"/></td>'+
 				 '<td><div class="input-group"><textarea class="form-control textarea-content addorremoverequired" required="required" name="meetingMOMs[{{idx}}].resolutionDetail" maxlength="5000" value="{{amountTextBoxValue}}" /><span class="input-group-addon" id="showModal" data-header="Sumoto Resolution - Resolution comments"><span class="glyphicon glyphicon-pencil" style="cursor:pointer"></span></span></div></td>'+
 		'</tr>';
 }

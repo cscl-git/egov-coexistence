@@ -45,60 +45,50 @@
   ~   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
   ~
   --%>
-
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
+<form:form role="form" action="/services/council/councilpreamble/sendsmsemailforagendainvitation" modelAttribute="councilAgendaInvitation" 
+	id="councilAgendaInvitationform" cssClass="form-horizontal form-groups-bordered"
+	enctype="multipart/form-data">
+	<%@ include file="councilagendainvitation-form.jsp"%>
+	<div class="form-group">
+		<div class="text-center">
+			<button type='submit' class='btn btn-primary' id="buttonSubmit">
+				<spring:message code='lbl.send' />
+			</button>
+			<!-- <a href='javascript:void(0)' class='btn btn-default'
+				onclick='self.close()'><spring:message code='lbl.close' /></a> -->
+		</div>
+	</div>
+</form:form>
+
+<!-- <script
+	src="<cdn:url value='/resources/app/js/councilMeetingHelper.js?rnd=${app_release_no}'/>"></script> -->
+<script
+	src="<cdn:url value='/resources/app/js/documentsupload.js?rnd=${app_release_no}'/>"></script>
 <script>
+	 $('#buttonSubmit').click(function(e) {
+		/* var place = $('#meetingLocation').val().trim();
+		place=place.replace(/\s\s+/g, ' ');
 
-
-	function validateWorkFlowApprover(name) {
-		document.getElementById("workFlowAction").value=name;
-	    var approverPosId = document.getElementById("approvalPosition");
-	    /* if(approverPosId && approverPosId.value != -1) {
-			var approver = approverPosId.options[approverPosId.selectedIndex].text; 
-			document.getElementById("approverName").value= approver.split('~')[0];
-		}   */
-		var rejectbutton=document.getElementById("workFlowAction").value;
-		if(rejectbutton!=null && (rejectbutton=='Reject'||rejectbutton=='Cancel'|| rejectbutton=='Provide more info'))
-			{
-			$('#approvalDepartment').removeAttr('required');
-			$('#approvalDesignation').removeAttr('required');
-			$('#approvalPosition').removeAttr('required');
-			$('#approvalComent').attr('required', 'required');	
-			} 
-		else if (rejectbutton == 'Approve') {
-			$('#approvalDepartment').removeAttr('required');
-			$('#approvalDesignation').removeAttr('required');
-			$('#approvalPosition').removeAttr('required');
-			$('#approvalComent').removeAttr('required');
+		if ($('#meetingLocation').val() != '' && place.length < 5) {
+			$('#meetingLocation').val('');
+			bootbox.alert("Meeting place should have atleast 5 characters");
+			e.preventDefault();
 		}
-		else if(rejectbutton == 'Forward'){
-			$('#approvalDepartment').attr('required', 'required');	
-			$('#approvalDesignation').attr('required', 'required');	
-			$('#approvalPosition').attr('required', 'required');	
-			$('#approvalComent').removeAttr('required');
-			}
-	   document.forms[0].submit;
-	   return true;
-	}
-</script>
+		 if($('#meetingLocation').val() != ''){
+				$('#meetingLocation').val(place);
+	     } */
 
-<div class="buttonbottom" align="center">
-	<table>
-		<tr>
-			<td>
-				<c:forEach items="${validActionList}" var="validButtons">
-					<form:button type="submit" id="${validButtons}" class="btn btn-primary workflow-submit"  value="${validButtons}" onclick="validateWorkFlowApprover('${validButtons}');">
-						<c:out value="${validButtons == 'Reject'?'Correction' :validButtons}" /> 
-					</form:button>
-				</c:forEach>
-				<c:if test="${(currentState!= 'null' && !'NEW'.equalsIgnoreCase(currentState))
-								|| (stateType!= 'null' && 'CouncilMeeting'.equalsIgnoreCase(stateType))}">
-					<input type="button" name="button2" id="button2" value="Close"
-					class="btn btn-default" onclick="window.close();" />
-				</c:if> 
-			</td>
-		</tr>
-	</table>
-</div>
+		if ($('form').valid()) {
+			 var action = '/services/council/councilpreamble/sendsmsemailforagendainvitation' ;
+ 			$('#councilAgendaInvitationform').attr('method', 'post');
+ 			$('#councilAgendaInvitationform').attr('action', action); 
+		} else {
+			e.preventDefault();
+		}
+	});	 
+</script>

@@ -118,7 +118,7 @@
 							<tr>
 								<td>
 									<fmt:formatDate value="${history.date}" var="historyDate"
-										pattern="dd-MM-yyyy HH:mm a E" />
+										pattern="dd-MM-yyyy" />
 									<c:out value="${historyDate}" />
 								</td>
 								<td><c:out value="${history.updatedBy}" /></td>

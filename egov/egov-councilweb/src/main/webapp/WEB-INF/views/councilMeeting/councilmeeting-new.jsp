@@ -70,6 +70,8 @@
 <script
 	src="<cdn:url value='/resources/app/js/councilMeetingHelper.js?rnd=${app_release_no}'/>"></script>
 <script
+	src="<cdn:url value='/resources/app/js/documentsupload.js?rnd=${app_release_no}'/>"></script>
+<script
 	src="<cdn:url value='/resources/app/js/showMoreorLessContent.js?rnd=${app_release_no}'/>"></script>
 
 <script>

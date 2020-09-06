@@ -88,8 +88,7 @@
 				<input type="hidden" name="councilPreamble"
 					value="${councilPreamble.id}" />
 				<form:hidden path="type" id="type" value="${councilPreamble.type}" />
-			</div>
-			<div class="form-group">
+				
 				<label class="col-sm-2 control-label text-right"><spring:message
 						code="lbl.department" /> <span class="mandatory"></span></label>
 				<div class="col-sm-3 add-margin">
@@ -140,6 +139,20 @@
 							itemLabel="name" />
 					</form:select>
 					<form:errors path="committeeType" cssClass="error-msg" />
+				</div>
+				<label class="col-sm-2 control-label text-right"><spring:message
+						code="lbl.agendatype" /> <span class="mandatory"></span> </label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="councilAgendaType" id="councilAgendaType"
+						required="required" cssClass="form-control"
+						cssErrorClass="form-control error">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:options items="${councilAgendaType}" itemValue="id"
+							itemLabel="name" />
+					</form:select>
+					<form:errors path="councilAgendaType" cssClass="error-msg" />
 				</div>
 			</div>
 			<!-- <div class="form-group">

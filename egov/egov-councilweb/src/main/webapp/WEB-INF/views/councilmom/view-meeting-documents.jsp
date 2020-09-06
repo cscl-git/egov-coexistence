@@ -56,7 +56,7 @@
 	<div class="col-md-12">
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading custom_form_panel_heading">
-				<div class="panel-title">Uploaded Document Details</div>
+				<div class="panel-title">MOM Document Details</div>
 			</div>
 			<div class="panel-body custom">
 				<div class="col-sm-12 add-margin">

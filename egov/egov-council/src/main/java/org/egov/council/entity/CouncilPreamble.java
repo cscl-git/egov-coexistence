@@ -162,6 +162,9 @@ public class CouncilPreamble extends StateAware {
     private CommitteeType committeeType;
     
     @Transient
+    private CouncilAgendaType councilAgendaType;
+    
+    @Transient
     private String approvalDepartment;
     
     @Transient
@@ -396,6 +399,14 @@ public class CouncilPreamble extends StateAware {
 
 	public void setDisplayStatus(EgwStatus displayStatus) {
 		this.displayStatus = displayStatus;
+	}
+
+	public CouncilAgendaType getCouncilAgendaType() {
+		return councilAgendaType;
+	}
+
+	public void setCouncilAgendaType(CouncilAgendaType councilAgendaType) {
+		this.councilAgendaType = councilAgendaType;
 	}
     
 }

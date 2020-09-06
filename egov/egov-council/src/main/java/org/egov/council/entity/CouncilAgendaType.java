@@ -26,12 +26,12 @@
  *
  *         1) All versions of this program, verbatim or modified must carry this
  *            Legal Notice.
- *            Further, all user interfaces, including but not limited to citizen facing interfaces, 
- *            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any 
+ *            Further, all user interfaces, including but not limited to citizen facing interfaces,
+ *            Urban Local Bodies interfaces, dashboards, mobile applications, of the program and any
  *            derived works should carry eGovernments Foundation logo on the top right corner.
  *
  *            For the logo, please refer http://egovernments.org/html/logo/egov_logo.png.
- *            For any further queries on attribution, including queries on brand guidelines, 
+ *            For any further queries on attribution, including queries on brand guidelines,
  *            please contact contact@egovernments.org
  *
  *         2) Any misrepresentation of the origin of the material is prohibited. It
@@ -45,55 +45,78 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-$(document)
-		.ready(
-				function() {
 
-					var fileformatsinclude = [ 'doc', 'docx', 'xls', 'xlsx',
-							'rtf', 'pdf', 'jpeg', 'jpg', 'png', 'txt', 'zip',
-							'rar' ];
+package org.egov.council.entity;
 
-					$('.upload-file')
-							.change(
-									function(e) {
-										/* validation for file upload */
-										myfile = $(this).val();
-										var ext = myfile.split('.').pop();
-										if ($.inArray(ext.toLowerCase(),
-												fileformatsinclude) > -1) {
-											// do something
-										} else {
-											bootbox
-													.alert("Invalid file format. Please upload file in different format");
-											$(this).val('');
-											return false;
-										}
+import org.egov.infra.persistence.entity.AbstractAuditable;
+import org.egov.infra.persistence.validator.annotation.Unique;
+import org.hibernate.validator.constraints.Length;
 
-										var fileInput = $(this);
-										var maxSize = 10485760; // file size in
-																// bytes(10MB)
-										var inMB = maxSize / 1024 / 1024;
-										if (fileInput.get(0).files.length) {
-											var fileSize = this.files[0].size; // in
-																				// bytes
-											var charlen = (this.value
-													.split('/').pop().split(
-															'\\').pop()).length;
-											if (charlen > 50) {
-												bootbox
-														.alert('File length should not exceed 50 characters!');
-												fileInput.replaceWith(fileInput
-														.val('').clone(true));
-												return false;
-											} else if (fileSize > maxSize) {
-												bootbox
-														.alert('File size should not exceed '
-																+ inMB + ' MB!');
-												fileInput.replaceWith(fileInput
-														.val('').clone(true));
-												return false;
-											}
-										}
-									});
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+import javax.validation.constraints.NotNull;
 
-				});
+import static org.egov.council.entity.CouncilAgendaType.SEQ_COUNCILCASTE;
+
+@Entity
+@Unique(fields = {"code", "name"}, enableDfltMsg = true)
+@Table(name = "egcncl_agenda_type")
+@SequenceGenerator(name = SEQ_COUNCILCASTE, sequenceName = SEQ_COUNCILCASTE, allocationSize = 1)
+public class CouncilAgendaType extends AbstractAuditable {
+
+    public static final String SEQ_COUNCILCASTE = "seq_egcncl_agenda_type";
+    private static final long serialVersionUID = 6603829370535410709L;
+    @Id
+    @GeneratedValue(generator = SEQ_COUNCILCASTE, strategy = GenerationType.SEQUENCE)
+    private Long id;
+
+    @NotNull
+    @Length(min = 2, max = 100)
+    private String name;
+
+    @NotNull
+    @Length(max = 20)
+    @Column(name = "code", updatable = false)
+    private String code;
+
+    @NotNull
+    private Boolean isActive;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Boolean getIsActive() {
+        return isActive;
+    }
+
+    public void setIsActive(Boolean isActive) {
+        this.isActive = isActive;
+    }
+
+    public String getCode() {
+        return code;
+    }
+
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+}
