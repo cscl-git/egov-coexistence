@@ -1467,7 +1467,7 @@ public class MicroserviceUtils {
     }
     
     private String getSingleQuoteBasedOnType(Class filterType) {
-        String string = filterType.getSimpleName().equalsIgnoreCase("Boolean") ||  filterType.getSimpleName().equalsIgnoreCase("Long") ?  "" : "'";
+        String string = filterType.getSimpleName().equalsIgnoreCase("Boolean") ||  filterType.getSimpleName().equalsIgnoreCase("Long") ?  "" : "";
         return string;
     }
 
