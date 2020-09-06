@@ -45,61 +45,78 @@
   ~   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
   ~
   --%>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
-<form:form role="form" action="/services/council/councilmeeting/create" modelAttribute="councilMeeting" 
-	id="councilMeetingform" cssClass="form-horizontal form-groups-bordered"
-	enctype="multipart/form-data">
-	<%@ include file="councilmeeting-form.jsp"%>
-	
-	 <%@ include file="councilmeeting-agendaDetail.jsp"%> 
-	<div class="form-group">
-		<div class="text-center">
-			<button type='submit' class='btn btn-primary' id="buttonSubmit">
-				<spring:message code='lbl.create' />
-			</button>
-			<a href='javascript:void(0)' class='btn btn-default'
-				onclick='self.close()'><spring:message code='lbl.close' /></a>
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="lbl.agenda.invitation" />
+				</div>
+			</div>
+			<div class="panel-body custom">
+				<div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.number" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.meetingNumber}</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.agenda.invitation.message" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.message}</div>
+				</div>
+				<!-- <div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.date" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						<fmt:formatDate pattern="dd/MM/yyyy"
+							value="${councilAgendaInvitation.meetingDate}" />
+					</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.place" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.meetingLocation}</div>
+				</div> -->
+				<div class="row add-border">
+					<!-- <div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.time" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilAgendaInvitation.meetingTime}</div> -->
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.meeting.document" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						<c:choose>
+							<c:when test="${councilAgendaInvitation.filestoreid != null}">
+								<a
+									href="/services/council/councilpreamble/downloadfile/${councilAgendaInvitation.filestoreid.fileStoreId}"
+									data-gallery target="_blank">${councilAgendaInvitation.filestoreid.fileName}</a>
+
+							</c:when>
+							<c:otherwise>
+								<spring:message code="msg.no.attach.found" />
+							</c:otherwise>
+						</c:choose>
+				</div>
+			</div>
 		</div>
 	</div>
-</form:form>
+</div>
 
-<script
-	src="<cdn:url value='/resources/app/js/councilMeetingHelper.js?rnd=${app_release_no}'/>"></script>
-<script
-	src="<cdn:url value='/resources/app/js/documentsupload.js?rnd=${app_release_no}'/>"></script>
-<script
-	src="<cdn:url value='/resources/app/js/showMoreorLessContent.js?rnd=${app_release_no}'/>"></script>
-
-<script>
-	 $('#buttonSubmit').click(function(e) {
-		  var place = $('#meetingLocation').val().trim();
-			place=place.replace(/\s\s+/g, ' ');
-
-			if ($('#meetingLocation').val() != '' && place.length < 5) {
-				$('#meetingLocation').val('');
-				bootbox.alert("Meeting place should have atleast 5 characters");
-				e.preventDefault();
-			}
-			 if($('#meetingLocation').val() != ''){
-					$('#meetingLocation').val(place);
-		     }
-
-		if ($('form').valid()) {
-			 var action = '/services/council/councilmeeting/create' ;
- 			$('#councilMeetingform').attr('method', 'post');
- 			$('#councilMeetingform').attr('action', action); 
-		} else {
-			e.preventDefault();
-		}
-	});	 
-</script>
-
-<style>
-	.morecontent span {
-	    display: none;
-	}
-</style>
+<div class="row text-center">
+	<div class="add-margin">
+		<a href="javascript:void(0)" class="btn btn-default"
+			onclick="self.close()">Close</a>
+	</div>
+</div>

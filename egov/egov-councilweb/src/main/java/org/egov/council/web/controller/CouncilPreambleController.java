@@ -48,6 +48,7 @@
 
 package org.egov.council.web.controller;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_MODULENAME;
 import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_APPROVED;
 import static org.egov.council.utils.constants.CouncilConstants.IMPLEMENTATIONSTATUS;
@@ -59,6 +60,8 @@ import static org.egov.council.utils.constants.CouncilConstants.AGENDA_STATUS_IN
 import static org.egov.infra.utils.JsonUtils.toJSON;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,15 +81,18 @@ import org.egov.council.autonumber.PreambleNumberGenerator;
 import org.egov.council.entity.CommitteeType;
 import org.egov.council.entity.CouncilAgenda;
 import org.egov.council.entity.CouncilAgendaDetails;
+import org.egov.council.entity.CouncilAgendaInvitation;
 import org.egov.council.entity.CouncilAgendaType;
 import org.egov.council.entity.CouncilPreamble;
 import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.enums.PreambleTypeEnum;
 import org.egov.council.service.BidderService;
 import org.egov.council.service.CommitteeTypeService;
+import org.egov.council.service.CouncilAgendaInvitationService;
 import org.egov.council.service.CouncilAgendaService;
 import org.egov.council.service.CouncilAgendaTypeService;
 import org.egov.council.service.CouncilPreambleService;
+import org.egov.council.service.CouncilSmsAndEmailService;
 import org.egov.council.service.CouncilThirdPartyService;
 import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.council.web.adaptor.CouncilPreambleJsonAdaptor;
@@ -150,7 +156,10 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     private static final String ADDITIONALRULE = "additionalRule";
     private static final String IS_AGENDA_ADMIN = "isAgendaAdmin";
     private static final String RICH_TEXT_EDITOR = "editor";
-    
+    private static final String COUNCIL_AGENDA_INVITATION = "councilAgendaInvitation";
+    private static final String COUNCIL_AGENDA_INVITATION_NEW = "councilagendainvitation-new";
+    private static final String REDIRECT_COUNCIL_AGENDA_INVITATION_RESULT = "redirect:/councilpreamble/agendainvitation/result/";
+    private static final String COUNCIL_AGENDA_INVITATION_RESULT = "councilagendainvitation-result";
     
     private static final String COUNCILPREAMBLE_API_VIEW = "councilpreamble-viewnew";
     private static final Logger LOGGER = Logger
@@ -184,6 +193,10 @@ public class CouncilPreambleController extends GenericWorkFlowController {
     private SecurityUtils securityUtils;
     @Autowired
     protected CouncilAgendaTypeService councilAgendaTypeService;
+    @Autowired
+    protected CouncilSmsAndEmailService councilSmsAndEmailService;
+    @Autowired
+    protected CouncilAgendaInvitationService councilAgendaInvitationService;
 
     @ModelAttribute("departments")
     public List<Department> getDepartmentList() {
@@ -686,6 +699,83 @@ public class CouncilPreambleController extends GenericWorkFlowController {
                 .append(toJSON(finalResultList, CouncilPreamble.class,
                         CouncilPreambleJsonAdaptor.class))
                 .append("}").toString();
+    }
+    
+    @RequestMapping(value = "/agendainvitationnew", method = RequestMethod.POST)
+    public String agendaInvitationNewForm(final Model model) {
+        CouncilAgendaInvitation councilAgendaInvitation = new CouncilAgendaInvitation();
+        model.addAttribute(COUNCIL_AGENDA_INVITATION, councilAgendaInvitation);
+        return COUNCIL_AGENDA_INVITATION_NEW;
+    }
+    
+    @RequestMapping(value = "/sendsmsemailforagendainvitation", method = RequestMethod.POST)
+    public String sendSmsAndEmailDetailsForAgendaInvitation(@Valid @ModelAttribute final CouncilAgendaInvitation councilAgendaInvitation, 
+    		final BindingResult errors,@RequestParam final MultipartFile attachments,
+    		final Model model, final RedirectAttributes redirectAttrs) {
+        
+    	validateCouncilAgendaInvitation(councilAgendaInvitation, errors);
+        if (errors.hasErrors()) {
+            model.addAttribute(COUNCIL_AGENDA_INVITATION, councilAgendaInvitation);
+            return COUNCIL_AGENDA_INVITATION_NEW;
+        }
+        
+        if (attachments != null && attachments.getSize() > 0) {
+            try {
+            	councilAgendaInvitation.setFilestoreid(fileStoreService.store(
+                        attachments.getInputStream(),
+                        attachments.getOriginalFilename(),
+                        attachments.getContentType(),
+                        CouncilConstants.MODULE_NAME));
+            } catch (IOException e) {
+                LOGGER.error("Error in upload documents" + e.getMessage(), e);
+            }
+        }
+    	
+        councilAgendaInvitationService.create(councilAgendaInvitation);
+        
+        try {
+        	councilSmsAndEmailService.sendSmsForAgendaInvitation(councilAgendaInvitation.getMessage());
+        }catch(Exception e) {
+        	LOGGER.error("Unable to send SMS to for agenda invitation "+councilAgendaInvitation.getMeetingNumber());
+        }
+            
+        try {
+	        //Sent mail with of uploaded agenda invitation document
+	        if(null != councilAgendaInvitation.getFilestoreid()) {
+	        	Path file = fileStoreService.fetchAsPath(councilAgendaInvitation.getFilestoreid().getFileStoreId(), CouncilConstants.MODULE_NAME);
+	    		try {
+					byte[] data = Files.readAllBytes(file);
+					String fileType = isBlank(councilAgendaInvitation.getFilestoreid().getContentType()) ? Files.probeContentType(file)
+	                        : councilAgendaInvitation.getFilestoreid().getContentType();
+	        		String fileName = councilAgendaInvitation.getFilestoreid().getFileName();
+	        		councilSmsAndEmailService.sendEmailForAgendaInvitation(councilAgendaInvitation.getMessage(), data,fileType, fileName);
+				} catch (IOException e) {
+					LOGGER.error("Error in sending email for agenda invitation",e);
+				}
+	        }
+        }catch(Exception e) {
+        	LOGGER.error("Unable to send EMAIL of agenda invitation "+councilAgendaInvitation.getMeetingNumber());
+        }
+        
+        redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.councilagenda.invitation.success", null, null));
+        return REDIRECT_COUNCIL_AGENDA_INVITATION_RESULT + councilAgendaInvitation.getId();
+    }
+    
+    @RequestMapping(value = "/agendainvitation/result/{id}", method = RequestMethod.GET)
+    public String agendaInvitationResult(@PathVariable("id") final Long id, Model model) {
+    	CouncilAgendaInvitation councilAgendaInvitation = councilAgendaInvitationService.findOne(id);
+        
+    	model.addAttribute(COUNCIL_AGENDA_INVITATION, councilAgendaInvitation);
+        return COUNCIL_AGENDA_INVITATION_RESULT;
+    }
+    
+    private void validateCouncilAgendaInvitation(final CouncilAgendaInvitation councilAgendaInvitation, BindingResult errors) {
+    	ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingNumber", "notempty.meeting.meetingNumber");
+        //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingDate", "notempty.meeting.meetingDate");
+        //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingTime", "notempty.meeting.meetingTime");
+        //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingLocation", "notempty.meeting.committeeType");
+        if (councilAgendaInvitation.getAttachments().getSize() == 0 && councilAgendaInvitation.getFilestoreid() == null)
+            errors.rejectValue("attachments", "notempty.preamble.attachments");
     }
     
     public Boolean isAutoPreambleNoGenEnabled() {

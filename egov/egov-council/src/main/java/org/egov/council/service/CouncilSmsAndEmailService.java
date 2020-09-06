@@ -131,6 +131,23 @@ public class CouncilSmsAndEmailService {
             buildCouncilSmsDetails(customMessage, councilMeeting);
         }
     }
+    
+    public void sendSmsForAgendaInvitation(String customMessage) {
+        Boolean smsEnabled = isSmsEnabled();
+
+        if (smsEnabled) {
+            try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage);
+	                }
+	            }
+            }catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to agenda invitation");
+            }
+        }
+    }
 
     public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment) {
     	sendEmail(councilMeeting, customMessage, attachment, null, null);
@@ -162,6 +179,23 @@ public class CouncilSmsAndEmailService {
 	            }
 	        }catch(Exception e) {
 	        	LOGGER.error("Unable to send EMAIL to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
+	        }
+        }
+    }
+    
+    public void sendEmailForAgendaInvitation(String customMessage, final byte[] attachment, String fileType, String fileName) {
+        Boolean emailEnabled = isEmailEnabled();
+        if (emailEnabled) {
+        	try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getEmailId() != null) {
+	                	buildEmailForAgendaInvitation(user.getUserName(), user.getEmailId(), customMessage,
+	                            attachment, fileType, fileName);
+	                }
+	            }
+	        }catch(Exception e) {
+	        	LOGGER.error("Unable to send EMAIL to agenda invitation");
 	        }
         }
     }
@@ -242,6 +276,11 @@ public class CouncilSmsAndEmailService {
         if (mobileNumber != null && smsMsg != null)
             sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
     }
+    
+    public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
+            final String customMessage) {
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
+    }
 
     public void buildEmailForMeetingForCouncilRoles(final String userName, final String email,
             final CouncilMeeting councilMeeting,
@@ -263,6 +302,16 @@ public class CouncilSmsAndEmailService {
             body = emailBodyByCodeAndArgsWithType("email.council.roles.meeting.body", userName, councilMeeting,
                     customMessage);
         }
+        if (email != null && body != null)
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
+    }
+    
+    public void buildEmailForAgendaInvitation(final String userName, final String email,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
+        String body = customMessage;
+        String subject;
+        subject = emailSubjectforEmailByCodeAndArgs("email.council.agenda.invitation.subject");
+        body = customMessage;
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
@@ -330,6 +379,12 @@ public class CouncilSmsAndEmailService {
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
                         String.valueOf(councilMeeting.getMeetingLocation()) },
+                LocaleContextHolder.getLocale());
+    }
+    
+    public String emailSubjectforEmailByCodeAndArgs(final String code) {
+        final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
+        return councilMessageSource.getMessage(code,null,
                 LocaleContextHolder.getLocale());
     }
 

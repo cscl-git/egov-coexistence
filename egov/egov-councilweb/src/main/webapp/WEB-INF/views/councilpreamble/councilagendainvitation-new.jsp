@@ -50,56 +50,45 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
-<form:form role="form" action="/services/council/councilmeeting/create" modelAttribute="councilMeeting" 
-	id="councilMeetingform" cssClass="form-horizontal form-groups-bordered"
+<form:form role="form" action="/services/council/councilpreamble/sendsmsemailforagendainvitation" modelAttribute="councilAgendaInvitation" 
+	id="councilAgendaInvitationform" cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
-	<%@ include file="councilmeeting-form.jsp"%>
-	
-	 <%@ include file="councilmeeting-agendaDetail.jsp"%> 
+	<%@ include file="councilagendainvitation-form.jsp"%>
 	<div class="form-group">
 		<div class="text-center">
 			<button type='submit' class='btn btn-primary' id="buttonSubmit">
-				<spring:message code='lbl.create' />
+				<spring:message code='lbl.send' />
 			</button>
-			<a href='javascript:void(0)' class='btn btn-default'
-				onclick='self.close()'><spring:message code='lbl.close' /></a>
+			<!-- <a href='javascript:void(0)' class='btn btn-default'
+				onclick='self.close()'><spring:message code='lbl.close' /></a> -->
 		</div>
 	</div>
 </form:form>
 
-<script
-	src="<cdn:url value='/resources/app/js/councilMeetingHelper.js?rnd=${app_release_no}'/>"></script>
+<!-- <script
+	src="<cdn:url value='/resources/app/js/councilMeetingHelper.js?rnd=${app_release_no}'/>"></script> -->
 <script
 	src="<cdn:url value='/resources/app/js/documentsupload.js?rnd=${app_release_no}'/>"></script>
-<script
-	src="<cdn:url value='/resources/app/js/showMoreorLessContent.js?rnd=${app_release_no}'/>"></script>
-
 <script>
 	 $('#buttonSubmit').click(function(e) {
-		  var place = $('#meetingLocation').val().trim();
-			place=place.replace(/\s\s+/g, ' ');
+		/* var place = $('#meetingLocation').val().trim();
+		place=place.replace(/\s\s+/g, ' ');
 
-			if ($('#meetingLocation').val() != '' && place.length < 5) {
-				$('#meetingLocation').val('');
-				bootbox.alert("Meeting place should have atleast 5 characters");
-				e.preventDefault();
-			}
-			 if($('#meetingLocation').val() != ''){
-					$('#meetingLocation').val(place);
-		     }
+		if ($('#meetingLocation').val() != '' && place.length < 5) {
+			$('#meetingLocation').val('');
+			bootbox.alert("Meeting place should have atleast 5 characters");
+			e.preventDefault();
+		}
+		 if($('#meetingLocation').val() != ''){
+				$('#meetingLocation').val(place);
+	     } */
 
 		if ($('form').valid()) {
-			 var action = '/services/council/councilmeeting/create' ;
- 			$('#councilMeetingform').attr('method', 'post');
- 			$('#councilMeetingform').attr('action', action); 
+			 var action = '/services/council/councilpreamble/sendsmsemailforagendainvitation' ;
+ 			$('#councilAgendaInvitationform').attr('method', 'post');
+ 			$('#councilAgendaInvitationform').attr('action', action); 
 		} else {
 			e.preventDefault();
 		}
 	});	 
 </script>
-
-<style>
-	.morecontent span {
-	    display: none;
-	}
-</style>

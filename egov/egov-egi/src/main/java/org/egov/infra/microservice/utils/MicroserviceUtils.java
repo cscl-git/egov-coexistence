@@ -793,6 +793,32 @@ public class MicroserviceUtils {
         else
             return null;
     }
+    
+    public List<EmployeeInfo> getEmployeesByRoles(List<String> roles) {
+
+        final RestTemplate restTemplate = createRestTemplate();
+
+        StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
+        empUrl.append("?tenantId=" + getTenentId());
+
+        if (!CollectionUtils.isEmpty(roles)){
+        	empUrl.append("&roles=" + String.join(",", roles));
+        }else {
+        	return null;
+        }
+
+        RequestInfo requestInfo = new RequestInfo();
+        RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
+
+        requestInfo.setAuthToken(getUserToken());
+        requestInfo.setTs(getEpochDate(new Date()));
+        reqWrapper.setRequestInfo(requestInfo);
+        EmployeeInfoResponse empResponse = restTemplate.postForObject(empUrl.toString(), reqWrapper, EmployeeInfoResponse.class);
+        if (empResponse.getEmployees() != null && !empResponse.getEmployees().isEmpty())
+            return empResponse.getEmployees();
+        else
+            return null;
+    }
 
     public List<Assignment> getAssignments(String department, String designation) {
         List<Assignment> assignmentList = new ArrayList<>();

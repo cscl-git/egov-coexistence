@@ -126,6 +126,11 @@ public class CouncilConstants {
     
     public static final String COUNCIL_COMMON_WORKFLOW = "CouncilCommonWorkflow";
     public static final String COUNCIL_ABA_WORKFLOW = "CouncilABAWorkflow";
+    
+    public static final String ROLE_MEETING_DEPARTMENT_USER = "AGENDA_MEETING_DEPARTMENT_USER";
+    public static final String ROLE_MEETING_SENIOR_OFFICER = "AGENDA_MEETING_SENIOR_OFFICER";
+    public static final String ROLE_MEETING_SPECIAL_OFFICER = "AGENDA_MEETING_SPECIAL_OFFICER";
+    
 
     private static final Map<String, String> MEETING_TIMINGS = new LinkedHashMap<>();
     static {
