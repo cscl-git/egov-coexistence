@@ -56,6 +56,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -90,6 +91,7 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
+import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
 import org.egov.pims.commons.Position;
@@ -312,10 +314,12 @@ public class UpdateExpenseBillController extends BaseBillController {
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
         
+        if(!egBillregister.getBillPayeedetails().isEmpty())
+    	{
         populateBillDetails(egBillregister);
         validateBillNumber(egBillregister, resultBinder);
         validateLedgerAndSubledger(egBillregister, resultBinder);
-        
+    	}
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
             model.addAttribute("stateType", egBillregister.getClass().getSimpleName());

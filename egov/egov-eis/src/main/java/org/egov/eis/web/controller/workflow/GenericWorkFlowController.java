@@ -66,6 +66,7 @@ import org.egov.infra.workflow.matrix.entity.WorkFlowDeptDesgMap;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.matrix.service.CustomizedWorkFlowService;
 import org.egov.infra.workflow.matrix.service.WorkFlowDeptDesgMapService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -204,10 +205,16 @@ public abstract class GenericWorkFlowController {
                 || model.getCurrentState().getValue().equals("END"))
             validActions = Arrays.asList("Forward","SaveAsDraft");
         else if (model.getCurrentState() != null)
+        	 
+        	if(! model.getState().getValue().equals("SaveAsDraft")) {
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                     model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
                     container.getCurrentDesignation());
+        	}
+        	else {
+        		validActions = Arrays.asList("Forward","SaveAsDraft");
+        	}
         else
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),

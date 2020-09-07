@@ -82,6 +82,7 @@ import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.commons.service.FunctionService;
 import org.egov.commons.utils.BankAccountType;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.DepartmentService;
@@ -118,6 +119,8 @@ import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 import com.exilant.exility.common.TaskFailedException;
 import com.opensymphony.xwork2.validator.annotations.Validation;
+
+import javaxt.http.Request;
 
 @ParentPackage("egov")
 @Validation
@@ -233,7 +236,10 @@ public class PaymentAction extends BasePaymentAction {
     private List<Bankbranch> bankBranchList = new ArrayList<Bankbranch>();
     private String firstsignatory="-1";
     private String secondsignatory="-1";
- 
+ 	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
+   
+    @Autowired
+    private FinancialUtils financialUtils;
     public PaymentAction() {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("creating PaymentAction...");
@@ -868,6 +874,8 @@ public class PaymentAction extends BasePaymentAction {
                     paymentService.validateForRTGSPayment(contingentList,
                             FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
             }
+            voucherHeader = (CVoucherHeader) voucherService.findById( billList.get(0).getBillVoucherId(),false);
+            workflowHistory.addAll(financialUtils.getWorkflowHistory(voucherHeader.getState(), voucherHeader.getStateHistory()));
 
             if (!"Auto".equalsIgnoreCase(voucherTypeForULB.readVoucherTypes("Payment"))) {
                 headerFields.add("vouchernumber");
@@ -878,6 +886,7 @@ public class PaymentAction extends BasePaymentAction {
             if(isDateAutoPopulateDefaultValueEnable()){
                 voucherdate = formatter.format(new Date());                
             }
+         
         } catch (final ValidationException e) {
             try {
                 this.setMiscount(0);
@@ -1049,6 +1058,8 @@ public class PaymentAction extends BasePaymentAction {
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
             paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
+            workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getVoucherheader().getState(), paymentheader.getVoucherheader().getStateHistory()));
+            workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
             // sendForApproval();// this should not be called here as it is
             // public method which is called from jsp submit
             if (!cutOffDate.isEmpty() && cutOffDate != null)
@@ -1183,6 +1194,8 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed sendForApproval.");
         LOGGER.info("Completed sendForApproval.");
         populateDepartmentName();
+        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getVoucherheader().getState(), paymentheader.getVoucherheader().getStateHistory()));
+        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
         if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
         {
         	 final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
@@ -1268,7 +1281,8 @@ public class PaymentAction extends BasePaymentAction {
          * paymentheader.getState().getValue().contains("Rejected")) { if (LOGGER.isDebugEnabled()) LOGGER.debug("Completed view."
          * ); return modify(); }
          */
-        
+        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getVoucherheader().getState(), paymentheader.getVoucherheader().getStateHistory()));
+        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
         miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
         getChequeInfo(paymentheader);
         if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("view"))
@@ -2539,5 +2553,12 @@ public String getSecondsignatory() {
 
 public void setSecondsignatory(String secondsignatory) {
 	this.secondsignatory = secondsignatory;
+}
+public List<HashMap<String, Object>> getWorkflowHistory() {
+	return workflowHistory;
+}
+
+public void setWorkflowHistory(List<HashMap<String, Object>> workflowHistory) {
+	this.workflowHistory = workflowHistory;
 }
 }

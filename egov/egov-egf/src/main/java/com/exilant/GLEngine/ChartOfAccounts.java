@@ -806,6 +806,10 @@ public class ChartOfAccounts {
 						final GLParameter glPrm = (GLParameter) glParamList.get(a);
 
 						{ // Post the details sent apart from defaults
+							if(txnPrm == null)
+							{
+								continue;
+							}
 							for (int z = 0; z < txnPrm.size(); z++) {
 								final TransaxtionParameter tParam = (TransaxtionParameter) txnPrm.get(z);
 								if (LOGGER.isInfoEnabled())

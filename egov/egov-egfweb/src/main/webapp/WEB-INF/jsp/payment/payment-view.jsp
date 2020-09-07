@@ -577,7 +577,9 @@ function openBudgetDtls()
 					</tr>
 				</table>
 			</div>
+			
 			<div class="buttonbottom" id="buttondiv">
+			<%@ include file='../workflow/commonworkflowhistory.jsp'%>
 				<s:hidden id="pId" name="paymentid" value="%{paymentheader.id}" />
 				<s:hidden name="actionname" id="actionName" value="%{action}" />
 				<s:hidden name="finanicalYearAndClosedPeriodCheckIsClosed" id="finanicalYearAndClosedPeriodCheckIsClosed" value="%{finanicalYearAndClosedPeriodCheckIsClosed}" />

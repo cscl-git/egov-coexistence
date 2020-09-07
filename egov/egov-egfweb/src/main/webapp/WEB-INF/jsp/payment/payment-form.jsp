@@ -546,6 +546,7 @@
 				<s:hidden name="cutOffDate" id="cutOffDate" />
 				<s:hidden name="bankBalanceCheck" id="bankBalanceCheck"
 					value="%{bankBalanceCheck}" />
+                 <%@ include file='../workflow/commonworkflowhistory.jsp'%>
 
 				<%@ include file='../payment/commonWorkflowMatrix.jsp'%>
 				<%@ include file='../workflow/commonWorkflowMatrix-button.jsp'%>

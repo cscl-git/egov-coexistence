@@ -337,11 +337,11 @@ public class ExpenseBillService {
             egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
       
 //            commented as budget check was disabled
-//            try {
-//                checkBudgetAndGenerateBANumber(egBillregister);
-//            } catch (final ValidationException e) {
-//                throw new ValidationException(e.getErrors());
-//            }
+           try {
+           checkBudgetAndGenerateBANumber(egBillregister);
+           } catch (final ValidationException e) {
+               throw new ValidationException(e.getErrors());
+            }
 
         }
         if (updatedegBillregister != null) {
@@ -555,17 +555,12 @@ public class ExpenseBillService {
                         && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
                     stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
 
-                //changes for forward after >save as draft
-                	/*if(egBillregister.getCurrentState().getValue().equalsIgnoreCase("SaveAsDraft")) {
-                		wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
-                        null, additionalRule, currState, null);
-                	}
-                	else {*/
+             
                 
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
-                	//}
+                	
                 
                 if (stateValue.isEmpty())
                 {

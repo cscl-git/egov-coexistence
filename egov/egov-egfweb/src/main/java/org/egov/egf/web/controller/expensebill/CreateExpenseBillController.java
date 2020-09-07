@@ -209,7 +209,11 @@ public class CreateExpenseBillController extends BaseBillController {
 
         populateBillDetails(egBillregister);
         validateBillNumber(egBillregister, resultBinder);
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
         validateLedgerAndSubledger(egBillregister, resultBinder);
+    	}
+     //   
 
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
