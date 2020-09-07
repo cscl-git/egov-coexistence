@@ -50,7 +50,7 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
-<form:form role="form" action="../update"
+<form:form role="form" action="/services/council/councilmom/update"
 	modelAttribute="councilMeeting" id="councilMomform"
 	cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
