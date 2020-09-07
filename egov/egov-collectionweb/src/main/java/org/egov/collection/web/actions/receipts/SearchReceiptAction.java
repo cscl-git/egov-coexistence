@@ -230,7 +230,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
-                    receiptHeader.setService(billDetail.getBusinessService());
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
                     receiptHeader.setReferenceDesc(billDetail.getBillDescription());
                     receiptHeader.setPaidBy(bill.getPaidBy());

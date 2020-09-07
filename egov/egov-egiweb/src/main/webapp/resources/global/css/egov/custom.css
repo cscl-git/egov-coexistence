@@ -188,8 +188,7 @@ label.error {
   border-color: #ff0000;
 }
 .modal {
-  /* z-index: 10001; */
-  z-index: 9999999;
+  z-index: 10001;
 }
 .add-border {
   border-bottom: 1px solid #ebebeb;
@@ -1510,11 +1509,11 @@ label.error {
   border-right-style: solid;
   border-bottom-style: solid;
   font-family: semibold;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
-  color: #767676;
+  color: #ffffff;
   padding: 4px;
-  background-color: #f8f8f8;
+  background-color: #265988;
   background-image: none;
   text-align: center;
 }
