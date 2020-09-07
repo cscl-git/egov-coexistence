@@ -293,14 +293,25 @@ public class CouncilMomController  extends GenericWorkFlowController{
     	
     	validateCouncilMOM(councilMeeting, errors);
         if (errors.hasErrors()) {
-        	prepareWorkFlowOnLoad(model, councilMeeting);
-        	if(null == councilMeeting.getCurrentState()) {
-        		model.addAttribute(CURRENT_STATE, "NEW");
-        	}else {
-        		model.addAttribute(CURRENT_STATE, councilMeeting
-                    .getCurrentState().getValue());
-        	}
-            return COUNCILMEETING_EDIT;
+        	if(null == councilMeeting.getState()) {
+	            model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+	            model.addAttribute(CURRENT_STATE, "NEW");
+            }else {
+            	model.addAttribute(CURRENT_STATE, councilMeeting.getCurrentState()
+                        .getValue());
+            	if(CouncilConstants.REJECTED.equalsIgnoreCase(councilMeeting.getStatus().getCode())){
+                    model.addAttribute(ADDITIONALRULE, COUNCIL_COMMON_WORKFLOW);
+                }
+            	
+            	model.addAttribute(APPLICATION_HISTORY,
+                        councilThirdPartyService.getHistory(councilMeeting));
+            	model.addAttribute("wfNextAction", councilMeeting.getState().getNextAction());
+            }
+        	councilMeeting.setApprovalDepartment("");
+        	councilMeeting.setApprovalDesignation("");
+        	councilMeeting.setApprovalPosition(0l);
+            prepareWorkFlowOnLoad(model, councilMeeting);
+            return COUNCILMOM_NEW;
         }
         /*String biddersId = request.getParameter("councilBidderHdn");
         if (StringUtils.isNotEmpty(biddersId)) {
@@ -405,9 +416,11 @@ public class CouncilMomController  extends GenericWorkFlowController{
     }
 
     private void validateCouncilMOM(final CouncilMeeting councilMeeting, BindingResult errors) {
-        if (councilMeeting.getFiles() == null || councilMeeting.getFiles().length == 0) {
-            errors.rejectValue("attachments", "notempty.mom.attachments");
-        }
+        if(CollectionUtils.isEmpty(councilMeeting.getSupportDocs())) {
+	    	if (councilMeeting.getFiles() == null || councilMeeting.getFiles().length == 0) {
+	            errors.rejectValue("attachments", "notempty.mom.attachments");
+	        }
+    	}
     }
     
     @RequestMapping(value = "/result/{id}", method = RequestMethod.GET)

@@ -146,10 +146,10 @@ $(document).on('change','.files-upload-container input:file',function(e) {
 $(document).on('click','.file-add',function() {
 		
 	if($(this).data('unlimited-files') && $(this).data('file-input-name')) {
-		$(this).parent('.files-viewer').find('.file-viewer').each(function(idx) {
+		/*$(this).parent('.files-viewer').find('.file-viewer').each(function(idx) {
 			bootbox.alert('You can not upload more than one document.');
 			return;
-	    });
+	    });*/
 		
 		var isFileInputNotAvailable=true;
 		$(this).parent().find('input:file').each(function(idx) {
