@@ -260,6 +260,7 @@
         <module>egov-audit</module>
         <module>egov-lcms</module>
 	      <module>egov-council</module>
+		<module>egov-works</module>
         <module>egov-collection</module>
         <module>egov-apnimandi</module>
         <module>egov-commonsweb</module>
@@ -269,6 +270,7 @@
         <module>egov-auditweb</module>
         <module>egov-lcmsweb</module>
 	      <module>egov-councilweb</module>
+		<module>egov-worksweb</module>
         <module>egov-collectionweb</module>
         <module>egov-apnimandiweb</module>
         <module>egov-ear</module>
