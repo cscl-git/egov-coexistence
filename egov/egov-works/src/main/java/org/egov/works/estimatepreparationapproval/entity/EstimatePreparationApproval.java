@@ -12,11 +12,16 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Inheritance;
+import javax.persistence.InheritanceType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
@@ -24,6 +29,7 @@ import org.egov.works.boq.entity.BoQDetails;
 
 @Entity
 @Table(name = "txn_estimate_preparation")
+@Inheritance(strategy = InheritanceType.JOINED)
 @SequenceGenerator(name = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, sequenceName = EstimatePreparationApproval.SEQ_ESTIMATE_PREPARATION, allocationSize = 1)
 public class EstimatePreparationApproval extends StateAware implements Serializable {
 
@@ -108,14 +114,12 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "time_limit")
 	private String timeLimit;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
-	private List<BoQDetails> newBoQDetailsList;
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
+	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
-	/*
-	 * @ManyToOne
-	 * 
-	 * @JoinColumn(name = "statusid") private EgwStatus status;
-	 */
+	@ManyToOne
+    @JoinColumn(name = "statusid")
+    private EgwStatus status;
 
 	@Transient
 	private List<EstimatePreparationApproval> estimateList;
@@ -159,6 +163,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private User approver;
 	@Transient
 	private Date approvedOn;
+	
+	@Transient
+	private String workFlowAction;
 
 	public Long getWorksWing() {
 		return worksWing;
@@ -469,7 +476,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	}
 
 	@Override
-	protected void setId(Long id) {
+	public void setId(Long id) {
 		this.id = id;
 
 	}
@@ -505,5 +512,23 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	public void setApprovedOn(Date approvedOn) {
 		this.approvedOn = approvedOn;
 	}
+
+	public EgwStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(EgwStatus status) {
+		this.status = status;
+	}
+
+	public String getWorkFlowAction() {
+		return workFlowAction;
+	}
+
+	public void setWorkFlowAction(String workFlowAction) {
+		this.workFlowAction = workFlowAction;
+	}
+	
+	
 
 }

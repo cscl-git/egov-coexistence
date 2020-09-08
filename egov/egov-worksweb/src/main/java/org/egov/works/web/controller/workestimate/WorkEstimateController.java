@@ -1,9 +1,6 @@
 package org.egov.works.web.controller.workestimate;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -46,18 +43,21 @@ public class WorkEstimateController {
 			final Model model, final HttpServletRequest request) throws Exception {
 		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
 
-		// Convert input string into a date
+		/*// Convert input string into a date
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 		Date fromdate = inputFormat.parse(estimatePreparationApproval.getFromDate());
 		estimatePreparationApproval.setFromDt(fromdate);
 
 		Date todate = inputFormat.parse(estimatePreparationApproval.getToDate());
 		estimatePreparationApproval.setToDt(todate);
-
-		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
-		estimatePreparationApproval.setExecutingDivision(department);
+*/
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != ""
+				&& !estimatePreparationApproval.getDepartment().isEmpty()) {
+			estimatePreparationApproval
+					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
+		}
 		
-		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimateData(request,
+		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimate(request,
 				estimatePreparationApproval);
 		approvalList.addAll(workEstimateDetails);
 		estimatePreparationApproval.setEstimateList(approvalList);
@@ -75,13 +75,18 @@ public class WorkEstimateController {
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 		for (int i = 0; i < estimatePreparationApproval.getEstimateList().size(); i++) {
 			if (estimatePreparationApproval.getEstimateList().get(i).isChecked() == true) {
-				List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchBoqData(request,
+				
+				
+				EstimatePreparationApproval	workEstimateDetails = workEstimateService.searchBoqData(request,
+						estimatePreparationApproval.getEstimateList().get(i).getId());
+				
+				/*List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchBoqData(request,
 						estimatePreparationApproval.getEstimateList().get(i).getId());
 				
 				for(int j = 0; j<workEstimateDetails.size();j++ ) {
 					responseList= workEstimateDetails.get(j).getNewBoQDetailsList();
-				}	
-				estimatePreparationApproval.setBoQDetailsList(responseList);
+				}*/	
+				estimatePreparationApproval.setBoQDetailsList(workEstimateDetails.getNewBoQDetailsList());
 				model.addAttribute("workEstimateDetails", estimatePreparationApproval);
 
 			}

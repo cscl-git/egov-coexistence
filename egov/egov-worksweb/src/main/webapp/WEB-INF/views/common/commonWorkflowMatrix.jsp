@@ -85,7 +85,7 @@
 					<div class="col-sm-3 add-margin">
 						<form:select path="approvalDepartment" data-first-option="false" name="approvalDepartment"
 							id="approvalDepartment" cssClass="form-control"
-							cssErrorClass="form-control error" required="required">
+							cssErrorClass="form-control error">
 							<form:option value="">
 									<spring:message code="lbl.select" text="Select"/>
 							</form:option>
@@ -98,7 +98,7 @@
 					<input type="hidden" id="approvalDesignationValue" value="${approvalDesignation }" />
 						<form:select path="" data-first-option="false" name="approvalDesignation"
 							id="approvalDesignation" cssClass="form-control" onfocus="callAlertForDepartment();"
-							cssErrorClass="form-control error" required="required">  
+							cssErrorClass="form-control error" >  
 							<form:option value="">
 									<spring:message code="lbl.select" text="Select"/>
 							</form:option>
@@ -113,7 +113,7 @@
 						<input type="hidden" id="approverName" name="approverName" />
 					<form:select path="" data-first-option="false" 
 						id="approvalPosition" name="approvalPosition" cssClass="form-control" onfocus="callAlertForDesignation();" 
-						cssErrorClass="form-control error" required="required">  
+						cssErrorClass="form-control error" >  
 						<form:option value="">
 									<spring:message code="lbl.select" text="Select"/>
 							</form:option>

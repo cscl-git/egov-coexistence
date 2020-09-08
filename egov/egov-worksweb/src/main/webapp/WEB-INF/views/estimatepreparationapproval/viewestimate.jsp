@@ -21,7 +21,7 @@
 	
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 <!-- JS, Popper.js, and jQuery -->
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
+	
 </script>
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
@@ -34,12 +34,10 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
 	integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 	crossorigin="anonymous"></script>
-
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 
 
 <meta charset="UTF-8">
-<title>BoQ</title>
-<link href="/css/main.css" rel="stylesheet">
 <style>
 /* .container {
 	overflow: hidden
@@ -153,12 +151,11 @@ tr:hover {
 </head>
 <body>
 
-	<form:form name="view-estimate-form" role="form" method="post"
-		action="estimate" modelAttribute="estimatePreparationApproval"
-		id="estimatePreparationApproval" enctype="multipart/form-data">
 		<div class="card">
 			<div class="container">
 				<div class="row">
+				<input type="hidden" name="estimatePreparationApproval"
+						value="${estimatePreparationApproval.id}" />
 					<div class="col-md-6">
 						<div class="form-group">
 							<label for="inputPassword"
@@ -252,39 +249,6 @@ tr:hover {
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.necessity" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.necessity}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.scope.work" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.workScope}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.work.status" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.workStatus}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.estimate.preparation.estimate.amount" /></label>
 							<div class="col-md-6 block-colm">
 								${estimatePreparationApproval.estimateAmount}</div>
@@ -316,104 +280,6 @@ tr:hover {
 					</div>
 
 
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.financing.details" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.financingDetails}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.fund.source" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.fundSource}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.financial.year" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.financialYear}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.estimate.percentage" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.estimatePercentage}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.agency.work.order" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.agencyWorkOrder}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.date" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.date}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.time.limit" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.timeLimit}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.work.type" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.workType}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.tendered.cost" /></label>
-							<div class="col-md-6 block-colm">
-								${estimatePreparationApproval.tenderCost}</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
 
 
 					<div class="col-md-12">
@@ -427,8 +293,30 @@ tr:hover {
 						</div>
 					</div>
 
+					<div class="col-md-12">
+						<div class="form-group">
+							<label for="inputPassword"
+								class="col-md-3 col-form-label block-colm"><spring:message
+									code="lbl.estimate.preparation.necessity" /></label>
+							<div class="col-md-9 block-colm">
+								${estimatePreparationApproval.necessity}</div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+
+					<div class="col-md-12">
+						<div class="form-group">
+							<label for="inputPassword"
+								class="col-md-3 col-form-label block-colm"><spring:message
+									code="lbl.estimate.preparation.scope.work" /></label>
+							<div class="col-md-9 block-colm">
+								${estimatePreparationApproval.workScope}</div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+
 					<div style="padding: 0 15px;">
-						<table id="table" border="1" cellpadding="10">
+						<table id="table" border="1" cellpadding="10" style="width: 100%">
 							<thead>
 								<tr>
 									<th><spring:message code="lbl.item.description" /></th>
@@ -485,7 +373,6 @@ tr:hover {
 			</div>
 		</div>
 
-	</form:form>
 
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>

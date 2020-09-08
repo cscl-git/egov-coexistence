@@ -46,38 +46,34 @@
   ~
   --%>
 
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
-<header class="navbar navbar-fixed-top"><!-- set fixed position by adding class "navbar-fixed-top" -->
-<!--	<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
-		<div class="container-fluid">
-			<div class="navbar-header col-md-10 col-xs-10">
-				<a class="navbar-brand" href="javascript:void(0);">
-					<img src="<c:url value='/downloadfile/logo' context='/services/egi'/>" height="60">
-					<div>
-						<span class="title2">
-						<c:set var="titleKey">
-							<tiles:getAsString name="page-title"/>
-						</c:set>
-						<spring:message code="${titleKey}"/>
-						</span>
-					</div>
-				</a>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form" %>
+<script>
+			function processRequest(){
+		
+				
+				
+				
+		console.log('posted the message');
+	}
+</script>
+<div id="main">
+<div class="row">
+	<div class="col-md-12">
+		<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title text-center">
+					<c:out value="${message }" /><br />
+					<c:forEach items="${basMessages }" var="basMessage">
+						<c:out value="${basMessage }" /><br />
+					</c:forEach>
+				</div>
 			</div>
-
-			<div class="nav-right-menu col-md-2 col-xs-2">
-				<ul class="hr-menu text-right">
-					<li class="ico-menu">
-						
-					</li>
-
-				</ul>
-			</div>
-
 		</div>
-	</nav> -->
-</header>
+	</div>			
+	<div class="text-center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/></div>		
+</div>					
+</div>

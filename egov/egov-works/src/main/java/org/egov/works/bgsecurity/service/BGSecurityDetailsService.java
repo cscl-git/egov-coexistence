@@ -23,4 +23,11 @@ public class BGSecurityDetailsService {
 
 	}
 
+	@Transactional
+	public BGSecurityDetails getBGSecurityDetails(Long id) {
+		// TODO Auto-generated method stub
+		BGSecurityDetails bgSecurityDetails = bgSecurityDetailsRepository.findById(id);
+		return bgSecurityDetails;
+	}
+
 }

@@ -138,9 +138,8 @@ tr:hover {
 </head>
 <body>
 
-	<form:form name="tender-form" role="form" method="post"
-		action="tenderSave" modelAttribute="tender" id="tender"
-		enctype="multipart/form-data">
+	<form:form name="view-tender-form" role="form" method="post"
+		action="tenderSave" modelAttribute="tender" id="tender">
 		<div class="card">
 			<div class="container">
 				<div class="row">
@@ -150,9 +149,8 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.tender.amount" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="number" class="form-control txtRight"
-									path="procurementAmount" />
-							</div>
+
+								${tender.procurementAmount}</div>
 							<div class="clearfix"></div>
 						</div>
 					</div>
@@ -162,10 +160,7 @@ tr:hover {
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.tender.date" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input id="procurementDate" path="procurementDate"
-									class="form-control datepicker" data-date-end-date="0d"
-									placeholder="DD/MM/YYYY" />
+							<div class="col-md-6 block-colm">${tender.procurementDate}
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -177,9 +172,8 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.tender.vendor.details" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="contractorDetails" />
-							</div>
+
+								${tender.contractorDetails}</div>
 							<div class="clearfix"></div>
 						</div>
 					</div>
@@ -189,39 +183,13 @@ tr:hover {
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.tender.loa.number" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="number" class="form-control txtRight"
-									path="loaNumber" />
-							</div>
+							<div class="col-md-6 block-colm">${tender.loaNumber}</div>
 							<div class="clearfix"></div>
 
 						</div>
 					</div>
 				</div>
 
-			</div>
-		</div>
-		<br />
-
-		<div class="card">
-			<div class="container">
-				<div>
-					<p style="color: #4e799f; font-size: 25px;">Documents</p>
-				</div>
-				<div class="row">
-					<jsp:include page="fileupload.jsp" />
-				</div>
-			</div>
-		</div>
-		<br />
-
-		<div class="card">
-			<div class="container">
-				<div class="vertical-center">
-					<input type="submit" id="tenderSave" class="btn-info"
-						name="tenderSave" code="lbl.save.tender"
-						value="Save Tender Creation" />
-				</div>
 			</div>
 		</div>
 	</form:form>

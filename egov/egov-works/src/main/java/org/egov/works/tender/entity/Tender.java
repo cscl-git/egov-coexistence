@@ -18,82 +18,71 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Table(name = "txn_tender")
 @SequenceGenerator(name = Tender.SEQ_TENDER, sequenceName = Tender.SEQ_TENDER, allocationSize = 1)
 
-public class Tender implements Serializable {
-	private static final long serialVersionUID = 1L;
-
+public class Tender implements  java.io.Serializable {
+	
+	private static final long serialVersionUID = -4312140421386028968L;
 	public static final String SEQ_TENDER = "SEQ_TENDER";
 
 	@Id
 	@GeneratedValue(generator = SEQ_TENDER, strategy = GenerationType.SEQUENCE)
-	@Column(name = "procurement_no")
-	private Long procurement_no;
+	@Column(name = "id")
+	private Long id;
 
 	@Column(name = "procurement_amount")
-	private Double procurement_amount;
+	private Double procurementAmount;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy HH:mm:ss", timezone = "Asia/Kolkata")
 	@Column(name = "procurement_date")
-	private Date procurement_date;
+	private Date procurementDate;
 
 	@Column(name = "contractor_details")
-	private String contractor_details;
+	private String contractorDetails;
 
 	@Column(name = "loa_number")
-	private Double loa_number;
+	private Double loaNumber;
 
-	@Transient
-	private String procurement_dt;
-
-	public Long getProcurement_no() {
-		return procurement_no;
+	public Long getId() {
+		return id;
 	}
 
-	public void setProcurement_no(Long procurement_no) {
-		this.procurement_no = procurement_no;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
-	public Double getProcurement_amount() {
-		return procurement_amount;
+	public Double getProcurementAmount() {
+		return procurementAmount;
 	}
 
-	public void setProcurement_amount(Double procurement_amount) {
-		this.procurement_amount = procurement_amount;
+	public void setProcurementAmount(Double procurementAmount) {
+		this.procurementAmount = procurementAmount;
 	}
 
-	public Date getProcurement_date() {
-		return procurement_date;
+	public Date getProcurementDate() {
+		return procurementDate;
 	}
 
-	public void setProcurement_date(Date procurement_date) {
-		this.procurement_date = procurement_date;
+	public void setProcurementDate(Date procurementDate) {
+		this.procurementDate = procurementDate;
 	}
 
-	public String getContractor_details() {
-		return contractor_details;
+	public String getContractorDetails() {
+		return contractorDetails;
 	}
 
-	public void setContractor_details(String contractor_details) {
-		this.contractor_details = contractor_details;
+	public void setContractorDetails(String contractorDetails) {
+		this.contractorDetails = contractorDetails;
 	}
 
-	public Double getLoa_number() {
-		return loa_number;
+	public Double getLoaNumber() {
+		return loaNumber;
 	}
 
-	public void setLoa_number(Double loa_number) {
-		this.loa_number = loa_number;
+	public void setLoaNumber(Double loaNumber) {
+		this.loaNumber = loaNumber;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
-	}
-
-	public String getProcurement_dt() {
-		return procurement_dt;
-	}
-
-	public void setProcurement_dt(String procurement_dt) {
-		this.procurement_dt = procurement_dt;
 	}
 
 }

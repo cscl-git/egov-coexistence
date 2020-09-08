@@ -31,6 +31,7 @@ import org.egov.works.boq.entity.BoQDetails;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -65,6 +66,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	private static final String APPROVAL_POSITION = "approvalPosition";
 
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
+    @Autowired
+	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -81,15 +84,98 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 	private void prepareValidActionListByCutOffDate(Model model) {
             model.addAttribute("validActionList",
-                    Arrays.asList("Forward"));
+                    Arrays.asList("Forward","Save As Draft"));
 	}
 
 	@RequestMapping(value = "/estimate", params = "Forward", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request,@RequestParam final String workFlowAction)
+			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
 			throws Exception {
 
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
+		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != "") {
+			estimatePreparationApproval.setEstimateDate(inputFormat.parse(estimatePreparationApproval.getEstimateDt()));
+		}
+
+		if (estimatePreparationApproval.getDt() != null && estimatePreparationApproval.getDt() != "") {
+			estimatePreparationApproval.setDate(inputFormat.parse(estimatePreparationApproval.getDt()));
+		}*/
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+			estimatePreparationApproval
+					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
+		}
+		String deptCode = "";
+		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
+		deptCode = estimatePreparationApproval.getDepartment();
+	    String estimateNumber = v.getEstimateNumber(deptCode);
+		estimatePreparationApproval.setEstimateNumber(estimateNumber);
+		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
+		//start of workflow
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        
+		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
+				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+
+		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
+        + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
+
+	}
+	
+	@RequestMapping(value = "/success", method = RequestMethod.GET)
+    public String showSuccessPage(@RequestParam("approverDetails") final String approverDetails,@RequestParam("workflowaction") final String workflowaction, final Model model,
+                                  final HttpServletRequest request,@RequestParam("estId") final String estId) {
+		
+		EstimatePreparationApproval savedEstimatePreparationApproval=estimatePreparationApprovalRepository.getOne(Long.parseLong(estId));
+		final String message = getMessageByStatus(savedEstimatePreparationApproval, approverDetails,workflowaction);
+
+        model.addAttribute("message", message);
+
+        return "works-success";
+    }
+
+	
+	private String getMessageByStatus(EstimatePreparationApproval savedEstimatePreparationApproval,
+			String approverDetails, String workflowaction) {
+		String approverName="";
+		String msg="";
+		
+		if(workflowaction.equalsIgnoreCase("Save As Draft"))
+		{
+			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+"is Saved as draft";
+		}
+		else if((workflowaction.equalsIgnoreCase("Forward") || workflowaction.equalsIgnoreCase("Approve")) && savedEstimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
+		{
+			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+"is approved";
+		}
+		else 
+		{
+			approverName=getEmployeeName(Long.parseLong(approverDetails));
+			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+"has been forwarded to "+approverName;
+		}
+		return msg;
+	}
+
+	@RequestMapping(value = "/estimate", params = "Save As Draft", method = RequestMethod.POST)
+	public String saveBoQDetailsDataDraft(
+			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
+			throws Exception {
+		
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		if (estimatePreparationApproval.getEstimateDt() != null || estimatePreparationApproval.getEstimateDt() != "") {
@@ -132,9 +218,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
 				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
-		return "estimatepreparationapproval-form";
+		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
+        + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
 
 	}
+
 
 	@RequestMapping(value = "/estimate", params = "save", method = RequestMethod.POST)
 	public String saveBoqFileData(
@@ -216,7 +304,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 						count++;
 						aBoQDetails.setSlNo(count);
 						boQDetailsList.add(aBoQDetails);
-						System.out.println("aBoQDetails:: " + boQDetailsList);
 
 					}
 				}
@@ -230,6 +317,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		}
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
+        prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
 
 		return "estimatepreparationapproval-form";
@@ -272,15 +363,24 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
 
 		// Convert input string into a date
-		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		if (estimatePreparationApproval.getFromDate() != null && estimatePreparationApproval.getFromDate() != ""
+				&& !estimatePreparationApproval.getFromDate().isEmpty()) {
 		Date fromdate = inputFormat.parse(estimatePreparationApproval.getFromDate());
 		estimatePreparationApproval.setFromDt(fromdate);
+		}
 
+		if (estimatePreparationApproval.getToDate() != null && estimatePreparationApproval.getToDate() != ""
+				&& !estimatePreparationApproval.getToDate().isEmpty()) {
 		Date todate = inputFormat.parse(estimatePreparationApproval.getToDate());
 		estimatePreparationApproval.setToDt(todate);
-
+		}
+		
+*/
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
 		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
 		estimatePreparationApproval.setExecutingDivision(department);
+		}
 
 		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimateData(request,
 				estimatePreparationApproval);
@@ -312,7 +412,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "view-estimate-form";
 	}
 
-	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+	@RequestMapping(value = "/edit/{id}", method = RequestMethod.POST)
 	public String edit(@PathVariable("id") final Long id, Model model) {
 
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
@@ -329,38 +429,66 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 		estimateDetails.setDepartments(getDepartmentsFromMs());
 
-		String dt = estimateDetails.getDate().toString();
+		/*String dt = estimateDetails.getDate().toString();
 		estimateDetails.setDt(dt);
 
 		String estimateDt = estimateDetails.getEstimateDate().toString();
-		estimateDetails.setEstimateDt(estimateDt);
+		estimateDetails.setEstimateDt(estimateDt);*/
+
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
 
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
 
-		return "edit-estimate-form";
+		return "create-estimate-form";
 	}
 
-	@RequestMapping(value = "/editdata", params = "editdata", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
-	@ResponseBody
+	@RequestMapping(value = "/edit/saveestimate1",  method = RequestMethod.POST)
 	public String editEstimateData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final HttpServletRequest request,@RequestParam final String workFlowAction) throws Exception {
+			final HttpServletRequest request) throws Exception {
 
-		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-		Date estimateDate = inputFormat.parse(estimatePreparationApproval.getEstimateDt());
-		estimatePreparationApproval.setEstimateDate(estimateDate);
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
+		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != ""
+				&& !estimatePreparationApproval.getEstimateDt().isEmpty()) {
+			estimatePreparationApproval.setEstimateDate(inputFormat.parse(estimatePreparationApproval.getEstimateDt()));
+		}
 
-		Date date = inputFormat.parse(estimatePreparationApproval.getDt());
-		estimatePreparationApproval.setDate(date);
-
-		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
-		estimatePreparationApproval.setExecutingDivision(department);
-
+		if (estimatePreparationApproval.getDt() != null && estimatePreparationApproval.getDt() != ""
+				&& !estimatePreparationApproval.getDt().isEmpty()) {
+			estimatePreparationApproval.setDate(inputFormat.parse(estimatePreparationApproval.getDt()));
+		}
+*/
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != ""
+				&& !estimatePreparationApproval.getDepartment().isEmpty()) {
+			estimatePreparationApproval
+					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
+		}
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
-				.saveEstimatePreparationData(request, estimatePreparationApproval,null,null,null,null);
+				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
-		return "estimatepreparationapproval-form";
+		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
+        + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
 
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
+
 
 }

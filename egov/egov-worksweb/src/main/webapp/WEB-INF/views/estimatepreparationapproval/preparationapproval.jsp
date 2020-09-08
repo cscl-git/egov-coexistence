@@ -21,7 +21,6 @@
 	
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 <!-- JS, Popper.js, and jQuery -->
-	<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous">
 </script>
 <script
 	src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
@@ -34,14 +33,12 @@
 	src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
 	integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
 	crossorigin="anonymous"></script>
-
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
 <script
-        src="<cdn:url value='/resources/app/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 
 <meta charset="UTF-8">
-<title>BoQ</title>
-<link href="/css/main.css" rel="stylesheet">
 <style>
 /* .container {
 	overflow: hidden
@@ -175,7 +172,8 @@ tr:hover {
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.works.wing" /></label>
+									code="lbl.estimate.preparation.works.wing" /><span
+								class="mandatory"></span></label>
 							<div class="col-md-6 block-colm">
 								<form:select path="worksWing" id="worksWing"
 									cssClass="form-control" cssErrorClass="form-control error"
@@ -196,7 +194,8 @@ tr:hover {
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.executing.division" /></label>
+									code="lbl.estimate.preparation.executing.division" /><span
+								class="mandatory"></span></label>
 							<div class="col-md-6 block-colm">
 								<form:select path="department" id="department"
 									class="form-control" required="required">
@@ -216,10 +215,14 @@ tr:hover {
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.estimate.date" /></label>
+									code="lbl.estimate.preparation.estimate.date" /><span
+								class="mandatory"></span></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight datepicker"
-									path="estimateDt" pattern="dd/MM/yyyy" required="required" />
+								<%-- <form:input type="date" class="form-control txtRight datepicker"
+									path="estimateDt" pattern="dd/MM/yyyy" required="required" /> --%>
+									<form:input id="estimateDate" path="estimateDate"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>
 							<div class="clearfix"></div>
@@ -271,7 +274,8 @@ tr:hover {
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.work.category" /></label>
+									code="lbl.estimate.preparation.work.category" /><span
+								class="mandatory"></span></label>
 							<div class="col-md-6 block-colm">
 								<form:select path="workCategory" id="workCategory"
 									cssClass="form-control" cssErrorClass="form-control error"
@@ -279,63 +283,18 @@ tr:hover {
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-									<form:option value="1">Initiated</form:option>
-									<form:option value="2">Under Verification</form:option>
-									<form:option value="3">Approved</form:option>
-									<form:option value="4">AA Approved</form:option>
-									<form:option value="5">Detailed Estimate Approved</form:option>
+									<form:option value="1">Road Work </form:option>
+									<form:option value="2">Bridge Work</form:option>
+									<form:option value="3">Maintaince Work</form:option>
 								</form:select>
 							</div>
 							<div class="clearfix"></div>
 						</div>
 					</div>
 
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.necessity" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="necessity" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
 
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.scope.work" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="workScope" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
 
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.work.status" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="workStatus" id="workStatus"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Pending</form:option>
-									<form:option value="2">Ongoing</form:option>
-									<form:option value="3">Complete</form:option>
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
+
 
 					<div class="col-md-6">
 						<div class="form-group">
@@ -384,152 +343,48 @@ tr:hover {
 						</div>
 					</div>
 
-
-					<div class="col-md-6">
+					<div class="col-md-12">
 						<div class="form-group">
 							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.financing.details" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="financingDetails" id="financingDetails"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Govt</form:option>
-									<form:option value="2">Pvt</form:option>
-								</form:select>
+								class="col-md-3 col-form-label block-colm"><spring:message
+									code="lbl.estimate.preparation.name.work" /><span
+								class="mandatory"></span></label>
+							<div class="col-md-9 block-colm">
+								<form:textarea class="form-control txtRight" path="workName"
+									maxlength="2000" required="required" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
 					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.fund.source" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="fundSource" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.financial.year" /></label>
-							<div class="col-md-6 block-colm">
-								<form:select path="financialYear" id="financialYear"
-									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">2020</form:option>
-									<form:option value="2">2019</form:option>
-								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.estimate.percentage" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="estimatePercentage" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.agency.work.order" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="agencyWorkOrder" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.date" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight datepicker"
-									path="dt" pattern="dd/MM/yyyy" required="required" />
-								<form:errors path="dt" cssClass="add-margin error-msg" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.time.limit" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="timeLimit" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.work.type" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="workType" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.tendered.cost" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="tenderCost" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
 
 					<div class="col-md-12">
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-3 col-form-label block-colm"><spring:message
-									code="lbl.estimate.preparation.name.work" /></label>
+									code="lbl.estimate.preparation.necessity" /><span
+								class="mandatory"></span></label>
 							<div class="col-md-9 block-colm">
-								<form:textarea class="form-control txtRight" path="workName"
-									maxlength="2000" />
+								<form:input type="text" class="form-control txtRight"
+									path="necessity" required="required" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
 					</div>
+
+					<div class="col-md-12">
+						<div class="form-group">
+							<label for="inputPassword"
+								class="col-md-3 col-form-label block-colm"><spring:message
+									code="lbl.estimate.preparation.scope.work" /><span
+								class="mandatory"></span></label>
+							<div class="col-md-9 block-colm">
+								<form:input type="text" class="form-control txtRight"
+									path="workScope" required="required" />
+							</div>
+							<div class="clearfix"></div>
+						</div>
+					</div>
+
 				</div>
 			</div>
 		</div>

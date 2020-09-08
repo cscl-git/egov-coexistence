@@ -110,10 +110,6 @@ public abstract class GenericWorkFlowController {
      */
     protected void prepareWorkflow(final Model prepareModel, final StateAware model,
             final WorkflowContainer container) {
-    	if(null != model)
-    	{
-    		System.out.println("Type  : "+model.getStateType());
-    	}
     	prepareWorkflow(prepareModel, model, container, false);
     }
     

@@ -23,4 +23,14 @@ public class TenderService {
 
 	}
 
+	@Transactional
+	public Tender searchTenderData(Long id) {
+		// TODO Auto-generated method stub
+		Tender tender = new Tender();
+		Tender detailsList = tenderRepository.findById(id);
+
+		return detailsList;
+
+	}
+
 }

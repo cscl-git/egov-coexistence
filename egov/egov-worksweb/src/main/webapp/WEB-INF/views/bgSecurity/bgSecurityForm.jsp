@@ -139,7 +139,8 @@ tr:hover {
 <body>
 
 	<form:form name="bg-security-form" role="form" method="post"
-		action="bgSecuritySave" modelAttribute="bgSecurityDetails" id="bgSecurityDetails">
+		action="bgSecuritySave" modelAttribute="bgSecurityDetails"
+		id="bgSecurityDetails">
 		<div class="card">
 			<div class="container">
 				<!-- <h4>Work Order/Agreement Creation(2nd Part)</h4> -->
@@ -176,8 +177,9 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.bg.security.start.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="start_dt" />
+								<form:input id="security_start_date" path="security_start_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -189,8 +191,9 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.bg.security.end.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="end_dt" />
+								<form:input id="security_end_date" path="security_end_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 
@@ -203,7 +206,7 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.bg.security.loa.number" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="number" class="form-control txtRight"
+								<form:input type="text" class="form-control txtRight"
 									path="loa_number" />
 							</div>
 							<div class="clearfix"></div>
