@@ -2,6 +2,7 @@ package org.egov.works.bgsecurity.entity;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 
 @Entity
 @Table(name = "txn_bgsecurity_details")
@@ -37,7 +39,10 @@ public class BGSecurityDetails implements Serializable {
 	private Date security_end_date;
 
 	@Column(name = "loa_number")
-	private String loa_number;
+	private String loaNumber;
+
+	@Transient
+	private List<BGSecurityDetails> bgSecurityDetailsList;
 
 	public Long getId() {
 		return id;
@@ -79,12 +84,20 @@ public class BGSecurityDetails implements Serializable {
 		this.security_end_date = security_end_date;
 	}
 
-	public String getLoa_number() {
-		return loa_number;
+	public String getLoaNumber() {
+		return loaNumber;
 	}
 
-	public void setLoa_number(String loa_number) {
-		this.loa_number = loa_number;
+	public void setLoaNumber(String loaNumber) {
+		this.loaNumber = loaNumber;
+	}
+
+	public List<BGSecurityDetails> getBgSecurityDetailsList() {
+		return bgSecurityDetailsList;
+	}
+
+	public void setBgSecurityDetailsList(List<BGSecurityDetails> bgSecurityDetailsList) {
+		this.bgSecurityDetailsList = bgSecurityDetailsList;
 	}
 
 	public static long getSerialversionuid() {

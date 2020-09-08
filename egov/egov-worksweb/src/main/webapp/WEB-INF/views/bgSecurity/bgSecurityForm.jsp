@@ -177,7 +177,10 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.bg.security.start.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input id="security_start_date" path="security_start_date"
+								<%-- <form:input id="security_start_date" path="security_start_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" /> --%>
+									<form:input id="security_start_date" path="security_start_date"
 									class="form-control datepicker" data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 							</div>
@@ -191,7 +194,10 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.bg.security.end.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input id="security_end_date" path="security_end_date"
+								<%-- <form:input id="security_end_date" path="security_end_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" /> --%>
+									<form:input id="security_end_date" path="security_end_date"
 									class="form-control datepicker" data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 							</div>
@@ -207,7 +213,7 @@ tr:hover {
 									code="lbl.bg.security.loa.number" /></label>
 							<div class="col-md-6 block-colm">
 								<form:input type="text" class="form-control txtRight"
-									path="loa_number" />
+									path="loaNumber" />
 							</div>
 							<div class="clearfix"></div>
 						</div>

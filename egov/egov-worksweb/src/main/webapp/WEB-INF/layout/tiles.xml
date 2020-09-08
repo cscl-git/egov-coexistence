@@ -344,6 +344,16 @@
         <put-attribute name="page-title" value="title.tender.view" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/bgSecurity/viewbgsecurity.jsp"/>
     </definition>
+    
+    <definition name="search-tender-form" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.search.tender" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/tender/searchtender.jsp"/>
+    </definition>
+    
+    <definition name="search-bgsecurity-form" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.search.bg.security" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/bgSecurity/searchbgsecurity.jsp"/>
+    </definition>
 
 </tiles-definitions>
 

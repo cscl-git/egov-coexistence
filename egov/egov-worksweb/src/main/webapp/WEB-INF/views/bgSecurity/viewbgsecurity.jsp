@@ -100,7 +100,7 @@
 								code="lbl.bg.security.loa.number" /></label>
 						<div class="col-md-6 block-colm">
 							<form:input type="text" class="form-control txtRight"
-								path="loa_number" readonly="true" />
+								path="loaNumber" readonly="true" />
 						</div>
 						<div class="clearfix"></div>
 					</div>

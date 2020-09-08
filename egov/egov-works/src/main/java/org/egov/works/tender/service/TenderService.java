@@ -1,5 +1,8 @@
 package org.egov.works.tender.service;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.egov.works.tender.entity.Tender;
@@ -31,6 +34,19 @@ public class TenderService {
 
 		return detailsList;
 
+	}
+
+	@Transactional
+	public List<Tender> searchTenderData(HttpServletRequest request, Tender tender) {
+		// TODO Auto-generated method stub
+		List<Tender> tenderDetails = new ArrayList<Tender>();
+		if (tender.getLoaNumber() != null) {
+			tenderDetails = tenderRepository.findByLoaNumber(tender.getLoaNumber());
+		} else {
+			tenderDetails = tenderRepository.findByAllParams(tender.getLoaNumber(), tender.getFromDt(), tender.getToDt());
+		}
+
+		return tenderDetails;
 	}
 
 }

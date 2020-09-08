@@ -2489,9 +2489,15 @@ function openBudget()
 			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=bpw&vhId='+vhId;
 			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 			}
-		}
-	
 
+		}
+}	
+function removeVoucher() {
+	alert("in reomve");
+	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action';
+//	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?voucherNumber=';
+
+	document.preApprovedVoucher.submit();
 }
 
 function openBudgetDetails()

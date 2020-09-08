@@ -1,7 +1,7 @@
 package org.egov.works.tender.entity;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -18,8 +18,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Table(name = "txn_tender")
 @SequenceGenerator(name = Tender.SEQ_TENDER, sequenceName = Tender.SEQ_TENDER, allocationSize = 1)
 
-public class Tender implements  java.io.Serializable {
-	
+public class Tender implements java.io.Serializable {
+
 	private static final long serialVersionUID = -4312140421386028968L;
 	public static final String SEQ_TENDER = "SEQ_TENDER";
 
@@ -40,6 +40,15 @@ public class Tender implements  java.io.Serializable {
 
 	@Column(name = "loa_number")
 	private Double loaNumber;
+
+	@Transient
+	private Date fromDt;
+
+	@Transient
+	private Date toDt;
+
+	@Transient
+	private List<Tender> tenderList;
 
 	public Long getId() {
 		return id;
@@ -83,6 +92,30 @@ public class Tender implements  java.io.Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public Date getFromDt() {
+		return fromDt;
+	}
+
+	public void setFromDt(Date fromDt) {
+		this.fromDt = fromDt;
+	}
+
+	public Date getToDt() {
+		return toDt;
+	}
+
+	public void setToDt(Date toDt) {
+		this.toDt = toDt;
+	}
+
+	public List<Tender> getTenderList() {
+		return tenderList;
+	}
+
+	public void setTenderList(List<Tender> tenderList) {
+		this.tenderList = tenderList;
 	}
 
 }

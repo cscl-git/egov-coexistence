@@ -119,6 +119,9 @@
 			obj.value = obj.value.substring(1,1024);
 		}
 	}
+
+	
+	
 </script>
 </head>
 
@@ -290,16 +293,22 @@
 				</s:iterator>
 			</s:if>
 			<input name="button" type="button" class="buttonsubmit" id="button1"
-				value="Print" onclick="window.print()" />&nbsp; <input
-				type="button" id="button2" value="Close"
+				value="Print" onclick="window.print()" />&nbsp;
+				
+			<input	type="button" id="button2" value="Close"
 				onclick="javascript:window.close()" class="button" />
+				
+			<input	type="button" id="buttonRemove" value="Remove Voucher"
+				onclick="removeVoucher()" class="button" />
 		</div>
+		
 		<s:hidden id="vhid" name="vhid" value="%{voucherHeader.id}" />
 		<s:hidden id="id" name="id" value="%{voucherHeader.id}" />
 		<s:hidden id="contraId" name="contraId" value="%{contraVoucher.id}" />
-
-
-
+		<s:hidden id="pexNumber" name="pexNumber" value="%{voucherHeader.voucherNumberPrefix}" />
+		<s:hidden id="pexNumber" name="pexNumber" value="%{PEXNUMBER}" />
+		<s:hidden id="instrumentAmount" name="instrumentAmount" value="%{INSTRUMENTAMOUNT}" />
+		<s:hidden id="instrumentAmount" name="instrumentAmount" value="%{voucherHeader.voucherNumType}" />
 	</s:form>
 
 </body>

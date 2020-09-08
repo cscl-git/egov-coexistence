@@ -124,7 +124,7 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 								<td style="text-align: center" class="blueborderfortdnew">
 									<s:iterator var="v" value="instrumentVouchers" status="st">
 										<A href="#"
-											onclick='openDetails(<s:property value="%{voucherHeaderId.id}"/>);'>
+											onclick='openDetails(<s:property value="%{voucherHeaderId.id}"/>,<s:property value="%{id}"/>,<s:property value="%{instrumentAmount}"/>);'>
 											<s:property value="%{voucherHeaderId.voucherNumber}" />
 										</A>
 									</s:iterator>
@@ -227,10 +227,13 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 			}
 			
 		
-	function openDetails(val)
+	function openDetails(val,pexNumber,instrumentAmount)
 	{
+				
+	var pexNumberoku="";		
+	pexNumberoku=pexNumber;
 	var mode="view";
- 	window.open("/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+val+"&showMode="+mode,"","height=650,width=900,scrollbars=yes,left=30,top=30,status=yes");
+ 	window.open("/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+val+"&showMode="+mode+"&pexNumber="+pexNumberoku+"&instrumentAmount="+instrumentAmount,"","height=650,width=900,scrollbars=yes,left=30,top=30,status=yes");
  	}
  	function surrenderChq(){
  		resetSelectedRowsId();

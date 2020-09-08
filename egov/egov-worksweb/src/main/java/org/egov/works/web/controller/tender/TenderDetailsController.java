@@ -1,5 +1,8 @@
 package org.egov.works.web.controller.tender;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.egov.works.tender.entity.Tender;
@@ -31,7 +34,7 @@ public class TenderDetailsController {
 	@RequestMapping(value = "/tenderSave", params = "tenderSave", method = RequestMethod.POST)
 	public String saveTenderDetailsData(@ModelAttribute("tender") final Tender tender, final Model model,
 			@RequestParam("file1") MultipartFile file1, final HttpServletRequest request) throws Exception {
-System.out.println("sneha");
+		System.out.println("sneha");
 		Tender savedTender = tenderService.saveTenderDetailsData(request, tender);
 
 		return "tender-form";
@@ -46,6 +49,28 @@ System.out.println("sneha");
 		model.addAttribute("tender", tenderDetails);
 
 		return "view-tender-form";
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	public String showEstimateNewFormGet(@ModelAttribute("tender") final Tender tender, final Model model,
+			HttpServletRequest request) {
+
+		return "search-tender-form";
+	}
+
+	@RequestMapping(value = "/tenderSearch", params = "tenderSearch", method = RequestMethod.POST)
+	public String searchWorkEstimateData(@ModelAttribute("tender") final Tender tender, final Model model,
+			final HttpServletRequest request) throws Exception {
+		List<Tender> tenderList = new ArrayList<Tender>();
+
+		List<Tender> tenderDetails = tenderService.searchTenderData(request, tender);
+		 tenderList.addAll(tenderDetails);
+		 tender.setTenderList(tenderList);
+
+		model.addAttribute("tender", tender);
+
+		return "search-tender-form";
+
 	}
 
 }

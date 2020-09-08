@@ -128,6 +128,8 @@ import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.contra.ContraJournalVoucher;
+import org.egov.model.instrument.InstrumentHeader;
+import org.egov.model.instrument.InstrumentVoucher;
 import org.egov.model.voucher.PreApprovedVoucher;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.pims.commons.Designation;
@@ -136,6 +138,8 @@ import org.egov.pims.model.PersonalInformation;
 import org.egov.pims.service.EisUtilService;
 import org.egov.services.bills.BillsService;
 import org.egov.services.contra.ContraService;
+import org.egov.services.instrument.InstrumentHeaderService;
+import org.egov.services.instrument.InstrumentVoucherService;
 import org.egov.services.voucher.PreApprovedActionHelper;
 import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
@@ -201,6 +205,13 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     @Autowired
     private MicroserviceUtils microserviceUtils;
 
+    @Autowired
+    private InstrumentVoucherService instrumentVoucherService;
+    private Query query;
+    @Autowired
+	@Qualifier("instrumentHeaderService")
+	private InstrumentHeaderService instrumentHeaderService;
+
     private static final Logger LOGGER = Logger.getLogger(PreApprovedVoucherAction.class);
     protected FinancialYearHibernateDAO financialYearDAO;
     private final PreApprovedVoucher preApprovedVoucher = new PreApprovedVoucher();
@@ -213,6 +224,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private static final String BILLID = "billid";
     protected static final String VOUCHEREDIT = "voucheredit";
     private static final String VHID = "vhid";
+    private  String PEXNUMBER = "pexNumber";
+    private  String INSTRUMENTAMOUNT = "instrumentAmount";
     private static final String CGN = "cgn";
     private static final String VOUCHERQUERY = " from CVoucherHeader where id=?";
     private static final String VOUCHERQUERYBYCGN = " from CVoucherHeader where cgn=?";
@@ -290,6 +303,56 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         return "list";
     }
 
+    
+    
+    @SkipValidation
+    @Action(value = "/voucher/preApprovedVoucher-removeVoucher")
+    public String removeVoucher() {
+    	
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting chequeAssignment-removeVoucher...");
+     
+        LOGGER.debug("voucher id=======" + parameters.get(PEXNUMBER)[0]);
+    
+        
+        Long instrumentVoucherId= Long.valueOf(parameters.get(PEXNUMBER)[0]);
+        Long voucherid= Long.valueOf(parameters.get(VHID)[0]);
+        String instrumrntamount =parameters.get(getINSTRUMENTAMOUNT())[0];
+        BigDecimal bigDecimalinstrumrntamount=new BigDecimal(instrumrntamount);
+        BigDecimal balanceAmount = BigDecimal.ZERO;
+        
+       
+        if(instrumentVoucherId!=null && voucherid!=null) {
+        
+     //delete from egf_instrumentvoucher
+       query = persistenceService.getSession().createSQLQuery(
+                "delete from egf_instrumentvoucher where voucherheaderid= " + voucherid+" and id="+instrumentVoucherId);
+        query.executeUpdate();
+        }
+       //updating pex amount 
+      
+     /* final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
+    		  instrumentHeaderDtl.getInstrumentHeaderId());*/
+      
+     // final InstrumentHeader instrumentHeaderqdtl=   instrumentHeaderService.findById(instrumentHeaderq.getId(), true);
+        final InstrumentVoucher instrumentHeaderDtl = instrumentVoucherService.findById(instrumentVoucherId, true);
+     if( instrumentHeaderDtl!=null) {
+        InstrumentHeader instrumentHeaderq=   instrumentHeaderDtl.getInstrumentHeaderId();
+       // instrumentHeaderq.getId();
+      
+      instrumentHeaderq.getInstrumentAmount();
+      balanceAmount=  bigDecimalinstrumrntamount.subtract(instrumentHeaderq.getInstrumentAmount());
+      
+      
+      query = persistenceService.getSession().createSQLQuery(
+              "update egf_instrumentheader set instrumentamount="+balanceAmount +" where id="+instrumentHeaderDtl.getInstrumentHeaderId());
+    int r=  query.executeUpdate();
+     }
+		return "view";
+       
+    }
+    
+    
     @SkipValidation
     @Action(value = "/voucher/preApprovedVoucher-voucher")
     public String voucher() {
@@ -578,7 +641,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     @SkipValidation
     @Action(value = "/voucher/preApprovedVoucher-loadvoucherview")
     public String loadvoucherview() throws ApplicationException {
+    	 LOGGER.debug("voucher id=======" + parameters.get(PEXNUMBER)[0]);
 
+    	 PEXNUMBER=parameters.get(PEXNUMBER)[0];
+    	 INSTRUMENTAMOUNT=parameters.get(INSTRUMENTAMOUNT)[0];
         billDetails = new HashMap<String, Object>();
         if (parameters.get("from") != null
                 && FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA.equals(parameters.get("from")[0])) {
@@ -592,6 +658,8 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
             voucherHeader.setDocumentDetail(voucherDocList);
             voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_VIEW_MODE);
+            voucherHeader.setVoucherNumberPrefix(PEXNUMBER);
+            voucherHeader.setVoucherNumType(INSTRUMENTAMOUNT);
             from = FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL;
         }
         getMasterDataForBillVoucher();
@@ -1766,6 +1834,24 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
+
+	public String getPEXNUMBER() {
+		return PEXNUMBER;
+	}
+
+	public void setPEXNUMBER(String pEXNUMBER) {
+		PEXNUMBER = pEXNUMBER;
+	}
+
+	public String getINSTRUMENTAMOUNT() {
+		return INSTRUMENTAMOUNT;
+	}
+
+	public void setINSTRUMENTAMOUNT(String iNSTRUMENTAMOUNT) {
+		INSTRUMENTAMOUNT = iNSTRUMENTAMOUNT;
+	}
+
+
     
 
 }
