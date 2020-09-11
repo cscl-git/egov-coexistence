@@ -73,9 +73,11 @@
 								width="100%">
 								<tr>
 									<th class="subheadsmallnew" colspan="16" bgcolor="#265988" style="color:#ffffff;"><s:property
-											value="ulbName" /><br /> <strong><s:text
+											value="ulbName" /><br /> <strong><%--<s:text
 												name="report.balancesheet.year" /> <s:property
-												value="model.financialYear.finYearRange" />
+												value="model.financialYear.finYearRange" />--%>
+												<s:text
+												name="report.balancesheet.yr" />
 											<s:property value="header" /></strong></th>
 									</td>
 								</tr>

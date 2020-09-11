@@ -23,7 +23,7 @@ function openHistory(auditId,checkListId){
 function setWorkFLowAction(name)
 {
 	console.log(name);
-	if(name =='sectionOfficer' && (document.getElementById('auditStatus').value == 'Created' || document.getElementById('auditStatus').value == 'Pending with Auditor'))
+	if(name =='sectionOfficer' && (document.getElementById('auditStatus').value == 'Created' || document.getElementById('auditStatus').value == 'Pending with Auditor') || document.getElementById('auditStatus').value =='Pending with Examiner' )
 		{
 			if (document.getElementById('leadAuditorEmpNo').value == '-1')
 				{

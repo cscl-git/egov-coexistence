@@ -120,7 +120,13 @@
 		}
 	}
 
+	function removeVoucher() {
+		alert("in reomve");
+		document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action;
+//		document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?voucherNumber=';
 	
+		document.preApprovedVoucher.submit();
+	}
 	
 </script>
 </head>
@@ -199,8 +205,9 @@
 					</td>
 					<td class="greybox setborder" style="text-align: right"><fmt:formatNumber
 							value="${db}" pattern="#0.00" /></td>
-					<td class="greybox setborder" style="text-align: right"><fmt:formatNumber
+					<td class="greybox setborder" id="voucherAmount" style="text-align: right" ><fmt:formatNumber
 							value="${cr}" pattern="#0.00" /></td>
+		
 				</tr>
 			</table>
 			<s:hidden name="methodName" id="methodName" value="%{methodName}" />
@@ -298,17 +305,19 @@
 			<input	type="button" id="button2" value="Close"
 				onclick="javascript:window.close()" class="button" />
 				
-			<input	type="button" id="buttonRemove" value="Remove Voucher"
-				onclick="removeVoucher()" class="button" />
+				
+			<s:if test="%{voucherHeader.voucherNumberPrefix!=null && voucherHeader.voucherNumberPrefix!=''}">
+				<input	type="button" id="buttonRemove" value="Remove Voucher"	onclick="removeVoucher()" class="button" />
+			</s:if>	
+			
 		</div>
 		
 		<s:hidden id="vhid" name="vhid" value="%{voucherHeader.id}" />
 		<s:hidden id="id" name="id" value="%{voucherHeader.id}" />
 		<s:hidden id="contraId" name="contraId" value="%{contraVoucher.id}" />
 		<s:hidden id="pexNumber" name="pexNumber" value="%{voucherHeader.voucherNumberPrefix}" />
-		<s:hidden id="pexNumber" name="pexNumber" value="%{PEXNUMBER}" />
-		<s:hidden id="instrumentAmount" name="instrumentAmount" value="%{INSTRUMENTAMOUNT}" />
-		<s:hidden id="instrumentAmount" name="instrumentAmount" value="%{voucherHeader.voucherNumType}" />
+		 
+
 	</s:form>
 
 </body>

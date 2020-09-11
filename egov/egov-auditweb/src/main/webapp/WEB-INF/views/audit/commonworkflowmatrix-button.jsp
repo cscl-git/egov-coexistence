@@ -30,6 +30,12 @@
 						</c:if>
 				</c:if>
 				<c:if test="${auditDetail.auditStatus == 'Pending with Examiner' }">
+					<c:if test="${auditDetail.auditEmployees != null && !auditEmployees.isEmpty()}">
+				 <form:select path = "leadAuditorEmpNo" id="leadAuditorEmpNo">
+                     <form:option value = "-1" label = "Select RSA"/>
+                     <form:options items = "${auditDetail.auditEmployees}" itemValue="empCode" itemLabel="empName" />
+                  </form:select>   
+				</c:if>
 						<input type="submit" id="sendToDept" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('department')" value="Send To Dept"/>
 						<input type="submit" id="sendToSO" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('sectionOfficer')" value="Send To RSA"/>
 						<input type="submit" id="approve" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('approve')" value="Approve"/>

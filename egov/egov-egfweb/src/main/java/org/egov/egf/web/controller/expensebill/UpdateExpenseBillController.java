@@ -53,6 +53,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -207,8 +208,10 @@ public class UpdateExpenseBillController extends BaseBillController {
             model.addAttribute("currentState", egBillregister.getState().getValue());
         model.addAttribute("workflowHistory",
                 financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
-
+        List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
+       
+
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
         prepareBillDetailsForView(egBillregister);
         expenseBillService.validateSubledgeDetails(egBillregister);
@@ -239,6 +242,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("validActionList", validActions);
             return "expensebill-update";
         }
         else {

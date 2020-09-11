@@ -276,7 +276,8 @@ public class PaymentAction extends BasePaymentAction {
             bankBranchList=persistenceService.findAllBy(
                     "from Bankbranch br where br.id in (select bankbranch.id from Bankaccount where fund=? and type in ('RECEIPTS_PAYMENTS','PAYMENTS') ) and br.isactive=true order by br.bank.name asc",
                     fund);
-        } else
+        }
+        else
         {
         	addDropdownData("bankbranchList", Collections.EMPTY_LIST);
         	bankBranchList=Collections.EMPTY_LIST;
@@ -874,9 +875,14 @@ public class PaymentAction extends BasePaymentAction {
                     paymentService.validateForRTGSPayment(contingentList,
                             FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
             }
-            voucherHeader = (CVoucherHeader) voucherService.findById( billList.get(0).getBillVoucherId(),false);
+            if(billList!=null)
+            {
+              for(int i =0; i< billList.size();i++)
+              {
+                voucherHeader = (CVoucherHeader) voucherService.findById( billList.get(i).getBillVoucherId(),false);
             workflowHistory.addAll(financialUtils.getWorkflowHistory(voucherHeader.getState(), voucherHeader.getStateHistory()));
-
+              }
+            }
             if (!"Auto".equalsIgnoreCase(voucherTypeForULB.readVoucherTypes("Payment"))) {
                 headerFields.add("vouchernumber");
                 mandatoryFields.add("vouchernumber");
@@ -1058,7 +1064,14 @@ public class PaymentAction extends BasePaymentAction {
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
             paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
-            workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getVoucherheader().getState(), paymentheader.getVoucherheader().getStateHistory()));
+            if(miscBillList!=null)
+            {
+              for(int i =0; i< miscBillList.size();i++)
+              {
+            	  workflowHistory.addAll(financialUtils.getWorkflowHistory(miscBillList.get(i).getBillVoucherHeader().getState(),miscBillList.get(i).getBillVoucherHeader().getStateHistory()));
+                
+              }
+            }            
             workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
             // sendForApproval();// this should not be called here as it is
             // public method which is called from jsp submit
@@ -1132,6 +1145,15 @@ public class PaymentAction extends BasePaymentAction {
         billList = paymentService.getMiscBillListForPaymentHeader(paymentheader);
         LOGGER.info("populate billlist");
         LOGGER.info("print Bill Id:: "+ billList.get(0).getBillId());
+        if(billList!=null)
+        {
+          for(int i =0; i< billList.size();i++)
+          {
+            voucherHeader = (CVoucherHeader) voucherService.findById( billList.get(i).getBillVoucherId(),false);
+            workflowHistory.addAll(financialUtils.getWorkflowHistory(voucherHeader.getState(), voucherHeader.getStateHistory()));
+          }
+        }
+       
         
         billregister = (EgBillregister) persistenceService.find(" from EgBillregister where id=?",
                 billList.get(0).getBillId());
@@ -1194,7 +1216,6 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed sendForApproval.");
         LOGGER.info("Completed sendForApproval.");
         populateDepartmentName();
-        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getVoucherheader().getState(), paymentheader.getVoucherheader().getStateHistory()));
         workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
         if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
         {
@@ -1279,11 +1300,19 @@ public class PaymentAction extends BasePaymentAction {
         /*
          * if (paymentheader.getState().getValue() != null && !paymentheader.getState().getValue().isEmpty() &&
          * paymentheader.getState().getValue().contains("Rejected")) { if (LOGGER.isDebugEnabled()) LOGGER.debug("Completed view."
-         * ); return modify(); }
+         * ); return modify();
          */
-        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getVoucherheader().getState(), paymentheader.getVoucherheader().getStateHistory()));
-        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
+        
+        
         miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
+        if(miscBillList!=null)
+        {
+          for(int i=0;i<miscBillList.size();i++) 
+          {
+           workflowHistory.addAll(financialUtils.getWorkflowHistory(miscBillList.get(i).getBillVoucherHeader().getState(), miscBillList.get(0).getBillVoucherHeader().getStateHistory()));
+          }
+        }
+        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
         getChequeInfo(paymentheader);
         if (null != parameters.get("showMode") && parameters.get("showMode")[0].equalsIgnoreCase("view"))
             // if user is drilling down form source , parameter showMode is
@@ -2561,4 +2590,8 @@ public List<HashMap<String, Object>> getWorkflowHistory() {
 public void setWorkflowHistory(List<HashMap<String, Object>> workflowHistory) {
 	this.workflowHistory = workflowHistory;
 }
+
+
+
+
 }

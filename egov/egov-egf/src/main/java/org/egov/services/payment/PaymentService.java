@@ -812,6 +812,39 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.debug("Completed updateVoucherHeader.");
     }
 
+    private void updateVoucherHeaderForPayment(final Map<String, String[]> parameters, final CVoucherHeader existingVH,
+            final CVoucherHeader voucherHeader) throws Exception {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting updateVoucherHeader...");
+
+        voucherHeader.setFundId(existingVH.getFundId());
+
+        voucherService.getUpdatedVNumCGVN(existingVH, voucherHeader, existingVH.getType());
+
+        /*
+         * String voucherNumber = VoucherHelper.getGeneratedVoucherNumber(existingVH .getFundId().getId(), autoVoucherType,
+         * voucherHeader.getVoucherDate(), vNumGenMode, manualVoucherNumber);
+         */
+        // existingVH.setVoucherNumber(voucherNumber);
+        /*
+         * if ("Auto".equalsIgnoreCase(vNumGenMode)) { if(LOGGER.isDebugEnabled()) LOGGER.debug(
+         * "Voucher number generation mode is : "+ vNumGenMode); existingVH
+         * .setVoucherNumber(cmImpl.getTxnNumber(existingVH.getFundId() .getId().toString(),autoVoucherType,vDate,con)); }else {
+         * existingVH.setVoucherNumber (parameters.get("voucherNumberPrefix")[0]+parameters .get("voucherNumberSuffix")[0]); }
+         */
+      
+        existingVH.setDescription(voucherHeader.getDescription());
+        existingVH.setVoucherDate(voucherHeader.getVoucherDate());
+        //existingVH.setCgvn(vType + eg_voucher);
+        existingVH.setLastModifiedDate(new Date());
+        existingVH.setLastModifiedBy(user);
+        // persistenceService.setType(CVoucherHeader.class);
+        persistenceService.update(existingVH);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed updateVoucherHeader.");
+    }
+
+
     private void prepareVoucherDetailsForModify(final List<PaymentBean> paymentBillList,
             final Map<String, String[]> parameters, final Bankaccount ba) {
         if (LOGGER.isDebugEnabled())
@@ -1532,15 +1565,14 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
  public List<PaymentBean> getMiscBillListForPaymentHeader(final Paymentheader header) {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting getMiscBillListForPaymentHeader...");
-            LOGGER.info("Starting getMiscBillListForPaymentHeader...");
         List<PaymentBean> paymentBeanList = null;
         final Query query = getSession()
                 .createSQLQuery(
-                        "select br.id as billId,mb.billnumber as billNumber,mb.billdate as billDate,mb.paidto as payTo,mb.amount as netAmt,  "
+                        "select mb.billvhid as billVoucherId ,  br.id as billId,mb.billnumber as billNumber,mb.billdate as billDate,mb.paidto as payTo,mb.amount as netAmt,  "
                                 + " mb.passedamount as passedAmt,mb.paidamount as paymentAmt,br.expendituretype as expType from miscbilldetail mb, eg_billregister br , eg_billregistermis mis "
                                 + " where mb.payvhid=" + header.getVoucherheader().getId()
                                 + " and br.id= mis.billid and mis.voucherheaderid=billvhid order by mb.paidto,mb.BILLDATE")
-                .addScalar("billId", BigDecimalType.INSTANCE).addScalar("billNumber").addScalar("billDate")
+                .addScalar("billVoucherId",LongType.INSTANCE).addScalar("billId", BigDecimalType.INSTANCE).addScalar("billNumber").addScalar("billDate")
                 .addScalar("payTo").addScalar("netAmt", BigDecimalType.INSTANCE)
                 .addScalar("passedAmt", BigDecimalType.INSTANCE).addScalar("paymentAmt", BigDecimalType.INSTANCE)
                 .addScalar("expType").setResultTransformer(Transformers.aliasToBean(PaymentBean.class));
@@ -1551,7 +1583,8 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             earlierAmt = (BigDecimal) persistenceService.find(
                     " select sum(paidamount) from Miscbilldetail where billVoucherHeader.id=?"
                             + " and payVoucherHeader.status not in(?,?)",
-                    bean.getCsBillId(), FinancialConstants.CANCELLEDVOUCHERSTATUS,
+                    //bean.getCsBillId(), FinancialConstants.CANCELLEDVOUCHERSTATUS,
+                            bean.getBillVoucherId(), FinancialConstants.CANCELLEDVOUCHERSTATUS,
                     FinancialConstants.REVERSEDVOUCHERSTATUS);
             if (earlierAmt == null)
                 earlierAmt = BigDecimal.ZERO;
@@ -1560,7 +1593,6 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         }
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed getMiscBillListForPaymentHeader.");
-            LOGGER.info("Completed getMiscBillListForPaymentHeader.");
         return paymentBeanList;
     }
 
@@ -3149,6 +3181,39 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.debug("Completed prepareInstrumentHeaderForPex.");
         return instrumentHeaderMap;
     }
+    public Paymentheader updatePaymentHeader(final Map<String, String[]> parameters, final List<PaymentBean> billList,
+            final Paymentheader paymentheader,Bankaccount ba) throws ApplicationRuntimeException, ValidationException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting updatePaymentHeader...");
+        try {
+            miscBillList = new ArrayList<Miscbilldetail>();
+            user = ApplicationThreadLocals.getUserId();
+         
+            final CVoucherHeader existingVH = (CVoucherHeader) persistenceService.find(" from CVoucherHeader where id=?",
+                    paymentheader.getVoucherheader().getId());
+         
+            updateVoucherHeaderForPayment(parameters, existingVH, paymentheader.getVoucherheader());
+           
+         
+            paymentheader.setPaymentAmount(new BigDecimal(parameters.get("grandTotal")[0]));
+          
+            paymentheader.setBankaccount(ba);
+       
+            update(paymentheader);
+           
+        } catch (final ValidationException e) {
+            throw e;
+        } catch (final Exception e) {
+            LOGGER.error(e.getMessage());
+            final List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError("createPayment", e.getMessage()));
+            throw new ValidationException(errors);
+        }
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed updatePayment.");
+        return paymentheader;
+    }
+
 
     
     

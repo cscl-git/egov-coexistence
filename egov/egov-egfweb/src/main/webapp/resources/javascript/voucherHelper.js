@@ -2493,10 +2493,10 @@ function openBudget()
 		}
 }	
 function removeVoucher() {
-	alert("in reomve");
-	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action';
-//	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?voucherNumber=';
 
+	var instrumentAmount=document.getElementById('voucherAmount').innerText;
+	
+	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?instrumentAmount='+instrumentAmount;
 	document.preApprovedVoucher.submit();
 }
 

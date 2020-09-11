@@ -122,6 +122,7 @@ public class IncomeExpenditureService extends ReportService {
         minorCodeLength = Integer.valueOf(getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
         coaType.add('I');
         coaType.add('E');
+      
         Date  fromDate = getFromDate(ie);
         Date  toDate = getToDate(ie);
         final String filterQuery = getFilterQuery(ie);
@@ -129,6 +130,7 @@ public class IncomeExpenditureService extends ReportService {
         // populateSchedule(ie,IE);
         ie = addBudgetDetails(ie);
         removeFundsWithNoDataIE(ie);
+        
     }
 
     private Statement addBudgetDetails(final Statement ie) {

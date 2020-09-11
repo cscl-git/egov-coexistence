@@ -43,8 +43,9 @@
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 				<form:select path="checkList[${status.index}].status" id="checkList[${status.index}].status"  required="required" class="form-control">
 				<form:option value="">-Select-</form:option>
-				<form:option value="Pass">Pass</form:option>
-				<form:option value="Fail">Fail</form:option>
+				<form:option value="Seen/Checked">Seen/Checked</form:option>
+				<form:option value="Incorrect">Incorrect</form:option>
+				<form:option value="Not Required">Not Required</form:option>
 				</form:select>
 			</c:if>
 			<c:if test="${auditDetail.auditStatus == 'Pending with Department' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
@@ -57,12 +58,12 @@
 			</td>
 			
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
-			<c:if test="${audit.status == 'Pass' }">
+			<c:if test="${audit.status == 'Seen/Checked' }">
 			<td>
 				<form:input id="checkList[${status.index}].checklist_date" path="checkList[${status.index}].checklist_date" class="form-control datepicker" data-date-end-date="0d" readonly="true" placeholder="DD/MM/YYYY"/>
 			</td>
 			</c:if>
-			<c:if test="${audit.status != 'Pass' }">
+			<c:if test="${audit.status != 'Seen/Checked' }">
 			<td>
 				<form:input id="checkList[${status.index}].checklist_date" path="checkList[${status.index}].checklist_date" class="form-control datepicker" data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
 			</td>
@@ -75,12 +76,12 @@
 			</td>
 			</c:if>
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
-			<c:if test="${audit.status == 'Pass' }">
+			<c:if test="${audit.status == 'Seen/Checked' }">
 			<td>
 				<form:textarea path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments" readonly="true" class="form-control" maxlength="200" ></form:textarea>
 			</td>
 			</c:if>
-			<c:if test="${audit.status != 'Pass' }">
+			<c:if test="${audit.status != 'Seen/Checked' }">
 			<td>
 				<form:textarea path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments" required="required" class="form-control" maxlength="200" ></form:textarea>
 			</td>
@@ -96,12 +97,12 @@
 			<td style="display:none;">
 				<form:textarea path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments" required="required" class="form-control" maxlength="200" ></form:textarea>
 			</td>
-			<c:if test="${audit.status != 'Pass' }">
+			<c:if test="${audit.status != 'Seen/Checked' }">
 			<td>
 				<form:textarea path="checkList[${status.index}].user_comments" id="checkList[${status.index}].user_comments" class="form-control" required="required" maxlength="200" ></form:textarea>
 			</td>
 			</c:if>
-			<c:if test="${audit.status == 'Pass' }">
+			<c:if test="${audit.status == 'Seen/Checked' }">
 			<td>
 				<form:textarea path="checkList[${status.index}].user_comments" id="checkList[${status.index}].user_comments" class="form-control" readonly="true" maxlength="200" ></form:textarea>
 			</td>

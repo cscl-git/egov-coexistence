@@ -158,6 +158,7 @@ import com.exilant.eGov.src.transactions.VoucherTypeForULB;
         @Result(name = "editVoucher", type = "redirectAction", location = "journalVoucherModify-beforeModify", params = {
                 "namespace", "/voucher", "voucherId", "${voucherId}" }),
         @Result(name = "view", location = "preApprovedVoucher-view.jsp"),
+        @Result(name = "success", location = "stopPayment-success.jsp"),
         @Result(name = PreApprovedVoucherAction.VOUCHEREDIT, location = "preApprovedVoucher-voucheredit.jsp"),
         @Result(name = "billview", location = "preApprovedVoucher-billview.jsp"),
         @Result(name = "voucherview", location = "preApprovedVoucher-voucherview.jsp"),
@@ -317,36 +318,43 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         
         Long instrumentVoucherId= Long.valueOf(parameters.get(PEXNUMBER)[0]);
         Long voucherid= Long.valueOf(parameters.get(VHID)[0]);
-        String instrumrntamount =parameters.get(getINSTRUMENTAMOUNT())[0];
-        BigDecimal bigDecimalinstrumrntamount=new BigDecimal(instrumrntamount);
+        String Vouheramount =parameters.get(INSTRUMENTAMOUNT)[0];
+        BigDecimal bigDecimalVouheramountamount=new BigDecimal(Vouheramount);
         BigDecimal balanceAmount = BigDecimal.ZERO;
         
        
         if(instrumentVoucherId!=null && voucherid!=null) {
         
-     //delete from egf_instrumentvoucher
-       query = persistenceService.getSession().createSQLQuery(
-                "delete from egf_instrumentvoucher where voucherheaderid= " + voucherid+" and id="+instrumentVoucherId);
-        query.executeUpdate();
-        }
-       //updating pex amount 
+        	//updatepex amount
       
-     /* final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
-    		  instrumentHeaderDtl.getInstrumentHeaderId());*/
-      
-     // final InstrumentHeader instrumentHeaderqdtl=   instrumentHeaderService.findById(instrumentHeaderq.getId(), true);
         final InstrumentVoucher instrumentHeaderDtl = instrumentVoucherService.findById(instrumentVoucherId, true);
      if( instrumentHeaderDtl!=null) {
         InstrumentHeader instrumentHeaderq=   instrumentHeaderDtl.getInstrumentHeaderId();
-       // instrumentHeaderq.getId();
+        	        instrumentHeaderDtl.getVoucherHeaderId();
+        	        instrumentHeaderq.getId();
       
-      instrumentHeaderq.getInstrumentAmount();
-      balanceAmount=  bigDecimalinstrumrntamount.subtract(instrumentHeaderq.getInstrumentAmount());
+        	        balanceAmount=  instrumentHeaderq.getInstrumentAmount().subtract(bigDecimalVouheramountamount);
+        	     // balanceAmount=  bigDecimalinstrumrntamount.subtract(instrumentHeaderq.getInstrumentAmount());
       
       
       query = persistenceService.getSession().createSQLQuery(
-              "update egf_instrumentheader set instrumentamount="+balanceAmount +" where id="+instrumentHeaderDtl.getInstrumentHeaderId());
-    int r=  query.executeUpdate();
+        	              "update egf_instrumentheader set instrumentamount="+balanceAmount +" where id="+ instrumentHeaderq.getId());
+        	    int amountupdate=  query.executeUpdate();	
+        	
+        	
+		     //delete from egf_instrumentvoucher
+		       query = persistenceService.getSession().createSQLQuery(
+		                "delete from egf_instrumentvoucher where voucherheaderid= " + voucherid+" and id="+instrumentVoucherId);
+		       int rremoveVoucher=  query.executeUpdate();
+		        
+		       if(rremoveVoucher==1 && amountupdate==1) {
+		        addActionMessage(getMessage("voucherRemoved.succesful"));}
+		       else 
+		       {
+		    	   addActionError("error while processing the request");
+		       }
+        }
+      
      }
 		return "view";
        
@@ -641,10 +649,9 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     @SkipValidation
     @Action(value = "/voucher/preApprovedVoucher-loadvoucherview")
     public String loadvoucherview() throws ApplicationException {
-    	 LOGGER.debug("voucher id=======" + parameters.get(PEXNUMBER)[0]);
+    	try {
+    	
 
-    	 PEXNUMBER=parameters.get(PEXNUMBER)[0];
-    	 INSTRUMENTAMOUNT=parameters.get(INSTRUMENTAMOUNT)[0];
         billDetails = new HashMap<String, Object>();
         if (parameters.get("from") != null
                 && FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA.equals(parameters.get("from")[0])) {
@@ -658,12 +665,18 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
             voucherHeader.setDocumentDetail(voucherDocList);
             voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_VIEW_MODE);
+            
+            if(parameters.get(PEXNUMBER)[0]!=null) {
+            PEXNUMBER=parameters.get(PEXNUMBER)[0];
             voucherHeader.setVoucherNumberPrefix(PEXNUMBER);
-            voucherHeader.setVoucherNumType(INSTRUMENTAMOUNT);
+            }
+            
             from = FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL;
         }
         getMasterDataForBillVoucher();
         getHeaderMandateFields();
+    	}
+    	catch(Exception e) {e.printStackTrace();}
         return "view";
     }
     @SkipValidation
@@ -1851,7 +1864,9 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 		INSTRUMENTAMOUNT = iNSTRUMENTAMOUNT;
 	}
 
-
+	protected String getMessage(final String key) {
+        return getText(key);
+    }
     
 
 }

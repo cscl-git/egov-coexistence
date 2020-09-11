@@ -627,7 +627,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -635,15 +635,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {
 					  
 					  secondsignatory="Chief Accounts Officer";
 				  }
-				  
-				  
 			  }
 		  }
 		  else
@@ -708,7 +706,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -716,14 +714,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {
 					  
 					  secondsignatory="Chief Accounts Officer";
 				  }
-				  
 				  
 			  }
 		  }
@@ -790,7 +787,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -798,15 +795,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {
 					  
 					  secondsignatory="Chief Accounts Officer";
 				  }
-				  
-				  
 			  }
 		  }
 		  else
@@ -872,7 +867,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -880,7 +875,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {

@@ -88,11 +88,11 @@
 						<th class="bluebgheadtd"><s:text name="" /></th>
 						<th class="bluebgheadtd"><s:text name="" /></th>
 						<s:iterator value="incomeExpenditureStatement.funds" status="stat">
-							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><s:text
-									name="report.currentTotals" /> <s:property
+							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><%--<s:text
+									name="report.currentTotals" />--%> <s:property
 									value="currentYearToDate" /></th>
-							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><s:text
-									name="report.previousTotals" /> <s:property
+							<th class="bluebgheadtd" width="15%" align="center" colspan="1"><%--<s:text
+									name="report.previousTotals" />--%> <s:property
 									value="previousYearToDate" /></th>
 						</s:iterator>
 					</tr>

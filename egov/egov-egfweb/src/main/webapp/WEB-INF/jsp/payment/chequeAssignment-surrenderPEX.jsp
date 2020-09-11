@@ -227,13 +227,13 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 			}
 			
 		
-	function openDetails(val,pexNumber,instrumentAmount)
+	function openDetails(val,pexNumber)
 	{
 				
 	var pexNumberoku="";		
 	pexNumberoku=pexNumber;
 	var mode="view";
- 	window.open("/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+val+"&showMode="+mode+"&pexNumber="+pexNumberoku+"&instrumentAmount="+instrumentAmount,"","height=650,width=900,scrollbars=yes,left=30,top=30,status=yes");
+ 	window.open("/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+val+"&showMode="+mode+"&pexNumber="+pexNumberoku,"","height=650,width=900,scrollbars=yes,left=30,top=30,status=yes");
  	}
  	function surrenderChq(){
  		resetSelectedRowsId();

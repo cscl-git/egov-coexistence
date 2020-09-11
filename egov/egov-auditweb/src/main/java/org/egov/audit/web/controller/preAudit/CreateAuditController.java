@@ -423,7 +423,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			{
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
-					if(checkListDb.getStatus().equalsIgnoreCase("Pass")) {
+					if(checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 						continue;
 					}
 					checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
@@ -461,7 +461,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 				
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
-					if(checkListDb.getStatus().equalsIgnoreCase("Pass"))
+					if(checkListDb.getStatus().equalsIgnoreCase("Seen/Checked"))
 					{
 						continue;
 					}
@@ -497,7 +497,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			{
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
-					if(checkListDb.getStatus().equalsIgnoreCase("Pass"))
+					if(checkListDb.getStatus().equalsIgnoreCase("Seen/Checked"))
 					{
 						continue;
 					}
