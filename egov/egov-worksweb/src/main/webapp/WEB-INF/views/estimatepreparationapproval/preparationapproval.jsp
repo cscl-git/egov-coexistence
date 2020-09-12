@@ -39,115 +39,6 @@
 
 
 <meta charset="UTF-8">
-<style>
-/* .container {
-	overflow: hidden
-}
- */
-.tab {
-	float: left;
-}
-
-.tab-2 {
-	margin-left: 50px
-}
-
-.tab-2 input {
-	display: block;
-	margin-bottom: 10px
-}
-
-tr {
-	transition: all .25s ease-in-out
-}
-
-tr:hover {
-	background-color: #EEE;
-	cursor: pointer
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 15px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-* {
-	box-sizing: border-box;
-}
-
-.row:after {
-	content: "";
-	display: table;
-	clear: both;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.txtRight {
-	float: right
-}
-
-.block-colm {
-	display: inline-block;
-	float: left;
-	text-align: right;
-}
-
-.vertical-center {
-	text-align: center;
-}
-
-.file-ellipsis {
-	width: auto !Important;
-}
-
-.padding-10 {
-	padding: 10px;
-}
-</style>
 
 </head>
 <body>
@@ -165,7 +56,7 @@ tr:hover {
 			</div>
 		</spring:hasBindErrors>
 
-		<div class="card">
+		<div class="panel panel-primary">
 			<div class="container">
 				<div class="row">
 					<div class="col-md-6">
@@ -391,7 +282,7 @@ tr:hover {
 
 		<br />
 
-		<div class="card">
+		<div class="panel panel-primary">
 			<div class="container">
 				<div>
 					<p style="color: #4e799f; font-size: 25px;">BoQ Upload</p>
@@ -468,7 +359,7 @@ tr:hover {
 
 		<br />
 
-		<div class="card">
+		<div class="panel panel-primary">
 			<div class="container">
 				<div>
 					<p style="color: #4e799f; font-size: 25px;">Documents</p>
@@ -481,7 +372,7 @@ tr:hover {
 
 		<br />
 
-		<div class="card">
+		<div class="panel panel-primary">
 			<div class="container">
 				<div>
 					<p style="color: #4e799f; font-size: 25px;">Approval Details</p>

@@ -4,120 +4,7 @@
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 
 <script
-        src="<cdn:url value='/resources/app/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
-
-<style>
-/* .container {
-	overflow: hidden
-}
- */
-.tab {
-	float: left;
-}
-
-.tab-2 {
-	margin-left: 50px
-}
-
-.tab-2 input {
-	display: block;
-	margin-bottom: 10px
-}
-
-tr {
-	transition: all .25s ease-in-out
-}
-
-tr:hover {
-	background-color: #EEE;
-	cursor: pointer
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 15px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-* {
-	box-sizing: border-box;
-}
-
-.row:after {
-	content: "";
-	display: table;
-	clear: both;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.txtRight {
-	float: right
-}
-
-.block-colm {
-	display: inline-block;
-	float: left;
-	text-align: right;
-}
-
-.vertical-center {
-	text-align: center;
-}
-
-.file-ellipsis {
-	width: auto !Important;
-}
-
-.padding-10 {
-	padding: 10px;
-}
-</style>
-
-
-	
+        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 		<spring:hasBindErrors name="estimatePreparationApproval">
 			<div class="alert alert-danger"
@@ -127,7 +14,7 @@ tr:hover {
 			</div>
 		</spring:hasBindErrors>
 
-		<div class="card">
+		<div class="panel panel-primary">
 			<div class="container">
 				<div class="row">
 					<input type="hidden" name="estimatePreparationApproval"
@@ -365,6 +252,14 @@ tr:hover {
 					</div>
 
  					<div style="padding: 0 15px;">
+				<div class="row">
+					<div class="col-md-5">
+						<h4>BoQ Details</h4>
+						<button onclick="addFileInputField();" class="btn-info"
+							style="margin-bottom: 15px; float: left;" id="plus">Add
+							new row</button>
+					</div>
+				</div>
 						<table id="table" border="1" cellpadding="10">
 							<thead>
 								<tr>
@@ -375,7 +270,7 @@ tr:hover {
 									<th><spring:message code="lbl.rate" /></th>
 									<th><spring:message code="lbl.quantity" /></th>
 									<th><spring:message code="lbl.amount" /></th>
-
+							<th><spring:message code="lbl.action" /></th>
 								</tr>
 							</thead>
 							`
@@ -422,6 +317,11 @@ tr:hover {
 													required="required" class="form-control amount"
 													maxlength="200" name="amount" readonly="true"></form:input>
 											</td>
+											<td>
+
+										<button onclick="deleteRow(this);" class="btn-info"
+											style="margin-bottom: 15px; float: left;" id="plus">-</button>
+									</td>
 										</tr>
 									</c:forEach>
 								<tbody>
@@ -433,13 +333,6 @@ tr:hover {
 						</table>
 				</div>
 
-					<%-- <jsp:include page="boq.jsp" /> --%>
-
-					<!-- <div class="vertical-center">
-						<input type="submit" id="editdata" class="btn-info"
-							name="editdata" code="lbl.select"
-							value="Save Estimate Preparation & Approval" />
-					</div> -->
 
 				</div>
 			</div>

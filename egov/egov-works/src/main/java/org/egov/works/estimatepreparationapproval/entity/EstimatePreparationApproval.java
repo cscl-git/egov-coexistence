@@ -114,7 +114,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "time_limit")
 	private String timeLimit;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
 	@ManyToOne

@@ -3,19 +3,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 
-<style>
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-</style>
-
-<div class="card">
+<div class="panel panel-primary">
 	<div class="container">
 		<div class="row">
 			<input type="hidden" name="estimatePreparationApproval"
