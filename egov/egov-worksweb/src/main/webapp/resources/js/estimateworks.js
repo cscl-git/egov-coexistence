@@ -1,7 +1,14 @@
-$('.btn-wf-primary').click(function(){
+/*$('.btn-wf-primary').click(function(){
 	var button = $(this).attr('id');
 	document.getElementById("workFlowAction").value = button;
 	
-});
+});*/
+
+
+function setWorkflow(action)
+{
+	
+	document.getElementById("workFlowAction").value = action;
+}
 
 

@@ -114,7 +114,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "time_limit")
 	private String timeLimit;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
 	@ManyToOne
@@ -163,6 +163,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private User approver;
 	@Transient
 	private Date approvedOn;
+
+	@Transient
+	private String workFlowAction;
 
 	public Long getWorksWing() {
 		return worksWing;
@@ -516,6 +519,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setStatus(EgwStatus status) {
 		this.status = status;
+	}
+
+	public String getWorkFlowAction() {
+		return workFlowAction;
+	}
+
+	public void setWorkFlowAction(String workFlowAction) {
+		this.workFlowAction = workFlowAction;
 	}
 	
 	

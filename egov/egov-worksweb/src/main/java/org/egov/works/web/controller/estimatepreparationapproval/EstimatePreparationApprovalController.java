@@ -10,9 +10,13 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -25,8 +29,12 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infra.workflow.entity.State;
+import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.works.boq.entity.BoQDetails;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
@@ -35,7 +43,6 @@ import org.egov.works.estimatepreparationapproval.repository.EstimatePreparation
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -43,7 +50,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -90,10 +96,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "Forward", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request,@RequestParam  String workFlowAction)
+			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
 			throws Exception {
 
-		workFlowAction="Forward";
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
 		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != "") {
@@ -172,18 +178,18 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "Save As Draft", method = RequestMethod.POST)
 	public String saveBoQDetailsDataDraft(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request,@RequestParam  String workFlowAction)
+			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
 			throws Exception {
 		
-		workFlowAction="SaveAsDraft";
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-		if (estimatePreparationApproval.getEstimateDt() != null || estimatePreparationApproval.getEstimateDt() != "") {
+		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != "") {
 		Date estimateDate = inputFormat.parse(estimatePreparationApproval.getEstimateDt());
 		estimatePreparationApproval.setEstimateDate(estimateDate);
 		}
 
-		if (estimatePreparationApproval.getDt() != null || estimatePreparationApproval.getDt() != "") {
+		if (estimatePreparationApproval.getDt() != null && estimatePreparationApproval.getDt() != "") {
 		Date date = inputFormat.parse(estimatePreparationApproval.getDt());
 		estimatePreparationApproval.setDate(date);
 		}
@@ -412,7 +418,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "view-estimate-form";
 	}
 
-	@RequestMapping(value = "/edit/{id}", method = RequestMethod.POST)
+	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") final Long id, Model model) {
 
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
@@ -436,28 +442,21 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimateDetails.setEstimateDt(estimateDt);*/
 
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
-
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
-
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-estimate-form";
 	}
 
 	@RequestMapping(value = "/edit/saveestimate1",  method = RequestMethod.POST)
 	public String editEstimateData(
-			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final HttpServletRequest request,@RequestParam final String workFlowAction) throws Exception {
+			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,
+			final HttpServletRequest request) throws Exception {
 
-		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != ""
-				&& !estimatePreparationApproval.getEstimateDt().isEmpty()) {
-			estimatePreparationApproval.setEstimateDate(inputFormat.parse(estimatePreparationApproval.getEstimateDt()));
-		}
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
 
-		if (estimatePreparationApproval.getDt() != null && estimatePreparationApproval.getDt() != ""
-				&& !estimatePreparationApproval.getDt().isEmpty()) {
-			estimatePreparationApproval.setDate(inputFormat.parse(estimatePreparationApproval.getDt()));
-		}
-*/
 		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != ""
 				&& !estimatePreparationApproval.getDepartment().isEmpty()) {
 			estimatePreparationApproval
@@ -489,5 +488,66 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
 
+	public List<HashMap<String, Object>> getHistory(final State state, final List<StateHistory> history) {
+        User user = null;
+        EmployeeInfo ownerobj = null;
+        final List<HashMap<String, Object>> historyTable = new ArrayList<>();
+        final HashMap<String, Object> map = new HashMap<>(0);
+        if (null != state) {
+            if (!history.isEmpty() && history != null)
+                Collections.reverse(history);
+            for (final StateHistory stateHistory : history) {
+                final HashMap<String, Object> workflowHistory = new HashMap<>(0);
+                workflowHistory.put("date", stateHistory.getDateInfo());
+                workflowHistory.put("comments", stateHistory.getComments());
+                workflowHistory.put("updatedBy", stateHistory.getLastModifiedBy() + "::"
+                        + stateHistory.getLastModifiedBy());
+                workflowHistory.put("status", stateHistory.getValue());
+                final Long owner = stateHistory.getOwnerPosition();
+                final State _sowner = stateHistory.getState();
+               ownerobj=    this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
+                if (null != ownerobj) {
+                    workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+                    if(null != department)
+                        workflowHistory.put("department", department.getName());
+                } else if (null != _sowner && null != _sowner.getDeptName()) {
+                    user = microserviceUtils.getEmployee(owner, null, null, null).get(0).getUser();
+                    workflowHistory
+                            .put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
+                    workflowHistory.put("department", null != _sowner.getDeptName() ? _sowner.getDeptName() : "");
+                }
+                historyTable.add(workflowHistory);
+            }
+            map.put("date", state.getDateInfo());
+            map.put("comments", state.getComments() != null ? state.getComments() : "");
+            map.put("updatedBy", state.getLastModifiedBy() + "::" + state.getLastModifiedBy());
+            map.put("status", state.getValue());
+            final Long ownerPosition = state.getOwnerPosition();
+            ownerobj=    this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0);
+            if(null != ownerobj){
+                map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+              Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+              if(null != department)
+                  map.put("department", department.getName());
+              //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
+//                        .getDepartmentForUser(user.getId()).getName() : "");
+            } else if (null != ownerPosition && null != state.getDeptName()) {
+                user = microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0).getUser();
+                map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
+                map.put("department", null != state.getDeptName() ? state.getDeptName() : "");
+            }
+            historyTable.add(map);
+            Collections.sort(historyTable, new Comparator<Map<String, Object>> () {
+
+                public int compare(Map<String, Object> mapObject1, Map<String, Object> mapObject2) {
+
+                    return ((java.sql.Timestamp) mapObject1.get("date")).compareTo((java.sql.Timestamp) mapObject2.get("date")); //ascending order
+                }
+
+            });
+        }
+        return historyTable;
+    }
 
 }

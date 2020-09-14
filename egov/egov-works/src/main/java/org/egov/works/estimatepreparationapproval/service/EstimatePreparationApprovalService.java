@@ -165,7 +165,7 @@ public class EstimatePreparationApprovalService {
         	{
         		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Estimate");
 
@@ -174,7 +174,7 @@ public class EstimatePreparationApprovalService {
         	{
         		estimatePreparationApproval.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(stateValue).withDateInfo(new Date())
+                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Estimate");
 
