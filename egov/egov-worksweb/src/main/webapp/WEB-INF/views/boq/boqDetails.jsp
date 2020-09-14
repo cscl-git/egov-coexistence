@@ -37,107 +37,6 @@
 <meta charset="UTF-8">
 <title>BoQ</title>
 <link href="/css/main.css" rel="stylesheet">
-<style>
-/* .container {
-	overflow: hidden
-}
- */
-.tab {
-	float: left;
-}
-
-.tab-2 {
-	margin-left: 50px
-}
-
-.tab-2 input {
-	display: block;
-	margin-bottom: 10px
-}
-
-tr {
-	transition: all .25s ease-in-out
-}
-
-tr:hover {
-	background-color: #EEE;
-	cursor: pointer
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 15px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-* {
-	box-sizing: border-box;
-}
-
-.row:after {
-	content: "";
-	display: table;
-	clear: both;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.txtRight {
-	float: right
-}
-
-.block-colm {
-	display: inline-block;
-	float: left;
-	text-align: right;
-}
-
-.vertical-center {
-	text-align: center;
-}
-</style>
 
 </head>
 <body>
@@ -145,11 +44,20 @@ tr:hover {
 	<form:form name="workOrderAgreementForm" role="form" method="post"
 		action="work" modelAttribute="workOrderAgreement"
 		id="workOrderAgreement" enctype="multipart/form-data">
-		<div class="card">
+
+		<spring:hasBindErrors name="workOrderAgreement">
+			<div class="alert alert-danger"
+				style="margin-top: 20px; margin-bottom: 10px;">
+				<form:errors path="*" />
+				<br />
+			</div>
+		</spring:hasBindErrors>
+
+		<div class="panel panel-primary">
 			<div class="container">
-				<!-- 
-				<h4>Work Order/Agreement Creation(2nd Part)</h4> -->
 				<div class="row">
+					<input type="hidden" name="workOrderAgreement"
+						value="${workOrderAgreement.id}" />
 					<div class="col-md-6">
 						<div class="form-group">
 							<label for="inputPassword"
@@ -169,7 +77,7 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.estimate.number" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="number" class="form-control txtRight"
+								<form:input type="text" class="form-control txtRight"
 									path="work_number" />
 							</div>
 							<div class="clearfix"></div>
@@ -182,8 +90,11 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.start.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="work_start_date" />
+								<%-- <form:input type="date" class="form-control txtRight"
+									path="work_start_date" /> --%>
+								<form:input id="work_start_date" path="work_start_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -195,8 +106,11 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.intended.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="work_intended_date" />
+								<%-- <form:input type="date" class="form-control txtRight"
+									path="work_intended_date" /> --%>
+								<form:input id="work_intended_date" path="work_intended_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 
@@ -209,8 +123,11 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.extended.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="work_end_date" />
+								<%-- <form:input type="date" class="form-control txtRight"
+									path="work_end_date" /> --%>
+								<form:input id="work_end_date" path="work_end_date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -222,8 +139,14 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.executing.department" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="executing_department" />
+								<form:select path="department" id="department"
+									class="form-control">
+									<form:option value="">
+										<spring:message code="lbl.select" />
+									</form:option>
+									<form:options items="${workOrderAgreement.departments}"
+										itemValue="code" itemLabel="name" />
+								</form:select>
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -417,8 +340,11 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.work.order.search.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="date" />
+								<%-- <form:input type="date" class="form-control txtRight"
+									path="date" /> --%>
+								<form:input id="date" path="date"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -459,7 +385,7 @@ tr:hover {
 
 		<br />
 
-		<div class="card">
+		<div class="panel panel-primary">
 			<div class="container">
 				<div>
 					<p style="color: #4e799f; font-size: 25px;">Contractor Details</p>
@@ -553,7 +479,22 @@ tr:hover {
 
 		<br />
 
-		<div class="card">
+
+		<div class="panel panel-primary">
+			<div class="container">
+				<div>
+					<p style="color: #4e799f; font-size: 25px;">Document Upload</p>
+				</div>
+				<div class="row">
+					<jsp:include page="fileupload.jsp" />
+				</div>
+			</div>
+		</div>
+
+		<br />
+
+
+		<div class="panel panel-primary">
 			<div class="container">
 				<div>
 					<p style="color: #4e799f; font-size: 25px;">Upload Document</p>
@@ -576,7 +517,7 @@ tr:hover {
 
 				<div class="tab tab-1">
 
-					<table id="table" border="1" cellpadding="10">
+					<table id="table" border="1" cellpadding="10" style="width: 100%">
 						<thead>
 							<tr>
 								<th><spring:message code="lbl.item.description" /></th>

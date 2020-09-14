@@ -1,6 +1,7 @@
 package org.egov.works.boq.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,15 +12,22 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.egov.commons.EgwStatus;
+import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.workflow.entity.StateAware;
+
 @Entity
 @Table(name = "txn_work_agreement")
 @SequenceGenerator(name = WorkOrderAgreement.SEQ_WORK_ORDER_AGREEMENT, sequenceName = WorkOrderAgreement.SEQ_WORK_ORDER_AGREEMENT, allocationSize = 1)
-public class WorkOrderAgreement implements Serializable {
+public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -27,8 +35,8 @@ public class WorkOrderAgreement implements Serializable {
 
 	@Id
 	@GeneratedValue(generator = SEQ_WORK_ORDER_AGREEMENT, strategy = GenerationType.SEQUENCE)
-	@Column(name = "work_id")
-	private Long work_id;
+	@Column(name = "id")
+	private Long id;
 
 	@Column(name = "name_work_order")
 	private String name_work_order;
@@ -37,13 +45,13 @@ public class WorkOrderAgreement implements Serializable {
 	private String work_number;
 
 	@Column(name = "work_start_date")
-	private String work_start_date;
+	private Date work_start_date;
 
 	@Column(name = "work_intended_date")
-	private String work_intended_date;
+	private Date work_intended_date;
 
 	@Column(name = "work_end_date")
-	private String work_end_date;
+	private Date work_end_date;
 
 	@Column(name = "executing_department")
 	private String executing_department;
@@ -100,7 +108,7 @@ public class WorkOrderAgreement implements Serializable {
 	private String agencyWorkOrder;
 
 	@Column(name = "date")
-	private String date;
+	private Date date;
 
 	@Column(name = "time_limit")
 	private String timeLimit;
@@ -111,15 +119,41 @@ public class WorkOrderAgreement implements Serializable {
 	@Transient
 	private List<BoQDetails> boQDetailsList;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "workOrderAgreement", targetEntity = BoQDetails.class)
-	private List<BoQDetails> newBoQDetailsList;
+	@Transient
+	private String department = "";
 
-	public Long getWork_id() {
-		return work_id;
+	@Transient
+	private List<Department> departments = new ArrayList<Department>();
+
+	@Transient
+	private List<WorkOrderAgreement> WorkOrderList;
+
+	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "workOrderAgreement", targetEntity = BoQDetails.class)
+	private List<BoQDetails> newBoQDetailsList;
+	
+	@ManyToOne
+    @JoinColumn(name = "statusid")
+    private EgwStatus status;
+	
+	@Transient
+	private String approvalDepartment;
+	@Transient
+	private String approvalComent;
+
+	@Transient
+	private User approver;
+	@Transient
+	private Date approvedOn;
+	
+	@Transient
+	private String workFlowAction;
+
+	public Long getId() {
+		return id;
 	}
 
-	public void setWork_id(Long work_id) {
-		this.work_id = work_id;
+	public void setId(Long id) {
+		this.id = id;
 	}
 
 	public String getName_work_order() {
@@ -138,27 +172,27 @@ public class WorkOrderAgreement implements Serializable {
 		this.work_number = work_number;
 	}
 
-	public String getWork_start_date() {
+	public Date getWork_start_date() {
 		return work_start_date;
 	}
 
-	public void setWork_start_date(String work_start_date) {
+	public void setWork_start_date(Date work_start_date) {
 		this.work_start_date = work_start_date;
 	}
 
-	public String getWork_intended_date() {
+	public Date getWork_intended_date() {
 		return work_intended_date;
 	}
 
-	public void setWork_intended_date(String work_intended_date) {
+	public void setWork_intended_date(Date work_intended_date) {
 		this.work_intended_date = work_intended_date;
 	}
 
-	public String getWork_end_date() {
+	public Date getWork_end_date() {
 		return work_end_date;
 	}
 
-	public void setWork_end_date(String work_end_date) {
+	public void setWork_end_date(Date work_end_date) {
 		this.work_end_date = work_end_date;
 	}
 
@@ -210,6 +244,38 @@ public class WorkOrderAgreement implements Serializable {
 		this.work_status = work_status;
 	}
 
+	public String getFund() {
+		return fund;
+	}
+
+	public void setFund(String fund) {
+		this.fund = fund;
+	}
+
+	public String getEstimatedCost() {
+		return estimatedCost;
+	}
+
+	public void setEstimatedCost(String estimatedCost) {
+		this.estimatedCost = estimatedCost;
+	}
+
+	public String getSector() {
+		return sector;
+	}
+
+	public void setSector(String sector) {
+		this.sector = sector;
+	}
+
+	public String getWorkLocation() {
+		return workLocation;
+	}
+
+	public void setWorkLocation(String workLocation) {
+		this.workLocation = workLocation;
+	}
+
 	public String getContractor_name() {
 		return contractor_name;
 	}
@@ -250,22 +316,6 @@ public class WorkOrderAgreement implements Serializable {
 		this.contractor_email = contractor_email;
 	}
 
-	public List<BoQDetails> getBoQDetailsList() {
-		return boQDetailsList;
-	}
-
-	public void setBoQDetailsList(List<BoQDetails> boQDetailsList) {
-		this.boQDetailsList = boQDetailsList;
-	}
-
-	public List<BoQDetails> getNewBoQDetailsList() {
-		return newBoQDetailsList;
-	}
-
-	public void setNewBoQDetailsList(List<BoQDetails> newBoQDetailsList) {
-		this.newBoQDetailsList = newBoQDetailsList;
-	}
-
 	public String getWorkType() {
 		return workType;
 	}
@@ -290,11 +340,11 @@ public class WorkOrderAgreement implements Serializable {
 		this.agencyWorkOrder = agencyWorkOrder;
 	}
 
-	public String getDate() {
+	public Date getDate() {
 		return date;
 	}
 
-	public void setDate(String date) {
+	public void setDate(Date date) {
 		this.date = date;
 	}
 
@@ -314,40 +364,101 @@ public class WorkOrderAgreement implements Serializable {
 		this.category = category;
 	}
 
-	public String getFund() {
-		return fund;
+	public List<BoQDetails> getBoQDetailsList() {
+		return boQDetailsList;
 	}
 
-	public void setFund(String fund) {
-		this.fund = fund;
+	public void setBoQDetailsList(List<BoQDetails> boQDetailsList) {
+		this.boQDetailsList = boQDetailsList;
 	}
 
-	public String getEstimatedCost() {
-		return estimatedCost;
+	public String getDepartment() {
+		return department;
 	}
 
-	public void setEstimatedCost(String estimatedCost) {
-		this.estimatedCost = estimatedCost;
+	public void setDepartment(String department) {
+		this.department = department;
 	}
 
-	public String getSector() {
-		return sector;
+	public List<Department> getDepartments() {
+		return departments;
 	}
 
-	public void setSector(String sector) {
-		this.sector = sector;
+	public void setDepartments(List<Department> departments) {
+		this.departments = departments;
 	}
 
-	public String getWorkLocation() {
-		return workLocation;
+	public List<WorkOrderAgreement> getWorkOrderList() {
+		return WorkOrderList;
 	}
 
-	public void setWorkLocation(String workLocation) {
-		this.workLocation = workLocation;
+	public void setWorkOrderList(List<WorkOrderAgreement> workOrderList) {
+		WorkOrderList = workOrderList;
+	}
+
+	public List<BoQDetails> getNewBoQDetailsList() {
+		return newBoQDetailsList;
+	}
+
+	public void setNewBoQDetailsList(List<BoQDetails> newBoQDetailsList) {
+		this.newBoQDetailsList = newBoQDetailsList;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	@Override
+	public String getStateDetails() {
+		return getState().getComments().isEmpty() ? work_number : work_number + "-" + getState().getComments();
+	}
+
+	public EgwStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(EgwStatus status) {
+		this.status = status;
+	}
+
+	public String getApprovalDepartment() {
+		return approvalDepartment;
+	}
+
+	public void setApprovalDepartment(String approvalDepartment) {
+		this.approvalDepartment = approvalDepartment;
+	}
+
+	public String getApprovalComent() {
+		return approvalComent;
+	}
+
+	public void setApprovalComent(String approvalComent) {
+		this.approvalComent = approvalComent;
+	}
+
+	public User getApprover() {
+		return approver;
+	}
+
+	public void setApprover(User approver) {
+		this.approver = approver;
+	}
+
+	public Date getApprovedOn() {
+		return approvedOn;
+	}
+
+	public void setApprovedOn(Date approvedOn) {
+		this.approvedOn = approvedOn;
+	}
+
+	public String getWorkFlowAction() {
+		return workFlowAction;
+	}
+
+	public void setWorkFlowAction(String workFlowAction) {
+		this.workFlowAction = workFlowAction;
 	}
 
 }

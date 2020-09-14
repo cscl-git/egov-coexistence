@@ -12,7 +12,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-//import javax.ws.rs.QueryParam;
 
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -20,6 +19,8 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.service.BoQDetailsService;
@@ -27,6 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -39,10 +41,13 @@ public class BoQDetailsController {
 	@Autowired
 	BoQDetailsService boQDetailsService;
 
+	@Autowired
+	public MicroserviceUtils microserviceUtils;
+
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
-		System.out.println("Hello");
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		return "boqDetails";
 	}
 
@@ -50,6 +55,11 @@ public class BoQDetailsController {
 	public String saveBoQDetailsData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model, final HttpServletRequest request) throws Exception {
 		
+		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
+				&& !workOrderAgreement.getDepartment().isEmpty()) {
+			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
+		}
+
 		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement);
 
 		return "boqDetails";
@@ -166,6 +176,92 @@ public class BoQDetailsController {
 			throw new IllegalArgumentException("The specified file is not Excel file");
 		}
 		return workbook;
+	}
+
+	public List<Department> getDepartmentsFromMs() {
+		List<Department> departments = microserviceUtils.getDepartments();
+		return departments;
+	}
+
+	@RequestMapping(value = "/view/{id}", method = RequestMethod.POST)
+	public String view(@PathVariable("id") final Long id, Model model) {
+
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+
+		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
+
+		for (int j = 0; j < workOrderAgreement.getNewBoQDetailsList().size(); j++) {
+			responseList = workOrderAgreement.getNewBoQDetailsList();
+		}
+		workOrderAgreement.setBoQDetailsList(responseList);
+		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+
+		return "view-work-agreement";
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	public String showEstimateNewFormGet(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
+			final Model model, HttpServletRequest request) {
+
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+
+		return "search-work-agreement-form";
+	}
+
+	@RequestMapping(value = "/workOrderAgreementSearch1", method = RequestMethod.POST)
+	public String searchWorkOrderAgreement(
+			@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement, final Model model,
+			final HttpServletRequest request) throws Exception {
+		List<WorkOrderAgreement> workList = new ArrayList<WorkOrderAgreement>();
+		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
+				&& !workOrderAgreement.getDepartment().isEmpty()) {
+			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
+		}
+
+		List<WorkOrderAgreement> workDetails = boQDetailsService.searchWorkOrderAgreement(request, workOrderAgreement);
+		workList.addAll(workDetails);
+		workOrderAgreement.setWorkOrderList(workList);
+
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+
+		return "search-work-agreement-form";
+
+	}
+
+	@RequestMapping(value = "/edit/{id}", method = RequestMethod.POST)
+	public String edit(@PathVariable("id") final Long id, Model model) {
+
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+
+		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
+
+		for (int j = 0; j < workOrderAgreement.getNewBoQDetailsList().size(); j++) {
+			responseList = workOrderAgreement.getNewBoQDetailsList();
+		}
+		workOrderAgreement.setBoQDetailsList(responseList);
+		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+
+		return "edit-work-agreement";
+	}
+	
+	@RequestMapping(value = "/edit/work1", method = RequestMethod.POST)
+	public String saveEditData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
+			final Model model, final HttpServletRequest request) throws Exception {
+
+		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
+				&& !workOrderAgreement.getDepartment().isEmpty()) {
+			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
+		}
+
+		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement);
+
+		return "boqDetails";
+
 	}
 
 }

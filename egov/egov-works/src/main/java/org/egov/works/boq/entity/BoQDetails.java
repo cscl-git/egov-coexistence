@@ -19,7 +19,6 @@ import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationAppr
 @Entity
 @Table(name = "txn_BoQDetails")
 @SequenceGenerator(name = BoQDetails.SEQ_BOQ_DETAILS, sequenceName = BoQDetails.SEQ_BOQ_DETAILS, allocationSize = 1)
-
 public class BoQDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -49,12 +48,12 @@ public class BoQDetails implements Serializable {
 	@Column(name = "amount")
 	private Double amount;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "work_id", nullable = true, updatable = true, insertable = true)
+	@ManyToOne
+	@JoinColumn(name = "work_id")
 	private WorkOrderAgreement workOrderAgreement;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "estimate_preparation_id", nullable = true, updatable = true, insertable = true)
+	@ManyToOne
+	@JoinColumn(name = "estimate_preparation_id")
 	private EstimatePreparationApproval estimatePreparationApproval;
 
 	@Transient
@@ -144,4 +143,14 @@ public class BoQDetails implements Serializable {
 		this.checkboxChecked = checkboxChecked;
 	}
 
+	/*public boolean isCheckboxChecked() {
+		return checkboxChecked;
+	}
+
+	public void setCheckboxChecked(boolean checkboxChecked) {
+		this.checkboxChecked = checkboxChecked;
+	}
+*/
+	
+	
 }

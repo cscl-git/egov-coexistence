@@ -181,15 +181,10 @@
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.estimate.preparation.estimate.prepared.by" /></label>
 							<div class="col-md-6 block-colm">
-								<form:select path="estimatePreparedBy" id="estimatePreparedBy"
+								<form:input type="text" path="estimatePreparedBy" id="estimatePreparedBy"
 									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Sneha</form:option>
-									<form:option value="2">Bhushan</form:option>
-								</form:select>
+									required="required" />
+									
 							</div>
 							<div class="clearfix"></div>
 						</div>

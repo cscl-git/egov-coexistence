@@ -55,8 +55,8 @@
 				<br />
 			</div>
 		</spring:hasBindErrors>
-
-		<div class="panel panel-primary">
+<div class="tab-content">
+	<div class="panel panel-primary">
 			<div class="container">
 				<div class="row">
 					<div class="col-md-6">
@@ -206,15 +206,10 @@
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.estimate.preparation.estimate.prepared.by" /></label>
 							<div class="col-md-6 block-colm">
-								<form:select path="estimatePreparedBy" id="estimatePreparedBy"
+								<form:input type="text" path="estimatePreparedBy" id="estimatePreparedBy"
 									cssClass="form-control" cssErrorClass="form-control error"
-									required="required">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Sneha</form:option>
-									<form:option value="2">Bhushan</form:option>
-								</form:select>
+									required="required"/>
+									
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -374,9 +369,6 @@
 
 		<div class="panel panel-primary">
 			<div class="container">
-				<div>
-					<p style="color: #4e799f; font-size: 25px;">Approval Details</p>
-				</div>
 				<jsp:include page="../common/commonWorkflowMatrix.jsp" />
 				<div class="buttonbottom" align="center">
 					<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
@@ -384,6 +376,8 @@
 
 			</div>
 		</div>
+</div>
+		
 
 	</form:form>
 

@@ -34,4 +34,47 @@ public class BoQDetailsService {
 
 	}
 
+	@Transactional
+	public WorkOrderAgreement viewWorkData(Long id) {
+		// TODO Auto-generated method stub
+		WorkOrderAgreement viewWorkDataResponse = workOrderAgreementRepository.findById(id);
+
+		return viewWorkDataResponse;
+	}
+
+	@Transactional
+	public List<WorkOrderAgreement> searchWorkOrderAgreement(HttpServletRequest request,
+			WorkOrderAgreement workOrderAgreement) {
+		// TODO Auto-generated method stub
+
+		List<WorkOrderAgreement> workDetails = workOrderAgreementRepository.findByParams(
+				workOrderAgreement.getWork_start_date(), workOrderAgreement.getWork_end_date(),
+				workOrderAgreement.getExecuting_department(), workOrderAgreement.getWork_agreement_status(),
+				workOrderAgreement.getWork_number());
+		return workDetails;
+	}
+
+	@Transactional
+	public WorkOrderAgreement saveBoqData(HttpServletRequest request, WorkOrderAgreement workOrderAgreement) {
+		// TODO Auto-generated method stub
+
+		WorkOrderAgreement boqList = workOrderAgreementRepository.findById(workOrderAgreement.getId());
+
+		for (BoQDetails boqDb : boqList.getNewBoQDetailsList()) {
+			for (BoQDetails boqUI : workOrderAgreement.getNewBoQDetailsList()) {
+				if (boqDb.getSlNo() == boqUI.getSlNo()) {
+					boqDb.setAmount(boqUI.getAmount());
+					boqDb.setItem_description(boqUI.getItem_description());
+					boqDb.setQuantity(boqUI.getQuantity());
+					boqDb.setRate(boqUI.getRate());
+					boqDb.setRef_dsr(boqUI.getRef_dsr());
+					boqDb.setUnit(boqUI.getUnit());
+				}
+			}
+		}
+		WorkOrderAgreement saveBoqDetails = workOrderAgreementRepository.save(boqList);
+
+		return saveBoqDetails;
+	}
+
 }

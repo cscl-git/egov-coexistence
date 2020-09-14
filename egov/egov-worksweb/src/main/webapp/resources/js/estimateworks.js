@@ -7,7 +7,7 @@
 
 function setWorkflow(action)
 {
-	alert('action :::'+action);
+	
 	document.getElementById("workFlowAction").value = action;
 }
 

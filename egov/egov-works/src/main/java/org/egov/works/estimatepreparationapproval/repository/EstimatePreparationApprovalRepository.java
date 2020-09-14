@@ -21,14 +21,21 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 
 	List<EstimatePreparationApproval> findByEstimateNumber(final String estimateNumber);
 
-	List<EstimatePreparationApproval> findByExecutingDivision(final Long executingDivision);
+	@Query(" from EstimatePreparationApproval tep where tep.executingDivision =:executingDivision and tep.status = (select es.id from EgwStatus es where es.code ='Approved' and es.moduletype ='EstimatePreparationApproval')")
+	List<EstimatePreparationApproval> findByExecutingDivisionAndStatusId(@Param("executingDivision") Long executingDivision);
 	
-	@Query(" from EstimatePreparationApproval e where e.workCategory =:workCategory  and e.executingDivision =:executingDivision and e.estimateDate BETWEEN :fromDt AND :toDt")
-	List<EstimatePreparationApproval> findByParams(@Param("workCategory") Long id,
-			@Param("executingDivision") Long executingDivision,
+	@Query(" from EstimatePreparationApproval tep where tep.executingDivision =:executingDivision and tep.estimateDate BETWEEN :fromDt AND :toDt and tep.status = (select es.id from EgwStatus es where es.code ='Approved' and es.moduletype ='EstimatePreparationApproval')")
+	List<EstimatePreparationApproval> findByParams(@Param("executingDivision") Long executingDivision,
 			@Param("fromDt") Date fromDt, @Param("toDt") Date toDt);
 
 
-	//List<EstimatePreparationApproval> findByParams(long id, Long executingDivision, Date fromDt, Date toDt);
 
+	
+
+	/*@Query(" from EstimatePreparationApproval tep where tep.id = (select es.estimatePreparationApproval from BoQDetails es where es.workOrderAgreement =:'null' and es.estimatePreparationApproval =:id)")
+	EstimatePreparationApproval findByIdAndWorId(Long id, int workId);
+
+	*/
+	/*@Query(" from EstimatePreparationApproval tep where tep.id = (select es.estimatePreparationApproval from BoQDetails es where es.checkboxChecked =:'true' and es.estimatePreparationApproval =:estimatePreparationId)")
+	EstimatePreparationApproval findByParam(Long estimatePreparationId, boolean isCheckboxChecked);*/
 }

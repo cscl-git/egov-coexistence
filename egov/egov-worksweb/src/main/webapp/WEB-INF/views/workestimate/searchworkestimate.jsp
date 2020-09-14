@@ -141,10 +141,13 @@ tr:hover {
 	<form:form name="search-work-estimate-form" role="form" method="post"
 		action="workEstimateSearch" modelAttribute="workEstimateDetails"
 		id="workEstimateDetails">
+		<input type="number" name="workEstimateDetails"
+			value="${estimatePreparationApproval.id}" />
 		<div class="card">
 			<div class="container">
 				<div class="row">
-					<div class="col-md-6">
+
+					<%-- <div class="col-md-6">
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
@@ -166,8 +169,8 @@ tr:hover {
 							<div class="clearfix"></div>
 						</div>
 					</div>
-
-					<div class="col-md-6">
+ --%>
+					<%-- 				<div class="col-md-6">
 						<div class="form-group">
 							<label for="inputPassword"
 								class="col-md-6 col-form-label block-colm"><spring:message
@@ -178,7 +181,7 @@ tr:hover {
 							</div>
 							<div class="clearfix"></div>
 						</div>
-					</div>
+					</div> --%>
 
 					<div class="col-md-6">
 						<div class="form-group">
@@ -186,8 +189,9 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.work.estimate.from.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="fromDate" />
+								<form:input id="fromDt" path="fromDt"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -199,8 +203,9 @@ tr:hover {
 								class="col-md-6 col-form-label block-colm"><spring:message
 									code="lbl.work.estimate.to.date" /></label>
 							<div class="col-md-6 block-colm">
-								<form:input type="date" class="form-control txtRight"
-									path="toDate" />
+								<form:input id="toDt" path="toDt"
+									class="form-control datepicker" data-date-end-date="0d"
+									placeholder="DD/MM/YYYY" />
 							</div>
 							<div class="clearfix"></div>
 
@@ -218,23 +223,9 @@ tr:hover {
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-									<form:options
-										items="${workEstimateDetails.departments}"
+									<form:options items="${workEstimateDetails.departments}"
 										itemValue="code" itemLabel="name" />
 								</form:select>
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div>
-
-					<div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.estimate.package.number" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="number" class="form-control txtRight"
-									path="wardNumber" />
 							</div>
 							<div class="clearfix"></div>
 						</div>
@@ -290,10 +281,8 @@ tr:hover {
 												path="estimateList[${status.index}].estimateAmount"
 												id="estimateList[${status.index}].estimateAmount" />
 											${result.estimateAmount }</td>
-										<td><form:hidden
-												path="estimateList[${status.index}].id"
-												id="estimateList[${status.index}].id" />
-											${result.id }</td>
+										<td><form:hidden path="estimateList[${status.index}].id"
+												id="estimateList[${status.index}].id" /> ${result.id }</td>
 
 									</tr>
 								</c:forEach>
@@ -305,71 +294,100 @@ tr:hover {
 					</c:if>
 					</table>
 				</div>
+
+				<div>
+					<c:if
+						test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
 				<div class="vertical-center">
 					<input type="submit" id="save" class="btn-info" name="save"
 						value="Submit" />
 				</div>
+					</c:if>
+				</div>
 
 				<div style="padding: 0 15px;">
+					<%-- <input type="hidden" name="workEstimateDetails" value="${estimatePreparationApproval.id}" /> --%>
+					<form:hidden path="id" id="id" value="${workEstimateDetails.id}" />
 					<table class="table table-bordered" id="searchResult">
 						<thead>
 							<tr>
 								<th><spring:message code="lbl.selectAll" text="Select All" />
 									<input type="checkbox" id="selectAll" name="selectAll"
 									onclick="checkAll(this)"></th>
-
+								<th><spring:message code="lbl.item.description" /></th>
 								<th><spring:message code="lbl.item.description" /></th>
 								<th><spring:message code="lbl.ref.dsr" /></th>
 								<th><spring:message code="lbl.unit" /></th>
 								<th><spring:message code="lbl.rate" /></th>
 								<th><spring:message code="lbl.quantity" /></th>
 								<th><spring:message code="lbl.amount" /></th>
-
+								<th><spring:message code="lbl.amount" /></th>
 							</tr>
 						</thead>
 						`
 						<c:if
-							test="${workEstimateDetails.boQDetailsList != null &&  !workEstimateDetails.boQDetailsList.isEmpty()}">
+							test="${workEstimateDetails.newBoQDetailsList != null &&  !workEstimateDetails.newBoQDetailsList.isEmpty()}">
 							<tbody>
-								<c:forEach items="${workEstimateDetails.boQDetailsList}"
+								<c:forEach items="${workEstimateDetails.newBoQDetailsList}"
 									var="result" varStatus="status">
 									<tr>
 										<td><form:checkbox
-												path="boQDetailsList[${status.index}].checkboxChecked" /></td>
+												path="newBoQDetailsList[${status.index}].checkboxChecked"
+												id="newBoQDetailsList[${status.index}].checkboxChecked" /></td>
+										<td><form:hidden
+												path="newBoQDetailsList[${status.index}].slNo"
+												id="newBoQDetailsList[${status.index}].slNo" />
+											${result.slNo }</td>
 
 										<td><form:hidden
-												path="boQDetailsList[${status.index}].item_description"
-												id="boQDetailsList[${status.index}].item_description" />
+												path="newBoQDetailsList[${status.index}].item_description"
+												id="newBoQDetailsList[${status.index}].item_description" />
 											${result.item_description }</td>
 										<td><form:hidden
-												path="boQDetailsList[${status.index}].ref_dsr"
-												id="boQDetailsList[${status.index}].ref_dsr" />
+												path="newBoQDetailsList[${status.index}].ref_dsr"
+												id="newBoQDetailsList[${status.index}].ref_dsr" />
 											${result.ref_dsr }</td>
 										<td><form:hidden
-												path="boQDetailsList[${status.index}].unit"
-												id="boQDetailsList[${status.index}].unit" /> ${result.unit }</td>
+												path="newBoQDetailsList[${status.index}].unit"
+												id="newBoQDetailsList[${status.index}].unit" />
+											${result.unit }</td>
 										<td><form:hidden
-												path="boQDetailsList[${status.index}].rate"
-												id="boQDetailsList[${status.index}].rate" /> ${result.rate }</td>
+												path="newBoQDetailsList[${status.index}].rate"
+												id="newBoQDetailsList[${status.index}].rate" />
+											${result.rate }</td>
 										<td><form:hidden
-												path="boQDetailsList[${status.index}].quantity"
-												id="boQDetailsList[${status.index}].quantity" />
+												path="newBoQDetailsList[${status.index}].quantity"
+												id="newBoQDetailsList[${status.index}].quantity" />
 											${result.quantity }</td>
 										<td><form:hidden
-												path="boQDetailsList[${status.index}].amount"
-												id="boQDetailsList[${status.index}].amount" />
+												path="newBoQDetailsList[${status.index}].amount"
+												id="newBoQDetailsList[${status.index}].amount" />
 											${result.amount }</td>
+
+										<td><form:hidden
+												path="newBoQDetailsList[${status.index}].estimatePreparationApproval.id"
+												id="newBoQDetailsList[${status.index}].estimatePreparationApproval.id" />
+											${result.estimatePreparationApproval.id }</td>
+
 									</tr>
 								</c:forEach>
 							<tbody>
 						</c:if>
 						<c:if
-							test="${workEstimateDetails.boQDetailsList == null ||  workEstimateDetails.boQDetailsList.isEmpty()}">
+							test="${workEstimateDetails.newBoQDetailsList == null ||  workEstimateDetails.newBoQDetailsList.isEmpty()}">
 					No records found
 					</c:if>
 					</table>
 				</div>
-
+				<div>
+					<c:if
+						test="${workEstimateDetails.newBoQDetailsList != null &&  !workEstimateDetails.newBoQDetailsList.isEmpty()}">
+						<div class="vertical-center">
+							<input type="submit" id="saveboq" class="btn-info" name="saveboq"
+								value="Submit" />
+						</div>
+					</c:if>
+				</div>
 			</div>
 		</div>
 	</form:form>
