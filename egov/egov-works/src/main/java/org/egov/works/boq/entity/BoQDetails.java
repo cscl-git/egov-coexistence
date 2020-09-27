@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -47,6 +46,12 @@ public class BoQDetails implements Serializable {
 
 	@Column(name = "amount")
 	private Double amount;
+
+	@Column(name = "measured_quantity")
+	private Double measured_quantity;
+
+	@Column(name = "measured_amount")
+	private Double measured_amount;
 
 	@ManyToOne
 	@JoinColumn(name = "work_id")
@@ -143,14 +148,20 @@ public class BoQDetails implements Serializable {
 		this.checkboxChecked = checkboxChecked;
 	}
 
-	/*public boolean isCheckboxChecked() {
-		return checkboxChecked;
+	public Double getMeasured_quantity() {
+		return measured_quantity;
 	}
 
-	public void setCheckboxChecked(boolean checkboxChecked) {
-		this.checkboxChecked = checkboxChecked;
+	public void setMeasured_quantity(Double measured_quantity) {
+		this.measured_quantity = measured_quantity;
 	}
-*/
+
+	public Double getMeasured_amount() {
+		return measured_amount;
+	}
 	
+	public void setMeasured_amount(Double measured_amount) {
+		this.measured_amount = measured_amount;
+	}
 	
 }

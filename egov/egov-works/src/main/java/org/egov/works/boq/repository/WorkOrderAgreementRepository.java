@@ -32,4 +32,8 @@ public interface WorkOrderAgreementRepository extends JpaRepository<WorkOrderAgr
 			@Param("estimatedCost") String estimatedCost, @Param("tenderCost") String tenderCost,
 			@Param("agencyWorkOrder") String agencyWorkOrder, @Param("date") Date date,
 			@Param("timeLimit") String timeLimit);
+
+	@Query(" from WorkOrderAgreement w where w.work_start_date =:work_start_date and w.work_end_date =:work_end_date and w.work_agreement_status =:work_agreement_status")
+	List<WorkOrderAgreement> findByParam(@Param("work_start_date") Date work_start_date,
+			@Param("work_end_date") Date work_end_date, @Param("work_agreement_status") String work_agreement_status);
 }

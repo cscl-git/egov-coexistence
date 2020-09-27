@@ -147,6 +147,12 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Transient
 	private String workFlowAction;
+	
+	@Column(name = "ward_number")
+	private String wardNumber;
+	
+	@Transient
+	private Double progressCompletion;
 
 	public Long getId() {
 		return id;
@@ -459,6 +465,22 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setWorkFlowAction(String workFlowAction) {
 		this.workFlowAction = workFlowAction;
+	}
+
+	public String getWardNumber() {
+		return wardNumber;
+	}
+
+	public void setWardNumber(String wardNumber) {
+		this.wardNumber = wardNumber;
+	}
+
+	public Double getProgressCompletion() {
+		return progressCompletion;
+	}
+
+	public void setProgressCompletion(Double progressCompletion) {
+		this.progressCompletion = progressCompletion;
 	}
 
 }

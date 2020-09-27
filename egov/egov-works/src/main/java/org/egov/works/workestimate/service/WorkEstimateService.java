@@ -30,8 +30,7 @@ public class WorkEstimateService {
 					.findByEstimateNumber(estimatePreparationApproval.getEstimateNumber());
 		}else {
 		workEstimateDetails = estimatePreparationApprovalRepository.findByAllParams(
-					//estimatePreparationApproval.getStatus().getId(),
-					estimatePreparationApproval.getWorkCategory(), estimatePreparationApproval.getEstimateNumber(),
+					 estimatePreparationApproval.getEstimateNumber(),
 				estimatePreparationApproval.getExecutingDivision(), estimatePreparationApproval.getFromDt(),
 				estimatePreparationApproval.getToDt());
 		}
@@ -39,17 +38,6 @@ public class WorkEstimateService {
 		return workEstimateDetails;
 	}
 	
-	/*
-	 * @Transactional public List<EstimatePreparationApproval>
-	 * searchBoqData(HttpServletRequest request, Long estimatePreparationId) { //
-	 * TODO Auto-generated method stub EstimatePreparationApproval boqDetailsList =
-	 * estimatePreparationApprovalRepository .findById(estimatePreparationId);
-	 * 
-	 * // return boqDetailsList; return boqDetailsList;
-	 * 
-	 * }
-*/
-
 	@Transactional
 	public EstimatePreparationApproval searchEstimateData(Long estimatePreparationId) {
 		// TODO Auto-generated method stub
@@ -103,16 +91,6 @@ public class WorkEstimateService {
 		EstimatePreparationApproval saveBoqDetails = estimatePreparationApprovalRepository.save(boqList);
 
 		return saveBoqDetails;
-	}
-
-	@Transactional
-	public EstimatePreparationApproval searchBoqList(Long id) {
-		// TODO Auto-generated method stub
-		/*int workId=0;
-		EstimatePreparationApproval boqList = estimatePreparationApprovalRepository
-				.findByIdAndWorId(id, workId);
-*/		
-		return null;
 	}
 
 }

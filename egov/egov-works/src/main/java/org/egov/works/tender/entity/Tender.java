@@ -1,7 +1,7 @@
 package org.egov.works.tender.entity;
 
-import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -40,6 +40,15 @@ public class Tender implements  java.io.Serializable {
 
 	@Column(name = "loa_number")
 	private Double loaNumber;
+
+	@Transient
+	private Date fromDt;
+
+	@Transient
+	private Date toDt;
+
+	@Transient
+	private List<Tender> tenderList;
 
 	public Long getId() {
 		return id;
@@ -83,6 +92,30 @@ public class Tender implements  java.io.Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public Date getFromDt() {
+		return fromDt;
+	}
+
+	public void setFromDt(Date fromDt) {
+		this.fromDt = fromDt;
+	}
+
+	public Date getToDt() {
+		return toDt;
+	}
+
+	public void setToDt(Date toDt) {
+		this.toDt = toDt;
+	}
+
+	public List<Tender> getTenderList() {
+		return tenderList;
+	}
+
+	public void setTenderList(List<Tender> tenderList) {
+		this.tenderList = tenderList;
 	}
 
 }

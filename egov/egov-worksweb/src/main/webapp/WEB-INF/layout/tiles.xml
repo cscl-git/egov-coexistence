@@ -374,6 +374,16 @@
         <put-attribute name="page-title" value="lbl.work.closure" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/closureedit.jsp"/>
     </definition>
+    
+    <definition name="search-closure-work-agreement-form" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/closuresearch.jsp"/>
+    </definition>
+    
+    <definition name="edit-measured-quantity-work-agreement" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/editmeasuredquantity.jsp"/>
+    </definition>
 
 </tiles-definitions>
 

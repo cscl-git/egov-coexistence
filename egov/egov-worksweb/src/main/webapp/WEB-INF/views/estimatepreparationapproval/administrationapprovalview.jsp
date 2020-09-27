@@ -4,117 +4,86 @@
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 
 
+<div class="tab-pane fade in active">
 <div class="panel panel-primary" data-collapsed="0">
-	<div class="panel-heading custom_form_panel_heading">
-		<div class="panel-title">
-			<spring:message code="title.estimate.administration.approval"
-				text="Administration Approval" />
-		</div>
-	</div>
+		<div class="form-group" style="padding: 50px 20px 0;">
 
-	<div class="panel panel-primary">
-		<div class="container">
-			<div class="row">
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.estimate.preparation.financing.details" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.financingDetails}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.estimate.preparation.fund.source" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.fundSource}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.estimate.preparation.financial.year" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.financialYear}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.estimate.preparation.estimate.percentage" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.estimatePercentage}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.agency.work.order" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.agencyWorkOrder}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.date" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.date}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.time.limit" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.timeLimit}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.work.type" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.workType}</div>
-						<div class="clearfix"></div>
-					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.tendered.cost" /></label>
-						<div class="col-md-6 block-colm">
-							${estimatePreparationApproval.tenderCost}</div>
-						<div class="clearfix"></div>
-					</div>
+			<input type="hidden" name="estimatePreparationApproval"
+				value="${estimatePreparationApproval.id}" /> <label
+				class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.financing.details" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="financingDetails" id="financingDetails"
+					cssClass="form-control" cssErrorClass="form-control error"
+					readonly="true">
+					<form:option value="">
+						<spring:message code="lbl.select" />
+					</form:option>
+					<form:option value="1">Govt</form:option>
+					<form:option value="2">Pvt</form:option>
+				</form:select>
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.fund.source" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input type="text" class="form-control" path="fundSource"
+					readonly="true" />
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.financial.year" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="financialYear" id="financialYear"
+					cssClass="form-control" cssErrorClass="form-control error"
+					readonly="true">
+					<form:option value="">
+						<spring:message code="lbl.select" />
+					</form:option>
+					<form:option value="1">2020</form:option>
+					<form:option value="2">2019</form:option>
+				</form:select>
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.estimate.percentage" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input type="text" class="form-control"
+					path="estimatePercentage" readonly="true" />
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.work.order.search.agency.work.order" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input type="text" class="form-control" path="agencyWorkOrder"
+					readonly="true" />
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.work.order.search.date" /><span class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input id="date" path="date" class="form-control datepicker"
+					data-date-end-date="0d" placeholder="DD/MM/YYYY" readonly="true" />
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.work.order.search.time.limit" /><span class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input type="text" class="form-control" path="timeLimit"
+					readonly="true" />
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.work.order.search.work.type" /><span class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input type="text" class="form-control" path="workType"
+					readonly="true" />
+			</div>
+			<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.work.order.search.tendered.cost" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:input type="text" class="form-control" path="tenderCost"
+					readonly="true" />
 				</div>
 			</div>
 		</div>
-	</div>
 </div>

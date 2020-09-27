@@ -25,6 +25,7 @@ import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
 
 @Entity
@@ -82,7 +83,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private Double estimateAmount;
 
 	@Column(name = "estimate_prepared_by")
-	private Long estimatePreparedBy;
+	private String estimatePreparedBy;
 
 	@Column(name = "preparation_designation")
 	private String preparationDesignation;
@@ -166,6 +167,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	
 	@Transient
 	private String workFlowAction;
+	
+	@Transient
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
 
 	public Long getWorksWing() {
 		return worksWing;
@@ -271,13 +275,6 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 		this.estimateAmount = estimateAmount;
 	}
 
-	public Long getEstimatePreparedBy() {
-		return estimatePreparedBy;
-	}
-
-	public void setEstimatePreparedBy(Long estimatePreparedBy) {
-		this.estimatePreparedBy = estimatePreparedBy;
-	}
 
 	public String getPreparationDesignation() {
 		return preparationDesignation;
@@ -527,6 +524,22 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setWorkFlowAction(String workFlowAction) {
 		this.workFlowAction = workFlowAction;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public String getEstimatePreparedBy() {
+		return estimatePreparedBy;
+	}
+
+	public void setEstimatePreparedBy(String estimatePreparedBy) {
+		this.estimatePreparedBy = estimatePreparedBy;
 	}
 	
 	

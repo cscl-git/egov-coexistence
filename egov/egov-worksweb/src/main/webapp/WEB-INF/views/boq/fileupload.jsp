@@ -6,7 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %> --%>
-<script src="<cdn:url value='/resources/js/tender/fileupload.js'/>"></script>
+<script src="<cdn:url value='/resources/js/boq/fileupload.js'/>"></script>
 <style>
     .file-ellipsis {
         width : auto !Important;

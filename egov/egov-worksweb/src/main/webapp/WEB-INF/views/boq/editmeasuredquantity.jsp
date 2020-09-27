@@ -1,14 +1,17 @@
+<%@ include file="/includes/taglibs.jsp"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 
 
-<form:form name="closure-work-agreement" role="form" method="post"
-	modelAttribute="workOrderAgreement" id="workOrderAgreement"
-	class="form-horizontal form-groups-bordered"
+<form:form name="edit-measured-quantity-work-agreement" role="form"
+	method="post" modelAttribute="workOrderAgreement" action="workmeasured"
+	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
-
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
@@ -282,17 +285,26 @@
 							<thead>
 								<tr>
 									<th><spring:message code="lbl.item.description" /></th>
+									<th><spring:message code="lbl.item.description" /></th>
 									<th><spring:message code="lbl.ref.dsr" /></th>
 									<th><spring:message code="lbl.unit" /></th>
 									<th><spring:message code="lbl.rate" /></th>
 									<th><spring:message code="lbl.quantity" /></th>
+									<th><spring:message code="lbl.measured.quantity" /></th>
 									<th><spring:message code="lbl.amount" /></th>
+									<th><spring:message code="lbl.measured.amount" /></th>
 								</tr>
 							</thead>
 							<tbody>
 								<c:forEach var="boq"
 									items="${workOrderAgreement.boQDetailsList}" varStatus="status">
 									<tr id="detailsrow" class="repeat-address">
+									<td><form:input type="text"
+												path="boQDetailsList[${status.index}].slNo"
+												id="boQDetailsList[${status.index}].slNo"
+												required="required" class="form-control slNo"
+												maxlength="200" readonly="true"></form:input></td>
+												
 										<td><form:input type="text"
 												path="boQDetailsList[${status.index}].item_description"
 												id="boQDetailsList[${status.index}].item_description"
@@ -312,17 +324,31 @@
 												path="boQDetailsList[${status.index}].rate" step=".01"
 												id="boQDetailsList[${status.index}].rate"
 												required="required" class="form-control rate"
-												readonly="true"></form:input></td>
+												readonly="true" onchange="valueChanged()"></form:input></td>
 										<td><form:input type="number"
 												path="boQDetailsList[${status.index}].quantity" step=".01"
 												id="boQDetailsList[${status.index}].quantity"
 												required="required" class="form-control quantity"
 												name="quantity" readonly="true"></form:input></td>
+
+										<td><form:input type="number"
+												path="boQDetailsList[${status.index}].measured_quantity"
+												step=".01"
+												id="boQDetailsList[${status.index}].measured_quantity"
+												required="required" class="form-control measured_quantity"
+												name="measured_quantity" onchange="valueChanged()"></form:input></td>
+
 										<td><form:input type="number"
 												path="boQDetailsList[${status.index}].amount"
 												id="boQDetailsList[${status.index}].amount"
 												required="required" class="form-control amount"
 												maxlength="200" name="amount" readonly="true"></form:input>
+										</td>
+										<td><form:input type="number"
+												path="boQDetailsList[${status.index}].measured_amount"
+												id="boQDetailsList[${status.index}].measured_amount"
+												required="required" class="form-control measured_amount"
+												maxlength="200" name="measured_amount" readonly="true"></form:input>
 										</td>
 									</tr>
 								</c:forEach>
@@ -335,45 +361,35 @@
 		</div>
 
 		<!-- ========================code end=========== -->
-
-		<div class="panel panel-primary" data-collapsed="0"
-			style="scrollable: true;">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<spring:message code="lbl.work.closure" text="Closure" />
-				</div>
-			</div>
-			<br>
-			<div>
-				<%-- <c:if
-					test="${workOrderAgreement.status.code == 'set code here' }"> --%>
-				<label class="col-sm-2 control-label text-left-audit"><spring:message
-						code="lbl.email" /></label>
-				<%-- <form:checkbox path="id"/> --%>
-
-				<label class="col-sm-3 control-label text-right"><spring:message
-						code="lbl.comments" text="Comments" /></label>
-				<div class="col-sm-7 add-margin">
-					<form:textarea class="form-control" path="contractor_email" />
-				</div>
-
-
-			</div>
-
-
-			<%-- </c:if> --%>
-			<br> <br> <br> <br>
-
-		</div>
-		<div align="center">
-			<input type="submit" id="work1" class="btn btn-primary" name="work1"
+		<br> <br>
+		<div class="buttonbottom" align="center">
+			<input type="submit" id="workmeasured" class="btn btn-primary" name="workmeasured"
 				code="lbl.select" value="Save Work Order/Agreement Creation" />
 		</div>
+
 	</div>
-
-
 </form:form>
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script type="text/javascript">
+	function valueChanged() {
+		var estimateAmt = 0;
+		for (var i = 1; i < table.rows.length; i++) {
+			// get the seected row index
+			rIndex = i;
+
+			var rate = document.getElementById("boQDetailsList[" + (rIndex - 1)
+					+ "].rate").value;
+
+			var quantity = document.getElementById("boQDetailsList["
+					+ (rIndex - 1) + "].measured_quantity").value;
+
+			var amt = quantity * rate;
+			document.getElementById("boQDetailsList[" + (rIndex - 1)
+					+ "].measured_amount").value = amt;
+
+		}
+	}
+</script>
 

@@ -1,5 +1,8 @@
 package org.egov.works.web.controller.tender;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.egov.works.tender.entity.Tender;
@@ -41,11 +44,33 @@ System.out.println("sneha");
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.POST)
 	public String view(@PathVariable("id") final Long id, Model model) {
 
-		Tender tenderDetails = tenderService.searchTenderData(id);
+		Tender tender = tenderService.searchTenderData(id);
 
-		model.addAttribute("tender", tenderDetails);
+		model.addAttribute("tender", tender);
 
 		return "view-tender-form";
+	}
+
+	@RequestMapping(value = "/search", method = RequestMethod.POST)
+	public String showEstimateNewFormGet(@ModelAttribute("tender") final Tender tender, final Model model,
+			HttpServletRequest request) {
+
+		return "search-tender-form";
+	}
+
+	@RequestMapping(value = "/tenderSearch", params = "tenderSearch", method = RequestMethod.POST)
+	public String searchWorkEstimateData(@ModelAttribute("tender") final Tender tender, final Model model,
+			final HttpServletRequest request) throws Exception {
+		List<Tender> tenderList = new ArrayList<Tender>();
+
+		List<Tender> tenderDetails = tenderService.searchTenderData(request, tender);
+		 tenderList.addAll(tenderDetails);
+		 tender.setTenderList(tenderList);
+
+		model.addAttribute("tender", tender);
+
+		return "search-tender-form";
+
 	}
 
 }

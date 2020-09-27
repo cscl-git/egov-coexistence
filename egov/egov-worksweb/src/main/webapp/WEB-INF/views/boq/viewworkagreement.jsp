@@ -1,14 +1,17 @@
+<%@ include file="/includes/taglibs.jsp"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 
 
-<form:form name="closure-work-agreement" role="form" method="post"
+<form:form name="view-work-agreement" role="form" method="post"
 	modelAttribute="workOrderAgreement" id="workOrderAgreement"
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
-
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
@@ -242,27 +245,29 @@
 						code="lbl.adddress" /></label>
 				<div class="col-sm-3 add-margin">
 					<form:input type="text" class="form-control"
-						path="contractor_address" readonly="true" />
+						path="contractor_address" readonly="true"/>
 				</div>
 
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
 						code="lbl.phone" /></label>
 				<div class="col-sm-3 add-margin">
 					<form:input type="text" class="form-control"
-						path="contractor_phone" readonly="true" />
+						path="contractor_phone" readonly="true"/>
 				</div>
 
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
 						code="lbl.email" /></label>
 				<div class="col-sm-3 add-margin">
 					<form:input type="text" class="form-control"
-						path="contractor_email" readonly="true" />
+						path="contractor_email" readonly="true"/>
 				</div>
-				<br> <br> <br> <br> <br> <br>
+				<br><br><br><br><br><br>
 			</div>
 		</div>
 
-		<br> <br> <br>
+		<br>
+		<br>
+		<br>
 
 		<!-- ========================code end=========== -->
 
@@ -336,42 +341,7 @@
 
 		<!-- ========================code end=========== -->
 
-		<div class="panel panel-primary" data-collapsed="0"
-			style="scrollable: true;">
-			<div class="panel-heading">
-				<div class="panel-title">
-					<spring:message code="lbl.work.closure" text="Closure" />
-				</div>
-			</div>
-			<br>
-			<div>
-				<%-- <c:if
-					test="${workOrderAgreement.status.code == 'set code here' }"> --%>
-				<label class="col-sm-2 control-label text-left-audit"><spring:message
-						code="lbl.email" /></label>
-				<%-- <form:checkbox path="id"/> --%>
-
-				<label class="col-sm-3 control-label text-right"><spring:message
-						code="lbl.comments" text="Comments" /></label>
-				<div class="col-sm-7 add-margin">
-					<form:textarea class="form-control" path="contractor_email" />
-				</div>
-
-
-			</div>
-
-
-			<%-- </c:if> --%>
-			<br> <br> <br> <br>
-
-		</div>
-		<div align="center">
-			<input type="submit" id="work1" class="btn btn-primary" name="work1"
-				code="lbl.select" value="Save Work Order/Agreement Creation" />
-		</div>
 	</div>
-
-
 </form:form>
 
 

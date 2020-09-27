@@ -168,7 +168,7 @@ public class WorkEstimateController {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
 
-		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement);
+		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,null,null,null,null);
 
 		return "edit-work-agreement";
 
@@ -183,7 +183,7 @@ public class WorkEstimateController {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
 
-		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement);
+		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,null,null,null,null);
 
 		return "boqDetails";
 

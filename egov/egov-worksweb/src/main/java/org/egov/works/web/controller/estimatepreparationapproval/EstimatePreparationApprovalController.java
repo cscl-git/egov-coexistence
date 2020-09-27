@@ -1,8 +1,10 @@
 package org.egov.works.web.controller.estimatepreparationapproval;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,8 +20,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -28,6 +33,7 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.User;
@@ -35,6 +41,7 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
@@ -74,6 +81,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
     @Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
+    
+    private static final int BUFFER_SIZE = 4096;
+    
+    @Autowired
+	private FileStoreService fileStoreService;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -84,7 +96,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
-        
+        System.out.println("eeee");
 		return "estimatepreparationapproval-form";
 	}
 
@@ -96,19 +108,24 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "Forward", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
+			final Model model, @RequestParam("file1") MultipartFile[] files, final HttpServletRequest request)
 			throws Exception {
 
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
-		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != "") {
-			estimatePreparationApproval.setEstimateDate(inputFormat.parse(estimatePreparationApproval.getEstimateDt()));
-		}
-
-		if (estimatePreparationApproval.getDt() != null && estimatePreparationApproval.getDt() != "") {
-			estimatePreparationApproval.setDate(inputFormat.parse(estimatePreparationApproval.getDt()));
-		}*/
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		estimatePreparationApproval.setDocumentDetail(list);
 		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
 			estimatePreparationApproval
 					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
@@ -178,10 +195,24 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "Save As Draft", method = RequestMethod.POST)
 	public String saveBoQDetailsDataDraft(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile file1, final HttpServletRequest request)
+			final Model model, @RequestParam("file1") MultipartFile[] files, final HttpServletRequest request)
 			throws Exception {
 		
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		estimatePreparationApproval.setDocumentDetail(list);
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
 
 		if (estimatePreparationApproval.getEstimateDt() != null && estimatePreparationApproval.getEstimateDt() != "") {
@@ -328,6 +359,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
+		model.addAttribute("fileuploadAllowed","Y");
 
 		return "estimatepreparationapproval-form";
 
@@ -551,5 +583,55 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         }
         return historyTable;
     }
+	
+	@RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
+	public void getBillDoc(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+		final ServletContext context = request.getServletContext();
+		final String fileStoreId = request.getParameter("fileStoreId");
+		String fileName = "";
+		final File downloadFile = fileStoreService.fetch(fileStoreId, "Works");
+		final FileInputStream inputStream = new FileInputStream(downloadFile);
+		EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
+		estDetails = getBillDocuments(estDetails);
+
+		for (final DocumentUpload doc : estDetails.getDocumentDetail())
+			if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
+				fileName = doc.getFileStore().getFileName();
+
+		// get MIME type of the file
+		String mimeType = context.getMimeType(downloadFile.getAbsolutePath());
+		if (mimeType == null)
+			// set to binary type if MIME mapping not found
+			mimeType = "application/octet-stream";
+
+		// set content attributes for the response
+		response.setContentType(mimeType);
+		response.setContentLength((int) downloadFile.length());
+
+		// set headers for the response
+		final String headerKey = "Content-Disposition";
+		final String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+		response.setHeader(headerKey, headerValue);
+
+		// get output stream of the response
+		final OutputStream outStream = response.getOutputStream();
+
+		final byte[] buffer = new byte[BUFFER_SIZE];
+		int bytesRead = -1;
+
+		// write bytes read from the input stream into the output stream
+		while ((bytesRead = inputStream.read(buffer)) != -1)
+			outStream.write(buffer, 0, bytesRead);
+
+		inputStream.close();
+		outStream.close();
+	}
+	
+	private EstimatePreparationApproval getBillDocuments(final EstimatePreparationApproval estDetails) {
+		List<DocumentUpload> documentDetailsList = estimatePreparationApprovalService.findByObjectIdAndObjectType(estDetails.getId(),
+				"Works_Est");
+		estDetails.setDocumentDetail(documentDetailsList);
+		return estDetails;
+	}
 
 }
