@@ -50,161 +50,71 @@
 <%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <head>
-<script type="text/javascript"
-	src="/services/EGF/resources/javascript/ajaxCommonFunctions.js?rnd=${app_release_no}"></script>
-<script type="text/javascript"
-	src="/services/EGF/resources/javascript/tdsReportHelper.js?rnd=${app_release_no}"></script>
-<script type="text/javascript" src="/services/EGF/resources/javascript/helper.js?rnd=${app_release_no}"></script>
-<style type="text/css">
-#codescontainer {
-	position: absolute;
-	left: 11em;
-	width: 9%;
-	text-align: left;
-}
-
-#codescontainer .yui-ac-content {
-	position: absolute;
-	width: 350px;
-	border: 1px solid #404040;
-	background: #fff;
-	overflow: hidden;
-	z-index: 20000;
-}
-
-#codescontainer .yui-ac-shadow {
-	position: absolute;
-	margin: .3em;
-	width: 300px;
-	background: #a0a0a0;
-	z-index: 19999;
-}
-
-.yui-skin-sam .yui-ac-input {
-	width: 100%;
-}
-
-#codescontainer ul {
-	padding: 5px 0;
-	width: 100%;
-}
-
-#codescontainer li {
-	padding: 0 5px;
-	cursor: default;
-	white-space: nowrap;
-}
-
-#codescontainer li.yui-ac-highlight {
-	background: #ff0;
-}
-
-#codescontainer li.yui-ac-prehighlight {
-	background: #FFFFCC;
-}
-
-.yui-skin-sam tr.yui-dt-odd {
-	background-color: #FFF;
-}
-
-#detailcodescontainer {
-	position: absolute;
-	left: 11em;
-	width: 9%;
-	text-align: left;
-}
-
-#detailcodescontainer .yui-ac-content {
-	position: absolute;
-	width: 350px;
-	border: 1px solid #404040;
-	background: #fff;
-	overflow: hidden;
-	z-index: 20000;
-}
-
-#detailcodescontainer .yui-ac-shadow {
-	position: absolute;
-	margin: .3em;
-	width: 300px;
-	background: #a0a0a0;
-	z-index: 19999;
-}
-
-#detailcodescontainer ul {
-	padding: 5px 0;
-	width: 100%;
-}
-
-#detailcodescontainer li {
-	padding: 0 5px;
-	cursor: default;
-	white-space: nowrap;
-}
-
-#detailcodescontainer li.yui-ac-highlight {
-	background: #ff0;
-}
-
-#detailcodescontainer li.yui-ac-prehighlight {
-	background: #FFFFCC;
-}
-</style>
-</head>
 <script>
-var callback = {
-		success: function(o){
-			document.getElementById('results').innerHTML=o.responseText;
-			//clearWaitingImage();
-			undoLoadingMask();
-			},
-			failure: function(o) {
-}
-		}
-function getDeductionData(){
-	var fromDate=document.getElementById("fromDate").value;
-	var asOnDate =  document.getElementById('asOnDate').value;
-	var department =  document.getElementById('department').value;
-	var fund =  document.getElementById('fund').value;
-	var recovery =  document.getElementById('recovery').value;
-
-	isValid = validateDeductionData();
-	if(isValid == false)
-		return false;
-	var url = '/services/EGF/report/pendingTDSReport-ajaxLoadDeductionData.action?skipPrepare=true&asOnDate='+asOnDate+'&department.code='+
-							department+'&fund.id='+fund+'&recovery.id='+recovery+'&fromDate='+fromDate;
-	YAHOO.util.Connect.asyncRequest('POST', url, callback, null);
-	//loadWaitingImage();
-	doLoadingMask();
-}
-
-function exportDeductionXls(){
-	var fromDate=document.getElementById("fromDate").value;
-	var asOnDate =  document.getElementById('asOnDate').value;
-	var department =  document.getElementById('department').value;
-	var fund =  document.getElementById('fund').value;
-	var recovery =  document.getElementById('recovery').value;
-	window.open('/services/EGF/report/pendingTDSReport-exportDeductionXls.action?skipPrepare=true&asOnDate='+asOnDate+'&department.code='+department+'&fund.id='+fund+
-	'&recovery.id='+recovery+'&fromDate='+fromDate,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
-}
-
-function exportPdf(){
-	var asOnDate =  document.getElementById('asOnDate').value;
-	var department =  document.getElementById('department').value;
-	var fund =  document.getElementById('fund').value;
-	var recovery =  document.getElementById('recovery').value;
-	var detailKey =  document.getElementById('detailKey').value;
-	var partyName =  document.getElementById('partyName').value;
-	window.open('/services/EGF/report/pendingTDSReport-exportSummaryPdf.action?skipPrepare=true&asOnDate='+asOnDate+'&department.code='+department+'&fund.id='+
-	fund+'&recovery.id='+recovery+'&detailKey='+detailKey+'&partyName='+partyName,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
-}
-function hideIncludeRemittance(){
-	document.getElementById('showRemittedEntries').style.display = "none";
-	document.getElementById('showRemittedEntrieslabel').style.display = "none";
+function resetPage(){
+	jQuery("#results").empty();
 }
 </script>
-<body onload="loadEntities();">
+</head>
+<div class="formmainbox">
+	<div class="formheading"></div>
+	<div class="subheadnew">Deduction report</div>
 
-	<jsp:include page="pendingTDSReport-deductionform.jsp"></jsp:include>
-</body>
-</html>
+	<s:form action="pendingTDSReport" theme="simple"
+		name="pendingTDSReport">
+		<table width="100%" cellpadding="0" cellspacing="0" border="0">
+			<tr>
+				<td class="greybox" width="10%">Recovery Code:<span
+					class="mandatory1">*</span></td>
+				<td class="greybox"><s:select name="recovery" id="recovery"
+						list="dropdownData.recoveryListReport" listKey="id" listValue="type+'-'+recoveryName"
+						headerKey="-1" headerValue="----Choose----" /></td>
+				<td class="greybox" width="10%">Fund:<span class="mandatory1">*</span></td>
+				<td class="greybox"><s:select name="fund" id="fund"
+						list="dropdownData.fundList" listKey="id" listValue="name"
+						headerKey="-1" headerValue="----Choose----" /></td>
+
+			</tr>
+			<tr>
+				<td class="bluebox" width="10%"><s:text name="from.date" /><span
+					class="mandatory1">*</span></td>
+				<td class="bluebox"><s:textfield name="fromDate" id="fromDate"
+						cssStyle="width:100px" value='%{getFormattedDate(fromDate)}'
+						onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
+					href="javascript:show_calendar('pendingTDSReport.fromDate');"
+					style="text-decoration: none">&nbsp;<img
+						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)<br />
+				</td>
+
+				<td class="bluebox" width="10%">As On Date:<span
+					class="mandatory1">*</span></td>
+				<td class="bluebox"><s:textfield name="asOnDate" id="asOnDate"
+						cssStyle="width:100px" value='%{getFormattedDate(asOnDate)}'
+						onkeyup="DateFormat(this,this.value,event,false,'3')" /><a
+					href="javascript:show_calendar('pendingTDSReport.asOnDate');"
+					style="text-decoration: none">&nbsp;<img
+						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)<br />
+				</td>
+			</tr>
+			<tr>
+				<td class="greybox" width="10%">Department:</td>
+				<td class="greybox"><s:select name="department" id="department"
+						list="dropdownData.departmentList" listKey="code"
+						listValue="name" headerKey="-1" headerValue="----Choose----" />
+				</td>
+			</tr>
+		</table>
+		<br />
+		<div class="buttonbottom">
+			<input type="button" value="Search" class="buttonsubmit"
+				onclick="return getDeductionData()" /> &nbsp;
+			<s:reset name="button" type="submit" cssClass="button" id="button"
+				value="Reset" onclick="resetPage();"/>
+			<input type="button" value="Close" onclick="window.parent.postMessage('close','*');window.close();"
+				Class="button" />
+		</div>
+		<s:hidden name="detailKey" id="detailKey"></s:hidden>
+	</s:form>
+</div>
+
+<div id="results"></div>
