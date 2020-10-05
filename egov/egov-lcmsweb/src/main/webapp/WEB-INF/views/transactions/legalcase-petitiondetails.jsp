@@ -88,7 +88,7 @@
 							class="form-control table-input text-left"
 							id="bipartisanPetitionerDetailsList[${status.index}].name"
 							name="bipartisanPetitionerDetailsList[${status.index}].name"
-							value="${bipartisanPetitionerDetailsList.name}" maxlength="50"
+							value="${bipartisanPetitionerDetailsList.name}" maxlength="300"
 							required="required" /></td>
 
 						<td class="text-right"><input type="text"
@@ -142,7 +142,7 @@
 						class="form-control table-input text-left"
 						data-pattern="alphanumerichyphenbackslash"
 						name="bipartisanPetitionerDetailsList[0].name"
-						id="bipartisanPetitionerDetailsList[0].name" maxlength="50"
+						id="bipartisanPetitionerDetailsList[0].name" maxlength="300"
 						required="required"></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input"
