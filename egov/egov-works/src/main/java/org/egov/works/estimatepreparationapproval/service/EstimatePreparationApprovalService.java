@@ -1,5 +1,7 @@
 package org.egov.works.estimatepreparationapproval.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,13 +11,17 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
@@ -45,6 +51,10 @@ public class EstimatePreparationApprovalService {
     private EgwStatusHibernateDAO egwStatusDAO;
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
+	@Autowired
+    private FileStoreService fileStoreService;
+	@Autowired
+	private DocumentUploadRepository documentUploadRepository;
 
 	@Transactional
 	public EstimatePreparationApproval saveEstimatePreparationData(HttpServletRequest request,
@@ -70,15 +80,23 @@ public class EstimatePreparationApprovalService {
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Pending for Approval"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("Pending for Approval"))
+		else if((workFlowAction.equalsIgnoreCase("Forward"))&& estimatePreparationApproval.getStatus().getCode().equals("Pending for Approval"))
+		{
+			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Pending for Approval"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Forward"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Pending for Approval"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Pending for Approval"))
+		else if((workFlowAction.equalsIgnoreCase("Forward"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Pending for Approval"))
+		{
+			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Pending for Approval"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Initiated"));
 		}
@@ -92,7 +110,16 @@ public class EstimatePreparationApprovalService {
 		}
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalRepository
 				.save(estimatePreparationApproval);
+		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
+				: estimatePreparationApproval.getDocumentDetail();
+		final List<DocumentUpload> documentDetails;
 		
+		documentDetails = getDocumentDetails(files, estimatePreparationApproval,
+				"Works_Est");
+		if (!documentDetails.isEmpty()) {
+			savedEstimatePreparationApproval.setDocumentDetail(documentDetails);
+			persistDocuments(documentDetails);
+		}
 		createEstimateWorkflowTransition(savedEstimatePreparationApproval, approvalPosition, approvalComment, null,
                 workFlowAction,approvalDesignation);
 		EstimatePreparationApproval savedEstimatePreparationApproval1=estimatePreparationApprovalRepository
@@ -227,5 +254,40 @@ public class EstimatePreparationApprovalService {
 		auditable.setLastModifiedBy(ApplicationThreadLocals.getUserId());
 		auditable.setLastModifiedDate(currentDate);
 	}
+	
+	public List<DocumentUpload> getDocumentDetails(final List<DocumentUpload> files, final Object object,
+            final String objectType) {
+        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
 
+        Long id;
+        Method method;
+        try {
+            method = object.getClass().getMethod("getId", null);
+            id = (Long) method.invoke(object, null);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
+        }
+
+        for (DocumentUpload doc : files) {
+            final DocumentUpload documentDetails = new DocumentUpload();
+            documentDetails.setObjectId(id);
+            documentDetails.setObjectType(objectType);
+            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+                    doc.getContentType(), "Works_Est"));
+            documentDetailsList.add(documentDetails);
+
+        }
+        return documentDetailsList;
+    }
+	
+	public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+		if (documentDetailsList != null && !documentDetailsList.isEmpty())
+			for (final DocumentUpload doc : documentDetailsList)
+				documentUploadRepository.save(doc);
+	}
+	
+	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
+		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
+	}
 }

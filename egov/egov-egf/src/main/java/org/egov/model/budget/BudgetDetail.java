@@ -166,8 +166,16 @@ public class BudgetDetail extends StateAware {
 
     @Length(max = 32)
     private String uniqueNo;
+  
     private BigDecimal planningPercent;
+    
+    // //Author - Bhushan > Added four quater field
     private BigDecimal quarterpercent;
+    private BigDecimal quartertwopercent;
+    private BigDecimal quarterthreepercent;
+    private BigDecimal quarterfourpercent;
+    
+    
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status")
@@ -533,6 +541,32 @@ public class BudgetDetail extends StateAware {
 		this.execDeptName = execDeptName;
 	}
 
+	
+
+	public BigDecimal getQuartertwopercent() {
+		return quartertwopercent;
+	}
+
+	public void setQuartertwopercent(BigDecimal quartertwopercent) {
+		this.quartertwopercent = quartertwopercent;
+	}
+
+	public BigDecimal getQuarterthreepercent() {
+		return quarterthreepercent;
+	}
+
+	public void setQuarterthreepercent(BigDecimal quarterthreepercent) {
+		this.quarterthreepercent = quarterthreepercent;
+	}
+
+	public BigDecimal getQuarterfourpercent() {
+		return quarterfourpercent;
+	}
+
+	public void setQuarterfourpercent(BigDecimal quarterfourpercent) {
+		this.quarterfourpercent = quarterfourpercent;
+	}
+
 	public BigDecimal getQuarterpercent() {
 		return quarterpercent;
 	}
@@ -541,4 +575,5 @@ public class BudgetDetail extends StateAware {
 		this.quarterpercent = quarterpercent;
 	}
 
+	
 }

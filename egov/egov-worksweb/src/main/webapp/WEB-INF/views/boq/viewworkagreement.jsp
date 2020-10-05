@@ -1,577 +1,346 @@
+<%@ include file="/includes/taglibs.jsp"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
-
-<style>
-/* .container {
-	overflow: hidden
-}
- */
-.tab {
-	float: left;
-}
-
-.tab-2 {
-	margin-left: 50px
-}
-
-.tab-2 input {
-	display: block;
-	margin-bottom: 10px
-}
-
-tr {
-	transition: all .25s ease-in-out
-}
-
-tr:hover {
-	background-color: #EEE;
-	cursor: pointer
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 15px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-* {
-	box-sizing: border-box;
-}
-
-.row:after {
-	content: "";
-	display: table;
-	clear: both;
-}
-
-.container {
-	padding: 10px 50px 20px;
-}
-
-.card {
-	/* Add shadows to create the "card" effect */
-	box-shadow: 0 5px 9px 0 rgba(0, 0, 0, 0.7);
-	padding: 20px 0;
-}
-
-.btn-info {
-	background: #f0794f;
-	border: none;
-	border-radius: 3px;
-	font-size: 18px;
-	padding: 10px 20px;
-	color: white;
-}
-
-.btn-info:hover {
-	background: #fdd3b6;
-	transition: 0.5s background;
-	cursor: pointer;
-}
-
-.txtRight {
-	float: right
-}
-
-.block-colm {
-	display: inline-block;
-	float: left;
-	text-align: right;
-}
-
-.vertical-center {
-	text-align: center;
-}
-</style>
 
 
 <form:form name="view-work-agreement" role="form" method="post"
 	modelAttribute="workOrderAgreement" id="workOrderAgreement"
-	enctype="multipart/form-data">
-	<div class="card">
-		<div class="container">
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.name.work" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="name_work_order" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+	class="form-horizontal form-groups-bordered"
+	enctype="multipart/form-data" style="margin-top:-20px;">
+	<div class="tab-content">
+		<div class="tab-pane fade in active" id="auditheader">
+			<div class="panel panel-primary" data-collapsed="0">
+				<div class="form-group" style="padding: 50px 20px 0;">
+					<input type="hidden" name="workOrderAgreement"
+						value="${workOrderAgreement.id}" /> <label
+						class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.name.work" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control"
+							path="name_work_order" readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.estimate.number" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="work_number" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.estimate.number" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="work_number"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.start.date" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="date" class="form-control txtRight"
-								path="work_start_date" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.start.date" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="work_start_date" path="work_start_date"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" readonly="true" />
 					</div>
-				</div>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.intended.date" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="date" class="form-control txtRight"
-								path="work_intended_date" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
-
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.intended.date" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="work_intended_date" path="work_intended_date"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.extended.date" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="date" class="form-control txtRight"
-								path="work_end_date" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.extended.date" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="work_end_date" path="work_end_date"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.executing.department" /></label>
-						<div class="col-md-6 block-colm">
-							<form:select path="department" id="department"
-								class="form-control" readonly="true">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:options items="${workOrderAgreement.departments}"
-									itemValue="code" itemLabel="name" />
-							</form:select>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.executing.department" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="department" id="department"
+							class="form-control" readonly="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${workOrderAgreement.departments}"
+								itemValue="code" itemLabel="name" />
+						</form:select>
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.amount" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="number" class="form-control txtRight"
-								path="work_amount" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.amount" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="number" class="form-control" path="work_amount"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.details" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="work_details" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.details" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="work_details"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.agreement.details" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="agreement_details" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.agreement.details" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control"
+							path="agreement_details" readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.agreement.status" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="work_agreement_status" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.agreement.status" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="work_agreement_status"
+							id="work_agreement_status" cssClass="form-control"
+							cssErrorClass="form-control error" readonly="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:option value="Initiated">Initiated</form:option>
+							<form:option value="Under Verification">Under Verification</form:option>
+							<form:option value="Approved">Approved</form:option>
+							<form:option value="AA Approved">AA Approved</form:option>
+							<form:option value="Detailed Estimate Approved">Detailed Estimate Approved</form:option>
+						</form:select>
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.status" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="work_status" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.status" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="work_status" id="work_status"
+							cssClass="form-control" cssErrorClass="form-control error"
+							readonly="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:option value="Pending">Pending</form:option>
+							<form:option value="Ongoing">Ongoing</form:option>
+							<form:option value="Complete">Complete</form:option>
+						</form:select>
 					</div>
-				</div>
 
-				<!-- -------------------------- -->
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.category" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="category" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.category" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="category"
+							readonly="true" />
 					</div>
-				</div>
 
-				<%-- <div class="col-md-6">
-						<div class="form-group">
-							<label for="inputPassword"
-								class="col-md-6 col-form-label block-colm"><spring:message
-									code="lbl.work.order.search.work.location" /></label>
-							<div class="col-md-6 block-colm">
-								<form:input type="text" class="form-control txtRight"
-									path="workLocation" />
-							</div>
-							<div class="clearfix"></div>
-						</div>
-					</div> --%>
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.sector.number" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="number" class="form-control txtRight"
-								path="sector" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.sector.number" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="number" class="form-control" path="sector"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.estimated.cost" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="number" class="form-control txtRight"
-								path="estimatedCost" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.estimated.cost" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="number" class="form-control"
+							path="estimatedCost" readonly="true" />
 					</div>
-				</div>
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.work.type" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="workType" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.work.type" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="workType"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.tendered.cost" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="tenderCost" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.tendered.cost" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="tenderCost"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.fund" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="number" class="form-control txtRight"
-								path="fund" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.fund" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="number" class="form-control" path="fund"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.work.location" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="workLocation" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.work.location" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="workLocation"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.agency.work.order" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="agencyWorkOrder" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.agency.work.order" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control"
+							path="agencyWorkOrder" readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.date" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="date" class="form-control txtRight" path="date" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.date" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="date" path="date" class="form-control datepicker"
+							data-date-end-date="0d" placeholder="DD/MM/YYYY" readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.time.limit" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="timeLimit" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.time.limit" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="timeLimit"
+							readonly="true" />
 					</div>
-				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.work.order.search.category" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="category" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.category" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="category"
+							readonly="true" />
 					</div>
+
 				</div>
-
-
-
-				<!-- ---------------------------------- -->
 			</div>
 		</div>
-	</div>
+		<!-- ===========contractor here below======== -->
 
-	<br />
-
-	<div class="card">
-		<div class="container">
+		<div class="panel panel-primary" data-collapsed="0"
+			style="scrollable: true;">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="lbl.work.contractor.details"
+						text="Contractor Details" />
+				</div>
+			</div>
+			<br>
 			<div>
-				<p style="color: #4e799f; font-size: 25px;">Contractor Details</p>
-			</div>
-			<div class="row">
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.name" /></label>
-						<div class="col-md-6 block-colm">
-							<form:select path="contractor_name" id="contractor_name"
-								cssClass="form-control" cssErrorClass="form-control error"
-								readonly="true">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:option value="abc">ABC</form:option>
-								<form:option value="def">DEF</form:option>
-							</form:select>
-
-						</div>
-						<div class="clearfix"></div>
-					</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+						code="lbl.name" /></label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="contractor_name" id="contractor_name"
+						cssClass="form-control" cssErrorClass="form-control error"
+						readonly="true">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:option value="abc">ABC</form:option>
+						<form:option value="def">DEF</form:option>
+					</form:select>
 				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.code" /></label>
-						<div class="col-md-6 block-colm">
-							<form:select path="contractor_code" id="contractor_code"
-								cssClass="form-control" cssErrorClass="form-control error"
-								readonly="true">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:option value="abc">ABC</form:option>
-								<form:option value="def">DEF</form:option>
-							</form:select>
-						</div>
-						<div class="clearfix"></div>
-					</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+						code="lbl.code" /></label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="contractor_code" id="contractor_code"
+						cssClass="form-control" cssErrorClass="form-control error"
+						readonly="true">
+						<form:option value="">
+							<spring:message code="lbl.select" />
+						</form:option>
+						<form:option value="abc">ABC</form:option>
+						<form:option value="def">DEF</form:option>
+					</form:select>
 				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.adddress" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="contractor_address" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
-					</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+						code="lbl.adddress" /></label>
+				<div class="col-sm-3 add-margin">
+					<form:input type="text" class="form-control"
+						path="contractor_address" readonly="true"/>
 				</div>
 
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.phone" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="contractor_phone" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
-
-					</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+						code="lbl.phone" /></label>
+				<div class="col-sm-3 add-margin">
+					<form:input type="text" class="form-control"
+						path="contractor_phone" readonly="true"/>
 				</div>
 
-
-				<div class="col-md-6">
-					<div class="form-group">
-						<label for="inputPassword"
-							class="col-md-6 col-form-label block-colm"><spring:message
-								code="lbl.email" /></label>
-						<div class="col-md-6 block-colm">
-							<form:input type="text" class="form-control txtRight"
-								path="contractor_email" readonly="true"/>
-						</div>
-						<div class="clearfix"></div>
-					</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+						code="lbl.email" /></label>
+				<div class="col-sm-3 add-margin">
+					<form:input type="text" class="form-control"
+						path="contractor_email" readonly="true"/>
 				</div>
-
+				<br><br><br><br><br><br>
 			</div>
 		</div>
-	</div>
 
-	<br />
+		<br>
+		<br>
+		<br>
 
-	<div class="card">
-		<div class="container">
-			<div>
-				<p style="color: #4e799f; font-size: 25px;">BOQ Document</p>
-			</div>
-			<div class="tab tab-1">
+		<!-- ========================code end=========== -->
 
-				<table id="table" border="1" cellpadding="10" style="width: 100%">
-					<thead>
-						<tr>
-							<th><spring:message code="lbl.item.description" /></th>
-							<th><spring:message code="lbl.ref.dsr" /></th>
-							<th><spring:message code="lbl.unit" /></th>
-							<th><spring:message code="lbl.rate" /></th>
-							<th><spring:message code="lbl.quantity" /></th>
-							<th><spring:message code="lbl.amount" /></th>
+		<!-- ===========boq here below======== -->
 
-						</tr>
-					</thead>
-					<tbody>
-						<c:forEach var="boq" items="${workOrderAgreement.boQDetailsList}"
-							varStatus="status">
-							<tr id="detailsrow" class="repeat-address">
-								<td><form:hidden
-										path="boQDetailsList[${status.index}].item_description"
-										id="boQDetailsList[${status.index}].item_description" />
-									${boq.item_description}</td>
-								<td><form:hidden
-										path="boQDetailsList[${status.index}].ref_dsr"
-										id="boQDetailsList[${status.index}].ref_dsr" />
-									${boq.ref_dsr}</td>
-								<td><form:hidden
-										path="boQDetailsList[${status.index}].unit"
-										id="boQDetailsList[${status.index}].unit" /> ${boq.unit}</td>
-								<td><form:hidden
-										path="boQDetailsList[${status.index}].rate"
-										id="boQDetailsList[${status.index}].rate" /> ${boq.rate}</td>
-								<td><form:hidden
-										path="boQDetailsList[${status.index}].quantity"
-										id="boQDetailsList[${status.index}].quantity" />
-									${boq.quantity}</td>
-								<td><form:hidden
-										path="boQDetailsList[${status.index}].amount"
-										id="boQDetailsList[${status.index}].amount" /> ${boq.amount}
-								</td>
 
-							</tr>
-						</c:forEach>
-					</tbody>
-				</table>
+		<div class="panel panel-primary" data-collapsed="0"
+			style="scrollable: true;">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="lbl.work.boq" text="BoQ Document" />
+				</div>
+				<br>
+				<div>
+					<div>
+						<table id="table" class="table table-bordered">
+							<thead>
+								<tr>
+									<th><spring:message code="lbl.item.description" /></th>
+									<th><spring:message code="lbl.ref.dsr" /></th>
+									<th><spring:message code="lbl.unit" /></th>
+									<th><spring:message code="lbl.rate" /></th>
+									<th><spring:message code="lbl.quantity" /></th>
+									<th><spring:message code="lbl.amount" /></th>
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach var="boq"
+									items="${workOrderAgreement.boQDetailsList}" varStatus="status">
+									<tr id="detailsrow" class="repeat-address">
+										<td><form:input type="text"
+												path="boQDetailsList[${status.index}].item_description"
+												id="boQDetailsList[${status.index}].item_description"
+												required="required" class="form-control item_description"
+												maxlength="200" readonly="true"></form:input></td>
+										<td><form:input type="text"
+												path="boQDetailsList[${status.index}].ref_dsr"
+												id="boQDetailsList[${status.index}].ref_dsr"
+												required="required" class="form-control ref_dsr"
+												maxlength="200" readonly="true"></form:input></td>
+										<td><form:input type="text"
+												path="boQDetailsList[${status.index}].unit"
+												id="boQDetailsList[${status.index}].unit"
+												required="required" class="form-control unit"
+												maxlength="200" readonly="true"></form:input></td>
+										<td><form:input type="number"
+												path="boQDetailsList[${status.index}].rate" step=".01"
+												id="boQDetailsList[${status.index}].rate"
+												required="required" class="form-control rate"
+												readonly="true"></form:input></td>
+										<td><form:input type="number"
+												path="boQDetailsList[${status.index}].quantity" step=".01"
+												id="boQDetailsList[${status.index}].quantity"
+												required="required" class="form-control quantity"
+												name="quantity" readonly="true"></form:input></td>
+										<td><form:input type="number"
+												path="boQDetailsList[${status.index}].amount"
+												id="boQDetailsList[${status.index}].amount"
+												required="required" class="form-control amount"
+												maxlength="200" name="amount" readonly="true"></form:input>
+										</td>
+									</tr>
+								</c:forEach>
+							</tbody>
+
+						</table>
+					</div>
+				</div>
 			</div>
 		</div>
+
+		<!-- ========================code end=========== -->
+
 	</div>
 </form:form>
 

@@ -411,6 +411,14 @@ public class RemitRecoveryAction extends BasePaymentAction {
             final String voucherDate = formatter1.format(date1);
             String cutOffDate1 = null;
             prepareListRemitBean(selectedRows);
+            if(listRemitBean != null && !listRemitBean.isEmpty())
+            {
+            	for(RemittanceBean row : listRemitBean)
+            	{
+            		System.out.println("voucher name :: "+row.getVoucherName());
+            		System.out.println("voucher number :: "+row.getVoucherNumber());
+            	}
+            }
             if(isPartialPaymentEnabled){
                 setPartialAmountForSelectedDeduction();
             }

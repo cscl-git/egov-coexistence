@@ -158,7 +158,6 @@ import com.exilant.eGov.src.transactions.VoucherTypeForULB;
         @Result(name = "editVoucher", type = "redirectAction", location = "journalVoucherModify-beforeModify", params = {
                 "namespace", "/voucher", "voucherId", "${voucherId}" }),
         @Result(name = "view", location = "preApprovedVoucher-view.jsp"),
-        @Result(name = "success", location = "stopPayment-success.jsp"),
         @Result(name = PreApprovedVoucherAction.VOUCHEREDIT, location = "preApprovedVoucher-voucheredit.jsp"),
         @Result(name = "billview", location = "preApprovedVoucher-billview.jsp"),
         @Result(name = "voucherview", location = "preApprovedVoucher-voucherview.jsp"),
@@ -591,6 +590,12 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                     ismodifyJv = true;
                 }
             }
+            else {
+                type = FinancialConstants.JOURNALVOUCHER_NAME_GENERAL;
+                result = "editVoucher";
+                ismodifyJv = true;
+                System.out.println("type-----------5----------"+type);
+            }
         // loadApproverUser(type);
        			
         if (!ismodifyJv)
@@ -666,7 +671,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             voucherHeader.setDocumentDetail(voucherDocList);
             voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_VIEW_MODE);
             
-            if(parameters.get(PEXNUMBER)[0]!=null) {
+            if(parameters.get(PEXNUMBER)!=null) {
             PEXNUMBER=parameters.get(PEXNUMBER)[0];
             voucherHeader.setVoucherNumberPrefix(PEXNUMBER);
             }
@@ -1404,6 +1409,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 
     public Map<String, Object> getAccountDetails(final Integer detailtypeid, final Integer detailkeyid,
             final Map<String, Object> tempMap) throws ApplicationException {
+    	try {
         final Accountdetailtype detailtype = (Accountdetailtype) getPersistenceService().find(ACCDETAILTYPEQUERY,
                 detailtypeid);
         tempMap.put("detailtype", detailtype.getDescription());
@@ -1419,15 +1425,34 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             tempMap.put(Constants.DETAILKEY, entityType.getName());
             tempMap.put(Constants.DETAILCODE, entityType.getCode());
         }
+    	}catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
         return tempMap;
     }
 
-    public void setupDropDownForSL(final List<Long> glcodeIdList) {
+   /* public void setupDropDownForSL(final List<Long> glcodeIdList) {
         List<CChartOfAccounts> glcodeList = null;
         final Query glcodeListQuery = persistenceService.getSession().createQuery(
                 " from CChartOfAccounts where id in (select glCodeId from CChartOfAccountDetail) and id in  ( :IDS )");
         glcodeListQuery.setParameterList("IDS", glcodeIdList);
         glcodeList = glcodeListQuery.list();
+        if (glcodeIdList.isEmpty())
+            dropdownData.put("glcodeList", Collections.EMPTY_LIST);
+        else
+            dropdownData.put("glcodeList", glcodeList);
+    }*/
+    
+    public void setupDropDownForSL(final List<Long> glcodeIdList) {
+        List<CChartOfAccounts> glcodeList = null;
+        if (!glcodeIdList.isEmpty())
+        {
+        final Query glcodeListQuery = persistenceService.getSession().createQuery(
+                " from CChartOfAccounts where id in (select glCodeId from CChartOfAccountDetail) and id in  ( :IDS )");
+        glcodeListQuery.setParameterList("IDS", glcodeIdList);
+        glcodeList = glcodeListQuery.list();
+        }
         if (glcodeIdList.isEmpty())
             dropdownData.put("glcodeList", Collections.EMPTY_LIST);
         else

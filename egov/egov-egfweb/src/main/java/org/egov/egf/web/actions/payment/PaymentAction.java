@@ -75,6 +75,7 @@ import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.Bankbranch;
 import org.egov.commons.CFunction;
+import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
@@ -1068,6 +1069,7 @@ public class PaymentAction extends BasePaymentAction {
             {
               for(int i =0; i< miscBillList.size();i++)
               {
+            	 // voucherHeader = (CVoucherHeader) voucherService.findById( miscBillList.get(i).getBillVoucherHeader().getOriginalvcId(),false);
             	  workflowHistory.addAll(financialUtils.getWorkflowHistory(miscBillList.get(i).getBillVoucherHeader().getState(),miscBillList.get(i).getBillVoucherHeader().getStateHistory()));
                 
               }
@@ -1176,11 +1178,28 @@ public class PaymentAction extends BasePaymentAction {
         LOGGER.info("setbillRegisterFunction with dept and function");
         final Bankaccount ba = (Bankaccount) persistenceService.find(" from Bankaccount where id = ? ",
                 Long.valueOf(parameters.get("bankaccount")[0]));
+        final HashMap<String, Object> accdetailsMap = new HashMap<String, Object>();
+       
+        /*accdetailsMap.put(VoucherConstant.GLCODE, ba.getChartofaccounts().getGlcode());
+        accdetailsMap.put(VoucherConstant.NARRATION, ba.getChartofaccounts().getName());
+        accdetailsMap.put(VoucherConstant.DEBITAMOUNT, 0);
+        accdetailsMap.put(VoucherConstant.CREDITAMOUNT, parameters.get("grandTotal")[0]);
+        accountcodedetails.add(accdetailsMap);*/
         
         LOGGER.info("getting bank account");
         LOGGER.info("before set form data::"+paymentheader.getPaymentAmount());
         voucherHeader = paymentheader.getVoucherheader();
              
+        
+        for (final CGeneralLedger details : voucherHeader.getGeneralLedger()) {
+        	if(paymentheader.getBankaccount().getChartofaccounts().getGlcode().equals(details.getGlcode()))
+        	{
+        	details.setGlcode(ba.getChartofaccounts().getGlcode());
+        	details.setGlcodeId(ba.getChartofaccounts());
+        	}
+
+        }
+        
         voucherHeader.setVoucherDate(formatter.parse(parameters.get(VoucherConstant.VOUCHERDATE)[0]));
         voucherHeader.setDescription(parameters.get(VoucherConstant.DESCRIPTION)[0]);
         voucherHeader.getVouchermis().setDepartmentcode(billregister.getEgBillregistermis().getDepartmentcode() );
@@ -1216,7 +1235,7 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed sendForApproval.");
         LOGGER.info("Completed sendForApproval.");
         populateDepartmentName();
-        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
+       
         if (paymentheader.getVoucherheader().getFundId().getId()!=null && !paymentheader.getVoucherheader().getFundId().getId().equals("-1"))
         {
         	 final Fund fund = (Fund) persistenceService.find("from Fund where id=?",
@@ -1243,6 +1262,9 @@ public class PaymentAction extends BasePaymentAction {
          LOGGER.info("populate available balance after sendForApproval.");
          LOGGER.info("Completed sendForApproval.");
         setMode("view");
+        
+        paymentheader = getPayment();
+        workflowHistory.addAll(financialUtils.getWorkflowHistory(paymentheader.getState(), paymentheader.getStateHistory()));
         }
         catch(Exception e)
         {
@@ -1309,6 +1331,7 @@ public class PaymentAction extends BasePaymentAction {
         {
           for(int i=0;i<miscBillList.size();i++) 
           {
+        	 // voucherHeader = (CVoucherHeader) voucherService.findById( miscBillList.get(i).getBillVoucherHeader().getOriginalvcId(),false);
            workflowHistory.addAll(financialUtils.getWorkflowHistory(miscBillList.get(i).getBillVoucherHeader().getState(), miscBillList.get(0).getBillVoucherHeader().getStateHistory()));
           }
         }

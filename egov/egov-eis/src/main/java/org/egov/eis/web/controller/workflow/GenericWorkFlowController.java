@@ -199,22 +199,22 @@ public abstract class GenericWorkFlowController {
      * @return List of WorkFlow Buttons From Matrix By Passing parametres Type,CurrentState,CreatedDate
      */
     public List<String> getValidActions(final StateAware model, final WorkflowContainer container) {
-        List<String> validActions;
+        List<String> validActions = null;
         if (model == null || model.getId() == null || model.getCurrentState() == null
                 || model.getCurrentState().getValue().equals("Closed")
                 || model.getCurrentState().getValue().equals("END"))
             validActions = Arrays.asList("Forward");
-        else if (model.getCurrentState() != null)
         	 
-        	if(! model.getState().getValue().equals("SaveAsDraft")) {
+         if (model.getCurrentState() != null)
+        	 
+        	
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),
                     model.getCurrentState().getValue(), container.getPendingActions(), model.getCreatedDate(),
                     container.getCurrentDesignation());
-        	}
-        	else {
-        		validActions = Arrays.asList("Forward","SaveAsDraft");
-        	}
+        
+        		
+        	
         else
             validActions = customizedWorkFlowService.getNextValidActions(model.getStateType(),
                     container.getWorkFlowDepartment(), container.getAmountRule(), container.getAdditionalRule(),

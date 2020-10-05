@@ -770,6 +770,29 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			}
 		}
 	}
+	
+	 protected void removeEmptyRowsAccoutDraftDetail(final List list) {
+	        for (final Iterator<VoucherDetails> detail = list.iterator(); detail.hasNext();) {
+	            final VoucherDetails next = detail.next();
+	            if (next == null)
+	                detail.remove();
+	            else {
+	                if (next.getDebitAmountDetail() == null)
+	                    next.setDebitAmountDetail(BigDecimal.ZERO);
+	                
+	                if (next.getCreditAmountDetail() == null)
+	                    next.setCreditAmountDetail(BigDecimal.ZERO);
+	                
+	                if (next.getGlcodeDetail()== null)
+	                    next.setGlcodeDetail("");
+	                
+	                if (next.getFunctionDetail()==null)
+	                    next.setFunctionDetail("");
+	                
+	                
+	            }
+	        }
+	    }
 
 	protected void removeEmptyRowsSubledger(final List<VoucherDetails> list) {
 		for (final Iterator<VoucherDetails> detail = list.iterator(); detail.hasNext();) {

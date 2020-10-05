@@ -102,37 +102,13 @@
 }
 
 </style>
-<script>
-	function openSource(){
-		if("<s:property value='%{voucherHeader.vouchermis.sourcePath}' escapeHtml='false'/>"=="" || "<s:property value='%{voucherHeader.vouchermis.sourcePath}'/>"=='null')
-			bootbox.alert('Source is not available');
-		else{
-			var url = '<s:property value="%{voucherHeader.vouchermis.sourcePath}" escapeHtml="false"/>'+'&showMode=view';
-			window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
-		}   
-	}
-	function checkLength(obj)
-	{
-		if(obj.value.length>1024)
-		{
-			bootbox.alert('Max 1024 characters are allowed for comments. Remaining characters are truncated.')
-			obj.value = obj.value.substring(1,1024);
-		}
-	}
-
-	function removeVoucher() {
-		alert("in reomve");
-		document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action;
-//		document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?voucherNumber=';
 	
-		document.preApprovedVoucher.submit();
-	}
-	
-</script>
 </head>
 
 <body onload="refreshInbox()">
 	<s:form action="preApprovedVoucher" theme="simple">
+	<s:hidden id="vouchermissourcepath" name="vouchermissourcepath" value="%{voucherHeader.vouchermis.sourcePath}" />
+	
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="Voucher-View" />
 		</jsp:include>
@@ -316,7 +292,7 @@
 		<s:hidden id="id" name="id" value="%{voucherHeader.id}" />
 		<s:hidden id="contraId" name="contraId" value="%{contraVoucher.id}" />
 		<s:hidden id="pexNumber" name="pexNumber" value="%{voucherHeader.voucherNumberPrefix}" />
-		 
+
 
 	</s:form>
 

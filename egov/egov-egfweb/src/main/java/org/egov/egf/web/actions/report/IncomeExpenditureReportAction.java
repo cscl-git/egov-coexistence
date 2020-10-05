@@ -495,17 +495,23 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     }
 
     public String getCurrentYearFromDate() {
-    
         return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getFromDate(incomeExpenditureStatement));
-  	   
     }
 
     public String getPreviousYearFromDate() {
-    	
         return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureService
                 .getFromDate(incomeExpenditureStatement)));
-      
     }
+    public String getCurrentYearToDateStr() {
+      
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getToDate(incomeExpenditureStatement));
+    }
+
+    public String getPreviousYearToDateStr() {
+        return incomeExpenditureService.getFormattedDate(incomeExpenditureService.getPreviousYearFor(incomeExpenditureService
+                .getToDate(incomeExpenditureStatement)));
+    }
+
     public Date getTodayDate() {
         return todayDate;
     }

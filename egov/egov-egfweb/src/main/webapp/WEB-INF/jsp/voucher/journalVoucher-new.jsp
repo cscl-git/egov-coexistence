@@ -266,6 +266,15 @@
 			return false;
 		}
 	}
+	
+	// jayanta for save as draft
+	function onSubmitDraft()
+	{
+		
+			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action';
+	    	return true;
+		
+	}
 
 	function validateCutOff()
 	{

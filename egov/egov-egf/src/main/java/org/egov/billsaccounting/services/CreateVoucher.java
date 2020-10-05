@@ -127,6 +127,8 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.contra.ContraJournalVoucher;
 import org.egov.model.voucher.PreApprovedVoucher;
+import org.egov.model.voucher.VoucherDraftDetails;
+import org.egov.model.voucher.WorkflowBean;
 import org.egov.pims.commons.Designation;
 import org.egov.pims.commons.Position;
 import org.egov.pims.dao.PersonalInformationDAO;
@@ -150,6 +152,8 @@ import com.exilant.GLEngine.Transaxtion;
 import com.exilant.GLEngine.TransaxtionParameter;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 import com.exilant.exility.common.TaskFailedException;
+
+import com.exilant.eGov.src.reports.JournalVoucherDraftService;
 
 /**
  * This Class will create voucher from bill <br>
@@ -242,6 +246,12 @@ public class CreateVoucher {
 
 	@Autowired
 	private GenericSequenceNumberGenerator genericSequenceNumberGenerator;
+
+	// jayanta for save as draft
+    @Autowired
+    @Qualifier("journalVoucherDraftService")
+    private JournalVoucherDraftService journalVoucherDraftService;
+    
 
 	private static final String ERR = "Exception in CreateVoucher";
 	private static final String DEPTMISSINGMSG = "Department is missing in the Bill cannot proceed creating vouvher";
@@ -2820,5 +2830,219 @@ public class CreateVoucher {
 		}
 		return fiscalPeriod;
 	}
+	
+	// jayanta for save as draft
+		@Transactional
+		public CVoucherHeader createPreApprovedVoucher(final HashMap<String, Object> headerdetails,
+				final List<HashMap<String, Object>> accountcodedetails,
+				final List<HashMap<String, Object>> subledgerdetails,
+				final WorkflowBean workflowBean)
+				throws ApplicationRuntimeException, ValidationException {
+			final AppConfig appConfig = appConfigService.getAppConfigByKeyName("PREAPPROVEDVOUCHERSTATUS");
+			if (null != appConfig && null != appConfig.getConfValues())
+				for (final AppConfigValues appConfigVal : appConfig.getConfValues())
+					headerdetails.put(VoucherConstant.STATUS, Integer.valueOf(appConfigVal.getValue()));
+			else
+				throw new ApplicationRuntimeException(
+						"Appconfig value for PREAPPROVEDVOUCHERSTATUS is not defined in the system");
+			CVoucherHeader vh;
+			try {
+				System.out.println("accountcodedetails---------"+accountcodedetails);
+				vh = createVoucher(headerdetails, accountcodedetails, subledgerdetails, workflowBean);
+				/*
+				 * if (vh.getModuleId() != null) startWorkflow(vh);
+				 */
+				// if u need workflow enable above lines and fix workflow
+			} catch (final ValidationException ve) {
+				LOGGER.error(ERR, ve);
+				ve.printStackTrace();
+				final List<ValidationError> errors = new ArrayList<ValidationError>();
+				//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+				throw new ValidationException(errors);
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error(ERR, e);
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			return vh;
+		}
+		
+		// jayanta for save as draft
+		@Transactional
+		public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
+				final List<HashMap<String, Object>> accountcodedetails,
+				final List<HashMap<String, Object>> subledgerdetails,
+				final WorkflowBean workflowBean) throws ApplicationRuntimeException {
+			CVoucherHeader vh;
+			Vouchermis mis;
+			System.out.println("-------------------------------");
+
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("start | createVoucher API");
+			try {
+	            System.out.println("headerdetails.containsKey(VoucherConstant.SERVICE_NAME)------:"+headerdetails.containsKey(VoucherConstant.SERVICE_NAME));            
+	            System.out.println("headerdetails.containsKey(VoucherConstant.REFERENCEDOC)------:"+headerdetails.containsKey(VoucherConstant.REFERENCEDOC));
+	            System.out.println("headerdetails.get(VoucherConstant.SERVICE_NAME)------:"+headerdetails.containsKey(VoucherConstant.SERVICE_NAME));
+	            System.out.println("headerdetails.get(VoucherConstant.REFERENCEDOC)------:"+headerdetails.containsKey(VoucherConstant.REFERENCEDOC));
+	            
+				if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
+	                            String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
+	                            String referenceDocument = headerdetails.get(VoucherConstant.REFERENCEDOC).toString();
+	                            validateReferenceDocument(referenceDocument,serviceName);
+	                        }
+				boolean CheckSaveAsDraft= true;
+				if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
+				{
+					for (final HashMap<String, Object> accDetailMap : accountcodedetails) {
+						String glcode = accDetailMap.get(VoucherConstant.GLCODE).toString();
+						if(glcode==null || glcode.equals(""))
+						{
+							CheckSaveAsDraft=false;
+							break;
+						}
+					}
+				}
+				
+				if(CheckSaveAsDraft)
+				{
+				    validateMandateFields(headerdetails);
+					validateLength(headerdetails);
+					validateVoucherMIS(headerdetails);
+					validateTransaction(accountcodedetails, subledgerdetails);
+					validateFunction(headerdetails, accountcodedetails);
+				}
+				
+				vh = createVoucherHeader(headerdetails);
+				mis = createVouchermis(headerdetails);
+				mis.setVoucherheaderid(vh);
+				vh.setVouchermis(mis);
+				// insertIntoVoucherHeader(vh);
+
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("start | insertIntoVoucherHeader");
+				final String vdt = formatter.format(vh.getVoucherDate());
+				String fiscalPeriod = null;
+				try {
+					CFiscalPeriod fp = getFiscalPeriod(vdt);
+	                                fiscalPeriod = fp.getId().toString();
+	                                vh.setFiscalName(fp.getName());
+				} catch (final TaskFailedException e) {
+					throw new ApplicationRuntimeException("error while getting fiscal period");
+				}
+				if (null == fiscalPeriod)
+					throw new ApplicationRuntimeException(
+							"Voucher Date not within an open period or Financial year not open for posting, fiscalPeriod := "
+									+ fiscalPeriod);
+				vh.setFiscalPeriodId(Integer.valueOf(fiscalPeriod));
+
+				vh.setCgvn(getCGVNNumber(vh));
+
+				try {
+					if (!isUniqueVN(vh.getVoucherNumber(), vdt))
+						throw new ValidationException(
+								Arrays.asList(new ValidationError("Duplicate Voucher Number", "Duplicate Voucher Number")));
+				} catch (final ValidationException e) {
+					e.printStackTrace();
+					LOGGER.error(ERR, e);
+					throw e;
+				}
+				 catch (final Exception e) {
+					 e.printStackTrace();
+						LOGGER.error(ERR, e);
+						throw new ApplicationRuntimeException(e.getMessage());
+					}
+				voucherService.applyAuditing(vh);
+				if (LOGGER.isInfoEnabled())
+					LOGGER.info("++++++++++++++++++" + vh.toString());
+				voucherService.persist(vh);
+				if (null != vh.getVouchermis().getSourcePath() && null == vh.getModuleId() && vh.getVouchermis()
+						.getSourcePath().length() == vh.getVouchermis().getSourcePath().indexOf("=") + 1) {
+					final StringBuffer sourcePath = new StringBuffer();
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("Source Path received : " + vh.getVouchermis().getSourcePath());
+					if (LOGGER.isDebugEnabled())
+						LOGGER.debug("Voucher Header Id  : " + vh.getId());
+					sourcePath.append(vh.getVouchermis().getSourcePath()).append(vh.getId().toString());
+					vh.getVouchermis().setSourcePath(sourcePath.toString());
+					voucherService.applyAuditing(vh);
+					voucherService.update(vh);
+				}
+
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("End | insertIntoVoucherHeader");
+				
+				if(CheckSaveAsDraft)
+				{
+				// insertIntoRecordStatus(vh);
+				final List<Transaxtion> transactions = createTransaction(headerdetails, accountcodedetails,
+						subledgerdetails, vh);
+				// persistenceService.getSession().flush();
+				// engine = ChartOfAccounts.getInstance();
+				// setChartOfAccounts();
+				Transaxtion txnList[] = new Transaxtion[transactions.size()];
+				txnList = transactions.toArray(txnList);
+				final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
+				if (!chartOfAccounts.postTransaxtions(txnList, formatter.format(vh.getVoucherDate())))
+					throw new ApplicationRuntimeException("Voucher creation Failed");
+				
+				// Generating EVENT to push the generated voucher to ES index.
+				finDashboardService.publishEvent(FinanceEventType.voucherCreateOrUpdate, vh);
+				}
+				else {
+					//createVoucherDraft(headerdetails, accountcodedetails,
+						//	subledgerdetails, vh);
+					createVoucherDraft( accountcodedetails, vh);
+				}
+			}
+
+			catch (final ValidationException ve) {
+				ve.printStackTrace();
+				final List<ValidationError> errors = new ArrayList<ValidationError>();
+				//errors.add(new ValidationError("exp", ve.getErrors().get(0).getMessage()));
+				ve.printStackTrace();
+				throw new ValidationException(errors);
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error(ERR, e);
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("End | createVoucher API");
+			return vh;
+
+		}
+		
+		public boolean createVoucherDraft( final List<HashMap<String, Object>> accountcodedetails,final CVoucherHeader vh)
+				throws ApplicationRuntimeException {
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("Start | createVoucherDraft() ");
+			boolean status=false;
+			try {
+				Integer voucherLineId = 1;
+				for (final HashMap<String, Object> accDetailMap : accountcodedetails) {
+					VoucherDraftDetails voucherDraftDetails =new VoucherDraftDetails();
+					final String glcode = accDetailMap.get(VoucherConstant.GLCODE).toString();
+					voucherDraftDetails.setVoucherNumber(vh.getVoucherNumber());
+					//voucherDraftDetails.setAccounthead(voucherDraftDetails);
+					voucherDraftDetails.setDebitAmountDetail(new BigDecimal(accDetailMap.get(VoucherConstant.DEBITAMOUNT).toString()));
+					voucherDraftDetails.setCreditAmountDetail(new BigDecimal(accDetailMap.get(VoucherConstant.CREDITAMOUNT).toString()));
+				//	voucherDraftDetails.setIsSubledger(isSubledger);
+					voucherDraftDetails.setGlcodeDetail(accDetailMap.get(VoucherConstant.GLCODE).toString());
+					
+					journalVoucherDraftService.delete(voucherDraftDetails);
+					journalVoucherDraftService.create(voucherDraftDetails);
+					status=true;
+					
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error("Exception occured while posting data into voucher detail draft ");
+				throw new ApplicationRuntimeException(
+						"Exception occured while posting data into voucher detail draft" + e.getMessage());
+			}
+			if (LOGGER.isDebugEnabled())
+				LOGGER.debug("END | createVoucherDraft() ");
+			return status;
+		}
 
 }

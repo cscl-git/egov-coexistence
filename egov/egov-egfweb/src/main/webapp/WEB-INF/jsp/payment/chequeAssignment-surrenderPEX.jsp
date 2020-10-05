@@ -124,7 +124,7 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 								<td style="text-align: center" class="blueborderfortdnew">
 									<s:iterator var="v" value="instrumentVouchers" status="st">
 										<A href="#"
-											onclick='openDetails(<s:property value="%{voucherHeaderId.id}"/>,<s:property value="%{id}"/>,<s:property value="%{instrumentAmount}"/>);'>
+											onclick='openDetails(<s:property value="%{voucherHeaderId.id}"/>,<s:property value="%{id}"/>);'>
 											<s:property value="%{voucherHeaderId.voucherNumber}" />
 										</A>
 									</s:iterator>
@@ -166,11 +166,14 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 						<input type="button" Class="buttonsubmit" name="Surrender"
 							value="Surrender" onclick="return surrenderChq();" method="save" />
 							
-						
+						<s:submit onclick="onSubmit();" value="Data Refresh" id="searchBtn"
+					cssClass="buttonsubmit" />
 					
 					
 						<input type="button" value="Close"
 							onclick="javascript:window.close()" class="button" />
+							
+							
 					</div>
 				</s:if>
 				<s:else>
@@ -183,6 +186,11 @@ href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
 			<s:token />
 	</s:form>
 	<script>
+	function onSubmit() {
+		
+		document.chequeAssignment.action = '/services/EGF/payment/chequeAssignment-searchForPEXSurrender.action';
+		document.chequeAssignment.submit();
+	}
 		function validatechequeno(obj)
 			{
 				if(isNaN(obj.value))

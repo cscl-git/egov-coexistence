@@ -12,8 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EstimatePreparationApprovalRepository extends JpaRepository<EstimatePreparationApproval, Long> {
 
-	@Query(" from EstimatePreparationApproval e where e.workCategory =:workCategory and e.estimateNumber =:estimateNumber and e.executingDivision =:executingDivision and e.estimateDate BETWEEN :fromDt AND :toDt")
-	List<EstimatePreparationApproval> findByAllParams(@Param("workCategory") Long workCategory,
+	@Query(" from EstimatePreparationApproval e where e.estimateNumber =:estimateNumber and e.executingDivision =:executingDivision and e.estimateDate BETWEEN :fromDt AND :toDt")
+	List<EstimatePreparationApproval> findByAllParams(
 			@Param("estimateNumber") String estimateNumber, @Param("executingDivision") Long executingDivision,
 			@Param("fromDt") Date fromDt, @Param("toDt") Date toDt);
 	
@@ -21,14 +21,21 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 
 	List<EstimatePreparationApproval> findByEstimateNumber(final String estimateNumber);
 
-	List<EstimatePreparationApproval> findByExecutingDivision(final Long executingDivision);
+	@Query(" from EstimatePreparationApproval tep where tep.executingDivision =:executingDivision and tep.status = (select es.id from EgwStatus es where es.code ='Approved' and es.moduletype ='EstimatePreparationApproval')")
+	List<EstimatePreparationApproval> findByExecutingDivisionAndStatusId(
+			@Param("executingDivision") Long executingDivision);
 	
-	@Query(" from EstimatePreparationApproval e where e.workCategory =:workCategory  and e.executingDivision =:executingDivision and e.estimateDate BETWEEN :fromDt AND :toDt")
-	List<EstimatePreparationApproval> findByParams(@Param("workCategory") Long id,
-			@Param("executingDivision") Long executingDivision,
+	@Query(" from EstimatePreparationApproval tep where tep.executingDivision =:executingDivision and tep.estimateDate BETWEEN :fromDt AND :toDt and tep.status = (select es.id from EgwStatus es where es.code ='Approved' and es.moduletype ='EstimatePreparationApproval')")
+	List<EstimatePreparationApproval> findByParams(@Param("executingDivision") Long executingDivision,
 			@Param("fromDt") Date fromDt, @Param("toDt") Date toDt);
 
-
-	//List<EstimatePreparationApproval> findByParams(long id, Long executingDivision, Date fromDt, Date toDt);
+	@Query(" from EstimatePreparationApproval tep where tep.workStatus =:workStatus or tep.workCategory =:workCategory or tep.executingDivision =:executingDivision or tep.workName =:workName or tep.workLocation =:workLocation or tep.sectorNumber =:sectorNumber or tep.wardNumber =:wardNumber or tep.fundSource =:fundSource or tep.estimateAmount =:estimateAmount or tep.tenderCost =:tenderCost or tep.agencyWorkOrder =:agencyWorkOrder or tep.date =:date or tep.timeLimit =:timeLimit")
+	List<EstimatePreparationApproval> findByAllParameters(@Param("workStatus") Long workStatus,
+			@Param("workCategory") Long workCategory, @Param("executingDivision") Long executingDivision,
+			@Param("workName") String workName, @Param("workLocation") String workLocation,
+			@Param("sectorNumber") Long sectorNumber, @Param("wardNumber") Long wardNumber,
+			@Param("fundSource") String fundSource, @Param("estimateAmount") Double estimateAmount,
+			@Param("tenderCost") String tenderCost, @Param("agencyWorkOrder") String agencyWorkOrder,
+			@Param("date") Date date, @Param("timeLimit") String timeLimit);
 
 }

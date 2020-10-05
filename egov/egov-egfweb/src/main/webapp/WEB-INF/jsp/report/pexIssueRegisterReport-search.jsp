@@ -182,9 +182,8 @@
 							onChange="loadBank(this);" value="%{fundId.id}" /></td>
 					<td class="bluebox"><s:text name="voucher.department" />
 					<td class="bluebox"><s:select name="departmentid"
-							id="departmentid" list="dropdownData.departmentList" listKey="id"
+							id="departmentid" list="dropdownData.departmentList" listKey="code"
 							listValue="name" headerKey="-1" headerValue="----Choose----"
-							onChange="alertWhileSelectingDepartment(this);"
 							value="%{departmentId.id}" /></td>
 				</tr>
 				<tr>
@@ -294,17 +293,7 @@
 			document.rtgsIssueRegisterReport.submit();
 			return true;
 		}
-		function alertWhileSelectingDepartment() {
-			var department = document.getElementById('departmentid').value;
-			if (department == -1) {
-				return true;
-			} else {
-				bootbox
-						.alert("The payments that are not of the selected department in the respective RTGS transaction will be not be shown here. Please unselect department if you wish to see all the payments in the RTGS transactions");
-				return true;
-			}
-
-		}
+		
 		function loadBank(fund) {
 			if (fund.value != -1) {
 				populatebank({

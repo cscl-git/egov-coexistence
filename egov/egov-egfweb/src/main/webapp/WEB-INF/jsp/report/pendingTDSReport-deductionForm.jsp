@@ -203,7 +203,7 @@ function hideIncludeRemittance(){
 	document.getElementById('showRemittedEntrieslabel').style.display = "none";
 }
 </script>
-<body onload="hideIncludeRemittance();loadEntities();">
+<body onload="loadEntities();">
 
 	<jsp:include page="pendingTDSReport-deductionform.jsp"></jsp:include>
 </body>

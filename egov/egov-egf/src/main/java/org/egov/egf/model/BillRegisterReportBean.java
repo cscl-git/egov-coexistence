@@ -73,6 +73,12 @@ public class BillRegisterReportBean {
     private String remittanceVoucherNumber;
     private String remittanceChequeNumberAndDate;
     private Date ChequeDate;
+    private Long vhId;
+    private Long phId;
+    private Long deducVhId;
+    private String deducVoucherNumber;
+    private String pexNo;
+    private String deducPexNo;
 
     public String getBillNumber() {
         return billNumber;
@@ -186,5 +192,53 @@ public class BillRegisterReportBean {
             final String remittanceChequeNumberAndDate) {
         this.remittanceChequeNumberAndDate = remittanceChequeNumberAndDate;
     }
+
+	public Long getVhId() {
+		return vhId;
+	}
+
+	public void setVhId(Long vhId) {
+		this.vhId = vhId;
+	}
+
+	public Long getPhId() {
+		return phId;
+	}
+
+	public void setPhId(Long phId) {
+		this.phId = phId;
+	}
+
+	public Long getDeducVhId() {
+		return deducVhId;
+	}
+
+	public void setDeducVhId(Long deducVhId) {
+		this.deducVhId = deducVhId;
+	}
+
+	public String getDeducVoucherNumber() {
+		return deducVoucherNumber;
+	}
+
+	public void setDeducVoucherNumber(String deducVoucherNumber) {
+		this.deducVoucherNumber = deducVoucherNumber;
+	}
+
+	public String getPexNo() {
+		return pexNo;
+	}
+
+	public void setPexNo(String pexNo) {
+		this.pexNo = pexNo;
+	}
+
+	public String getDeducPexNo() {
+		return deducPexNo;
+	}
+
+	public void setDeducPexNo(String deducPexNo) {
+		this.deducPexNo = deducPexNo;
+	}
 
 }

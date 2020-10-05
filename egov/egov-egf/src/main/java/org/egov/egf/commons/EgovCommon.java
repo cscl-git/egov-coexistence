@@ -84,6 +84,7 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.budget.BudgetUsage;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.masters.AccountCodePurpose;
+import org.egov.model.masters.OtherParty;
 import org.egov.pims.service.EmployeeServiceOld;
 import org.egov.services.report.FundFlowService;
 import org.egov.utils.Constants;
@@ -801,6 +802,18 @@ public class EgovCommon {
                 employee.setName(detailNames[1]);
                 
                 entity = (EntityType) employee;
+            }else if(aClass.equals(OtherParty.class)){
+                Accountdetailkey accdetailKey = (Accountdetailkey) persistenceService.find("from Accountdetailkey where detailkey=? and detailtypeid =?",(Integer)detailkey,accountdetailtype.getId());
+                if(null==accdetailKey || accdetailKey.getDetailname()==null){
+                    throw new Exception("OtherParty not found for "+ detailkey);
+                }
+                //String[] detailNames = accdetailKey.getDetailname().split("-");
+                OtherParty otherParty = new OtherParty();
+                //otherParty.setId(accdetailKey.getDetailkey().longValue());
+                otherParty.setCode(accdetailKey.getDetailname());
+                otherParty.setName(accdetailKey.getDetailname());
+                
+                entity = (EntityType) otherParty;
             }else{
             final java.lang.reflect.Method method = aClass.getMethod("getId");
             final String dataType = method.getReturnType().getSimpleName();

@@ -2992,6 +2992,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         List<ChequeAssignment> pexChequeAssignmentList;
         List<ChequeAssignment> dbpPexAssignmentList;
         List<ChequeAssignment> pexEntry;
+        List<ChequeAssignment> bankToBankTransAssignmentList;
         //rtgsContractorAssignment = true;
         boolean addList = false;
         Bankaccount bnkAcc;
@@ -3000,8 +3001,9 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         System.out.println("paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader)" +pexChequeAssignmentList.size());
         dbpPexAssignmentList = paymentService.getDirectBankPaymentVoucherForRTGSInstrument(parameters, voucherHeader);
         System.out.println("paymentService.getPaymentVoucherForRTGSInstrument(parameters, voucherHeader)" +dbpPexAssignmentList.size());
-        
         pexChequeAssignmentList.addAll(dbpPexAssignmentList);
+       bankToBankTransAssignmentList = paymentService.getBankToBankTransVoucherForRTGSInstrument(parameters, voucherHeader);
+       pexChequeAssignmentList.addAll(bankToBankTransAssignmentList);
         if (!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
             final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF,
                     "cheque.assignment.infavourof");

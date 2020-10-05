@@ -72,7 +72,6 @@ import org.egov.deduction.model.EgRemittance;
 import org.egov.deduction.model.EgRemittanceDetail;
 import org.egov.deduction.model.EgRemittanceGl;
 import org.egov.deduction.model.EgRemittanceGldtl;
-import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.eis.entity.Assignment;
@@ -89,6 +88,7 @@ import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.advance.EgAdvanceRequisition;
+import org.egov.model.bills.DeducVoucherMpng;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.deduction.RemittanceBean;
@@ -98,6 +98,7 @@ import org.egov.model.voucher.CommonBean;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.pims.commons.Position;
+import org.egov.services.deduction.DeducVoucherMpngRepository;
 import org.egov.services.payment.MiscbilldetailService;
 import org.egov.services.payment.PaymentService;
 import org.egov.utils.FinancialConstants;
@@ -155,6 +156,8 @@ public class PaymentActionHelper {
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
     
+    //@Autowired
+	//private DeducVoucherMpngRepository deducVoucherMpngRepository;
 
     @Transactional
     public Paymentheader createDirectBankPayment(Paymentheader paymentheader, CVoucherHeader voucherHeader,
@@ -205,7 +208,7 @@ public class PaymentActionHelper {
             paymentheader = paymentService.createPaymentHeader(voucherHeader, accountNumberId,
                     modeOfPayment, totalAmount);
             updateEgRemittanceglDtl(paymentheader.getVoucherheader(), listRemitBean, recovery);
-            createMiscBillDetail(paymentheader.getVoucherheader(), remittanceBean, remittedTo);
+            createMiscBillDetail(paymentheader.getVoucherheader(), remittanceBean, remittedTo,listRemitBean);
             paymentheader = sendForApproval(paymentheader, workflowBean);
         } catch (final ValidationException e) {
             LOGGER.error(e.getMessage(), e);
@@ -433,8 +436,27 @@ public class PaymentActionHelper {
     }
 
     @Transactional
-    private void createMiscBillDetail(CVoucherHeader voucherHeader, RemittanceBean remittanceBean, String remittedTo) {
-        final Miscbilldetail miscbillDetail = new Miscbilldetail();
+    private void createMiscBillDetail(CVoucherHeader voucherHeader, RemittanceBean remittanceBean, String remittedTo, List<RemittanceBean> listRemitBean) {
+    	DeducVoucherMpng deducVoucher = null;
+    	CVoucherHeader vh = null;
+    	try
+    	{
+    	if(listRemitBean != null && !listRemitBean.isEmpty())
+    	{
+    		for(RemittanceBean row : listRemitBean)
+    		{
+    			deducVoucher= new DeducVoucherMpng();
+    			vh=(CVoucherHeader) persistenceService.find("from CVoucherHeader vh where vh.voucherNumber=?",row.getVoucherNumber());
+    			deducVoucher.setVh_id(vh.getId());
+    			deducVoucher.setPh_id(voucherHeader.getId());
+    			persistenceService.persist(deducVoucher);
+    		}
+    	}
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	final Miscbilldetail miscbillDetail = new Miscbilldetail();
         // miscbillDetail.setBillnumber(commonBean.getDocumentNumber());
         // miscbillDetail.setBilldate(commonBean.getDocumentDate());
         miscbillDetail.setBillamount(remittanceBean.getTotalAmount());

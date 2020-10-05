@@ -254,6 +254,14 @@ function onSubmit()
 }
 			
 }
+//jayanta for save as draft
+function onSubmitDraft()
+{
+	
+	document.forms[0].action='${pageContext.request.contextPath}/voucher/journalVoucherModify-update.action';
+	document.forms[0].submit();
+			
+}
 /*function validateAndSubmitJV()
 {
 	if(validateJV()){

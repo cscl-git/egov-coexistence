@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -19,7 +18,6 @@ import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationAppr
 @Entity
 @Table(name = "txn_BoQDetails")
 @SequenceGenerator(name = BoQDetails.SEQ_BOQ_DETAILS, sequenceName = BoQDetails.SEQ_BOQ_DETAILS, allocationSize = 1)
-
 public class BoQDetails implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -38,7 +36,7 @@ public class BoQDetails implements Serializable {
 	private String ref_dsr;
 
 	@Column(name = "unit")
-	private Double unit;
+	private String unit;
 
 	@Column(name = "rate")
 	private Double rate;
@@ -49,12 +47,18 @@ public class BoQDetails implements Serializable {
 	@Column(name = "amount")
 	private Double amount;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "work_id", nullable = true, updatable = true, insertable = true)
+	@Column(name = "measured_quantity")
+	private Double measured_quantity;
+
+	@Column(name = "measured_amount")
+	private Double measured_amount;
+
+	@ManyToOne
+	@JoinColumn(name = "work_id")
 	private WorkOrderAgreement workOrderAgreement;
 
-	@ManyToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name = "estimate_preparation_id", nullable = true, updatable = true, insertable = true)
+	@ManyToOne
+	@JoinColumn(name = "estimate_preparation_id")
 	private EstimatePreparationApproval estimatePreparationApproval;
 
 	@Transient
@@ -84,13 +88,6 @@ public class BoQDetails implements Serializable {
 		this.ref_dsr = ref_dsr;
 	}
 
-	public Double getUnit() {
-		return unit;
-	}
-
-	public void setUnit(Double unit) {
-		this.unit = unit;
-	}
 
 	public Double getRate() {
 		return rate;
@@ -144,4 +141,28 @@ public class BoQDetails implements Serializable {
 		this.checkboxChecked = checkboxChecked;
 	}
 
+	public Double getMeasured_quantity() {
+		return measured_quantity;
+	}
+
+	public void setMeasured_quantity(Double measured_quantity) {
+		this.measured_quantity = measured_quantity;
+	}
+
+	public Double getMeasured_amount() {
+		return measured_amount;
+	}
+	
+	public void setMeasured_amount(Double measured_amount) {
+		this.measured_amount = measured_amount;
+	}
+
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+	
 }

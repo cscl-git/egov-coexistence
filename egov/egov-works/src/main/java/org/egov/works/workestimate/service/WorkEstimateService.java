@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,33 +28,20 @@ public class WorkEstimateService {
 				&& !estimatePreparationApproval.getEstimateNumber().isEmpty()) {
 			workEstimateDetails = estimatePreparationApprovalRepository
 					.findByEstimateNumber(estimatePreparationApproval.getEstimateNumber());
-		}else {
-		workEstimateDetails = estimatePreparationApprovalRepository.findByAllParams(
-					//estimatePreparationApproval.getStatus().getId(),
-					estimatePreparationApproval.getWorkCategory(), estimatePreparationApproval.getEstimateNumber(),
-				estimatePreparationApproval.getExecutingDivision(), estimatePreparationApproval.getFromDt(),
-				estimatePreparationApproval.getToDt());
+		} else {
+			workEstimateDetails = estimatePreparationApprovalRepository.findByAllParams(
+					 estimatePreparationApproval.getEstimateNumber(),
+					estimatePreparationApproval.getExecutingDivision(), estimatePreparationApproval.getFromDt(),
+					estimatePreparationApproval.getToDt());
 		}
 
 		return workEstimateDetails;
 	}
-	
-	/*@Transactional
-	public List<EstimatePreparationApproval> searchBoqData(HttpServletRequest request, Long estimatePreparationId) {
-		// TODO Auto-generated method stub
-	EstimatePreparationApproval boqDetailsList = estimatePreparationApprovalRepository
-				.findById(estimatePreparationId);
-
-		// return boqDetailsList;
-		return boqDetailsList;
-
-	}
-*/
 
 	@Transactional
 	public EstimatePreparationApproval searchEstimateData(Long estimatePreparationId) {
 		// TODO Auto-generated method stub
-		EstimatePreparationApproval estimatePreparationApproval =estimatePreparationApprovalRepository
+		EstimatePreparationApproval estimatePreparationApproval = estimatePreparationApprovalRepository
 				.findById(estimatePreparationId);
 
 		return estimatePreparationApproval;
@@ -64,28 +52,45 @@ public class WorkEstimateService {
 			EstimatePreparationApproval estimatePreparationApproval) {
 		// TODO Auto-generated method stub
 		List<EstimatePreparationApproval> workEstimateDetails = new ArrayList<EstimatePreparationApproval>();
-		if (estimatePreparationApproval.getExecutingDivision() != null) {
+		if (estimatePreparationApproval.getExecutingDivision() != null
+				&& estimatePreparationApproval.getFromDt() == null && estimatePreparationApproval.getToDt() == null) {
 			workEstimateDetails = estimatePreparationApprovalRepository
-					.findByExecutingDivision(estimatePreparationApproval.getExecutingDivision());
+					.findByExecutingDivisionAndStatusId(estimatePreparationApproval.getExecutingDivision());
 		} else {
-
-			long id = 324;
-
 			workEstimateDetails = estimatePreparationApprovalRepository.findByParams(
-
-					id, estimatePreparationApproval.getExecutingDivision(), estimatePreparationApproval.getFromDt(),
+					estimatePreparationApproval.getExecutingDivision(), estimatePreparationApproval.getFromDt(),
 					estimatePreparationApproval.getToDt());
 		}
-
 		return workEstimateDetails;
-
-		}
+	}
 
 	@Transactional
 	public EstimatePreparationApproval searchBoqData(HttpServletRequest request, Long estimatePreparationId) {
 		// TODO Auto-generated method stub
 		EstimatePreparationApproval boqDetailsList = estimatePreparationApprovalRepository
 				.findById(estimatePreparationId);
+
 		return boqDetailsList;
 	}
+
+	@Transactional
+	public EstimatePreparationApproval saveBoqData(HttpServletRequest request,
+			EstimatePreparationApproval estimatePreparationApproval) {
+		// TODO Auto-generated method stub
+
+		EstimatePreparationApproval boqList = estimatePreparationApprovalRepository
+				.findById(estimatePreparationApproval.getId());
+
+		for (BoQDetails boqDb : boqList.getNewBoQDetailsList()) {
+			for (BoQDetails boqUI : estimatePreparationApproval.getNewBoQDetailsList()) {
+				if (boqDb.getSlNo() == boqUI.getSlNo()) {
+					boqDb.setCheckboxChecked(boqUI.isCheckboxChecked());
+				}
+			}
+		}
+		EstimatePreparationApproval saveBoqDetails = estimatePreparationApprovalRepository.save(boqList);
+
+		return saveBoqDetails;
+	}
+
 }

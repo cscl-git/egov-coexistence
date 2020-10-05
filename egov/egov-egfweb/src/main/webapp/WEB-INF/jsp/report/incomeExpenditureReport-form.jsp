@@ -142,16 +142,20 @@
 								<s:else>
 									<td class="blueborderfortd">
 										<div align="right">
-											<a href="javascript:void(0);"
+											<%--<a href="javascript:void(0);"
 												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="currentYearToDate"/>","<s:property value="currentYearFromDate"/>")'><s:property
+													value="netAmount[name]" /></a>&nbsp;--%>
+											<a href="javascript:void(0);"
+												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="currentYearToDateStr"/>","<s:property value="currentYearFromDate"/>")'><s:property
 													value="netAmount[name]" /></a>&nbsp;
 										</div>
 									</td>
 									<td class="blueborderfortd">
 										<div align="right">
 											<a href="javascript:void(0);"
-												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="previousYearToDate"/>","<s:property value="previousYearFromDate"/>")'><s:property
+												onclick='return showDetail(<s:property value="glCode"/>,"<s:property value="id"/>","<s:property value="previousYearToDateStr"/>","<s:property value="previousYearFromDate"/>")'><s:property
 													value="previousYearAmount[name]" /></a>&nbsp;
+													
 										</div>
 									</td>
 								</s:else>

@@ -343,9 +343,11 @@ public abstract class ReportService {
             financialYear = financialYearDAO
                     .getFinancialYearById(Long.valueOf(financialYearId));
             statement.setFinancialYear(financialYear);
-        } else
+            return statement.getFromDate();
+        } else {
             financialYear = statement.getFinancialYear();
         return financialYear.getStartingDate();
+        }
        }
 
     public Date getToDate(final Statement statement) {

@@ -109,7 +109,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
         @Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
                 "application/xls", "contentDisposition", "no-cache;filename=DeductionDetailedReport.xls" }),
         @Result(name = "deductionXLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
-                "application/xls", "contentDisposition", "no-cache;filename=DeductionReport.xls" }),
+                "application/xls", "contentDisposition", "no-cache;filename=DeductionReports.xls" }),
         @Result(name = "summary-PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
                 "contentType", "application/pdf", "contentDisposition", "no-cache;filename=DeductionsRemittanceSummary.pdf" }),
         @Result(name = "summary-XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
@@ -864,20 +864,92 @@ public class PendingTDSReportAction extends BaseFormAction {
         		bean.setGstNoOfAgency(row.getGstNo());
         		bean.setPanNoOfAgency(row.getPanNumber());
         		bean.setWorkDone(getNarration(row.getVoucherNumber()));
+        		bean.setBillVoucherNo(getBillVoucherNumber(row.getVoucherNumber()));
+        		bean.setPexNo(getPexNo(row.getVoucherNumber()));
         		reportList.add(bean);
             }
         }
         System.out.println("4");
         paramMap.put("labourCessDataSource",getDataSource(reportList));
-        final ReportRequest reportInput = new ReportRequest(jasperName, reportList, paramMap);
-        reportInput.setReportFormat(ReportFormat.XLS);
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+        ReportRequest reportInput = null;
+        ReportOutput reportOutput = null;
+        System.out.println("5");
+        try
+        {
+        	reportInput = new ReportRequest(jasperName, reportList, paramMap);
+            reportInput.setReportFormat(ReportFormat.XLS);
+            reportOutput = reportService.createReport(reportInput);
+            System.out.println("end of report:::"+reportOutput.getReportOutputData().length);
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+            System.out.println("inputStream ::::"+inputStream);
+        }catch (Exception e) {
+			e.printStackTrace();
+		}
         System.out.println("END");
         return "deductionXLS";
     }
 
-    private String getNarration(String voucherNumber) {
+    private String getPexNo(String billVoucherNo) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String pexNo="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select ei2.id,ei2.transactionnumber from egf_instrumentheader ei2 where id in (select ei.instrumentheaderid from egf_instrumentvoucher ei where ei.voucherheaderid in (select m.payvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v  where v.vouchernumber =:billVoucherNo)))");
+    	    query.setString("billVoucherNo", billVoucherNo);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] != null)
+    	    		{
+    	    			pexNo= element[1].toString();
+    	    		}
+    	    		else
+    	    		{
+    	    			pexNo="";
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return pexNo;
+	}
+
+	private String getBillVoucherNumber(String voucherNumber) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String desc="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vhd.id,vhd.vouchernumber from voucherheader vhd where vhd.id in  (select m.payvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v  where v.vouchernumber =:voucherNumber))");
+    	    query.setString("voucherNumber", voucherNumber);
+    	    rows = query.list();
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] != null)
+    	    		{
+    	    			desc= element[1].toString();
+    	    		}
+    	    		else
+    	    		{
+    	    			desc="";
+    	    		}
+    	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return desc;
+	}
+
+	private String getNarration(String voucherNumber) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	String desc="";
@@ -890,7 +962,15 @@ public class PendingTDSReportAction extends BaseFormAction {
     	    {
     	    	for(Object[] element : rows)
     	    	{
-    	    		desc= element[1].toString();
+    	    		if(element[1] != null)
+    	    		{
+    	    			desc= element[1].toString();
+    	    		}
+    	    		else
+    	    		{
+    	    			desc="";
+    	    		}
+    	    		
     	    	}
     	    }
     	}catch (Exception e) {

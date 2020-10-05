@@ -363,7 +363,7 @@
 						<tr>
 							<td>
 								<div class="buttonbottom" style="padding-bottom: 10px;">
-									<input type="submit" value="Forward to AC"
+									<input type="submit" value="Approve"
 										id="budgetReAppropriation__create" name="method:createCao"
 										onClick="javascript: return validate(false,'create');"
 										class="buttonsubmit" />

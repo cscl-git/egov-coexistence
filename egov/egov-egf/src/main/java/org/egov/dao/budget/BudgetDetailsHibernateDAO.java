@@ -58,6 +58,9 @@ import static org.egov.utils.FinancialConstants.BUDGETTYPE_DEBIT;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
@@ -1883,7 +1886,16 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
     private BigDecimal getQtrApprovedAmt(final List<BudgetDetail> bdList) {
         BigDecimal approvedAmt = BigDecimal.ZERO;
         for (final BudgetDetail bd : bdList) {
-        	BigDecimal qtrpercent=bd.getQuarterpercent();
+        	
+        	//Author: Bhushan > addedcode to get current quarter wise percent
+        	BigDecimal qtrpercent=	 BigDecimal.ZERO;
+        	int currentqtr=	getCurrentQuarter(LocalDate.now());
+        	if(currentqtr==1) {
+        	 qtrpercent=bd.getQuarterpercent();}
+        	else if(currentqtr==2){ qtrpercent=bd.getQuartertwopercent();}
+        	else if(currentqtr==3){qtrpercent=bd.getQuarterthreepercent();}
+        	else if(currentqtr==4){qtrpercent=bd.getQuarterfourpercent();}
+        	
             if (bd.getApprovedAmount() != null)
                 approvedAmt = approvedAmt.add(bd.getApprovedAmount());
             approvedAmt = approvedAmt.add(bd.getApprovedReAppropriationsTotal());
@@ -1896,6 +1908,36 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
         return approvedAmt;
     }
 
+    
+    /**Author : Bhusan C
+	   * Returns the current quarter of the given date
+	   * 
+	   * @return int (0 .. 3)
+	   * @param cal
+	   *          Given date, cannot be null
+	   */
+	  public static int getCurrentQuarter(LocalDate cal) {
+	    int month = cal.get(ChronoField.MONTH_OF_YEAR);
+	    switch (Month.of(month)) {
+	    case JANUARY:
+	    case FEBRUARY:
+	    case MARCH:
+	    default:
+	      return 4;
+	    case APRIL:
+	    case MAY:
+	    case JUNE:
+	      return 1;
+	    case JULY:
+	    case AUGUST:
+	    case SEPTEMBER:
+	      return 2;
+	    case OCTOBER:
+	    case NOVEMBER:
+	    case DECEMBER:
+	      return 3;
+	    }
+	  }
     private BigDecimal getApprovedAmtAsOnDate(final List<BudgetDetail> bdList, final Date asOnDate) {
         BigDecimal approvedAmt = BigDecimal.ZERO;
         for (final BudgetDetail bd : bdList) {

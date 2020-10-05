@@ -29,7 +29,7 @@ public class TenderService {
 	@Transactional
 	public Tender searchTenderData(Long id) {
 		// TODO Auto-generated method stub
-		Tender tender = new Tender();
+
 		Tender detailsList = tenderRepository.findById(id);
 
 		return detailsList;
@@ -43,7 +43,8 @@ public class TenderService {
 		if (tender.getLoaNumber() != null) {
 			tenderDetails = tenderRepository.findByLoaNumber(tender.getLoaNumber());
 		} else {
-			tenderDetails = tenderRepository.findByAllParams(tender.getLoaNumber(), tender.getFromDt(), tender.getToDt());
+			tenderDetails = tenderRepository.findByAllParams(tender.getLoaNumber(), tender.getFromDt(),
+					tender.getToDt());
 		}
 
 		return tenderDetails;

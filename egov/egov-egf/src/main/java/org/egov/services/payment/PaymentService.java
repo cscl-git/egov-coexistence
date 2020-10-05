@@ -1994,6 +1994,109 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         return chequeAssignmentList;
     }
 
+    public List<ChequeAssignment> getBankToBankTransVoucherForRTGSInstrument(final Map<String, String[]> parameters,
+            final CVoucherHeader voucherHeader) throws ApplicationException, ParseException {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting getBankToBankTransVoucherForRTGSInstrument...");
+        final List<ChequeAssignment> chequeAssignmentList = new ArrayList<ChequeAssignment>();
+
+        final StringBuffer sql = new StringBuffer();
+        if (!"".equals(parameters.get("fromDate")[0]))
+            sql.append(" and vh.voucherDate>='" + sdf.format(formatter.parse(parameters.get("fromDate")[0])) + "' ");
+        if (!"".equals(parameters.get("toDate")[0]))
+            sql.append(" and vh.voucherDate<='" + sdf.format(formatter.parse(parameters.get("toDate")[0])) + "'");
+        if (!StringUtils.isEmpty(voucherHeader.getVoucherNumber()))
+            sql.append(" and vh.voucherNumber like '%" + voucherHeader.getVoucherNumber() + "%'");
+        if (voucherHeader.getFundId() != null)
+            sql.append(" and vh.fundId=" + voucherHeader.getFundId().getId());
+        if (voucherHeader.getVouchermis().getFundsource() != null)
+            sql.append(" and vmis.fundsourceId=" + voucherHeader.getVouchermis().getFundsource().getId());
+        if (voucherHeader.getVouchermis().getDepartmentcode() != null && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
+            sql.append(" and vmis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode() + "'");
+        if (voucherHeader.getVouchermis().getSchemeid() != null)
+            sql.append(" and vmis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId());
+        if (voucherHeader.getVouchermis().getSubschemeid() != null)
+            sql.append(" and vmis.subschemeid=" + voucherHeader.getVouchermis().getSubschemeid().getId());
+        if (voucherHeader.getVouchermis().getFunctionary() != null)
+            sql.append(" and vmis.functionaryid=" + voucherHeader.getVouchermis().getFunctionary().getId());
+        if (voucherHeader.getVouchermis().getDivisionid() != null)
+            sql.append(" and vmis.divisionid=" + voucherHeader.getVouchermis().getDivisionid().getId());
+        if (parameters.get("bankaccount") != null && !parameters.get("bankaccount")[0].equals("-1")) {
+            sql.append(" and ph.bankaccountnumberid=" + parameters.get("bankaccount")[0]);
+            sql.append(" and lower(ph.type)=lower('" + parameters.get("paymentMode")[0] + "')");
+            sql.append(" and ph.bankaccountnumberid=ba.id");
+        } else
+            sql.append(" and ph.bankaccountnumberid=ba.id")
+                    .append(" and lower(ph.type)=lower('" + parameters.get("paymentMode")[0] + "')");
+//        sql.append(" and vmis.departmentid     =dept.id  ");
+        final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+                "APPROVEDVOUCHERSTATUS");
+        final String approvedstatus = appList.get(0).getValue();
+        final List<String> descriptionList = new ArrayList<String>();
+        descriptionList.add("New");
+        descriptionList.add("Reconciled");
+        final List<EgwStatus> egwStatusList = egwStatusDAO.getStatusListByModuleAndCodeList("Instrument",
+                descriptionList);
+        String statusId = "";
+        for (final EgwStatus egwStatus : egwStatusList)
+            statusId = statusId + egwStatus.getId() + ",";
+        statusId = statusId.substring(0, statusId.length() - 1);
+
+        persistenceService.find(" from Bankaccount where id=?", Long.valueOf(parameters.get("bankaccount")[0]));
+        Query query = null;
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("statusId -- > " + statusId);
+
+        chequeList = new ArrayList<ChequeAssignment>();
+
+        if (voucherHeader.getName() == null
+                || !voucherHeader.getName().equalsIgnoreCase(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE)) { // /
+                                                                                                                   // Only
+                                                                                                                   // for
+                                                                                                                   // bill
+                                                                                                                   // payment
+                                                                                                                   // screen
+            query = getSession()
+                    .createSQLQuery(
+                            " SELECT vh.id   AS voucherid , vh.voucherNumber        AS voucherNumber ,dept.code          AS departmentName,"
+                                    + "  vh.voucherDate  AS voucherDate , misbill.paidto  AS paidTo, SUM(misbill.paidamount) AS paidAmount,current_date AS chequeDate,"
+                                    + "   ba.accountnumber  AS bankAccNumber, ba.id  AS bankAccountId ,vh.name     AS expenditureType    FROM Paymentheader ph,"
+                                    + "  voucherheader vh,  vouchermis vmis,  Miscbilldetail misbill,  eg_department dept,  bankaccount ba,  egf_instrumentvoucher iv RIGHT OUTER JOIN voucherheader pvh"
+                                    + " ON (pvh.id    =iv.VOUCHERHEADERID) WHERE ph.voucherheaderid  =misbill.billvhid AND ph.voucherheaderid    =vh.id AND vh.name  ='"
+                                    + FinancialConstants.CONTRAVOUCHER_NAME_BTOB + "'"
+                                    + " AND vmis.voucherheaderid  = vh.id  AND vh.status   =" + approvedstatus + sql
+                                    + " AND pvh.id      =vh.id AND iv.id     IS NULL"
+//                                    + " AND dept.id  = vmis.departmentid AND ph.bankaccountnumberid= ba.id GROUP BY vh.id,   vh.voucherNumber,  dept.name , "
+                                    +" AND dept.code  = vmis.departmentcode AND ph.bankaccountnumberid= ba.id GROUP BY vh.id,   vh.voucherNumber,  dept.code , "
+                                    + " vh.voucherDate,  misbill.paidto,ba.accountnumber,  ba.id,vh.name"
+                                    + " UNION SELECT vh.id  AS voucherid ,vh.voucherNumber AS voucherNumber ,dept.code AS departmentName,vh.voucherDate          AS voucherDate ,"
+                                    + "  misbill.paidto          AS paidTo, SUM(misbill.paidamount) AS paidAmount, current_date   AS chequeDate,ba.accountnumber  AS bankAccNumber,"
+                                    + " ba.id   AS bankAccountId, vh.name  AS expenditureType FROM Paymentheader ph,voucherheader vh,vouchermis vmis,eg_department dept,bankaccount ba,"
+                                    + " Miscbilldetail misbill, egf_instrumentvoucher iv RIGHT OUTER JOIN voucherheader pvh ON (pvh.id=iv.VOUCHERHEADERID) LEFT OUTER JOIN egf_instrumentheader ih"
+                                    + " ON (ih.ID   =iv.INSTRUMENTHEADERID) WHERE ph.voucherheaderid  =misbill.billvhid AND ph.voucherheaderid    =vh.id AND vh.name ='"
+                                    + FinancialConstants.CONTRAVOUCHER_NAME_BTOB + "'"
+                                    + " AND vmis.voucherheaderid  = vh.id AND vh.status  =" + approvedstatus + sql
+//                                    + " AND pvh.id   =vh.id AND dept.id          = vmis.departmentid"
+                                    + " AND pvh.id   =vh.id AND dept.code = vmis.departmentcode"
+                                    + " AND ph.bankaccountnumberid= ba.id AND ih.id IN  (SELECT MAX(ih.id)  FROM egf_instrumentvoucher iv  RIGHT OUTER JOIN voucherheader pvh"
+                                    + " ON (pvh.id=iv.VOUCHERHEADERID) LEFT OUTER JOIN egf_instrumentheader ih   ON (ih.ID    =iv.INSTRUMENTHEADERID)  WHERE pvh.id =vh.id   "
+                                    + "  " + " ) and ih.id_status not in (" + statusId
+                                    + ") GROUP BY vh.id,  vh.voucherNumber,  dept.code ,  vh.voucherDate,  misbill.paidto,  ba.accountnumber,  ba.id,  vh.name                                           "
+                                    + " order by bankAccountId, departmentName,  voucherNumber ")
+                    .addScalar("voucherid", LongType.INSTANCE).addScalar("voucherNumber").addScalar("departmentName")
+                    .addScalar("voucherDate").addScalar("paidTo").addScalar("paidAmount", BigDecimalType.INSTANCE)
+                    .addScalar("chequeDate").addScalar("bankAccNumber").addScalar("bankAccountId", LongType.INSTANCE)
+                    .addScalar("expenditureType")
+                    .setResultTransformer(Transformers.aliasToBean(ChequeAssignment.class));
+
+            chequeAssignmentList.addAll(query.list());
+
+        }
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed getPaymentVoucherNotInInstrument.");
+        return chequeAssignmentList;
+    }
     // this will be used for all paymentVouchers
     private List<ChequeAssignment> chequeList = null;
 
@@ -3214,7 +3317,20 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         return paymentheader;
     }
 
-
+    public Paymentheader createPaymentHeaderForContra(final CVoucherHeader voucherHeader, final Bankaccount ba,final String payModType,final String paidAmt) {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Starting createPaymentHeader...");
+        final Paymentheader paymentheader = new Paymentheader();
+        paymentheader.setType(payModType);
+        paymentheader.setVoucherheader(voucherHeader);
+        paymentheader.setBankaccount(ba);
+        paymentheader.setPaymentAmount(BigDecimal.valueOf(Double.valueOf(paidAmt)));
+        applyAuditing(paymentheader);
+        persist(paymentheader);
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("Completed createPaymentHeader.");
+        return paymentheader;
+    }
     
     
 }

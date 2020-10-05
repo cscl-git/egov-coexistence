@@ -34,7 +34,7 @@ public class TenderDetailsController {
 	@RequestMapping(value = "/tenderSave", params = "tenderSave", method = RequestMethod.POST)
 	public String saveTenderDetailsData(@ModelAttribute("tender") final Tender tender, final Model model,
 			@RequestParam("file1") MultipartFile file1, final HttpServletRequest request) throws Exception {
-		System.out.println("sneha");
+System.out.println("sneha");
 		Tender savedTender = tenderService.saveTenderDetailsData(request, tender);
 
 		return "tender-form";
@@ -44,9 +44,9 @@ public class TenderDetailsController {
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.POST)
 	public String view(@PathVariable("id") final Long id, Model model) {
 
-		Tender tenderDetails = tenderService.searchTenderData(id);
+		Tender tender = tenderService.searchTenderData(id);
 
-		model.addAttribute("tender", tenderDetails);
+		model.addAttribute("tender", tender);
 
 		return "view-tender-form";
 	}

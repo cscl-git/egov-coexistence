@@ -18,8 +18,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 @Table(name = "txn_tender")
 @SequenceGenerator(name = Tender.SEQ_TENDER, sequenceName = Tender.SEQ_TENDER, allocationSize = 1)
 
-public class Tender implements java.io.Serializable {
-
+public class Tender implements  java.io.Serializable {
+	
 	private static final long serialVersionUID = -4312140421386028968L;
 	public static final String SEQ_TENDER = "SEQ_TENDER";
 

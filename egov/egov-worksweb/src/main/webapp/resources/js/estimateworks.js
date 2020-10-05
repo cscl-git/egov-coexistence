@@ -9,6 +9,15 @@ function setWorkflow(action)
 {
 	
 	document.getElementById("workFlowAction").value = action;
+	if(document.getElementById('boQDetailsList[0].amount') == null)
+		{
+			bootbox.alert("Please upload BOQ details");
+			return false;
+		}
+	else 
+		{
+		return true;
+		}
 }
 
 

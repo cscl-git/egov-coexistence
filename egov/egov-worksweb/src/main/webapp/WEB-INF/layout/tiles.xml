@@ -340,11 +340,6 @@
         <put-attribute name="body" value="/WEB-INF/views/tender/viewtender.jsp"/>
     </definition>
     
-    <definition name="view-bg-security-form" extends="base_layout">
-        <put-attribute name="page-title" value="title.tender.view" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/bgSecurity/viewbgsecurity.jsp"/>
-    </definition>
-    
     <definition name="search-tender-form" extends="base_layout">
         <put-attribute name="page-title" value="lbl.search.tender" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/tender/searchtender.jsp"/>
@@ -353,6 +348,41 @@
     <definition name="search-bgsecurity-form" extends="base_layout">
         <put-attribute name="page-title" value="lbl.search.bg.security" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/bgSecurity/searchbgsecurity.jsp"/>
+    </definition>
+    
+    <definition name="view-bg-security-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.tender.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/bgSecurity/viewbgsecurity.jsp"/>
+    </definition>
+    
+    <definition name="view-work-agreement" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/viewworkagreement.jsp"/>
+    </definition>
+    
+    <definition name="search-work-agreement-form" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/searchworkagreement.jsp"/>
+    </definition>
+    
+    <definition name="edit-work-agreement" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/editworkagreement.jsp"/>
+    </definition>
+    
+    <definition name="closure-work-agreement" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.closure" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/closureedit.jsp"/>
+    </definition>
+    
+    <definition name="search-closure-work-agreement-form" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/closuresearch.jsp"/>
+    </definition>
+    
+    <definition name="edit-measured-quantity-work-agreement" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/editmeasuredquantity.jsp"/>
     </definition>
 
 </tiles-definitions>

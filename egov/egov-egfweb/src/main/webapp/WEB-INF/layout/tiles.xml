@@ -852,6 +852,12 @@
     <definition name="expensebill-update-Workflow" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-update-Workflow.jsp"/>
+    </definition>
+    <definition name="approvebudget-searchSO" extends="base_layout">
+        <put-attribute name="page-title" value="title.approvebudget.search.cao"
+                       cascade="true"/>
+        <put-attribute name="body"
+                       value="/WEB-INF/views/approvebudget/approvebudget-searchSO.jsp"/>
     </definition> 
     
 </tiles-definitions>
