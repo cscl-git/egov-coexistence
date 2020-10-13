@@ -196,13 +196,13 @@ public class BoQDetailsController extends GenericWorkFlowController{
 							aBoQDetails.setItem_description(cell.getStringCellValue());
 						} else if (cell.getColumnIndex() == 1) {
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-						}
+						}else if (cell.getColumnIndex() == 2) {
+							aBoQDetails.setUnit(cell.getStringCellValue());
+						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
-						if (cell.getColumnIndex() == 2) {
-							aBoQDetails.setUnit(cell.getNumericCellValue());
-						} else if (cell.getColumnIndex() == 3) {
+						 if (cell.getColumnIndex() == 3) {
 							aBoQDetails.setRate(cell.getNumericCellValue());
 						} else if (cell.getColumnIndex() == 4) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());

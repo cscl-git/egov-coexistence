@@ -52,7 +52,7 @@
 <%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring" %>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
-<header class="navbar navbar-fixed-top"><!-- set fixed position by adding class "navbar-fixed-top" -->
+<header class="navbar navbar-fixed-top-expense"><!-- set fixed position by adding class "navbar-fixed-top" -->
 <!--	<nav class="navbar navbar-default navbar-custom navbar-fixed-top">
 		<div class="container-fluid">
 			<div class="navbar-header col-md-10 col-xs-10">

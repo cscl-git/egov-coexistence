@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,10 +32,12 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -86,6 +89,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     
     @Autowired
 	private FileStoreService fileStoreService;
+    
+    @Autowired
+	private DocumentUploadRepository documentUploadRepository;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -93,10 +99,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			final Model model, HttpServletRequest request) {
 
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
-        System.out.println("eeee");
+        
 		return "estimatepreparationapproval-form";
 	}
 
@@ -130,6 +137,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			estimatePreparationApproval
 					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
 		}
+		
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
@@ -178,16 +186,28 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		
 		if(workflowaction.equalsIgnoreCase("Save As Draft"))
 		{
-			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+"is Saved as draft";
+			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" is Saved as draft";
 		}
 		else if((workflowaction.equalsIgnoreCase("Forward") || workflowaction.equalsIgnoreCase("Approve")) && savedEstimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
 		{
-			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+"is approved";
+			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" TS is approved";
 		}
 		else 
 		{
 			approverName=getEmployeeName(Long.parseLong(approverDetails));
-			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+"has been forwarded to "+approverName;
+			if(savedEstimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
+			{
+				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" has been approved and forwarded to "+approverName +" for AA inititation";
+			}
+			else if(savedEstimatePreparationApproval.getStatus().getCode().equals("TS Initiated"))
+			{
+				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" AA has been approved and  forwarded to "+approverName +" for TS inititation";
+			}
+			else
+			{
+				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" has been forwarded to "+approverName;
+			}
+			
 		}
 		return msg;
 	}
@@ -276,7 +296,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String FILE_PATH_PROPERTIES = "D:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
-
+		Double estAmt= 0.0;
 		// String documentPath = "D://Upload/";
 
 		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
@@ -320,17 +340,19 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 							aBoQDetails.setItem_description(cell.getStringCellValue());
 						} else if (cell.getColumnIndex() == 1) {
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-						}
+						}else if (cell.getColumnIndex() == 2) {
+							aBoQDetails.setUnit(cell.getStringCellValue());
+						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
-						if (cell.getColumnIndex() == 2) {
-							aBoQDetails.setUnit(cell.getNumericCellValue());
-						} else if (cell.getColumnIndex() == 3) {
+						 if (cell.getColumnIndex() == 3) {
 							aBoQDetails.setRate(cell.getNumericCellValue());
 						} else if (cell.getColumnIndex() == 4) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
+							estAmt=estAmt+aBoQDetails.getAmount();
+							
 						}
 
 					}
@@ -355,6 +377,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
+		estimatePreparationApproval.setEstimateAmount(estAmt);
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
@@ -382,6 +406,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		List<Department> departments = microserviceUtils.getDepartments();
 		return departments;
 	}
+	
+	public List<Designation> getDesignationsFromMs() {
+		List<Designation> designations = microserviceUtils.getDesignations();
+        return designations;
+    }
 
 	@RequestMapping(value = "/formnew", method = RequestMethod.POST)
 	public String showEstimateNewFormGet(
@@ -453,26 +482,18 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") final Long id, Model model) {
 
-		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
+		estimateDetails.setDocumentDetail(documents);
 
-		for (int j = 0; j < estimateDetails.getNewBoQDetailsList().size(); j++) {
-			responseList = estimateDetails.getNewBoQDetailsList();
-		}
-
-		estimateDetails.setBoQDetailsList(responseList);
+		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
 		estimateDetails.setDepartments(getDepartmentsFromMs());
-
-		/*String dt = estimateDetails.getDate().toString();
-		estimateDetails.setDt(dt);
-
-		String estimateDt = estimateDetails.getEstimateDate().toString();
-		estimateDetails.setEstimateDt(estimateDt);*/
-
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
@@ -486,11 +507,24 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 	@RequestMapping(value = "/edit/saveestimate1",  method = RequestMethod.POST)
 	public String editEstimateData(
-			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,
+			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,@RequestParam("file1") MultipartFile[] files,
 			final HttpServletRequest request) throws Exception {
 
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
-
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		estimatePreparationApproval.setDocumentDetail(list);
 		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != ""
 				&& !estimatePreparationApproval.getDepartment().isEmpty()) {
 			estimatePreparationApproval
@@ -535,7 +569,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
                 workflowHistory.put("date", stateHistory.getDateInfo());
                 workflowHistory.put("comments", stateHistory.getComments());
                 workflowHistory.put("updatedBy", stateHistory.getLastModifiedBy() + "::"
-                        + stateHistory.getLastModifiedBy());
+                        + getEmployeeName(stateHistory.getLastModifiedBy()));
                 workflowHistory.put("status", stateHistory.getValue());
                 final Long owner = stateHistory.getOwnerPosition();
                 final State _sowner = stateHistory.getState();
@@ -555,7 +589,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
             }
             map.put("date", state.getDateInfo());
             map.put("comments", state.getComments() != null ? state.getComments() : "");
-            map.put("updatedBy", state.getLastModifiedBy() + "::" + state.getLastModifiedBy());
+            map.put("updatedBy", state.getLastModifiedBy() + "::" + getEmployeeName(state.getLastModifiedBy()));
             map.put("status", state.getValue());
             final Long ownerPosition = state.getOwnerPosition();
             ownerobj=    this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0);
@@ -589,7 +623,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		final ServletContext context = request.getServletContext();
 		final String fileStoreId = request.getParameter("fileStoreId");
 		String fileName = "";
-		final File downloadFile = fileStoreService.fetch(fileStoreId, "Works");
+		final File downloadFile = fileStoreService.fetch(fileStoreId, "Workst_Est");
 		final FileInputStream inputStream = new FileInputStream(downloadFile);
 		EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
 		estDetails = getBillDocuments(estDetails);

@@ -24,6 +24,7 @@ import javax.persistence.Transient;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
@@ -86,7 +87,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String estimatePreparedBy;
 
 	@Column(name = "preparation_designation")
-	private String preparationDesignation;
+	private Long preparationDesignation;
 
 	@Column(name = "financing_details")
 	private Long financingDetails;
@@ -114,7 +115,13 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Column(name = "time_limit")
 	private String timeLimit;
-
+	
+	@Column(name = "aanumber")
+	private String aanumber;
+	
+	@Column(name = "aadate")
+	private Date aadate;
+	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
@@ -151,6 +158,10 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Transient
 	private List<Department> departments = new ArrayList<Department>();
+	
+	@Transient
+	private List<Designation> designations = new ArrayList<Designation>();
+
 
 	@Transient
 	private String dt;
@@ -276,11 +287,11 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	}
 
 
-	public String getPreparationDesignation() {
+	public Long getPreparationDesignation() {
 		return preparationDesignation;
 	}
 
-	public void setPreparationDesignation(String preparationDesignation) {
+	public void setPreparationDesignation(Long preparationDesignation) {
 		this.preparationDesignation = preparationDesignation;
 	}
 
@@ -540,6 +551,30 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setEstimatePreparedBy(String estimatePreparedBy) {
 		this.estimatePreparedBy = estimatePreparedBy;
+	}
+
+	public List<Designation> getDesignations() {
+		return designations;
+	}
+
+	public void setDesignations(List<Designation> designations) {
+		this.designations = designations;
+	}
+
+	public String getAanumber() {
+		return aanumber;
+	}
+
+	public void setAanumber(String aanumber) {
+		this.aanumber = aanumber;
+	}
+
+	public Date getAadate() {
+		return aadate;
+	}
+
+	public void setAadate(Date aadate) {
+		this.aadate = aadate;
 	}
 	
 	

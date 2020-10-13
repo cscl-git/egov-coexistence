@@ -3,6 +3,8 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
+<script
+        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 
 	
@@ -26,7 +28,7 @@
 		<li class="active"><a data-toggle="tab" href="#estimatescreen"
 			data-tabidx=0><spring:message
 					code="title.estimate.preparation.create"
-					text="Estimate Preparation & Approval" /> </a></li>
+					text="Estimate Details" /> </a></li>
 	<c:if test="${estimatePreparationApproval.status.code == 'AA Initiated' || estimatePreparationApproval.status.code == 'AA Pending for Approval' || estimatePreparationApproval.status.code == 'TS Initiated' || estimatePreparationApproval.status.code == 'TS Pending for Approval' || estimatePreparationApproval.status.code == 'Approved'}">
 		<li><a data-toggle="tab" href="#administration" data-tabidx=1><spring:message
 					code="title.estimate.administration.approval"
@@ -110,19 +112,16 @@
 		</c:if>
 	</div>	
 
-
+		<br><br><br>
+		<jsp:include page="fileupload.jsp" />
 		<br> <br>
 		 <jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
-		<c:if test="${mode !='view' }">
-			<div class="container">
-				
-				<jsp:include page="../common/commonWorkflowMatrix.jsp" />
+		 <br>
+		 <br>
+		<jsp:include page="../common/commonWorkflowMatrix.jsp" />
 				<div class="buttonbottom" align="center">
 					<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
 				</div>
-
-			</div>
-		</c:if>
 	</div>
 
 </form:form>

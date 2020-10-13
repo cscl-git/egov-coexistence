@@ -157,13 +157,13 @@
 									value="%{#attr.currentRowObject_rowNum+ (page-1)*pageSize}" />
 							</display:column>
 
-							<display:column title="Bill Number"
+							<display:column title="Bill Number" href="javascript:test1();"
 								style="width:10%;text-align:center" property="billNumber" />
-							<display:column title="Bill Date"
+							<display:column title="Bill Date" href="javascript:test2('<s:property value="%{voucherNumber}"/>');"
 								style="width:8%;text-align:center" property="billDate"
 								sortProperty="billdate" sortable="true" />
-							<display:column title="Voucher number"
-								style="width:11%;text-align:center" property="voucherNumber" />
+								<a href="#" onclick="test();"><display:column title="Voucher number" 
+								style="width:11%;text-align:center" property="voucherNumber" /></a>
 							<display:column title="Party Name"
 								style="width:5%;text-align:center" property="partyName" />
 							<display:column title="  Gross Amount"
@@ -297,7 +297,19 @@
 		
 
 		}
-
+	
+		function test()
+		{
+			alert("test");
+		}
+		function test1()
+		{
+			alert("test1");
+		}
+		function test2(link)
+		{
+			alert("test2 : "+link);
+		}
 	</script>
 </body>
 </html>

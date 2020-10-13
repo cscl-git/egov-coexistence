@@ -5,7 +5,7 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<%--<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %> --%>
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/fileupload.js'/>"></script>
 <style>
@@ -22,14 +22,14 @@
          <div class="panel-title">
                 <spring:message code="lbl.upload.document" text="Documents" />
         </div> 
-    <c:if test="${estimatePreparationApproval.documentDetail != null &&  !estimatePreparationApproval.documentDetail.isEmpty()}">
-        <c:forEach items="${auditDetail.documentDetail }" var="documentDetials">
+      </div>
+   <c:if test="${estimatePreparationApproval.documentDetail != null &&  !estimatePreparationApproval.documentDetail.isEmpty()}">
+        <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
             <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
         </c:forEach>
     </c:if>
    <br> 
    <c:if test="${mode != 'view' }">
-    <input type="hidden" value="${fn:length(auditDetail.documentDetail)}" id="documentsSize">
         <div>
             <table width="100%">
                         <tbody>
@@ -52,5 +52,5 @@
                         </tbody>
             </table>
         </div>
-        </c:if>
+       </c:if>
 </div>
