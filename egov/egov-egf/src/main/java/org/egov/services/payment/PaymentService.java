@@ -220,13 +220,11 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     public BigDecimal getAccountBalance(final String accountId, final String voucherDate, final BigDecimal amount,
             final Long paymentId, final Long accGlcodeID) throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getAccountBalance...");
+            LOGGER.info("Starting getAccountBalance...");
         egovCommon.setPersistenceService(persistenceService);
         egovCommon.setFundFlowService(fundFlowService);
         egovCommon.setAppConfigValuesService(appConfigValuesService);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getAccountBalance.");
+            LOGGER.info("Completed getAccountBalance.");
         return egovCommon.getAccountBalance(formatter.parse(voucherDate), Long.valueOf(accountId), amount, paymentId,
                 accGlcodeID);
     }

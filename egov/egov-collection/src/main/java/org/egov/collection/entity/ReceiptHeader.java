@@ -126,6 +126,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String serviceIdText;
     private String g8data;
     private String paymentId;
+    private String ifsc;
     public ReceiptHeader() {
     }
 
@@ -847,5 +848,13 @@ public class ReceiptHeader extends StateAware implements Auditable {
     public void setPaymentId(String paymentId) {
         this.paymentId = paymentId;
     }
+
+	public String getIfsc() {
+		return ifsc;
+	}
+
+	public void setIfsc(String ifsc) {
+		this.ifsc = ifsc;
+	}
 
 }

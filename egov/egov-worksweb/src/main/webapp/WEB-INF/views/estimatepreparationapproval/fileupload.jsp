@@ -23,8 +23,13 @@
                 <spring:message code="lbl.upload.document" text="Documents" />
         </div> 
       </div>
-   
+   <c:if test="${estimatePreparationApproval.documentDetail != null &&  !estimatePreparationApproval.documentDetail.isEmpty()}">
+        <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
+            <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+        </c:forEach>
+    </c:if>
    <br> 
+   <c:if test="${mode != 'view' }">
         <div>
             <table width="100%">
                         <tbody>
@@ -47,5 +52,5 @@
                         </tbody>
             </table>
         </div>
-       
+       </c:if>
 </div>

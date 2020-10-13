@@ -215,9 +215,11 @@ public class SearchReceiptAction extends SearchFormAction {
         collectionVersion = ApplicationThreadLocals.getCollectionVersion();
 
         List<ReceiptHeader> receiptList = new ArrayList<>();
-        List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),
+        System.out.println("receipt :::"+ getReceiptNumber());
+        String type="search";
+        List<Receipt> receipts = microserviceUtils.searchRecieptsFinance("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
-                        ? getReceiptNumber() : null);
+                        ? getReceiptNumber() : null,type);
         
 
         for (Receipt receipt : receipts) {
@@ -232,7 +234,8 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
                     receiptHeader.setService(billDetail.getBusinessService());
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
-                    receiptHeader.setReferenceDesc(billDetail.getBillDescription());
+                    receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy());
                     receiptHeader.setTotalAmount(billDetail.getTotalAmount());
                     receiptHeader.setCurretnStatus(billDetail.getStatus());
@@ -269,10 +272,10 @@ public class SearchReceiptAction extends SearchFormAction {
 //                            }
 //                        }
 
-                        if (null != additional.getNarration())
-                            receiptHeader.setReferenceDesc(additional.getNarration());
-                        if (null != additional.getPayeeaddress())
-                            receiptHeader.setPayeeAddress(additional.getPayeeaddress());
+                        //if (null != additional.getNarration())
+                          //  receiptHeader.setReferenceDesc(additional.getNarration());
+                        //if (null != additional.getPayeeaddress())
+                          //  receiptHeader.setPayeeAddress(additional.getPayeeaddress());
                     }
 
                     receiptList.add(receiptHeader);

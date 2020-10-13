@@ -521,8 +521,7 @@ public class EgovCommon {
     @SuppressWarnings("unchecked")
     public BigDecimal getAccountBalance(final Date VoucherDate,
             final Long bankId, final BigDecimal amount, final Long paymentId, final Long accGlcodeId) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("EgovCommon | getCashBalance");
+            LOGGER.info("EgovCommon | getCashBalance");
         LOGGER
         .info("--------------------------------------------------------------------------------getAccountBalance-----------------");
 
@@ -545,6 +544,7 @@ public class EgovCommon {
             .info("-------------------------------------------------------------------------------------bankBalance"
                     + bankBalance);
         } catch (final ValidationException e) {
+        	e.printStackTrace();
             LOGGER.error("Balance Check Failed" + e.getMessage(), e);
             throw e;
         }
@@ -638,8 +638,7 @@ public class EgovCommon {
     @SuppressWarnings("unchecked")
     public BigDecimal getAccountBalanceFromLedger(final Date VoucherDate,
             final Integer bankId, final BigDecimal amount, final Long paymentId) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("EgovCommon | getCashBalance");
+            LOGGER.info("EgovCommon | getCashBalance");
         BigDecimal opeAvailable = BigDecimal.ZERO;
         BigDecimal bankBalance = BigDecimal.ZERO;
         try {
@@ -660,8 +659,7 @@ public class EgovCommon {
                     .findAllBy(opBalncQuery1.toString(), bankId.longValue());
             opeAvailable = BigDecimal.valueOf(Double.parseDouble(tsummarylist.get(0).toString()));
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("opeAvailable :" + opeAvailable);
+                LOGGER.info("opeAvailable :" + opeAvailable);
 
             final StringBuffer opBalncQuery2 = new StringBuffer(300);
             List<Object> list = getPersistenceService()
@@ -693,9 +691,11 @@ public class EgovCommon {
                     "from CChartOfAccounts where id=?", Long.valueOf(glcodeid));
             list = getPersistenceService().findAllBy(
                     opBalncQuery2.toString(), coa);
+            LOGGER.info("query fetch 1");
             bankBalance = BigDecimal.valueOf(Double.parseDouble(list.get(0).toString()));
+            LOGGER.info(" bankBalance 1 ::::"+bankBalance);
             bankBalance = opeAvailable.add(bankBalance);
-
+            LOGGER.info(" bankBalance 2::::"+bankBalance);
             // get the preapproved voucher amount also, if payment workflow
             // status in FMU level.... and subtract the amount from the balance
             // .
@@ -747,8 +747,10 @@ public class EgovCommon {
                                                 .append(paymentWFStatus).append(") )");
                 list = getPersistenceService().findAllBy(
                         paymentQuery.toString(), coa);
+                LOGGER.info("query fetch 2");
                 bankBalance = bankBalance.subtract(BigDecimal.valueOf(Math
                         .abs((Double) list.get(0))));
+                LOGGER.info(" bankBalance 3 ::::"+bankBalance);
                 final Integer voucherStatus = (Integer) persistenceService
                         .find(
                                 "select status from CVoucherHeader where id in (select voucherheader.id from Paymentheader where id=?)",
@@ -761,13 +763,14 @@ public class EgovCommon {
                 // transaction amount to it.
                 if (amountTobeInclude)
                     bankBalance = bankBalance.add(amount);
+                
+                LOGGER.info(" bankBalance 4 ::::"+bankBalance);
 
             }
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("bankBalance :" + bankBalance);
+                LOGGER.info("bankBalance 5 :" + bankBalance);
         } catch (final Exception e) {
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("exception occuered while geeting cash balance"
+        	e.printStackTrace();
+                LOGGER.info("exception occuered while geeting cash balance"
                         + e.getMessage(), e);
             throw new HibernateException(e);
         }

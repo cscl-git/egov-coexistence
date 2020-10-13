@@ -153,7 +153,7 @@ public class ContraBTBActionHelper {
 				voucherHeader = callCreateVoucher(voucherHeader, contraVoucher, contraBean);
 			if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 			{
-				final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
+				final Bankaccount ba = getBankaccount(contraVoucher.getFromBankAccountId().getId());
 				contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
 						voucherHeader, contraBean); 
 				

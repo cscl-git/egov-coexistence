@@ -105,6 +105,7 @@ public class VoucherController {
 				headerDetails.put(VoucherConstant.MODULEID, voucher.getModuleId());
 				String source = voucher.getSource();
 				headerDetails.put(VoucherConstant.SOURCEPATH, source);
+				headerDetails.put(VoucherConstant.RECEIPTNUMBER, voucher.getReceiptNumber());
 //				String receiptNumber = !source.isEmpty() & source != null ? source.indexOf("?selectedReceipts=") != -1 ? source.substring(source.indexOf("?selectedReceipts=")).split("=")[1]: "" : "";
 				if(voucher.getReferenceDocument() != null && !voucher.getReferenceDocument().isEmpty()){
 				    headerDetails.put(VoucherConstant.REFERENCEDOC, voucher.getReferenceDocument());

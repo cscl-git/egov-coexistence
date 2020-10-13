@@ -79,6 +79,7 @@ public class PaymentUtils {
             payment.getPaymentDetails().stream().forEach(paymentDetail -> {
                 Receipt receipt = new Receipt();
                 receipt.setInstrument(instrument);
+                System.out.println("payment id :"+payment.getId());
                 receipt.setPaymentId(payment.getId());
                 this.prepareReceipt(payment, paymentDetail, receipt);
                 receipts.add(receipt);
@@ -107,6 +108,9 @@ public class PaymentUtils {
         bill.setIsCancelled(billv2.getIsCancelled());
         bill.setMobileNumber(billv2.getMobileNumber());
         bill.setPaidBy(StringUtils.defaultIfBlank(billv2.getPaidBy(), payment.getPaidBy()));
+        bill.setPayerAddress(payment.getPayerAddress());
+        System.out.println("Narration : "+payment.getNarration());
+        bill.setNarration(payment.getNarration());
         bill.setPayerAddress(billv2.getPayerAddress());
         bill.setPayerEmail(billv2.getPayerEmail());
         bill.setPayerId(billv2.getPayerId());
@@ -174,6 +178,7 @@ public class PaymentUtils {
         instrument.setInstrumentDate(payment.getInstrumentDate());
         instrument.setInstrumentNumber(payment.getInstrumentNumber());
         instrument.setInstrumentStatus(payment.getInstrumentStatus().name());
+        instrument.setIfscCode(payment.getIfscCode());
         InstrumentType instrumentType = new InstrumentType();
         instrumentType.setName(payment.getPaymentMode().name());
         instrument.setInstrumentType(instrumentType);

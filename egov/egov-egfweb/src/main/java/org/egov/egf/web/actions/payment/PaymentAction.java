@@ -1486,16 +1486,15 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     public void getBankBalance(final String accountId, final String vdate, final BigDecimal amount,
             final Long paymentId, final Long bankGlcodeId) throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Inside getBankBalance.");
+            LOGGER.info("Inside getBankBalance.");
 
         try {
             balance = paymentService.getAccountBalance(accountId, vdate, amount, paymentId, bankGlcodeId);
         } catch (final Exception e) {
+        	e.printStackTrace();
             balance = BigDecimal.valueOf(-1);
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getBankBalance.");
+            LOGGER.info("Completed getBankBalance.");
     }
 
     @SkipValidation

@@ -28,7 +28,7 @@
 		<li class="active"><a data-toggle="tab" href="#estimatescreen"
 			data-tabidx=0><spring:message
 					code="title.estimate.preparation.create"
-					text="Estimate Preparation & Approval" /> </a></li>
+					text="Estimate Details" /> </a></li>
 	<c:if test="${estimatePreparationApproval.status.code == 'AA Initiated' || estimatePreparationApproval.status.code == 'AA Pending for Approval' || estimatePreparationApproval.status.code == 'TS Initiated' || estimatePreparationApproval.status.code == 'TS Pending for Approval' || estimatePreparationApproval.status.code == 'Approved'}">
 		<li><a data-toggle="tab" href="#administration" data-tabidx=1><spring:message
 					code="title.estimate.administration.approval"

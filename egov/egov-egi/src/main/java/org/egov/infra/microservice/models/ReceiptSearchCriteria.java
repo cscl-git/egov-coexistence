@@ -77,6 +77,7 @@ public class ReceiptSearchCriteria {
     String fund;
     String department;
     String classification;
+    String type;
     
     public void toPayemntSerachCriteriaContract(PaymentSearchCriteria contract){
 //        contract.setIds(this.ids);
@@ -84,7 +85,25 @@ public class ReceiptSearchCriteria {
         contract.setBusinessServices(this.businessCodes);
         contract.setFromDate(this.fromDate != null ? this.fromDate.getTime() : null);
         contract.setToDate(this.toDate != null ? this.toDate.getTime() : null);
-//        contract.setReceiptNumbers(this.receiptNumbers);
-        contract.setIds(this.receiptNumbers);
+        if(type == null || type.isEmpty())
+        {
+        	//contract.setReceiptNumbers(this.receiptNumbers);
+            contract.setIds(this.receiptNumbers);
+        }
+        else if (type.equals("search"))
+        {
+        	contract.setReceiptNumbers(this.receiptNumbers);
+            //contract.setIds(this.receiptNumbers);
+        }
+        else if (type.equals("view"))
+        {
+        	//contract.setReceiptNumbers(this.receiptNumbers);
+            contract.setIds(this.receiptNumbers);
+        }
+        else
+        {
+        	//contract.setReceiptNumbers(this.receiptNumbers);
+            contract.setIds(this.receiptNumbers);
+        }
     }
 }

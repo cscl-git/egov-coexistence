@@ -7,7 +7,7 @@
 	
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 0;">
+		<div class="form-group" style="padding: 50px 20px 465px;">
 	
 				<input type="hidden" name="estimatePreparationApproval"
 				value="${estimatePreparationApproval.id}" /> <label
@@ -64,28 +64,14 @@
 			<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="sectorNumber" id="sectorNumber" readonly="true"
-									cssClass="form-control" cssErrorClass="form-control error">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Sector 1 </form:option>
-									<form:option value="2">Sector 2</form:option>
-									<form:option value="3">Sector 3</form:option>
-								</form:select>
-							</div>						</div>
+				<form:input type="number" class="form-control" path="sectorNumber"
+					readonly="true" />
+						</div>
 			<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.ward.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="wardNumber" id="wardNumber" readonly="true"
-									cssClass="form-control" cssErrorClass="form-control error">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="1">Ward 1 </form:option>
-									<form:option value="2">Ward 2</form:option>
-									<form:option value="3">Ward 3</form:option>
-								</form:select>
+				<form:input type="number" class="form-control" path="wardNumber"
+					readonly="true" />
 						</div>
 			<label class="col-sm-3 control-label text-left-audit"><spring:message
 					code="lbl.estimate.preparation.work.category" /><span
@@ -173,7 +159,9 @@
 										items="${estimatePreparationApproval.boQDetailsList}"
 							varStatus="status">
 										<tr id="detailsrow" class="repeat-address">
-								<td><form:input type="text"
+								<td>
+								<form:hidden path="boQDetailsList[${status.index}].slNo" id="boQDetailsList[${status.index}].slNo"/>
+								<form:input type="text"
 													path="boQDetailsList[${status.index}].item_description"
 										id="boQDetailsList[${status.index}].item_description"
 										required="required" class="form-control item_description"

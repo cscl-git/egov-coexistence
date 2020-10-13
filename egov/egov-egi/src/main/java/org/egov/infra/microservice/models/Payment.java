@@ -151,6 +151,10 @@ public class Payment {
 
     @JsonProperty("paymentStatus")
     private PaymentStatusEnum paymentStatus;
+    
+    @Size(max=1024)
+    @JsonProperty("narration")
+    private String narration = null;
 
 
     public Payment addpaymentDetailsItem(PaymentDetail paymentDetail) {

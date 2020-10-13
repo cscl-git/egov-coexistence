@@ -179,14 +179,12 @@ public class EstimatePreparationApprovalService {
         	if(workFlowAction.equalsIgnoreCase("Save As Draft"))
         	{
         		wfmatrix = estimateWorkflowService.getWfMatrix(estimatePreparationApproval.getStateType(), null,
-                        null, additionalRule, "NEW", null);
-            	estimatePreparationApproval.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
+                        null, additionalRule, "SaveAsDraft", null);
+            	estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
                 .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
-                .withNatureOfTask("Works Estimate")
-                .withCreatedBy(user.getId())
-                .withtLastModifiedBy(user.getId());
+                .withNatureOfTask("Works Estimate");
         	}
         	else if(workFlowAction.equalsIgnoreCase("Forward") || (workFlowAction.equalsIgnoreCase("Approve") && !wfmatrix.getNextState().equals("END")))
         	{

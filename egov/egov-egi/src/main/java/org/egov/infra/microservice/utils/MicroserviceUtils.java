@@ -1213,12 +1213,32 @@ public class MicroserviceUtils {
         return this.searchReciepts(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo));
 
     }
+    
+    public List<Receipt> searchRecieptsFinance(String classification, Date fromDate, Date toDate, String businessCode,
+            String receiptNo,String type) {
+
+        return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo),type);
+
+    }
 
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,
             List<String> receiptNos) {
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
+                .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .classification(classification)
+                .build();
+        return this.getReceipt(criteria);
+    }
+    
+    public List<Receipt> searchRecieptsFin(String classification, Date fromDate, Date toDate, String businessCode,
+            List<String> receiptNos,String type) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .type(type)
                 .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
                 .receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
                 .classification(classification)

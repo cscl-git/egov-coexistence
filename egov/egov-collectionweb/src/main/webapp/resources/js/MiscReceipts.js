@@ -1136,6 +1136,7 @@ function updatetotalAmounts(){
 	for(var index=0;index<billDetailTableIndex;index++){
 		if(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail') == null || document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value == '' )
 			{
+			document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value =0;
 			inputAmount=0;
 			}
 		else

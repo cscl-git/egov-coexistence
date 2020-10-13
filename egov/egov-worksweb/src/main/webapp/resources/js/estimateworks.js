@@ -16,8 +16,25 @@ function setWorkflow(action)
 		}
 	else 
 		{
+			if(action == 'Forward')
+				{
+					if(document.getElementById('approvalPosition') != null && document.getElementById('approvalPosition').value == '')
+						{
+							bootbox.alert("Please select Approver");
+							return false;
+						}
+				}
+			else if (action == 'Approve')
+				{
+					if(document.getElementById('approvalPosition') != null && document.getElementById('approvalPosition').value == '')
+						{
+						bootbox.alert("Please select Approver");
+						return false;
+						}
+				}
 		return true;
 		}
+	
 }
 
 

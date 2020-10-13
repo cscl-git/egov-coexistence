@@ -47,8 +47,14 @@
  */
 package org.egov.collection.web.actions.receipts;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -93,9 +99,7 @@ import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
-import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
-import org.egov.commons.Fundsource;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
 import org.egov.commons.dao.BankBranchHibernateDAO;
@@ -109,6 +113,7 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.dao.FundSourceHibernateDAO;
 import org.egov.commons.dao.SchemeHibernateDAO;
 import org.egov.commons.dao.SubSchemeHibernateDAO;
+import org.egov.commons.dao.VouchermisHibernateDAO;
 import org.egov.commons.entity.Source;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
@@ -135,6 +140,11 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.instrument.InstrumentType;
+import org.egov.services.voucher.VoucherService;
+import org.hibernate.SQLQuery;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 
@@ -157,6 +167,8 @@ public class ReceiptAction extends BaseFormAction {
     protected List<String> mandatoryFields;
     private String reportId;
     private String message = "";
+    private String reciptNumber = "";
+    private String currentState = "";
     /**
      * A <code>String</code> representing the input xml coming from the billing system
      */
@@ -183,6 +195,8 @@ public class ReceiptAction extends BaseFormAction {
     private String reasonForCancellation;
     private String target = "view";
     private String paidBy;
+    private String referenceDesc;
+    private String paymentId="";
     private ReceiptHeader receiptHeader = new ReceiptHeader();
     private ReceiptResponse receiptResponse = new ReceiptResponse();
     /**
@@ -201,6 +215,9 @@ public class ReceiptAction extends BaseFormAction {
     private Boolean bankAllowed = Boolean.TRUE;
     private Boolean onlineAllowed = Boolean.FALSE;
     private Boolean isReceiptCancelEnable = Boolean.TRUE;
+    
+    private VoucherService voucherService;
+    private String vouchermissourcepath;
     /**
      * An instance of <code>InstrumentHeader</code> representing the cash instrument details entered by the user during receipt
      * creation
@@ -261,6 +278,7 @@ public class ReceiptAction extends BaseFormAction {
     private Integer bankBranchId;
 
     private String payeename = "";
+    private String sourcePath="";
 
     private Date manualReceiptDate;
 
@@ -314,6 +332,10 @@ public class ReceiptAction extends BaseFormAction {
     @Autowired
     private MicroserviceUtils microserviceUtils;
 
+    @Autowired
+    private VouchermisHibernateDAO vmisHibernateDao;
+    
+
     private List<CChartOfAccounts> bankCOAList;
 
     private String functionId;
@@ -333,6 +355,7 @@ public class ReceiptAction extends BaseFormAction {
     Map<String,String> serviceCategoryNames = new HashMap<String,String>();
     Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
     private String[] selectedPayments;
+    private String payeeAddress;
 
     @Override
     public void prepare() {
@@ -641,6 +664,16 @@ public class ReceiptAction extends BaseFormAction {
         return NEW;
     }
 
+    
+    /*@Action(value = "/receipts/receipt-successprint")
+    public String successprint() {
+    	message="Bhushan edits";
+    	reciptNumber="06/2020-21/000094";
+    	paymentId="54c50500-0c2c-4bce-9adc-f3f2ef8bdc2d";
+        return SUCCESS;
+    }*/
+    
+
     /**
      * This method is invoked when user creates a receipt.
      *
@@ -753,8 +786,13 @@ public class ReceiptAction extends BaseFormAction {
                     collectionsUtil.getStatusForModuleAndCode(CollectionConstants.MODULE_NAME_RECEIPTHEADER,
                             CollectionConstants.RECEIPT_STATUS_CODE_TO_BE_SUBMITTED));
             receiptHeader.setPaidBy(StringEscapeUtils.unescapeHtml(paidBy));
+            //receiptHeader.setPayeeName(StringEscapeUtils.unescapeHtml(paidBy));
+            LOGGER.info("payeeAddress ::::"+payeeAddress);
+            receiptHeader.setPayeeAddress(payeeAddress);
+            receiptHeader.setReferenceDesc(referenceDesc);
             receiptHeader.setSource(Source.SYSTEM.toString());
             receiptHeader.setModOfPayment(instrumentType);
+
 
             // If this is a new receipt in lieu of cancelling old
             // receipt, update
@@ -813,6 +851,11 @@ public class ReceiptAction extends BaseFormAction {
 
         message = "Receipt created with receipt number: "
                 + receiptResponse.getReceipts().get(0).getBill().get(0).getBillDetails().get(0).getReceiptNumber();
+        
+        reciptNumber=receiptResponse.getReceipts().get(0).getBill().get(0).getBillDetails().get(0).getReceiptNumber();
+        
+        paymentId=receiptResponse.getReceipts().get(0).getPaymentId();
+        vouchermissourcepath=paymentId;
         // populate all receipt header ids except the cancelled receipt
         // (in effect the newly created receipts)
         selectedReceipts = new String[noOfNewlyCreatedReceipts];
@@ -1136,8 +1179,18 @@ public class ReceiptAction extends BaseFormAction {
         // LOGGER.error("Error in printReceipts", e);
         // }
 
-        List<Receipt> receiptlist = this.microserviceUtils.searchReciepts(null, null, null, null,
-                Arrays.asList(selectedReceipts));
+        List<Receipt> receiptlist=null;
+        
+        if(currentState.equals("created")) {
+        	 receiptlist = this.microserviceUtils.searchReciepts(null, null, null, null,
+                     Arrays.asList(selectedReceipts));
+        }
+        else {
+        String type="view";
+         receiptlist = this.microserviceUtils.searchRecieptsFin(null, null, null, null,
+                Arrays.asList(selectedReceipts),type);
+        } 
+       
 
         receiptlist.stream().forEach(receipt -> {
 
@@ -1149,7 +1202,7 @@ public class ReceiptAction extends BaseFormAction {
                     String businessServiceCode = billDetail.getBusinessService();
                     receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(businessServiceCode));
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
-                    receiptHeader.setReferenceDesc(billDetail.getBillDescription());
+                    receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPaidBy(bill.getPaidBy());
                     receiptHeader.setPayeeName(bill.getPayerName());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
@@ -1267,6 +1320,13 @@ public class ReceiptAction extends BaseFormAction {
                         }
                         instrumentHeader.setIfscCode(_instrument.getIfscCode());
                         instrumentHeader.setBankBranchName(_instrument.getBranchName());
+                        instrumentHeader.setIfscCode(_instrument.getIfscCode());
+                        if(instrumentHeader != null && instrumentHeader.getIfscCode() != null && !instrumentHeader.getIfscCode().isEmpty())
+                        {
+                        	instrumentHeader.setBankBranchName(getBankdetails(instrumentHeader.getIfscCode()));
+                        }
+                        
+                        //String bank=getBankDetails();
                     }
 
                     receiptHeader.addInstrument(instrumentHeader);
@@ -2171,4 +2231,129 @@ public class ReceiptAction extends BaseFormAction {
         this.selectedPayments = selectedPayments;
     }
 
+
+
+	public String getReciptNumber() {
+		return reciptNumber;
+	}
+
+
+
+	public void setReciptNumber(String reciptNumber) {
+		this.reciptNumber = reciptNumber;
+	}
+
+
+
+	public String getCurrentState() {
+		return currentState;
+	}
+
+
+
+	public void setCurrentState(String currentState) {
+		this.currentState = currentState;
+	}
+
+
+
+	public String getPaymentId() {
+		return paymentId;
+	}
+
+
+
+	public void setPaymentId(String paymentId) {
+		this.paymentId = paymentId;
+	}
+
+
+
+	public String getPayeeAddress() {
+		return payeeAddress;
+	}
+
+
+
+	public void setPayeeAddress(String payeeAddress) {
+		this.payeeAddress = payeeAddress;
+	}
+
+
+
+	public String getReferenceDesc() {
+		return referenceDesc;
+	}
+
+
+
+	public void setReferenceDesc(String referenceDesc) {
+		this.referenceDesc = referenceDesc;
+	}
+
+
+
+	public String getVouchermissourcepath() {
+		return vouchermissourcepath;
+	}
+
+
+
+	public void setVouchermissourcepath(String vouchermissourcepath) {
+		this.vouchermissourcepath = vouchermissourcepath;
+	}
+	
+	private String getSourcePath(String receiptNumber) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String sourcepath="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select id,sourcepath from vouchermis v where v.reciept_number = :receiptNumber");
+    	    query.setString("receiptNumber", receiptNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	System.out.println("list :"+rows.get(1));
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		sourcepath= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return sourcepath;
+    }
+	
+	private String getBankdetails(String ifsc)
+	{
+		JSONParser parser = new JSONParser();
+		String bank="";
+		String branch="";
+        try {        
+            URL oracle = new URL("https://ifsc.razorpay.com/"+ifsc); // URL to Parse
+            HttpURLConnection conn = (HttpURLConnection)oracle.openConnection();
+            conn.setRequestMethod("GET");
+            conn.connect();
+            int responsecode = conn.getResponseCode(); 
+            BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+           
+            String inputLine;
+            while ((inputLine = in.readLine()) != null) {              
+            	JSONObject jobj = (JSONObject)parser.parse(inputLine); 
+                     bank=(String)jobj.get("BANK");
+                     branch=(String)jobj.get("BRANCH");
+            }
+            in.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (org.json.simple.parser.ParseException e) {
+			e.printStackTrace();
+		}
+        return bank+" - "+branch;
+	}
 }

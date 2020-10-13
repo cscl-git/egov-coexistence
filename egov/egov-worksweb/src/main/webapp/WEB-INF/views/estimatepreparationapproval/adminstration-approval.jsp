@@ -14,10 +14,41 @@
 
 <div class="tab-pane fade in active">
 <div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 0;">
+		<div class="form-group" style="padding: 50px 20px 250px;">
 
 <input type="hidden" name="estimatePreparationApproval"
-				value="${estimatePreparationApproval.id}" /> <label
+				value="${estimatePreparationApproval.id}" /> 
+				
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.fund.source" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="fundSource" id="fundSource"
+								cssClass="form-control" cssErrorClass="form-control error"
+								required="required">
+								<form:option value="">
+									<spring:message code="lbl.select" />
+								</form:option>
+								<form:option value="1">Municipal Fund</form:option>
+								<form:option value="2">Earmarked Fund</form:option>
+							</form:select>
+					</div>
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.financial.year" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+							<form:select path="financialYear" id="financialYear"
+								cssClass="form-control" cssErrorClass="form-control error"
+								required="required">
+								<form:option value="">
+									<spring:message code="lbl.select" />
+								</form:option>
+								<form:option value="1">2020-21</form:option>
+								<form:option value="2">2019-20</form:option>
+								<form:option value="3">2018-19</form:option>
+							</form:select>
+						</div>
+				<label
 				class="col-sm-3 control-label text-left-audit"><spring:message
 					code="lbl.estimate.preparation.financing.details" /><span
 				class="mandatory"></span></label>
@@ -33,27 +64,11 @@
 							</form:select>
 						</div>
 			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.estimate.preparation.fund.source" /><span
-				class="mandatory"></span></label>
+					code="lbl.work.order.search.tendered.cost" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control" path="fundSource"
-					required="required" />
-				<form:errors path="fundSource" cssClass="add-margin error-msg" />
-					</div>
-			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.estimate.preparation.financial.year" /><span
-				class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-							<form:select path="financialYear" id="financialYear"
-								cssClass="form-control" cssErrorClass="form-control error"
-								required="required">
-								<form:option value="">
-									<spring:message code="lbl.select" />
-								</form:option>
-								<form:option value="1">2020</form:option>
-								<form:option value="2">2019</form:option>
-							</form:select>
-						</div>
+				<form:input type="text" class="form-control" path="tenderCost" readonly="true"
+					 />
+				</div>
 			<label class="col-sm-3 control-label text-left-audit"><spring:message
 					code="lbl.estimate.preparation.estimate.percentage" /><span
 				class="mandatory"></span></label>
@@ -63,44 +78,6 @@
 				<form:errors path="estimatePercentage"
 					cssClass="add-margin error-msg" />
 					</div>
-			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.work.order.search.agency.work.order" /><span
-				class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control" path="agencyWorkOrder"
-					required="required" />
-				<form:errors path="agencyWorkOrder" cssClass="add-margin error-msg" />
-				</div>
-			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.work.order.search.date" /><span class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-				<form:input id="date" path="date" class="form-control datepicker"
-					data-date-end-date="0d" placeholder="DD/MM/YYYY"
-					required="required" />
-				<form:errors path="date" cssClass="add-margin error-msg" />
-						</div>
-			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.work.order.search.time.limit" /><span class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control" path="timeLimit"
-					required="required" />
-				<form:errors path="timeLimit" cssClass="add-margin error-msg" />
-					</div>
-			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.work.order.search.work.type" /><span class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control" path="workType"
-					required="required" />
-				<form:errors path="workType" cssClass="add-margin error-msg" />
-				</div>
-			<label class="col-sm-3 control-label text-left-audit"><spring:message
-					code="lbl.work.order.search.tendered.cost" /><span
-				class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control" path="tenderCost"
-					required="required" />
-				<form:errors path="tenderCost" cssClass="add-margin error-msg" />
-				</div>
 
 						</div>
 					</div>

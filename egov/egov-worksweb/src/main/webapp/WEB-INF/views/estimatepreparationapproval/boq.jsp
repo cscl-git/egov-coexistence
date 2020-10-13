@@ -7,7 +7,7 @@
 
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 0;">
+		<div class="form-group" style="padding: 50px 20px 265px;">
 
 			<input type="hidden" name="estimatePreparationApproval"
 				value="${estimatePreparationApproval.id}" /> <label
@@ -162,7 +162,9 @@
 							items="${estimatePreparationApproval.boQDetailsList}"
 							varStatus="status">
 								<tr id="detailsrow" class="repeat-address">
-									<td><form:input type="text"
+									<td>
+									<form:hidden path="boQDetailsList[${status.index}].slNo" id="boQDetailsList[${status.index}].slNo"/>
+									<form:input type="text"
 											path="boQDetailsList[${status.index}].item_description"
 											id="boQDetailsList[${status.index}].item_description"
 											required="required" class="form-control item_description"

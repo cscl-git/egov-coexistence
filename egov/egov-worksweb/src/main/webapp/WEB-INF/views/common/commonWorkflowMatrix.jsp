@@ -76,11 +76,10 @@
 <form:hidden  path="" id="amountRule" name="amountRule" value="${amountRule}"/>
 <form:hidden path="" id="workFlowDepartment" name="workFlowDepartment" value="${workFlowDepartment}"/>
 <form:hidden path="" id="pendingActions" name="pendingActions" value="${pendingActions}"/>
-<%-- <form:hidden path="" id="approverName" name="approverName" /> --%>
 
-				<div class="row show-row"  id="approverDetailHeading">
+				<div class="show-row"  id="approverDetailHeading">
 				<c:if test="${nextAction !='END'}" > 
-				<div class="show-row form-group" >
+				<div class="show-row row  form-group" >
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.approverdepartment" text="Approver Department"/><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="approvalDepartment" data-first-option="false" name="approvalDepartment"
@@ -106,7 +105,7 @@
 						</form:select>					
 					</div>
 				</div>
-				<div class="show-row form-group">
+				<div class="show-row row form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.approver" text="Approver"/><span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 					<input type="hidden" id="approvalPositionValue" value="${approvalPosition }" />
@@ -121,7 +120,7 @@
 					</div> 
 				</div>
 					</c:if>
-					<div class="show-row form-group">
+					<div class="show-row row form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.comments" text="Comments"/></label>
 		<div class="col-sm-8 add-margin">
 			<form:textarea class="form-control" path="approvalComent"  id="approvalComent" name="approvalComent" />

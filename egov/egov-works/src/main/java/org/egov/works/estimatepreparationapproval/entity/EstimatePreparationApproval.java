@@ -24,6 +24,7 @@ import javax.persistence.Transient;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
@@ -86,7 +87,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String estimatePreparedBy;
 
 	@Column(name = "preparation_designation")
-	private String preparationDesignation;
+	private Long preparationDesignation;
 
 	@Column(name = "financing_details")
 	private Long financingDetails;
@@ -151,6 +152,10 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Transient
 	private List<Department> departments = new ArrayList<Department>();
+	
+	@Transient
+	private List<Designation> designations = new ArrayList<Designation>();
+
 
 	@Transient
 	private String dt;
@@ -276,11 +281,11 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	}
 
 
-	public String getPreparationDesignation() {
+	public Long getPreparationDesignation() {
 		return preparationDesignation;
 	}
 
-	public void setPreparationDesignation(String preparationDesignation) {
+	public void setPreparationDesignation(Long preparationDesignation) {
 		this.preparationDesignation = preparationDesignation;
 	}
 
@@ -540,6 +545,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setEstimatePreparedBy(String estimatePreparedBy) {
 		this.estimatePreparedBy = estimatePreparedBy;
+	}
+
+	public List<Designation> getDesignations() {
+		return designations;
+	}
+
+	public void setDesignations(List<Designation> designations) {
+		this.designations = designations;
 	}
 	
 	

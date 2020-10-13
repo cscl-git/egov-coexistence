@@ -38,6 +38,14 @@ public class BoQDetails implements Serializable {
 	@Column(name = "unit")
 	private String unit;
 
+	public String getUnit() {
+		return unit;
+	}
+
+	public void setUnit(String unit) {
+		this.unit = unit;
+	}
+
 	@Column(name = "rate")
 	private Double rate;
 
@@ -88,6 +96,7 @@ public class BoQDetails implements Serializable {
 		this.ref_dsr = ref_dsr;
 	}
 
+	
 
 	public Double getRate() {
 		return rate;
@@ -155,14 +164,6 @@ public class BoQDetails implements Serializable {
 	
 	public void setMeasured_amount(Double measured_amount) {
 		this.measured_amount = measured_amount;
-	}
-
-	public String getUnit() {
-		return unit;
-	}
-
-	public void setUnit(String unit) {
-		this.unit = unit;
 	}
 	
 }

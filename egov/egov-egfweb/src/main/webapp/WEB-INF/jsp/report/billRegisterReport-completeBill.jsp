@@ -162,7 +162,7 @@
 							<display:column title="Bill Date"
 								style="width:8%;text-align:center" property="billDate"
 								sortProperty="billdate" sortable="true" />
-							<display:column title="Voucher number" href="javascript:openVoucher('<s:property value="%{#attr.currentRowObject.vhId}"/>');"
+							<display:column title="Voucher number" href="javascript:openVoucher('${currentRowObject.vhId}');"
 								style="width:11%;text-align:center" property="voucherNumber" />
 							<display:column title="Party Name"
 								style="width:5%;text-align:center" property="partyName" />
@@ -174,13 +174,13 @@
 								style="width:7%;text-align:right" property="netAmount" />
 							<display:column title="Paid Amount"
 								style="width:7%;text-align:right" property="paidAmount" />
-							<display:column title="Payment voucher number " href="#"
+							<display:column title="Payment voucher number " href="javascript:openVoucher('${currentRowObject.phId}');"
 								style="width:11%;text-align:center"
 								property="paymentVoucherNumber" />
 							<display:column title="Payment Pex number " 
 								style="width:11%;text-align:center"
 								property="pexNo" />
-							<display:column title="Deduction voucher number " href="#"
+							<display:column title="Deduction voucher number " href="javascript:openVoucher('${currentRowObject.deducVhId}');"
 								style="width:11%;text-align:center"
 								property="deducVoucherNumber" />
 							<display:column title="Deduction Pex number "
@@ -303,6 +303,10 @@
 		{
 			var url = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;
 			window.open(url,'','width=900, height=700');
+		}
+		function test()
+		{
+			alert('Test in UAT');
 		}
 	</script>
 </body>
