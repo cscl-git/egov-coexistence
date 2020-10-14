@@ -147,7 +147,7 @@
 	style="scrollable: true;">
 	<div class="panel-heading">
 		<div class="panel-title">
-			<spring:message code="lbl.work.boq" text="BoQ Details" />
+			<spring:message code="lbl.work.boq" text="BoQ Section" />
 					</div>
 		<br>
 		<div>

@@ -91,7 +91,7 @@
 					code="lbl.estimate.preparation.estimate.aadate" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:input id="aadate" path="estimateDate"
+				<form:input id="aadate" path="aadate"
 									class="form-control-works datepicker" data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="aadate" cssClass="add-margin error-msg" />
