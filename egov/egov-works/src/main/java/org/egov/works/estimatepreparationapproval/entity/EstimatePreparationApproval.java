@@ -115,7 +115,13 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Column(name = "time_limit")
 	private String timeLimit;
-
+	
+	@Column(name = "aanumber")
+	private String aanumber;
+	
+	@Column(name = "aadate")
+	private Date aadate;
+	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
@@ -553,6 +559,22 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setDesignations(List<Designation> designations) {
 		this.designations = designations;
+	}
+
+	public String getAanumber() {
+		return aanumber;
+	}
+
+	public void setAanumber(String aanumber) {
+		this.aanumber = aanumber;
+	}
+
+	public Date getAadate() {
+		return aadate;
+	}
+
+	public void setAadate(Date aadate) {
+		this.aadate = aadate;
 	}
 	
 	

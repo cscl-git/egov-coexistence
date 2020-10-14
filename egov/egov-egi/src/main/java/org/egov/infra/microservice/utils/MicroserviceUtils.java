@@ -91,6 +91,7 @@ import org.egov.infra.microservice.contract.CreateUserRequest;
 import org.egov.infra.microservice.contract.Position;
 import org.egov.infra.microservice.contract.PositionRequest;
 import org.egov.infra.microservice.contract.PositionResponse;
+import org.egov.infra.microservice.contract.RequestInfoSearchWrapper;
 import org.egov.infra.microservice.contract.RequestInfoWrapper;
 import org.egov.infra.microservice.contract.Task;
 import org.egov.infra.microservice.contract.TaskResponse;
@@ -1150,9 +1151,14 @@ public class MicroserviceUtils {
 
         default:
             RequestInfo requestInfo = new RequestInfo();
-            RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
+            //:Bhushan
+            //change by Bhushan -added RequestInfoSearchWrapper
+            RequestInfoSearchWrapper reqWrapper = new RequestInfoSearchWrapper();
             requestInfo.setAuthToken(getUserToken());
             requestInfo.setUserInfo(getUserInfo());
+            //:Bhushan
+            //change by Bhushan -add setids
+            reqWrapper.setIds(rSearchcriteria.getIds());
             reqWrapper.setRequestInfo(requestInfo);
             StringBuilder url = new StringBuilder();
             url.append(appConfigManager.getEgovCollSerHost()).append(receiptSearchUrl).append("?tenantId=").append(getTenentId());
@@ -1284,6 +1290,22 @@ public class MicroserviceUtils {
         return restTemplate.postForObject(url.toString(), request, RemittanceResponse.class);
     }
 
+    
+    public RemittanceResponse getDayWorkHistory(List<Remittance> remittanceList) {
+        final StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost() + remittanceCreateUrl);
+        RemittanceRequest request = new RemittanceRequest();
+        request.setRemittances(remittanceList);
+        final RequestInfo requestInfo = new RequestInfo();
+
+        requestInfo.setAuthToken(generateAdminToken(getTenentId()));
+        requestInfo.setUserInfo(new UserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        request.setRequestInfo(requestInfo);
+
+        return restTemplate.postForObject(url.toString(), request, RemittanceResponse.class);
+    }
+    
+    
     public ReceiptResponse updateReceipts(List<Receipt> receiptList) {
         final StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost() + receiptUpdateUrl);
         ReceiptRequest request = new ReceiptRequest();
