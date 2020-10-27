@@ -142,6 +142,7 @@ import org.egov.infra.microservice.models.ReceiptSearchCriteria;
 import org.egov.infra.microservice.models.Remittance;
 import org.egov.infra.microservice.models.RemittanceRequest;
 import org.egov.infra.microservice.models.RemittanceResponse;
+import org.egov.infra.microservice.models.RemittanceResponseDepositWorkDetails;
 import org.egov.infra.microservice.models.RequestInfo;
 import org.egov.infra.microservice.models.ResponseInfo;
 import org.egov.infra.microservice.models.TaxHeadMaster;
@@ -228,6 +229,9 @@ public class MicroserviceUtils {
     @Value("${egov.services.common.masters.businesscategory.url}")
     private String businessCategoryServiceUrl;
 
+    @Value("${egov.services.collection.service.remittance.depositworkurl}")
+    private String depositworkurl;
+    
     @Value("${egov.services.common.masters.businessdetails.url}")
     private String businessDetailsServiceUrl;
 
@@ -1220,6 +1224,25 @@ public class MicroserviceUtils {
 
     }
     
+    public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
+            String receiptNo) {
+
+        return this.searchReciepts(classification, fromDate, toDate, businessCode,department, Arrays.asList(receiptNo));
+
+    }
+    public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
+            List<String> receiptNos) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .department(department)
+                .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+               //.receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                //.classification(classification)
+                .build();
+        return this.getReceipt(criteria);
+    }
+    
     public List<Receipt> searchRecieptsFinance(String classification, Date fromDate, Date toDate, String businessCode,
             String receiptNo,String type) {
 
@@ -1291,10 +1314,10 @@ public class MicroserviceUtils {
     }
 
     
-    public RemittanceResponse getDayWorkHistory(List<Remittance> remittanceList) {
-        final StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost() + remittanceCreateUrl);
+    public RemittanceResponseDepositWorkDetails getDayWorkHistory(Set<String> reciptNumber) {
+        final StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost() + depositworkurl);
         RemittanceRequest request = new RemittanceRequest();
-        request.setRemittances(remittanceList);
+        request.setReceiptNumbers(reciptNumber);
         final RequestInfo requestInfo = new RequestInfo();
 
         requestInfo.setAuthToken(generateAdminToken(getTenentId()));
@@ -1302,7 +1325,7 @@ public class MicroserviceUtils {
         requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
         request.setRequestInfo(requestInfo);
 
-        return restTemplate.postForObject(url.toString(), request, RemittanceResponse.class);
+        return restTemplate.postForObject(url.toString(), request, RemittanceResponseDepositWorkDetails.class);
     }
     
     

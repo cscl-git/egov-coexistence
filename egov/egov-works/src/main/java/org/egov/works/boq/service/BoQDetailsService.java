@@ -1,5 +1,7 @@
 package org.egov.works.boq.service;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -9,16 +11,18 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
-import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
-import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +47,11 @@ public class BoQDetailsService {
 	@Autowired
     @Qualifier("workflowService")
     private SimpleWorkflowService<WorkOrderAgreement> workAgreementWorkflowService;
+	@Autowired
+    private FileStoreService fileStoreService;
+	@Autowired
+	private DocumentUploadRepository documentUploadRepository;
+	
 
 	@Transactional
 	public WorkOrderAgreement saveBoQDetailsData(HttpServletRequest request, WorkOrderAgreement workOrderAgreement,Long approvalPosition,String approvalComment,String approvalDesignation,String workFlowAction) {
@@ -54,6 +63,10 @@ public class BoQDetailsService {
 		}
 		workOrderAgreement.setNewBoQDetailsList(list);
 		if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Save as Draft")) && workOrderAgreement.getStatus() == null)
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Created"));
+		}
+		else if (workFlowAction.equalsIgnoreCase("Save as Draft") && workOrderAgreement.getStatus().getCode().equals("Created"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Created"));
 		}
@@ -69,11 +82,45 @@ public class BoQDetailsService {
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Approved"));
 		}
+		else if((workFlowAction.equalsIgnoreCase("Forward")) && (workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Forward")) && (workOrderAgreement.getProject_closure_comments() != null || !workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closure Initiated"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Approve")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Approved"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Approve")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closed"));
+		}
 
 		WorkOrderAgreement savedWorkOrderAgreement = workOrderAgreementRepository.save(workOrderAgreement);
+		List<DocumentUpload> files = workOrderAgreement.getDocumentDetail() == null ? null
+				: workOrderAgreement.getDocumentDetail();
+		final List<DocumentUpload> documentDetails;
+		
+		documentDetails = getDocumentDetails(files, workOrderAgreement,
+				"Works_Agreement");
+		if (!documentDetails.isEmpty()) {
+			savedWorkOrderAgreement.setDocumentDetail(documentDetails);
+			persistDocuments(documentDetails);
+		}
 		createEstimateWorkflowTransition(savedWorkOrderAgreement, approvalPosition, approvalComment, null,
                 workFlowAction,approvalDesignation);
-		WorkOrderAgreement savedWorkOrderAgreement1 = workOrderAgreementRepository.save(workOrderAgreement);
+		WorkOrderAgreement savedWorkOrderAgreement1 = workOrderAgreementRepository.save(savedWorkOrderAgreement);
 		return savedWorkOrderAgreement1;
 
 	}
@@ -158,7 +205,7 @@ public class BoQDetailsService {
             .withComments(approvalComent)
             .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
             .withNextAction(wfmatrix.getNextAction())
-            .withNatureOfTask("Works Estimate")
+            .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
             .withtLastModifiedBy(user.getId());
         
@@ -171,7 +218,7 @@ public class BoQDetailsService {
             .withComments(approvalComent)
             .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
             .withNextAction(wfmatrix.getNextAction())
-            .withNatureOfTask("Works Estimate")
+            .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
             .withtLastModifiedBy(user.getId());
         }
@@ -179,25 +226,37 @@ public class BoQDetailsService {
         {
         	wfmatrix = workAgreementWorkflowService.getWfMatrix(savedWorkOrderAgreement.getStateType(), null,
                     null, additionalRule, savedWorkOrderAgreement.getCurrentState().getValue(), null);
-        	if(workFlowAction.equalsIgnoreCase("Save As Draft"))
+        	System.out.println("savedWorkOrderAgreement.getCurrentState().getValue() :: "+savedWorkOrderAgreement.getCurrentState().getValue());
+        	if(savedWorkOrderAgreement.getCurrentState().getValue().equals("END"))
         	{
         		wfmatrix = workAgreementWorkflowService.getWfMatrix(savedWorkOrderAgreement.getStateType(), null,
                         null, additionalRule, "NEW", null);
-        		savedWorkOrderAgreement.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
+            	savedWorkOrderAgreement.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
-                .withNatureOfTask("Works Estimate")
+                .withNatureOfTask("Works Agreement")
                 .withCreatedBy(user.getId())
                 .withtLastModifiedBy(user.getId());
         	}
+        	else if(workFlowAction.equalsIgnoreCase("Save As Draft"))
+        	{
+        		wfmatrix = workAgreementWorkflowService.getWfMatrix(savedWorkOrderAgreement.getStateType(), null,
+                        null, additionalRule, "SaveAsDraft", null);
+            	savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                .withComments(approvalComent)
+                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+                .withNextAction(wfmatrix.getNextAction())
+                .withNatureOfTask("Works Agreement");
+        	}
         	else if(workFlowAction.equalsIgnoreCase("Forward") || (workFlowAction.equalsIgnoreCase("Approve") && !wfmatrix.getNextState().equals("END")))
         	{
+        		
         		savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
                 .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
-                .withNatureOfTask("Works Estimate");
+                .withNatureOfTask("Works Agreement");
 
         	}
         	else if(workFlowAction.equalsIgnoreCase("Approve") && wfmatrix.getNextState().equals("END"))
@@ -206,11 +265,47 @@ public class BoQDetailsService {
                 .withComments(approvalComent)
                 .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
                 .withNextAction(wfmatrix.getNextAction())
-                .withNatureOfTask("Works Estimate");
+                .withNatureOfTask("Works Agreement");
 
         	}
         }
         
+	}
+	
+	public List<DocumentUpload> getDocumentDetails(final List<DocumentUpload> files, final Object object,
+            final String objectType) {
+        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
+
+        Long id;
+        Method method;
+        try {
+            method = object.getClass().getMethod("getId", null);
+            id = (Long) method.invoke(object, null);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
+        }
+
+        for (DocumentUpload doc : files) {
+            final DocumentUpload documentDetails = new DocumentUpload();
+            documentDetails.setObjectId(id);
+            documentDetails.setObjectType(objectType);
+            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+                    doc.getContentType(), "Works_Agreement"));
+            documentDetailsList.add(documentDetails);
+
+        }
+        return documentDetailsList;
+    }
+	
+	public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+		if (documentDetailsList != null && !documentDetailsList.isEmpty())
+			for (final DocumentUpload doc : documentDetailsList)
+				documentUploadRepository.save(doc);
+	}
+	
+	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
+		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
 	}
 
 

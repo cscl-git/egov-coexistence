@@ -81,6 +81,7 @@ public class ReceiptSearchCriteria {
     
     public void toPayemntSerachCriteriaContract(PaymentSearchCriteria contract){
 //        contract.setIds(this.ids);
+    	 contract.setDepartment(this.department);
         contract.setStatus(this.status);
         contract.setBusinessServices(this.businessCodes);
         contract.setFromDate(this.fromDate != null ? this.fromDate.getTime() : null);

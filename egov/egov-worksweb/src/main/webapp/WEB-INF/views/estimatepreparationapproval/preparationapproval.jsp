@@ -128,25 +128,25 @@
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.name.work" /></label>
 					<div class="col-sm-9 block-colm">
-						<form:textarea class="form-control-works" path="workName"
+						<form:textarea class="form-control-works" path="workName" style="height: 100px;"
 									maxlength="2000"  />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.necessity" /></label>
 					<div class="col-sm-9 block-colm">
-							 <form:textarea class="form-control-works" path="necessity"
+							 <form:textarea class="form-control-works" path="necessity" style="height: 100px;"
 									maxlength="2000"  />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.scope.work" /></label>
 					<div class="col-sm-9 block-colm">
-							 <form:textarea class="form-control-works" path="workScope"
+							 <form:textarea class="form-control-works" path="workScope" style="height: 100px;"
 									maxlength="2000"  />
 					</div>
 				</div>
 			</div>
 		</div>
-		<div class="panel panel-primary" data-collapsed="0">
+		<div id="boq_div" class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 			<div class="panel-title">
 					<spring:message code="lbl.work.boq" text="BoQ Details" />
@@ -192,36 +192,36 @@
 									<td><form:input type="text" style="width:300px;"
 											path="boQDetailsList[${status.index}].item_description"
 											id="boQDetailsList[${status.index}].item_description"
-											required="required" class="form-control-works item_description"
+											required="required" class="form-control item_description"
 											maxlength="200"></form:input></td>
-									<td><form:input type="text" style="width:300px;"
+									<td><form:input type="text" style="width:150px;"
 											path="boQDetailsList[${status.index}].ref_dsr"
 											id="boQDetailsList[${status.index}].ref_dsr"
-											required="required" class="form-control-works ref_dsr"
+											required="required" class="form-control ref_dsr"
 											maxlength="200"></form:input></td>
 									<td><form:input type="text"
 											path="boQDetailsList[${status.index}].unit"
 												id="boQDetailsList[${status.index}].unit"
-												required="required" class="form-control-works unit"
+												required="required" class="form-control unit"
 												maxlength="200"></form:input></td>
 									<td><form:input type="number"
 											path="boQDetailsList[${status.index}].rate" step=".01"
 												id="boQDetailsList[${status.index}].rate"
-												required="required" class="form-control-works rate"
+												required="required" class="form-control rate"
 												onchange="valueChanged()"></form:input></td>
 									<td><form:input type="number"
 											path="boQDetailsList[${status.index}].quantity" step=".01"
 											id="boQDetailsList[${status.index}].quantity"
-											required="required" class="form-control-works quantity"
+											required="required" class="form-control quantity"
 											name="quantity" onchange="valueChanged()"></form:input></td>
 									<td><form:input type="number"
 											path="boQDetailsList[${status.index}].amount"
 											id="boQDetailsList[${status.index}].amount"
-											required="required" class="form-control-works amount"
+											required="required" class="form-control amount"
 											maxlength="200" name="amount" readonly="true"></form:input></td>
 									<td>
-											<button onclick="deleteRow(this);" class="btn btn-primary"
-											style="margin-bottom: 15px; float: left;" id="plus">-</button>
+									<a  onclick="deleteRow(this);"
+							href="#"><img style="height:30px;" title="Delete BoQ" src="/services/egi/resources/erp2/images/delete.png" border="0" /></a>
 									</td>
 								</tr>
 							</c:forEach>
@@ -278,6 +278,7 @@
 
 		newAddressRow.insertBefore(addressRow)
 		calculateTotal();
+		document.getElementById("boq_div").focus();
 	}
 
 
@@ -286,6 +287,7 @@
 			var i = r.parentNode.parentNode.rowIndex;
 			document.getElementById("table").deleteRow(i);
 			calculateTotal();
+			document.getElementById("boq_div").focus();
 		}
 		
  function calculateTotal() {

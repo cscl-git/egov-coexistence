@@ -55,6 +55,11 @@ function setCardInstrumentDetails(elem) {
 	document.getElementById("instrHeaderCard.instrumentAmount").value = elem.value;
 	document.getElementById("instrumentTypeCashOrCard").value = "card";
 }
+
+function setPosmohbdInstrumentDetails(elem) {
+	document.getElementById("instrHeaderCard.instrumentAmount").value = elem.value;
+	document.getElementById("instrumentTypeCashOrCard").value = "posmohbd";
+}
 function setBankInstrumentDetails(elem) {
 	document.getElementById("instrHeaderBank.instrumentAmount").value = elem.value;
 	document.getElementById("instrumentTypeCashOrCard").value = "bankchallan";
@@ -357,7 +362,8 @@ function displayPaymentDetails() {
 			&& document.getElementById("instrHeaderCard.instrumentAmount").value != "") {
 		document.getElementById('cardradiobutton').checked = true;
 		document.getElementById('carddetails').style.display = 'table-row';
-		document.getElementById('instrumentTypeCashOrCard').value = "card";
+		//document.getElementById('instrumentTypeCashOrCard').value = "card";
+		console.log('commented to check :::'+document.getElementById('instrumentTypeCashOrCard').value);
 		document.getElementById('cashdetails').style.display = "none";
 		document.getElementById('onlinedetails').style.display = "none";
 	}
@@ -397,6 +403,7 @@ function loadchequedetails() {
 function displayPaytModes() {
 	var cashAllowed = document.getElementById("cashAllowed").value;
 	var cardAllowed = document.getElementById("cardAllowed").value;
+	var posmohbdAllowed= document.getElementById("posmohbdAllowed").value;
 	// var chequeAllowed=document.getElementById("chequeAllowed").value;
 	// var ddAllowed=document.getElementById("ddAllowed").value;
 	var chequeDDAllowed = isChequeDDAllowed();
@@ -422,6 +429,15 @@ function displayPaytModes() {
 		if(cashAllowed == 'false'){  
 			document.getElementById('instrumentTypeCashOrCard').value = "card";  
 		}
+	} else {
+		// do not display card radio button
+		document.getElementById('cardradiobuttonspan').style.display = "none";
+	}
+	
+	if (posmohbdAllowed == 'true' ) {
+		// display card radio button
+		document.getElementById('posmohbdradiobuttonspan').style.display = "block";
+			document.getElementById('instrumentTypeCashOrCard').value = "posmohbd";  
 	} else {
 		// do not display card radio button
 		document.getElementById('cardradiobuttonspan').style.display = "none";
@@ -464,7 +480,7 @@ function displayPaytModes() {
 			&& chequeDDAllowed == 'false') {
 		document.getElementById('cardradiobutton').checked = true;
 		document.getElementById('carddetails').style.display = 'table-row';
-		document.getElementById('instrumentTypeCashOrCard').value = "card";
+		//document.getElementById('instrumentTypeCashOrCard').value = "card";
 	}
 	// if cash, cheque/DD and card are not allowed and bank is allowed, set bank
 	// as the default payt

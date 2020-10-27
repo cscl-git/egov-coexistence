@@ -37,4 +37,40 @@ function setWorkflow(action)
 	
 }
 
+function openEstimate(estId)
+{
+	var url = "/services/works/estimatePreparation/view/"+ estId;
+	window.open(url,'','width=900, height=700');
+}
+
+function openTender(tenderId)
+{
+	var url = "/services/works/tenderProcurement/view/"+ tenderId;
+	window.open(url,'','width=900, height=700');
+}
+
+function openBG(bgId)
+{
+	var url = "/services/works/bgSecurity/view/"+ bgId;
+	window.open(url,'','width=900, height=700');
+}
+
+function openWork(woId)
+{
+	var url = "/services/works/boq/edit/"+ woId;
+	window.open(url,'','width=900, height=700');
+}
+
+function openWorkView(woId)
+{
+	var url = "/services/works/boq/view/"+ woId;
+	window.open(url,'','width=900, height=700');
+}
+
+function openClosure(woId)
+{
+	var url = "/services/works/boq/closureDetails/"+ woId;
+	window.open(url,'','width=900, height=700');
+}
+
 

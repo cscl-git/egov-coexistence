@@ -24,7 +24,7 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:select path="fundSource" id="fundSource" readonly ="true"
-								cssClass="form-control-works" cssErrorClass="form-control-works error"
+								cssClass="form-control" cssErrorClass="form-control error"
 								required="required">
 								<form:option value="">
 									<spring:message code="lbl.select" />
@@ -38,7 +38,7 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 							<form:select path="financialYear" id="financialYear" readonly ="true"
-								cssClass="form-control-works" cssErrorClass="form-control-works error"
+								cssClass="form-control" cssErrorClass="form-control error"
 								required="required">
 								<form:option value="">
 									<spring:message code="lbl.select" />
@@ -54,7 +54,7 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 							<form:select path="financingDetails" id="financingDetails" readonly ="true"
-								cssClass="form-control-works" cssErrorClass="form-control-works error"
+								cssClass="form-control" cssErrorClass="form-control error"
 								required="required">
 								<form:option value="">
 									<spring:message code="lbl.select" />
@@ -66,14 +66,14 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.work.order.search.tendered.cost" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" path="tenderCost" readonly="true"
+				<form:input type="text" class="form-control" path="tenderCost" readonly="true"
 					 />
 				</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.estimate.percentage" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" readonly ="true"
+				<form:input type="text" class="form-control" readonly ="true"
 					path="estimatePercentage" required="required" />
 				<form:errors path="estimatePercentage"
 					cssClass="add-margin error-msg" />
@@ -82,7 +82,7 @@
 					code="lbl.estimate.preparation.estimate.aanumber" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" readonly ="true"
+				<form:input type="text" class="form-control" readonly ="true"
 					path="aanumber" required="required" />
 				<form:errors path="aanumber"
 					cssClass="add-margin error-msg" />
@@ -92,7 +92,7 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="aadate" path="aadate" readonly ="true"
-									class="form-control-works datepicker" data-date-end-date="0d"
+									class="form-control datepicker" data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="aadate" cssClass="add-margin error-msg" />
 					</div>

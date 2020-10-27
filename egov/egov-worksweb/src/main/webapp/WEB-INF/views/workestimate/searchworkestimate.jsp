@@ -1,9 +1,13 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 
-<form:form name="search-work-estimate-form" role="form" method="post"
+<script
+        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+
+	<form:form name="search-work-estimate-form" role="form" method="post"
 	action="workEstimateSearch" modelAttribute="workEstimateDetails"
 	id="workEstimateDetails" class="form-horizontal form-groups-bordered"
 	style="margin-top:-20px;">
@@ -40,15 +44,25 @@
 										itemValue="code" itemLabel="name" />
 								</form:select>
 							</div>
+					
+							</div>
+						</div>
+					</div>
 
-					<div class="buttonbottom" align="center">
-						<input type="submit" id="workEstimateSearch"
+		<div class="buttonbottom" align="center">
+			<input type="submit" id="workEstimateSearch"
 							class="btn btn-primary" name="workEstimateSearch"
 							code="lbl.search.work.estimate" value="Search" />
 				</div>
 
+		<br> <br> <br>
+		<div class="tab-pane fade in active" id="resultheader">
+			<h3>Search Result</h3>
+			<div class="panel panel-primary" data-collapsed="0">
 				<div style="padding: 0 15px;">
 					<table class="table table-bordered" id="table">
+					<c:if
+							test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
 						<thead>
 							<tr>
 								<th><spring:message code="lbl.selectonly" text="Select" /></th>
@@ -65,8 +79,7 @@
 							</tr>
 						</thead>
 						`
-						<c:if
-							test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
+						
 							<tbody>
 								<c:forEach items="${workEstimateDetails.estimateList}"
 									var="result" varStatus="status">
@@ -104,27 +117,25 @@
 					</c:if>
 					</table>
 				</div>
-
 				<div>
 					<c:if
 						test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
 							<div class="buttonbottom" align="center">
 								<input type="submit" id="save" class="btn btn-primary"
-									name="save" value="Submit" />
+									name="save" value="Search BOQ" />
 				</div>
 					</c:if>
 				</div>
-
 				<div style="padding: 0 15px;">
-					<%-- <input type="hidden" name="workEstimateDetails" value="${estimatePreparationApproval.id}" /> --%>
 					<form:hidden path="id" id="id" value="${workEstimateDetails.id}" />
 					<table class="table table-bordered" id="searchResult">
+					<c:if
+							test="${workEstimateDetails.newBoQDetailsList != null &&  !workEstimateDetails.newBoQDetailsList.isEmpty()}">
 						<thead>
 							<tr>
 								<th><spring:message code="lbl.selectAll" text="Select All" />
 									<input type="checkbox" id="selectAll" name="selectAll"
 									onclick="checkAll(this)"></th>
-								<th><spring:message code="lbl.item.description" /></th>
 								<th><spring:message code="lbl.item.description" /></th>
 								<th><spring:message code="lbl.ref.dsr" /></th>
 								<th><spring:message code="lbl.unit" /></th>
@@ -135,19 +146,18 @@
 							</tr>
 						</thead>
 						`
-						<c:if
-							test="${workEstimateDetails.newBoQDetailsList != null &&  !workEstimateDetails.newBoQDetailsList.isEmpty()}">
+						
 							<tbody>
 								<c:forEach items="${workEstimateDetails.newBoQDetailsList}"
 									var="result" varStatus="status">
 									<tr>
 										<td><form:checkbox
 												path="newBoQDetailsList[${status.index}].checkboxChecked"
-												id="newBoQDetailsList[${status.index}].checkboxChecked" /></td>
-										<td><form:hidden
+												id="newBoQDetailsList[${status.index}].checkboxChecked" />
+												<form:hidden
 												path="newBoQDetailsList[${status.index}].slNo"
 												id="newBoQDetailsList[${status.index}].slNo" />
-											${result.slNo }</td>
+												</td>
 
 										<td><form:hidden
 												path="newBoQDetailsList[${status.index}].item_description"
@@ -183,10 +193,6 @@
 								</c:forEach>
 							<tbody>
 						</c:if>
-						<c:if
-							test="${workEstimateDetails.newBoQDetailsList == null ||  workEstimateDetails.newBoQDetailsList.isEmpty()}">
-					No records found
-					</c:if>
 					</table>
 				</div>
 				<div>
@@ -198,50 +204,10 @@
 						</div>
 					</c:if>
 				</div>
-			</div>
-		</div>
 		</div>
 	</div>
 
-
 	</form:form>
 
-	<script type="text/javascript">
-		function checkAll(ele) {
-			var checkboxes = document.getElementsByTagName('input');
-			if (ele.checked) {
-				for (var i = 0; i < checkboxes.length; i++) {
-					if (checkboxes[i].type == 'checkbox') {
-						checkboxes[i].checked = true;
-					}
-				}
-			} else {
-				for (var i = 0; i < checkboxes.length; i++) {
-					console.log(i)
-					if (checkboxes[i].type == 'checkbox') {
-						checkboxes[i].checked = false;
-					}
-				}
-			}
-		}
-
-		function radioSelection(r) {
-			var selectedRow = r.parentNode.parentNode.rowIndex;
-			for (var i = 1; i < table.rows.length; i++) {
-				rIndex = i;
-				if (selectedRow == rIndex) {
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").value = true;
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").checked = true;
-				} else {
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").value = false;
-					document.getElementById("estimateList[" + (rIndex - 1)
-							+ "].checked").checked = false;
-				}
-			}
-		}
-	</script>
 
 

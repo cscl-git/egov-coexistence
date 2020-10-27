@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.ServletContext;
@@ -44,6 +44,7 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
@@ -53,6 +54,7 @@ import org.egov.works.estimatepreparationapproval.repository.EstimatePreparation
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -86,9 +88,15 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
     
     private static final int BUFFER_SIZE = 4096;
+    public static final Locale LOCALE = new Locale("en", "IN");
+    public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
     
     @Autowired
 	private FileStoreService fileStoreService;
+    
+    @Autowired
+	@Qualifier("persistenceService")
+	private PersistenceService persistenceService;
     
     @Autowired
 	private DocumentUploadRepository documentUploadRepository;
@@ -376,7 +384,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		}
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
-		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
 		estimatePreparationApproval.setEstimateAmount(estAmt);
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
@@ -430,28 +437,70 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
 
 		// Convert input string into a date
-		/*DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
-		if (estimatePreparationApproval.getFromDate() != null && estimatePreparationApproval.getFromDate() != ""
-				&& !estimatePreparationApproval.getFromDate().isEmpty()) {
-		Date fromdate = inputFormat.parse(estimatePreparationApproval.getFromDate());
-		estimatePreparationApproval.setFromDt(fromdate);
-		}
 
-		if (estimatePreparationApproval.getToDate() != null && estimatePreparationApproval.getToDate() != ""
-				&& !estimatePreparationApproval.getToDate().isEmpty()) {
-		Date todate = inputFormat.parse(estimatePreparationApproval.getToDate());
-		estimatePreparationApproval.setToDt(todate);
-		}
-		
-*/
 		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
 		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
 		estimatePreparationApproval.setExecutingDivision(department);
 		}
-
-		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimateData(request,
-				estimatePreparationApproval);
-		approvalList.addAll(workEstimateDetails);
+		EstimatePreparationApproval estimate=null;
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es where es.executingDivision = ? ")
+	        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
+	        .append(getMisQuery(estimatePreparationApproval));
+		 System.out.println("Query :: "+query.toString());
+         list = persistenceService.findAllBy(query.toString(),
+        		 estimatePreparationApproval.getExecutingDivision());
+		 
+         if (list.size() != 0) {
+        	 
+        	 for (final Object[] object : list) {
+        		 estimate = new EstimatePreparationApproval();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setWorkName(object[1].toString());
+        		 }
+        		 if(object[2] != null)
+        		 {
+        			 Long wkCat=Long.parseLong(object[0].toString());
+        			 if(wkCat == 1)
+        			 {
+        				 estimate.setWorkCategry("Road Work");
+        			 }
+        			 else if(wkCat == 2)
+        			 {
+        				 estimate.setWorkCategry("Bridge Work");
+        			 }
+        			 else
+        			 {
+        				 estimate.setWorkCategry("Maintenance Work");
+        			 }
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setEstimateNumber(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setEstimateDt(object[4].toString());
+        		 }
+        		 if(object[5] != null)
+        		 {
+        			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
+        		 }
+        		 if(object[6] != null)
+        		 {
+        			 estimate.setStatusDescription(object[6].toString());
+        		 }
+        		 approvalList.add(estimate);
+        	 }
+        	 
+         }
+        estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setEstimateList(approvalList);
 
 		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
@@ -463,18 +512,26 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable("id") final Long id, Model model) {
 
-		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
-
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
+		estimateDetails.setDocumentDetail(documents);
 
-		for (int j = 0; j < estimateDetails.getNewBoQDetailsList().size(); j++) {
-			responseList = estimateDetails.getNewBoQDetailsList();
-		}
-		estimateDetails.setBoQDetailsList(responseList);
+		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		model.addAttribute("mode", "view");
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 
 		return "view-estimate-form";
 	}
@@ -623,7 +680,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		final ServletContext context = request.getServletContext();
 		final String fileStoreId = request.getParameter("fileStoreId");
 		String fileName = "";
-		final File downloadFile = fileStoreService.fetch(fileStoreId, "Workst_Est");
+		final File downloadFile = fileStoreService.fetch(fileStoreId, "Works_Est");
 		final FileInputStream inputStream = new FileInputStream(downloadFile);
 		EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
 		estDetails = getBillDocuments(estDetails);
@@ -666,6 +723,69 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				"Works_Est");
 		estDetails.setDocumentDetail(documentDetailsList);
 		return estDetails;
+	}
+	
+	private  String getDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" and es.estimateDate>='")
+						.append(DDMMYYYYFORMAT1.format(billDateFrom))
+						.append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and es.estimateDate<='")
+						.append(DDMMYYYYFORMAT1.format(billDateTo))
+						.append("'");
+		} catch (final Exception e) {
+			e.printStackTrace();
+		}
+		return numDateQuery.toString();
+	}
+	
+	public String getMisQuery( EstimatePreparationApproval estimate) {
+
+		final StringBuffer misQuery = new StringBuffer(300);
+		if (null != estimate) {
+			if ( estimate.getEstimateNumber() != null && !estimate.getEstimateNumber().isEmpty())
+			{
+				misQuery.append(" and es.estimateNumber='")
+						.append(estimate.getEstimateNumber()).append("'");
+			}
+			if(estimate.getWorksWing() != null)
+			{
+				misQuery.append(" and es.worksWing=")
+				.append(estimate.getWorksWing());
+			}
+			if(estimate.getWorkLocation() != null && !estimate.getWorkLocation().isEmpty())
+			{
+				misQuery.append(" and es.workLocation='")
+				.append(estimate.getWorkLocation()).append("'");
+			}
+			if(estimate.getSectorNumber() != null)
+			{
+				misQuery.append(" and es.sectorNumber=")
+				.append(estimate.getSectorNumber());
+			}
+			if(estimate.getWardNumber() != null)
+			{
+				misQuery.append(" and es.wardNumber=")
+				.append(estimate.getWardNumber());
+			}
+			if(estimate.getWorkCategory() != null)
+			{
+				misQuery.append(" and es.workCategory=")
+				.append(estimate.getWorkCategory());
+			}
+			if(estimate.getEstimateAmount() != null)
+			{
+				misQuery.append(" and es.estimateAmount=")
+				.append(estimate.getEstimateAmount());
+			}
+			
+		}
+		return misQuery.toString();
+
 	}
 
 }

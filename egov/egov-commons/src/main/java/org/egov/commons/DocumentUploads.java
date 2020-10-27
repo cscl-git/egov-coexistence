@@ -68,8 +68,8 @@ import java.util.Date;
 
 @Entity
 @Table(name = "EGF_DOCUMENTS")
-@SequenceGenerator(name = DocumentUpload.SEQ_EGF_DOCUMENTS, sequenceName = DocumentUpload.SEQ_EGF_DOCUMENTS, allocationSize = 1)
-public class DocumentUpload implements Serializable {
+@SequenceGenerator(name = DocumentUploads.SEQ_EGF_DOCUMENTS, sequenceName = DocumentUploads.SEQ_EGF_DOCUMENTS, allocationSize = 1)
+public class DocumentUploads implements Serializable {
 
     public static final String SEQ_EGF_DOCUMENTS = "SEQ_EGF_DOCUMENTS";
 

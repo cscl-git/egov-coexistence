@@ -7,7 +7,7 @@
 
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 465px;">
+		<div class="form-group" style="padding: 50px 20px 765px;">
 
 			<input type="hidden" name="estimatePreparationApproval"
 				value="${estimatePreparationApproval.id}" /> <label
@@ -111,21 +111,21 @@
 					code="lbl.estimate.preparation.name.work" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 block-colm">
-				<form:textarea class="form-control-works" path="workName" maxlength="2000"
+				<form:textarea class="form-control-works" path="workName" maxlength="2000" style="height: 100px;"
 					readonly="true" />
 				</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.necessity" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 block-colm">
-				<form:input type="text" class="form-control-works" path="necessity"
+				<form:input type="text" class="form-control-works" path="necessity" style="height: 100px;"
 					readonly="true" />
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.scope.work" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 block-colm">
-				<form:input type="text" class="form-control-works" path="workScope"
+				<form:input type="text" class="form-control-works" path="workScope" style="height: 100px;"
 					readonly="true" />
 				</div>
 			</div>
@@ -167,34 +167,34 @@
 									<form:input type="text"
 											path="boQDetailsList[${status.index}].item_description" style="width:300px;"
 											id="boQDetailsList[${status.index}].item_description"
-											required="required" class="form-control-works item_description"
+											required="required" class="form-control item_description"
 											maxlength="200"></form:input></td>
 									<td><form:input type="text"
-											path="boQDetailsList[${status.index}].ref_dsr" style="width:300px;"
+											path="boQDetailsList[${status.index}].ref_dsr" style="width:150px;"
 											id="boQDetailsList[${status.index}].ref_dsr"
-											required="required" class="form-control-works ref_dsr"
+											required="required" class="form-control ref_dsr"
 											maxlength="200"></form:input></td>
 									<td><form:input type="text"
 											path="boQDetailsList[${status.index}].unit"
 											id="boQDetailsList[${status.index}].unit" required="required"
-											class="form-control-works unit" maxlength="200"></form:input></td>
+											class="form-control unit" maxlength="200"></form:input></td>
 									<td><form:input type="number"
 											path="boQDetailsList[${status.index}].rate" step=".01"
 											id="boQDetailsList[${status.index}].rate" required="required"
-											class="form-control-works rate" onchange="valueChanged()"></form:input></td>
+											class="form-control rate" onchange="valueChanged()"></form:input></td>
 									<td><form:input type="number"
 											path="boQDetailsList[${status.index}].quantity" step=".01"
 											id="boQDetailsList[${status.index}].quantity"
-											required="required" class="form-control-works quantity"
+											required="required" class="form-control quantity"
 											name="quantity" onchange="valueChanged()"></form:input></td>
 									<td><form:input type="number"
 											path="boQDetailsList[${status.index}].amount"
 											id="boQDetailsList[${status.index}].amount"
-											required="required" class="form-control-works amount"
+											required="required" class="form-control amount"
 											maxlength="200" name="amount" readonly="true"></form:input></td>
 								<td>
-									<button onclick="deleteRow(this);" class="btn btn-primary"
-										style="margin-bottom: 15px; float: left;" id="plus">-</button>
+									<a  onclick="deleteRow(this);"
+							href="#"><img style="height:30px;" title="Delete BoQ" src="/services/egi/resources/erp2/images/delete.png" border="0" /></a>
 								</td>
 								</tr>
 							</c:forEach>

@@ -444,4 +444,12 @@
     <bean id="EstimatePreparationApprovalInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
         <constructor-arg index="0" ref="estimatePreparationApprovalPersistenceService"/>
     </bean>
+    
+    <bean id="workOrderAgreementPersistenceService" parent="abstractPersistenceService">
+        <constructor-arg name="type" value="org.egov.works.boq.entity.WorkOrderAgreement" />
+    </bean>
+
+    <bean id="WorkOrderAgreementInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+        <constructor-arg index="0" ref="workOrderAgreementPersistenceService"/>
+    </bean>
 </beans>

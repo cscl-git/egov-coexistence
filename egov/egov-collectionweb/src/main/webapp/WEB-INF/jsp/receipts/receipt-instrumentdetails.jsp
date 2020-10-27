@@ -286,6 +286,19 @@ function showInstrumentDetails(obj){
 		clearChequeDDDetails();
 		//clearManualReceiptData();
 	}
+	else if(obj.id=='posmohbdradiobutton'){
+		document.getElementById('cashdetails').style.display='none';
+		document.getElementById('chequeDDdetails').style.display='none';
+		document.getElementById('carddetails').style.display='table-row';
+		document.getElementById('bankdetails').style.display='none';
+		document.getElementById('onlinedetails').style.display='none';
+		document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
+		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
+		clearCashDetails();
+		clearBankDetails();
+		clearChequeDDDetails();
+		//clearManualReceiptData();
+	}
 	else if(obj.id=='bankradiobutton'){
 		document.getElementById('cashdetails').style.display='none';
 		document.getElementById('chequeDDdetails').style.display='none';
@@ -321,7 +334,7 @@ function validateTransactionNumber()
 {
 	document.getElementById("receipt_error_area").innerHTML="";    
 	document.getElementById("receipt_error_area").style.display="none";
-	 if(document.getElementById("cardradiobutton").checked)
+	 if(document.getElementById("cardradiobutton").checked || document.getElementById("posmohbdradiobutton").checked)
 		 {    
 		 	 var instrumentNum="";
 		 	 var confirmInstrumentNo="";
@@ -395,7 +408,13 @@ loadBankDetailFailureHandler = function(){
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="card" id="cardradiobutton" name="paytradiobutton" /> Credit/Debit card
 			&nbsp;
-	</span> <span style="float: left;" id="bankradiobuttonspan"> <input
+	</span>
+	<span style="float: left;" id="posmohbdradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohbd" id="posmohbdradiobutton" name="paytradiobutton" /> POS MOH BD
+			&nbsp;
+	</span>
+	 <span style="float: left;" id="bankradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="bankchallan" id="bankradiobutton" name="paytradiobutton" /> Direct Bank &nbsp;
 	</span> </span> <span style="float: left;" id="onlineradiobuttonspan"> <input

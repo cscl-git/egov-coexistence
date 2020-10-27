@@ -1,6 +1,7 @@
 package org.egov.works.bgsecurity.entity;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.egov.model.bills.DocumentUpload;
 
 @Entity
 @Table(name = "txn_bgsecurity_details")
@@ -40,9 +43,28 @@ public class BGSecurityDetails implements Serializable {
 
 	@Column(name = "loa_number")
 	private String loaNumber;
+	
+	@Column(name = "security_number")
+	private String security_number;
 
 	@Transient
-	private List<BGSecurityDetails> bgSecurityDetailsList;
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
+	
+	@Transient
+	private List<BGSecurityDetails> bgSecurityDetailsList=new ArrayList<BGSecurityDetails>();
+	
+	@Transient
+	private Date fromDt;
+
+	@Transient
+	private Date toDt;
+	
+	@Transient
+	private String bgStartDate;
+	
+	@Transient
+	private String bgEndDate;
+	
 
 	public Long getId() {
 		return id;
@@ -92,6 +114,24 @@ public class BGSecurityDetails implements Serializable {
 		this.loaNumber = loaNumber;
 	}
 
+	
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public String getSecurity_number() {
+		return security_number;
+	}
+
+	public void setSecurity_number(String security_number) {
+		this.security_number = security_number;
+	}
+
 	public List<BGSecurityDetails> getBgSecurityDetailsList() {
 		return bgSecurityDetailsList;
 	}
@@ -100,8 +140,44 @@ public class BGSecurityDetails implements Serializable {
 		this.bgSecurityDetailsList = bgSecurityDetailsList;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public Date getFromDt() {
+		return fromDt;
+	}
+
+	public void setFromDt(Date fromDt) {
+		this.fromDt = fromDt;
+	}
+
+	public Date getToDt() {
+		return toDt;
+	}
+
+	public void setToDt(Date toDt) {
+		this.toDt = toDt;
+	}
+
+	public String getBgDate() {
+		return bgStartDate;
+	}
+
+	public void setBgDate(String bgDate) {
+		this.bgStartDate = bgDate;
+	}
+
+	public String getBgStartDate() {
+		return bgStartDate;
+	}
+
+	public void setBgStartDate(String bgStartDate) {
+		this.bgStartDate = bgStartDate;
+	}
+
+	public String getBgEndDate() {
+		return bgEndDate;
+	}
+
+	public void setBgEndDate(String bgEndDate) {
+		this.bgEndDate = bgEndDate;
 	}
 
 }

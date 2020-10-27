@@ -7,7 +7,7 @@
 	
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 465px;">
+		<div class="form-group" style="padding: 50px 20px 670px;">
 	
 				<input type="hidden" name="estimatePreparationApproval"
 				value="${estimatePreparationApproval.id}" /> <label
@@ -15,8 +15,8 @@
 					code="lbl.estimate.preparation.works.wing" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="worksWing" id="worksWing" cssClass="form-control-works"
-					cssErrorClass="form-control-works error" readonly="true">
+				<form:select path="worksWing" id="worksWing" cssClass="form-control"
+					cssErrorClass="form-control error" readonly="true">
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
@@ -29,7 +29,7 @@
 					code="lbl.estimate.preparation.executing.division" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="department" id="department" class="form-control-works"
+				<form:select path="department" id="department" class="form-control"
 					readonly="true">
 					<form:option value="">
 						<spring:message code="lbl.select" />
@@ -43,34 +43,34 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="estimateDate" path="estimateDate"
-					class="form-control-works datepicker" data-date-end-date="0d"
+					class="form-control datepicker" data-date-end-date="0d"
 					placeholder="DD/MM/YYYY" readonly="true" />
 
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.work.location" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" path="workLocation"
+				<form:input type="text" class="form-control" path="workLocation"
 					readonly="true" />
 					</div>
 
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" path="estimateNumber"
+				<form:input type="text" class="form-control" path="estimateNumber"
 					readonly="true" />
 					</div>
 
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="number" class="form-control-works" path="sectorNumber"
+				<form:input type="number" class="form-control" path="sectorNumber"
 					readonly="true" />
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.ward.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="number" class="form-control-works" path="wardNumber"
+				<form:input type="number" class="form-control" path="wardNumber"
 					readonly="true" />
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -78,7 +78,7 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:select path="workCategory" id="workCategory"
-					cssClass="form-control-works" cssErrorClass="form-control-works error"
+					cssClass="form-control" cssErrorClass="form-control error"
 					readonly="true">
 					<form:option value="">
 						<spring:message code="lbl.select" />
@@ -91,21 +91,21 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.amount" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="number" class="form-control-works" path="estimateAmount"
+				<form:input type="number" class="form-control" path="estimateAmount"
 					readonly="true" />
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.prepared.by" /></label>
 			<div class="col-sm-3 add-margin">
 				<form:input type="text" path="estimatePreparedBy"
-					id="estimatePreparedBy" cssClass="form-control-works"
-					cssErrorClass="form-control-works error" readonly="true" />
+					id="estimatePreparedBy" cssClass="form-control"
+					cssErrorClass="form-control error" readonly="true" />
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.designation" /></label>
 			<div class="col-sm-3 add-margin">
 				<form:select path="preparationDesignation" id="preparationDesignation" readonly="true"
-									class="form-control-works">
+									class="form-control">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
@@ -115,28 +115,28 @@
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"></label>
 			<div class="col-sm-3 add-margin">
-				<input type="text" class="form-control-works" style="visibility:hidden"
+				<input type="text" class="form-control" style="visibility:hidden"
 									 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.name.work" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-9 block-colm">
-				<form:textarea class="form-control-works" path="workName" maxlength="2000" readonly="true"
+				<form:textarea class="form-control" path="workName" maxlength="2000" readonly="true" style="height: 100px;"
 					 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.necessity" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-9 block-colm">
-					<form:textarea class="form-control-works" path="necessity" maxlength="2000" readonly ="true"
+					<form:textarea class="form-control" path="necessity" maxlength="2000" readonly ="true" style="height: 100px;"
 					 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.scope.work" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-9 block-colm">
-					 <form:textarea class="form-control-works" path="workScope" maxlength="2000" readonly="true"
+					 <form:textarea class="form-control" path="workScope" maxlength="2000" readonly="true" style="height: 100px;"
 					 />
 			</div>
 					</div>
@@ -175,30 +175,30 @@
 								<form:input type="text" style="width:300px;"
 													path="boQDetailsList[${status.index}].item_description"
 										id="boQDetailsList[${status.index}].item_description"
-										required="required" class="form-control-works item_description"
+										required="required" class="form-control item_description"
 										maxlength="200" readonly="true"></form:input></td>
-								<td><form:input type="text" style="width:300px;"
+								<td><form:input type="text" style="width:150px;"
 													path="boQDetailsList[${status.index}].ref_dsr"
 										id="boQDetailsList[${status.index}].ref_dsr"
-										required="required" class="form-control-works ref_dsr"
+										required="required" class="form-control ref_dsr"
 										maxlength="200" readonly="true"></form:input></td>
 								<td><form:input type="text"
 													path="boQDetailsList[${status.index}].unit"
 										id="boQDetailsList[${status.index}].unit" required="required"
-										class="form-control-works unit" maxlength="200" readonly="true"></form:input></td>
+										class="form-control unit" maxlength="200" readonly="true"></form:input></td>
 								<td><form:input type="number"
 										path="boQDetailsList[${status.index}].rate" step=".01"
 										id="boQDetailsList[${status.index}].rate" required="required"
-										class="form-control-works rate" readonly="true"></form:input></td>
+										class="form-control rate" readonly="true"></form:input></td>
 								<td><form:input type="number"
 										path="boQDetailsList[${status.index}].quantity" step=".01"
 										id="boQDetailsList[${status.index}].quantity"
-										required="required" class="form-control-works quantity"
+										required="required" class="form-control quantity"
 										name="quantity" readonly="true"></form:input></td>
 								<td><form:input type="number"
 													path="boQDetailsList[${status.index}].amount"
 										id="boQDetailsList[${status.index}].amount"
-										required="required" class="form-control-works amount"
+										required="required" class="form-control amount"
 										maxlength="200" name="amount" readonly="true"></form:input></td>
 
 										</tr>

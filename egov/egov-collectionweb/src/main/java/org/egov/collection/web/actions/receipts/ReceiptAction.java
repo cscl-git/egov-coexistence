@@ -210,6 +210,7 @@ public class ReceiptAction extends BaseFormAction {
     private BigDecimal totalAmntToBeCollected;
     private Boolean cashAllowed = Boolean.TRUE;
     private Boolean cardAllowed = Boolean.TRUE;
+    private Boolean posmohbdAllowed = Boolean.TRUE;
     private Boolean chequeAllowed = Boolean.TRUE;
     private Boolean ddAllowed = Boolean.TRUE;
     private Boolean bankAllowed = Boolean.TRUE;
@@ -791,6 +792,7 @@ public class ReceiptAction extends BaseFormAction {
             receiptHeader.setPayeeAddress(payeeAddress);
             receiptHeader.setReferenceDesc(referenceDesc);
             receiptHeader.setSource(Source.SYSTEM.toString());
+            LOGGER.info("instrumentType ::"+instrumentType);
             receiptHeader.setModOfPayment(instrumentType);
 
 
@@ -979,7 +981,7 @@ public class ReceiptAction extends BaseFormAction {
 
     private List<InstrumentHeader> populateInstrumentDetails() {
         List<InstrumentHeader> instrumentHeaderList = new ArrayList<>(0);
-
+        LOGGER.info("instrumentTypeCashOrCard ::::"+instrumentTypeCashOrCard);
         if (CollectionConstants.INSTRUMENTTYPE_CASH.equals(instrumentTypeCashOrCard)) {
             instrHeaderCash
                     .setInstrumentType(financialsUtil.getInstrumentTypeByType(CollectionConstants.INSTRUMENTTYPE_CASH));
@@ -995,6 +997,19 @@ public class ReceiptAction extends BaseFormAction {
         if (CollectionConstants.INSTRUMENTTYPE_CARD.equals(instrumentTypeCashOrCard)) {
             instrHeaderCard
                     .setInstrumentType(financialsUtil.getInstrumentTypeByType(CollectionConstants.INSTRUMENTTYPE_CARD));
+            if (instrHeaderCard.getTransactionDate() == null)
+                instrHeaderCard.setTransactionDate(new Date());
+            instrHeaderCard.setIsPayCheque(CollectionConstants.ZERO_INT);
+
+            // the instrumentNumber, transactionNumber, instrumentAmount are
+            // set into the object directly through binding
+            cashOrCardInstrumenttotal = cashOrCardInstrumenttotal.add(instrHeaderCard.getInstrumentAmount());
+
+            instrumentHeaderList.add(instrHeaderCard);
+        }
+        if ("posmohbd".equals(instrumentTypeCashOrCard)) {
+            instrHeaderCard
+                    .setInstrumentType(financialsUtil.getInstrumentTypeByType("posmohbd"));
             if (instrHeaderCard.getTransactionDate() == null)
                 instrHeaderCard.setTransactionDate(new Date());
             instrHeaderCard.setIsPayCheque(CollectionConstants.ZERO_INT);
@@ -1040,7 +1055,8 @@ public class ReceiptAction extends BaseFormAction {
         // cheque/DD types
         if (instrumentProxyList != null && !CollectionConstants.INSTRUMENTTYPE_CASH.equals(instrumentTypeCashOrCard)
                 && !CollectionConstants.INSTRUMENTTYPE_CARD.equals(instrumentTypeCashOrCard)
-                && !CollectionConstants.INSTRUMENTTYPE_BANK.equals(instrumentTypeCashOrCard))
+                && !CollectionConstants.INSTRUMENTTYPE_BANK.equals(instrumentTypeCashOrCard)
+                && !"posmohbd".equals(instrumentTypeCashOrCard))
             if (getInstrumentType().equals(CollectionConstants.INSTRUMENTTYPE_CHEQUE)
                     || getInstrumentType().equals(CollectionConstants.INSTRUMENTTYPE_DD))
                 instrumentHeaderList = populateInstrumentHeaderForChequeDD(instrumentHeaderList,instrumentProxyList);
@@ -2355,5 +2371,17 @@ public class ReceiptAction extends BaseFormAction {
 			e.printStackTrace();
 		}
         return bank+" - "+branch;
+	}
+
+
+
+	public Boolean getPosmohbdAllowed() {
+		return posmohbdAllowed;
+	}
+
+
+
+	public void setPosmohbdAllowed(Boolean posmohbdAllowed) {
+		this.posmohbdAllowed = posmohbdAllowed;
 	}
 }

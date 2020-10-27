@@ -6,8 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %> --%>
-<script
-	src="<cdn:url value='/resources/js/estimatepreparationapproval/fileupload.js'/>"></script>
+<script src="<cdn:url value='/resources/js/tender/fileupload.js'/>"></script>
 <style>
     .file-ellipsis {
         width : auto !Important;
@@ -23,10 +22,12 @@
                 <spring:message code="lbl.upload.document" text="Documents" />
         </div> 
       </div>
-   <c:if test="${workOrderAgreement.documentDetail != null &&  !workOrderAgreement.documentDetail.isEmpty()}">
-        <c:forEach items="${workOrderAgreement.documentDetail }" var="documentDetials">
-            <a href="/services/works/boq/downloadBillDoc?workDetailsId=${workOrderAgreement.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+      <c:if test="${mode != 'initial' }">
+   <c:if test="${bgSecurityDetails.documentDetail != null &&  !bgSecurityDetails.documentDetail.isEmpty()}">
+        <c:forEach items="${bgSecurityDetails.documentDetail }" var="documentDetials">
+            <a href="/services/works/bgSecurity/downloadBillDoc?bgDetailsId=${bgSecurityDetails.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
         </c:forEach>
+    </c:if>
     </c:if>
    <br> 
    <c:if test="${mode != 'view' }">

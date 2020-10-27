@@ -273,6 +273,7 @@ function validate()
 	var instrTypeCheque = document.getElementById("chequeradiobutton").checked;
 	var instrTypeDD = document.getElementById("ddradiobutton").checked;
 	var instrTypeCard = document.getElementById("cardradiobutton").checked;
+	var instrTypePosmohbd = document.getElementById("posmohbdradiobutton").checked;
 	var instrTypeBank = document.getElementById("bankradiobutton").checked;
 	var instrTypeOnline = document.getElementById("onlineradiobutton").checked;
 	var chequetable=document.getElementById('chequegrid');
@@ -302,7 +303,7 @@ function validate()
 		}
 	}
 	//if mode of payment is card
-	if(instrTypeCard){
+	if(instrTypeCard || instrTypePosmohbd){
 		if(document.getElementById("instrHeaderCard.transactionNumber")!=null){
 
 	    	var transNo=document.getElementById("instrHeaderCard.transactionNumber").value;
@@ -344,7 +345,15 @@ function validate()
 				collectiontotal=collectiontotal+cardamount;
 			}
 		}
-		document.getElementById('instrumentTypeCashOrCard').value="card";
+		if(instrTypeCard)
+			{
+			document.getElementById('instrumentTypeCashOrCard').value="card";
+			}
+		else
+			{
+			document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
+			}
+		
 	}
 	
 	//if mode of payment is bank
@@ -1138,6 +1147,7 @@ function showHideMandataryMark(obj){
 		<s:hidden label="minimumAmount" id="minimumAmount" value="%{minimumAmount}" name="minimumAmount"/>
 		<s:hidden label="cashAllowed" id="cashAllowed" value="%{cashAllowed}" name="cashAllowed"/>
 		<s:hidden label="cardAllowed" id="cardAllowed" value="%{cardAllowed}" name="cardAllowed"/>
+		<s:hidden label="posmohbdAllowed" id="posmohbdAllowed" value="%{posmohbdAllowed}" name="posmohbdAllowed"/>
 		<s:hidden label="chequeAllowed" id="chequeAllowed" value="%{chequeAllowed}" name="chequeAllowed"/>
 		<s:hidden label="bankAllowed" id="bankAllowed" value="%{bankAllowed}" name="bankAllowed"/>
 		<s:hidden label="ddAllowed" id="ddAllowed" value="%{ddAllowed}" name="ddAllowed"/>

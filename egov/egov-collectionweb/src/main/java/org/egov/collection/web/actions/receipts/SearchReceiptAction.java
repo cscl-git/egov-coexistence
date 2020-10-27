@@ -47,23 +47,46 @@
  */
 package org.egov.collection.web.actions.receipts;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.regex.Pattern;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.egov.collection.bean.ReceiptReportBean;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.ReceiptHeader;
 import org.egov.collection.utils.CollectionsUtil;
-import org.egov.eis.entity.Assignment;
 import org.egov.eis.service.AssignmentService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.BillDetailAdditional;
+import org.egov.infra.microservice.models.BusinessService;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.Receipt;
+import org.egov.infra.microservice.models.RemittanceDepositWorkDetail;
+import org.egov.infra.microservice.models.RemittanceResponseDepositWorkDetails;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
+import org.egov.infra.reporting.engine.ReportFormat;
+import org.egov.infra.reporting.engine.ReportOutput;
+import org.egov.infra.reporting.engine.ReportRequest;
+import org.egov.infra.reporting.engine.ReportService;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.web.struts.actions.SearchFormAction;
 import org.egov.infra.web.utils.EgovPaginatedList;
@@ -74,21 +97,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.TreeMap;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @ParentPackage("egov")
 @Results({
-        @Result(name = SearchReceiptAction.SUCCESS, location = "searchReceipt.jsp")
+        @Result(name = SearchReceiptAction.SUCCESS, location = "searchReceipt.jsp"),
+        @Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
+                "application/xls", "contentDisposition", "no-cache;filename=ReceiptReport.xls" }),
+        @Result(name = SearchReceiptAction.DAYBOOKREPORT, location = "dayBookReport.jsp")
 })
 public class SearchReceiptAction extends SearchFormAction {
 
     private static final long serialVersionUID = 1L;
+    protected static final String DAYBOOKREPORT = "dayBookReport";
     private String serviceTypeId = null;
+    private String serviceTypeIdforExcel =null;
+    private String deptId = null;
     private Long userId = (long) -1;
     private String instrumentType;
     private String receiptNumber;
@@ -102,6 +126,9 @@ public class SearchReceiptAction extends SearchFormAction {
     private TreeMap<String, String> serviceClassMap = new TreeMap<String, String>();
     private CollectionsUtil collectionsUtil;
     private Integer branchId;
+    private String reportId;
+    private ReportService reportService;
+    private InputStream inputStream;
 
     @Autowired
     private AssignmentService assignmentService;
@@ -159,6 +186,8 @@ public class SearchReceiptAction extends SearchFormAction {
         this.toDate = toDate;
     }
 
+    Map<String,String> serviceCategoryNames = new HashMap<String,String>();
+    Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
     @Action(value = "/receipts/searchReceipt-reset")
     public String reset() {
         setPage(1);
@@ -180,7 +209,7 @@ public class SearchReceiptAction extends SearchFormAction {
         super.prepare();
         // if(searchResult==null)
         // searchResult = new EgovPaginatedList();
-
+        this.getServiceCategoryList();
         setupDropdownDataExcluding();
         // addDropdownData("instrumentTypeList",
         // getPersistenceService().findAllBy("from InstrumentType i where i.isActive = true order by type"));
@@ -191,15 +220,43 @@ public class SearchReceiptAction extends SearchFormAction {
         // serviceClassMap.remove(CollectionConstants.SERVICE_TYPE_PAYMENT);
         // addDropdownData("serviceTypeList", Collections.EMPTY_LIST);
 //        addDropdownData("businessCategorylist", microserviceUtils.getBusinessCategories());
-        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
-        
+        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService("Finance"));
+        addDropdownData("departmentList", masterDataCache.get("egi-department"));
         // addDropdownData("bankBranchList", collectionsUtil.getBankCollectionBankBranchList());
     }
-
+    private void getServiceCategoryList() {
+        List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
+        for(BusinessService bs : businessService){
+            String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
+            String[] splitSerCode = bs.getCode().split(Pattern.quote("."));
+            if(splitServName.length==2 && splitSerCode.length == 2){
+                if(!serviceCategoryNames.containsKey(splitSerCode[0])){
+                    serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+                }
+                if(serviceTypeMap.containsKey(splitSerCode[0])){
+                    Map<String, String> map = serviceTypeMap.get(splitSerCode[0]);
+                    map.put(splitSerCode[1], splitServName[1]);
+                    serviceTypeMap.put(splitSerCode[0], map);
+                }else{
+                    Map<String, String> map = new HashMap<>();
+                    map.put(splitSerCode[1], splitServName[1]);
+                    serviceTypeMap.put(splitSerCode[0],map);
+                }
+            }else{
+                serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+            }
+        }
+    }
     @Override
     @Action(value = "/receipts/searchReceipt")
     public String execute() {
         return SUCCESS;
+    }
+
+    
+    @Action(value = "/receipts/daybookReport")
+    public String dayBookReport() {
+        return DAYBOOKREPORT;
     }
 
     public List getReceiptStatuses() {
@@ -221,7 +278,7 @@ public class SearchReceiptAction extends SearchFormAction {
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null,type);
         
-
+        
         for (Receipt receipt : receipts) {
 
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
@@ -237,6 +294,8 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy());
+                    receiptHeader.setPayeeName(bill.getPayerName());
+                  
                     receiptHeader.setTotalAmount(billDetail.getTotalAmount());
                     receiptHeader.setCurretnStatus(billDetail.getStatus());
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
@@ -297,6 +356,358 @@ public class SearchReceiptAction extends SearchFormAction {
         return SUCCESS;
     }
 
+    
+    @Action(value = "/receipts/searchReceipt-searchDayBookReport")
+    public String searchDayBookReport() {
+        target = "searchresult";
+        collectionVersion = ApplicationThreadLocals.getCollectionVersion();
+
+        List<ReceiptHeader> receiptList = new ArrayList<>();
+        System.out.println("from date ::"+getFromDate());
+        System.out.println("to date :::"+getToDate());
+        System.out.println("getServiceTypeId() :::"+getServiceTypeId());
+        serviceTypeIdforExcel=getServiceTypeId();
+        List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),getDeptId(),
+                (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
+                        ? getReceiptNumber() : null);
+      
+       
+        List<RemittanceDepositWorkDetail> remittanceResponselist=null;
+        BigDecimal totalReciptAmount=BigDecimal.ZERO;
+        BigDecimal totalDepositAmount=BigDecimal.ZERO;
+        if(receipts!=null && !receipts.isEmpty()) {
+         remittanceResponselist =  getDepositWork(receipts);
+        	}                   
+       
+
+        for (Receipt receipt : receipts) {
+
+            for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+
+                for (BillDetail billDetail : bill.getBillDetails()) {
+                	
+                	
+                	
+
+                    ReceiptHeader receiptHeader = new ReceiptHeader();
+                    receiptHeader.setPaymentId(receipt.getPaymentId());
+                    receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
+                    receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
+                    receiptHeader.setService(billDetail.getBusinessService());
+                    receiptHeader.setReferencenumber("");
+                    receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setPayeeName(bill.getPayerName());
+                    receiptHeader.setPayeeAddress(bill.getPayerAddress());
+                    receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
+                    receiptHeader.setTotalAmount(billDetail.getTotalAmount());
+                    totalReciptAmount.add(billDetail.getTotalAmount());
+                    receiptHeader.setTotalreciptAmount(totalReciptAmount);
+                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
+                    if (null != billDetail.getManualReceiptNumber()) {
+                        receiptHeader.setManualreceiptnumber(billDetail.getManualReceiptNumber());
+                        receiptHeader.setG8data(billDetail.getManualReceiptNumber());
+                    }
+                    if (billDetail.getManualReceiptDate() != null && billDetail.getManualReceiptDate() != 0) {
+                        receiptHeader.setManualreceiptdate(new Date(billDetail.getManualReceiptDate()));
+                        if (null != billDetail.getManualReceiptNumber()) {
+                            receiptHeader.setG8data(billDetail.getManualReceiptNumber()+"/"+new Date(billDetail.getManualReceiptDate()).toString()); 
+                        }
+                        else
+                            receiptHeader.setG8data(new Date(billDetail.getManualReceiptDate()).toString());
+                    }
+                    receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
+                    EmployeeInfo empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    if (null != empInfo && empInfo.getUser().getUserName() != null)
+                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    JsonNode jsonNode = billDetail.getAdditionalDetails();
+                    BillDetailAdditional additional = null;
+                    try {
+                        if (null != jsonNode)
+                            additional = (BillDetailAdditional) new ObjectMapper().readValue(jsonNode.toString(),
+                                    BillDetailAdditional.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (null != additional) {
+//                        if (null != additional.getBusinessReason()) {
+//                            if (additional.getBusinessReason().contains("-")) {
+//                                receiptHeader.setService(additional.getBusinessReason().split("-")[0]);
+//                            } else {
+//                                receiptHeader.setService(additional.getBusinessReason());
+//                            }
+//                        }
+
+                        if (null != additional.getNarration())
+                            receiptHeader.setReferenceDesc(additional.getNarration());
+                        if (null != additional.getPayeeaddress())
+                            receiptHeader.setPayeeAddress(additional.getPayeeaddress());
+                    }
+                    
+                    //add Work Deposit
+                    
+                    if(remittanceResponselist!=null && remittanceResponselist!=null) {
+	                   for (RemittanceDepositWorkDetail remittance : remittanceResponselist) {
+	                    	
+	                    	if(billDetail.getReceiptNumber().equals(remittance.getReciptNumber())) 
+	                    	{
+	                    		receiptHeader.setReferencenumber(remittance.getReferenceNumber());
+	                    		receiptHeader.setRrDate(new Date(remittance.getReferenceDate()));
+	                    		receiptHeader.setDepositAmount(remittance.getCreditAmount());
+	                    		
+	                    		BigDecimal depositAmount = new BigDecimal(remittance.getCreditAmount());
+	                    		totalDepositAmount.add(depositAmount);
+	                    		receiptHeader.setTotalDepositAmount(totalDepositAmount);
+	                    		
+	                    	}
+	                    	else
+	                    	{
+	                    		receiptHeader.setReferencenumber("");
+	                    	}
+	                    		
+						}
+                    }
+
+                    receiptList.add(receiptHeader);
+
+                }
+            }
+
+        }
+
+        if (searchResult == null) {
+            Page page = new Page<ReceiptHeader>(1, receiptList.size(), receiptList);
+            searchResult = new EgovPaginatedList(page, receiptList.size());
+        } else {
+            searchResult.getList().clear();
+            searchResult.getList().addAll(receiptList);
+        }
+
+        resultList = searchResult.getList();
+        return DAYBOOKREPORT;
+    }
+
+	 @Action(value = "/receipts/searchReceipt-downloadDayBookReport")
+    public String downloadDayBookReport() {
+        target = "searchresult";
+        collectionVersion = ApplicationThreadLocals.getCollectionVersion();
+        System.out.println("from date ::"+getFromDate());
+        System.out.println("to date :::"+getToDate());
+        System.out.println("getServiceTypeId() :::"+getServiceTypeId());
+        List<ReceiptHeader> receiptList = new ArrayList<>();
+        List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),getDeptId(),
+                (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
+                        ? getReceiptNumber() : null);
+      
+        
+        List<RemittanceDepositWorkDetail> remittanceResponselist=null;
+        BigDecimal totalReciptAmount=BigDecimal.ZERO;
+        BigDecimal totalDepositAmount=BigDecimal.ZERO;
+        if(receipts!=null && !receipts.isEmpty()) {
+         remittanceResponselist =  getDepositWork(receipts);
+        	}                   
+
+
+        for (Receipt receipt : receipts) {
+
+            for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+
+                for (BillDetail billDetail : bill.getBillDetails()) {
+                	
+                	
+                	
+
+                    ReceiptHeader receiptHeader = new ReceiptHeader();
+                    receiptHeader.setPaymentId(receipt.getPaymentId());
+                    receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
+                    receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
+                    receiptHeader.setService(billDetail.getBusinessService());
+                    receiptHeader.setReferencenumber("");
+                    receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setPayeeAddress(bill.getPayerAddress());
+                    receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
+                    receiptHeader.setTotalAmount(billDetail.getTotalAmount());
+                    totalReciptAmount.add(billDetail.getTotalAmount());
+                    receiptHeader.setTotalreciptAmount(totalReciptAmount);
+                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
+                    if (null != billDetail.getManualReceiptNumber()) {
+                        receiptHeader.setManualreceiptnumber(billDetail.getManualReceiptNumber());
+                        receiptHeader.setG8data(billDetail.getManualReceiptNumber());
+                    }
+                    if (billDetail.getManualReceiptDate() != null && billDetail.getManualReceiptDate() != 0) {
+                        receiptHeader.setManualreceiptdate(new Date(billDetail.getManualReceiptDate()));
+                        if (null != billDetail.getManualReceiptNumber()) {
+                            receiptHeader.setG8data(billDetail.getManualReceiptNumber()+"/"+new Date(billDetail.getManualReceiptDate()).toString()); 
+                        }
+                        else
+                            receiptHeader.setG8data(new Date(billDetail.getManualReceiptDate()).toString());
+                    }
+                    receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
+                    EmployeeInfo empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    if (null != empInfo && empInfo.getUser().getUserName() != null)
+                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    JsonNode jsonNode = billDetail.getAdditionalDetails();
+                    BillDetailAdditional additional = null;
+                    try {
+                        if (null != jsonNode)
+                            additional = (BillDetailAdditional) new ObjectMapper().readValue(jsonNode.toString(),
+                                    BillDetailAdditional.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (null != additional) {
+//                        if (null != additional.getBusinessReason()) {
+//                            if (additional.getBusinessReason().contains("-")) {
+//                                receiptHeader.setService(additional.getBusinessReason().split("-")[0]);
+//                            } else {
+//                                receiptHeader.setService(additional.getBusinessReason());
+//                            }
+//                        }
+
+                        if (null != additional.getNarration())
+                            receiptHeader.setReferenceDesc(additional.getNarration());
+                        if (null != additional.getPayeeaddress())
+                            receiptHeader.setPayeeAddress(additional.getPayeeaddress());
+                    }
+                    
+                    //add Work Deposit
+                    
+                    if(remittanceResponselist!=null && remittanceResponselist!=null) {
+	                   for (RemittanceDepositWorkDetail remittance : remittanceResponselist) {
+	                    	
+	                    	if(billDetail.getReceiptNumber().equals(remittance.getReciptNumber())) 
+	                    	{
+	                    		receiptHeader.setReferencenumber(remittance.getReferenceNumber());
+	                    		receiptHeader.setRrDate(new Date(remittance.getReferenceDate()));
+	                    		receiptHeader.setDepositAmount(remittance.getCreditAmount());
+	                    		
+	                    		BigDecimal depositAmount = new BigDecimal(remittance.getCreditAmount());
+	                    		totalDepositAmount.add(depositAmount);
+	                    		receiptHeader.setTotalDepositAmount(totalDepositAmount);
+	                    		
+	                    	}
+	                    	else
+	                    	{
+	                    		receiptHeader.setReferencenumber("");
+	                    	}
+	                    		
+						}
+                    }
+
+                    receiptList.add(receiptHeader);
+
+                }
+            }
+
+        }
+        List<ReceiptReportBean> receiptReportList = new ArrayList<ReceiptReportBean>();
+        ReceiptReportBean bean=null;
+        int i=1;
+        if(receiptList != null && !receiptList.isEmpty())
+        {
+        	System.out.println("receipt non empty");
+        	for(ReceiptHeader header:receiptList)
+            {
+        		bean=new ReceiptReportBean();
+        		bean.setSlNo(String.valueOf(i++));
+        		bean.setParamDate(getDateString(header.getReceiptdate()));
+        		bean.setReceiptNo(header.getReceiptnumber());
+        		bean.setCollectedBy(header.getCreatedUser());
+        		bean.setPayeeName(header.getPaidBy().split("&")[0]);
+        		bean.setServiceType(header.getService());
+        		bean.setModeOfPayment(header.getModOfPayment());
+        		bean.setParticulars(header.getReferenceDesc());
+        		bean.setTotalReceiptAmount(header.getTotalAmount());
+        		if(header.getRrDate() != null)
+        		{
+        			bean.setDateOfDeposite(getDateString(header.getRrDate()));
+        		}
+        		else
+        		{
+        			bean.setDateOfDeposite("");
+        		}
+        		if(header.getRemittanceReferenceNumber() != null)
+        		{
+        			bean.setRemitanceNo(String.valueOf(header.getReferencenumber()));
+        		}
+        		else
+        		{
+        			bean.setRemitanceNo("");
+        		}
+        		if(header.getBankAccountNumber() != null)
+        		{
+        			bean.setBankAccountNo(header.getBankAccountNumber());
+        		}
+        		else
+        		{
+        			bean.setBankAccountNo("");
+        		}
+        		
+        		if(header.getDepositAmount() != null)
+        		{
+        			bean.setDepositAmount(new BigDecimal(header.getDepositAmount()));
+        		}
+        		else
+        		{
+        			bean.setDepositAmount(new BigDecimal("0"));
+        		}
+        		receiptReportList.add(bean);
+            }
+            
+        }
+        System.out.println("report size ::"+receiptReportList.size());
+        Map<String, Object> paramMap = new HashMap<String, Object>();
+    	String jasperName="CollectionReport";
+    	paramMap.put("CollectionReportDataSource",getDataSource(receiptReportList));
+    	paramMap.put("HeaderParameter", "Detail of Collection Report between "+getDateString(getFromDate())+" and "+getDateString(getToDate()));
+    	ReportRequest reportInput = null;
+        ReportOutput reportOutput = null;
+        System.out.println("Start of report" );
+        try
+        {
+        	for(ReceiptReportBean row:receiptReportList)
+        	{
+        		System.out.println(row.toString());
+        	}
+        	reportInput = new ReportRequest(jasperName, receiptReportList, paramMap);
+            reportInput.setReportFormat(ReportFormat.XLS);
+            if(reportService != null)
+            {
+            	System.out.println("report service not null");
+            }
+            reportOutput = reportService.createReport(reportInput);
+            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+        }catch (Exception e) {
+			e.printStackTrace();
+		}
+        System.out.println("END");
+        return "XLS";
+    }
+	
+	
+    private List<RemittanceDepositWorkDetail> getDepositWork(List<Receipt> receipts) {
+		
+    	Set<String> reciptNumber = new HashSet<>();
+    	
+    	for (Receipt receipt : receipts) {
+
+            for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+
+                for (BillDetail billDetail : bill.getBillDetails()) {
+                	
+                	reciptNumber.add(billDetail.getReceiptNumber());
+                	
+                	
+                }
+                
+                }
+            }
+    	
+    	RemittanceResponseDepositWorkDetails remittanceResponse=microserviceUtils.getDayWorkHistory(reciptNumber);
+    	return remittanceResponse.getRemittanceDepositWorkDetail();
+	}
+
     /**
      * @return the target
      */
@@ -310,6 +721,19 @@ public class SearchReceiptAction extends SearchFormAction {
 
     public void setUserId(final Long userId) {
         this.userId = userId;
+    }
+    public Map<String, String> getServiceCategoryNames() {
+        return serviceCategoryNames;
+    }
+
+    public void setServiceCategoryNames(Map<String, String> serviceCategoryNames) {
+        this.serviceCategoryNames = serviceCategoryNames;
+    }
+    public Map<String, Map<String, String>> getServiceTypeMap() {
+        return serviceTypeMap;
+    }
+    public void setServiceTypeMap(Map<String, Map<String, String>> serviceTypeMap) {
+        this.serviceTypeMap = serviceTypeMap;
     }
 
     @Override
@@ -441,5 +865,58 @@ public class SearchReceiptAction extends SearchFormAction {
     
     public void setCollectionVersion(String collectionVersion) {
         this.collectionVersion = collectionVersion;
+    }
+
+	public String getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(String deptId) {
+		this.deptId = deptId;
+	}
+
+	public String getReportId() {
+		return reportId;
+	}
+
+	public void setReportId(String reportId) {
+		this.reportId = reportId;
+	}
+	
+	private static JRBeanCollectionDataSource getDataSource(List<ReceiptReportBean> reportList) {
+        return new JRBeanCollectionDataSource(reportList); 
+    }
+
+	public InputStream getInputStream() {
+		return inputStream;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
+
+	public String getServiceTypeIdforExcel() {
+		return serviceTypeIdforExcel;
+	}
+
+	public void setServiceTypeIdforExcel(String serviceTypeIdforExcel) {
+		this.serviceTypeIdforExcel = serviceTypeIdforExcel;
+	}
+
+	public void setReportService(ReportService reportService) {
+		this.reportService = reportService;
+	}
+	
+	private String getDateString(Date date){
+        Date d=new Date();
+       String dateString = null;
+  SimpleDateFormat sdfr = new SimpleDateFormat("dd/MM/yyyy");
+  
+  try{
+	dateString = sdfr.format( date );
+  }catch (Exception ex ){
+	  ex.printStackTrace();
+  }
+  return dateString;
     }
 }

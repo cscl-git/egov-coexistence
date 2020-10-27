@@ -10,7 +10,7 @@
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 <form:form name="workOrderAgreementForm" role="form" method="post"
-	action="/services/works/boq/work" modelAttribute="workOrderAgreement"
+	action="/services/works/boq/edit/work1" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
 
@@ -31,40 +31,40 @@
 						class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.name.work" /></label>
 					<div class="col-sm-9 add-margin">
-							<form:textarea class="form-control" path="name_work_order" maxlength="2000" style="height: 100px;"
+							<form:textarea class="form-control" path="name_work_order" maxlength="2000" style="height: 100px;" readonly="true"
 					 />
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_number"  />
+						<form:input type="text" class="form-control" path="work_number" readonly="true" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="work_agreement_number" readonly="true" />
 					</div>
-
+					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.start.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="work_start_date" path="work_start_date"
-							class="form-control datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-date-end-date="0d" readonly="true"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.intended.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="work_intended_date" path="work_intended_date"
-							class="form-control datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-date-end-date="0d" readonly="true"
 							placeholder="DD/MM/YYYY" />
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="department" id="department"
+						<form:select path="department" id="department" readonly="true"
 							class="form-control" required="required">
 							<form:option value="">
 								<spring:message code="lbl.select" />
@@ -77,13 +77,13 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.amount.wrk" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="number" class="form-control" path="work_amount" readonly="true" />
+						<form:input type="number" class="form-control" path="work_amount"  readonly="true"/>
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.details" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_details" />
+						<form:input type="text" class="form-control" path="work_details" readonly="true" />
 					</div>
 
 
@@ -91,7 +91,7 @@
 							code="lbl.work.order.search.category" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="category" id="category"
-									cssClass="form-control" cssErrorClass="form-contro error"
+									cssClass="form-control" cssErrorClass="form-contro error" readonly="true"
 									>
 									<form:option value="">
 										<spring:message code="lbl.select" />
@@ -105,7 +105,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.search.sector.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="sector" id="sector"
+						<form:select path="sector" id="sector" readonly="true"
 									cssClass="form-control" cssErrorClass="form-control error">
 									<form:option value="">
 										<spring:message code="lbl.select" />
@@ -118,7 +118,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.ward.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="wardNumber" id="wardNumber"
+				<form:select path="wardNumber" id="wardNumber" readonly="true"
 									cssClass="form-control" cssErrorClass="form-control error">
 									<form:option value="">
 										<spring:message code="lbl.select" />
@@ -129,11 +129,13 @@
 								</form:select>
 							</div>
 
+					
+
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.search.fund" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="fund" id="fund"
+						<form:select path="fund" id="fund" readonly="true"
 									cssClass="form-control" cssErrorClass="form-control error">
 									<form:option value="">
 										<spring:message code="lbl.select" />
@@ -146,9 +148,21 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.search.work.location" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="workLocation" />
+						<form:input type="text" class="form-control" path="workLocation" readonly="true" />
+					</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.project.closure.comments" /></label>
+					<div class="col-sm-9 add-margin">
+					<form:textarea class="form-control" path="project_closure_comments" maxlength="2000" style="height: 100px;" required="required"
+					 />
 					</div>
 
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.contractor.comments" /></label>
+					<div class="col-sm-9 add-margin">
+					<form:textarea class="form-control" path="contractor_performance_comments" maxlength="2000" style="height: 100px;" required="required"
+					 />
+					</div>
 				</div>
 				</div>
 			</div>
@@ -166,9 +180,9 @@
 			<br>
 			<div>
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
-						code="lbl.name" /><span class="mandatory"></span></label>
+						code="lbl.name" /></label>
 				<div class="col-sm-3 add-margin">
-					 <form:select path="contractor_name" id="contractor_name"
+					 <form:select path="contractor_name" id="contractor_name" readonly="true"
 						class="form-control"  onchange="getContractorDetails(this)">
 						<form:option value="">
 							<spring:message code="lbl.select" text="Select" />
@@ -182,14 +196,14 @@
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
 						code="lbl.code" /></label>
 				<div class="col-sm-3 add-margin">
-					<form:input type="text" class="form-control" id="contractor_code"
-						path="contractor_code" readonly="true"/>
+					<form:input type="text" class="form-control" id="contractor_code" readonly="true"
+						path="contractor_code" />
 				</div>
 
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
 						code="lbl.adddress" /></label>
 				<div class="col-sm-3 add-margin">
-					<form:input type="text" class="form-control" id= "contractor_address"
+					<form:input type="text" class="form-control" id="contractor_address"
 						path="contractor_address" readonly="true"/>
 				</div>
 
@@ -203,7 +217,7 @@
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
 						code="lbl.email" /></label>
 				<div class="col-sm-3 add-margin">
-					<form:input type="text" class="form-control" id="contractor_email"
+					<form:input type="text" class="form-control" id ="contractor_email"
 						path="contractor_email" readonly="true"/>
 				</div>
 				<br> <br> <br> <br> <br> <br>
@@ -240,10 +254,6 @@
 							value="Upload" /> <br>
 					</div>
 					</c:if>
-					<c:if test="${fileuploadAllowed == 'Y' }">
-					<a style="float:right;" onclick="addFileInputField();"
-							href="#"><img style="height:30px;" title="Add new BoQ" src="/services/egi/resources/erp2/images/add.png" border="0" /></a>
-					</c:if>
 					<div>
 					<c:if test="${fileuploadAllowed == 'Y' }">
 						<table id="table" class="table table-bordered">
@@ -255,7 +265,6 @@
 									<th><spring:message code="lbl.rate" /></th>
 									<th><spring:message code="lbl.quantity" /></th>
 									<th><spring:message code="lbl.amount" /></th>
-									<th><spring:message code="lbl.action" /></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -264,12 +273,12 @@
 									<tr id="detailsrow" class="repeat-address">
 										<td>
 										<form:hidden path="boQDetailsList[${status.index}].slNo" id="boQDetailsList[${status.index}].slNo"/>
-										<form:input type="text"
+										<form:input type="text" readonly="true"
 												path="boQDetailsList[${status.index}].item_description" style="width:300px;"
 												id="boQDetailsList[${status.index}].item_description"
 												required="required" class="form-control item_description"
 												maxlength="200"></form:input></td>
-										<td><form:input type="text"
+										<td><form:input type="text" readonly="true"
 												path="boQDetailsList[${status.index}].ref_dsr" style="width:150px;"
 												id="boQDetailsList[${status.index}].ref_dsr"
 												required="required" class="form-control ref_dsr"
@@ -279,26 +288,23 @@
 												id="boQDetailsList[${status.index}].unit"
 												required="required" class="form-control unit"
 												maxlength="200"></form:input></td>
-										<td><form:input type="number"
+										<td><form:input type="number" readonly="true"
 												path="boQDetailsList[${status.index}].rate" step=".01"
 												id="boQDetailsList[${status.index}].rate"
 												required="required" class="form-control rate"
 												onchange="valueChanged()"></form:input></td>
-										<td><form:input type="number"
+										<td><form:input type="number" readonly="true"
 												path="boQDetailsList[${status.index}].quantity" step=".01"
 												id="boQDetailsList[${status.index}].quantity"
 												required="required" class="form-control quantity"
 												name="quantity" onchange="valueChanged()"></form:input></td>
-										<td><form:input type="number"
+										<td><form:input type="number" 
 												path="boQDetailsList[${status.index}].amount"
 												id="boQDetailsList[${status.index}].amount"
 												required="required" class="form-control amount"
 												maxlength="200" name="amount" readonly="true"></form:input>
 										</td>
-										<td>
-											<a  onclick="deleteRow(this);"
-							href="#"><img style="height:30px;" title="Delete BoQ" src="/services/egi/resources/erp2/images/delete.png" border="0" /></a>
-										</td>
+										
 									</tr>
 								</c:forEach>
 							</tbody>
@@ -314,11 +320,11 @@
 
 		<jsp:include page="fileupload.jsp" />
 		<br> <br>
+		<jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
 		<br> <br>
-		<jsp:include page="../common/commonWorkflowMatrix.jsp" />
-
+				<jsp:include page="../common/commonWorkflowMatrix.jsp" />
 				<div class="buttonbottom" align="center">
-					<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
+				<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
 		</div>
 
 	</div>

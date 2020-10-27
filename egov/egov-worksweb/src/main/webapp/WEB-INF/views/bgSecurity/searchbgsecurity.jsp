@@ -2,6 +2,8 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
+<script
+        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 
 <form:form name="search-bgsecurity-form" role="form" method="post"
@@ -15,25 +17,27 @@
 				<div class="form-group" style="padding: 50px 20px 0;">
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.bg.security.start.date" /></label>
+							code="lbl.bg.security.start.date" /><span
+								class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="security_start_date" path="security_start_date"
+						<form:input id="fromDt" path="fromDt" required="true"
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.bg.security.end.date" /></label>
+							code="lbl.bg.security.end.date" /><span
+								class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="security_end_date" path="security_end_date"
+						<form:input id="fromDt" path="security_end_date" fromDt="true"
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.bg.security.loa.number" /></label>
+							code="lbl.bg.security.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="loaNumber" />
+						<form:input type="text" class="form-control" path="security_number" />
 					</div>
 				</div>
 			</div>
@@ -53,11 +57,13 @@
 						<table class="table table-bordered" id="table">
 							<thead>
 								<tr>
+									<th><spring:message code="lbl.bg.security.number" /></th>
 									<th><spring:message code="lbl.bg.security.validity" /></th>
 									<th><spring:message code="lbl.bg.security.amount" /></th>
 									<th><spring:message code="lbl.bg.security.start.date" /></th>
 									<th><spring:message code="lbl.bg.security.end.date" /></th>
 									<th><spring:message code="lbl.bg.security.loa.number" /></th>
+									<th><spring:message code="lbl.tender.file" /></th>
 								</tr>
 							</thead>
 							`
@@ -68,6 +74,10 @@
 										var="result" varStatus="status">
 										<tr>
 											<td><form:hidden
+													path="bgSecurityDetailsList[${status.index}].security_number"
+													id="bgSecurityDetailsList[${status.index}].security_number" />
+												${result.security_number }</td>
+											<td><form:hidden
 													path="bgSecurityDetailsList[${status.index}].security_validity"
 													id="bgSecurityDetailsList[${status.index}].security_validity" />
 												${result.security_validity }</td>
@@ -76,17 +86,20 @@
 													id="bgSecurityDetailsList[${status.index}].security_amount" />
 												${result.security_amount }</td>
 											<td><form:hidden
-													path="bgSecurityDetailsList[${status.index}].security_start_date"
-													id="bgSecurityDetailsList[${status.index}].security_start_date" />
-												${result.security_start_date }</td>
+													path="bgSecurityDetailsList[${status.index}].bgStartDate"
+													id="bgSecurityDetailsList[${status.index}].bgStartDate" />
+												${result.bgStartDate }</td>
 											<td><form:hidden
-													path="bgSecurityDetailsList[${status.index}].security_end_date"
-													id="bgSecurityDetailsList[${status.index}].security_end_date" />
-												${result.security_end_date }</td>
+													path="bgSecurityDetailsList[${status.index}].bgEndDate"
+													id="bgSecurityDetailsList[${status.index}].bgEndDate" />
+												${result.bgEndDate }</td>
 											<td><form:hidden
 													path="bgSecurityDetailsList[${status.index}].loaNumber"
 													id="bgSecurityDetailsList[${status.index}].loaNumber" />
 												${result.loaNumber }</td>
+											<td>
+												<a href="#" onclick="openBG('${result.id}')">View</a>
+											</td>
 										</tr>
 									</c:forEach>
 								<tbody>

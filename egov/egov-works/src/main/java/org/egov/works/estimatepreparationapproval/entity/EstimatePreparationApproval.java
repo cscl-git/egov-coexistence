@@ -161,7 +161,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	
 	@Transient
 	private List<Designation> designations = new ArrayList<Designation>();
-
+	
+	@Transient
+	private String statusDescription;
 
 	@Transient
 	private String dt;
@@ -181,6 +183,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
+	
+	@Transient
+	private String workCategry;
 
 	public Long getWorksWing() {
 		return worksWing;
@@ -575,6 +580,22 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setAadate(Date aadate) {
 		this.aadate = aadate;
+	}
+
+	public String getWorkCategry() {
+		return workCategry;
+	}
+
+	public void setWorkCategry(String workCategry) {
+		this.workCategry = workCategry;
+	}
+
+	public String getStatusDescription() {
+		return statusDescription;
+	}
+
+	public void setStatusDescription(String statusDescription) {
+		this.statusDescription = statusDescription;
 	}
 	
 	

@@ -18,13 +18,22 @@
 			<br>
 		</div>
 	</spring:hasBindErrors>
-
+	<c:if test="${not empty message}">
+						<div id="message" class="success" style="color: green;margin-top:45px;">
+							${message }
+						</div>
+					</c:if>
 
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="form-group" style="padding: 50px 20px 0;">
-
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.tender.loa.number" /><span class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="loaNumber" required="required"/>
+						<form:errors path="loaNumber" cssClass="add-margin error-msg" />
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.tender.amount" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
@@ -52,12 +61,13 @@
 						<form:errors path="contractorDetails"
 							cssClass="add-margin error-msg" />
 					</div>
-
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.tender.loa.number" /><span class="mandatory"></span></label>
+							code="lbl.tender.pro.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="number" class="form-control" path="loaNumber" required="required"/>
-						<form:errors path="loaNumber" cssClass="add-margin error-msg" />
+						<form:input type="text" class="form-control"
+							path="tenderProNumber" />
+						<form:errors path="tenderProNumber"
+							cssClass="add-margin error-msg" />
 					</div>
 				</div>
 			</div>

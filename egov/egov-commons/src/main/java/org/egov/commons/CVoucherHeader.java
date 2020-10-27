@@ -115,7 +115,7 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     @Transient
     private List<CGeneralLedgerDetail> subLedgerDetails = new ArrayList<>();
     @Transient
-    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
   
     @Transient
     private String documentMode;
@@ -556,11 +556,11 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 		this.secondsignatory = secondsignatory;
 	}
 
-	public List<DocumentUpload> getDocumentDetail() {
+	public List<DocumentUploads> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 

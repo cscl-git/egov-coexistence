@@ -79,7 +79,6 @@ public class PaymentUtils {
             payment.getPaymentDetails().stream().forEach(paymentDetail -> {
                 Receipt receipt = new Receipt();
                 receipt.setInstrument(instrument);
-                System.out.println("payment id :"+payment.getId());
                 receipt.setPaymentId(payment.getId());
                 this.prepareReceipt(payment, paymentDetail, receipt);
                 receipts.add(receipt);
@@ -109,7 +108,6 @@ public class PaymentUtils {
         bill.setMobileNumber(billv2.getMobileNumber());
         bill.setPaidBy(StringUtils.defaultIfBlank(billv2.getPaidBy(), payment.getPaidBy()));
         bill.setPayerAddress(payment.getPayerAddress());
-        System.out.println("Narration : "+payment.getNarration());
         bill.setNarration(payment.getNarration());
         bill.setPayerAddress(billv2.getPayerAddress());
         bill.setPayerEmail(billv2.getPayerEmail());

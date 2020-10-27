@@ -1,5 +1,6 @@
 package org.egov.works.tender.entity;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
+
+import org.egov.model.bills.DocumentUpload;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -38,8 +41,11 @@ public class Tender implements  java.io.Serializable {
 	@Column(name = "contractor_details")
 	private String contractorDetails;
 
+	@Column(name = "tender_number")
+	private String loaNumber;
+	
 	@Column(name = "loa_number")
-	private Double loaNumber;
+	private String tenderProNumber;
 
 	@Transient
 	private Date fromDt;
@@ -49,6 +55,12 @@ public class Tender implements  java.io.Serializable {
 
 	@Transient
 	private List<Tender> tenderList;
+	
+	@Transient
+	private String tenderDate;
+	
+	@Transient
+    private List<org.egov.model.bills.DocumentUpload> documentDetail = new ArrayList<>();
 
 	public Long getId() {
 		return id;
@@ -82,11 +94,11 @@ public class Tender implements  java.io.Serializable {
 		this.contractorDetails = contractorDetails;
 	}
 
-	public Double getLoaNumber() {
+	public String getLoaNumber() {
 		return loaNumber;
 	}
 
-	public void setLoaNumber(Double loaNumber) {
+	public void setLoaNumber(String loaNumber) {
 		this.loaNumber = loaNumber;
 	}
 
@@ -116,6 +128,30 @@ public class Tender implements  java.io.Serializable {
 
 	public void setTenderList(List<Tender> tenderList) {
 		this.tenderList = tenderList;
+	}
+
+	public List<org.egov.model.bills.DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<org.egov.model.bills.DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public String getTenderDate() {
+		return tenderDate;
+	}
+
+	public void setTenderDate(String tenderDate) {
+		this.tenderDate = tenderDate;
+	}
+
+	public String getTenderProNumber() {
+		return tenderProNumber;
+	}
+
+	public void setTenderProNumber(String tenderProNumber) {
+		this.tenderProNumber = tenderProNumber;
 	}
 
 }

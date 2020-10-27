@@ -7,10 +7,10 @@
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
-	<form:form name="search-work-agreement-form" role="form" method="post"
-	action="workOrderAgreementSearch1" modelAttribute="workOrderAgreement"
-	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
-	style="margin-top:-20px;">
+	<form:form name="search-closure-work-agreement-form" role="form"
+	method="post" action="searchclosurePage"
+	modelAttribute="workOrderAgreement" id="workOrderAgreement"
+	class="form-horizontal form-groups-bordered" style="margin-top:-20px;">
 
 	<div class="tab-content">
 		<div class="tab-pane fade in active">
@@ -108,7 +108,7 @@
 											<td><form:hidden
 													path="workOrderList[${status.index}].work_agreement_number"
 													id="workOrderList[${status.index}].work_agreement_number" />
-												<a href="#" onclick="openWorkView('${result.id}')" > ${result.work_agreement_number }</a>
+												<a href="#" onclick="openClosure('${result.id}')" > ${result.work_agreement_number }</a>
 												</td>
 												<td><form:hidden
 													path="workOrderList[${status.index}].startDate"

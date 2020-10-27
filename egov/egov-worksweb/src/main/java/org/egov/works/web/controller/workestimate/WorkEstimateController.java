@@ -1,12 +1,17 @@
 package org.egov.works.web.controller.workestimate;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.egov.egf.masters.services.ContractorService;
+import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.service.BoQDetailsService;
@@ -22,7 +27,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping(value = "/workEstimate")
-public class WorkEstimateController {
+public class WorkEstimateController extends GenericWorkFlowController{
 
 	@Autowired
 	WorkEstimateService workEstimateService;
@@ -32,6 +37,11 @@ public class WorkEstimateController {
 
 	@Autowired
 	BoQDetailsService boQDetailsService;
+	
+	private static final String STATE_TYPE = "stateType";
+	
+	@Autowired
+	private ContractorService contractorService;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -102,7 +112,7 @@ public class WorkEstimateController {
 
 	}
 	
-	private List<Department> getDepartmentsFromMs() {
+	public List<Department> getDepartmentsFromMs() {
         List<Department> departments = microserviceUtils.getDepartments();
         return departments;
     }
@@ -134,21 +144,63 @@ public class WorkEstimateController {
 		}
 		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
-		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
-		workOrderAgreement.setAgreement_details(saveBoqDetails.getAgencyWorkOrder());
-		// workOrderAgreement.setBoQDetailsList(saveBoqDetails.getNewBoQDetailsList());
 		workOrderAgreement.setBoQDetailsList(responseList);
-		workOrderAgreement.setWork_amount(saveBoqDetails.getEstimateAmount().toString());
+		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
+		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
+		workOrderAgreement.setDepartment(String.valueOf(saveBoqDetails.getExecutingDivision()));
+		workOrderAgreement.setWork_amount(String.valueOf(amount));
+		String category1="";
+		if(saveBoqDetails.getWorkCategory() == 1)
+		{
+			category1="Road Work";
+		}
+		else if(saveBoqDetails.getWorkCategory() == 2)
+		{
+			category1="Bridge Work";
+		}
+		else if (saveBoqDetails.getWorkCategory() == 3)
+		{
+			category1="Maintaince Work";
+		}
+		workOrderAgreement.setCategory(category1);
+		String ward="";
+		if(saveBoqDetails.getWardNumber() == 1)
+		{
+			ward="Ward 1";
+		}
+		else if(saveBoqDetails.getWardNumber() == 2)
+		{
+			ward="Ward 2";
+		}
+		else if (saveBoqDetails.getWardNumber() == 3)
+		{
+			ward="Ward 3";
+		}
+		workOrderAgreement.setWardNumber(ward);
+		String sector="";
+		if(saveBoqDetails.getSectorNumber() == 1)
+		{
+			sector="Sector 1";
+		}
+		else if(saveBoqDetails.getSectorNumber() == 2)
+		{
+			sector="Sector 2";
+		}
+		else if (saveBoqDetails.getSectorNumber() == 3)
+		{
+			sector="Sector 3";
+		}
 		workOrderAgreement.setFund(saveBoqDetails.getFundSource());
-		workOrderAgreement.setExecuting_department(saveBoqDetails.getExecutingDivision().toString());
-		workOrderAgreement.setWork_status(saveBoqDetails.getWorkStatus().toString());
-		workOrderAgreement.setTenderCost(saveBoqDetails.getTenderCost());
-		workOrderAgreement.setTimeLimit(saveBoqDetails.getTimeLimit());
-		workOrderAgreement.setEstimatedCost(amount.toString());
+		workOrderAgreement.setSector(sector);
+		workOrderAgreement.setWorkLocation(saveBoqDetails.getWorkLocation());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
-
+		workOrderAgreement.setContractors(getAllActiveContractors());
+		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+        prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
-		return "edit-work-agreement";
+		model.addAttribute("fileuploadAllowed","Y");
+		return "boqDetails";
 
 	}
 
@@ -188,6 +240,15 @@ public class WorkEstimateController {
 		return "boqDetails";
 
 	}
-
+	
+	public List<Contractor> getAllActiveContractors() {
+		List<Contractor> contractors = contractorService.getAllActiveContractors();
+		return contractors;
+	}
+	
+	private void prepareValidActionListByCutOffDate(Model model) {
+        model.addAttribute("validActionList",
+                Arrays.asList("Forward","Save As Draft"));
+	}
 
 }

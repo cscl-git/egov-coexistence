@@ -1720,6 +1720,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
     private PaymentModeEnum getPaymentModeEnum(String modeOfPayment){
         PaymentModeEnum payModeEnum = null;
+        LOGGER.info("modeOfPayment ::"+modeOfPayment);
         switch (modeOfPayment.toUpperCase()) {
         case "CASH":
             payModeEnum = PaymentModeEnum.CASH;
@@ -1735,6 +1736,9 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             break;
         case "ONLINE":
             payModeEnum = PaymentModeEnum.ONLINE;
+            break;
+        case "POSMOHBD":
+            payModeEnum = PaymentModeEnum.POSMOHBD;
             break;
 
         default:

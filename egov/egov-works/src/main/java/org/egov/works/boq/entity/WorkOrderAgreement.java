@@ -23,6 +23,8 @@ import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.model.bills.DocumentUpload;
+import org.egov.model.masters.Contractor;
 
 @Entity
 @Table(name = "txn_work_agreement")
@@ -153,6 +155,44 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Transient
 	private Double progressCompletion;
+	@Transient
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
+	@Transient
+	private List<Contractor> contractors = new ArrayList<Contractor>();
+	
+	@Column(name = "work_agreement_number")
+	private String work_agreement_number;
+	
+	
+	//for search & modification
+	@Transient
+	private String name_work_order_search;
+	
+	@Transient
+	private String work_number_search;
+	
+	@Transient
+	private String work_agreement_number_search;
+	
+	@Transient
+	private Date fromDate;
+	
+	@Transient
+	private Date toDate;
+	@Transient
+	private String startDate;
+	@Transient
+	private String endDate;
+	@Transient
+	private String statusDescp;
+	
+	@Column(name = "project_closure_comments")
+	private String project_closure_comments;
+	
+	@Column(name = "contractor_performance_comments")
+	private String contractor_performance_comments;
+	
+	
 
 	public Long getId() {
 		return id;
@@ -416,7 +456,7 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	@Override
 	public String getStateDetails() {
-		return getState().getComments().isEmpty() ? work_number : work_number + "-" + getState().getComments();
+		return getState().getComments().isEmpty() ? work_agreement_number : work_agreement_number + "-" + getState().getComments();
 	}
 
 	public EgwStatus getStatus() {
@@ -481,6 +521,110 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setProgressCompletion(Double progressCompletion) {
 		this.progressCompletion = progressCompletion;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public List<Contractor> getContractors() {
+		return contractors;
+	}
+
+	public void setContractors(List<Contractor> contractors) {
+		this.contractors = contractors;
+	}
+
+	public String getWork_agreement_number() {
+		return work_agreement_number;
+	}
+
+	public void setWork_agreement_number(String work_agreement_number) {
+		this.work_agreement_number = work_agreement_number;
+	}
+
+	public String getName_work_order_search() {
+		return name_work_order_search;
+	}
+
+	public void setName_work_order_search(String name_work_order_search) {
+		this.name_work_order_search = name_work_order_search;
+	}
+
+	public String getWork_number_search() {
+		return work_number_search;
+	}
+
+	public void setWork_number_search(String work_number_search) {
+		this.work_number_search = work_number_search;
+	}
+
+	public String getWork_agreement_number_search() {
+		return work_agreement_number_search;
+	}
+
+	public void setWork_agreement_number_search(String work_agreement_number_search) {
+		this.work_agreement_number_search = work_agreement_number_search;
+	}
+
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+	}
+
+	public String getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(String startDate) {
+		this.startDate = startDate;
+	}
+
+	public String getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(String endDate) {
+		this.endDate = endDate;
+	}
+
+	public String getStatusDescp() {
+		return statusDescp;
+	}
+
+	public void setStatusDescp(String statusDescp) {
+		this.statusDescp = statusDescp;
+	}
+
+	public String getProject_closure_comments() {
+		return project_closure_comments;
+	}
+
+	public void setProject_closure_comments(String project_closure_comments) {
+		this.project_closure_comments = project_closure_comments;
+	}
+
+	public String getContractor_performance_comments() {
+		return contractor_performance_comments;
+	}
+
+	public void setContractor_performance_comments(String contractor_performance_comments) {
+		this.contractor_performance_comments = contractor_performance_comments;
 	}
 
 }

@@ -22,8 +22,15 @@
                 <spring:message code="lbl.upload.document" text="Documents" />
         </div> 
       </div>
-   
+      <c:if test="${mode != 'initial' }">
+   <c:if test="${tender.documentDetail != null &&  !tender.documentDetail.isEmpty()}">
+        <c:forEach items="${tender.documentDetail }" var="documentDetials">
+            <a href="/services/works/tenderProcurement/downloadBillDoc?tenderDetailsId=${tender.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+        </c:forEach>
+    </c:if>
+    </c:if>
    <br> 
+   <c:if test="${mode != 'view' }">
         <div>
             <table width="100%">
                         <tbody>
@@ -46,5 +53,5 @@
                         </tbody>
             </table>
         </div>
-       
+       </c:if>
 </div>

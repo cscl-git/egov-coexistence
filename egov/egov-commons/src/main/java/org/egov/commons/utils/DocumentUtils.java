@@ -19,7 +19,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.egov.common.contstants.CommonConstants;
-import org.egov.commons.DocumentUpload;
+import org.egov.commons.DocumentUploads;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,9 +31,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class DocumentUtils {
 	   @Autowired
 	    private FileStoreService fileStoreService;
-	 public List<DocumentUpload> getDocumentDetails(final List<DocumentUpload> files, final Object object,
+	 public List<DocumentUploads> getDocumentDetails(final List<DocumentUploads> files, final Object object,
 	            final String objectType) {
-	        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
+	        final List<DocumentUploads> documentDetailsList = new ArrayList<>();
 
 	        Long id;
 	        Method method;
@@ -45,8 +45,8 @@ public class DocumentUtils {
 	            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
 	        }
 
-	        for (DocumentUpload doc : files) {
-	            final DocumentUpload documentDetails = new DocumentUpload();
+	        for (DocumentUploads doc : files) {
+	            final DocumentUploads documentDetails = new DocumentUploads();
 	            documentDetails.setObjectId(id);
 	            documentDetails.setObjectType(objectType);
 	            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
