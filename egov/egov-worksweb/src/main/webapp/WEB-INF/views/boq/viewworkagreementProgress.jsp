@@ -10,7 +10,7 @@
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 <form:form name="workOrderAgreementForm" role="form" method="post"
-	action="/services/works/boq/edit/work1" modelAttribute="workOrderAgreement"
+	action="/services/works/boq/progress/updateProgress" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
 
@@ -150,19 +150,8 @@
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="workLocation" readonly="true" />
 					</div>
-					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.work.order.project.closure.comments" /></label>
-					<div class="col-sm-9 add-margin">
-					<form:textarea class="form-control" path="project_closure_comments" maxlength="2000" style="height: 100px;" required="required"
-					 />
-					</div>
+					
 
-					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.work.order.contractor.comments" /></label>
-					<div class="col-sm-9 add-margin">
-					<form:textarea class="form-control" path="contractor_performance_comments" maxlength="2000" style="height: 100px;" required="required"
-					 />
-					</div>
 				</div>
 				</div>
 			</div>
@@ -264,7 +253,9 @@
 									<th><spring:message code="lbl.unit" /></th>
 									<th><spring:message code="lbl.rate" /></th>
 									<th><spring:message code="lbl.quantity" /></th>
+									<th><spring:message code="lbl.measure.quantity" /></th>
 									<th><spring:message code="lbl.amount" /></th>
+									<th><spring:message code="lbl.measure.amount" /></th>
 								</tr>
 							</thead>
 							<tbody>
@@ -299,10 +290,21 @@
 												required="required" class="form-control quantity"
 												name="quantity" onchange="valueChanged()"></form:input></td>
 										<td><form:input type="number" 
+												path="boQDetailsList[${status.index}].measured_quantity" step=".01"
+												id="boQDetailsList[${status.index}].measured_quantity"
+												required="required" class="form-control quantity"
+												name="measured_quantity" onchange="valueChanged()"></form:input></td>
+										<td><form:input type="number" 
 												path="boQDetailsList[${status.index}].amount"
 												id="boQDetailsList[${status.index}].amount"
 												required="required" class="form-control amount"
 												maxlength="200" name="amount" readonly="true"></form:input>
+										</td>
+										<td><form:input type="number" 
+												path="boQDetailsList[${status.index}].measured_amount"
+												id="boQDetailsList[${status.index}].measured_amount"
+												required="required" class="form-control amount"
+												maxlength="200" name="measured_amount" readonly="true"></form:input>
 										</td>
 										
 									</tr>
@@ -322,9 +324,10 @@
 		<br> <br>
 		<jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
 		<br> <br>
-				<jsp:include page="../common/commonWorkflowMatrix.jsp" />
 				<div class="buttonbottom" align="center">
-				<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
+				<input type="submit" id="workEstimateSearch" class="btn btn-primary"
+						name="workEstimateSearch" code="lbl.search.work.estimate"
+						value="Save and Update" />
 		</div>
 
 	</div>
@@ -335,7 +338,7 @@
 
 <script type="text/javascript">
 	function valueChanged() {
-
+debugger;
 		for (var i = 1; i < table.rows.length; i++) {
 			// get the seected row index
 			rIndex = i;
@@ -345,10 +348,26 @@
 
 			var quantity = document.getElementById("boQDetailsList["
 					+ (rIndex - 1) + "].quantity").value;
+			var measured_quantity=0;
+			if(document.getElementById("boQDetailsList["
+					+ (rIndex - 1) + "].measured_quantity").value != null && document.getElementById("boQDetailsList["
+							+ (rIndex - 1) + "].measured_quantity").value != '')
+				{
+				measured_quantity =document.getElementById("boQDetailsList["
+						+ (rIndex - 1) + "].measured_quantity").value;
+				}
+			else
+				{
+				document.getElementById("boQDetailsList["
+						+ (rIndex - 1) + "].measured_quantity").value=measured_quantity;
+				}
 
 			var amt = quantity * rate;
+			var measuredAmt= measured_quantity * rate;
 			document.getElementById("boQDetailsList[" + (rIndex - 1)
 					+ "].amount").value = amt;
+			document.getElementById("boQDetailsList[" + (rIndex - 1)
+					+ "].measured_amount").value = measuredAmt;
 		}
 	}
 

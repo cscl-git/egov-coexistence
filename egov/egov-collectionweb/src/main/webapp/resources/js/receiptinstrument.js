@@ -60,6 +60,14 @@ function setPosmohbdInstrumentDetails(elem) {
 	document.getElementById("instrHeaderCard.instrumentAmount").value = elem.value;
 	document.getElementById("instrumentTypeCashOrCard").value = "posmohbd";
 }
+function setPosmohcattleInstrumentDetails(elem) {
+	document.getElementById("instrHeaderCard.instrumentAmount").value = elem.value;
+	document.getElementById("instrumentTypeCashOrCard").value = "posmohcattle";
+}
+function setPosmohslhInstrumentDetails(elem) {
+	document.getElementById("instrHeaderCard.instrumentAmount").value = elem.value;
+	document.getElementById("instrumentTypeCashOrCard").value = "posmohslh";
+}
 function setBankInstrumentDetails(elem) {
 	document.getElementById("instrHeaderBank.instrumentAmount").value = elem.value;
 	document.getElementById("instrumentTypeCashOrCard").value = "bankchallan";
@@ -404,6 +412,8 @@ function displayPaytModes() {
 	var cashAllowed = document.getElementById("cashAllowed").value;
 	var cardAllowed = document.getElementById("cardAllowed").value;
 	var posmohbdAllowed= document.getElementById("posmohbdAllowed").value;
+	var posmohcattledAllowed= document.getElementById("posmohcattleAllowed").value;
+	var posmohslhAllowed= document.getElementById("posmohslhAllowed").value;
 	// var chequeAllowed=document.getElementById("chequeAllowed").value;
 	// var ddAllowed=document.getElementById("ddAllowed").value;
 	var chequeDDAllowed = isChequeDDAllowed();
@@ -438,6 +448,22 @@ function displayPaytModes() {
 		// display card radio button
 		document.getElementById('posmohbdradiobuttonspan').style.display = "block";
 			document.getElementById('instrumentTypeCashOrCard').value = "posmohbd";  
+	} else {
+		// do not display card radio button
+		document.getElementById('cardradiobuttonspan').style.display = "none";
+	}
+	if (posmohcattleAllowed == 'true' ) {
+		// display card radio button
+		document.getElementById('posmohcattleradiobuttonspan').style.display = "block";
+			document.getElementById('instrumentTypeCashOrCard').value = "posmohcattle";  
+	} else {
+		// do not display card radio button
+		document.getElementById('cardradiobuttonspan').style.display = "none";
+	}
+	if (posmohslhAllowed == 'true' ) {
+		// display card radio button
+		document.getElementById('posmohslhradiobuttonspan').style.display = "block";
+			document.getElementById('instrumentTypeCashOrCard').value = "posmohslh";  
 	} else {
 		// do not display card radio button
 		document.getElementById('cardradiobuttonspan').style.display = "none";

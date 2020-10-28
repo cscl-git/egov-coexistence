@@ -72,5 +72,10 @@ function openClosure(woId)
 	var url = "/services/works/boq/closureDetails/"+ woId;
 	window.open(url,'','width=900, height=700');
 }
+function openProgress(woId)
+{
+	var url = "/services/works/boq/progress/"+ woId;
+	window.open(url,'','width=900, height=700');
+}
 
 

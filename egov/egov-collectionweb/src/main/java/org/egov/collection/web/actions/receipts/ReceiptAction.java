@@ -211,6 +211,8 @@ public class ReceiptAction extends BaseFormAction {
     private Boolean cashAllowed = Boolean.TRUE;
     private Boolean cardAllowed = Boolean.TRUE;
     private Boolean posmohbdAllowed = Boolean.TRUE;
+    private Boolean posmohcattleAllowed = Boolean.TRUE;
+    private Boolean posmohslhAllowed = Boolean.TRUE;
     private Boolean chequeAllowed = Boolean.TRUE;
     private Boolean ddAllowed = Boolean.TRUE;
     private Boolean bankAllowed = Boolean.TRUE;
@@ -1020,6 +1022,32 @@ public class ReceiptAction extends BaseFormAction {
 
             instrumentHeaderList.add(instrHeaderCard);
         }
+        if ("posmohcattle".equals(instrumentTypeCashOrCard)) {
+            instrHeaderCard
+                    .setInstrumentType(financialsUtil.getInstrumentTypeByType("posmohcattle"));
+            if (instrHeaderCard.getTransactionDate() == null)
+                instrHeaderCard.setTransactionDate(new Date());
+            instrHeaderCard.setIsPayCheque(CollectionConstants.ZERO_INT);
+
+            // the instrumentNumber, transactionNumber, instrumentAmount are
+            // set into the object directly through binding
+            cashOrCardInstrumenttotal = cashOrCardInstrumenttotal.add(instrHeaderCard.getInstrumentAmount());
+
+            instrumentHeaderList.add(instrHeaderCard);
+        }
+        if ("posmohslh".equals(instrumentTypeCashOrCard)) {
+            instrHeaderCard
+                    .setInstrumentType(financialsUtil.getInstrumentTypeByType("posmohslh"));
+            if (instrHeaderCard.getTransactionDate() == null)
+                instrHeaderCard.setTransactionDate(new Date());
+            instrHeaderCard.setIsPayCheque(CollectionConstants.ZERO_INT);
+
+            // the instrumentNumber, transactionNumber, instrumentAmount are
+            // set into the object directly through binding
+            cashOrCardInstrumenttotal = cashOrCardInstrumenttotal.add(instrHeaderCard.getInstrumentAmount());
+
+            instrumentHeaderList.add(instrHeaderCard);
+        }
 
         if (CollectionConstants.INSTRUMENTTYPE_BANK.equals(instrumentTypeCashOrCard)) {
             instrHeaderBank
@@ -1056,7 +1084,9 @@ public class ReceiptAction extends BaseFormAction {
         if (instrumentProxyList != null && !CollectionConstants.INSTRUMENTTYPE_CASH.equals(instrumentTypeCashOrCard)
                 && !CollectionConstants.INSTRUMENTTYPE_CARD.equals(instrumentTypeCashOrCard)
                 && !CollectionConstants.INSTRUMENTTYPE_BANK.equals(instrumentTypeCashOrCard)
-                && !"posmohbd".equals(instrumentTypeCashOrCard))
+                && !"posmohbd".equals(instrumentTypeCashOrCard)
+                && !"posmohcattle".equals(instrumentTypeCashOrCard)
+                && !"posmohslh".equals(instrumentTypeCashOrCard))
             if (getInstrumentType().equals(CollectionConstants.INSTRUMENTTYPE_CHEQUE)
                     || getInstrumentType().equals(CollectionConstants.INSTRUMENTTYPE_DD))
                 instrumentHeaderList = populateInstrumentHeaderForChequeDD(instrumentHeaderList,instrumentProxyList);
@@ -2383,5 +2413,29 @@ public class ReceiptAction extends BaseFormAction {
 
 	public void setPosmohbdAllowed(Boolean posmohbdAllowed) {
 		this.posmohbdAllowed = posmohbdAllowed;
+	}
+
+
+
+	public Boolean getPosmohcattleAllowed() {
+		return posmohcattleAllowed;
+	}
+
+
+
+	public void setPosmohcattleAllowed(Boolean posmohcattleAllowed) {
+		this.posmohcattleAllowed = posmohcattleAllowed;
+	}
+
+
+
+	public Boolean getPosmohslhAllowed() {
+		return posmohslhAllowed;
+	}
+
+
+
+	public void setPosmohslhAllowed(Boolean posmohslhAllowed) {
+		this.posmohslhAllowed = posmohslhAllowed;
 	}
 }

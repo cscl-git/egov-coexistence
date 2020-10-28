@@ -86,7 +86,7 @@ public class BoQDetailsService {
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && (workOrderAgreement.getProject_closure_comments() != null || !workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		else if((workFlowAction.equalsIgnoreCase("Forward")) && (workOrderAgreement.getProject_closure_comments() != null && !workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closure Initiated"));
 		}
@@ -98,11 +98,11 @@ public class BoQDetailsService {
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Approved"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Project Closure Initiated"))
 		{
-			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closure Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Approve")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Approve")) && workOrderAgreement.getStatus().getCode().equals("Project Closure Initiated"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closed"));
 		}
@@ -306,6 +306,22 @@ public class BoQDetailsService {
 	
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
 		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
+	}
+	
+	@Transactional
+	public WorkOrderAgreement saveProgress(HttpServletRequest request, WorkOrderAgreement workOrderAgreement) {
+		// TODO Auto-generated method stub
+		List<BoQDetails> list = new ArrayList<BoQDetails>();
+		for (BoQDetails boq : workOrderAgreement.getBoQDetailsList()) {
+			boq.setWorkOrderAgreement(workOrderAgreement);
+			list.add(boq);
+		}
+		workOrderAgreement.setNewBoQDetailsList(list);
+
+		WorkOrderAgreement savedWorkOrderAgreement = workOrderAgreementRepository.save(workOrderAgreement);
+		
+		return savedWorkOrderAgreement;
+
 	}
 
 

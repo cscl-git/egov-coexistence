@@ -57,7 +57,9 @@ public enum PaymentModeEnum {
     DD("DD"),
     ONLINE("ONLINE"),
     CARD("CARD"),
-    POSMOHBD("POSMOHBD");
+    POSMOHBD("POSMOHBD"),
+    POSMOHCATTLE("POSMOHCATTLE"),
+    POSMOHSLH("POSMOHSLH");
 
 
     private String value;

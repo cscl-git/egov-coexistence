@@ -274,6 +274,8 @@ function validate()
 	var instrTypeDD = document.getElementById("ddradiobutton").checked;
 	var instrTypeCard = document.getElementById("cardradiobutton").checked;
 	var instrTypePosmohbd = document.getElementById("posmohbdradiobutton").checked;
+	var instrTypePosmohcattle = document.getElementById("posmohcattleradiobutton").checked;
+	var instrTypePosmohslh = document.getElementById("posmohslhradiobutton").checked;
 	var instrTypeBank = document.getElementById("bankradiobutton").checked;
 	var instrTypeOnline = document.getElementById("onlineradiobutton").checked;
 	var chequetable=document.getElementById('chequegrid');
@@ -303,7 +305,7 @@ function validate()
 		}
 	}
 	//if mode of payment is card
-	if(instrTypeCard || instrTypePosmohbd){
+	if(instrTypeCard || instrTypePosmohbd || instrTypePosmohcattle || instrTypePosmohslh){
 		if(document.getElementById("instrHeaderCard.transactionNumber")!=null){
 
 	    	var transNo=document.getElementById("instrHeaderCard.transactionNumber").value;
@@ -349,10 +351,19 @@ function validate()
 			{
 			document.getElementById('instrumentTypeCashOrCard').value="card";
 			}
-		else
+		else if(instrTypePosmohbd)
 			{
 			document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
 			}
+		else if(instrTypePosmohcattle)
+		{
+		document.getElementById('instrumentTypeCashOrCard').value="posmohcattle";
+		}
+		else if(instrTypePosmohslh)
+		{
+		document.getElementById('instrumentTypeCashOrCard').value="posmohslh";
+		}
+		
 		
 	}
 	
@@ -1148,6 +1159,8 @@ function showHideMandataryMark(obj){
 		<s:hidden label="cashAllowed" id="cashAllowed" value="%{cashAllowed}" name="cashAllowed"/>
 		<s:hidden label="cardAllowed" id="cardAllowed" value="%{cardAllowed}" name="cardAllowed"/>
 		<s:hidden label="posmohbdAllowed" id="posmohbdAllowed" value="%{posmohbdAllowed}" name="posmohbdAllowed"/>
+		<s:hidden label="posmohcattleAllowed" id="posmohcattleAllowed" value="%{posmohcattleAllowed}" name="posmohcattleAllowed"/>
+		<s:hidden label="posmohslhAllowed" id="posmohslhAllowed" value="%{posmohslhAllowed}" name="posmohslhAllowed"/>
 		<s:hidden label="chequeAllowed" id="chequeAllowed" value="%{chequeAllowed}" name="chequeAllowed"/>
 		<s:hidden label="bankAllowed" id="bankAllowed" value="%{bankAllowed}" name="bankAllowed"/>
 		<s:hidden label="ddAllowed" id="ddAllowed" value="%{ddAllowed}" name="ddAllowed"/>

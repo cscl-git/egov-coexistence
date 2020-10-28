@@ -192,7 +192,8 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Column(name = "contractor_performance_comments")
 	private String contractor_performance_comments;
 	
-	
+	@Transient
+	private String percentCompletion;
 
 	public Long getId() {
 		return id;
@@ -625,6 +626,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setContractor_performance_comments(String contractor_performance_comments) {
 		this.contractor_performance_comments = contractor_performance_comments;
+	}
+
+	public String getPercentCompletion() {
+		return percentCompletion;
+	}
+
+	public void setPercentCompletion(String percentCompletion) {
+		this.percentCompletion = percentCompletion;
 	}
 
 }

@@ -216,6 +216,16 @@ public class BoQDetailsController extends GenericWorkFlowController{
         return "works-success";
     }
 	
+	@RequestMapping(value = "/successProgress", method = RequestMethod.GET)
+    public String successProgress(final Model model,final HttpServletRequest request) {
+		
+		final String message = "BOQ Progress have been successfully updated.";
+
+        model.addAttribute("message", message);
+
+        return "works-success";
+    }
+	
 	private String getMessageByStatus(WorkOrderAgreement savedWorkOrderAgreement,
 			String approverDetails, String workflowaction) {
 		String approverName="";
@@ -421,12 +431,42 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		model.addAttribute("workflowHistory",
 				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
-        prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 	
 		return "view-work-agreement-closure";
+	}
+	
+	@RequestMapping(value = "/progress/{id}", method = RequestMethod.GET)
+	public String progress(@PathVariable("id") final Long id, Model model) {
+
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+
+		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
+			System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
+		workOrderAgreement.setDocumentDetail(documents);
+
+		
+		workOrderAgreement.setBoQDetailsList(workOrderAgreement.getNewBoQDetailsList());
+		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setContractors(getAllActiveContractors());
+		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+		if (workOrderAgreement.getState() != null)
+            model.addAttribute("currentState", workOrderAgreement.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+		prepareValidActionListByCutOffDate(model);
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+		model.addAttribute("fileuploadAllowed","Y");
+		model.addAttribute("mode","view");
+		System.out.println("test ending");
+		return "view-work-agreement-progress";
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
@@ -584,6 +624,27 @@ public class BoQDetailsController extends GenericWorkFlowController{
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
 
 	}
+	
+	@RequestMapping(value = "/progress/updateProgress", method = RequestMethod.POST)
+	public String updateProgress(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
+			final Model model, final HttpServletRequest request) throws Exception {
+		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
+				&& !workOrderAgreement.getDepartment().isEmpty()) {
+			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
+		}
+		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
+				&& !workOrderAgreement.getDepartment().isEmpty()) {
+			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
+		}
+		
+		//start of workflow
+		
+		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveProgress(request, workOrderAgreement);
+
+		return "redirect:/boq/successProgress";
+
+	}
+	
 	private void prepareValidActionListByCutOffDate(Model model) {
         model.addAttribute("validActionList",
                 Arrays.asList("Forward","Save As Draft"));
@@ -669,6 +730,13 @@ public class BoQDetailsController extends GenericWorkFlowController{
 			final Model model, HttpServletRequest request) {
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		return "search-closure-work-agreement-page-form";
+	}
+	
+	@RequestMapping(value = "/progressUpdate", method = RequestMethod.POST)
+	public String progressUpdate(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
+			final Model model, HttpServletRequest request) {
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		return "search-progress-work-agreement-page-form";
 	}
 	
 	@RequestMapping(value = "/searchclosure", method = RequestMethod.POST)
@@ -792,6 +860,67 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 
 		return "search-closure-work-agreement-page-form";
+
+	}
+	
+	@RequestMapping(value = "/searchboqProgress", method = RequestMethod.POST)
+	public String searchboqProgress(
+			@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement, final Model model,
+			final HttpServletRequest request) throws Exception {
+		List<WorkOrderAgreement> workList = new ArrayList<WorkOrderAgreement>();
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		WorkOrderAgreement agreement=null;
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select wo.id,wo.name_work_order,wo.work_number,wo.work_agreement_number,wo.work_start_date,wo.work_intended_date,wo.work_amount,wo.status.description from WorkOrderAgreement wo where wo.status.description ='Approved' and wo.executing_department = ? ")
+	        .append(getDateQuery(workOrderAgreement.getFromDate(), workOrderAgreement.getToDate()))
+	        .append(getMisQuery(workOrderAgreement));
+        list = persistenceService.findAllBy(query.toString(),
+        		workOrderAgreement.getDepartment());
+		
+        if (list.size() != 0) {
+       	 for (final Object[] object : list) {
+       		agreement=new WorkOrderAgreement();
+       		agreement.setId(Long.parseLong(object[0].toString()));
+       		if(object[1] != null)
+       		{
+       			agreement.setName_work_order(object[1].toString());
+       		}
+       		if(object[2] != null)
+       		{
+       			agreement.setWork_number(object[2].toString());
+       		}
+       		if(object[3] != null)
+       		{
+       			agreement.setWork_agreement_number(object[3].toString());
+       		}
+       		if(object[4] != null)
+       		{
+       			agreement.setStartDate(object[4].toString());
+       		}
+       		if(object[5] != null)
+       		{
+       			agreement.setEndDate(object[5].toString());
+       		}
+       		if(object[6] != null)
+       		{
+       			agreement.setWork_amount(object[6].toString());
+       		}
+       		if(object[7] != null)
+       		{
+       			agreement.setStatusDescp(object[7].toString());
+       		}
+       		workList.add(agreement);
+       		
+       	 }
+        }
+		
+		workOrderAgreement.setWorkOrderList(workList);
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+
+		return "search-progress-work-agreement-page-form";
 
 	}
 	
