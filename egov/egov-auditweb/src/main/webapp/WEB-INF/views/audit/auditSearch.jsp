@@ -62,13 +62,19 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
                      <form:options items = "${auditDetail.auditEmployees}" itemValue="empCode" itemLabel="empName" />
                   </form:select>
 				</div>
+				<label class="col-sm-3 control-label text-left-audit">Pass Under Objection
+				</label>
+					<div class="col-sm-3 add-margin">
+					<form:checkbox  path="passUnderobjection" id="passUnderobjection" value="0" ></form:checkbox>
+					
+					</div>
     		</div>
     	</div>
     	
     	</div>
     	
         <div class="buttonbottom" align="center">
-        <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  value="Search"/>
+        <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  onclick="searchCheck()" value="Search"/>
         </div>
         <br>
         <br>

@@ -755,7 +755,7 @@ public class MicroserviceUtils {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
         empUrl.append("?tenantId=" + getTenentId());
-
+        List<EmployeeInfo> resultList=null;
         if (empId != 0)
             empUrl.append("&ids=" + empId);
         if (toDay != null)
@@ -773,7 +773,11 @@ public class MicroserviceUtils {
         reqWrapper.setRequestInfo(requestInfo);
 
         EmployeeInfoResponse empResponse = restTemplate.postForObject(empUrl.toString(), reqWrapper, EmployeeInfoResponse.class);
-        return empResponse.getEmployees();
+        	if(empResponse != null && empResponse.getEmployees() != null || !empResponse.getEmployees().isEmpty())
+            {
+        		resultList=empResponse.getEmployees();
+            }
+        return resultList;
     }
 
     public EmployeeInfo getEmployeeById(Long empId) {
@@ -1604,7 +1608,7 @@ public class MicroserviceUtils {
     }
     
     private String getSingleQuoteBasedOnType(Class filterType) {
-        String string = filterType.getSimpleName().equalsIgnoreCase("Boolean") ||  filterType.getSimpleName().equalsIgnoreCase("Long") ?  "" : "'";
+        String string = filterType.getSimpleName().equalsIgnoreCase("Boolean") ||  filterType.getSimpleName().equalsIgnoreCase("Long") ?  "" : "";
         return string;
     }
 
@@ -1736,13 +1740,33 @@ public class MicroserviceUtils {
     
     public List<Payment> getPayments(PaymentSearchCriteria searchCriteria){
         PaymentResponse response = null;
+         RequestInfo requestInfo = getRequestInfo();
+         RequestInfoWrapper reqWrapper = null;
+         RequestInfoSearchWrapper reqSearchWrapper = new RequestInfoSearchWrapper();
         StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentSearch()).append("?");
-        final RequestInfo requestInfo = getRequestInfo();
-        RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
+        if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
+        {
+        	reqSearchWrapper.setIds(searchCriteria.getIds());
+        	reqSearchWrapper.setRequestInfo(requestInfo);
+        }
+        else
+        {
+            reqWrapper = new RequestInfoWrapper();
         reqWrapper.setRequestInfo(requestInfo);
+        }
         try {
             preparePaymentSearchQueryString(searchCriteria, url);
+            if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
+            {
+            	LOGGER.info("ids ; "+url.toString());
+            	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
+            }
+            else
+            {
+            	LOGGER.info("non ids : "+url.toString());
             response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
+            }
+            
             return response.getPayments();
         } catch (Exception e) {
             LOGGER.error("ERROR occurred while fetching the Payment list : ",e);
@@ -1781,9 +1805,9 @@ public class MicroserviceUtils {
         if(CollectionUtils.isNotEmpty(searchCriteria.getBillIds())){
             url.append("&billIds=").append(StringUtils.join(searchCriteria.getBillIds(),","));
         }
-        if(CollectionUtils.isNotEmpty(searchCriteria.getIds())){
+        /*if(CollectionUtils.isNotEmpty(searchCriteria.getIds())){
             url.append("&ids=").append(StringUtils.join(searchCriteria.getIds(),","));
-        }
+        }*/
     }
 
     public PaymentResponse generatePayments(Payment payment) {

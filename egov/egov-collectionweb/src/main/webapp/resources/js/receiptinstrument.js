@@ -452,7 +452,7 @@ function displayPaytModes() {
 		// do not display card radio button
 		document.getElementById('cardradiobuttonspan').style.display = "none";
 	}
-	if (posmohcattleAllowed == 'true' ) {
+	if (posmohcattledAllowed == 'true' ) {
 		// display card radio button
 		document.getElementById('posmohcattleradiobuttonspan').style.display = "block";
 			document.getElementById('instrumentTypeCashOrCard').value = "posmohcattle";  

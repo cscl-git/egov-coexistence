@@ -66,7 +66,9 @@ import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.audit.autonumber.AuditNumberGenerator;
 import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.repository.AuditRepository;
+import org.egov.audit.service.ManageAuditorService;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
@@ -151,6 +153,9 @@ public class UpdateExpenseBillController extends BaseBillController {
     @Autowired
     protected FileStoreService fileStoreService;   
     //private List<FileStoreMapper> originalFiles = new ArrayList<FileStoreMapper>();
+    
+    @Autowired
+	 private ManageAuditorService manageAuditorService;
     
     @Autowired
     private DocumentUploadRepository documentUploadRepository;
@@ -403,12 +408,13 @@ public class UpdateExpenseBillController extends BaseBillController {
     private void populateauditWorkFlow(EgBillregister updatedEgBillregister) {
     	AuditDetails audit=new AuditDetails();
     	final User user = securityUtils.getCurrentUser();
-    	List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
+    	/*List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + updatedEgBillregister.getEgBillregistermis().getDepartmentcode());*/
     	Position owenrPos = new Position();
-    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+    	List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(updatedEgBillregister.getEgBillregistermis().getDepartmentcode()), "Auditor");
+    	if(auditorList != null && !auditorList.isEmpty())
     	{
-    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+    		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
     	}
     	else
     	{

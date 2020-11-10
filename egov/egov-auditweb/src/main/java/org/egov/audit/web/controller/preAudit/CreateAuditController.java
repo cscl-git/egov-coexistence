@@ -71,9 +71,11 @@ import org.egov.audit.entity.AuditPostVoucherMpng;
 import org.egov.audit.model.AuditBillDetails;
 import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditEmployee;
+import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.model.PostAuditResult;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditService;
+import org.egov.audit.service.ManageAuditorService;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
 import org.egov.commons.CVoucherHeader;
@@ -88,6 +90,7 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
@@ -111,6 +114,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
@@ -171,7 +175,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 	
 	@Autowired
 	private AuditRepository auditRepository;
-	
+	 @Autowired
+	 ManageAuditorService manageAuditorService;
 	@Autowired
     @Qualifier("miscbilldetailService")
     private MiscbilldetailService miscbilldetailService;
@@ -193,11 +198,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AppConfigValues> appConfigValuesEmpList =null;
 		AuditEmployee emp=null;
 		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
-		appConfigValuesEmpList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"audit_sec_officer");
-		for (AppConfigValues value : appConfigValuesEmpList) {
+		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("RSA");
+		for (ManageAuditor value : auditorList) {
 		 emp=new AuditEmployee();
-		 emp.setEmpCode(Long.parseLong(value.getValue()));
+		 emp.setEmpCode(Long.valueOf(value.getEmployeeid()));
 		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
 		 auditEmployees.add(emp);
 		 }
@@ -398,6 +402,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 			AuditDetails savedAuditDetails=null;
 			auditDetails.setDocumentDetail(list);
+			auditDetails.setPassUnderobjection(auditDetail.getPassUnderobjection());
 			try {
 				savedAuditDetails = auditService.create(auditDetails,workFlowAction,auditDetail.getApprovalComent(),auditDetail.getLeadAuditorEmpNo());
 			} catch (Exception e) {
@@ -864,12 +869,11 @@ public class CreateAuditController extends GenericWorkFlowController {
     			
     		}
     	}
-    	List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + deptCode);
+    	List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(deptCode), "Auditor");
     	Position owenrPos = new Position();
-    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+    	if(auditorList != null && !auditorList.isEmpty())
     	{
-    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+    		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
     	}
     	else
     	{
@@ -959,11 +963,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AppConfigValues> appConfigValuesEmpList =null;
 		AuditEmployee emp=null;
 		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
-		appConfigValuesEmpList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
-				"audit_auditor");
-		for (AppConfigValues value : appConfigValuesEmpList) {
+		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("Auditor");
+		for (ManageAuditor value : auditorList) {
 		 emp=new AuditEmployee();
-		 emp.setEmpCode(Long.parseLong(value.getValue()));
+		 emp.setEmpCode(Long.valueOf(value.getEmployeeid()));
 		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
 		 auditEmployees.add(emp);
 		 }
@@ -1015,11 +1018,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AppConfigValues> appConfigValuesEmpList =null;
 		AuditEmployee emp=null;
 		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
-		appConfigValuesEmpList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
-				"audit_auditor");
-		for (AppConfigValues value : appConfigValuesEmpList) {
+		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("Auditor");
+		for (ManageAuditor value : auditorList) {
 		 emp=new AuditEmployee();
-		 emp.setEmpCode(Long.parseLong(value.getValue()));
+		 emp.setEmpCode(Long.valueOf(value.getEmployeeid()));
 		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
 		 auditEmployees.add(emp);
 		 }
@@ -1126,6 +1128,169 @@ public class CreateAuditController extends GenericWorkFlowController {
 				documentUploadRepository.save(doc);
 	}
 	
+	
+	
+	@RequestMapping(value = "/post/auditStateSearch", method = RequestMethod.POST)
+	public String auditStateSearch(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			HttpServletRequest request) {
+		LOGGER.info("Audit Search");
+		auditDetail.setDepartments(this.getDepartmentsFromMs());
+		AuditEmployee emp=null;
+		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
+		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("Auditor");
+		for (ManageAuditor value : auditorList) {
+		 emp=new AuditEmployee();
+		 emp.setEmpCode(Long.valueOf(value.getEmployeeid()));
+		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
+		 auditEmployees.add(emp);
+		 }
+		auditDetail.setAuditEmployees(auditEmployees);
+		model.addAttribute("auditDetail", auditDetail);
+		return "auditStateSearch";
+	}
+	
+	
+	@RequestMapping(value = "/post/searchStateResult",params="search",method = RequestMethod.POST)
+	public String searchStateResult(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			final BindingResult resultBinder, 
+			final HttpServletRequest request) throws IOException {
+		LOGGER.info("Search");
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+        query
+        .append(
+                "select ad.id,ad.auditno,ad.type,ad.audit_sch_date,ad.status.description from AuditDetails ad where ad.status.description not in ('Approved') and  ad.type = ? ")
+                .append(auditUtils
+                                .getAuditDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
+                                .append(auditUtils.getAuditTaskMisQuery(auditDetail));
+        LOGGER.info("Query :: "+query.toString());
+          list = persistenceService.findAllBy(query.toString(),
+        		auditDetail.getAuditType());
+        AuditDetails result = null;
+        if (list.size() != 0) {
+        	resultsDtlsList = new ArrayList<AuditDetails>();
+
+            for (final Object[] object : list) {
+            	result = new AuditDetails();
+            	result.setId(Long.parseLong(object[0].toString()));
+            	AuditDetails auditDetails = auditService.getById(result.getId());
+            	if(auditDetail.getLeadAuditorEmpNo() != null && auditDetail.getLeadAuditorEmpNo() != -1 && auditDetails.getCurrentState().getOwnerPosition() != auditDetail.getLeadAuditorEmpNo())
+            	{
+            		continue;
+            	}
+            	result.setAuditno(object[1].toString());
+            	result.setType(object[2].toString());
+            	if(object[3] != null)
+            	{
+            		result.setSchdDate(object[3].toString());
+            	}
+            	else
+            	{
+            		result.setSchdDate(null);
+            	}
+            	result.setStatusDescription(object[4].toString());
+            	resultsDtlsList.add(result);
+            }
+        }
+        auditDetail.setAuditSearchList(resultsDtlsList);
+        auditDetail.setDepartments(this.getDepartmentsFromMs());
+		AuditEmployee emp=null;
+		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
+		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("Auditor");
+		for (ManageAuditor value : auditorList) {
+		 emp=new AuditEmployee();
+		 emp.setEmpCode(Long.valueOf(value.getEmployeeid()));
+		 emp.setEmpName(getEmployeeName(emp.getEmpCode()));
+		 auditEmployees.add(emp);
+		 }
+		auditDetail.setAuditEmployees(auditEmployees);
+		model.addAttribute("fundList",populateFundList());
+		model.addAttribute("auditDetail", auditDetail);
+		return "auditStateSearch";
+		
+	}
+	
+	
+	
+	 @RequestMapping(value = "/employee/{type}", method = RequestMethod.GET)
+	    @ResponseBody
+	    public List<EmployeeInfo> getApprovers(@PathVariable(name = "type") String type) {
+
+	        List<EmployeeInfo> approvers=new ArrayList<>();
+
+	       List<ManageAuditor> manageAuditorsSave=manageAuditorService.getAudiorsByType(type);
+	       for (ManageAuditor manageAuditor2 : manageAuditorsSave) {
+			
+	    	   EmployeeInfo employeeInfo=microserviceUtils.getEmployeeById(Long.valueOf(manageAuditor2.getEmployeeid()));
+	    	   approvers.add(employeeInfo);
+		}
+	        
+	        return approvers;
+	    }
+	
+
+	 @RequestMapping(value="/updateAuditorScreen/{auditId}/{type}")    
+	    public String updateAuditOwnerscreen(@PathVariable Long auditId,@PathVariable String type, Model model){
+		 AuditDetails auditDetails=new AuditDetails();
+		 AuditDetail auditDetail=new AuditDetail();
+		  auditDetails = auditService.findByid(auditId);
+		 
+		 if(auditDetails!=null) {
+  	   EmployeeInfo employeeInfo=microserviceUtils.getEmployeeById(auditDetails.getState().getOwnerPosition());
+  	   auditDetails.setEmployeeName(employeeInfo.getUser().getName());
+		 }
+		 
+		 auditDetail.setAuditId(auditId);
+		 auditDetail.setAuditType(auditDetails.getType());
+		 auditDetail.setAuditNumber(auditDetails.getAuditno());
+		 auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
+		 auditDetail.setAuditStatus(auditDetails.getStatus().getDescription());
+		 auditDetail.setLeadAuditorName(auditDetails.getEmployeeName());
+		 auditDetail.setLeadAuditorEmpNo(auditDetails.getState().getOwnerPosition());
+		 auditDetail.setStateId(auditDetails.getState().getId());
+		 
+		/*add employye list to drop down*/
+		  List<EmployeeInfo> approvers=new ArrayList<>();
+
+	       List<ManageAuditor> manageAuditorsSave=manageAuditorService.getAudiorsByType(type);
+	       for (ManageAuditor manageAuditor2 : manageAuditorsSave) {
+			
+	    	   EmployeeInfo employeeInfo=microserviceUtils.getEmployeeById(Long.valueOf(manageAuditor2.getEmployeeid()));
+	    	   approvers.add(employeeInfo);
+		}
+		 
+	 model.addAttribute("approverList", approvers);       
+	model.addAttribute("auditDetail", auditDetail);
+
+	return "auditStateUpdate"; 
+	 
+	 }
+	 
+	 
+	 @RequestMapping(value="/updateauditorOwner",method = RequestMethod.POST)    
+	    public String updateAuditOwner(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+				final BindingResult resultBinder, 
+				final HttpServletRequest request) throws IOException{
+		 
+		// AuditDetails auditDetails = auditService.getById(auditId);
+		 AuditDetails auditDetails=new AuditDetails();
+		
+		 
+		persistenceService
+      .getSession()
+      .createSQLQuery(
+              "update eg_wf_states set owner_pos = :empid where id =:stateid").setLong("empid", auditDetail.getLeadAuditorEmpNo()).setLong("stateid", auditDetail.getStateId()).executeUpdate();
+	persistenceService.getSession().flush();
+	
+		model.addAttribute("auditDetail", auditDetail);
+	model.addAttribute("message", "Updated Successfully");
+
+	return "audit-success"; 
+	 
+	 }
+	 
+	 
+	 
 	public String getEmployeeName(Long empId){
 	
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();

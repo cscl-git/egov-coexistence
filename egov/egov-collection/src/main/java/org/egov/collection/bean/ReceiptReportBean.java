@@ -13,6 +13,8 @@ public class ReceiptReportBean {
 	private String modeOfPayment;
 	private String particulars;
 	private BigDecimal totalReceiptAmount;
+	private BigDecimal principalAmt;
+	private BigDecimal gstAmount;
 	private String dateOfDeposite;
 	private String remitanceNo;
 	private String bankAccountNo;
@@ -95,13 +97,18 @@ public class ReceiptReportBean {
 	public void setDepositAmount(BigDecimal depositAmount) {
 		this.depositAmount = depositAmount;
 	}
-	@Override
-	public String toString() {
-		return "ReceiptReportBean [slNo=" + slNo + ", paramDate=" + paramDate + ", receiptNo=" + receiptNo
-				+ ", collectedBy=" + collectedBy + ", payeeName=" + payeeName + ", serviceType=" + serviceType
-				+ ", modeOfPayment=" + modeOfPayment + ", particulars=" + particulars + ", totalReceiptAmount="
-				+ totalReceiptAmount + ", dateOfDeposite=" + dateOfDeposite + ", remitanceNo=" + remitanceNo
-				+ ", bankAccountNo=" + bankAccountNo + ", depositAmount=" + depositAmount + "]";
+	
+	public BigDecimal getPrincipalAmt() {
+		return principalAmt;
+	}
+	public void setPrincipalAmt(BigDecimal principalAmt) {
+		this.principalAmt = principalAmt;
+	}
+	public BigDecimal getGstAmount() {
+		return gstAmount;
+	}
+	public void setGstAmount(BigDecimal gstAmount) {
+		this.gstAmount = gstAmount;
 	}
 	
 	

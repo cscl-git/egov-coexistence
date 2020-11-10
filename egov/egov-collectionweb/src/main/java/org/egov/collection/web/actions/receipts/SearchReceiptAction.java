@@ -60,7 +60,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.convention.annotation.Action;
@@ -93,6 +95,7 @@ import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.search.SearchQuery;
 import org.egov.infstr.search.SearchQueryHQL;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -116,6 +119,9 @@ public class SearchReceiptAction extends SearchFormAction {
     private Long userId = (long) -1;
     private String instrumentType;
     private String receiptNumber;
+    private String collectedBy="";
+    private String modeOfPayment="";
+    private String searchAmount="0";
     private Date fromDate;
     private Date toDate;
     private Integer searchStatus = -1;
@@ -191,7 +197,7 @@ public class SearchReceiptAction extends SearchFormAction {
     @Action(value = "/receipts/searchReceipt-reset")
     public String reset() {
         setPage(1);
-        serviceTypeId = "null";
+        serviceTypeId = null;
         userId = (long) -1;
         receiptNumber = "";
         fromDate = null;
@@ -220,7 +226,7 @@ public class SearchReceiptAction extends SearchFormAction {
         // serviceClassMap.remove(CollectionConstants.SERVICE_TYPE_PAYMENT);
         // addDropdownData("serviceTypeList", Collections.EMPTY_LIST);
 //        addDropdownData("businessCategorylist", microserviceUtils.getBusinessCategories());
-        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService("Finance"));
+        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
         addDropdownData("departmentList", masterDataCache.get("egi-department"));
         // addDropdownData("bankBranchList", collectionsUtil.getBankCollectionBankBranchList());
     }
@@ -288,15 +294,16 @@ public class SearchReceiptAction extends SearchFormAction {
                     ReceiptHeader receiptHeader = new ReceiptHeader();
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
+                    populateBifurcationAmount(receiptHeader);
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
-                    receiptHeader.setService(billDetail.getBusinessService());
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy());
                     receiptHeader.setPayeeName(bill.getPayerName());
                   
-                    receiptHeader.setTotalAmount(billDetail.getTotalAmount());
+                    //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
                     receiptHeader.setCurretnStatus(billDetail.getStatus());
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     if (null != billDetail.getManualReceiptNumber()) {
@@ -339,6 +346,8 @@ public class SearchReceiptAction extends SearchFormAction {
 
                     receiptList.add(receiptHeader);
 
+                    List<ReceiptHeader> beerDrinkers = receiptList.stream()
+                    	    .filter(p -> p.getModOfPayment() == "").collect(Collectors.toList());
                 }
             }
 
@@ -366,6 +375,9 @@ public class SearchReceiptAction extends SearchFormAction {
         System.out.println("from date ::"+getFromDate());
         System.out.println("to date :::"+getToDate());
         System.out.println("getServiceTypeId() :::"+getServiceTypeId());
+        if(getServiceTypeId().equalsIgnoreCase("")) {
+        setServiceTypeId(null);
+        }
         serviceTypeIdforExcel=getServiceTypeId();
         List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),getDeptId(),
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
@@ -373,12 +385,22 @@ public class SearchReceiptAction extends SearchFormAction {
       
        
         List<RemittanceDepositWorkDetail> remittanceResponselist=null;
+       
+        
         BigDecimal totalReciptAmount=BigDecimal.ZERO;
+        BigDecimal totalReciptAmount2= BigDecimal.ZERO; 
+        totalReciptAmount2= totalReciptAmount.setScale(2, BigDecimal.ROUND_DOWN);
+        System.out.println("check total amount="+totalReciptAmount2);
+        
+        
         BigDecimal totalDepositAmount=BigDecimal.ZERO;
+        BigDecimal totalDepositAmount2=BigDecimal.ZERO;
+        totalDepositAmount2= totalDepositAmount2.setScale(2, BigDecimal.ROUND_DOWN);
+        
+        
         if(receipts!=null && !receipts.isEmpty()) {
          remittanceResponselist =  getDepositWork(receipts);
         	}                   
-       
 
         for (Receipt receipt : receipts) {
 
@@ -392,16 +414,18 @@ public class SearchReceiptAction extends SearchFormAction {
                     ReceiptHeader receiptHeader = new ReceiptHeader();
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
+                    populateBifurcationAmount(receiptHeader);
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
-                    receiptHeader.setService(billDetail.getBusinessService());
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
                     receiptHeader.setReferencenumber("");
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeName(bill.getPayerName());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
-                    receiptHeader.setTotalAmount(billDetail.getTotalAmount());
-                    totalReciptAmount.add(billDetail.getTotalAmount());
-                    receiptHeader.setTotalreciptAmount(totalReciptAmount);
+                    //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
+                   // totalReciptAmount2= totalReciptAmount2.add(billDetail.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+                    
+                    //receiptHeader.setTotalreciptAmount(totalReciptAmount2);
                     receiptHeader.setCurretnStatus(billDetail.getStatus());
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     if (null != billDetail.getManualReceiptNumber()) {
@@ -417,9 +441,22 @@ public class SearchReceiptAction extends SearchFormAction {
                             receiptHeader.setG8data(new Date(billDetail.getManualReceiptDate()).toString());
                     }
                     receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
-                    EmployeeInfo empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
-                    if (null != empInfo && empInfo.getUser().getUserName() != null)
-                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    EmployeeInfo empInfo = null;
+                    try
+                    {
+                    	empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    }catch (Exception e) {
+					}
+                     
+                    if (null != empInfo && empInfo.getUser().getUserName() != null && !empInfo.getUser().getUserName().isEmpty())
+                    {
+                    	receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    }
+                    else
+                    {
+                    	receiptHeader.setCreatedUser("");
+                    }
+                        
                     JsonNode jsonNode = billDetail.getAdditionalDetails();
                     BillDetailAdditional additional = null;
                     try {
@@ -456,8 +493,9 @@ public class SearchReceiptAction extends SearchFormAction {
 	                    		receiptHeader.setDepositAmount(remittance.getCreditAmount());
 	                    		
 	                    		BigDecimal depositAmount = new BigDecimal(remittance.getCreditAmount());
-	                    		totalDepositAmount.add(depositAmount);
-	                    		receiptHeader.setTotalDepositAmount(totalDepositAmount);
+	                    		receiptHeader.setTotalDepositAmount(depositAmount);
+	                    		//totalDepositAmount2=totalDepositAmount2.add(depositAmount.setScale(4, BigDecimal.ROUND_DOWN));
+	                    		
 	                    		
 	                    	}
 	                    	else
@@ -468,32 +506,234 @@ public class SearchReceiptAction extends SearchFormAction {
 						}
                     }
 
+                    
                     receiptList.add(receiptHeader);
 
+                    
                 }
             }
 
         }
+        ///Bhushan :added filter to list
+       List<ReceiptHeader> receiptListfilterList=receiptList;
+       List<ReceiptHeader> receiptListnew=new ArrayList<>();
+      // receiptList.clear();
+       
+       
+        for (ReceiptHeader receiptHeader2 : receiptListfilterList) {
+			
+			
+        	 BigDecimal searchamt = new BigDecimal(searchAmount);
+             
+             BigDecimal  searchamtbig = receiptHeader2.getTotalAmount().setScale(4, BigDecimal.ROUND_DOWN);
+             searchamt = searchamt.setScale(4, BigDecimal.ROUND_DOWN);
+        	
+        	
+        
+        if(searchAmount!=null && !searchAmount.equals("0")){
+        	
+        	if(collectedBy!=null && !collectedBy.equals("")){
+        		
+        		if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+        			
+        			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+                    {
+        				if(receiptHeader2.getTotalDepositAmount()!=null) {
+                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				if(receiptHeader2.getTotalAmount()!=null) {
+                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				receiptListnew.add(receiptHeader2);
+                   
+                    }
+        		}
+        		else {
+        			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
+                    {
+        				if(receiptHeader2.getTotalDepositAmount()!=null) {
+                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				if(receiptHeader2.getTotalAmount()!=null) {
+                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				receiptListnew.add(receiptHeader2);
+                   
+                    }
+        			
+        		}
+        	}
+        	else if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+    			
+	        		if(searchamtbig.equals(searchamt) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+	                {
+	        			if(receiptHeader2.getTotalDepositAmount()!=null) {
+                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				if(receiptHeader2.getTotalAmount()!=null) {
+                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				receiptListnew.add(receiptHeader2);
+	               
+	                }
+	    		}else{
+	        		
+	    			if(searchamtbig.equals(searchamt))
+	                {
+	    				if(receiptHeader2.getTotalDepositAmount()!=null) {
+                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				if(receiptHeader2.getTotalAmount()!=null) {
+                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        				}
+        				receiptListnew.add(receiptHeader2);
+	               
+	                }
+	        	}
+        }
+        else if(collectedBy!=null && !collectedBy.equals("")) {
+        	
+			if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+			    			
+			        		if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+			                {
+			        			if(receiptHeader2.getTotalDepositAmount()!=null) {
+		                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+                }
+		        				if(receiptHeader2.getTotalAmount()!=null) {
+		                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+		        				}
+		        				receiptListnew.add(receiptHeader2);
+			               
+			                }
+			    		}else {
+			    			
+			    			if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
+			                {
+			    				if(receiptHeader2.getTotalDepositAmount()!=null) {
+		                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+		        				}
+		        				if(receiptHeader2.getTotalAmount()!=null) {
+		                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+		        				}
+		        				receiptListnew.add(receiptHeader2);
+			               
+			                }
+			    		}
+        	
+        }
+        else if(modeOfPayment!=null && !modeOfPayment.equals("")){
+        	
+        	if(receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+            {
+        		if(receiptHeader2.getTotalDepositAmount()!=null) {
+            		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+				}
+				if(receiptHeader2.getTotalAmount()!=null) {
+                totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+				}
+				receiptListnew.add(receiptHeader2);
+           
+            }
+        	
+            }
+        else {
+
+        	if(receiptHeader2.getTotalDepositAmount()!=null) {
+        		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+			}
+			if(receiptHeader2.getTotalAmount()!=null) {
+            totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+        }
+			receiptListnew.add(receiptHeader2);
+        }
+        
+       
+        
+        
+        }
+        
+        
+        
+        
+     //   totalReciptAmount2=totalReciptAmount;
+      //  totalDepositAmount2=totalDepositAmount;
+        for (ReceiptHeader receiptHeadern : receiptListnew) {
+        	receiptHeadern.setTotalreciptAmount(totalReciptAmount2);
+        	receiptHeadern.setTotalDepositAmount(totalDepositAmount2);
+		}
+        
 
         if (searchResult == null) {
-            Page page = new Page<ReceiptHeader>(1, receiptList.size(), receiptList);
-            searchResult = new EgovPaginatedList(page, receiptList.size());
+            Page page = new Page<ReceiptHeader>(1, receiptListnew.size(), receiptListnew);
+            searchResult = new EgovPaginatedList(page, receiptListnew.size());
         } else {
             searchResult.getList().clear();
-            searchResult.getList().addAll(receiptList);
+            searchResult.getList().addAll(receiptListnew);
         }
 
         resultList = searchResult.getList();
         return DAYBOOKREPORT;
     }
 
-	 @Action(value = "/receipts/searchReceipt-downloadDayBookReport")
+    
+    
+    
+    
+
+	 private void populateBifurcationAmount(ReceiptHeader receiptHeader) {
+		 SQLQuery query =  null;
+	    	List<Object[]> rows = null;
+	    	BigDecimal pAmount=new BigDecimal("0");
+	    	BigDecimal gstAmount=new BigDecimal("0");
+	    	BigDecimal totalAmount=new BigDecimal("0");
+	    	try
+	    	{
+	    		 query = this.persistenceService.getSession().createSQLQuery("select gl.id,gl.glcode,gl.debitamount,gl.creditamount from generalledger gl where voucherheaderid =(select vmis.voucherheaderid from vouchermis vmis where vmis.reciept_number =:receipt_no)");
+	    	    query.setString("receipt_no", receiptHeader.getReceiptnumber());
+	    	    rows = query.list();
+	    	    
+	    	    if(rows != null && !rows.isEmpty())
+	    	    {
+	    	    	for(Object[] element : rows)
+	    	    	{
+	    	    		if(!element[3].toString().equalsIgnoreCase("0.00"))
+	    	    		{
+	    	    			if(element[1].toString().equalsIgnoreCase("3502020") || element[1].toString().equalsIgnoreCase("3502019"))
+	    	    			{
+	    	    				gstAmount=gstAmount.add(new BigDecimal(element[3].toString()));
+	    	    			}
+	    	    			else
+	    	    			{
+	    	    				pAmount=pAmount.add(new BigDecimal(element[3].toString()));
+	    	    			}
+	    	    		}
+	    	    		else
+	    	    		{
+	    	    			totalAmount=totalAmount.add(new BigDecimal(element[2].toString()));
+	    	    		}
+	    	    		
+	    	    	}
+	    	    	receiptHeader.setPrincipalAmount(pAmount);
+	    	    	receiptHeader.setGstAmount(gstAmount);
+	    	    	receiptHeader.setTotalAmount(totalAmount);
+	    	    }
+	    	}catch (Exception e) {
+				e.printStackTrace();
+			}
+		
+	}
+
+	@Action(value = "/receipts/searchReceipt-downloadDayBookReport")
     public String downloadDayBookReport() {
         target = "searchresult";
         collectionVersion = ApplicationThreadLocals.getCollectionVersion();
         System.out.println("from date ::"+getFromDate());
         System.out.println("to date :::"+getToDate());
         System.out.println("getServiceTypeId() :::"+getServiceTypeId());
+        if(getServiceTypeId().equalsIgnoreCase("") || getServiceTypeId().contains("0") || getServiceTypeId().contains("-1")) {
+            setServiceTypeId(null);
+            }
         List<ReceiptHeader> receiptList = new ArrayList<>();
         List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),getDeptId(),
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
@@ -501,8 +741,15 @@ public class SearchReceiptAction extends SearchFormAction {
       
         
         List<RemittanceDepositWorkDetail> remittanceResponselist=null;
+        
         BigDecimal totalReciptAmount=BigDecimal.ZERO;
+        BigDecimal totalReciptAmount2= BigDecimal.ZERO; 
+        totalReciptAmount2= totalReciptAmount.setScale(2, BigDecimal.ROUND_DOWN);
+        
+        
         BigDecimal totalDepositAmount=BigDecimal.ZERO;
+        BigDecimal totalDepositAmount2=BigDecimal.ZERO;
+        totalDepositAmount2= totalDepositAmount2.setScale(2, BigDecimal.ROUND_DOWN);
         if(receipts!=null && !receipts.isEmpty()) {
          remittanceResponselist =  getDepositWork(receipts);
         	}                   
@@ -520,14 +767,15 @@ public class SearchReceiptAction extends SearchFormAction {
                     ReceiptHeader receiptHeader = new ReceiptHeader();
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
+                    populateBifurcationAmount(receiptHeader);
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
                     receiptHeader.setService(billDetail.getBusinessService());
                     receiptHeader.setReferencenumber("");
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
-                    receiptHeader.setTotalAmount(billDetail.getTotalAmount());
-                    totalReciptAmount.add(billDetail.getTotalAmount());
+                    //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
+                   // totalReciptAmount.add(billDetail.getTotalAmount());
                     receiptHeader.setTotalreciptAmount(totalReciptAmount);
                     receiptHeader.setCurretnStatus(billDetail.getStatus());
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
@@ -544,9 +792,21 @@ public class SearchReceiptAction extends SearchFormAction {
                             receiptHeader.setG8data(new Date(billDetail.getManualReceiptDate()).toString());
                     }
                     receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
-                    EmployeeInfo empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
-                    if (null != empInfo && empInfo.getUser().getUserName() != null)
-                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    EmployeeInfo empInfo = null;
+                    try
+                    {
+                    	empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    }catch (Exception e) {
+					}
+                     
+                    if (null != empInfo && empInfo.getUser().getUserName() != null && !empInfo.getUser().getUserName().isEmpty())
+                    {
+                    	receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    }
+                    else
+                    {
+                    	receiptHeader.setCreatedUser("");
+                    }
                     JsonNode jsonNode = billDetail.getAdditionalDetails();
                     BillDetailAdditional additional = null;
                     try {
@@ -583,8 +843,7 @@ public class SearchReceiptAction extends SearchFormAction {
 	                    		receiptHeader.setDepositAmount(remittance.getCreditAmount());
 	                    		
 	                    		BigDecimal depositAmount = new BigDecimal(remittance.getCreditAmount());
-	                    		totalDepositAmount.add(depositAmount);
-	                    		receiptHeader.setTotalDepositAmount(totalDepositAmount);
+	                    		receiptHeader.setTotalDepositAmount(depositAmount);
 	                    		
 	                    	}
 	                    	else
@@ -601,13 +860,157 @@ public class SearchReceiptAction extends SearchFormAction {
             }
 
         }
+        
+        ///Bhushan
+        List<ReceiptHeader> receiptListfilterList=receiptList;
+        List<ReceiptHeader> receiptListnew=new ArrayList<>();
+       // receiptList.clear();
+        
+        
+         
+         for (ReceiptHeader receiptHeader2 : receiptListfilterList) {
+ 			
+ 			
+         	 BigDecimal searchamt = new BigDecimal(searchAmount);
+              
+              BigDecimal  searchamtbig = receiptHeader2.getTotalAmount().setScale(4, BigDecimal.ROUND_DOWN);
+              searchamt = searchamt.setScale(4, BigDecimal.ROUND_DOWN);
+         	
+         	
+         
+         if(searchAmount!=null && !searchAmount.equals("0")){
+         	
+         	if(collectedBy!=null && !collectedBy.equals("")){
+         		
+         		if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+         			
+         			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+                     {
+         				if(receiptHeader2.getTotalDepositAmount()!=null) {
+                     		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				if(receiptHeader2.getTotalAmount()!=null) {
+                         totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				receiptListnew.add(receiptHeader2);
+                    
+                     }
+         		}
+         		else {
+         			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
+                     {
+         				if(receiptHeader2.getTotalDepositAmount()!=null) {
+                     		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				if(receiptHeader2.getTotalAmount()!=null) {
+                         totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				receiptListnew.add(receiptHeader2);
+                    
+                     }
+         			
+         		}
+         	}
+         	else if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+     			
+ 	        		if(searchamtbig.equals(searchamt) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+ 	                {
+ 	        			if(receiptHeader2.getTotalDepositAmount()!=null) {
+                     		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				if(receiptHeader2.getTotalAmount()!=null) {
+                         totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				receiptListnew.add(receiptHeader2);
+ 	               
+ 	                }
+ 	    		}else{
+ 	        		
+ 	    			if(searchamtbig.equals(searchamt))
+ 	                {
+ 	    				if(receiptHeader2.getTotalDepositAmount()!=null) {
+                     		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				if(receiptHeader2.getTotalAmount()!=null) {
+                         totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+         				}
+         				receiptListnew.add(receiptHeader2);
+ 	               
+ 	                }
+ 	        	}
+         }
+         else if(collectedBy!=null && !collectedBy.equals("")) {
+         	
+ 			if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+ 			    			
+ 			        		if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+ 			                {
+ 			        			if(receiptHeader2.getTotalDepositAmount()!=null) {
+ 		                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 		        				}
+ 		        				if(receiptHeader2.getTotalAmount()!=null) {
+ 		                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 		        				}
+ 		        				receiptListnew.add(receiptHeader2);
+ 			               
+ 			                }
+ 			    		}else {
+ 			    			
+ 			    			if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
+ 			                {
+ 			    				if(receiptHeader2.getTotalDepositAmount()!=null) {
+ 		                    		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 		        				}
+ 		        				if(receiptHeader2.getTotalAmount()!=null) {
+ 		                        totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 		        				}
+ 		        				receiptListnew.add(receiptHeader2);
+ 			               
+ 			                }
+ 			    		}
+         	
+         }
+         else if(modeOfPayment!=null && !modeOfPayment.equals("")){
+         	
+         	if(receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
+             {
+         		if(receiptHeader2.getTotalDepositAmount()!=null) {
+             		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 				}
+ 				if(receiptHeader2.getTotalAmount()!=null) {
+                 totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 				}
+ 				receiptListnew.add(receiptHeader2);
+            
+             }
+         	
+         }
+         else {
+         	
+         	if(receiptHeader2.getTotalDepositAmount()!=null) {
+         		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 			}
+ 			if(receiptHeader2.getTotalAmount()!=null) {
+             totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
+ 			}
+ 			receiptListnew.add(receiptHeader2);
+         }
+         
+        
+         
+         
+         }
+         
+        
+        
+        
         List<ReceiptReportBean> receiptReportList = new ArrayList<ReceiptReportBean>();
         ReceiptReportBean bean=null;
         int i=1;
-        if(receiptList != null && !receiptList.isEmpty())
+        if(receiptListnew != null && !receiptListnew.isEmpty())
         {
         	System.out.println("receipt non empty");
-        	for(ReceiptHeader header:receiptList)
+        	for(ReceiptHeader header:receiptListnew)
             {
         		bean=new ReceiptReportBean();
         		bean.setSlNo(String.valueOf(i++));
@@ -619,6 +1022,22 @@ public class SearchReceiptAction extends SearchFormAction {
         		bean.setModeOfPayment(header.getModOfPayment());
         		bean.setParticulars(header.getReferenceDesc());
         		bean.setTotalReceiptAmount(header.getTotalAmount());
+        		if(header.getPrincipalAmount() != null)
+        		{
+        			bean.setPrincipalAmt(header.getPrincipalAmount());
+        		}
+        		else
+        		{
+        			bean.setPrincipalAmt(new BigDecimal("0"));
+        		}
+        		if(header.getGstAmount() != null)
+        		{
+        			bean.setGstAmount(header.getGstAmount());
+        		}
+        		else
+        		{
+        			bean.setPrincipalAmt(new BigDecimal("0"));
+        		}
         		if(header.getRrDate() != null)
         		{
         			bean.setDateOfDeposite(getDateString(header.getRrDate()));
@@ -666,10 +1085,6 @@ public class SearchReceiptAction extends SearchFormAction {
         System.out.println("Start of report" );
         try
         {
-        	for(ReceiptReportBean row:receiptReportList)
-        	{
-        		System.out.println(row.toString());
-        	}
         	reportInput = new ReportRequest(jasperName, receiptReportList, paramMap);
             reportInput.setReportFormat(ReportFormat.XLS);
             if(reportService != null)
@@ -770,9 +1185,13 @@ public class SearchReceiptAction extends SearchFormAction {
             criteriaString.append(" and receipt.receiptdate >= ? ");
             params.add(fromDate);
         }
-        if (getToDate() != null) {
+       /* if (getToDate() != null) {
             criteriaString.append(" and receipt.receiptdate < ? ");
             params.add(DateUtils.add(toDate, Calendar.DATE, 1));
+        }*/
+        if (getToDate() != null) {
+            criteriaString.append(" and receipt.receiptdate < ? ");
+            params.add(toDate);
         }
         if (getServiceTypeId() != null) {
             criteriaString.append(" and receipt.service.id = ? ");
@@ -919,4 +1338,28 @@ public class SearchReceiptAction extends SearchFormAction {
   }
   return dateString;
     }
+
+	public String getCollectedBy() {
+		return collectedBy;
+	}
+
+	public void setCollectedBy(String collectedBy) {
+		this.collectedBy = collectedBy;
+	}
+
+	public String getSearchAmount() {
+		return searchAmount;
+	}
+
+	public void setSearchAmount(String searchAmount) {
+		this.searchAmount = searchAmount;
+	}
+
+	public String getModeOfPayment() {
+		return modeOfPayment;
+	}
+
+	public void setModeOfPayment(String modeOfPayment) {
+		this.modeOfPayment = modeOfPayment;
+	}
 }

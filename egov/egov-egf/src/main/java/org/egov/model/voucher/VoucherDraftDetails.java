@@ -22,7 +22,8 @@ public class VoucherDraftDetails {
 	@Id
 	@GeneratedValue(generator = SEQ_VoucherDraftDetails, strategy = GenerationType.SEQUENCE)
 	private Long id;
-	
+	private Long functionIdDetail;
+    private String functionDetail;	
 	private String voucherNumber;
 	private Long glcodeIdDetail;
 	private String glcodeDetail;
@@ -79,6 +80,18 @@ public class VoucherDraftDetails {
 	}
 	public void setDebitAmountDetail(BigDecimal debitAmountDetail) {
 		this.debitAmountDetail = debitAmountDetail;
+	}
+	public Long getFunctionIdDetail() {
+		return functionIdDetail;
+	}
+	public void setFunctionIdDetail(Long functionIdDetail) {
+		this.functionIdDetail = functionIdDetail;
+	}
+	public String getFunctionDetail() {
+		return functionDetail;
+	}
+	public void setFunctionDetail(String functionDetail) {
+		this.functionDetail = functionDetail;
 	}
 	
 	

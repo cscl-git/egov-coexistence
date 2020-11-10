@@ -224,7 +224,7 @@ function downloadExcel()
 	var fromDate=document.getElementById('fromDate').value;
 	var toDate=document.getElementById('toDate').value;
 	var service=document.getElementById('serviceTypeIdforExcel').value;
-	var dept=document.getElementById('deptId').value;;
+	var dept=document.getElementById('deptId').value;
 
 	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeId="+service+"&deptId="+dept;
 	document.searchReceiptForm.submit();
@@ -266,6 +266,7 @@ function validate()
 {
 	var fromdate=dom.get("fromDate").value;
 	var todate=dom.get("toDate").value;
+	document.getElementById("toDate").value = todate;
 	console.log("todate :::"+todate);
 	var serviceCategoryid=dom.get("serviceCategoryid").value;
 	var serviceId=dom.get("serviceId").value;
@@ -273,13 +274,13 @@ function validate()
 	console.log("serviceCategoryid : "+serviceCategoryid);
 	console.log("serviceId : "+serviceId);
 	
-	if(serviceCategoryid==-1|| serviceCategoryid=="")
+	if(serviceCategoryid==-1|| serviceCategoryid==0)
 	{
 		valueservicetype=null;
 		
 		}
 	else{
-			if(serviceId==-1 || serviceId==""){
+			if(serviceId==0 || serviceId==""){
 				
 				valueservicetype=serviceCategoryid;
 				
@@ -390,6 +391,7 @@ function checkviewforselectedrecord()
 
 }
 function populateServiceType(selected){
+	addServiceTypeDropdown('serviceTable');
     var isServiceTypeExist = false;
    // document.getElementById('serviceTable').innerHTML='';
     if(selected == -1){
@@ -425,6 +427,7 @@ function addServiceTypeDropdown(tableId){
     cell2.innerHTML = '<select name="serviceId" id="serviceId" onchange="loadFinDetails(this)"/>'; */
 	document.getElementById('serviceId').options.length=0;
 	document.getElementById('serviceId').options[0]= new Option('--------Choose--------','0');
+	console.log('ok');
 
 }
 function onChangeServiceClass(obj)
@@ -435,11 +438,12 @@ function onChangeServiceClass(obj)
 }
 
 function onBodyLoad(){
+	addServiceTypeDropdown('serviceTable');
 	console.log('inbodyload');
-	document.getElementById("toDate").value=currDate;
+	//document.getElementById("toDate").value=currDate;
 	//document.getElementById("toDate").disabled = true;
-	var todate=document.getElementById("toDate").value;
-	console.log(todate);
+	//var todate=document.getElementById("toDate").value;
+	//console.log(todate);
 	
 };
 </script> 
@@ -554,9 +558,42 @@ function onBodyLoad(){
 		<td width="21%" class="bluebox2"><s:text name="challan.department"/></td>
 		  <td width="24%" class="bluebox2"><s:select headerKey=""
 							headerValue="----Choose----" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptId}"/> </td>
+	    
+	    
+	    <!-- add by bhushan -->
+	    <td width="21%" class="bluebox"><s:text name="Collected By"/></td>
+	      <td width="24%" class="bluebox">
+	      <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy"/></td>
+	      
+	     
+	    
+	    
 	      <td><s:hidden  name="serviceTypeId" id="serviceType"   value="0" />
 	      		<input type="hidden" name="serviceTypeIdforExcel" value="${serviceTypeIdforExcel}" id="serviceTypeIdforExcel">
 	      	 </td>
+	    </tr>	    
+	    
+	    
+	    <!-- add by bhushan -->
+	    <tr>
+	     
+	      <td width="21%" class="bluebox"><s:text name="Amount"/></td>
+	      <td width="24%" class="bluebox">
+	      <div class="yui-skin-sam"><s:textfield id="searchAmount" type="text" name="searchAmount"/></td>
+	    
+	    
+	    <td width="21%" class="bluebox2"><s:text name="Mode Of Payment"/></td>
+		  <td width="24%" class="bluebox2"><select name="modeOfPayment">
+   <option value="">----Choose----</option>
+    <option value="cash">CASH</option>
+     <option value="cheque">CHEQUE</option>
+    <option value="DD" >DD</option> 
+    <option value="card" >Card</option>
+    <option value="posmohbd"> POS MOH B&D</option> 
+    <option value="posmohcattle"> POS MOH Cattle</option>
+    <option value="posmohslh">POS MOH SLH</option>
+</select> </td>
+	    
 	    </tr>	    
 	 <%--    <tr>
 	      <td width="4%" class="bluebox">&nbsp;</td>
@@ -636,13 +673,18 @@ function onBodyLoad(){
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Payee Name" style="width:8%;text-align:right" property="paidBy"/>
 
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service" style="width:12%;text-align:left" property="service" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of payment" style="width:12%;text-align:left" property="modOfPayment" />
+
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Particulars" style="width:12%;text-align:left" property="referenceDesc" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Prinicpal Amount (Rs.)" property="principalAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST (Rs.)" property="gstAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Amount (Rs.)" property="totalAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date Of Deposit"  format="{0,date,dd/MM/yyyy}" style="width:12%;text-align:left" property="rrDate" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Remitance No." style="width:16%;text-align:left" property="referencenumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bank Account No." style="width:12%;text-align:left" property="bankAccountNumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Deposit Amount." style="width:27%;text-align:left" property="depositAmount" />
+
 
 
 <%-- <div align="center">

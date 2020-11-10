@@ -116,7 +116,6 @@ jQuery(window).load(function () {
 	undoLoadingMask();
 });
 
-
 function onChangeBankAccount(branchId) {
 	var serviceName = document.getElementById("serviceName").value;
 	var fundName = "", fundId = -1;
@@ -1079,6 +1078,13 @@ function showHideMandataryMark(obj){
 		
 	}
 }
+
+jQuery(document).keypress(
+		  function(event){
+		    if (event.which == '13') {
+		      event.preventDefault();
+		    }
+		});
 </script>
 
 	<title><s:text name="billreceipt.pagetitle"/></title>
@@ -1256,11 +1262,11 @@ function showHideMandataryMark(obj){
 			 <div id="loadingMask" style="display:none;overflow:hidden;text-align: center"><img src="/services/collection/resources/images/bar_loader.gif"/> <span style="color: red">Please wait....</span></div>
 			<div align="left" class="mandatorycoll"><s:text name="common.mandatoryfields"/></div>
 			<div class="buttonbottom" align="center">
-			      <label><input align="center" type="submit" class="buttonsubmit" id="button2" value="<s:text name='lbl.pay'/>" onclick="return validate();"/></label>
+			      <label><input align="center" type="submit" class="buttonsubmit" id="button2" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="return validate();"/></label>
 			      &nbsp;
-			      <input name="button" type="button" class="button" id="button" value="<s:text name='lbl.reset'/>" onclick="checkreset();"/>
+			      <input name="button" type="button" class="button" id="button" tabindex="-1" value="<s:text name='lbl.reset'/>" onclick="checkreset();"/>
 			      &nbsp;
-			      <input name="button" type="button" class="button" id="buttonclose2" value="<s:text name='lbl.close'/>" onclick="window.close();" />
+			      <input name="button" type="button" class="button" id="buttonclose2" tabindex="-1" value="<s:text name='lbl.close'/>" onclick="window.close();" />
 				</div>
 
 <!-- <table width="100%" >

@@ -107,6 +107,8 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String collModesNotAllwd;
     private String displayMsg;
     private BigDecimal totalAmount;
+    private BigDecimal principalAmount;
+    private BigDecimal gstAmount;
     private BigDecimal minimumAmount;
     private BigDecimal totalAmountToBeCollected;
     private Date voucherDate;
@@ -927,6 +929,22 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setRrDate(Date rrDate) {
 		this.rrDate = rrDate;
+	}
+
+	public BigDecimal getPrincipalAmount() {
+		return principalAmount;
+	}
+
+	public void setPrincipalAmount(BigDecimal principalAmount) {
+		this.principalAmount = principalAmount;
+	}
+
+	public BigDecimal getGstAmount() {
+		return gstAmount;
+	}
+
+	public void setGstAmount(BigDecimal gstAmount) {
+		this.gstAmount = gstAmount;
 	}
 
 	

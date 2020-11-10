@@ -65,8 +65,28 @@
 			value="/WEB-INF/views/audit/auditSearch.jsp" />
 
 	</definition>
-	 
+	 <definition name="manageAuditor-form" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/manageAuditor-form.jsp"/>
+    </definition>
+   
+ <definition name="manageAuditor-formedit" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/manageAuditor-formedit.jsp"/>
+    </definition>
+<definition name="auditStateSearch" extends="base_layout">
 
+<put-attribute name="page-title" value="Audit"
+cascade="true" />
+
+<put-attribute name="body"
+value="/WEB-INF/views/audit/auditStateSearch.jsp" />
+
+</definition>
+<definition name="auditStateUpdate" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditStateUpdate.jsp"/>
+    </definition>
 
 
 

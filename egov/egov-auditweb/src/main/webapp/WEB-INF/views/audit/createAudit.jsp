@@ -98,4 +98,5 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
         src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 <script
         src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-        
+ <script
+        src="<cdn:url value='/resources/app/js/audit/helper.js?rnd=${app_release_no}' context='/services/audit'/>"></script>       

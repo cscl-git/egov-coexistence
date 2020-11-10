@@ -233,6 +233,32 @@ public class AuditUtils {
 				misQuery.append(" and ad.lead_auditor=")
 				.append(auditDetail.getLeadAuditorEmpNo());
 			}
+			if(auditDetail.getPassUnderobjection() != 0)
+			{
+				misQuery.append(" and ad.passUnderobjection=")
+				.append(auditDetail.getPassUnderobjection());
+			}
+			
+		}
+		return misQuery.toString();
+
+	}
+	
+	public String getAuditTaskMisQuery(final AuditDetail auditDetail) {
+
+		final StringBuffer misQuery = new StringBuffer(300);
+		if (null != auditDetail) {
+			if ( auditDetail.getAuditNumber() != null)
+			{
+				misQuery.append(" and ad.auditno='")
+						.append(auditDetail.getAuditNumber()).append("'");
+			}
+			if(auditDetail.getDepartment() != null && !auditDetail.getDepartment().isEmpty())
+			{
+				misQuery.append(" and ad.department='")
+				.append(auditDetail.getDepartment()).append("'");
+			}
+			
 			
 		}
 		return misQuery.toString();

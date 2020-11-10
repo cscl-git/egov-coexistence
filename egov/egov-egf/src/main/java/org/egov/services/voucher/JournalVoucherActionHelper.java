@@ -227,10 +227,13 @@ public class JournalVoucherActionHelper {
                 
                   for (final VoucherDetails vd : billDetailslist) {
                   if(vd.getGlcodeIdDetail()==null ||
-                  vd.getGlcodeIdDetail().toString().equals("")) { CheckSaveAsDraft=false;
-                  break; } }
+                  vd.getGlcodeIdDetail().toString().equals("")) { 
+                	  CheckSaveAsDraft=false;
+                	  break; 
+                	  } 
+                  }
                  
-                CheckSaveAsDraft=false;
+                //CheckSaveAsDraft=false;
             }
             if(CheckSaveAsDraft)
             {
@@ -313,9 +316,7 @@ public class JournalVoucherActionHelper {
                     .withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
                     .withDateInfo(currentDate.toDate());
         } else {
-        	System.out.println("voucherHeader.getState() : "+voucherHeader.getState());
-        	System.out.println("voucherHeader.getState() : "+voucherHeader.getStateType());
-        	System.out.println("workflowBean.getCurrentState() : "+workflowBean.getCurrentState());
+        	
             if (null == voucherHeader.getState()) {
                 final WorkFlowMatrix wfmatrix = voucherHeaderWorkflowService.getWfMatrix(voucherHeader.getStateType(), null,
                         null, null, workflowBean.getCurrentState(), null);
@@ -516,8 +517,28 @@ public class JournalVoucherActionHelper {
             final List<HashMap<String, Object>> subledgerDetails = new ArrayList<HashMap<String, Object>>();
             detailMap = new HashMap<String, Object>();
             final Map<String, Object> glcodeMap = new HashMap<String, Object>();
+           
+            
+            
             for (final VoucherDetails voucherDetail : billDetailslist) {
                 detailMap = new HashMap<String, Object>();
+                
+                if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
+    			{
+                	 if(voucherDetail.getFunctionIdDetail()==null)
+                		 detailMap.put(VoucherConstant.FUNCTIONIDDETAILS, "");
+                	 else
+                		 detailMap.put(VoucherConstant.FUNCTIONIDDETAILS, voucherDetail.getFunctionIdDetail());
+                	 
+                	 
+                	 if(voucherDetail.getFunctionDetail()==null)
+                		 detailMap.put(VoucherConstant.FUNCTIONDETAILS, "");
+                	 else
+                		 detailMap.put(VoucherConstant.FUNCTIONDETAILS, voucherDetail.getFunctionDetail());
+    			
+    			}
+                
+                
                 if (voucherDetail.getFunctionIdDetail() != null)
                     if (voucherHeader.getIsRestrictedtoOneFunctionCenter())
                         detailMap.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());

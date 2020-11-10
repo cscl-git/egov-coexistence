@@ -10,6 +10,7 @@ import org.apache.log4j.Logger;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.entity.AuditPostBillMpng;
 import org.egov.audit.entity.AuditPostVoucherMpng;
+import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
@@ -73,6 +74,8 @@ public class AuditService {
     private FinancialUtils financialUtils;
 	@Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
+	@Autowired
+	 private ManageAuditorService manageAuditorService;
 
 	@Autowired
 	public AuditService(final ScriptService scriptExecutionService) {
@@ -85,6 +88,10 @@ public class AuditService {
 
 	public AuditDetails getById(final Long id) {
 		return auditRepository.findOne(id);
+	}
+	
+	public AuditDetails findByid(final Long id) {
+		return auditRepository.findById(id);
 	}
 
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
@@ -242,16 +249,16 @@ public class AuditService {
 		}
 		else if(workFlowAction.equalsIgnoreCase("sectionOfficer"))
 		{
-			List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-	                FinancialConstants.MODULE_NAME_APPCONFIG, AuditConstants.AUDIT_SECTION_OFFICER);
+			
+			List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(auditDetails.getDepartment()), "RSA");
 	    	Position owenrPos = new Position();
 	    	if(leadEmpNo != null)
 	    	{
 	    		owenrPos.setId(leadEmpNo);
 	    	}
-	    	else if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+	    	else if(auditorList != null && !auditorList.isEmpty())
 	    	{
-	    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+	    		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
 	    	}
 	    	else
 	    	{
@@ -267,27 +274,25 @@ public class AuditService {
 		}
 		else if(workFlowAction.equalsIgnoreCase("auditor"))
 		{
-			List<AppConfigValues> configValuesByModuleAndKey =null;
+			List<ManageAuditor> auditorList=null;
 			if(expType.equalsIgnoreCase("Receipt"))
 			{
-				configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-		                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getPostVoucherMpng().get(0).getVoucherheader().getVouchermis().getDepartmentcode());
+				
+				auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(auditDetails.getPostVoucherMpng().get(0).getVoucherheader().getVouchermis().getDepartmentcode()), "Auditor");
 			}
 			else if(expType.equalsIgnoreCase("Post"))
 			{
-				configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-		                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getPostBillMpng().get(0).getEgBillregister().getEgBillregistermis().getDepartmentcode());
+				auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(auditDetails.getPostBillMpng().get(0).getEgBillregister().getEgBillregistermis().getDepartmentcode()), "Auditor");
 			}
 			else
 			{
-				configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-		                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + auditDetails.getEgBillregister().getEgBillregistermis().getDepartmentcode());
+				auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(auditDetails.getEgBillregister().getEgBillregistermis().getDepartmentcode()), "Auditor");
 			}
 			 
 	    	Position owenrPos = new Position();
-	    	if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+	    	if(auditorList != null && !auditorList.isEmpty())
 	    	{
-	    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+	    		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
 	    	}
 	    	else
 	    	{
@@ -341,42 +346,6 @@ public class AuditService {
 			LOGGER.info(" WorkFlow Transition Completed  ...");
 	}
 	
-	private Assignment getCurrentUserAssignmet(Long userId){
-//    	Long userId = ApplicationThreadLocals.getUserId();
-    	List<EmployeeInfo> emplist = microServiceUtil.getEmployee(userId, null, null, null);
-    	Assignment assignment =new Assignment();
-    	if(null!=emplist && emplist.size()>0 && emplist.get(0).getAssignments().size()>0){
-    		Position position = new Position();
-    		position.setId(emplist.get(0).getAssignments().get(0).getPosition());
-    		assignment.setPosition(position);
-            
-    		org.egov.pims.commons.Designation designation = new org.egov.pims.commons.Designation();
-            Designation _desg = this.getDesignationDetails(emplist.get(0).getAssignments().get(0).getDesignation());
-            designation.setCode(_desg.getCode());
-            designation.setName(_desg.getName());
-            assignment.setDesignation(designation);
-            
-            org.egov.infra.admin.master.entity.Department department = new org.egov.infra.admin.master.entity.Department();
-            Department _dept = this.getDepartmentDetails(emplist.get(0).getAssignments().get(0).getDepartment());
-            department.setCode(_dept.getCode());
-            department.setName(_dept.getName());
-            
-            return assignment;
-    	}
-    	return null;
-    }
-	
-	private Department getDepartmentDetails(String deptCode){
-    	Department dept = microServiceUtil.getDepartmentByCode(deptCode);
-    	return dept;
-    	
-    }
-    
-    private Designation getDesignationDetails(String desgnCode){
-    	List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
-    	return desgnList.get(0);
-    }
-
 	public EgBillregister getBillDetails(long billId) {
 		return expenseBillService.getById(billId);
 	}

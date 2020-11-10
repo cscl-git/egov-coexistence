@@ -9,5 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface AuditRepository extends JpaRepository<AuditDetails, Long>{
 	
 	AuditDetails findByAuditno(final String auditNumber);
+	AuditDetails findById(Long id);
 
 }

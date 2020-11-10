@@ -28,6 +28,7 @@ public class AuditDetail {
     private User approver;
     private Date approvedOn;
     private Long billId;
+    private Long stateId;
     private Long auditId;
     private String auditStatus;
     private String workFlowAction;
@@ -43,6 +44,9 @@ public class AuditDetail {
     private List<Department> departments = new ArrayList<Department>();
     private List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
 	private String notes;
+	private int passUnderobjection=0;
+	
+	
 	public Date getAuditScheduledDate() {
 		return auditScheduledDate;
 	}
@@ -216,6 +220,18 @@ public class AuditDetail {
 	}
 	public void setAuditEmployees(List<AuditEmployee> auditEmployees) {
 		this.auditEmployees = auditEmployees;
+	}
+	public Long getStateId() {
+		return stateId;
+	}
+	public void setStateId(Long stateId) {
+		this.stateId = stateId;
+	}
+	public int getPassUnderobjection() {
+		return passUnderobjection;
+	}
+	public void setPassUnderobjection(int passUnderobjection) {
+		this.passUnderobjection = passUnderobjection;
 	}
 	
 
