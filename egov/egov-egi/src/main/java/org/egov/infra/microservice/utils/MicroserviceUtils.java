@@ -91,6 +91,7 @@ import org.egov.infra.microservice.contract.CreateUserRequest;
 import org.egov.infra.microservice.contract.Position;
 import org.egov.infra.microservice.contract.PositionRequest;
 import org.egov.infra.microservice.contract.PositionResponse;
+import org.egov.infra.microservice.contract.RequestInfoCancelWrapper;
 import org.egov.infra.microservice.contract.RequestInfoSearchWrapper;
 import org.egov.infra.microservice.contract.RequestInfoWrapper;
 import org.egov.infra.microservice.contract.Task;
@@ -1772,6 +1773,18 @@ public class MicroserviceUtils {
             LOGGER.error("ERROR occurred while fetching the Payment list : ",e);
         }
         return null;
+    }
+    
+    public void cancelReceipts(Set<String> receiptNumbers)
+    {
+    	RequestInfoCancelWrapper reqSearchWrapper = new RequestInfoCancelWrapper();
+    	StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentCancel());
+    	PaymentResponse response = null;
+        RequestInfo requestInfo = getRequestInfo();
+        reqSearchWrapper.setIds(receiptNumbers);
+    	reqSearchWrapper.setRequestInfo(requestInfo);
+    	LOGGER.info("ids ; "+url.toString());
+    	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
     }
 
     private void preparePaymentSearchQueryString(PaymentSearchCriteria searchCriteria, StringBuilder url) {

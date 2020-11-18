@@ -550,4 +550,10 @@ public class BillReceiptInfoImpl implements BillReceiptInfo {
 		}
 	}
 
+	@Override
+	public String getSubdivison() {
+		System.out.println("during report :: "+receiptHeader.getSubdivison());
+		return receiptHeader.getSubdivison();
+	}
+
 }

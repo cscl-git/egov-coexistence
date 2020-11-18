@@ -207,6 +207,14 @@
 						</table>
 					</div>
 				</div>
+				
+				<br> <br>
+				<div class="panel-title"> Rough Cost Estimate </div>
+				<div>
+				<jsp:include page="RoughWorkfileupload.jsp" />
+				</div>
+		<br> <br>
+				
 			</div>
 		</div>
 

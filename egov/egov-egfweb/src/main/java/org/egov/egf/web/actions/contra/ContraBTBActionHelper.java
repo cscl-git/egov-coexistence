@@ -518,6 +518,11 @@ public class ContraBTBActionHelper {
 		headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
 		headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
 		headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
+		//modified added by Prasanta
+				if (voucherHeader.getFirstsignatory() != null)
+		            headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+		        if (voucherHeader.getSecondsignatory() != null)
+		            headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
 
 		if (voucherHeader.getVouchermis().getDepartmentcode() != null)
 			headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());

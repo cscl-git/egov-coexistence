@@ -497,8 +497,7 @@ loadBankDetailFailureHandler = function(){
 							<tr id="chequebankrow">
 								<td class="bluebox" width="3%"></td>
 								<td class="bluebox"><s:text
-										name="billreceipt.payment.ifsccode" /><span
-									class="mandatory1">*</span></td>
+										name="billreceipt.payment.ifsccode" /></td>
 								<td class="bluebox"><s:textfield
 										label="instrumentIfscCode" id="instrumentIfscCode"
 										maxlength="50" name="instrumentProxyList[0].ifscCode"
@@ -512,7 +511,7 @@ loadBankDetailFailureHandler = function(){
 										name="billreceipt.payment.bankname" /><span
 									class="mandatory1">*</span></td>
 								<td class="bluebox"><s:textfield id="bankName" type="text"
-										name="instrumentProxyList[0].bankId.name" readonly="true"/> <s:hidden id="bankCode"
+										name="instrumentProxyList[0].bankId.name" /> <s:hidden id="bankCode"
 										name="instrumentProxyList[0].bankId.code" />
 									<div id="bankcodescontainer"></div></td>
 							</tr>
@@ -524,7 +523,7 @@ loadBankDetailFailureHandler = function(){
 								<td class="bluebox"><s:textfield
 										label="instrumentBranchName" id="instrumentBranchName"
 										maxlength="50" name="instrumentProxyList[0].bankBranchName"
-										size="18" readonly="true"/></td>
+										size="18" /></td>
 								<td class="bluebox"><s:text
 										name="billreceipt.payment.instrumentAmount" /><span
 									class="mandatory1">*</span></td>

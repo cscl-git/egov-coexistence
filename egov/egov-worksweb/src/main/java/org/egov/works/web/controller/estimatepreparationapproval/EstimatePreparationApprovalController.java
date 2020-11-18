@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,10 +17,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -123,7 +126,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "Forward", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile[] files, final HttpServletRequest request)
+			final Model model, @RequestParam("file1") MultipartFile[] files,@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost, final HttpServletRequest request)
 			throws Exception {
 
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
@@ -140,6 +143,20 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
 			}
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(estimatePreparationApproval.getObjectType());
+				list.add(upload2);
+			}
+		
 		estimatePreparationApproval.setDocumentDetail(list);
 		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
 			estimatePreparationApproval
@@ -295,8 +312,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			final Model model, @RequestParam("file") MultipartFile file, final HttpServletRequest request)
 			throws Exception {
 
-		List boQDetailsList = new ArrayList();
-		Long count = 0L;
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		HashSet<String> milesstoneList=new HashSet<>();
+		int count = 0;
 		String fileName = null;
 		String extension = null;
 		String filePath = null;
@@ -334,10 +353,12 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			Workbook workbook = getWorkbook(inputStream, filePath);
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> iterator = firstSheet.iterator();
+			
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
+
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
@@ -345,18 +366,23 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+							
+						}
+						
+						else if (cell.getColumnIndex() == 1) {
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-						} else if (cell.getColumnIndex() == 1) {
+						} else if (cell.getColumnIndex() == 2) {
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-						}else if (cell.getColumnIndex() == 2) {
+						}else if (cell.getColumnIndex() == 3) {
 							aBoQDetails.setUnit(cell.getStringCellValue());
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
-						 if (cell.getColumnIndex() == 3) {
+						 if (cell.getColumnIndex() == 4) {
 							aBoQDetails.setRate(cell.getNumericCellValue());
-						} else if (cell.getColumnIndex() == 4) {
+						} else if (cell.getColumnIndex() == 5) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
@@ -368,12 +394,15 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
 							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
 							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
-						count++;
-						aBoQDetails.setSlNo(count);
+						count=boQDetailsList.size();
+						aBoQDetails.setSlNo(Long.valueOf(count));
 						boQDetailsList.add(aBoQDetails);
+
+					
 
 					}
 				}
+				
 			}
 
 			// workbook.close();
@@ -382,6 +411,12 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		} else {
 			// response = "Please choose a file.";
 		}
+		
+		  Map<String, List<BoQDetails>> groupByPriceMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		  System.out.println("groupByPriceMap---------"+groupByPriceMap);
+		
+		  
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
@@ -391,6 +426,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
 		model.addAttribute("fileuploadAllowed","Y");
+		model.addAttribute("milestoneList",groupByPriceMap);
 
 		return "estimatepreparationapproval-form";
 
@@ -512,9 +548,16 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable("id") final Long id, Model model) {
 
+		List<DocumentUpload> documentsall=new ArrayList<>();
+		
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
-		estimateDetails.setDocumentDetail(documents);
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+
+		
+		documentsall.addAll(documents);
+		documentsall.addAll(roughCostEstmatedocuments);
+		estimateDetails.setDocumentDetail(documentsall);
 
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
@@ -540,9 +583,16 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	public String edit(@PathVariable("id") final Long id, Model model) {
 
 
+		List<DocumentUpload> documentsall=new ArrayList<>();
+		
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
-		estimateDetails.setDocumentDetail(documents);
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+
+		
+		documentsall.addAll(documents);
+		documentsall.addAll(roughCostEstmatedocuments);
+		estimateDetails.setDocumentDetail(documentsall);
 
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();

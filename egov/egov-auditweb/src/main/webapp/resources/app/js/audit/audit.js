@@ -1,8 +1,16 @@
 
 $(document).ready(function(){
-	
 	$('input[type=checkbox]').removeAttr('checked');
 	
+	var passUnderObjection=$('#passUnderobjection').val();
+	if(passUnderObjection==1){$('input[type=checkbox]').attr( 'checked', true );}
+
+	
+	
+	
+});
+$('body').on('focus',".datepicker", function(){
+    $(this).datepicker();
 });
 
 function getLocale(paramName){

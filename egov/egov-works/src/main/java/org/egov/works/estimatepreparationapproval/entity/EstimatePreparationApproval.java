@@ -182,6 +182,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String workFlowAction;
 	
 	@Transient
+	private String objectType;
+	
+	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
 	
 	@Transient
@@ -596,6 +599,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setStatusDescription(String statusDescription) {
 		this.statusDescription = statusDescription;
+	}
+
+	public String getObjectType() {
+		return objectType;
+	}
+
+	public void setObjectType(String objectType) {
+		this.objectType = objectType;
 	}
 	
 	

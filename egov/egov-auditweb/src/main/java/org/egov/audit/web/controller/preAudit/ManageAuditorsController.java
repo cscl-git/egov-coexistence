@@ -151,7 +151,8 @@ public class ManageAuditorsController{
 	        exists=  manageAuditorService. findByEmployeeidExists(manageAuditors);
 	        
 	        if(exists) {
-	        	redirectAttrs.addFlashAttribute("message", "msg.ManageAuditorAlreadyExist.success");
+	        	//redirectAttrs.addFlashAttribute("message", "msg.ManageAuditorAlreadyExist.success");
+	        	 model.addAttribute("message", "Relation Already Exists");
 	        }
 	        else {
 	        ManageAuditor manageAuditorsSave=manageAuditorService.saveAuditors(manageAuditors);
@@ -160,10 +161,13 @@ public class ManageAuditorsController{
 		        model.addAttribute("manageAuditors", manageAuditors);
 	        
 		        if(manageAuditorsSave!=null) {
-		        	redirectAttrs.addFlashAttribute("message", "msg.ManageAuditorAlreadyupdate.success");
+		        	//redirectAttrs.addFlashAttribute("message", "msg.ManageAuditorAlreadyupdate.success");
+		        	 model.addAttribute("message", "Updated Successfully");
 		        }
 	        }    
-	         return "redirect:/manageAuditor/manageAudform";
+	       
+
+			 return "audit-success"; 
 	    }
 	 
 	  private void prepareNewFormDropDown(final Model model) {

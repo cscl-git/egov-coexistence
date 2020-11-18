@@ -233,7 +233,7 @@ public class AuditUtils {
 				misQuery.append(" and ad.lead_auditor=")
 				.append(auditDetail.getLeadAuditorEmpNo());
 			}
-			if(auditDetail.getPassUnderobjection() != 0)
+			if(auditDetail.getPassUnderobjection() != null && auditDetail.getPassUnderobjection() != 0)
 			{
 				misQuery.append(" and ad.passUnderobjection=")
 				.append(auditDetail.getPassUnderobjection());

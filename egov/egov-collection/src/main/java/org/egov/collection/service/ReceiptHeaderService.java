@@ -1689,6 +1689,8 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .totalDue(receiptHeader.getTotalAmount())
                 .totalAmountPaid(receiptHeader.getTotalAmount())
                 .paidBy(receiptHeader.getPaidBy() +" & "+receiptHeader.getPayeeAddress())
+                .gstno(receiptHeader.getGstno())
+                .subdivison(receiptHeader.getSubdivison())
                 .narration(receiptHeader.getReferenceDesc())
                 .payerAddress(receiptHeader.getPayeeAddress())
                 .paymentStatus(PaymentStatusEnum.NEW)
@@ -1707,12 +1709,18 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             Long transactionDate = instrumentHeader.getTransactionDate() != null ? instrumentHeader.getTransactionDate().getTime() : instrumentDate;
             String transactionNumber = instrumentHeader.getTransactionNumber() != null ? instrumentHeader.getTransactionNumber() : instrumentHeader.getInstrumentNumber();
             String ifscCode = instrumentHeader.getIfscCode();
+            String bankName=instrumentHeader.getBankId() != null ? instrumentHeader.getBankId().getName() : "";
+            String branchName=instrumentHeader.getBankBranchName() != null ? instrumentHeader.getBankBranchName() : "";
+            LOGGER.info("bankName :::"+bankName);
+            LOGGER.info("branchName :::"+branchName);
             payment.setInstrumentDate(instrumentDate);
             payment.setInstrumentNumber(instrumentNumber);
             payment.setInstrumentStatus(instrumentStatus);
             payment.setTransactionDate(transactionDate);
             payment.setTransactionNumber(transactionNumber);
             payment.setIfscCode(ifscCode);
+            payment.setBankBranch(branchName);
+            payment.setBankName(bankName);
         } catch (Exception e) {
             LOGGER.error("ERROR occurred while setting the instruments details",e);
         }

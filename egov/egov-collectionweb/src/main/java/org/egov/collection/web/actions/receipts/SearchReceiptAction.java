@@ -71,10 +71,13 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.egov.collection.bean.ReceiptReportBean;
+import org.egov.collection.bean.SubDivison;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.ReceiptHeader;
 import org.egov.collection.utils.CollectionsUtil;
 import org.egov.eis.service.AssignmentService;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.BillDetailAdditional;
@@ -146,6 +149,11 @@ public class SearchReceiptAction extends SearchFormAction {
     private MicroserviceUtils microserviceUtils;
     
     private String collectionVersion;
+    
+    private String subdivison;
+    
+    @Autowired
+	private AppConfigValueService appConfigValuesService;
 
     @Override
     public Object getModel() {
@@ -229,6 +237,18 @@ public class SearchReceiptAction extends SearchFormAction {
         addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
         addDropdownData("departmentList", masterDataCache.get("egi-department"));
         // addDropdownData("bankBranchList", collectionsUtil.getBankCollectionBankBranchList());
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivison> subdivisonList=new ArrayList<SubDivison>();
+        SubDivison subdivison=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivison = new SubDivison();
+        	subdivison.setSubdivisonCode(value.getValue());
+        	subdivison.setSubdivisonName(value.getValue());
+        	subdivisonList.add(subdivison);
+        }
+        addDropdownData("subdivisonList", subdivisonList);
     }
     private void getServiceCategoryList() {
         List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
@@ -280,6 +300,10 @@ public class SearchReceiptAction extends SearchFormAction {
         List<ReceiptHeader> receiptList = new ArrayList<>();
         System.out.println("receipt :::"+ getReceiptNumber());
         String type="search";
+        if(getServiceTypeId() != null && getServiceTypeId().equalsIgnoreCase("-1"))
+        {
+        	setServiceTypeId(null);
+        }
         List<Receipt> receipts = microserviceUtils.searchRecieptsFinance("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null,type);
@@ -302,9 +326,12 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy());
                     receiptHeader.setPayeeName(bill.getPayerName());
-                  
+                    System.out.println("subdivison ::: "+receipt.getSubdivison());
+                    System.out.println("gst ::: "+receipt.getGstNo());
+                    receiptHeader.setSubdivison(receipt.getSubdivison());
+                    receiptHeader.setGstno(receipt.getGstNo());
                     //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
-                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     if (null != billDetail.getManualReceiptNumber()) {
                         receiptHeader.setManualreceiptnumber(billDetail.getManualReceiptNumber());
@@ -422,6 +449,14 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setPayeeName(bill.getPayerName());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
+                    if(subdivison != null && !subdivison.isEmpty() && !subdivison.equalsIgnoreCase("-1") && !subdivison.equalsIgnoreCase(receipt.getSubdivison()))
+                    {
+                    	continue;
+                    }
+                    System.out.println("subdivison ::: "+receipt.getSubdivison());
+                    System.out.println("gst ::: "+receipt.getGstNo());
+                    receiptHeader.setSubdivison(receipt.getSubdivison());
+                    receiptHeader.setGstno(receipt.getGstNo());
                     //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
                    // totalReciptAmount2= totalReciptAmount2.add(billDetail.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
                     
@@ -774,6 +809,14 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
+                    if(subdivison != null && !subdivison.isEmpty() && !subdivison.equalsIgnoreCase("-1") && !subdivison.equalsIgnoreCase(receipt.getSubdivison()))
+                    {
+                    	continue;
+                    }
+                    System.out.println("subdivison ::: "+receipt.getSubdivison());
+                    System.out.println("gst ::: "+receipt.getGstNo());
+                    receiptHeader.setSubdivison(receipt.getSubdivison());
+                    receiptHeader.setGstno(receipt.getGstNo());
                     //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
                    // totalReciptAmount.add(billDetail.getTotalAmount());
                     receiptHeader.setTotalreciptAmount(totalReciptAmount);
@@ -1361,5 +1404,13 @@ public class SearchReceiptAction extends SearchFormAction {
 
 	public void setModeOfPayment(String modeOfPayment) {
 		this.modeOfPayment = modeOfPayment;
+	}
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
 	}
 }

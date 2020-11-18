@@ -90,6 +90,8 @@ public class InstrumentHeader extends BaseModel {
     private ECSType ECSType;
     private String ifscCode;
     private String voucherNumber;
+    private String bankName;
+    private String branchName;
 
     private Set<InstrumentVoucher> instrumentVouchers = new HashSet<InstrumentVoucher>(0);
 
@@ -462,6 +464,22 @@ public class InstrumentHeader extends BaseModel {
 
 	public void setVoucherNumber(String voucherNumber) {
 		this.voucherNumber = voucherNumber;
+	}
+
+	public String getBankName() {
+		return bankName;
+	}
+
+	public void setBankName(String bankName) {
+		this.bankName = bankName;
+	}
+
+	public String getBranchName() {
+		return branchName;
+	}
+
+	public void setBranchName(String branchName) {
+		this.branchName = branchName;
 	}
 
 }

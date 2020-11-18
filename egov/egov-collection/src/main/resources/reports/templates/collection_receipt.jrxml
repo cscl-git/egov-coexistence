@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.6.0.final using JasperReports Library version 4.7.0  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="collection_receipt_challan" language="groovy" pageWidth="595" pageHeight="842" columnWidth="595" leftMargin="0" rightMargin="0" topMargin="10" bottomMargin="10" resourceBundle="custom" uuid="1fd0c026-6f9d-417e-b936-3ab1dd76cfd4">
 	<property name="ireport.zoom" value="1.0"/>
 	<property name="ireport.x" value="0"/>
@@ -18,6 +19,7 @@
 	<parameter name="CORNER_LOGO_PATH" class="java.lang.String"/>
 	<parameter name="BACKGROUND" class="java.lang.String"/>
 	<parameter name="RECEIPT_HEADER" class="java.lang.String"/>
+	<parameter name="SUBDIVISION" class="java.lang.String"/>
 	<field name="instrumentDetails" class="java.util.Collection"/>
 	<field name="accountDetails" class="java.util.Collection"/>
 	<field name="totalAmount" class="java.math.BigDecimal"/>
@@ -30,9 +32,9 @@
 	</variable>
 	<group name="Receipt" isStartNewPage="true"/>
 	<background>
-		<band height="424" splitType="Stretch">
+		<band height="500" splitType="Stretch">
 			<image scaleImage="FillFrame" hAlign="Center">
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="424" uuid="c37357aa-13aa-4f7e-b514-92b4d9d713d0"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="595" height="500" uuid="c37357aa-13aa-4f7e-b514-92b4d9d713d0"/>
 				<imageExpression><![CDATA[$P{BACKGROUND}]]></imageExpression>
 			</image>
 		</band>
@@ -84,9 +86,7 @@
 				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("collection_receipt_single.jasper")]]></subreportExpression>
 			</subreport>
 			<frame>
-				<reportElement x="0" y="0" width="595" height="2" uuid="e90d9345-c385-4d59-9dd7-0811cfb4d6d0">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-				</reportElement>
+				<reportElement x="0" y="0" width="595" height="2" uuid="e90d9345-c385-4d59-9dd7-0811cfb4d6d0"/>
 				<box>
 					<bottomPen lineWidth="2.0" lineStyle="Dashed"/>
 				</box>
@@ -94,9 +94,7 @@
 		</band>
 		<band height="130">
 			<frame>
-				<reportElement x="0" y="0" width="595" height="2" uuid="8bb2d230-271e-4dcf-aa9c-71d9d4185a93">
-					<property name="com.jaspersoft.studio.unit.y" value="pixel"/>
-				</reportElement>
+				<reportElement x="0" y="0" width="595" height="2" uuid="8bb2d230-271e-4dcf-aa9c-71d9d4185a93"/>
 				<box>
 					<bottomPen lineWidth="2.0" lineStyle="Dashed"/>
 				</box>

@@ -55,6 +55,8 @@ import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,6 +76,7 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.egov.collection.bean.SubDivison;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.AccountPayeeDetail;
 import org.egov.collection.entity.ReceiptDetail;
@@ -102,6 +105,7 @@ import org.egov.commons.CFunction;
 import org.egov.commons.Fund;
 import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
+import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.BankBranchHibernateDAO;
 import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.commons.dao.BankaccountHibernateDAO;
@@ -113,14 +117,18 @@ import org.egov.commons.dao.FundHibernateDAO;
 import org.egov.commons.dao.FundSourceHibernateDAO;
 import org.egov.commons.dao.SchemeHibernateDAO;
 import org.egov.commons.dao.SubSchemeHibernateDAO;
+import org.egov.commons.dao.VoucherHeaderDAO;
+import org.egov.commons.dao.VoucherHeaderHibernateDAO;
 import org.egov.commons.dao.VouchermisHibernateDAO;
 import org.egov.commons.entity.Source;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.entity.Role;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.Assignment;
 import org.egov.infra.microservice.models.BillDetailAdditional;
 import org.egov.infra.microservice.models.BusinessDetails;
 import org.egov.infra.microservice.models.BusinessService;
@@ -130,6 +138,7 @@ import org.egov.infra.microservice.models.Instrument;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.models.ReceiptResponse;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.NumberUtil;
 import org.egov.infra.utils.StringUtils;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -195,6 +204,8 @@ public class ReceiptAction extends BaseFormAction {
     private String reasonForCancellation;
     private String target = "view";
     private String paidBy;
+    private String gstno;
+    private String subdivison;
     private String referenceDesc;
     private String paymentId="";
     private ReceiptHeader receiptHeader = new ReceiptHeader();
@@ -219,8 +230,11 @@ public class ReceiptAction extends BaseFormAction {
     private Boolean onlineAllowed = Boolean.FALSE;
     private Boolean isReceiptCancelEnable = Boolean.TRUE;
     
+    @Autowired
     private VoucherService voucherService;
     private String vouchermissourcepath;
+    @Autowired
+    private VoucherHeaderDAO voucherHeaderDao;
     /**
      * An instance of <code>InstrumentHeader</code> representing the cash instrument details entered by the user during receipt
      * creation
@@ -260,6 +274,9 @@ public class ReceiptAction extends BaseFormAction {
      * payment that are not allowed during receipt creation
      */
     private List<String> collectionModesNotAllowed = new ArrayList<>(0);
+    
+    @Autowired
+    private SecurityUtils securityUtils;
 
     /**
      * The <code>User</code> representing the counter operator who has created the receipt
@@ -355,6 +372,9 @@ public class ReceiptAction extends BaseFormAction {
     @Autowired
     protected EgovMasterDataCaching masterDataCache;
     
+    @Autowired
+	private AppConfigValueService appConfigValuesService;
+    
     Map<String,String> serviceCategoryNames = new HashMap<String,String>();
     Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
     private String[] selectedPayments;
@@ -366,6 +386,7 @@ public class ReceiptAction extends BaseFormAction {
         BillInfoImpl collDetails;
         // setReceiptCreatedByCounterOperator(collectionsUtil.getLoggedInUser());
         // populates model when request is from the billing system
+        
         this.getServiceCategoryList();
         if (getCollectXML() != null && !getCollectXML().isEmpty()) {
             final String decodedCollectXML = decodeBillXML();
@@ -414,6 +435,20 @@ public class ReceiptAction extends BaseFormAction {
         }
 //        addDropdownData("serviceCategoryList", this.getServiceCategory());
         addDropdownData("serviceList", Collections.emptyList());
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivison> subdivisonList=new ArrayList<SubDivison>();
+        SubDivison subdivison=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivison = new SubDivison();
+        	subdivison.setSubdivisonCode(value.getValue());
+        	subdivison.setSubdivisonName(value.getValue());
+        	subdivisonList.add(subdivison);
+        }
+        addDropdownData("subdivisonList", subdivisonList);
+        
         if (instrumentProxyList == null)
             instrumentCount = 0;
         else
@@ -796,7 +831,10 @@ public class ReceiptAction extends BaseFormAction {
             receiptHeader.setSource(Source.SYSTEM.toString());
             LOGGER.info("instrumentType ::"+instrumentType);
             receiptHeader.setModOfPayment(instrumentType);
-
+            LOGGER.info("subdivison ::"+subdivison);
+            receiptHeader.setSubdivison(subdivison);
+            LOGGER.info("gstno ::"+gstno);
+            receiptHeader.setGstno(gstno);
 
             // If this is a new receipt in lieu of cancelling old
             // receipt, update
@@ -1114,6 +1152,7 @@ public class ReceiptAction extends BaseFormAction {
                 instrumentType.setType(CollectionConstants.INSTRUMENTTYPE_DD);
                 instrumentHeader.setInstrumentType(instrumentType);
             }
+            
             if (instrumentHeader.getBankId() != null && instrumentHeader.getBankId().getCode() == null) {
                 addActionError("Bank is not exist");
                 throw new ApplicationRuntimeException("Bank is not exist");
@@ -1205,6 +1244,245 @@ public class ReceiptAction extends BaseFormAction {
         setSubLedgerlist(collectionCommon.setAccountPayeeList(receiptHeader));
     }
 
+    private String changeStatus() {
+    	if (selectedReceipts == null || selectedReceipts.length == 0)
+            throw new ApplicationRuntimeException("No receipts selected to view!");
+
+        receipts = new ReceiptHeader[selectedReceipts.length];
+        List<Receipt> receiptlist=null;
+        
+        if(selectedReceipts.length == 1) {
+        	 receiptlist = this.microserviceUtils.searchReciepts(null, null, null, null,
+                     Arrays.asList(selectedReceipts));
+        }else {
+        	throw new ApplicationRuntimeException("Please Select Only One Receipt!");
+        }
+        receiptlist.stream().forEach(receipt -> {
+        	receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+            receipt.getBill().forEach(bill -> {
+                bill.getBillDetails().forEach(billDetail -> {
+                    ReceiptHeader header = new ReceiptHeader();
+                    receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
+                    receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
+                    String businessServiceCode = billDetail.getBusinessService();
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(businessServiceCode));
+                    receiptHeader.setReferencenumber(billDetail.getBillNumber());
+                    receiptHeader.setReferenceDesc(bill.getNarration());
+                    receiptHeader.setPaidBy(bill.getPaidBy());
+                    receiptHeader.setPayeeName(bill.getPayerName());
+                    receiptHeader.setPayeeAddress(bill.getPayerAddress());
+                    receiptHeader.setTotalAmount(billDetail.getTotalAmount());
+                    receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+                    receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
+                    receiptHeader.setManualreceiptnumber(billDetail.getManualReceiptNumber());
+                    receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
+                    receiptHeader.setConsumerCode(billDetail.getConsumerCode());
+                    receiptHeader.setManualreceiptnumber(billDetail.getManualReceiptNumber());
+                    if (billDetail.getManualReceiptDate() != 0)
+                        receiptHeader.setManualreceiptdate(new Date(billDetail.getManualReceiptDate()));
+                    JsonNode jsonNode = billDetail.getAdditionalDetails();
+                    BillDetailAdditional additional = null;
+                    try {
+                        if (null != jsonNode)
+                            additional = (BillDetailAdditional) new ObjectMapper().readValue(jsonNode.toString(),
+                                    BillDetailAdditional.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+                    if (null != additional) {
+                        ReceiptMisc receiptMisc = new ReceiptMisc();
+                        if (null != additional.getScheme()) {
+                            Scheme scheme = this.schemeDAO.getSchemeByCode(additional.getScheme());
+                            receiptMisc.setScheme(scheme);
+                        }
+
+                        if (null != additional.getSubScheme()) {
+                            SubScheme subScheme = this.subSchemeDAO.getSubSchemeByCode(additional.getSubScheme());
+                            receiptMisc.setSubscheme(subScheme);
+                        }
+
+
+                        receiptHeader.setReceiptMisc(receiptMisc);
+                        if (null != additional.getNarration())
+                            receiptHeader.setReferenceDesc(additional.getNarration());
+                        if (null != additional.getPayeeaddress())
+                            receiptHeader.setPayeeAddress(additional.getPayeeaddress());
+                    }
+
+                    if(ApplicationThreadLocals.getCollectionVersion().toUpperCase().equalsIgnoreCase("V1")){
+                        if (billDetail.getCollectionType().equals(CollectionType.COUNTER))
+                            receiptHeader.setCollectiontype(CollectionConstants.COLLECTION_TYPE_COUNTER);
+                        else if (billDetail.getCollectionType().equals(CollectionType.FIELD))
+                            receiptHeader.setCollectiontype(CollectionConstants.COLLECTION_TYPE_FIELDCOLLECTION);
+                        else if (billDetail.getCollectionType().equals(CollectionType.ONLINE))
+                            receiptHeader.setCollectiontype(CollectionConstants.COLLECTION_TYPE_ONLINECOLLECTION);
+                    }
+                    
+                    if (billDetail.getReceiptType().equalsIgnoreCase(CollectionConstants.RECEIPT_M_TYPE_MISCELLANEOUS) ||
+                            billDetail.getReceiptType().equalsIgnoreCase(CollectionConstants.RECEIPT_M_TYPE_ADHOC))
+                        receiptHeader.setReceipttype(CollectionConstants.RECEIPT_TYPE_ADHOC);
+                    else if (billDetail.getReceiptType().equalsIgnoreCase(CollectionConstants.RECEIPT_M_TYPE_BILLBASED))
+                        receiptHeader.setReceipttype(CollectionConstants.RECEIPT_TYPE_BILL);
+
+                    Set<ReceiptDetail> receiptdetailslist = new HashSet<>();
+                    billDetail.getBillAccountDetails().forEach(billAccountDetail -> {
+                        ReceiptDetail receiptDetail = new ReceiptDetail();
+                        receiptDetail.setAccounthead(new CChartOfAccounts());
+
+                        switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
+                        case "V2":
+                        case "VERSION2":
+                            receiptDetail.setDramount(billAccountDetail.getAmount().compareTo(BigDecimal.ZERO) > 0 ? BigDecimal.ZERO : billAccountDetail.getAmount());
+                            receiptDetail.setCramount(billAccountDetail.getAmount().compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : billAccountDetail.getAmount());
+                            break;
+
+                        default:
+                            receiptDetail.setDramount(billAccountDetail.getDebitAmount());
+                            receiptDetail.setCramount(billAccountDetail.getCreditAmount());
+                            break;
+                        }
+                        receiptDetail.setOrdernumber(billAccountDetail.getOrder().longValue());
+                        receiptDetail.setPurpose(billAccountDetail.getPurpose()!=null?billAccountDetail.getPurpose().toString():"");
+                        receiptdetailslist.add(receiptDetail);
+                    });
+                    receiptHeader.setReceiptDetails(receiptdetailslist);
+                    receiptHeader.setReceiptHeader(header);
+                    InstrumentHeader instrumentHeader = new InstrumentHeader();
+
+                    Instrument _instrument = receipt.getInstrument();
+                    instrumentHeader.setInstrumentNumber(_instrument.getInstrumentNumber() != null ? _instrument.getInstrumentNumber() : _instrument.getTransactionNumber());
+                    instrumentHeader.setInstrumentDate(new Date(_instrument.getTransactionDateInput() != null ? _instrument.getTransactionDateInput() : _instrument.getInstrumentDate()));
+
+                    InstrumentType instrumentType = new InstrumentType();
+                    instrumentType.setType(_instrument.getInstrumentType().getName().toLowerCase());
+                    instrumentHeader.setInstrumentType(instrumentType);
+
+                    instrumentHeader.setInstrumentAmount(_instrument.getAmount());
+                    // instrumentHe instrument.getFinancialStatus();
+
+                    if (instrumentType.getType().equalsIgnoreCase(CollectionConstants.INSTRUMENTTYPE_CHEQUE) ||
+                            instrumentType.getType().equalsIgnoreCase(CollectionConstants.INSTRUMENTTYPE_DD)) {
+                        Bankaccount account = new Bankaccount();
+                        if (null != _instrument.getBankAccount())
+                            account.setAccountnumber(_instrument.getBankAccount().getAccountNumber());
+                        // account.setAccountt
+                        instrumentHeader.setBankAccountId(account);
+
+                        if(_instrument.getBank() != null){
+//                            Bank bank = this.bankDAO.findById(_instrument.getBank().getId().intValue(), false);
+                           // Todo : Have to handle the Bank Details 
+                            Bank bank = new Bank();
+                            bank.setName(_instrument.getBank().getName());
+                            instrumentHeader.setBankId(bank);                            
+                        }
+                        instrumentHeader.setIfscCode(_instrument.getIfscCode());
+                        instrumentHeader.setBankBranchName(_instrument.getBranchName());
+                        instrumentHeader.setIfscCode(_instrument.getIfscCode());
+                        if(instrumentHeader != null && instrumentHeader.getIfscCode() != null && !instrumentHeader.getIfscCode().isEmpty())
+                        {
+                        	instrumentHeader.setBankBranchName(getBankdetails(instrumentHeader.getIfscCode()));
+                        }
+                        
+                        //String bank=getBankDetails();
+                    }
+
+                    receiptHeader.addInstrument(instrumentHeader);
+                    //EmployeeInfo empInfo = this.microserviceUtils.getEmployeeById(Long.parseLong(receipt.getAuditDetails().getCreatedBy()));
+                    EmployeeInfo empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    if (null != empInfo && empInfo.getUser().getUserName() != null)
+                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    // receiptHeaderList.add(receiptHeader);
+                    receipts[0] = receiptHeader;
+
+                });
+            });
+
+        });
+//        for(ReceiptHeader rh : receipts) {
+//        	System.out.println("Receipt Data::.."+rh.getCurretnStatus() +"....."+rh.getReceiptnumber());
+//        }
+        System.out.println("Receipt Number....."+receipts[0].getReceiptnumber());
+        Set<String> receiptNumbers=new HashSet<String>();
+        receiptNumbers.add(receipts[0].getReceiptnumber());
+        Vouchermis voucherMis = new Vouchermis();
+        try {
+        voucherMis= voucherService.getVouchermisByReceiptNumber(receipts[0].getReceiptnumber());
+        }catch(Exception e) {
+        	e.printStackTrace();
+        }
+        // voucherId from Vouchermis Table
+        Long voucherHeaderId = voucherMis.getVoucherheaderid().getId();
+        String status = receipts[0].getCurretnStatus();
+        System.out.println("Voucher MIS:>>>"+voucherHeaderId );
+        System.out.println("Voucher MIS:>>>"+ voucherMis.getServiceName());
+        System.out.println("Voucher Status>>"+status);
+        
+       final int statusActiveValue = 0;
+       final int statusInActiveValue = 4;
+       int returnValue = 0;
+       System.out.println("current date:::"+new Date());
+       Date currDate= new Date();
+       LocalDate today = convertToLocalDateViaInstant(currDate);
+       System.out.println("today  ::::"+today);
+       System.out.println("receipt date :::"+receipts[0].getReceiptdate());
+       LocalDate compDate = convertToLocalDateViaInstant(receipts[0].getReceiptdate());
+       System.out.println("compDate  ::::"+compDate);
+       int dateDiff=today.compareTo(compDate);
+       System.out.println("date diff :: "+dateDiff);
+       User user = securityUtils.getCurrentUser();
+       EmployeeInfo empInfo =microserviceUtils.getEmployee(user.getId(), null, null, null).get(0);
+       String dept="";
+       String desig="";
+       for(Assignment row :empInfo.getAssignments())
+       {
+    	   dept=row.getDepartment();
+    	   desig=row.getDesignation();
+       }
+       System.out.println("dept :::"+dept);
+       System.out.println("desig :::"+desig);
+       try {
+    	   if(!status.equalsIgnoreCase("CANCELLED")) {
+    		   if(dateDiff == 0)
+    		   {
+    			   returnValue= voucherHeaderDao.updateStatusInVoucherHeader (statusInActiveValue,voucherHeaderId);
+        		   microserviceUtils.cancelReceipts(receiptNumbers);
+    		   }
+    		   else
+    		   {
+    			   if(dept.equalsIgnoreCase("390"))
+    			   {
+    				   if(desig.equalsIgnoreCase("14") || desig.equalsIgnoreCase("225") || desig.equalsIgnoreCase("226"))
+    				   {
+    					   returnValue= voucherHeaderDao.updateStatusInVoucherHeader (statusInActiveValue,voucherHeaderId);
+    	        		   microserviceUtils.cancelReceipts(receiptNumbers);
+    				   }
+    				   else
+    				   {
+    					   target="noAccess";
+    				   }
+    			   }
+    			   else
+    			   {
+    				   target="noAccess";
+    			   }
+    		   }
+    		   
+    	   }else {
+    		   target="alreadyCancelled";
+    		   returnValue=voucherHeaderDao.updateStatusInVoucherHeader (statusActiveValue,voucherHeaderId);
+    	   }
+       }catch(Exception e) {
+    	   e.printStackTrace();
+       }
+        System.out.println("Return Value: >>"+ returnValue);
+         //voucherHeaderDao  = new VoucherHeaderHibernateDAO();
+        
+        
+        
+    	return INDEX;
+    }
+
     /**
      * Same method handles both view and print modes. If print receipts flag is passed as true, the PDF receipt will be generated
      * in such a way that it will show the print dialog box whenever it is opened.
@@ -1228,18 +1506,24 @@ public class ReceiptAction extends BaseFormAction {
         List<Receipt> receiptlist=null;
         
         if(currentState.equals("created")) {
+        	System.out.println("created");
         	 receiptlist = this.microserviceUtils.searchReciepts(null, null, null, null,
                      Arrays.asList(selectedReceipts));
         }
         else {
         String type="view";
+        System.out.println("view");
          receiptlist = this.microserviceUtils.searchRecieptsFin(null, null, null, null,
                 Arrays.asList(selectedReceipts),type);
         } 
        
-
+        System.out.println("asdsadsadsa");
         receiptlist.stream().forEach(receipt -> {
-
+        	System.out.println("1");
+        	System.out.println("subdivison ::: "+receipt.getSubdivison());
+            System.out.println("gst ::: "+receipt.getGstNo());
+            receiptHeader.setSubdivison(receipt.getSubdivison());
+            receiptHeader.setGstno(receipt.getGstNo());
             receipt.getBill().forEach(bill -> {
                 bill.getBillDetails().forEach(billDetail -> {
                     ReceiptHeader header = new ReceiptHeader();
@@ -1371,6 +1655,11 @@ public class ReceiptAction extends BaseFormAction {
                         {
                         	instrumentHeader.setBankBranchName(getBankdetails(instrumentHeader.getIfscCode()));
                         }
+                        else
+                        {
+                        	LOGGER.info("bank branch :: "+_instrument.getBank().getName() +" - "+_instrument.getBranchName());
+                        	instrumentHeader.setBankBranchName(_instrument.getBank().getName() +" - "+_instrument.getBranchName());
+                        }
                         
                         //String bank=getBankDetails();
                     }
@@ -1397,6 +1686,12 @@ public class ReceiptAction extends BaseFormAction {
         }
 
         return CollectionConstants.REPORT;
+    }
+
+    @Action(value = "/receipts/receipt-viewReceiptsChangeStatus")
+    public String viewReceiptsChangeStatus() {
+    	System.out.println("In side viewReceiptsChangeStatus function");
+    	return changeStatus();
     }
 
     @Action(value = "/receipts/receipt-viewReceipts")
@@ -2437,5 +2732,35 @@ public class ReceiptAction extends BaseFormAction {
 
 	public void setPosmohslhAllowed(Boolean posmohslhAllowed) {
 		this.posmohslhAllowed = posmohslhAllowed;
+	}
+
+
+
+	public String getGstno() {
+		return gstno;
+	}
+
+
+
+	public void setGstno(String gstno) {
+		this.gstno = gstno;
+	}
+
+
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
+	
+	public LocalDate convertToLocalDateViaInstant(Date dateToConvert) {
+	    return dateToConvert.toInstant()
+	      .atZone(ZoneId.systemDefault())
+	      .toLocalDate();
 	}
 }

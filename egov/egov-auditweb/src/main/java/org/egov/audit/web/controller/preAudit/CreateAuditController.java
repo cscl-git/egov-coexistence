@@ -84,6 +84,7 @@ import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.FundService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
+import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.User;
@@ -128,6 +129,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 	private static final Logger LOGGER = Logger.getLogger(CreateAuditController.class);
 	private static final int BUFFER_SIZE = 4096;
 	private static final String STATE_TYPE = "stateType";
+	private static final String APPROVAL_POSITION = "approvalPosition";
+	private static final String APPROVAL_DESIGNATION = "approvalDesignation";
 
 	@Autowired
 	@Qualifier("messageSource")
@@ -212,6 +215,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetail.setAuditNumber(auditDetails.getAuditno());
 		auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
 		auditDetail.setAuditType(auditDetails.getType());
+		auditDetail.setPassUnderobjection(auditDetails.getPassUnderobjection());
 		EgBillregister bill = null;
 		auditDetail.setAuditId(Long.parseLong(auditId));
 		auditDetail.setAuditStatus(auditDetails.getStatus().getCode());
@@ -310,8 +314,16 @@ public class CreateAuditController extends GenericWorkFlowController {
 		}
 		model.addAttribute("workflowHistory",
 				auditUtils.getHistory(auditDetails.getState(), auditDetails.getStateHistory()));
-		model.addAttribute("auditDetail", auditDetail);
+		
 		model.addAttribute(STATE_TYPE, auditDetails.getClass().getSimpleName());
+		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Department"))
+		{
+			if (auditDetails.getState() != null)
+	            model.addAttribute("currentState", auditDetails.getState().getValue());
+	        prepareWorkflow(model, auditDetails, new WorkflowContainer());
+		}
+		model.addAttribute("auditDetail", auditDetail);
+		
 		return "create";
 	}
 
@@ -362,6 +374,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		LOGGER.info("Save");
 		AuditDetails auditDetails = null;
 		String workFlowAction=auditDetail.getWorkFlowAction();
+		System.out.println("workFlowAction :::"+workFlowAction);
 		if(auditDetail.getAuditStatus().equalsIgnoreCase("Created") && !workFlowAction.equalsIgnoreCase("reject"))
 		{
 			auditDetails = populateDetails(auditDetail);
@@ -402,9 +415,39 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 			AuditDetails savedAuditDetails=null;
 			auditDetails.setDocumentDetail(list);
+			if(auditDetail.getPassUnderobjection() !=null) {
 			auditDetails.setPassUnderobjection(auditDetail.getPassUnderobjection());
+			}
+			else {
+				auditDetails.setPassUnderobjection(0);
+			}
+			Long approvalPosition = 0l;
+	        String approvalComment = "";
+	        String apporverDesignation = "";
+	        if(auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Department") )
+	        {
+	        	if (request.getParameter("approvalComent") != null)
+		            approvalComment = request.getParameter("approvalComent");
+		        System.out.println("approval comment : "+approvalComment);
+		        System.out.println("auditDetail.getApprovalComent() ::"+auditDetail.getApprovalComent());
+		        if(approvalComment != null &&  !approvalComment.isEmpty())
+		        {
+		        	auditDetail.setApprovalComent(approvalComment);
+		        }
+		        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+		            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+
+		        if ((approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
+		                && request.getParameter(APPROVAL_POSITION) != null
+		                && !request.getParameter(APPROVAL_POSITION).isEmpty())
+		            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+		        System.out.println("approval position :::"+approvalPosition);
+		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+		            apporverDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+		        System.out.println("Approval designation :: "+apporverDesignation);
+	        }
 			try {
-				savedAuditDetails = auditService.create(auditDetails,workFlowAction,auditDetail.getApprovalComent(),auditDetail.getLeadAuditorEmpNo());
+				savedAuditDetails = auditService.create(auditDetails,workFlowAction,auditDetail.getApprovalComent(),auditDetail.getLeadAuditorEmpNo(),approvalPosition,apporverDesignation);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -496,6 +539,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 	private AuditDetails populateDetailsDept(AuditDetail auditDetail) {
 		AuditDetails auditDetails = auditService.getById(auditDetail.getAuditId());
+		AuditChecklistHistory checkListHistory=null;
+		List<AuditChecklistHistory> checkListHistoryList=new ArrayList<AuditChecklistHistory>();
 		for(AuditCheckList checkListDb:auditDetails.getCheckList())
 		{
 			for(AuditCheckList checkListUI : auditDetail.getCheckList())
@@ -508,14 +553,17 @@ public class CreateAuditController extends GenericWorkFlowController {
 					}
 					checkListDb.setUser_comments(checkListUI.getUser_comments());
 					applyAuditing(checkListDb);
-					for(AuditChecklistHistory history : checkListDb.getCheckList_history())
-					{
-						if(history.getUser_comments() == null || history.getUser_comments().isEmpty())
-						{
-							history.setUser_comments(checkListUI.getUser_comments());
-							applyAuditing(history);
-						}
-					}
+					/*
+					 * for(AuditChecklistHistory history : checkListDb.getCheckList_history()) {
+					 * if(history.getUser_comments() == null ||
+					 * history.getUser_comments().isEmpty()) {
+					 * history.setUser_comments(checkListUI.getUser_comments());
+					 * applyAuditing(history); } }
+					 */
+					checkListHistory=new AuditChecklistHistory();
+					checkListHistory.setUser_comments(checkListUI.getUser_comments());
+					applyAuditing(checkListHistory); 
+					checkListDb.getCheckList_history().add(checkListHistory);
 				}
 			}
 		}
@@ -616,7 +664,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 	private String getMessageByStatus(String workflowAction,AuditDetails audit) {
 		String message = "";
-		if(workflowAction.equalsIgnoreCase("department"))
+		if(workflowAction.equalsIgnoreCase("department") || workflowAction.equalsIgnoreCase("Forward"))
 		{
 			message="Audit No : "+audit.getAuditno()+" is sent to Department for clarification";
 		}
@@ -624,7 +672,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			message="Audit No : "+audit.getAuditno()+" is sent to RSA for Verification";
 		}
-		else if(workflowAction.equalsIgnoreCase("auditor"))
+		else if(workflowAction.equalsIgnoreCase("auditor") || workflowAction.equals("Approve"))
 		{
 			message="Audit No : "+audit.getAuditno()+" is sent to Auditor for Verification";
 		}
@@ -632,7 +680,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			message="Audit No : "+audit.getAuditno()+" is sent to Examiner for Approval";
 		}
-		else if(workflowAction.equalsIgnoreCase("approve"))
+		else if(workflowAction.equals("approve"))
 		{
 			message="Audit No : "+audit.getAuditno()+" is approved";
 		}
@@ -644,7 +692,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			message="Audit No : "+audit.getAuditno()+" is rejected";
 		}
-		
 
 		return message;
 	}
@@ -897,7 +944,7 @@ public class CreateAuditController extends GenericWorkFlowController {
     	}
     	audit.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
         .withComments("Initiated Post-Audit")
-        .withStateValue("Created").withDateInfo(new Date()).withOwner(owenrPos)
+        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
         .withNextAction("Post Audit pending")
         .withNatureOfTask("Post-Audit")
         .withCreatedBy(user.getId())
@@ -1167,16 +1214,54 @@ public class CreateAuditController extends GenericWorkFlowController {
           list = persistenceService.findAllBy(query.toString(),
         		auditDetail.getAuditType());
         AuditDetails result = null;
+        List<ManageAuditor> auditorListAudit=manageAuditorService.getAudiorsByType("Auditor");
+        System.out.println("Size Auditor:: "+auditorListAudit.size() );
+        List<ManageAuditor> auditorListRSA=manageAuditorService.getAudiorsByType("RSA");
+        System.out.println("Size RSA:: "+auditorListRSA.size() );
+        AuditDetails auditDetails =null;
         if (list.size() != 0) {
         	resultsDtlsList = new ArrayList<AuditDetails>();
-
+        	System.out.println("Size :: "+list.size() );
             for (final Object[] object : list) {
             	result = new AuditDetails();
             	result.setId(Long.parseLong(object[0].toString()));
-            	AuditDetails auditDetails = auditService.getById(result.getId());
-            	if(auditDetail.getLeadAuditorEmpNo() != null && auditDetail.getLeadAuditorEmpNo() != -1 && auditDetails.getCurrentState().getOwnerPosition() != auditDetail.getLeadAuditorEmpNo())
+            	 auditDetails = auditService.getById(result.getId());
+            	if(auditDetail.getLeadAuditorEmpNo() != null && auditDetail.getLeadAuditorEmpNo() != -1 )
             	{
-            		continue;
+            		System.out.println("auditDetail.getLeadAuditorEmpNo() ::"+auditDetail.getLeadAuditorEmpNo());
+            		System.out.println("auditDetails.getCurrentState().getOwnerPosition() ::"+auditDetails.getCurrentState().getOwnerPosition());
+            		if(String.valueOf(auditDetails.getCurrentState().getOwnerPosition()).equals(String.valueOf(auditDetail.getLeadAuditorEmpNo())))
+            		{
+            			System.out.println("not continue");
+            		}
+            		else
+            		{
+            			System.out.println("continue");
+            			continue;
+            		}
+            		
+            	}
+            	else
+            	{
+            		System.out.println("auditDetail.getType() :: "+auditDetail.getType());
+            		if(auditDetail.getType().equalsIgnoreCase("Auditor") )
+            		{
+            			System.out.println("Auditor :"+auditDetails.getCurrentState().getOwnerPosition());
+            			if(!checkAuditor(auditDetails.getCurrentState().getOwnerPosition(),auditorListAudit))
+            			{
+            				System.out.println("continue Auditor");
+            				continue;
+            			}
+            		}
+            		else
+            		{
+            			System.out.println("RSA :"+auditDetails.getCurrentState().getOwnerPosition());
+            			if(!checkRSA(auditDetails.getCurrentState().getOwnerPosition(),auditorListRSA))
+            			{
+            				System.out.println("continue RSA");
+            				continue;
+            			}
+            		}
             	}
             	result.setAuditno(object[1].toString());
             	result.setType(object[2].toString());
@@ -1190,9 +1275,11 @@ public class CreateAuditController extends GenericWorkFlowController {
             	}
             	result.setStatusDescription(object[4].toString());
             	resultsDtlsList.add(result);
+            	System.out.println("Added");
             }
         }
         auditDetail.setAuditSearchList(resultsDtlsList);
+        System.out.println("resultsDtlsList :: "+resultsDtlsList.size());
         auditDetail.setDepartments(this.getDepartmentsFromMs());
 		AuditEmployee emp=null;
 		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
@@ -1212,7 +1299,35 @@ public class CreateAuditController extends GenericWorkFlowController {
 	
 	
 	
-	 @RequestMapping(value = "/employee/{type}", method = RequestMethod.GET)
+	 private boolean checkRSA(Long ownerPosition, List<ManageAuditor> auditorListRSA) {
+		boolean result=false;
+		for(ManageAuditor row:auditorListRSA)
+		{
+			if(String.valueOf((Long.valueOf(row.getEmployeeid()))).equals( String.valueOf(ownerPosition)))
+			{
+				result=true;
+				break;
+			}
+		}
+		return result;
+	}
+
+
+	private boolean checkAuditor(Long ownerPosition, List<ManageAuditor> auditorListAudit) {
+		boolean result=false;
+		for(ManageAuditor row:auditorListAudit)
+		{
+			if(String.valueOf((Long.valueOf(row.getEmployeeid()))).equals(String.valueOf(ownerPosition)))
+			{
+				result=true;
+				break;
+			}
+		}
+		return result;
+	}
+
+
+	@RequestMapping(value = "/employee/{type}", method = RequestMethod.GET)
 	    @ResponseBody
 	    public List<EmployeeInfo> getApprovers(@PathVariable(name = "type") String type) {
 

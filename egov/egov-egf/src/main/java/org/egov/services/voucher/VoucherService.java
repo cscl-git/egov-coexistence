@@ -72,6 +72,7 @@ import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgModules;
 import org.egov.commons.EgfRecordStatus;
 import org.egov.commons.EgwStatus;
+import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.AccountdetailtypeHibernateDAO;
 import org.egov.commons.dao.ChartOfAccountsDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
@@ -1646,6 +1647,18 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			return status;
 
 		}
+	 //Impplemented By Prasanta
+	 public Vouchermis getVouchermisByReceiptNumber(String recieptNumber) {
+		 System.out.println("Inside Service>>"+recieptNumber);
+		 Vouchermis vmis = new Vouchermis();
+		 try {
+		 vmis = vmisHibernateDao.getVouchermisByReceiptNumber(recieptNumber);
+		 }catch(NullPointerException e) {
+			 e.printStackTrace();
+		 }
+		 System.out.println(vmis.toString());
+		 return vmis;
+	 }
 	    
 
 }

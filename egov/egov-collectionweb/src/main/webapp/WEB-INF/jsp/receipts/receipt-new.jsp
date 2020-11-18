@@ -63,12 +63,52 @@
 	#bankcodescontainer li.yui-ac-highlight {background:#ff0;}
 	#bankcodescontainer li.yui-ac-prehighlight {background:#FFFFCC;}
 </style>
+<style type="text/css">
+	
+.modal {
+  display: none; 
+  position: fixed;
+  z-index: 9999; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%;
+  overflow: auto;
+  background-color: rgb(0,0,0); 
+  background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+
+  margin: 15% auto; 
+  width: 80%;  
+}
+.close {
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
+}
+.modal-header {
+    padding: 9px;
+}
+.modal in{
+	padding-left: 8px;
+    display: none;
+}
+
+</style>
 <script type="text/javascript">
 
 jQuery.noConflict();
 
 var isDatepickerOpened=false;
 jQuery(document).ready(function() {
+  	 
   	 
      jQuery(" form ").submit(function( event ) {
     	 doLoadingMask();
@@ -115,6 +155,23 @@ jQuery(document).ready(function() {
 jQuery(window).load(function () {
 	undoLoadingMask();
 });
+
+/* Modal Hide */
+ jQuery("#myModal").modal({backdrop: false});
+jQuery('#myModal').modal('hide');  
+
+jQuery(".showModal").click(function(){
+	
+	  jQuery("#myModal").modal('show');
+	
+	});
+jQuery(document).ready(function($) {
+	jQuery("#myModal").modal({
+		backdrop : false
+	});
+	jQuery('#myModal').modal('hide');  
+}); 
+
 
 function onChangeBankAccount(branchId) {
 	var serviceName = document.getElementById("serviceName").value;
@@ -560,6 +617,7 @@ function validate()
 	}
 	console.log('validation : ',validation);
 	if(validation==false){
+		
 		return false;
 	}
 	else {
@@ -568,6 +626,7 @@ function validate()
 		return validation;
 	}
 }//end of function 'validate'
+
 
 function verifyChequeDetails(table,len1)
 {
@@ -614,13 +673,7 @@ function verifyChequeDetails(table,len1)
 	    if(getControlInBranch(table.rows[j],'instrumentIfscCode')!=null ){
 	    	var ifscCode=getControlInBranch(table.rows[j],'instrumentIfscCode').value;
 	    	var bankName=getControlInBranch(table.rows[j],'bankName').value;
-	    	if(ifscCode==null || ifscCode==""){
-	    		if(bankNameErrMsg==""){
-	    		    bankNameErrMsg='<s:text name="billreceipt.missingifsc.code.errormessage" />' + '<br>';
-	    			document.getElementById("receipt_error_area").innerHTML+=bankNameErrMsg;
-	    		}
-	    		check=false;
-	    	}else if(bankName==null || bankName==""){
+	    	 if(bankName==null || bankName==""){
 	    		if(bankNameErrMsg==""){
 	    		    bankNameErrMsg='<s:text name="billreceipt.invalidifsc.code.errormessage" />' + '<br>';
 	    			document.getElementById("receipt_error_area").innerHTML+=bankNameErrMsg;
@@ -1262,7 +1315,9 @@ jQuery(document).keypress(
 			 <div id="loadingMask" style="display:none;overflow:hidden;text-align: center"><img src="/services/collection/resources/images/bar_loader.gif"/> <span style="color: red">Please wait....</span></div>
 			<div align="left" class="mandatorycoll"><s:text name="common.mandatoryfields"/></div>
 			<div class="buttonbottom" align="center">
-			      <label><input align="center" type="submit" class="buttonsubmit" id="button2" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="return validate();"/></label>
+			     <%-- <label><input align="center" type="submit" class="buttonsubmit" id="button2" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="return validate();"/></label> --%>
+			      <%-- <label><input align="center" type="button" class="buttonsubmit showModal" id="buttonPay" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="return validate();" data-toggle='modal' data-target='#myModal'/></label> --%>
+			      <label><input align="center" type="button" class="buttonsubmit showModal" id="buttonPay" tabindex="-1" value="<s:text name='lbl.pay'/>" onclick="payCall();" data-toggle='modal'/></label> 
 			      &nbsp;
 			      <input name="button" type="button" class="button" id="button" tabindex="-1" value="<s:text name='lbl.reset'/>" onclick="checkreset();"/>
 			      &nbsp;
@@ -1302,14 +1357,56 @@ jQuery(document).keypress(
 </table> -->
 
 
-
 </s:push>
 
 </s:form>
 
 </div>
 </s:else>
+
+
+<!-- Modal --> 
+	<div class="modal" id="myModal" role="dialog" style="display: none;">
+		<div class="modal-dialog" role="dailog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal">&times;</button>
+					
+					<h4 class="modal-title"><b>Payment Confirmation</b></h4>
+				</div>
+				<div class="modal-body">
+				<p>Do You Really Want To Pay?</p>
+					<!-- <font style="align: center;">Are You Sure To Delete Record?</font> -->
+					</div>
+				<div class="modal-footer">
+					<input  type="button" class="btn btn-danger" id="button2" value="<s:text name='lbl.pay'/>" onclick="document.collDetails.submit()" data-dismiss="modal" style="width: 100px;"/>
+					<!-- <button type="submit" class="btn btn-danger" onclick="return validate()" data-dismiss="modal" style="width: 100px;">Proceed</button> -->
+					<button type="button" class="btn btn-primary" data-dismiss="modal" style="width: 100px;">Cancel</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+
 <script type="text/javascript">
+
+
+ function payCall()
+{
+	console.log("inside CAll");
+	var result = validate();
+	console.log("result>>"+result);
+	if(result==true){
+	 	jQuery('#myModal').modal('show'); 
+	 }
+	 else{
+		jQuery('#myModal').modal('show');
+	} 
+	 
+}  
+	
+	
 // MAIN FUNCTION: new switchcontent("class name", "[optional_element_type_to_scan_for]") REQUIRED
 // Call Instance.init() at the very end. REQUIRED
 var bobexample=new switchcontent("switchgroup1", "div") //Limit scanning of switch contents to just "div" elements

@@ -137,6 +137,8 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String ifsc;
     private String rDate;
     private Date rrDate;
+    private String subdivison;
+    private String gstno;
     public ReceiptHeader() {
     }
 
@@ -945,6 +947,22 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setGstAmount(BigDecimal gstAmount) {
 		this.gstAmount = gstAmount;
+	}
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
+
+	public String getGstno() {
+		return gstno;
+	}
+
+	public void setGstno(String gstno) {
+		this.gstno = gstno;
 	}
 
 	

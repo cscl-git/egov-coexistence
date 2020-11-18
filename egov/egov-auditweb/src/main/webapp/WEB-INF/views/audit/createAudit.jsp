@@ -81,12 +81,17 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     	<br>
     	<jsp:include page="commonworkflowhistory-view.jsp"/>
     	<c:if test="${mode !='view' }">
+    	<c:if test="${auditDetail.auditStatus != 'Pending with Department' }">
     	<div class="show-row form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.comments" text="Comments"/></label>
 						<div class="col-sm-8 add-margin">
 							<form:textarea class="form-control" path="approvalComent"  id="approvalComent" required="required"/>
 						</div>
 		</div>
+		</c:if>
+		<c:if test="${auditDetail.auditStatus == 'Pending with Department' }">
+		<jsp:include page="commonworkflowmatrix-auditbill.jsp"/>
+		</c:if>
         <div class="buttonbottom" align="center">
             <jsp:include page="commonworkflowmatrix-button.jsp"/>
         </div>

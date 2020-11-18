@@ -89,6 +89,9 @@ public class ApplicationConfigManager {
     @Value("${egov.services.collection.service.payment.search:}")
     private String collSerPaymentSearch;
     
+    @Value("${egov.services.collection.service.payment.cancel:}")
+    private String collSerPaymentCancel;
+    
     @Value("${egov.services.collection.service.payment.create:}")
     private String collSerPaymentCreate;
     

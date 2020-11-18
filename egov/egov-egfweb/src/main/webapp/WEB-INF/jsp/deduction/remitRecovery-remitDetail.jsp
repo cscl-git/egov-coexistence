@@ -206,6 +206,32 @@ function populateUser(){
 		   document.getElementById('lblError').innerHTML='<s:text name="msg.please.select.bank.account.number"/>';
 		   return false;
 		   }
+		   //Added for validation Signatory by Prasanta
+		  
+		   var firstsignatory='';
+			if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
+		   {
+		   document.getElementById('lblError').innerHTML='Please Select First Signatory';
+		   return false;
+		   }
+			else
+				{
+					firstsignatory=dom.get('firstsignatory').value;
+				}
+			var secondsignatory=''
+			if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
+		   {
+		   document.getElementById('lblError').innerHTML='Please Select Second Signatory';
+		   return false;
+		   }
+			else
+			{
+				secondsignatory=dom.get('secondsignatory').value;
+				
+			}
+		   
+		   
+		   
 		   if(document.getElementById('narration') == null || document.getElementById('narration').value == '')
 		   {
 			   document.getElementById('lblError').innerHTML='<s:text name="msg.payment.narration.mandatory"/>';
@@ -237,6 +263,30 @@ function onSubmit()
 	var balanceCheckWarning='<s:text name="payment.warning"/>';
 	var noBalanceCheck='<s:text name="payment.none"/>';
 	if(validate()){
+		 //Added for validation Signatory by Prasanta
+		var firstsignatory='';
+		if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
+		{
+			document.getElementById('lblError').innerHTML='Please Select First Signatory';
+			return false;
+		}
+		else
+			{
+				firstsignatory=dom.get('firstsignatory').value;
+			}
+		var secondsignatory=''
+		if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
+		{
+			document.getElementById('lblError').innerHTML='Please Select Second Signatory';
+			return false;
+		}
+		else
+		{
+			secondsignatory=dom.get('secondsignatory').value;
+			
+		}
+	   //end validation of Signatory and get selected value 
+		
 		 var myform = jQuery('#remittanceForm');
 		// re-disabled the set of inputs that you previously
 		var disabled = myform.find(':input:disabled').removeAttr('disabled'); 
@@ -244,7 +294,7 @@ function onSubmit()
 		 if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 		{
 			disableAll();
-			document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action';
+			document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 		  return true;
 		}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -255,7 +305,7 @@ function onSubmit()
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
 			 disableAll();
-			 document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action';
+			 document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 			 document.remittanceForm.submit();
 			return true;
 		 } else {
@@ -265,7 +315,7 @@ function onSubmit()
 		}
 	else{
 		disableAll();
-		document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action';
+		document.remittanceForm.action='${pageContext.request.contextPath}/deduction/remitRecovery-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory;
 	 	document.remittanceForm.submit();
 	}
 			
@@ -417,6 +467,26 @@ else{
 																				style="text-align:right"
 																				value="%{commonBean.availableBalance}" /></span></td>
 																</tr>
+																
+																<tr>
+																	<td class="bluebox">&nbsp;</td>
+																	<td class="bluebox">First Signatory<span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox"><s:select name="firstsignatory"
+																	headerKey="-1" headerValue="Select First Signatory" value="%{firstsignatory}"
+																	list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+																			id="firstsignatory" />
+																	</td>
+																	<td class="bluebox" width="15%">Second Signatory<span
+																		class="mandatory1">*</span></td>
+																	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
+																	headerKey="-1" headerValue="Select Second Signatory"
+																	list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
+																			id="secondsignatory" /></td>
+																</tr>
+																
+																
+																
 																<tr>
 																	<td class="bluebox">&nbsp;</td>
 																	<td class="bluebox"><s:text name="modeofpayment" />&nbsp;</td>

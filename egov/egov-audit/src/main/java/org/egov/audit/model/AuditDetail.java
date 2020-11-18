@@ -44,8 +44,8 @@ public class AuditDetail {
     private List<Department> departments = new ArrayList<Department>();
     private List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
 	private String notes;
-	private int passUnderobjection=0;
-	
+	private Integer passUnderobjection=0;
+	private String type;
 	
 	public Date getAuditScheduledDate() {
 		return auditScheduledDate;
@@ -227,11 +227,17 @@ public class AuditDetail {
 	public void setStateId(Long stateId) {
 		this.stateId = stateId;
 	}
-	public int getPassUnderobjection() {
+	public Integer getPassUnderobjection() {
 		return passUnderobjection;
 	}
-	public void setPassUnderobjection(int passUnderobjection) {
+	public void setPassUnderobjection(Integer passUnderobjection) {
 		this.passUnderobjection = passUnderobjection;
+	}
+	public String getType() {
+		return type;
+	}
+	public void setType(String type) {
+		this.type = type;
 	}
 	
 

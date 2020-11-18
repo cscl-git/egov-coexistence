@@ -38,6 +38,9 @@ public class BoQDetails implements Serializable {
 	@Column(name = "unit")
 	private String unit;
 
+	@Column(name = "milestone")
+	private String milestone;
+
 	public String getUnit() {
 		return unit;
 	}
@@ -71,6 +74,7 @@ public class BoQDetails implements Serializable {
 
 	@Transient
 	private boolean checkboxChecked;
+
 
 	public Long getSlNo() {
 		return slNo;
@@ -165,5 +169,16 @@ public class BoQDetails implements Serializable {
 	public void setMeasured_amount(Double measured_amount) {
 		this.measured_amount = measured_amount;
 	}
+
+	public String getMilestone() {
+		return milestone;
+	}
+
+	public void setMilestone(String milestone) {
+		this.milestone = milestone;
+	}
+
+	
+	
 	
 }

@@ -35,7 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class EstimatePreparationApprovalService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(EstimatePreparationApprovalService.class);
@@ -112,10 +112,14 @@ public class EstimatePreparationApprovalService {
 				.save(estimatePreparationApproval);
 		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
 				: estimatePreparationApproval.getDocumentDetail();
-		final List<DocumentUpload> documentDetails;
+		List<DocumentUpload> documentDetails = new ArrayList<>();
+		
 		
 		documentDetails = getDocumentDetails(files, estimatePreparationApproval,
 				"Works_Est");
+			
+		
+		
 		if (!documentDetails.isEmpty()) {
 			savedEstimatePreparationApproval.setDocumentDetail(documentDetails);
 			persistDocuments(documentDetails);
@@ -270,14 +274,31 @@ public class EstimatePreparationApprovalService {
         for (DocumentUpload doc : files) {
             final DocumentUpload documentDetails = new DocumentUpload();
             documentDetails.setObjectId(id);
+           
+            if(doc.getObjectType()!=null) {
+	            if(doc.getObjectType().equals("roughWorkFile")) {
+	            	
+	            	 documentDetails.setObjectType("roughWorkFile");
+	            	 documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+	                         doc.getContentType(), "roughWorkFile"));
+	            }
+            }
+            else {
             documentDetails.setObjectType(objectType);
             documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
                     doc.getContentType(), "Works_Est"));
+            }
+           
             documentDetailsList.add(documentDetails);
 
         }
         return documentDetailsList;
     }
+	
+	
+	
+	
+	
 	
 	public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
 		if (documentDetailsList != null && !documentDetailsList.isEmpty())

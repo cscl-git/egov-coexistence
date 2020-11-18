@@ -197,6 +197,8 @@ public class ContraBTBAction extends BaseVoucherAction {
 	@Autowired
 	private EgovCommon egovCommon;
 
+	private String firstsignatory="-1";
+    private String secondsignatory="-1";
 	@Override
 	public void prepare() {
 		super.prepare();
@@ -256,6 +258,18 @@ public class ContraBTBAction extends BaseVoucherAction {
 	@ValidationErrorPage(value = NEW)
 	@Action(value = "/contra/contraBTB-create")
 	public String create() throws ValidationException {
+		String fSignatory = firstsignatory;
+		String sSignatory = secondsignatory;
+		
+		
+			if(fSignatory!=null) {
+				voucherHeader.setFirstsignatory(fSignatory);
+			}
+			if(sSignatory!=null) {
+				voucherHeader.setSecondsignatory(sSignatory);
+			}
+		
+		
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Starting Bank to Bank Transfer ...");
 		try {
@@ -1622,5 +1636,20 @@ public class ContraBTBAction extends BaseVoucherAction {
 
 	public void setChartOfAccounts(ChartOfAccounts chartOfAccounts) {
 		this.chartOfAccounts = chartOfAccounts;
+	}
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
 	}
 }

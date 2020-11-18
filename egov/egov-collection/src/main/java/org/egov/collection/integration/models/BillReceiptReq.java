@@ -76,6 +76,7 @@ public class BillReceiptReq {
     private String receiptInstrumentType;
     private String tenantId = null;
     private String receiptStatus;
+    private String subdivison;
     
     
 
@@ -90,6 +91,7 @@ public class BillReceiptReq {
         this.accountDetails = billReceipt.getAccountDetails();
         this.serviceName = billReceipt.getServiceName();
         this.paidBy = billReceipt.getPaidBy();
+        this.subdivison=billReceipt.getSubdivison();
         this.description = billReceipt.getDescription();
         this.totalAmount = billReceipt.getTotalAmount();
         this.receiptURL = billReceipt.getReceiptURL();
@@ -253,5 +255,13 @@ public class BillReceiptReq {
     public void setReceiptStatus(final String receiptStatus) {
         this.receiptStatus = receiptStatus;
     }
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
 
 }

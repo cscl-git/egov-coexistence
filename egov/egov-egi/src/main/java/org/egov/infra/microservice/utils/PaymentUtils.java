@@ -53,6 +53,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.egov.infra.microservice.models.Bank;
 import org.egov.infra.microservice.models.Bill;
 import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.BillDetailV2;
@@ -120,6 +121,11 @@ public class PaymentUtils {
         //prepare billdetails
         this.prepareBillDetailsData(paymentDetail,bill);
         receipt.getBill().add(bill);
+        System.out.println("subdivison xxxx ::: "+payment.getSubdivison());
+        System.out.println("gst xxxx ::: "+payment.getGstno());
+        receipt.setSubdivison(payment.getSubdivison());
+        receipt.setGstNo(payment.getGstno());
+        receipt.setPaymentStatus(payment.getPaymentStatus().name());
     }
 
     private void prepareBillDetailsData(PaymentDetail paymentDetail, Bill bill) {
@@ -177,6 +183,10 @@ public class PaymentUtils {
         instrument.setInstrumentNumber(payment.getInstrumentNumber());
         instrument.setInstrumentStatus(payment.getInstrumentStatus().name());
         instrument.setIfscCode(payment.getIfscCode());
+        Bank bank=new Bank();
+        bank.setName(payment.getBankName());
+        instrument.setBank(bank);
+        instrument.setBranchName(payment.getBankBranch());
         InstrumentType instrumentType = new InstrumentType();
         instrumentType.setName(payment.getPaymentMode().name());
         instrument.setInstrumentType(instrumentType);

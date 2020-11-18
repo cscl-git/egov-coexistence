@@ -962,6 +962,19 @@ var totaldbamt=0,totalcramt=0;
 						</table>
 					</td>
 				</tr>
+				<tr>
+					<td width="4%" class="bluebox2">&nbsp;</td>
+					<td class="bluebox" width="21%"><s:text
+							name="misc.receipt.sub.divison" /><span class="mandatory1">*</span></td>
+					<td class="bluebox">
+							<s:select headerKey="-1"
+							headerValue="----Choose----" name="subdivison" id="subdivison"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivison}"/> </td>
+					<td width="21%" class="bluebox2"><s:text
+							name="misc.receipt.gst.no" /></td>
+					<td width="24%" class="bluebox2"><s:textfield label="gstno" id="gstno"
+							maxlength="50" name="gstno" value="%{gstno}" /></td>
+				</tr>
+				
 			</table>
 		</td>
 	</tr>

@@ -225,8 +225,9 @@ function downloadExcel()
 	var toDate=document.getElementById('toDate').value;
 	var service=document.getElementById('serviceTypeIdforExcel').value;
 	var dept=document.getElementById('deptId').value;
+	var subdivison=document.getElementById('subdivison').value;
 
-	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeId="+service+"&deptId="+dept;
+	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeId="+service+"&deptId="+dept+"&subdivison="+subdivison;
 	document.searchReceiptForm.submit();
 }
 
@@ -594,6 +595,18 @@ function onBodyLoad(){
     <option value="posmohslh">POS MOH SLH</option>
 </select> </td>
 	    
+	    </tr>
+	    <tr>
+	     
+	      <td width="21%" class="bluebox"><s:text name="misc.receipt.sub.divison"/></td>
+	      <td width="24%" class="bluebox">
+	      <div class="yui-skin-sam"><s:select headerKey="-1"
+							headerValue="----Choose----" name="subdivison" id="subdivison"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivison}"/></td>
+	    
+	    
+	    <td width="21%" class="bluebox2">&nbsp;</td>
+		  <td width="24%" class="bluebox2">&nbsp;</td>
+	    
 	    </tr>	    
 	 <%--    <tr>
 	      <td width="4%" class="bluebox">&nbsp;</td>
@@ -669,6 +682,7 @@ function onBodyLoad(){
 </display:column>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdate" title="Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:8%;text-align:right" property="receiptnumber"/>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST No." style="width:8%;text-align:left" property="gstno" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Collected By" style="width:8%;text-align:right" property="createdUser"/> 
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Payee Name" style="width:8%;text-align:right" property="paidBy"/>
 

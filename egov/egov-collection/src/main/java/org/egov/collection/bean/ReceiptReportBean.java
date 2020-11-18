@@ -19,6 +19,7 @@ public class ReceiptReportBean {
 	private String remitanceNo;
 	private String bankAccountNo;
 	private BigDecimal depositAmount;
+	private String gstNo;
 	public String getSlNo() {
 		return slNo;
 	}
@@ -109,6 +110,12 @@ public class ReceiptReportBean {
 	}
 	public void setGstAmount(BigDecimal gstAmount) {
 		this.gstAmount = gstAmount;
+	}
+	public String getGstNo() {
+		return gstNo;
+	}
+	public void setGstNo(String gstNo) {
+		this.gstNo = gstNo;
 	}
 	
 	

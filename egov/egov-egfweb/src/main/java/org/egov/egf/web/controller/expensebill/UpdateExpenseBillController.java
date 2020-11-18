@@ -429,6 +429,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     	audit.setLead_auditor(owenrPos.getId());
     	audit.setEgBillregister(updatedEgBillregister);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));
+    	audit.setPassUnderobjection(0);
     	audit.transition().start().withSenderName(user.getUsername() + STRING + user.getName())
         .withComments(INITIATED_PRE_AUDIT)
         .withStateValue(CREATED).withDateInfo(new Date()).withOwner(owenrPos)

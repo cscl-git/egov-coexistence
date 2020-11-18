@@ -163,7 +163,7 @@
 								style="width:8%;text-align:center" property="billDate"
 								sortProperty="billdate" sortable="true" />
 							<display:column title="Voucher number" href="javascript:openVoucher('${currentRowObject.vhId}');"
-								style="width:11%;text-align:center" property="voucherNumber" />
+								style="width:11%;text-align:center" property="voucherNumber" sortProperty="vouchernumber" sortable="true"/>
 							<display:column title="Party Name"
 								style="width:5%;text-align:center" property="partyName" />
 							<display:column title="  Gross Amount"
@@ -176,7 +176,7 @@
 								style="width:7%;text-align:right" property="paidAmount" />
 							<display:column title="Payment voucher number " href="javascript:openVoucher('${currentRowObject.phId}');"
 								style="width:11%;text-align:center"
-								property="paymentVoucherNumber" />
+								property="paymentVoucherNumber" sortProperty="vouchernumber" sortable="true"/>
 							<display:column title="Payment Pex number " 
 								style="width:11%;text-align:center"
 								property="pexNo" />

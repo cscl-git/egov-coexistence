@@ -304,6 +304,12 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 					voucherHeader.getVouchermis().getFunctionary().getCode());
 		if (voucherHeader.getVouchermis().getFunction() != null)
 			headerdetails.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
+		//modified added by Prasanta
+		if (voucherHeader.getFirstsignatory() != null)
+            headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+        if (voucherHeader.getSecondsignatory() != null)
+            headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        
 		return headerdetails;
 	}
 

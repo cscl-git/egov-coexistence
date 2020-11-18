@@ -1,7 +1,10 @@
 package org.egov.audit.service;
 
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -28,6 +31,7 @@ import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.security.utils.SecurityUtils;
+import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
@@ -99,7 +103,7 @@ public class AuditService {
 	}
 
 	@Transactional
-	public AuditDetails create(final AuditDetails auditDetails , final String workFlowAction, String comment, Long leadEmpNo) {
+	public AuditDetails create(final AuditDetails auditDetails , final String workFlowAction, String comment, Long leadEmpNo, Long approvalPosition, String apporverDesignation) {
 
 
 		 AuditDetails savedAuditDetails = auditRepository.save(auditDetails);
@@ -115,7 +119,7 @@ public class AuditService {
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_PENDING_WITH_SECTION_OFFICER));
 		}
-		else if(workFlowAction.equalsIgnoreCase("auditor"))
+		else if(workFlowAction.equalsIgnoreCase("auditor") || workFlowAction.equals("Approve"))
 		{
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_PENDING_WITH_AUDITOR));
@@ -125,7 +129,7 @@ public class AuditService {
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_PENDING_WITH_EXAMINER));
 		}
-		else if(workFlowAction.equalsIgnoreCase("approve"))
+		else if(workFlowAction.equals("approve"))
 		{
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_APPROVED_STATUS));
@@ -176,7 +180,7 @@ public class AuditService {
 		}
 		
 		
-		createAuditWorkflowTransition(savedAuditDetails, workFlowAction,comment,leadEmpNo);
+		createAuditWorkflowTransition(savedAuditDetails, workFlowAction,comment,leadEmpNo,approvalPosition, apporverDesignation);
 		List<DocumentUpload> files = auditDetails.getDocumentDetail() == null ? null
 				: auditDetails.getDocumentDetail();
 		final List<DocumentUpload> documentDetails;
@@ -208,7 +212,7 @@ public class AuditService {
 				documentUploadRepository.save(doc);
 	}
 
-	public void createAuditWorkflowTransition(final AuditDetails auditDetails,final String workFlowAction, String comment, Long leadEmpNo) {
+	public void createAuditWorkflowTransition(final AuditDetails auditDetails,final String workFlowAction, String comment, Long leadEmpNo, Long approvalPosition, String apporverDesignation) {
 			LOGGER.info(" Create WorkFlow Transition Started  ...");
 		final User user = securityUtils.getCurrentUser();
 		final DateTime currentDate = new DateTime();
@@ -235,13 +239,84 @@ public class AuditService {
 			actionName = "Post Audit pending";
 			natureOfTask = "Post-Audit";
 		}
+		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Department") && (workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equals("Approve")))
+		{
+			System.out.println("logic for workflow ::: "+workFlowAction);
+			String stateValue = "";
+			 WorkFlowMatrix wfmatrix;
+			 Map<String, String> finalDesignationNames = new HashMap<>();
+	           Designation designation = this.getDesignationDetails(apporverDesignation);
+	           Position owenrPos = new Position();
+	           owenrPos.setId(approvalPosition);
+	           wfmatrix = auditRegisterWorkflowService.getWfMatrix(auditDetails.getStateType(), null,
+	                    null, null, FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING, null);
+	           if (wfmatrix != null && wfmatrix.getCurrentDesignation() != null) {
+	                final List<String> finalDesignationName = Arrays.asList(wfmatrix.getCurrentDesignation().split(","));
+	                for (final String desgName : finalDesignationName)
+	                    if (desgName != null && !"".equals(desgName.trim()))
+	                        finalDesignationNames.put(desgName.toUpperCase(), desgName.toUpperCase());
+	            }
+	           if (workFlowAction.equals("Approve")) {
+	        	   System.out.println("Approve");
+	        	   owenrPos.setId(auditDetails.getLead_auditor());
+	   			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
+	   	        .withComments(comment)
+	   	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos)
+	   	        .withNextAction(actionName)
+	   	        .withNatureOfTask(natureOfTask)
+	   	        .withCreatedBy(user.getId())
+	   	        .withtLastModifiedBy(user.getId());
+	            }
+	           else
+	           {
+	        	   System.out.println("Forward");
+	                if (designation != null
+	                        && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
+	                    stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
+
+	             System.out.println("stateValue before::: "+stateValue);
+	                
+	                wfmatrix = auditRegisterWorkflowService.getWfMatrix(auditDetails.getStateType(), null,
+	                        null, null, auditDetails.getCurrentState().getValue(), null);
+
+	                	
+	                
+	                if (stateValue.isEmpty())
+	                {
+	                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+	                	{
+	                		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
+	                	}
+	                	else if(wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+	                	{
+	                		stateValue = "Pending With "+ designation.getName().toUpperCase();
+	                	}
+	                	else
+	                	{
+	                		stateValue = wfmatrix.getNextState();
+	                		
+	                	}
+	                    
+	                }
+	                System.out.println("stateValue before::: "+stateValue);
+					
+	                auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+	                        .withComments(comment)
+	                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+	                        .withNextAction(actionName)
+	        	   	        .withNatureOfTask(natureOfTask)
+	        	   	        .withCreatedBy(user.getId())
+	        	   	        .withtLastModifiedBy(user.getId());
+	            
+	        }
+		}
 		if(workFlowAction.equalsIgnoreCase("department"))
 		{
 			Position owenrPos = new Position();
 			owenrPos.setId(auditDetails.getCreatedBy());
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
-	        .withStateValue("Pending with Department").withDateInfo(new Date()).withOwner(owenrPos)
+	        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
 	        .withNextAction(actionName)
 	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
@@ -352,6 +427,11 @@ public class AuditService {
 	
 	public AuditDetails getByAudit_no(final String auditNumber) {
         return auditRepository.findByAuditno(auditNumber);
+    }
+	
+	private Designation getDesignationDetails(String desgnCode){
+    	List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
+    	return desgnList.get(0);
     }
 
 }

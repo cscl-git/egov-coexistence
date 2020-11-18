@@ -57,7 +57,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
     @JoinColumn(name = "bill_id")
     private EgBillregister egBillregister;
 	
-	private int passUnderobjection;
+	private Integer passUnderobjection;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditCheckList.class)
 	private List<AuditCheckList> checkList=new ArrayList<AuditCheckList>();
@@ -257,11 +257,11 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 		this.employeeName = employeeName;
 	}
 
-	public int getPassUnderobjection() {
+	public Integer getPassUnderobjection() {
 		return passUnderobjection;
 	}
 
-	public void setPassUnderobjection(int passUnderobjection) {
+	public void setPassUnderobjection(Integer passUnderobjection) {
 		this.passUnderobjection = passUnderobjection;
 	}
 

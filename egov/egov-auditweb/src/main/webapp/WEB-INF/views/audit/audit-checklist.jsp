@@ -41,10 +41,13 @@
 			<c:forEach items="${auditDetail.checkList}" var="audit" varStatus="status">
 			<tr id="tblchecklistRow">
 			<td>
-<%-- 			<form:hidden path="checkList[${status.index}].checklist_description" id="checkList[${status.index}].checklist_description" class="checklist_description"/>
- --%>			
+			<c:if test="${auditDetail.auditStatus != 'Created' && auditDetail.auditStatus != 'Pending with Auditor'}">
+			<form:hidden path="checkList[${status.index}].checklist_description" id="checkList[${status.index}].checklist_description" class="checklist_description"/>
+ 			${audit.checklist_description}
+ 			</c:if>
+ 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 			<form:input path="checkList[${status.index}].checklist_description" id="checkList[${status.index}].checklist_description" value="${audit.checklist_description}"  class="form-control checklist_description" maxlength="200" ></form:input>
-			
+			</c:if>
 			</td>
 			<td>
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
@@ -86,12 +89,12 @@
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 			<c:if test="${audit.status == 'Seen/Checked' }">
 			<td>
-				<form:textarea path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments" readonly="true" class="form-control auditor_comments" maxlength="200" ></form:textarea>
+				<form:input path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments"  class="form-control auditor_comments" readonly="true" maxlength="200" ></form:input>
 			</td>
 			</c:if>
 			<c:if test="${audit.status != 'Seen/Checked' }">
 			<td>
-				<form:textarea path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments" required="required" class="form-control auditor_comments" maxlength="200" ></form:textarea>
+				<form:input path="checkList[${status.index}].auditor_comments" id="checkList[${status.index}].auditor_comments" required="required" class="form-control auditor_comments" maxlength="200" ></form:input>
 			</td>
 			</c:if>		
 			
@@ -131,13 +134,9 @@
 			</c:forEach>
 			</tbody>
 		</table>
-		<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
+		<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
 		Pass Under Objection
 		<form:checkbox  path="passUnderobjection" id="passUnderobjection" value="${auditDetail.passUnderobjection}"></form:checkbox>
-		</c:if>
-		<c:if test="${auditDetail.auditStatus != 'Created' && auditDetail.auditStatus != 'Pending with Auditor'}">
-		Pass Under Objection
-		<form:checkbox  path="passUnderobjection" id="passUnderobjection" value="${auditDetail.passUnderobjection}" readonly="true"></form:checkbox>
 		</c:if>
 		
 	</div>

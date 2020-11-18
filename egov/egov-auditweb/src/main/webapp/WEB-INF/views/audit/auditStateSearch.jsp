@@ -22,7 +22,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     			<label class="col-sm-3 control-label text-left-audit">Type
 				</label>
 				 <div class="col-sm-3 add-margin">
-					<form:select path="" id="type"  required="required"  class="form-control">
+					<form:select path="type" id="type"  required="required"  class="form-control">
 						<form:option value="">-Select-</form:option>
 						<form:option value="Auditor" label="Auditor" ></form:option>
 						<form:option value="RSA" label="RSA"></form:option>
@@ -66,19 +66,13 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 							<form:options items="${auditDetail.departments}" itemValue="code" itemLabel="name" />
 						</form:select>
 				</div>
-				<label class="col-sm-3 control-label text-left-audit">Pass Under Objection
-				</label>
-					<div class="col-sm-3 add-margin">
-					<form:checkbox  path="passUnderobjection" id="passUnderobjection" value="0" ></form:checkbox>
-				
-    		</div>
     	</div>
     	</div>
     	
     	</div>
     	
         <div class="buttonbottom" align="center">
-        <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  onclick="searchCheck()" value="Search"/>
+        <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  value="Search"/>
         </div>
         <br>
         <br>

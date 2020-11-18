@@ -263,6 +263,32 @@ function enableAll() {
 }
 
 function validate() {
+	
+	 //Added for validation Signatory by Prasanta
+		var firstsignatory='';
+		if(dom.get('firstsignatory') == null || dom.get('firstsignatory').value == '-1')
+	   {
+		bootbox.alert('Please Select First Signatory');
+		return false;
+	   }
+		else
+			{
+				firstsignatory=dom.get('firstsignatory').value;
+			}
+		var secondsignatory=''
+		if(dom.get('secondsignatory') == null || dom.get('secondsignatory').value == '-1')
+	   {
+		   bootbox.alert('Please Select Second Signatory');
+			return false;
+	   }
+		else
+		{
+			secondsignatory=dom.get('secondsignatory').value;
+		}
+	   //end validation of Signatory and get selected value
+	   
+	   
+	   
 	var insuffientAlert = 'There is no sufficient bank balance. ';
 	var continueAlert = 'Do you want to continue ? ';
 	var fundFlowNotGeneratedAlert = '';
@@ -311,7 +337,7 @@ function validate() {
 		bootbox.alert("Amount should be greater than zero ");
 		return false;
 	}
-	document.cbtbform.action='/services/EGF/contra/contraBTB-create.action';
+	document.cbtbform.action='/services/EGF/contra/contraBTB-create.action?firstsignatory='+firstsignatory+'&secondsignatory='+secondsignatory;
 	document.cbtbform.submit();
 	return true;
 }
