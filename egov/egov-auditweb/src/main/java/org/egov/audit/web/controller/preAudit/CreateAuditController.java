@@ -271,6 +271,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		}
 		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Created") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Auditor") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Section Officer") || auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Examiner"))
 		{
+			System.out.println("status :::"+auditDetails.getStatus().getCode());
 			if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
 			{
 				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
@@ -282,6 +283,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 						"checklist_postAudit");
 				
 			}
+			if(auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
+			{
+				System.out.println("created");
 				for (AppConfigValues value : appConfigValuesList) {
 					checklistDetail = new AuditCheckList();
 					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
@@ -298,6 +302,28 @@ public class CreateAuditController extends GenericWorkFlowController {
 					checklistDetail.setChecklist_description(value.getValue());
 					checkList.add(checklistDetail);
 				}
+			}
+			else
+			{
+				System.out.println("no creteed");
+				for (AuditCheckList value : auditDetails.getCheckList()) {
+					checklistDetail = new AuditCheckList();
+					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
+					{
+						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,value.getChecklist_description(),"ID"));
+						checklistDetail.setSeverity(getAuditCheckList(auditDetails,value.getChecklist_description(),"Sev"));
+						checklistDetail.setStatus(getAuditCheckList(auditDetails,value.getChecklist_description(),"Stat"));
+						checklistDetail.setChecklist_date(getAuditCheckListDate(auditDetails,value.getChecklist_description(),"Date"));
+					}
+					else
+					{
+						checklistDetail.setCheckListId("0");
+					}
+					checklistDetail.setChecklist_description(value.getChecklist_description());
+					checkList.add(checklistDetail);
+				}
+			}
+				
 				auditDetail.setCheckList(checkList);
 		}
 		else if(auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Department"))
@@ -402,6 +428,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
 				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
 				upload.setFileName(files[i].getOriginalFilename());
 				upload.setContentType(files[i].getContentType());
@@ -417,6 +447,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 			auditDetails.setDocumentDetail(list);
 			if(auditDetail.getPassUnderobjection() !=null) {
 			auditDetails.setPassUnderobjection(auditDetail.getPassUnderobjection());
+			}
+			else if (auditDetails.getPassUnderobjection() != null)
+			{
+				auditDetails.setPassUnderobjection(auditDetails.getPassUnderobjection());
 			}
 			else {
 				auditDetails.setPassUnderobjection(0);
@@ -560,10 +594,19 @@ public class CreateAuditController extends GenericWorkFlowController {
 					 * history.setUser_comments(checkListUI.getUser_comments());
 					 * applyAuditing(history); } }
 					 */
+					checkListHistoryList=new ArrayList<AuditChecklistHistory>();
 					checkListHistory=new AuditChecklistHistory();
+					checkListHistory.setAuditCheckList(checkListDb);
+					checkListHistory.setChecklist_date(checkListDb.getChecklist_date());
+					checkListHistory.setChecklist_description(checkListDb.getChecklist_description());
+					checkListHistory.setAuditor_comments(checkListDb.getAuditor_comments());
 					checkListHistory.setUser_comments(checkListUI.getUser_comments());
-					applyAuditing(checkListHistory); 
-					checkListDb.getCheckList_history().add(checkListHistory);
+					checkListHistory.setStatus(checkListDb.getStatus());
+					checkListHistory.setSeverity(checkListDb.getSeverity());
+					checkListHistory.setAuditDetails(auditDetails);
+					applyAuditing(checkListHistory);
+					checkListHistoryList.add(checkListHistory);
+					checkListDb.getCheckList_history().addAll(checkListHistoryList);;
 				}
 			}
 		}
@@ -1095,6 +1138,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetail.setAuditNumber(auditDetails.getAuditno());
 		auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
 		auditDetail.setAuditType(auditDetails.getType());
+		auditDetail.setPassUnderobjection(auditDetails.getPassUnderobjection());
 		EgBillregister bill = null;
 		auditDetail.setAuditId(Long.parseLong(auditId));
 		auditDetail.setAuditStatus("Pending with Examiner");
@@ -1144,19 +1188,19 @@ public class CreateAuditController extends GenericWorkFlowController {
 						"checklist_postAudit");
 			}
 				
-				for (AppConfigValues value : appConfigValuesList) {
+				for (AuditCheckList value : auditDetails.getCheckList()) {
 					checklistDetail = new AuditCheckList();
 					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
 					{
-						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,value.getValue(),"ID"));
-						checklistDetail.setSeverity(getAuditCheckList(auditDetails,value.getValue(),"Sev"));
-						checklistDetail.setStatus(getAuditCheckList(auditDetails,value.getValue(),"Stat"));
+						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,value.getChecklist_description(),"ID"));
+						checklistDetail.setSeverity(getAuditCheckList(auditDetails,value.getChecklist_description(),"Sev"));
+						checklistDetail.setStatus(getAuditCheckList(auditDetails,value.getChecklist_description(),"Stat"));
 					}
 					else
 					{
 						checklistDetail.setCheckListId("0");
 					}
-					checklistDetail.setChecklist_description(value.getValue());
+					checklistDetail.setChecklist_description(value.getChecklist_description());
 					checkList.add(checklistDetail);
 				}
 				auditDetail.setCheckList(checkList);

@@ -155,7 +155,7 @@ function checkselectedreceiptcount(obj)
 		if (cnt[i].checked == true )
 		{
 			j++; 
-			if(obj=='cancel' && receiptstatus[i].value=="Cancelled")
+			if(obj=='cancel' && receiptstatus[i].value=="CANCELLED")
 			{
 				dom.get("selectedcancelledreceiptserror").style.display="block";
 				return -1;
@@ -418,8 +418,15 @@ function checkviewforselectedrecord()
 		if (cnt[i].checked == true )
 		{
 			j++; 
+			//added for check Status CANCELLED
+			if(receiptstatus[i].value=="CANCELLED")
+			{
+				dom.get("selectedcancelledreceiptserror").style.display="block";
+				j--;
 		}
 	}
+	}
+		
 	//no records have been selected for view
 	if(j==0)
 	{

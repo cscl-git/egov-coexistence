@@ -1,10 +1,11 @@
 
 $(document).ready(function(){
-	$('input[type=checkbox]').removeAttr('checked');
-	
-	var passUnderObjection=$('#passUnderobjection').val();
-	if(passUnderObjection==1){$('input[type=checkbox]').attr( 'checked', true );}
+	 var passUnderObjection=$('#passUnderobjection').val();
+	 console.log("pass ::"+passUnderObjection);
+	 if(passUnderObjection==0 || passUnderObjection=='null' || passUnderObjection==null){
 
+	 $('input[type=checkbox]').removeAttr('checked');
+	 }
 	
 	
 	
@@ -40,7 +41,7 @@ if($("#passUnderobjection").is(':checked')){
 function setWorkFLowAction(name)
 {
 	console.log(name);
-	if(name =='sectionOfficer' && (document.getElementById('auditStatus').value == 'Created' || document.getElementById('auditStatus').value == 'Pending with Auditor') || document.getElementById('auditStatus').value =='Pending with Examiner' )
+	if(name =='sectionOfficer' && (document.getElementById('auditStatus').value == 'Created' || document.getElementById('auditStatus').value == 'Pending with Auditor' || document.getElementById('auditStatus').value =='Pending with Examiner') )
 		{
 			if (document.getElementById('leadAuditorEmpNo').value == '-1')
 				{

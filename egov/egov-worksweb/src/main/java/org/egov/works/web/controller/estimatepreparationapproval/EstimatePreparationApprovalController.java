@@ -240,7 +240,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "Save As Draft", method = RequestMethod.POST)
 	public String saveBoQDetailsDataDraft(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file1") MultipartFile[] files, final HttpServletRequest request)
+			final Model model, @RequestParam("file1") MultipartFile[] files, @RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request)
 			throws Exception {
 		
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
@@ -256,6 +256,19 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				upload.setFileName(files[i].getOriginalFilename());
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
+			}
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(estimatePreparationApproval.getObjectType());
+				list.add(upload2);
 			}
 		estimatePreparationApproval.setDocumentDetail(list);
 		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -307,7 +320,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 
 	@RequestMapping(value = "/estimate", params = "save", method = RequestMethod.POST)
-	public String saveBoqFileData(
+	public String uploadBoqFileData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, @RequestParam("file") MultipartFile file, final HttpServletRequest request)
 			throws Exception {
@@ -412,9 +425,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			// response = "Please choose a file.";
 		}
 		
-		  Map<String, List<BoQDetails>> groupByPriceMap = 
+		  Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		  System.out.println("groupByPriceMap---------"+groupByPriceMap);
+		 
 		
 		  
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
@@ -426,7 +439,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
 		model.addAttribute("fileuploadAllowed","Y");
-		model.addAttribute("milestoneList",groupByPriceMap);
+		model.addAttribute("milestoneList",groupByMilesToneMap);
 
 		return "estimatepreparationapproval-form";
 
@@ -549,7 +562,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	public String view(@PathVariable("id") final Long id, Model model) {
 
 		List<DocumentUpload> documentsall=new ArrayList<>();
-		
+		List<BoQDetails> boQDetailsList = new ArrayList();
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
@@ -567,6 +580,15 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		
+		
+		boQDetailsList=	estimateDetails.getBoQDetailsList();
+		
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
 		model.addAttribute("mode", "view");
@@ -582,7 +604,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") final Long id, Model model) {
 
-
+		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<DocumentUpload> documentsall=new ArrayList<>();
 		
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
@@ -602,6 +624,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		
+		boQDetailsList=	estimateDetails.getBoQDetailsList();
+		
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 
+		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
@@ -615,7 +644,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/edit/saveestimate1",  method = RequestMethod.POST)
 	public String editEstimateData(
 			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,@RequestParam("file1") MultipartFile[] files,
-			final HttpServletRequest request) throws Exception {
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
 
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
 		List<DocumentUpload> list = new ArrayList<>();
@@ -630,6 +659,20 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				upload.setFileName(files[i].getOriginalFilename());
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
+			}
+		
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(estimatePreparationApproval.getObjectType());
+				list.add(upload2);
 			}
 		estimatePreparationApproval.setDocumentDetail(list);
 		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != ""

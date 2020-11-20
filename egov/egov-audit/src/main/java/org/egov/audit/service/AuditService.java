@@ -239,7 +239,7 @@ public class AuditService {
 			actionName = "Post Audit pending";
 			natureOfTask = "Post-Audit";
 		}
-		if(auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Department") && (workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equals("Approve")))
+		if( (workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equals("Approve")))
 		{
 			System.out.println("logic for workflow ::: "+workFlowAction);
 			String stateValue = "";
@@ -402,7 +402,7 @@ public class AuditService {
 	        .withCreatedBy(user.getId())
 	        .withtLastModifiedBy(user.getId());
 		}
-		else if(workFlowAction.equalsIgnoreCase("approve"))
+		else if(workFlowAction.equals("approve"))
 		{
 			auditDetails.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(comment)

@@ -174,10 +174,10 @@
 					</div>
 					</c:if>
 					<br>
-					<c:if test="${fileuploadAllowed == 'Y' }">
+					<%-- <c:if test="${fileuploadAllowed == 'Y' }">
 					<a style="float:right;" onclick="addFileInputField();"
 							href="#"><img style="height:30px;" title="Add new BoQ" src="/services/egi/resources/erp2/images/add.png" border="0" /></a>
-					</c:if>
+					</c:if> --%>
 				<div>
 				<c:if test="${fileuploadAllowed == 'Y' }">
 			<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">

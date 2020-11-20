@@ -460,6 +460,7 @@ public interface FinancialConstants {
     public static final String CONTINGENCYBILL_PENDING_FINANCE = "Pending with Finance";
     public static final String AUDIT_ = "audit_";
     public static final String WORKFLOW_STATE_SAVEASDRAFT  = "SaveAsDraft";
+    public static final String CONTINGENCYBILL_PENDING_CANCEL = "Pending for Cancellation";
 
 	
 }
