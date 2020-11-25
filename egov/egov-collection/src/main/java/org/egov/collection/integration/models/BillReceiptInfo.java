@@ -120,6 +120,8 @@ public interface BillReceiptInfo {
      * @return Name of person who has paid for this receipt
      */
     public abstract String getPaidBy();
+    
+    public abstract String getSubdivison();
 
     /**
      * @return The receipt description

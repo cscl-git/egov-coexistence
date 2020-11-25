@@ -1846,7 +1846,15 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                     budgetDetail.setExecutingDepartment(budgetUpload.getDeptCode());
                     budgetDetail.setAnticipatoryAmount(BigDecimal.ZERO);
                     budgetDetail.setPlanningPercent(BigDecimal.valueOf(budgetUpload.getPlanningPercentage()));
-                    budgetDetail.setQuarterpercent(BigDecimal.valueOf(budgetUpload.getQuarterpercent()));
+                  //  budgetDetail.setQuarterpercent(BigDecimal.valueOf(budgetUpload.getQuarterpercent()));
+                    
+                    //Author - Bhushan >set four  quater to budget details
+                    budgetDetail.setQuarterpercent(BigDecimal.valueOf(budgetUpload.getQuarterOnepercent()));
+                    budgetDetail.setQuartertwopercent(BigDecimal.valueOf(budgetUpload.getQuarterTwopercent()));
+                    budgetDetail.setQuarterthreepercent(BigDecimal.valueOf(budgetUpload.getQuarterThreepercent()));
+                    budgetDetail.setQuarterfourpercent(BigDecimal.valueOf(budgetUpload.getQuarterFourpercent()));
+                    
+                    
                     if (budgetType.equalsIgnoreCase(RE)) {
                         budgetDetail.setOriginalAmount(budgetUpload.getReAmount());
                         budgetDetail.setApprovedAmount(budgetUpload.getReAmount());
@@ -2450,6 +2458,10 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'CAO Verify'");
     }
     
+    public List<BudgetDetail> getBudgetDetailsForUploadReportSO() {
+        return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'CAO REJECTED'");
+    }
+    
     public List<BudgetDetail> getBudgetDetailsForUploadReportACMC() {
         return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'ACMC Verify'");
     }
@@ -2462,6 +2474,104 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     public void updateByMaterializedPathCAO(final String materializedPath) {
         final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
         final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSO(final String materializedPath) {
+        final EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+        final EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService.getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'")
+                .setLong("approvedStatus", approvedStatus.getId()).setLong("createdStatus", createdStatus.getId())
+                .executeUpdate();
+               
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathReturnByACMC(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+          EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathReturnByMC(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+          EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                        "update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelBySO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByCAO(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByACMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "ACMC Verify");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    @Transactional
+    public void updateByMaterializedPathSTATUSCancelByMC(final String materializedPath) {
+        EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CANCEL");
+        EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Created");
+        persistenceService
+                .getSession()
+                .createSQLQuery(
+                		"update egf_budgetdetail set status = :approvedStatus where status =:createdStatus and  materializedPath like'"
+                                + materializedPath + "%'").setLong("approvedStatus", approvedStatus.getId())
+                .setLong("createdStatus", createdStatus.getId()).executeUpdate();
+    }
+    
+    
+    @Transactional
+    public void updateByMaterializedPathForReVerify(final String materializedPath) {
+    	 EgwStatus approvedStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO Verify");
+         EgwStatus createdStatus = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "CAO REJECTED");
         persistenceService.getSession()
                 .createSQLQuery(
                         "update egf_budgetdetail  set status = :approvedStatus where status =:createdStatus and  materializedPath like'"

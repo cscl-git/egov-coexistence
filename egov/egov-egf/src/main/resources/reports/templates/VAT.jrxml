@@ -41,6 +41,8 @@
 		<field name="nameOfAgency" class="java.lang.String"/>
 		<field name="workDone" class="java.lang.String"/>
 		<field name="amount" class="java.math.BigDecimal"/>
+		<field name="billVoucherNo" class="java.lang.String"/>
+		<field name="pexNo" class="java.lang.String"/>
 		<variable name="totalAmount" class="java.lang.Integer" calculation="Sum">
 			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
 		</variable>
@@ -71,7 +73,7 @@
 						<dataSourceExpression><![CDATA[$P{labourCessDataSource}]]></dataSourceExpression>
 					</datasetRun>
 					<jr:column width="28" uuid="d938765c-5c39-4673-923a-f57902a0455b">
-						<jr:columnHeader style="Table_CH" height="30">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="28" height="30" uuid="4f73ebf4-f06e-4f79-bd25-5b1e6bf97762"/>
 								<textElement textAlignment="Center">
@@ -80,61 +82,103 @@
 								<text><![CDATA[Sl No.]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField>
 								<reportElement x="0" y="0" width="28" height="30" uuid="203a2e30-64ee-4c32-8261-87749fb6ad7f"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{slNo}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="72" uuid="b35e06d9-3060-4be3-b50f-5a83635e9ef5">
-						<jr:columnHeader style="Table_CH" height="30">
+					<jr:column width="59" uuid="b35e06d9-3060-4be3-b50f-5a83635e9ef5">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="72" height="30" uuid="ddb0cf5f-7fee-4767-a856-ec65d0607def"/>
+								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="58" height="30" uuid="ddb0cf5f-7fee-4767-a856-ec65d0607def"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
 								<text><![CDATA[Recovery Code]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="72" height="30" isPrintWhenDetailOverflows="true" uuid="e5752274-a8ed-4c5f-a165-510e2818ed95"/>
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="58" height="30" isPrintWhenDetailOverflows="true" uuid="e5752274-a8ed-4c5f-a165-510e2818ed95"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{recoveryCode}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
-					<jr:column width="70" uuid="fb283059-f121-40f8-ba0e-9ed4803cce91">
-						<jr:columnHeader style="Table_CH" height="30">
+					<jr:column width="59" uuid="fb283059-f121-40f8-ba0e-9ed4803cce91">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
-								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="70" height="30" uuid="62adc467-b3d5-4506-9b8f-d188e17de17d"/>
+								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="59" height="30" uuid="62adc467-b3d5-4506-9b8f-d188e17de17d"/>
 								<textElement textAlignment="Center">
 									<font fontName="Verdana" size="12"/>
 								</textElement>
 								<text><![CDATA[Voucher No]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="30" isPrintWhenDetailOverflows="true" uuid="7ce0b7d3-7ae6-428f-86a4-c07cb537b3e2"/>
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="59" height="30" isPrintWhenDetailOverflows="true" uuid="7ce0b7d3-7ae6-428f-86a4-c07cb537b3e2"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{voucherNo}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
+					<jr:column width="74" uuid="ba9e6e08-7adc-422f-b923-3c7928225428">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="74" height="30" uuid="84113fec-f596-44d5-975f-6bf0baf88831"/>
+								<textElement textAlignment="Center">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<text><![CDATA[Bill Voucher No.]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="74" height="30" isPrintWhenDetailOverflows="true" uuid="89fe66df-70d9-4c3c-9a65-a0de268c1f2a"/>
+								<textElement textAlignment="Center">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{billVoucherNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="75" uuid="39c2b941-5d42-41d6-98fd-13accbbdd429">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="75" height="30" uuid="03e5d391-c159-456b-af78-024a12de0899"/>
+								<textElement textAlignment="Center">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<text><![CDATA[PEX Number]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell height="30" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="75" height="30" isPrintWhenDetailOverflows="true" uuid="b8113eaf-4d71-44e3-8eb8-5e7b588dcff6"/>
+								<textElement textAlignment="Center">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{pexNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
 					<jr:column width="100" uuid="f350ff66-8854-4f5b-a229-5dd766d3ff83">
-						<jr:columnHeader style="Table_CH" height="30">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="100" height="30" uuid="45240ffa-ab32-4c8a-9bd4-7b3345968b0b"/>
 								<textElement textAlignment="Center">
@@ -143,19 +187,19 @@
 								<text><![CDATA[Division]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" uuid="6e950660-f63f-4f67-b83e-fde4183617c2"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{division}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="120" uuid="bbee1e1d-6924-4796-996a-e41e34da5c8f">
-						<jr:columnHeader style="Table_CH" height="30">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="120" height="30" uuid="d460e06c-158c-431a-8f04-5f6737389c93"/>
 								<textElement textAlignment="Center">
@@ -164,19 +208,19 @@
 								<text><![CDATA[Name Of Agency]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30"/>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1"/>
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="120" height="30" isPrintWhenDetailOverflows="true" uuid="0389a7c2-af88-4601-8cbd-d427639589ea"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{nameOfAgency}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="100" uuid="2af58328-7c45-4434-b38c-5ec3a71dbf03">
-						<jr:columnHeader style="Table_CH" height="30">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="100" height="30" uuid="ea6fde16-ebbf-49d9-bb5e-61c4fec24b3e"/>
 								<textElement textAlignment="Center">
@@ -185,7 +229,7 @@
 								<text><![CDATA[Work Done]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement x="0" y="0" width="100" height="30" uuid="38500972-0776-444a-ae87-9fde631850fd"/>
 								<textElement textAlignment="Right">
@@ -194,18 +238,18 @@
 								<text><![CDATA[Total]]></text>
 							</staticText>
 						</jr:columnFooter>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="30" isPrintWhenDetailOverflows="true" uuid="55606ac6-df3c-4519-8c28-cd6a36866f52"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{workDone}]]></textFieldExpression>
 							</textField>
 						</jr:detailCell>
 					</jr:column>
 					<jr:column width="60" uuid="187dbd4b-3b0b-488b-a32c-c4c9c63801b4">
-						<jr:columnHeader style="Table_CH" height="30">
+						<jr:columnHeader style="Table_CH" height="30" rowSpan="1">
 							<staticText>
 								<reportElement positionType="FixRelativeToBottom" x="0" y="0" width="60" height="30" uuid="2936333c-598a-460f-b887-a3ef2debb77a"/>
 								<textElement textAlignment="Center">
@@ -215,20 +259,20 @@
 Amount]]></text>
 							</staticText>
 						</jr:columnHeader>
-						<jr:columnFooter style="Table_CH" height="30">
+						<jr:columnFooter style="Table_CH" height="30" rowSpan="1">
 							<textField isBlankWhenNull="true">
 								<reportElement x="0" y="0" width="60" height="30" uuid="f8c8df77-7f6f-4a2d-b54f-40fe558beae2"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{totalAmount}]]></textFieldExpression>
 							</textField>
 						</jr:columnFooter>
-						<jr:detailCell style="Table_TD" height="30">
+						<jr:detailCell style="Table_TD" height="30" rowSpan="1">
 							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="30" isPrintWhenDetailOverflows="true" uuid="7283de0d-074a-4b1d-9488-fd4e8eef5c69"/>
 								<textElement textAlignment="Center">
-									<font fontName="Verdana" size="12"/>
+									<font fontName="Verdana" size="11"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 							</textField>

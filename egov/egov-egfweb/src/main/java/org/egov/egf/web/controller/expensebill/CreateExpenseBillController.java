@@ -56,6 +56,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -153,7 +154,7 @@ public class CreateExpenseBillController extends BaseBillController {
     public String showNewForm(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,HttpServletRequest request) {
         LOGGER.info("New expensebill creation request created");
         Cookie[] cookies = request.getCookies();
-    	
+       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
     	
     	if(null!=cookies && cookies.length>0)
     	{
@@ -164,6 +165,7 @@ public class CreateExpenseBillController extends BaseBillController {
         setDropDownValues(model);
         model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
+       model.addAttribute("validActionList", validActions);
         prepareValidActionListByCutOffDate(model);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            
@@ -209,7 +211,11 @@ public class CreateExpenseBillController extends BaseBillController {
 
         populateBillDetails(egBillregister);
         validateBillNumber(egBillregister, resultBinder);
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
         validateLedgerAndSubledger(egBillregister, resultBinder);
+    	}
+     //   
 
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);

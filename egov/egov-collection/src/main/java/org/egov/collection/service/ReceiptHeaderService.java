@@ -1688,7 +1688,11 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .paymentMode(getPaymentModeEnum(receiptHeader.getModOfPayment()))
                 .totalDue(receiptHeader.getTotalAmount())
                 .totalAmountPaid(receiptHeader.getTotalAmount())
-                .paidBy(receiptHeader.getPaidBy())
+                .paidBy(receiptHeader.getPaidBy() +" & "+receiptHeader.getPayeeAddress())
+                .gstno(receiptHeader.getGstno())
+                .subdivison(receiptHeader.getSubdivison())
+                .narration(receiptHeader.getReferenceDesc())
+                .payerAddress(receiptHeader.getPayeeAddress())
                 .paymentStatus(PaymentStatusEnum.NEW)
                 .build();
         this.prepareInstrumentsDetails(payment,receiptHeader);
@@ -1705,12 +1709,18 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             Long transactionDate = instrumentHeader.getTransactionDate() != null ? instrumentHeader.getTransactionDate().getTime() : instrumentDate;
             String transactionNumber = instrumentHeader.getTransactionNumber() != null ? instrumentHeader.getTransactionNumber() : instrumentHeader.getInstrumentNumber();
             String ifscCode = instrumentHeader.getIfscCode();
+            String bankName=instrumentHeader.getBankId() != null ? instrumentHeader.getBankId().getName() : "";
+            String branchName=instrumentHeader.getBankBranchName() != null ? instrumentHeader.getBankBranchName() : "";
+            LOGGER.info("bankName :::"+bankName);
+            LOGGER.info("branchName :::"+branchName);
             payment.setInstrumentDate(instrumentDate);
             payment.setInstrumentNumber(instrumentNumber);
             payment.setInstrumentStatus(instrumentStatus);
             payment.setTransactionDate(transactionDate);
             payment.setTransactionNumber(transactionNumber);
             payment.setIfscCode(ifscCode);
+            payment.setBankBranch(branchName);
+            payment.setBankName(bankName);
         } catch (Exception e) {
             LOGGER.error("ERROR occurred while setting the instruments details",e);
         }
@@ -1718,6 +1728,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
 
     private PaymentModeEnum getPaymentModeEnum(String modeOfPayment){
         PaymentModeEnum payModeEnum = null;
+        LOGGER.info("modeOfPayment ::"+modeOfPayment);
         switch (modeOfPayment.toUpperCase()) {
         case "CASH":
             payModeEnum = PaymentModeEnum.CASH;
@@ -1733,6 +1744,15 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             break;
         case "ONLINE":
             payModeEnum = PaymentModeEnum.ONLINE;
+            break;
+        case "POSMOHBD":
+            payModeEnum = PaymentModeEnum.POSMOHBD;
+            break;
+        case "POSMOHCATTLE":
+            payModeEnum = PaymentModeEnum.POSMOHCATTLE;
+            break;
+        case "POSMOHSLH":
+            payModeEnum = PaymentModeEnum.POSMOHSLH;
             break;
 
         default:

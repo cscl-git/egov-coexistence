@@ -86,9 +86,42 @@ public class BudgetUpload  {
     private Long planningPercentage;
     private Long quarterpercent;
 
+    private Long quarterOnepercent;private Long quarterTwopercent;private Long quarterThreepercent;private Long quarterFourpercent;
     private BigDecimal beAmount;
 
     private BigDecimal reAmount;
+
+    public Long getQuarterOnepercent() {
+		return quarterOnepercent;
+	}
+
+	public void setQuarterOnepercent(Long quarterOnepercent) {
+		this.quarterOnepercent = quarterOnepercent;
+	}
+
+	public Long getQuarterTwopercent() {
+		return quarterTwopercent;
+	}
+
+	public void setQuarterTwopercent(Long quarterTwopercent) {
+		this.quarterTwopercent = quarterTwopercent;
+	}
+
+	public Long getQuarterThreepercent() {
+		return quarterThreepercent;
+	}
+
+	public void setQuarterThreepercent(Long quarterThreepercent) {
+		this.quarterThreepercent = quarterThreepercent;
+	}
+
+	public Long getQuarterFourpercent() {
+		return quarterFourpercent;
+	}
+
+	public void setQuarterFourpercent(Long quarterFourpercent) {
+		this.quarterFourpercent = quarterFourpercent;
+	}
 
     private Fund fund;
 

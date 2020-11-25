@@ -304,6 +304,12 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 					voucherHeader.getVouchermis().getFunctionary().getCode());
 		if (voucherHeader.getVouchermis().getFunction() != null)
 			headerdetails.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
+		//modified added by Prasanta
+		if (voucherHeader.getFirstsignatory() != null)
+            headerdetails.put("firstsignatory", voucherHeader.getFirstsignatory());
+        if (voucherHeader.getSecondsignatory() != null)
+            headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        
 		return headerdetails;
 	}
 
@@ -770,6 +776,29 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			}
 		}
 	}
+	
+	 protected void removeEmptyRowsAccoutDraftDetail(final List list) {
+	        for (final Iterator<VoucherDetails> detail = list.iterator(); detail.hasNext();) {
+	            final VoucherDetails next = detail.next();
+	            if (next == null)
+	                detail.remove();
+	            else {
+	                if (next.getDebitAmountDetail() == null)
+	                    next.setDebitAmountDetail(BigDecimal.ZERO);
+	                
+	                if (next.getCreditAmountDetail() == null)
+	                    next.setCreditAmountDetail(BigDecimal.ZERO);
+	                
+	                if (next.getGlcodeDetail()== null)
+	                    next.setGlcodeDetail("");
+	                
+	                if (next.getFunctionDetail()==null)
+	                    next.setFunctionDetail("");
+	                
+	                
+	            }
+	        }
+	    }
 
 	protected void removeEmptyRowsSubledger(final List<VoucherDetails> list) {
 		for (final Iterator<VoucherDetails> detail = list.iterator(); detail.hasNext();) {

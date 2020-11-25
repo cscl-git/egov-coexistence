@@ -286,6 +286,32 @@ function showInstrumentDetails(obj){
 		clearChequeDDDetails();
 		//clearManualReceiptData();
 	}
+	else if(obj.id=='posmohbdradiobutton'){
+		document.getElementById('cashdetails').style.display='none';
+		document.getElementById('chequeDDdetails').style.display='none';
+		document.getElementById('carddetails').style.display='table-row';
+		document.getElementById('bankdetails').style.display='none';
+		document.getElementById('onlinedetails').style.display='none';
+		document.getElementById('instrumentTypeCashOrCard').value="posmohbd";
+		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
+		clearCashDetails();
+		clearBankDetails();
+		clearChequeDDDetails();
+		//clearManualReceiptData();
+	}
+	else if(obj.id=='posmohcattleradiobutton'){
+		document.getElementById('cashdetails').style.display='none';
+		document.getElementById('chequeDDdetails').style.display='none';
+		document.getElementById('carddetails').style.display='table-row';
+		document.getElementById('bankdetails').style.display='none';
+		document.getElementById('onlinedetails').style.display='none';
+		document.getElementById('instrumentTypeCashOrCard').value="posmohcattle";
+		document.getElementById('instrHeaderCard.instrumentAmount').value = document.getElementById('totalamountdisplay').value;
+		clearCashDetails();
+		clearBankDetails();
+		clearChequeDDDetails();
+		//clearManualReceiptData();
+	}
 	else if(obj.id=='bankradiobutton'){
 		document.getElementById('cashdetails').style.display='none';
 		document.getElementById('chequeDDdetails').style.display='none';
@@ -321,7 +347,7 @@ function validateTransactionNumber()
 {
 	document.getElementById("receipt_error_area").innerHTML="";    
 	document.getElementById("receipt_error_area").style.display="none";
-	 if(document.getElementById("cardradiobutton").checked)
+	 if(document.getElementById("cardradiobutton").checked || document.getElementById("posmohbdradiobutton").checked || document.getElementById("posmohcattleradiobutton").checked || document.getElementById("posmohslhradiobutton").checked)
 		 {    
 		 	 var instrumentNum="";
 		 	 var confirmInstrumentNo="";
@@ -395,7 +421,23 @@ loadBankDetailFailureHandler = function(){
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="card" id="cardradiobutton" name="paytradiobutton" /> Credit/Debit card
 			&nbsp;
-	</span> <span style="float: left;" id="bankradiobuttonspan"> <input
+	</span>
+	<span style="float: left;" id="posmohbdradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohbd" id="posmohbdradiobutton" name="paytradiobutton" /> POS MOH B&D
+			&nbsp;
+	</span>
+	<span style="float: left;" id="posmohcattleradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohcattle" id="posmohcattleradiobutton" name="paytradiobutton" /> POS MOH Cattle
+			&nbsp;
+	</span>
+	<span style="float: left;" id="posmohslhradiobuttonspan"> <input
+			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
+			value="posmohslh" id="posmohslhradiobutton" name="paytradiobutton" /> POS MOH SLH
+			&nbsp;
+	</span>
+	 <span style="float: left;" id="bankradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);" type="radio" align="absmiddle"
 			value="bankchallan" id="bankradiobutton" name="paytradiobutton" /> Direct Bank &nbsp;
 	</span> </span> <span style="float: left;" id="onlineradiobuttonspan"> <input
@@ -455,8 +497,7 @@ loadBankDetailFailureHandler = function(){
 							<tr id="chequebankrow">
 								<td class="bluebox" width="3%"></td>
 								<td class="bluebox"><s:text
-										name="billreceipt.payment.ifsccode" /><span
-									class="mandatory1">*</span></td>
+										name="billreceipt.payment.ifsccode" /></td>
 								<td class="bluebox"><s:textfield
 										label="instrumentIfscCode" id="instrumentIfscCode"
 										maxlength="50" name="instrumentProxyList[0].ifscCode"
@@ -470,7 +511,7 @@ loadBankDetailFailureHandler = function(){
 										name="billreceipt.payment.bankname" /><span
 									class="mandatory1">*</span></td>
 								<td class="bluebox"><s:textfield id="bankName" type="text"
-										name="instrumentProxyList[0].bankId.name" readonly="true"/> <s:hidden id="bankCode"
+										name="instrumentProxyList[0].bankId.name" /> <s:hidden id="bankCode"
 										name="instrumentProxyList[0].bankId.code" />
 									<div id="bankcodescontainer"></div></td>
 							</tr>
@@ -482,7 +523,7 @@ loadBankDetailFailureHandler = function(){
 								<td class="bluebox"><s:textfield
 										label="instrumentBranchName" id="instrumentBranchName"
 										maxlength="50" name="instrumentProxyList[0].bankBranchName"
-										size="18" readonly="true"/></td>
+										size="18" /></td>
 								<td class="bluebox"><s:text
 										name="billreceipt.payment.instrumentAmount" /><span
 									class="mandatory1">*</span></td>

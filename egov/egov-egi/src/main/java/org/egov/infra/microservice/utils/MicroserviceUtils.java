@@ -91,6 +91,8 @@ import org.egov.infra.microservice.contract.CreateUserRequest;
 import org.egov.infra.microservice.contract.Position;
 import org.egov.infra.microservice.contract.PositionRequest;
 import org.egov.infra.microservice.contract.PositionResponse;
+import org.egov.infra.microservice.contract.RequestInfoCancelWrapper;
+import org.egov.infra.microservice.contract.RequestInfoSearchWrapper;
 import org.egov.infra.microservice.contract.RequestInfoWrapper;
 import org.egov.infra.microservice.contract.Task;
 import org.egov.infra.microservice.contract.TaskResponse;
@@ -141,6 +143,7 @@ import org.egov.infra.microservice.models.ReceiptSearchCriteria;
 import org.egov.infra.microservice.models.Remittance;
 import org.egov.infra.microservice.models.RemittanceRequest;
 import org.egov.infra.microservice.models.RemittanceResponse;
+import org.egov.infra.microservice.models.RemittanceResponseDepositWorkDetails;
 import org.egov.infra.microservice.models.RequestInfo;
 import org.egov.infra.microservice.models.ResponseInfo;
 import org.egov.infra.microservice.models.TaxHeadMaster;
@@ -227,6 +230,9 @@ public class MicroserviceUtils {
     @Value("${egov.services.common.masters.businesscategory.url}")
     private String businessCategoryServiceUrl;
 
+    @Value("${egov.services.collection.service.remittance.depositworkurl}")
+    private String depositworkurl;
+    
     @Value("${egov.services.common.masters.businessdetails.url}")
     private String businessDetailsServiceUrl;
 
@@ -750,7 +756,7 @@ public class MicroserviceUtils {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
         empUrl.append("?tenantId=" + getTenentId());
-
+        List<EmployeeInfo> resultList=null;
         if (empId != 0)
             empUrl.append("&ids=" + empId);
         if (toDay != null)
@@ -768,7 +774,11 @@ public class MicroserviceUtils {
         reqWrapper.setRequestInfo(requestInfo);
 
         EmployeeInfoResponse empResponse = restTemplate.postForObject(empUrl.toString(), reqWrapper, EmployeeInfoResponse.class);
-        return empResponse.getEmployees();
+        	if(empResponse != null && empResponse.getEmployees() != null || !empResponse.getEmployees().isEmpty())
+            {
+        		resultList=empResponse.getEmployees();
+            }
+        return resultList;
     }
 
     public EmployeeInfo getEmployeeById(Long empId) {
@@ -1150,9 +1160,14 @@ public class MicroserviceUtils {
 
         default:
             RequestInfo requestInfo = new RequestInfo();
-            RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
+            //:Bhushan
+            //change by Bhushan -added RequestInfoSearchWrapper
+            RequestInfoSearchWrapper reqWrapper = new RequestInfoSearchWrapper();
             requestInfo.setAuthToken(getUserToken());
             requestInfo.setUserInfo(getUserInfo());
+            //:Bhushan
+            //change by Bhushan -add setids
+            reqWrapper.setIds(rSearchcriteria.getIds());
             reqWrapper.setRequestInfo(requestInfo);
             StringBuilder url = new StringBuilder();
             url.append(appConfigManager.getEgovCollSerHost()).append(receiptSearchUrl).append("?tenantId=").append(getTenentId());
@@ -1214,11 +1229,50 @@ public class MicroserviceUtils {
 
     }
 
+    public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
+            String receiptNo) {
+
+        return this.searchReciepts(classification, fromDate, toDate, businessCode,department, Arrays.asList(receiptNo));
+
+    }
+    public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
+            List<String> receiptNos) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .department(department)
+                .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+               //.receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                //.classification(classification)
+                .build();
+        return this.getReceipt(criteria);
+    }
+    
+    public List<Receipt> searchRecieptsFinance(String classification, Date fromDate, Date toDate, String businessCode,
+            String receiptNo,String type) {
+
+        return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo),type);
+
+    }
+
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,
             List<String> receiptNos) {
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
+                .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .classification(classification)
+                .build();
+        return this.getReceipt(criteria);
+    }
+
+    public List<Receipt> searchRecieptsFin(String classification, Date fromDate, Date toDate, String businessCode,
+            List<String> receiptNos,String type) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .type(type)
                 .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
                 .receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
                 .classification(classification)
@@ -1264,6 +1318,22 @@ public class MicroserviceUtils {
         return restTemplate.postForObject(url.toString(), request, RemittanceResponse.class);
     }
 
+    
+    public RemittanceResponseDepositWorkDetails getDayWorkHistory(Set<String> reciptNumber) {
+        final StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost() + depositworkurl);
+        RemittanceRequest request = new RemittanceRequest();
+        request.setReceiptNumbers(reciptNumber);
+        final RequestInfo requestInfo = new RequestInfo();
+
+        requestInfo.setAuthToken(generateAdminToken(getTenentId()));
+        requestInfo.setUserInfo(new UserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        request.setRequestInfo(requestInfo);
+
+        return restTemplate.postForObject(url.toString(), request, RemittanceResponseDepositWorkDetails.class);
+    }
+    
+    
     public ReceiptResponse updateReceipts(List<Receipt> receiptList) {
         final StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost() + receiptUpdateUrl);
         ReceiptRequest request = new ReceiptRequest();
@@ -1671,18 +1741,50 @@ public class MicroserviceUtils {
     
     public List<Payment> getPayments(PaymentSearchCriteria searchCriteria){
         PaymentResponse response = null;
+         RequestInfo requestInfo = getRequestInfo();
+         RequestInfoWrapper reqWrapper = null;
+         RequestInfoSearchWrapper reqSearchWrapper = new RequestInfoSearchWrapper();
         StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentSearch()).append("?");
-        final RequestInfo requestInfo = getRequestInfo();
-        RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
-        reqWrapper.setRequestInfo(requestInfo);
+        if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
+        {
+        	reqSearchWrapper.setIds(searchCriteria.getIds());
+        	reqSearchWrapper.setRequestInfo(requestInfo);
+        }
+        else
+        {
+            reqWrapper = new RequestInfoWrapper();
+            reqWrapper.setRequestInfo(requestInfo);
+        }
         try {
             preparePaymentSearchQueryString(searchCriteria, url);
-            response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
+            if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
+            {
+            	LOGGER.info("ids ; "+url.toString());
+            	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
+            }
+            else
+            {
+            	LOGGER.info("non ids : "+url.toString());
+            	response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
+            }
+            
             return response.getPayments();
         } catch (Exception e) {
             LOGGER.error("ERROR occurred while fetching the Payment list : ",e);
         }
         return null;
+    }
+    
+    public void cancelReceipts(Set<String> receiptNumbers)
+    {
+    	RequestInfoCancelWrapper reqSearchWrapper = new RequestInfoCancelWrapper();
+    	StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentCancel());
+    	PaymentResponse response = null;
+        RequestInfo requestInfo = getRequestInfo();
+        reqSearchWrapper.setIds(receiptNumbers);
+    	reqSearchWrapper.setRequestInfo(requestInfo);
+    	LOGGER.info("ids ; "+url.toString());
+    	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
     }
 
     private void preparePaymentSearchQueryString(PaymentSearchCriteria searchCriteria, StringBuilder url) {
@@ -1716,9 +1818,9 @@ public class MicroserviceUtils {
         if(CollectionUtils.isNotEmpty(searchCriteria.getBillIds())){
             url.append("&billIds=").append(StringUtils.join(searchCriteria.getBillIds(),","));
         }
-        if(CollectionUtils.isNotEmpty(searchCriteria.getIds())){
+        /*if(CollectionUtils.isNotEmpty(searchCriteria.getIds())){
             url.append("&ids=").append(StringUtils.join(searchCriteria.getIds(),","));
-        }
+        }*/
     }
 
     public PaymentResponse generatePayments(Payment payment) {

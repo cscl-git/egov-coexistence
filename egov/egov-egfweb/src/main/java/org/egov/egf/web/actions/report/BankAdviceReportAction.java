@@ -196,17 +196,23 @@ public class BankAdviceReportAction extends BaseFormAction {
         if (instrumentnumber == null)
             addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
         else {
-            List<Object[]> resultList = new ArrayList<Object[]>();
-            final List<InstrumentHeader> instrumentHeaderList = new ArrayList<InstrumentHeader>();
-            resultList = getPersistenceService()
-                    .findAllBy(RTGSPEXNUMBERSQUERY, bankaccount.getId());
-            for (final Object[] obj : resultList) {
-                InstrumentHeader ih = new InstrumentHeader();
-                ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", (Long) obj[0]);
-
-                instrumentHeaderList.add(ih);
-            }
-            addDropdownData("chequeNumberList", instrumentHeaderList);
+			
+			  List<Object[]> resultList = new ArrayList<Object[]>(); final
+			  List<InstrumentHeader> instrumentHeaderList = new
+			  ArrayList<InstrumentHeader>(); 
+			
+			  //resultList = getPersistenceService() .findAllBy(RTGSPEXNUMBERSQUERY,
+			  //bankaccount.getId()); 
+			  //for (final Object[] obj : resultList) {
+			  InstrumentHeader ih = new InstrumentHeader(); 
+			  ih = (InstrumentHeader)persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
+			  
+			  instrumentHeaderList.add(ih); 
+			  //}
+			 
+			  addDropdownData("chequeNumberList",
+			  instrumentHeaderList);
+			 
         }
         fullNameMonthMap = DateUtils.getAllMonthsWithFullNames();
         final List<CFinancialYear> financialYears = financialYearDAO.getAllActiveFinancialYearList();
@@ -239,28 +245,34 @@ public class BankAdviceReportAction extends BaseFormAction {
         if (instrumentnumber == null)
             addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
         else {
-            List<Object[]> resultList = new ArrayList<Object[]>();
-            final List<InstrumentHeader> instrumentHeaderList = new ArrayList<InstrumentHeader>();
-            resultList = getPersistenceService()
-                    .findAllBy(
-                            ""
-                                    +
-                                    "SELECT ih.id, ih.instrumentNumber FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "
-                                    +
-                                    "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
-                                    +
-                                    " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
-                                    +
-                                    "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
-                                    + FinancialConstants.MODEOFPAYMENT_PEX + "' " +
-                                    "GROUP BY ih.instrumentNumber,ih.id", bankaccount.getId());
-            for (final Object[] obj : resultList) {
-                InstrumentHeader ih = new InstrumentHeader();
-                ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", (Long) obj[0]);
-
-                instrumentHeaderList.add(ih);
-            }
-            addDropdownData("chequeNumberList", instrumentHeaderList);
+			
+			  List<Object[]> resultList = new ArrayList<Object[]>(); final
+			  List<InstrumentHeader> instrumentHeaderList = new
+			  ArrayList<InstrumentHeader>(); 
+			
+			/*
+			 * resultList = getPersistenceService() .findAllBy( "" +
+			 * "SELECT ih.id, ih.instrumentNumber FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "
+			 * +
+			 * "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
+			 * +
+			 * " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
+			 * +
+			 * "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
+			 * + FinancialConstants.MODEOFPAYMENT_PEX + "' " +
+			 * "GROUP BY ih.instrumentNumber,ih.id", bankaccount.getId());
+			 */ 
+			  //for (final Object[] obj : resultList) 
+			  //{ 
+				  InstrumentHeader ih = new InstrumentHeader(); 
+				  ih  = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
+			  
+			  instrumentHeaderList.add(ih);
+			  //}
+			  
+			  addDropdownData("chequeNumberList",
+			  instrumentHeaderList);
+			 
         }
         fullNameMonthMap = DateUtils.getAllMonthsWithFullNames();
         final List<CFinancialYear> financialYears = financialYearDAO.getAllActiveFinancialYearList();
@@ -627,7 +639,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -635,15 +647,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {
 					  
 					  secondsignatory="Chief Accounts Officer";
 				  }
-				  
-				  
 			  }
 		  }
 		  else
@@ -708,7 +718,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -716,14 +726,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {
 					  
 					  secondsignatory="Chief Accounts Officer";
 				  }
-				  
 				  
 			  }
 		  }
@@ -790,7 +799,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -798,15 +807,13 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {
 					  
 					  secondsignatory="Chief Accounts Officer";
 				  }
-				  
-				  
 			  }
 		  }
 		  else
@@ -872,7 +879,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  {
 				  if(element[0] != null && !element[0].toString().isEmpty())
 				  {
-					  firstsignatory=element[0].toString();
+					  firstsignatory=(element[0].toString()).split(",")[0];
 				  }
 				  else
 				  {
@@ -880,7 +887,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
-					  secondsignatory=element[1].toString();  
+					  secondsignatory=(element[1].toString()).split(",")[0];  
 				  }
 				  else
 				  {

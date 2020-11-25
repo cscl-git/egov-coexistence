@@ -477,7 +477,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppCao();
         for(BudgetDetail bd:detailList)
         {
-        	EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "REAPP ACMC");
+        	EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
             bd.setStatus(status);
             budgetDetailService.update(bd);
             getSession().flush();

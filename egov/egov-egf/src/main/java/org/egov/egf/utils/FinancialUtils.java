@@ -335,7 +335,68 @@ public class FinancialUtils {
         }
         return historyTable;
     }
+    public List<HashMap<String, Object>> getWorkflowHistory(final State state, final List<StateHistory> history) {
+        org.egov.infra.microservice.models.User user = null;
+        EmployeeInfo ownerobj = null;
+        final List<HashMap<String, Object>> historyTable = new ArrayList<>();
+        final HashMap<String, Object> map = new HashMap<>(0);
+        if (null != state) {
+            if (!history.isEmpty() && history != null)
+                Collections.reverse(history);
+            for (final StateHistory stateHistory : history) {
+                final HashMap<String, Object> workflowHistory = new HashMap<>(0);
+                workflowHistory.put("date", stateHistory.getDateInfo());
+                workflowHistory.put("comments", stateHistory.getComments());
+                workflowHistory.put("updatedBy", stateHistory.getLastModifiedBy() + "::"
+                        + stateHistory.getLastModifiedBy());
+                workflowHistory.put("status", stateHistory.getValue());
+                final Long owner = stateHistory.getOwnerPosition();
+                final State _sowner = stateHistory.getState();
+               ownerobj=    this.microServiceUtil.getEmployee(owner, null, null, null).get(0);
+                if (null != ownerobj) {
+                    workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    Department department=   this.microServiceUtil.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+                    if(null != department)
+                        workflowHistory.put("department", department.getName());
+                } else if (null != _sowner && null != _sowner.getDeptName()) {
+                    user = microServiceUtil.getEmployee(owner, null, null, null).get(0).getUser();
+                    workflowHistory
+                            .put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
+                    workflowHistory.put("department", null != _sowner.getDeptName() ? _sowner.getDeptName() : "");
+                }
+                historyTable.add(workflowHistory);
+            }
+            map.put("date", state.getDateInfo());
+            map.put("comments", state.getComments() != null ? state.getComments() : "");
+            map.put("updatedBy", state.getLastModifiedBy() + "::" + state.getLastModifiedBy());
+            map.put("status", state.getValue());
+            final Long ownerPosition = state.getOwnerPosition();
+            ownerobj=    this.microServiceUtil.getEmployee(ownerPosition, null, null, null).get(0);
+            if(null != ownerobj){
+                map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+              Department department=   this.microServiceUtil.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+              if(null != department)
+                  map.put("department", department.getName());
+              //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
+//                        .getDepartmentForUser(user.getId()).getName() : "");
+            } else if (null != ownerPosition && null != state.getDeptName()) {
+                user = this.microServiceUtil.getEmployee(ownerPosition, null, null, null).get(0).getUser();
+                map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
+                map.put("department", null != state.getDeptName() ? state.getDeptName() : "");
+            }
+            historyTable.add(map);
+            Collections.sort(historyTable, new Comparator<Map<String, Object>> () {
 
+                public int compare(Map<String, Object> mapObject1, Map<String, Object> mapObject2) {
+
+                    return ((java.sql.Timestamp) mapObject1.get("date")).compareTo((java.sql.Timestamp) mapObject2.get("date")); //ascending order
+                }
+
+            });
+        }
+        return historyTable;
+
+    }
     public AccountCodePurpose getAccountCodePurposeById(final Long id) {
 
         return getCurrentSession().load(AccountCodePurpose.class, id);

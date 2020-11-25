@@ -13,6 +13,8 @@ public class DeductionReportBean {
 	private BigDecimal amount;
 	private String gstNoOfAgency;
 	private String panNoOfAgency;
+	private String billVoucherNo;
+	private String pexNo;
 	public int getSlNo() {
 		return slNo;
 	}
@@ -67,6 +69,18 @@ public class DeductionReportBean {
 	}
 	public void setPanNoOfAgency(String panNoOfAgency) {
 		this.panNoOfAgency = panNoOfAgency;
+	}
+	public String getBillVoucherNo() {
+		return billVoucherNo;
+	}
+	public void setBillVoucherNo(String billVoucherNo) {
+		this.billVoucherNo = billVoucherNo;
+	}
+	public String getPexNo() {
+		return pexNo;
+	}
+	public void setPexNo(String pexNo) {
+		this.pexNo = pexNo;
 	}
 
 }

@@ -25,6 +25,12 @@ public class Receipt {
     // Read only, populated during search
     private Long receiptDate;
 
+    private String subdivison;
+    
+    private String paymentStatus;
+    
+    private String gstNo;
+
     @NotNull
     @Size(min = 1, max = 1)
     @Valid
@@ -110,4 +116,28 @@ public class Receipt {
     public void setPaymentId(String paymentId) {
         this.paymentId = paymentId;
     }
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
+
+	public String getGstNo() {
+		return gstNo;
+	}
+
+	public void setGstNo(String gstNo) {
+		this.gstNo = gstNo;
+	}
+
+	public String getPaymentStatus() {
+		return paymentStatus;
+	}
+
+	public void setPaymentStatus(String paymentStatus) {
+		this.paymentStatus = paymentStatus;
+	}
 }

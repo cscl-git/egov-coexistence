@@ -53,9 +53,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -70,9 +72,12 @@ import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
+import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
@@ -84,8 +89,10 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
+import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.pims.commons.Position;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -197,8 +204,10 @@ public class UpdateExpenseBillController extends BaseBillController {
             model.addAttribute("currentState", egBillregister.getState().getValue());
         model.addAttribute("workflowHistory",
                 financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
-
+        List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
+       
+
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
         prepareBillDetailsForView(egBillregister);
         expenseBillService.validateSubledgeDetails(egBillregister);
@@ -229,6 +238,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("validActionList", validActions);
             return "expensebill-update";
         }
         else {
@@ -303,6 +313,13 @@ public class UpdateExpenseBillController extends BaseBillController {
             validateBillNumber(egBillregister, resultBinder);
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
+        
+        if(!egBillregister.getBillPayeedetails().isEmpty())
+    	{
+        populateBillDetails(egBillregister);
+        validateBillNumber(egBillregister, resultBinder);
+        validateLedgerAndSubledger(egBillregister, resultBinder);
+    	}
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
             model.addAttribute("stateType", egBillregister.getClass().getSimpleName());

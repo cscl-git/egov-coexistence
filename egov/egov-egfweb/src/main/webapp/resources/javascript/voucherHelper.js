@@ -2511,3 +2511,41 @@ function openBudgetDetails()
 	}
 	
 	}
+
+function removeVoucher() {
+	
+	var instrumentAmount=document.getElementById('voucherAmount').innerText;
+	
+	document.preApprovedVoucher.action = '/services/EGF/voucher/preApprovedVoucher-removeVoucher.action?instrumentAmount='+instrumentAmount;
+	document.preApprovedVoucher.submit();
+	
+}
+
+function openSource(){
+	
+	
+	var vouchermissourcepath=document.getElementById('vouchermissourcepath').value;
+	
+	if(vouchermissourcepath=="" || vouchermissourcepath=='null')
+		bootbox.alert('Source is not available');
+	else{
+		var url = vouchermissourcepath+'&showMode=view';
+		window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}   
+}
+function checkLength(obj)
+{
+	if(obj.value.length>1024)
+	{
+		bootbox.alert('Max 1024 characters are allowed for comments. Remaining characters are truncated.')
+		obj.value = obj.value.substring(1,1024);
+	}
+}
+
+
+/*$( "#buttonRemove" ).click(function() {
+	  alert( "Handler for .click() called." );
+	});
+
+*/
+

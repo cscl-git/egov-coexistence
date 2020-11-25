@@ -179,6 +179,21 @@
 			listValue="glcode+'-'+name" headerKey="-1"
 			headerValue="----Choose----" /></td>
 </tr>
+<tr>
+	<td class="bluebox">&nbsp;</td>
+	<td class="bluebox">First Signatory<span class="mandatory1">*</span></td>
+	<td class="bluebox"><s:select name="firstsignatory" headerKey="-1"
+			headerValue="Select First Signatory" value="%{firstsignatory}"
+			list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+			id="firstsignatory" /></td>
+	<td class="bluebox" width="15%">Second Signatory<span
+		class="mandatory1">*</span></td>
+	<td class="bluebox" colspan="4"><s:select name="secondsignatory"
+			headerKey="-1" headerValue="Select Second Signatory"
+			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
+			id="secondsignatory" /></td>
+</tr>
+
 
 
 <tr>

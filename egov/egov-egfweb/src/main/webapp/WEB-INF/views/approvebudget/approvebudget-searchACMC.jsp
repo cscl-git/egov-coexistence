@@ -104,7 +104,10 @@
 				<th>Original Amount</th>
 				<th>Anticipatory Amount</th>
 				<th>Planning Percentage</th>
-				<th>Quarter-wise Percentage</th>				
+				<th>Quarter-One Percentage</th>
+				<th>Quarter-Two Percentage</th>
+				<th>Quarter-Three Percentage</th>
+				<th>Quarter-Four Percentage</th>				
 				</tr>
 				
 					 <c:forEach items="${budgetDetails}" var="details" varStatus="item">
@@ -118,6 +121,9 @@
 					 <td>${details.anticipatoryAmount }</td>
 					 <td>${details.planningPercent }</td>
 					 <td>${details.quarterpercent }</td>
+					 <td>${details.quartertwopercent }</td>
+					 <td>${details.quarterthreepercent }</td>
+					 <td>${details.quarterfourpercent }</td>
 					 </tr>
 					 </c:forEach>
 						 
@@ -132,8 +138,21 @@
 								<button type='submit' class='btn btn-primary' id="btnsearch">
 									<spring:message code='lbl.verify' />
 								</button>
+								
+								<button type='submit' class='btn btn-primary' id="rejectbutton">
+
+									<spring:message code='lbl.return' />
+
+								</button>
+								
+								<button type='submit' class='btn btn-primary' id="cancelbutton">
+
+									<spring:message code='lbl.cancel' />
+
+								</button>
 								<a href='javascript:void(0)' class='btn btn-default'
 									onclick='self.close()'><spring:message code='lbl.close' /></a>
+										<form:hidden path="" id="workAction" name="workAction"/> 
 							</div>
 						</div>
 					</div>
@@ -144,10 +163,50 @@
 </form:form>
 <script>
 	$('#btnsearch').click(function(e) {
+
+	document.getElementById("workAction").value = "VERIFY";
+
+	
+
 		if ($('form').valid()) {
+
 		} else {
+
 			e.preventDefault();
+
 		}
+
+});
+
+$('#rejectbutton').click(function(e) {
+
+	document.getElementById("workAction").value = "REJECT";
+
+	
+
+	 if ($('form').valid()) {
+
+	} else {
+
+			e.preventDefault();
+
+		}
+
+});
+$('#cancelbutton').click(function(e) {
+
+	document.getElementById("workAction").value = "CANCEL";
+
+	
+
+	 if ($('form').valid()) {
+
+	} else {
+
+		e.preventDefault();
+
+	}  
+
 	});
 </script>
 <link rel="stylesheet"

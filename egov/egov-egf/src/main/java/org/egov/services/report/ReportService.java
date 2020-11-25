@@ -336,20 +336,25 @@ public abstract class ReportService {
     public Date getFromDate(final Statement statement) {
         CFinancialYear financialYear = null;
         if ("Date".equalsIgnoreCase(statement.getPeriod())
-                && statement.getAsOndate() != null) {
-            final String financialYearId = financialYearDAO.getFinancialYearId(getFormattedDate2(statement.getAsOndate()));
+               // && statement.getAsOndate() != null) {
+        		 && statement.getFromDate() != null) {
+            //final String financialYearId = financialYearDAO.getFinancialYearId(getFormattedDate2(statement.getAsOndate()));
+        	final String financialYearId = financialYearDAO.getFinancialYearId(getFormattedDate2(statement.getFromDate()));
             financialYear = financialYearDAO
                     .getFinancialYearById(Long.valueOf(financialYearId));
             statement.setFinancialYear(financialYear);
-        } else
+            return statement.getFromDate();
+        } else {
             financialYear = statement.getFinancialYear();
         return financialYear.getStartingDate();
+       }
        }
 
     public Date getToDate(final Statement statement) {
         if ("Date".equalsIgnoreCase(statement.getPeriod())
-                && statement.getAsOndate() != null)
-            return statement.getAsOndate();
+               // && statement.getAsOndate() != null)
+        		 && statement.getToDate() != null) 
+            return statement.getToDate();
         if ("Half Yearly".equalsIgnoreCase(statement.getPeriod())) {
             final String halfYearly = getAppConfigValueFor("EGF",
                     "bs_report_half_yearly");

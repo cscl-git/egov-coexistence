@@ -123,7 +123,10 @@
 						{key:"approved_amount",label:'Total <br/>Approved Amount',className:"budgetSearch"},
 						{key:"reappropriation_amount",label:'Total <br/>Reappropriation Amount',className:"budgetSearch"},
 						{key:"planning_percent",label:'Planning Percentage',className:"budgetSearch"},
-						{key:"quarter_percent",label:'Quarter Percentage',className:"budgetSearch"},
+						{key:"quarter_onepercent",label:'Quarter One Percentage',className:"budgetSearch"},
+						{key:"quarter_twopercent",label:'Quarter Two Percentage',className:"budgetSearch"},
+						{key:"quarter_threepercent",label:'Quarter Three Percentage',className:"budgetSearch"},
+						{key:"quarter_fourpercent",label:'Quarter Four Percentage',className:"budgetSearch"},
 						{key:"comment",label:'Comments',className:"budgetSearch"},
 						/* {key:"document",label:'Documents',className:"budgetSearch"} */
 				];
@@ -194,7 +197,10 @@
 							"reappropriation_amount":'<s:property value="approvedReAppropriationsTotal.setScale(2).toString()"/>',
 							"approved_amount":'<s:property value="%{calculateTotal(#p)}"/>',
 							"planning_percent":'<s:property value="planningPercent"/>',
-							"quarter_percent":'<s:property value="quarterpercent"/>',
+							"quarter_onepercent":'<s:property value="quarterpercent"/>',
+							"quarter_twopercent":'<s:property value="quartertwopercent"/>',
+							"quarter_threepercent":'<s:property value="quarterthreepercent"/>',
+							"quarter_fourpercent":'<s:property value="quarterfourpercent"/>',
 							"comment":'<s:property value="comment"/>',
 							/* "document":'<input type="submit" class="buttonsubmit" value="View" onclick="'+'viewDocumentManager(<s:property value="#p.documentNumber"/>);return false;"/>' */
 						});

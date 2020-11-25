@@ -47,6 +47,11 @@
  */
 $(document).ready(function()
 {	
+var currentstate="";
+if(!$('#currentState').val()=="SaveAsDraft")
+{
+	currentstate=$('#currentState').val();
+}
 	$('#approvalDepartment').change(function(){
 		$.ajax({
 			url: "/services//eis/ajaxWorkFlow-getDesignationsByObjectType",     
@@ -55,7 +60,7 @@ $(document).ready(function()
 				approvalDepartment : $('#approvalDepartment').val(),
 				departmentRule : $('#approvalDepartment').find("option:selected").text(),
 				type : $('#stateType').val(),
-				currentState : $('#currentState').val(),
+				currentState : currentstate,
 				amountRule : $('#amountRule').val(),
 				additionalRule : $('#additionalRule').val(),
 				pendingAction : $('#pendingActions').val()

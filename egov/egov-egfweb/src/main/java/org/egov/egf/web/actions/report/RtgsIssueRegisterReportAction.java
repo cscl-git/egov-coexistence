@@ -75,6 +75,7 @@ import org.egov.utils.Constants;
 import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BigDecimalType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -326,11 +327,49 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
 		populateSubLedgerDetails();
+		LOGGER.info("start party number");
+		populatePartyNames(rtgsDisplayList);
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
 	}
 	
+	private void populatePartyNames(List<BankAdviceReportInfo> rtgsDisplayList2) {
+		for(BankAdviceReportInfo row : rtgsDisplayList2)
+		{
+			if (row.getStatus().equalsIgnoreCase("new"))
+			{
+				row.setStatus("Assigned");
+			}	
+			System.out.println("payment Number :: "+row.getPaymentNumber());
+			String partyName=getPartyName(row.getPaymentNumber());
+			row.setPartyName(partyName);
+		}
+	}
+
+	private String getPartyName(String paymentNumber) {
+		SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String partyName="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select a.id,a.detailname from accountdetailkey a  where a.detailkey in (select gd.detailkeyid from generalledgerdetail gd where gd.generalledgerid in (select g.id from generalledger g where g.debitamount <> 0 and g.voucherheaderid in (select vh.id from voucherheader vh where vh.vouchernumber =:paymentNumber)))");
+    	    query.setString("paymentNumber", paymentNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		partyName= element[1].toString();
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	return partyName;
+	}
+
 	@SuppressWarnings("unchecked")
 	@ValidationErrorPage(NEW)
 	@ReadOnly
@@ -356,7 +395,9 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
 		System.out.println("List size : "+rtgsDisplayList.size());
-		populateSubLedgerDetails();
+		//populateSubLedgerDetails();
+		LOGGER.info("start party number");
+		populatePartyNames(rtgsDisplayList);
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
@@ -390,6 +431,16 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 		final DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		StringBuffer instrumentHeaderQry = new StringBuffer("");
+		if(parameters.get("departmentcode")[0] != null)
+		{
+			LOGGER.info("department : "+parameters.get("departmentcode")[0]);
+		}
+		else
+		{
+			LOGGER.info("department : "+null);
+		}
+		
+		
 		try {
 			if (null != parameters.get("departmentcode")[0]
 					&& !parameters.get("departmentcode")[0].equalsIgnoreCase("-1"))
@@ -452,9 +503,9 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		final DateFormat dateFormat = new SimpleDateFormat("dd-MMM-yyyy");
 		StringBuffer instrumentHeaderQry = new StringBuffer("");
 		try {
-			if (null != parameters.get("departmentcode") && null != parameters.get("departmentcode")[0]
-					&& !parameters.get("departmentcode")[0].equalsIgnoreCase("-1"))
-				deptQry = " AND vmis.departmentcode ='" + parameters.get("departmentcode")[0] + "'";
+			if (null != parameters.get("departmentid") && null != parameters.get("departmentid")[0]
+					&& !parameters.get("departmentid")[0].equalsIgnoreCase("-1"))
+				deptQry = " AND vmis.departmentcode ='" + parameters.get("departmentid")[0] + "'";
 			if (null != parameters.get("rtgsAssignedFromDate") && null != parameters.get("rtgsAssignedFromDate")[0]
 					&& !parameters.get("rtgsAssignedFromDate")[0].isEmpty())
 

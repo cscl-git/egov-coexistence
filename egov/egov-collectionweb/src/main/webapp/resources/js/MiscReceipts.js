@@ -245,7 +245,7 @@ function createAmountFieldFormatterRebate(prefix,suffix,onblurfunction,table){
 	}
 
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<div style='display: inline-flex;'><span id='"+prefix+"["+rec+"]"+suffix+"amountTypeLabel'></span><input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' style='text-align:right;width:100px;height:auto' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' onblur='"+onblurfunction+";updatetotalAmounts()'/></div>";
+		el.innerHTML = "<div style='display: inline-flex;'><span id='"+prefix+"["+rec+"]"+suffix+"amountTypeLabel'></span><input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' style='text-align:right;width:100px;height:auto' maxlength='10' class='form-control patternvalidation text-right' data-pattern='number' onblur='"+onblurfunction+";updatetotalAmounts()' onfocus='if (this.value == 0){this.value=&#39;&#39;}' onfocusout='if (this.value==&#39;&#39){this.value=0}'/></div>";
 	}
 }
 
@@ -1136,6 +1136,7 @@ function updatetotalAmounts(){
 	for(var index=0;index<billDetailTableIndex;index++){
 		if(document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail') == null || document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value == '' )
 			{
+			document.getElementById('billCreditDetailslist['+index+'].creditAmountDetail').value =0;
 			inputAmount=0;
 			}
 		else
@@ -1513,8 +1514,10 @@ function checkLength(obj)
 function updateAccountTableIndex(){
 	
 	billDetailTableIndex = billDetailTableIndex +1 ;
+	
 	patternvalidation();
 }
+
 function updateSLTableIndex(){
 	
 	 slDetailTableIndex = slDetailTableIndex +1 ;

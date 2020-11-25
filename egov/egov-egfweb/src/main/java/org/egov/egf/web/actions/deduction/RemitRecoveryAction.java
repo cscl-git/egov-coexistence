@@ -239,6 +239,9 @@ public class RemitRecoveryAction extends BasePaymentAction {
     List<Long> remDtlIds;
 	List<String> remAssignNumbers;
     
+	private String firstsignatory="-1";
+    private String secondsignatory="-1";
+    
     public BigDecimal getBalance() {
         return balance;
     }
@@ -406,11 +409,25 @@ public class RemitRecoveryAction extends BasePaymentAction {
     @Action(value = "/deduction/remitRecovery-create")
     public String create() {
         try {
+        	
+        	String fSignatory =firstsignatory;
+        	String sSignatory = secondsignatory;
+        	
+        	System.out.println("In create Function....>>"+fSignatory+"..."+sSignatory);
+        	
             final String vdate = parameters.get("voucherDate")[0];
             final Date date1 = sdf1.parse(vdate);
             final String voucherDate = formatter1.format(date1);
             String cutOffDate1 = null;
             prepareListRemitBean(selectedRows);
+            if(listRemitBean != null && !listRemitBean.isEmpty())
+            {
+            	for(RemittanceBean row : listRemitBean)
+            	{
+            		System.out.println("voucher name :: "+row.getVoucherName());
+            		System.out.println("voucher number :: "+row.getVoucherNumber());
+            	}
+            }
             if(isPartialPaymentEnabled){
                 setPartialAmountForSelectedDeduction();
             }
@@ -419,6 +436,10 @@ public class RemitRecoveryAction extends BasePaymentAction {
             System.out.println("Part 2");
             voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
             voucherHeader.setName(FinancialConstants.PAYMENTVOUCHER_NAME_REMITTANCE);
+            //added by prasanta for save signotory
+            voucherHeader.setFirstsignatory(fSignatory);
+            voucherHeader.setSecondsignatory(sSignatory);
+            
             final HashMap<String, Object> headerDetails = createHeaderAndMisDetails();
             recovery = (Recovery) persistenceService.find("from Recovery where id=?", remittanceBean.getRecoveryId());
             populateWorkflowBean();
@@ -1456,5 +1477,26 @@ public class RemitRecoveryAction extends BasePaymentAction {
 		message="Acknowledge Number(s) has been saved successfully";
         return assignNumber();
     }
+
+	public String getFirstsignatory() {
+		return firstsignatory;
+	}
+
+	public void setFirstsignatory(String firstsignatory) {
+		this.firstsignatory = firstsignatory;
+	}
+
+	public String getSecondsignatory() {
+		return secondsignatory;
+	}
+
+	public void setSecondsignatory(String secondsignatory) {
+		this.secondsignatory = secondsignatory;
+	}
+
+	
+	
+	
+	
     
 }

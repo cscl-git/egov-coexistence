@@ -119,10 +119,16 @@ public class BudgetLoadAction extends BaseFormAction {
     private static final int DEPARTMENTCODE_CELL_INDEX = 1;
     private static final int FUNCTIONCODE_CELL_INDEX = 2;
     private static final int GLCODE_CELL_INDEX = 3;
-    private static final int REAMOUNT_CELL_INDEX = 4;
-    private static final int BEAMOUNT_CELL_INDEX = 5;
+    //Author - Bhushan > chnages index here
+    private static final int BEAMOUNT_CELL_INDEX = 4;
+    private static final int REAMOUNT_CELL_INDEX = 5;
     private static final int PLANNINGPERCENTAGE_CELL_INDEX = 6;
+  //Author - Bhushan > Addedd new quater
     private static final int QUARTERPERCENTAGE_CELL_INDEX = 7;
+    private static final int QUARTERONEPERCENTAGE_CELL_INDEX = 7;
+    private static final int QUARTERTWOPERCENTAGE_CELL_INDEX = 8;
+    private static final int QUARTERTHREEPERCENTAGE_CELL_INDEX = 9;
+    private static final int QUARTERFOURPERCENTAGE_CELL_INDEX = 10;
     private boolean errorInMasterData = false;
     private boolean isBudgetUploadFileEmpty = true;
     private MultipartFile[] originalFile = new MultipartFile[1];
@@ -609,14 +615,24 @@ public class BudgetLoadAction extends BaseFormAction {
                         .getCell(FUNCTIONCODE_CELL_INDEX)));
                 budget.setBudgetHead(getStrValue(row.getCell(GLCODE_CELL_INDEX)) == null ? "" : getStrValue(row
                         .getCell(GLCODE_CELL_INDEX)));
-                budget.setReAmount(BigDecimal.valueOf(Long.valueOf(getStrValue(row.getCell(REAMOUNT_CELL_INDEX)) == null ? "0"
-                        : getStrValue(row.getCell(REAMOUNT_CELL_INDEX)))));
+                //Author - Bhushan > only shuffle here
                 budget.setBeAmount(BigDecimal.valueOf(Long.valueOf(getStrValue(row.getCell(BEAMOUNT_CELL_INDEX)) == null ? "0"
                         : getStrValue(row.getCell(BEAMOUNT_CELL_INDEX)))));
+                budget.setReAmount(BigDecimal.valueOf(Long.valueOf(getStrValue(row.getCell(REAMOUNT_CELL_INDEX)) == null ? "0"
+                        : getStrValue(row.getCell(REAMOUNT_CELL_INDEX)))));
                 budget.setPlanningPercentage(getNumericValue(row.getCell(PLANNINGPERCENTAGE_CELL_INDEX)) == null ? 0
                         : getNumericValue(row.getCell(PLANNINGPERCENTAGE_CELL_INDEX)).longValue());
                 budget.setQuarterpercent(getNumericValue(row.getCell(QUARTERPERCENTAGE_CELL_INDEX)) == null ? 0
                         : getNumericValue(row.getCell(QUARTERPERCENTAGE_CELL_INDEX)).longValue());
+                //Author - Bhushan >Add quater wise percentage
+                budget.setQuarterOnepercent(getNumericValue(row.getCell(QUARTERONEPERCENTAGE_CELL_INDEX)) == null ? 0
+                        : getNumericValue(row.getCell(QUARTERONEPERCENTAGE_CELL_INDEX)).longValue());
+                budget.setQuarterTwopercent(getNumericValue(row.getCell(QUARTERTWOPERCENTAGE_CELL_INDEX)) == null ? 0
+                        : getNumericValue(row.getCell(QUARTERTWOPERCENTAGE_CELL_INDEX)).longValue());
+                budget.setQuarterThreepercent(getNumericValue(row.getCell(QUARTERTHREEPERCENTAGE_CELL_INDEX)) == null ? 0
+                        : getNumericValue(row.getCell(QUARTERTHREEPERCENTAGE_CELL_INDEX)).longValue());
+                budget.setQuarterFourpercent(getNumericValue(row.getCell(QUARTERFOURPERCENTAGE_CELL_INDEX)) == null ? 0
+                        : getNumericValue(row.getCell(QUARTERFOURPERCENTAGE_CELL_INDEX)).longValue());
             }
         } catch (final ValidationException e)
         {

@@ -1882,6 +1882,11 @@ public class CreateVoucher {
 
 		if (null != headerdetails.get(VoucherConstant.SOURCEPATH))
 			vouchermis.setSourcePath(headerdetails.get(VoucherConstant.SOURCEPATH).toString());
+		
+		if (null != headerdetails.get(VoucherConstant.RECEIPTNUMBER))
+			vouchermis.setRecieptNumber(headerdetails.get(VoucherConstant.RECEIPTNUMBER).toString());
+		
+		
 		if (headerdetails.containsKey(VoucherConstant.DIVISIONID)
 				&& null != headerdetails.get(VoucherConstant.DIVISIONID))
 			vouchermis.setDivisionid(

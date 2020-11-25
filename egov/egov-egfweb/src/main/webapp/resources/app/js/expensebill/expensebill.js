@@ -178,7 +178,7 @@ $('.btn-wf-primary').click(function(){
 	           
 	            return false;
 	           }
-	        if(validate()){
+	        if(true){
 	             
 	            deleteHiddenSubledgerRow();
 	            //$('approvalDesignation').attr('required', false);
@@ -486,7 +486,7 @@ $('.subledgerGl_code').change(function () {
 			 var issubledger =document.getElementById('tempCreditDetails['+index+'].isSubLedger').value;
 			 var glcode =document.getElementById('tempCreditDetails['+index+'].glcode').value;
 			 
-			 if(glcodeid!='' && glcode!='' && name!=''){
+			 if(glcodeid!='' && glcode!='' && name!='' && issubledger!='false'){
 				 
 			netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option(glcode + '-' +name + '~' + issubledger,  glcodeid);
 			
@@ -494,6 +494,8 @@ $('.subledgerGl_code').change(function () {
 				});
 		
 });
+
+
 
 $('#billSubType').change(function () {
 	$("#selectedCheckList").val("");
@@ -567,7 +569,7 @@ $('.subledgerGl_code').change(function () {
 						 var name =document.getElementById('tempCreditDetails['+index+'].creditAccountHead').value;
 						 var issubledger =document.getElementById('tempCreditDetails['+index+'].isSubLedger').value;
 						 var glcode =document.getElementById('tempCreditDetails['+index+'].glcode').value;
-						 if(glcodeid!='' && glcode!='' && name!=''){
+						 if(glcodeid!='' && glcode!='' && name!='' && issubledger!='false'){
 							 
 						netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option(glcode + '-' +name + '~' + issubledger,  glcodeid);
 					
@@ -1373,6 +1375,9 @@ function validateWorkFlowApprover(name) {
 	        $('#approvalDesignation').removeAttr('required');
 	        $('#approvalPosition').removeAttr('required');
 	        $('#approvalComent').removeAttr('required');
+	     
+	        $('#narration').removeAttr('required');
+	          $('#billSubType').removeAttr('required');
 	    }
 	if (button != null && button == 'Cancel') {
 		$('#approvalDepartment').removeAttr('required');
@@ -1384,7 +1389,7 @@ function validateWorkFlowApprover(name) {
 		$('#approvalDepartment').attr('required', 'required');
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
-		$('#approvalComent').removeAttr('required');
+		$('#approvalComent').attr('required', 'required');
 	}
 	if (button != null && button == 'Verify') {
 		$('#approvalComent').removeAttr('required');

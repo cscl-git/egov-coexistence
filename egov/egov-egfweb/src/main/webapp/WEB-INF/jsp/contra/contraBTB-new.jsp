@@ -195,6 +195,8 @@ function	onLoadTask_new()
 			document.getElementById("chequeGrid").style.visibility="visible";
 			document.getElementById("mdcNumber").innerHTML = '<s:text name="contra.refNumber" />';
 			document.getElementById("mdcDate").innerHTML = '<s:text name="contra.refDate" />';
+		} else if(obj.value == "pex") {
+			 document.getElementById("chequeGrid").style.visibility="hidden";
 		} else {
 		<s:if test="egovCommon.isShowChequeNumber()">
 		 document.getElementById("chequeGrid").style.visibility="visible";

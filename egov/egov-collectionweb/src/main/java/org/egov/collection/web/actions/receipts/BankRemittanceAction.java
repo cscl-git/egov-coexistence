@@ -196,6 +196,7 @@ public class BankRemittanceAction extends BaseFormAction {
     @Action(value = "/receipts/bankRemittance-listData")
     @SkipValidation
     public String listData() {
+    	LOGGER.info("listData method");
         isListData = true;
         remitAccountNumber = "";
         if (accountNumberId != null) {
@@ -219,14 +220,17 @@ public class BankRemittanceAction extends BaseFormAction {
                 serviceCodeList.add(basm.getBusinessDetails());
             }
             final CFinancialYear financialYear = financialYearDAO.getFinancialYearById(finYearId);
+            LOGGER.info("before  findCashRemittanceDetailsForServiceAndFund method");
             resultList = remittanceService.findCashRemittanceDetailsForServiceAndFund("", StringUtils.join(serviceCodeList, ","),
                     StringUtils.join(fundCodeSet, ","), fromDate == null ? financialYear.getStartingDate() : fromDate,
                     toDate == null ? financialYear.getEndingDate() : toDate);
+            LOGGER.info("after  findCashRemittanceDetailsForServiceAndFund method");
             if (fromDate != null && toDate != null)
                 pageSize = resultList.size();
             else
                 pageSize = CollectionConstants.DEFAULT_PAGE_SIZE;
         }
+        LOGGER.info("End");
         return NEW;
     }
 
@@ -252,6 +256,7 @@ public class BankRemittanceAction extends BaseFormAction {
             throw new ValidationException(Arrays.asList(new ValidationError("Please select Account number",
                     "bankremittance.error.noaccountNumberselected")));
         // voucherHeaderValues =
+        LOGGER.info("accountNumberId  :"+accountNumberId);
         List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
         final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
