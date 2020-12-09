@@ -13,6 +13,7 @@ import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
+import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 
 @Entity
@@ -72,9 +73,16 @@ public class BoQDetails implements Serializable {
 	@JoinColumn(name = "estimate_preparation_id")
 	private EstimatePreparationApproval estimatePreparationApproval;
 
+	
+	@ManyToOne
+	@JoinColumn(name = "dnit_creation_id")
+	private DNITCreation dnitCreation;
+	
 	@Transient
 	private boolean checkboxChecked;
 
+	@Transient
+	private Integer sizeIndex;
 
 	public Long getSlNo() {
 		return slNo;
@@ -176,6 +184,22 @@ public class BoQDetails implements Serializable {
 
 	public void setMilestone(String milestone) {
 		this.milestone = milestone;
+	}
+
+	public DNITCreation getDnitCreation() {
+		return dnitCreation;
+	}
+
+	public void setDnitCreation(DNITCreation dnitCreation) {
+		this.dnitCreation = dnitCreation;
+	}
+
+	public Integer getSizeIndex() {
+		return sizeIndex;
+	}
+
+	public void setSizeIndex(Integer sizeIndex) {
+		this.sizeIndex = sizeIndex;
 	}
 
 	

@@ -6,18 +6,22 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional(readOnly = true)
+@Transactional
 public class WorkEstimateService {
 
 	@Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
+	@Autowired
+	DNITCreationRepository dNITCreationRepository;
 
 	@Transactional
 	public List<EstimatePreparationApproval> searchWorkEstimateData(HttpServletRequest request,
@@ -64,6 +68,25 @@ public class WorkEstimateService {
 		return workEstimateDetails;
 	}
 
+	
+	@Transactional
+	public List<DNITCreation> searchWorkDnit(HttpServletRequest request,
+			DNITCreation dNITCreation) {
+		// TODO Auto-generated method stub
+		List<DNITCreation> workEstimateDetails = new ArrayList<DNITCreation>();
+		if (dNITCreation.getExecutingDivision() != null
+				&& dNITCreation.getFromDt() == null && dNITCreation.getToDt() == null) {
+			workEstimateDetails = dNITCreationRepository
+					.findByExecutingDivisionAndStatusId(dNITCreation.getExecutingDivision());
+		} else {
+			workEstimateDetails = dNITCreationRepository.findByParams(
+					dNITCreation.getExecutingDivision(), dNITCreation.getFromDt(),
+					dNITCreation.getToDt());
+		}
+		return workEstimateDetails;
+	}
+	
+
 	@Transactional
 	public EstimatePreparationApproval searchBoqData(HttpServletRequest request, Long estimatePreparationId) {
 		// TODO Auto-generated method stub
@@ -73,6 +96,15 @@ public class WorkEstimateService {
 		return boqDetailsList;
 	}
 
+	@Transactional
+	public DNITCreation searchDnitBoqData(HttpServletRequest request, Long estimatePreparationId) {
+		// TODO Auto-generated method stub
+		DNITCreation boqDetailsList = dNITCreationRepository
+				.findById(estimatePreparationId);
+
+		return boqDetailsList;
+	}
+	
 	@Transactional
 	public EstimatePreparationApproval saveBoqData(HttpServletRequest request,
 			EstimatePreparationApproval estimatePreparationApproval) {

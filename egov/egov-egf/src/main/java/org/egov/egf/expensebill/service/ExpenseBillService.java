@@ -407,6 +407,14 @@ public class ExpenseBillService {
                     && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
+            else if ("Pending for Cancellation".equals(egBillregister.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
+                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                        "Pending for Cancellation"));
+            else if ("Pending for Cancellation".equals(egBillregister.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONAPPROVE))
+                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                        "Cancelled"));
 
     }
 
@@ -561,10 +569,11 @@ public class ExpenseBillService {
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
                 	
-                
+                System.out.println("stateValue ::: "+stateValue);
+                System.out.println("wfmatrix.getNextState() ::: "+wfmatrix.getNextState());
                 if (stateValue.isEmpty())
                 {
-                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("Pending for Cancellation") && !wfmatrix.getNextState().equalsIgnoreCase("Final Cancellation Pending") && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
                 	{
                 		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
                 	}
@@ -575,8 +584,11 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
+                		{
+                			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                                    FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		}
                 		
                 	}
                     
@@ -596,6 +608,14 @@ public class ExpenseBillService {
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
 		        
 		        }
+				else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction))
+				{
+					egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date())
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+				}
 				else
 				{
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())

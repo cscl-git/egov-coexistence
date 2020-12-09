@@ -57,6 +57,9 @@
 						<table class="table table-bordered" id="table">
 							<thead>
 								<tr>
+									<th><spring:message code="lbl.tender.preparation.name.work" /></th>
+									<th><spring:message code="lbl.bg.tender.number" /></th>
+									<th><spring:message code="lbl.tender.preparation.naration" /></th>
 									<th><spring:message code="lbl.bg.security.number" /></th>
 									<th><spring:message code="lbl.bg.security.validity" /></th>
 									<th><spring:message code="lbl.bg.security.amount" /></th>
@@ -73,6 +76,18 @@
 									<c:forEach items="${bgSecurityDetails.bgSecurityDetailsList}"
 										var="result" varStatus="status">
 										<tr>
+										<td><form:hidden
+													path="bgSecurityDetailsList[${status.index}].project_name"
+													id="bgSecurityDetailsList[${status.index}].project_name" />
+												${result.project_name }</td>
+												<td><form:hidden
+													path="bgSecurityDetailsList[${status.index}].security_tender_number"
+													id="bgSecurityDetailsList[${status.index}].security_tender_number" />
+												${result.security_tender_number }</td>
+												<td><form:hidden
+													path="bgSecurityDetailsList[${status.index}].narration"
+													id="bgSecurityDetailsList[${status.index}].narration" />
+												${result.narration }</td>
 											<td><form:hidden
 													path="bgSecurityDetailsList[${status.index}].security_number"
 													id="bgSecurityDetailsList[${status.index}].security_number" />

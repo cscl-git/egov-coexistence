@@ -184,4 +184,12 @@
 		<form:errors path="esiNumber" cssClass="add-margin error-msg" />
 	</div>
 </div>
+<div class="form-group">
+	<label class="col-sm-2 control-label text-right" for="narration"> <spring:message code="contractor.vigilance" text='Vigilance Case'/>
+	</label>
+	<div class="col-sm-3 add-margin">
+		<form:textarea path="vigilance" cols="35" cssClass="form-control textfieldsvalidate" id="vigilance" maxlength = "250" />
+		<form:errors path="vigilance" cssClass="add-margin error-msg" />
+	</div>
+</div>
 <input type="hidden" name="contractor" value="${contractor.id}" />

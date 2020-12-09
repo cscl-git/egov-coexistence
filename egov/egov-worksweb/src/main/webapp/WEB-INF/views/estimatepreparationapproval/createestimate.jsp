@@ -6,7 +6,17 @@
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
-
+<style>
+.table thead > tr > th {
+    color: black;
+    background-color: #acbfd0;
+    vertical-align: top;
+}
+.table tbody > tr > td {
+    color: black;
+    vertical-align: top;
+}
+</style>
 	
 		<form:form name="create-estimate-form" role="form"
 		method="post" action="saveestimate1"

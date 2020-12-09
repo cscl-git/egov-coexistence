@@ -133,7 +133,18 @@
 							data-inputmask="'mask': 'd/m/y'" autocomplete="off"/>
 							
 							</td>
+							
 				</tr>
+				<tr>
+					<td style="width: 5%"></td>
+					<td class="bluebox">Amount</td>
+					<td class="bluebox"><s:textfield name="amount"
+							id="amount" maxlength="25" value="%{amount}" /></td>
+					<td class="bluebox">Party Name</td>
+					<td class="bluebox"><s:textfield name="partyName"
+							id="partyName" maxlength="25" value="%{partyName}" /></td>
+				</tr>
+				
 				<tr>
 					<jsp:include page="../voucher/voucher-filter.jsp" />
 				</tr>

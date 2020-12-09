@@ -3,11 +3,22 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 	
+<style>
+.table thead > tr > th {
+    color: black;
+    background-color: #acbfd0;
+    vertical-align: top;
+}
+.table tbody > tr > td {
+    color: black;
+    vertical-align: top;
+}
+</style>	
 	
 	
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 670px;">
+		<div class="form-group" style="padding: 50px 20px 870px;">
 	
 				<input type="hidden" name="estimatePreparationApproval"
 				value="${estimatePreparationApproval.id}" /> <label
@@ -20,9 +31,9 @@
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
-					<form:option value="1">Building & Roads</form:option>
-					<form:option value="2">Public Health</form:option>
-					<form:option value="3">Horticulture & Electrical</form:option>
+					<form:option value="Building & Roads">Building & Roads</form:option>
+					<form:option value="Public Health">Public Health</form:option>
+					<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option>
 				</form:select>
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -64,30 +75,15 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="number" class="form-control" path="sectorNumber"
+				<form:input type="text" class="form-control" path="sectorNumber" value="${estimatePreparationApproval.sectorNumber}"
 					readonly="true" />
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.ward.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="number" class="form-control" path="wardNumber"
+				<form:input type="text" class="form-control" path="wardNumber" value="${estimatePreparationApproval.wardNumber}"
 					readonly="true" />
 						</div>
-			<label class="col-sm-3 control-label text-left-audit1"><spring:message
-					code="lbl.estimate.preparation.work.category" /><span
-				class="mandatory"></span></label>
-			<div class="col-sm-3 add-margin">
-				<form:select path="workCategory" id="workCategory"
-					cssClass="form-control" cssErrorClass="form-control error"
-					readonly="true">
-					<form:option value="">
-						<spring:message code="lbl.select" />
-					</form:option>
-					<form:option value="1">Road Work </form:option>
-					<form:option value="2">Bridge Work</form:option>
-					<form:option value="3">Maintaince Work</form:option>
-				</form:select>
-					</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.amount" /></label>
 			<div class="col-sm-3 add-margin">
@@ -113,7 +109,65 @@
 										itemValue="code" itemLabel="name" />
 								</form:select>
 					</div>
-					<label class="col-sm-3 control-label text-left-audit1"></label>
+					
+				<!-- New field added here -->		
+				
+				
+				
+					
+				<label class="col-sm-3 control-label text-left-audit1"><spring:message
+									code="lbl.estimate.preparation.estimate.Contingency.Percentage" /></label>
+
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" path="contingentPercentage"
+							id="contingentPercentage" cssClass="form-control"
+							cssErrorClass="form-control error" readonly="true"/>
+					</div>
+<label class="col-sm-3 control-label text-left-audit1"><spring:message
+									code="lbl.estimate.preparation.estimate.Contingency.amount" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" path="contingentAmount"
+							id="contingentAmount" value="" cssClass="form-control" readonly="true"
+							cssErrorClass="form-control error" />
+							</div>	
+										
+				<label class="col-sm-3 control-label text-left-audit1"><spring:message
+									code="lbl.estimate.preparation.estimate.Consultancy.fee" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" path="consultantFee" value=""
+							id="consultantFee" cssClass="form-control" onchange="valueChanged()"  readonly="true"
+							cssErrorClass="form-control error" />
+							</div>
+							
+				<label class="col-sm-3 control-label text-left-audit1"><spring:message
+									code="lbl.estimate.preparation.estimate.Unforeseen.charges" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" path="unforseenCharges" value=""
+							id="unforseenCharges" cssClass="form-control" onchange="valueChanged()"  readonly="true"
+							cssErrorClass="form-control error" />
+							</div>
+				
+													
+							
+				<!-- New field end here -->				
+					
+					<label
+				class="col-sm-3 control-label text-left-audit1"><spring:message
+					code="lbl.estimate.preparation.aa.exp.head" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+							<form:select path="expHead_est"  id="wardCheck" readonly="true"
+								cssClass="form-control" cssErrorClass="form-control error">
+								<form:option value="">
+									<spring:message code="lbl.select" />
+								</form:option>
+								<form:option value="Capital">Capital</form:option>
+								<form:option value="Revenue">Revenue</form:option>
+								<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
+								<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+							</form:select>
+						</div>
+						<label class="col-sm-3 control-label text-left-audit1"></label>
 			<div class="col-sm-3 add-margin">
 				<input type="text" class="form-control" style="visibility:hidden"
 									 />
@@ -153,9 +207,17 @@
 		<div>
 
 			<div>
-				<table id="table" class="table table-bordered">
+				<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
+					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
+				
+				
+				
 							<thead>
 								<tr>
+							<th><c:out value="${mapboq.key}"/></th>
+							</tr>
+							<tr>
+								<th><spring:message code="lbl.item.Milestone" /></th>	
 									<th><spring:message code="lbl.item.description" /></th>
 									<th><spring:message code="lbl.ref.dsr" /></th>
 									<th><spring:message code="lbl.unit" /></th>
@@ -165,51 +227,70 @@
 
 								</tr>
 							</thead>
+						
+				
 								<tbody>
-						<c:forEach var="boq"
-										items="${estimatePreparationApproval.boQDetailsList}"
-							varStatus="status">
-										<tr id="detailsrow" class="repeat-address">
-								<td>
-								<form:hidden path="boQDetailsList[${status.index}].slNo" id="boQDetailsList[${status.index}].slNo"/>
-								<form:input type="text" style="width:300px;"
-													path="boQDetailsList[${status.index}].item_description"
-										id="boQDetailsList[${status.index}].item_description"
-										required="required" class="form-control item_description"
-										maxlength="200" readonly="true"></form:input></td>
-								<td><form:input type="text" style="width:150px;"
-													path="boQDetailsList[${status.index}].ref_dsr"
-										id="boQDetailsList[${status.index}].ref_dsr"
-										required="required" class="form-control ref_dsr"
-										maxlength="200" readonly="true"></form:input></td>
-								<td><form:input type="text"
-													path="boQDetailsList[${status.index}].unit"
-										id="boQDetailsList[${status.index}].unit" required="required"
-										class="form-control unit" maxlength="200" readonly="true"></form:input></td>
-								<td><form:input type="number"
-										path="boQDetailsList[${status.index}].rate" step=".01"
-										id="boQDetailsList[${status.index}].rate" required="required"
-										class="form-control rate" readonly="true"></form:input></td>
-								<td><form:input type="number"
-										path="boQDetailsList[${status.index}].quantity" step=".01"
-										id="boQDetailsList[${status.index}].quantity"
-										required="required" class="form-control quantity"
-										name="quantity" readonly="true"></form:input></td>
-								<td><form:input type="number"
-													path="boQDetailsList[${status.index}].amount"
-										id="boQDetailsList[${status.index}].amount"
-										required="required" class="form-control amount"
-										maxlength="200" name="amount" readonly="true"></form:input></td>
+					
+						
+						<c:forEach var="boq" items="${mapboq.value}" varStatus="status">
+						
+						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
+								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
+										<td>
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
+												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:input type="text" style="width:200px;"
+											path="boQDetailsList[${boq.sizeIndex}].milestone"
+											id="boQDetailsList[${boq.sizeIndex}].milestone"
+											required="required" class="form-control milestone"
+											  readonly="true"  title="${boq.milestone}"></form:input></td>
+									<td><form:input type="text" style="width:400px;"
+											path="boQDetailsList[${boq.sizeIndex}].item_description"
+											id="boQDetailsList[${boq.sizeIndex}].item_description"
+											required="required" class="form-control item_description"
+											  readonly="true"  title="${boq.item_description}" ></form:input></td>
+									<td><form:input type="text" style="width:80px;"
+											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
+											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
+											required="required" class="form-control ref_dsr"
+											maxlength="200"   readonly="true" title="${boq.ref_dsr}"></form:input></td>
+									<td><form:input type="text" style="width:80px;"
+											path="boQDetailsList[${boq.sizeIndex}].unit"
+												id="boQDetailsList[${boq.sizeIndex}].unit"
+												required="required"  readonly="true" class="form-control unit"
+												maxlength="200"></form:input></td>
+									<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].rate" step=".01"
+												id="boQDetailsList[${boq.sizeIndex}].rate"
+												required="required"  readonly="true" class="form-control rate"
+												onchange="valueChanged()"></form:input></td>
+									<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].quantity" step=".01"
+											id="boQDetailsList[${boq.sizeIndex}].quantity"
+											required="required"  readonly="true" class="form-control quantity"
+											name="quantity" onchange="valueChanged()"></form:input></td>
+									<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].amount"
+											id="boQDetailsList[${boq.sizeIndex}].amount"
+											required="required" class="form-control amount"
+											  readonly="true" name="amount" ></form:input></td>
+									
 
 										</tr>
+						<%-- 	</c:if>	 --%>
 									</c:forEach>
+							
 					</tbody>
 						</table>
+				
+					
+					
+				</c:forEach>
 					</div>
 				</div>
 				
 				<br> <br>
-				<div class="panel-title"> Rough Cost Estimate </div>
+				<div class="panel-title"> Estimate Rate Analysis </div>
 				<div>
 				<jsp:include page="RoughWorkfileupload.jsp" />
 				</div>
@@ -221,7 +302,7 @@
 
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
+<script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 	<script type="text/javascript">
 		function valueChanged() {
 

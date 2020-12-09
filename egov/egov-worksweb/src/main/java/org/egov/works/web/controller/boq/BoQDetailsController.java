@@ -15,10 +15,12 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -260,8 +262,10 @@ public class BoQDetailsController extends GenericWorkFlowController{
 			final Model model, @RequestParam("file") MultipartFile file, final HttpServletRequest request)
 			throws Exception {
 
-		List boQDetailsList = new ArrayList();
-		Long count = 0L;
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		HashSet<String> milesstoneList=new HashSet<>();
+		int count = 0;
 		String fileName = null;
 		String extension = null;
 		String filePath = null;
@@ -311,18 +315,23 @@ public class BoQDetailsController extends GenericWorkFlowController{
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+							
+						}
+						
+						else if (cell.getColumnIndex() == 1) {
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-						} else if (cell.getColumnIndex() == 1) {
+						} else if (cell.getColumnIndex() == 2) {
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-						}else if (cell.getColumnIndex() == 2) {
+						}else if (cell.getColumnIndex() == 3) {
 							aBoQDetails.setUnit(cell.getStringCellValue());
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
-						 if (cell.getColumnIndex() == 3) {
+						 if (cell.getColumnIndex() == 4) {
 							aBoQDetails.setRate(cell.getNumericCellValue());
-						} else if (cell.getColumnIndex() == 4) {
+						} else if (cell.getColumnIndex() == 5) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
@@ -333,10 +342,12 @@ public class BoQDetailsController extends GenericWorkFlowController{
 					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
 							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
 							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
-						count++;
-						aBoQDetails.setSlNo(count);
+						count=boQDetailsList.size();
+						aBoQDetails.setSlNo(Long.valueOf(count));
+						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
-						System.out.println("aBoQDetails:: " + boQDetailsList);
+						
+					
 
 					}
 				}
@@ -348,6 +359,10 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		} else {
 			// response = "Please choose a file.";
 		}
+		 Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 
+		
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
 		workOrderAgreement.setBoQDetailsList(boQDetailsList);
@@ -355,6 +370,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+        model.addAttribute("milestoneList",groupByMilesToneMap);
         prepareValidActionListByCutOffDate(model);
         model.addAttribute("fileuploadAllowed","Y");
 		return "boqDetails";

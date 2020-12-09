@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -155,6 +156,11 @@ public class ChequeRemittanceAction extends BaseFormAction {
     private Boolean isBankCollectionRemitter;
     private String remitAccountNumber;
 
+    //Property added by prasanta
+    Map<String,String> serviceCategoryNames = new HashMap<String,String>();
+    Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
+    private String serviceTypeId = null;
+
     /**
      * @param collectionsUtil the collectionsUtil to set
      */
@@ -181,6 +187,8 @@ public class ChequeRemittanceAction extends BaseFormAction {
     @Action(value = "/receipts/chequeRemittance-listData")
     @SkipValidation
     public String listData() {
+    	String serviceTId = getServiceTypeId();
+    	System.out.println("LIST DATA ACTION >>>>"+serviceTId);
         isListData = true;
         remitAccountNumber = "";
         if (accountNumberId != null) {
@@ -196,21 +204,37 @@ public class ChequeRemittanceAction extends BaseFormAction {
         if (!hasErrors() && accountNumberId != null) {
 
             final List<String> serviceCodeList = new ArrayList<>(0);
-            List<BankAccountServiceMapping> mappings = microserviceUtils
-                    .getBankAcntServiceMappingsByBankAcc(accountNumberId.toString(), null);
-            for (BankAccountServiceMapping basm : mappings) {
-                serviceCodeList.add(basm.getBusinessDetails());
-            }
+			/*
+			 * List<BankAccountServiceMapping> mappings = microserviceUtils
+			 * .getBankAcntServiceMappingsByBankAcc(accountNumberId.toString(), null); for
+			 * (BankAccountServiceMapping basm : mappings) {
+			 * serviceCodeList.add(basm.getBusinessDetails()); }
+			 */
             final Query fundQuery = persistenceService.getSession().createSQLQuery(FUND_QUERY);
             fundQuery.setString("accountNumberId", accountNumberId);
-            List<String> fundCodeList = fundQuery.list();
-            final String fundCode = fundCodeList != null && !fundCodeList.isEmpty() ? fundCodeList.get(0).toString() : null;
-
+			/*
+			 * List<String> fundCodeList = fundQuery.list(); final String fundCode =
+			 * fundCodeList != null && !fundCodeList.isEmpty() ?
+			 * fundCodeList.get(0).toString() : null;
+			 */
             final CFinancialYear financialYear = financialYearDAO.getFinancialYearById(finYearId);
-            receiptBeanList = remittanceService.findChequeRemittanceDetailsForServiceAndFund("",
-                    StringUtils.join(serviceCodeList, ","), fundCode,
-                    fromDate == null ? financialYear.getStartingDate() : fromDate,
-                    toDate == null ? financialYear.getEndingDate() : toDate);
+			
+			/*
+			 * receiptBeanList =
+			 * remittanceService.findChequeRemittanceDetailsForServiceAndFund("",
+			 * StringUtils.join(serviceCodeList, ","), fundCode, fromDate == null ?
+			 * financialYear.getStartingDate() : fromDate, toDate == null ?
+			 * financialYear.getEndingDate() : toDate,getServiceTypeId());
+			 */
+            
+            try {
+            	receiptBeanList = remittanceService.findChequeRemittanceDetailsForServiceAndFund("MISCELLANEOUS",fromDate == null ? financialYear.getStartingDate() : fromDate, toDate == null ? financialYear.getEndingDate() : toDate, getServiceTypeId(),null,"search");
+    			
+    			System.out.println("Result receiptBeanList LIST>>>" +receiptBeanList);
+
+    			}catch(Exception e){
+    				e.printStackTrace();
+    			}
             if (fromDate != null && toDate != null)
                 pageSize = receiptBeanList.size();
             else
@@ -236,6 +260,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
     @Override
     public void prepare() {
         super.prepare();
+        this.getServiceCategoryList();
         final String showColumn = collectionsUtil.getAppConfigValue(CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
                 CollectionConstants.APPCONFIG_VALUE_COLLECTION_BANKREMITTANCE_SHOWCOLUMNSCARDONLINE);
         if (!showColumn.isEmpty() && showColumn.equals(CollectionConstants.YES))
@@ -249,6 +274,8 @@ public class ChequeRemittanceAction extends BaseFormAction {
         isBankCollectionRemitter = collectionsUtil.isBankCollectionOperator(collectionsUtil.getLoggedInUser());
         addDropdownData("bankBranchList", Collections.emptyList());
         addDropdownData(ACCOUNT_NUMBER_LIST, Collections.emptyList());
+        //added by prasanta
+        addDropdownData("serviceTypeList", microserviceUtils.getBusinessService("Finance"));
     }
 
     @ValidationErrorPage(value = "error")
@@ -275,6 +302,34 @@ public class ChequeRemittanceAction extends BaseFormAction {
         totalChequeAmount = getSum(finalBeanList);
         return INDEX;
     }
+
+    //added  by Prasanta
+    
+    private void getServiceCategoryList() {
+        List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
+        for(BusinessService bs : businessService){
+            String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
+            String[] splitSerCode = bs.getCode().split(Pattern.quote("."));
+            if(splitServName.length==2 && splitSerCode.length == 2){
+                if(!serviceCategoryNames.containsKey(splitSerCode[0])){
+                    serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+                }
+                if(serviceTypeMap.containsKey(splitSerCode[0])){
+                    Map<String, String> map = serviceTypeMap.get(splitSerCode[0]);
+                    map.put(splitSerCode[1], splitServName[1]);
+                    serviceTypeMap.put(splitSerCode[0], map);
+                }else{
+                    Map<String, String> map = new HashMap<>();
+                    map.put(splitSerCode[1], splitServName[1]);
+                    serviceTypeMap.put(splitSerCode[0],map);
+                }
+            }else{
+                serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+            }
+        }
+    }
+
+
 
     private void populateNames(List<Receipt> receiptList) {
         List<BusinessService> businessServices = microserviceUtils.getBusinessService(null);
@@ -676,5 +731,29 @@ public class ChequeRemittanceAction extends BaseFormAction {
     public void setFinalBeanList(List<ReceiptBean> finalBeanList) {
         this.finalBeanList = finalBeanList;
     }
+
+	public Map<String, String> getServiceCategoryNames() {
+		return serviceCategoryNames;
+	}
+
+	public void setServiceCategoryNames(Map<String, String> serviceCategoryNames) {
+		this.serviceCategoryNames = serviceCategoryNames;
+	}
+
+	public Map<String, Map<String, String>> getServiceTypeMap() {
+		return serviceTypeMap;
+	}
+
+	public void setServiceTypeMap(Map<String, Map<String, String>> serviceTypeMap) {
+		this.serviceTypeMap = serviceTypeMap;
+	}
+
+	public String getServiceTypeId() {
+		return serviceTypeId;
+	}
+
+	public void setServiceTypeId(String serviceTypeId) {
+		this.serviceTypeId = serviceTypeId;
+	}
 
 }

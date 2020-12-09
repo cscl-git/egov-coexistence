@@ -58,17 +58,17 @@
 			.ready(
 					function($) {
 						
-						if(jQuery("#finYearId").val()!=-1){
+						/* if(jQuery("#finYearId").val()!=-1){
 							$("#dateDiv").hide();
 							$("#fromDate").val("");
 							$("#toDate").val("");
 						}
 						else if(jQuery("#finYearId").val()==-1){
 							$("#dateDiv").show();
-						}
+						} */
 						
 						//hide or show date fields on selecting year from drop down
-						jQuery("#finYearId").on("change",function(){
+						/*jQuery("#finYearId").on("change",function(){
 							if(jQuery("#finYearId").val()!=-1){
 								$("#dateDiv").hide();
 								$("#fromDate").val("");
@@ -77,7 +77,7 @@
 							else if(jQuery("#finYearId").val()==-1){
 								$("#dateDiv").show();
 							}
-						});
+						}); */
 
 						
 						jQuery('#remittanceDate').val("");
@@ -266,6 +266,11 @@
 	}
 
 	function searchDataToRemit() {
+		var serviceType=dom.get("serviceType").value;
+		if(serviceType==-1){
+			bootbox.alert("Please Select Service Type");
+			return false;
+		}
 		if(jQuery("#finYearId").val()==-1 && jQuery("#fromDate").val()=="" && jQuery("#toDate").val()==""){
 			bootbox.alert("<s:text name='msg.please.enter.either.financial.year.or.fromDate.and.toDate'/>");
 			return false;
@@ -414,6 +419,19 @@
 										</c:forEach>
 								</select>		
 							</td>
+							<td width="21%" class="bluebox">
+							 	<s:text name="searchreceipts.criteria.servicetype"/> 
+							 	<span class="mandatory">
+							 </td>
+	     					 <td width="24%" class="bluebox">
+	     					 	 <s:select headerKey="-1"  
+	     					 			headerValue="%{getText('searchreceipts.servicetype.select')}"  
+	     					 			name="serviceTypeId" 
+	     					 			id="serviceType" cssClass="selectwk" 
+	     					 			list="dropdownData.serviceTypeList" 
+	     					 			listKey="code" 
+	     					 			listValue="businessService" value="%{serviceTypeId}" />  
+	     					 </td>
 						</tr>
 						<tr>
 							<td width="4%" class="bluebox">&nbsp;</td>
@@ -465,6 +483,7 @@
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Drawee bank and branch" style="width:20%;text-align: center" value="${currentRow.bank}  ${currentRow.bankBranch}"  />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:15%;text-align: center" value="${currentRow.serviceName}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Department" style="width:15%;text-align: center" value="${currentRow.departmentName}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of Payment" style="width:15%;text-align: center" value="${currentRow.instrumentType}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Cheque /DD Amount (Rs)" style="width:10%;text-align: center">
 									<div align="center">
 										<c:if test="${not empty currentRow.instrumentAmount}">
@@ -491,7 +510,20 @@
 							<td class="bluebox"><s:text name="bankremittance.remittanceamount" /></td>
 							<td class="bluebox"><s:textfield id="remittanceAmount" name="remittanceAmount" readonly="true" /></td>								
 							<td class="bluebox"><s:text name="bankremittance.accountnumber" /></td>
-							<td class="bluebox"><s:textfield id="remitAccountNumber" name="remitAccountNumber" readonly="true" /></td>		
+							<%-- <td class="bluebox"><s:textfield id="remitAccountNumber" name="remitAccountNumber" readonly="true" /></td> --%>
+							<td class="bluebox">
+								<select id="remitAccountNumber" name="remitAccountNumber" value="%{accountNumberId}">
+									<option value="-1">Select</option>
+									<c:forEach items="${dropdownData.accountNumberList}" var="accNum">
+										<c:if test="${accNum.bankAccount == accountNumberId }">
+											<option value="${accNum.bankAccount}" selected="selected">${accNum.bank} - ${accNum.bankAccount}</option>
+										</c:if>
+										<c:if test="${accNum.bankAccount != accountNumberId }">
+											<option value="${accNum.bankAccount}" >${accNum.bank} - ${accNum.bankAccount}</option>
+										</c:if>
+									</c:forEach>
+								</select>
+							</td>		
 						</tr>
 					</table>
 				</div>
@@ -500,7 +532,7 @@
 					<s:text name="common.mandatoryfields" />
 				</div>
 				<div class="buttonbottom">
-					<input name="button32" type="submit" class="buttonsubmit" id="button32" value="<s:text name='lbl.remit.to.bank'/>" onclick="return validate();" />
+					<input name="button32" type="submit" class="buttonsubmit" id="button32" value="Remit to Bank" onclick="return validate();" />
 						&nbsp; 
 					<input name="buttonClose" type="button" class="button" id="button" value="<s:text name='lbl.close'/>" onclick="window.close()" />
 				</div>

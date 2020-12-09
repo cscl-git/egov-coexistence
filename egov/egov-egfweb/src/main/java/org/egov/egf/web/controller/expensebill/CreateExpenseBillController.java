@@ -358,9 +358,12 @@ public class CreateExpenseBillController extends BaseBillController {
         else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue()))
             message = messageSource.getMessage("msg.expense.bill.reject",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
-        else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getState().getValue()))
+        else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getStatus().getCode()))
             message = messageSource.getMessage("msg.expense.bill.cancel",
                     new String[]{expenseBill.getBillnumber()}, null);
+        else if ("Pending for Cancellation".equals(expenseBill.getStatus().getCode()))
+        	message = messageSource.getMessage("msg.expense.bill.cancel.success",
+                    new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
 
         return message;
     }

@@ -14,7 +14,12 @@
 		<div class="tab-pane fade in active">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="form-group" style="padding: 50px 20px 0;">
-
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+									code="lbl.tender.preparation.name.work" /></label>
+					<div class="col-sm-9 block-colm">
+						<form:textarea class="form-control" path="project_name_search" style="height: 100px;"
+									maxlength="2000"  />
+							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.estimate.from.date" /><span
 								class="mandatory"></span></label>
@@ -55,6 +60,7 @@
 						<table class="table table-bordered" id="table">
 							<thead>
 								<tr>
+									<th><spring:message code="lbl.tender.preparation.name.work" /></th>
 									<th><spring:message code="lbl.tender.loa.number" /></th>
 									<th><spring:message code="lbl.tender.amount" /></th>
 									<th><spring:message code="lbl.tender.date" /></th>
@@ -71,6 +77,10 @@
 										varStatus="status">
 										<tr>
 										<td><form:hidden
+													path="tenderList[${status.index}].project_name"
+													id="tenderList[${status.index}].project_name" />
+												${result.project_name }</td>
+										<td><form:hidden
 													path="tenderList[${status.index}].loaNumber"
 													id="tenderList[${status.index}].loaNumber" />
 												${result.loaNumber }</td>
@@ -78,6 +88,7 @@
 													path="tenderList[${status.index}].procurementAmount"
 													id="tenderList[${status.index}].procurementAmount" />
 												${result.procurementAmount }</td>
+											
 											<td><form:hidden
 													path="tenderList[${status.index}].tenderDate"
 													id="tenderList[${status.index}].tenderDate" />

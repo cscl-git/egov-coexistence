@@ -130,8 +130,11 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Transient
 	private List<WorkOrderAgreement> WorkOrderList;
 
-	@OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE, mappedBy = "workOrderAgreement", targetEntity = BoQDetails.class)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "workOrderAgreement", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList;
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "workOrderAgreement", targetEntity = PaymentDistribution.class)
+	private List<PaymentDistribution> paymentDistribution;
 	
 	@ManyToOne
     @JoinColumn(name = "statusid")
@@ -634,6 +637,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setPercentCompletion(String percentCompletion) {
 		this.percentCompletion = percentCompletion;
+	}
+
+	public List<PaymentDistribution> getPaymentDistribution() {
+		return paymentDistribution;
+	}
+
+	public void setPaymentDistribution(List<PaymentDistribution> paymentDistribution) {
+		this.paymentDistribution = paymentDistribution;
 	}
 
 }

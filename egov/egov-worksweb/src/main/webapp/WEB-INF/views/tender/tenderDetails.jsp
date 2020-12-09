@@ -28,6 +28,12 @@
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="form-group" style="padding: 50px 20px 0;">
+				<label class="col-sm-3 control-label text-left-audit"><spring:message
+									code="lbl.tender.preparation.name.work" /></label>
+					<div class="col-sm-9 add-margin">
+						<form:textarea class="form-control" path="project_name" style="height: 100px;"
+									maxlength="2000"  />
+							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.tender.loa.number" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">

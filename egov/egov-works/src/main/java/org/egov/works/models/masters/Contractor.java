@@ -96,6 +96,8 @@ public class Contractor extends BaseModel implements EntityType {
     @Length(max = 1024, message = "contractor.narration.length")
     @OptionalPattern(regex = WorksConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "contractor.narration.alphaNumeric")
     private String narration;
+    
+    
 
     @Length(max = 10, message = "contractor.panNumber.length")
     @OptionalPattern(regex = Constants.PANNUMBER, message = "contractor.panNumber.alphaNumeric")

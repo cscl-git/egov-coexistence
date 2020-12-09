@@ -122,7 +122,7 @@ public class TenderDetailsController {
 		 List<Object[]> list =null;
 		 query
 	        .append(
-	                "select td.id,td.procurementAmount,td.procurementDate,td.contractorDetails,td.loaNumber,td.tenderProNumber from Tender td where ")
+	                "select td.id,td.procurementAmount,td.procurementDate,td.contractorDetails,td.loaNumber,td.tenderProNumber,td.project_name from Tender td where ")
 	        .append(getDateQuery(tender.getFromDt(), tender.getToDt()))
 	        .append(getMisQuery(tender));
 		 System.out.println("Query :: "+query.toString());
@@ -152,6 +152,10 @@ public class TenderDetailsController {
         		if(object[5] != null)
         		{
         			tenderDetails.setTenderProNumber(object[5].toString());
+        		}
+        		if(object[6] != null)
+        		{
+        			tenderDetails.setProject_name(object[6].toString());
         		}
         		tenderList.add(tenderDetails);
         	}
@@ -191,6 +195,11 @@ public class TenderDetailsController {
 			{
 				misQuery.append(" and td.loaNumber='")
 						.append(tender.getLoaNumber()).append("'");
+			}
+			if ( tender.getProject_name_search() != null && !tender.getProject_name_search().isEmpty())
+			{
+				misQuery.append(" and td.project_name like '%")
+						.append(tender.getProject_name_search()).append("%'");
 			}
 			
 			

@@ -1145,6 +1145,18 @@ public class MicroserviceUtils {
                 .build();
         return this.getReceipt(criteria);
     }
+
+	public List<Receipt> getReceipts(String ids, String status, String serviceCodes, Date fromDate, Date toDate,String serviceTypeId) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .status(Arrays.stream(status.split(",")).collect(Collectors.toSet()))
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .businessCodes(serviceTypeId != null ? Arrays.stream(serviceTypeId.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .receiptNumbers(Arrays.stream(ids.split(",")).collect(Collectors.toSet()))
+                .businessCodes(Arrays.stream(serviceCodes.split(",")).collect(Collectors.toSet()))
+                .build();
+        return this.getReceipt(criteria);
+    }
     
     public List<Receipt> getReceipt(ReceiptSearchCriteria rSearchcriteria) {
         // Checking for the collection version either older version or new version are getting used

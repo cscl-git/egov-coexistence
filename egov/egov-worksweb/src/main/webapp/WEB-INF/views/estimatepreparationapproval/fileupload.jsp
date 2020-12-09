@@ -5,7 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%--<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %> --%>
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/fileupload.js'/>"></script>
 <style>
@@ -25,7 +24,10 @@
       </div>
    <c:if test="${estimatePreparationApproval.documentDetail != null &&  !estimatePreparationApproval.documentDetail.isEmpty()}">
         <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
+        
+        <c:if test="${documentDetials.objectType != 'roughWorkFile' }">
             <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+       </c:if>
         </c:forEach>
     </c:if>
    <br> 

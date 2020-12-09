@@ -68,8 +68,16 @@ public abstract class RemittanceService implements Serializable {
     public abstract List<Receipt> createCashBankRemittance(List<ReceiptBean> receiptList, final String accountNumberId,
             final Date remittanceDate);
 
-    public abstract List<ReceiptBean> findCashRemittanceDetailsForServiceAndFund(final String boundaryIdList,
-            final String serviceCodes, final String fundCodes, Date startDate, Date endDate);
+	/*
+	 * public abstract List<ReceiptBean>
+	 * findCashRemittanceDetailsForServiceAndFund(final String boundaryIdList, final
+	 * String serviceCodes, final String fundCodes, Date startDate, Date endDate,
+	 * String serviceTypeId);
+	 */
+    public abstract List<ReceiptBean> findCashRemittanceDetailsForServiceAndFund( String classification, Date fromDate, Date toDate, String businessCode,
+    	    String receiptNo,String type);
+    
+   
 
     public List<CollectionBankRemittanceReport> prepareBankRemittanceReport(final List<ReceiptHeader> receiptHeaders) {
         final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
@@ -132,8 +140,16 @@ public abstract class RemittanceService implements Serializable {
         return reportList;
     }
 
-    public abstract List<ReceiptBean> findChequeRemittanceDetailsForServiceAndFund(final String boundaryIdList,
-            final String serviceCodes, final String fundCodes, Date startDate, Date endDate);
+    
+	public abstract List<ReceiptBean> findChequeRemittanceDetailsForServiceAndFund(String classification, Date fromDate, Date toDate, String businessCode,
+    	    String receiptNo,String type);
+	 
+	/*
+	 * public abstract List<ReceiptBean>
+	 * findChequeRemittanceDetailsForServiceAndFund(final String boundaryIdList,
+	 * final String serviceCodes, final String fundCodes, Date startDate, Date
+	 * endDate,String serviceTypeId);
+	 */
 
     public abstract List<Receipt> createChequeBankRemittance(List<ReceiptBean> receiptList, String accountNumberId,
             final Date remittanceDate, final String[] instrumentIdArray);

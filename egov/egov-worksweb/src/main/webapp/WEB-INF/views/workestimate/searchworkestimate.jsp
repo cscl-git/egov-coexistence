@@ -128,72 +128,92 @@
 				</div>
 				<div style="padding: 0 15px;">
 					<form:hidden path="id" id="id" value="${workEstimateDetails.id}" />
-					<table class="table table-bordered" id="searchResult">
-					<c:if
-							test="${workEstimateDetails.newBoQDetailsList != null &&  !workEstimateDetails.newBoQDetailsList.isEmpty()}">
+					
+					
+						<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
+					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
+				
+				
+				
 						<thead>
 							<tr>
+							<th><c:out value="${mapboq.key}"/></th>
+							</tr>
+							<tr>
 								<th><spring:message code="lbl.selectAll" text="Select All" />
-									<input type="checkbox" id="selectAll" name="selectAll"
-									onclick="checkAll(this)"></th>
+									</th>
+								<th><spring:message code="lbl.item.Milestone" /></th>	
 								<th><spring:message code="lbl.item.description" /></th>
 								<th><spring:message code="lbl.ref.dsr" /></th>
 								<th><spring:message code="lbl.unit" /></th>
 								<th><spring:message code="lbl.rate" /></th>
 								<th><spring:message code="lbl.quantity" /></th>
 								<th><spring:message code="lbl.amount" /></th>
-								<th><spring:message code="lbl.amount" /></th>
+								
 							</tr>
 						</thead>
-						`
+						
 						
 							<tbody>
-								<c:forEach items="${workEstimateDetails.newBoQDetailsList}"
-									var="result" varStatus="status">
-									<tr>
+					
+						
+						<c:forEach var="boq" items="${mapboq.value}" varStatus="status">
+						
+						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
+								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
+								
 										<td><form:checkbox
-												path="newBoQDetailsList[${status.index}].checkboxChecked"
-												id="newBoQDetailsList[${status.index}].checkboxChecked" />
+												path="newBoQDetailsList[${boq.sizeIndex}].checkboxChecked"
+												id="newBoQDetailsList[${boq.sizeIndex}].checkboxChecked" />
 												<form:hidden
-												path="newBoQDetailsList[${status.index}].slNo"
-												id="newBoQDetailsList[${status.index}].slNo" />
+												path="newBoQDetailsList[${boq.sizeIndex}].slNo"
+												id="newBoQDetailsList[${boq.sizeIndex}].slNo" />
 												</td>
+								<td><form:hidden
+												path="newBoQDetailsList[${boq.sizeIndex}].milestone"
+												id="newBoQDetailsList[${boq.sizeIndex}].milestone" />
+											${boq.milestone }</td>
 
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].item_description"
-												id="newBoQDetailsList[${status.index}].item_description" />
-											${result.item_description }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].item_description"
+												id="newBoQDetailsList[${boq.sizeIndex}].item_description" />
+											${boq.item_description }</td>
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].ref_dsr"
-												id="newBoQDetailsList[${status.index}].ref_dsr" />
-											${result.ref_dsr }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].ref_dsr"
+												id="newBoQDetailsList[${boq.sizeIndex}].ref_dsr" />
+											${boq.ref_dsr }</td>
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].unit"
-												id="newBoQDetailsList[${status.index}].unit" />
-											${result.unit }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].unit"
+												id="newBoQDetailsList[${boq.sizeIndex}].unit" />
+											${boq.unit }</td>
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].rate"
-												id="newBoQDetailsList[${status.index}].rate" />
-											${result.rate }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].rate"
+												id="newBoQDetailsList[${boq.sizeIndex}].rate" />
+											${boq.rate }</td>
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].quantity"
-												id="newBoQDetailsList[${status.index}].quantity" />
-											${result.quantity }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].quantity"
+												id="newBoQDetailsList[${boq.sizeIndex}].quantity" />
+											${boq.quantity }</td>
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].amount"
-												id="newBoQDetailsList[${status.index}].amount" />
-											${result.amount }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].amount"
+												id="newBoQDetailsList[${boq.sizeIndex}].amount" />
+											${boq.amount }</td>
 
 										<td><form:hidden
-												path="newBoQDetailsList[${status.index}].estimatePreparationApproval.id"
-												id="newBoQDetailsList[${status.index}].estimatePreparationApproval.id" />
-											${result.estimatePreparationApproval.id }</td>
+												path="newBoQDetailsList[${boq.sizeIndex}].estimatePreparationApproval.id"
+												id="newBoQDetailsList[${boq.sizeIndex}].estimatePreparationApproval.id" />
+											</td>
 
 									</tr>
+						<%-- 	</c:if>	 --%>
 								</c:forEach>
-							<tbody>
-						</c:if>
+							
+						</tbody>
 					</table>
+				
+					
+					
+				</c:forEach>
 				</div>
 				<div>
 					<c:if

@@ -452,4 +452,12 @@
     <bean id="WorkOrderAgreementInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
         <constructor-arg index="0" ref="workOrderAgreementPersistenceService"/>
     </bean>
+    <bean id="dnitcreationPersistenceService" parent="abstractPersistenceService">
+        <constructor-arg name="type" value="org.egov.works.estimatepreparationapproval.entity.DNITCreation" />
+    </bean>
+
+    <bean id="DNITCreationInboxRenderService" class="org.egov.infra.workflow.inbox.DefaultInboxRenderServiceImpl">
+        <constructor-arg index="0" ref="dnitcreationPersistenceService"/>
+    </bean>
+    
 </beans>

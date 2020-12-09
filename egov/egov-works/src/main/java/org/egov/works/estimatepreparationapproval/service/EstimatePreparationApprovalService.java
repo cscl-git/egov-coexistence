@@ -12,10 +12,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.eis.service.DesignationService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.Designation;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -55,6 +58,10 @@ public class EstimatePreparationApprovalService {
     private FileStoreService fileStoreService;
 	@Autowired
 	private DocumentUploadRepository documentUploadRepository;
+	@Autowired
+    private MicroserviceUtils microServiceUtil;
+	@Autowired
+    private DesignationService designationService;
 
 	@Transactional
 	public EstimatePreparationApproval saveEstimatePreparationData(HttpServletRequest request,
@@ -68,7 +75,7 @@ public class EstimatePreparationApprovalService {
 			}
 			estimatePreparationApproval.setNewBoQDetailsList(list);
 		
-		if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Save as Draft")) && estimatePreparationApproval.getStatus() == null)
+		if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Save as Draft")) && estimatePreparationApproval.getStatus() == null)
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Created"));
 		}
@@ -76,11 +83,11 @@ public class EstimatePreparationApprovalService {
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Created"));
 		}
-		else if ((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("Created"))
+		else if ((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("Created"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Pending for Approval"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward"))&& estimatePreparationApproval.getStatus().getCode().equals("Pending for Approval"))
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& estimatePreparationApproval.getStatus().getCode().equals("Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Pending for Approval"));
 		}
@@ -88,11 +95,11 @@ public class EstimatePreparationApprovalService {
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Pending for Approval"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Pending for Approval"))
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Pending for Approval"));
 		}
@@ -100,11 +107,11 @@ public class EstimatePreparationApprovalService {
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("TS Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") )&& estimatePreparationApproval.getStatus().getCode().equals("TS Initiated"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Pending for Approval"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("TS Pending for Approval"))
+		else if(( workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("TS Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Approved"));
 		}
@@ -142,6 +149,11 @@ public class EstimatePreparationApprovalService {
         final String currState = "";
         String stateValue = "";
         WorkFlowMatrix wfmatrix;
+        org.egov.pims.commons.Designation designation = designationService.getDesignationById(Long.parseLong(approvalDesignation));
+        if(designation != null)
+        {
+     	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());
+        }
         Position owenrPos = new Position();
         if(workFlowAction.equalsIgnoreCase("Save As Draft"))
         {
@@ -168,9 +180,10 @@ public class EstimatePreparationApprovalService {
         {
         	wfmatrix = estimateWorkflowService.getWfMatrix(estimatePreparationApproval.getStateType(), null,
                     null, additionalRule, "NEW", null);
+        	String statetype="Pending With "+designation.getName().toUpperCase();
         	estimatePreparationApproval.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Estimate")
             .withCreatedBy(user.getId())
@@ -190,21 +203,31 @@ public class EstimatePreparationApprovalService {
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Estimate");
         	}
-        	else if(workFlowAction.equalsIgnoreCase("Forward") || (workFlowAction.equalsIgnoreCase("Approve") && !wfmatrix.getNextState().equals("END")))
+        	else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Approve")) && !estimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("TS Initiated") && !estimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
         	{
+        		String statetype="Pending With "+designation.getName().toUpperCase();
         		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Estimate");
 
         	}
-        	else if(workFlowAction.equalsIgnoreCase("Approve") && wfmatrix.getNextState().equals("END"))
+        	else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Approve")) && estimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("TS Initiated"))
+        	{
+        		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                .withComments(approvalComent)
+                .withStateValue("Pending With EXECUTIVE ENGINEER").withDateInfo(new Date()).withOwner(0L)
+                .withNextAction(wfmatrix.getNextAction())
+                .withNatureOfTask("Works Estimate");
+
+        	}
+        	else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Approve")) && estimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
         	{
         		estimatePreparationApproval.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
-                .withNextAction(wfmatrix.getNextAction())
+                .withStateValue("END").withDateInfo(new Date())
+                .withNextAction("Estimate Approved")
                 .withNatureOfTask("Works Estimate");
 
         	}
@@ -309,4 +332,6 @@ public class EstimatePreparationApprovalService {
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
 		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
 	}
+	
+	
 }

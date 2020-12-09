@@ -121,7 +121,7 @@ public class BGSecurityController {
 		 List<Object[]> list =null;
 		 query
 	        .append(
-	                "select bg.id,bg.security_validity,bg.security_amount,bg.security_start_date,bg.security_end_date,bg.loaNumber,bg.security_number  from BGSecurityDetails bg where ")
+	                "select bg.id,bg.security_validity,bg.security_amount,bg.security_start_date,bg.security_end_date,bg.loaNumber,bg.security_number,bg.project_name,bg.security_tender_number,bg.narration  from BGSecurityDetails bg where ")
 	        .append(getDateQuery(bgSecurityDetails.getFromDt(), bgSecurityDetails.getToDt()))
 	        .append(getMisQuery(bgSecurityDetails));
 		 System.out.println("Query :: "+query.toString());
@@ -155,6 +155,18 @@ public class BGSecurityController {
         		if(object[6] != null)
         		{
         			bg.setSecurity_number(object[6].toString());
+        		}
+        		if(object[7] != null)
+        		{
+        			bg.setProject_name(object[7].toString());
+        		}
+        		if(object[8] != null)
+        		{
+        			bg.setSecurity_tender_number(object[8].toString());
+        		}
+        		if(object[9] != null)
+        		{
+        			bg.setNarration(object[9].toString());
         		}
         		securityList.add(bg);
         	}

@@ -1,6 +1,7 @@
 package org.egov.works.estimatepreparationapproval.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,7 +46,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private Long id;
 
 	@Column(name = "works_wing")
-	private Long worksWing;
+	private String worksWing;
 
 	@Column(name = "executing_division")
 	private Long executingDivision;
@@ -60,16 +61,16 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String workLocation;
 
 	@Column(name = "sector_number")
-	private Long sectorNumber;
+	private String sectorNumber;
 
 	@Column(name = "ward_number")
-	private Long wardNumber;
+	private String wardNumber;
 
 	@Column(name = "work_name")
 	private String workName;
 
 	@Column(name = "work_category")
-	private Long workCategory;
+	private String workCategory;
 
 	@Column(name = "necessity")
 	private String necessity;
@@ -82,7 +83,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Column(name = "estimate_amount")
 	private Double estimateAmount;
-
+	
 	@Column(name = "estimate_prepared_by")
 	private String estimatePreparedBy;
 
@@ -98,8 +99,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "financial_year")
 	private String financialYear;
 
-	@Column(name = "estimate_percentage")
-	private String estimatePercentage;
+	
 
 	@Column(name = "work_type")
 	private String workType;
@@ -122,12 +122,81 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "aadate")
 	private Date aadate;
 	
+	@Column(name = "meetNumber")
+	private String meetNumber;
+	
+	@Column(name = "meetCategory")
+	private String meetCategory;
+	
+	@Column(name = "meetDate")
+	private Date meetDate;
+	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
 	@ManyToOne
     @JoinColumn(name = "statusid")
     private EgwStatus status;
+
+	
+	@Column(name = "estimate_percentage")
+	private String estimatePercentage;
+	
+	@Column(name = "contingent_percentage")
+	private Double contingentPercentage;
+	
+	@Column(name = "contingent_amount")
+	private BigDecimal contingentAmount;
+	@Column(name = "consultant_fee")
+	private BigDecimal consultantFee;
+	@Column(name = "unforseen_charges")
+	private BigDecimal unforseenCharges;
+	
+	@Column(name = "expenditure_head")
+	private String expHead;
+	
+	@Column(name = "expenditure_head_est")
+	private String expHead_est;
+	
+	@Column(name = "expenditure_sub_category")
+	private String expSubCategory;
+	
+	@Column(name = "expenditure_category")
+	private String expCategory;
+	
+	
+
+	public Double getContingentPercentage() {
+		return contingentPercentage;
+	}
+
+	public void setContingentPercentage(Double contingentPercentage) {
+		this.contingentPercentage = contingentPercentage;
+	}
+
+	public BigDecimal getContingentAmount() {
+		return contingentAmount;
+	}
+
+	public void setContingentAmount(BigDecimal contingentAmount) {
+		this.contingentAmount = contingentAmount;
+	}
+
+	public BigDecimal getConsultantFee() {
+		return consultantFee;
+	}
+
+	public void setConsultantFee(BigDecimal consultantFee) {
+		this.consultantFee = consultantFee;
+	}
+
+	public BigDecimal getUnforseenCharges() {
+		return unforseenCharges;
+	}
+
+	public void setUnforseenCharges(BigDecimal unforseenCharges) {
+		this.unforseenCharges = unforseenCharges;
+	}
 
 	@Transient
 	private List<EstimatePreparationApproval> estimateList;
@@ -188,15 +257,12 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
     private List<DocumentUpload> documentDetail = new ArrayList<>();
 	
 	@Transient
+    private List<DocumentUpload> roughCostdocumentDetail = new ArrayList<>();
+	
+	@Transient
 	private String workCategry;
+	
 
-	public Long getWorksWing() {
-		return worksWing;
-	}
-
-	public void setWorksWing(Long worksWing) {
-		this.worksWing = worksWing;
-	}
 
 	public Long getExecutingDivision() {
 		return executingDivision;
@@ -230,21 +296,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 		this.workLocation = workLocation;
 	}
 
-	public Long getSectorNumber() {
-		return sectorNumber;
-	}
 
-	public void setSectorNumber(Long sectorNumber) {
-		this.sectorNumber = sectorNumber;
-	}
 
-	public Long getWardNumber() {
-		return wardNumber;
-	}
 
-	public void setWardNumber(Long wardNumber) {
-		this.wardNumber = wardNumber;
-	}
 
 	public String getWorkName() {
 		return workName;
@@ -254,13 +308,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 		this.workName = workName;
 	}
 
-	public Long getWorkCategory() {
-		return workCategory;
-	}
 
-	public void setWorkCategory(Long workCategory) {
-		this.workCategory = workCategory;
-	}
 
 	public String getNecessity() {
 		return necessity;
@@ -607,6 +655,102 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setObjectType(String objectType) {
 		this.objectType = objectType;
+	}
+
+	public String getWorksWing() {
+		return worksWing;
+	}
+
+	public void setWorksWing(String worksWing) {
+		this.worksWing = worksWing;
+	}
+
+	public String getSectorNumber() {
+		return sectorNumber;
+	}
+
+	public void setSectorNumber(String sectorNumber) {
+		this.sectorNumber = sectorNumber;
+	}
+
+	public String getWardNumber() {
+		return wardNumber;
+	}
+
+	public void setWardNumber(String wardNumber) {
+		this.wardNumber = wardNumber;
+	}
+
+	public String getWorkCategory() {
+		return workCategory;
+	}
+
+	public void setWorkCategory(String workCategory) {
+		this.workCategory = workCategory;
+	}
+
+	public String getExpHead() {
+		return expHead;
+	}
+
+	public void setExpHead(String expHead) {
+		this.expHead = expHead;
+	}
+
+	public String getExpSubCategory() {
+		return expSubCategory;
+	}
+
+	public void setExpSubCategory(String expSubCategory) {
+		this.expSubCategory = expSubCategory;
+	}
+
+	public String getExpCategory() {
+		return expCategory;
+	}
+
+	public void setExpCategory(String expCategory) {
+		this.expCategory = expCategory;
+	}
+
+	public List<DocumentUpload> getRoughCostdocumentDetail() {
+		return roughCostdocumentDetail;
+	}
+
+	public void setRoughCostdocumentDetail(List<DocumentUpload> roughCostdocumentDetail) {
+		this.roughCostdocumentDetail = roughCostdocumentDetail;
+	}
+
+	public String getMeetNumber() {
+		return meetNumber;
+	}
+
+	public void setMeetNumber(String meetNumber) {
+		this.meetNumber = meetNumber;
+	}
+
+	public String getMeetCategory() {
+		return meetCategory;
+	}
+
+	public void setMeetCategory(String meetCategory) {
+		this.meetCategory = meetCategory;
+	}
+
+	public Date getMeetDate() {
+		return meetDate;
+	}
+
+	public void setMeetDate(Date meetDate) {
+		this.meetDate = meetDate;
+	}
+
+	public String getExpHead_est() {
+		return expHead_est;
+	}
+
+	public void setExpHead_est(String expHead_est) {
+		this.expHead_est = expHead_est;
 	}
 	
 	

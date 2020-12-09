@@ -73,6 +73,7 @@ import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.expensebill.repository.ExpenseBillRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.admin.master.entity.Department;
@@ -112,6 +113,8 @@ public class CancelBillAction extends BaseFormAction {
 	private boolean afterSearch = false;
 	Integer loggedInUser = ApplicationThreadLocals.getUserId().intValue();
 	public final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Constants.LOCALE);
+	@Autowired
+	private ExpenseBillRepository expenseBillRepository;
 	
 	@Autowired
 	 private ManageAuditorService manageAuditorService;
@@ -222,7 +225,7 @@ public class CancelBillAction extends BaseFormAction {
 				" select billmis.egBillregister.id, billmis.egBillregister.billnumber, billmis.egBillregister.billdate, billmis.egBillregister.billamount, billmis.departmentcode from EgBillregistermis billmis ");
 		// if the logged in user is same as creator or is superruser
 		query.append(userCond);
-
+		
 		if (fund != null && fund.getId() != null && fund.getId() != -1 && fund.getId() != 0)
 			query.append(" billmis.fund.id=" + fund.getId());
 
@@ -276,6 +279,7 @@ public class CancelBillAction extends BaseFormAction {
 						+ "' and billmis.egBillregister.status.code='"
 						+ FinancialConstants.CONTRACTORBILL_APPROVED_STATUS + "'");
 		}
+		query.append(" and billmis.egBillregister.status.description not in ('Pending for Cancellation', 'Cancelled') ");
 
 		return query;
 
@@ -311,8 +315,7 @@ public class CancelBillAction extends BaseFormAction {
 			final String[] searchQuery = query();
 			final List<Object[]> tempBillList = new ArrayList<Object[]>();
 			List<Object[]> billListWithNoVouchers, billListWithCancelledReversedVouchers;
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Search Query - " + searchQuery);
+				LOGGER.info("Search Query - " + searchQuery);
 			billListWithNoVouchers = persistenceService.findAllBy(searchQuery[0]);
 			billListWithCancelledReversedVouchers = persistenceService.findAllBy(searchQuery[1]);
 			tempBillList.addAll(billListWithNoVouchers);
@@ -377,6 +380,8 @@ public class CancelBillAction extends BaseFormAction {
          .withCreatedBy(user.getId())
          .withtLastModifiedBy(user.getId());
 		 applyAuditing(egBillregister,user.getId());
+		 expenseBillRepository.save(egBillregister);
+		 persistenceService.getSession().flush();
 		 //egBillregister
 		addActionMessage(getText("Bill to be Cancelled has been sent to Audit Department"));
 		prepareBeforeSearch();

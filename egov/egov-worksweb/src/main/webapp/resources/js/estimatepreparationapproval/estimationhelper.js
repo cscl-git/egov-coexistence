@@ -48,8 +48,134 @@
  */
 
 $(document).ready(function(){
+	
 });
 
+function calcualtePerctAmount(x){
+	var work_amount=0;
+	var dataId = $(x).attr("data-idx");
+
+	
+	  if (dataId==undefined)
+	  {
+	  	dataId=0;
+	  }
+	
+	
+	if (null != document.getElementById("work_amount")) {
+		var val = document.getElementById("work_amount").value;
+		if (val != "" && !isNaN(val)) {
+			work_amount = val;
+		}
+	}
+	
+
+	
+	if (null != document.getElementById("paymentDistribution[" + dataId
+			+ "].payment_percent") && document.getElementById("paymentDistribution[" + dataId
+					+ "].payment_percent").value != 0) {
+		var val = document.getElementById("paymentDistribution[" + dataId
+				+ "].payment_percent").value;
+		if (val != "" && !isNaN(val)) {
+			var amt=(val*work_amount)/100;
+			document.getElementById("paymentDistribution[" + dataId
+					+ "].amount").value=parseFloat(Number(amt)).toFixed(2);
+			//creditamt = parseFloat(Number(creditamt) + Number(amt)).toFixed(2);
+		}	
+	}
+	
+}
+
+var subledgerrowcount=0;
+function addpaymentRow() { 
+	
+	
+	var rowcount = $("#tblchecklist tbody tr").length;
+	if (rowcount < 30) {
+		if (document.getElementById('tblchecklistRow') != null) {
+			addRowPayment('tblchecklist','tblchecklistRow');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.payment_desc').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.payment_percent').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.amount').val('');
+			
+			++subledgerrowcount;
+			
+			addCustomEvent(rowcount,'temppayment[index].addButton','keydown',shortKeyFunForAddButton);
+		}
+	} else {
+		  bootbox.alert($.i18n.prop('msg.limit.reached'));
+	}
+}
+
+
+
+
+
+function addRowPayment(tableName,rowName) { 
+	
+	var rowcount = $("#"+tableName+" tbody tr").length;
+	if (rowcount < 30) {
+		if (document.getElementById(rowName) != null) {
+			// get Next Row Index to Generate
+			var nextIdx = 0;
+				nextIdx = $("#"+tableName+" tbody tr").length;
+			// validate status variable for exiting function
+			var isValid = 1;// for default have success value 0
+
+			// validate existing rows in table
+			$("#"+tableName+" tbody tr").find('input,select').each(
+					function() {
+						if (($(this).data('optional') === 0)
+								&& (!$(this).val()) && !($(this).attr('name')===undefined)) { 
+							$(this).focus();
+							bootbox.alert($(this).data('errormsg'));
+							isValid = 0;// set validation failure
+							return false;
+						}
+			});
+			if (isValid === 0) {
+				return false;
+			}
+			
+			// Generate all textboxes Id and name with new index
+			$("#"+rowName+"").clone().find("input,select,errors,span").each(
+			function() {	
+				if ($(this).data('server')) {
+					$(this).removeAttr('data-server');
+				}
+				
+				$(this).attr(
+						{
+							'name' : function(_, name) {
+								if(!($(this).attr('name')===undefined))
+									return name.replace(/\d+/, nextIdx); 
+							},
+							'class' : function(_, name) {
+								if(!($(this).attr('class')===undefined))
+									return name.replace(/\d+/, nextIdx); 
+							},
+							'id' : function(_, id) {
+								if(!($(this).attr('id')===undefined))
+									return id.replace(/\d+/, nextIdx); 
+							},
+							'data-idx' : function(_,dataIdx)
+							{
+								return nextIdx;
+							}
+						});
+	
+					// if element is static attribute hold values for next row, otherwise it will be reset
+					if (!$(this).data('static')) {
+						$(this).val('');
+					}
+	
+			}).end().appendTo("#"+tableName+" tbody");		
+			
+		}
+	} else {
+		  bootbox.alert('limit reached!');
+	}
+}
 
 function addRow(tableName,rowName) { 
 	
@@ -125,7 +251,7 @@ function deleteRow(obj,tableName) {
     //To get all the deleted rows id
     var aIndex = rIndex - 1;
 	var tbl=document.getElementById(tableName);	
-	var rowcount=$("#tableBoq tbody tr").length;
+	var rowcount=$(".tableBoq tbody tr").length;
     if(rowcount<=1 && tableName!=tableName) {
 		bootbox.alert("This row can not be deleted");
 		return false;
@@ -231,7 +357,36 @@ function addcheckListRow(x) {
 	}
 }
 
-function deleteSubledgerRow(x) {
+function deleteEsRow(obj,x) {
+	var rowcount=$(".tableBoq tbody tr").length;
+   
+		deleteRow(obj,'boq'+x+'tableBoqrow');
+		--subledgerrowcount;
+		return true;
+	
+    
+   // resetDebitCodes();
+}
+
+
+function deleteFSRow(r) {
+	var i = r.parentNode.parentNode.rowIndex;
+	document.getElementById("table").deleteRow(i);
+	calculateTotal();
+	document.getElementById("boq_div").focus();
+}
+
+
+
+	
+
+
+
+
+
+
+
+/*function deleteSubledgerRow(obj,x) {
 	var rowcount=$("#tableBoq tbody tr").length;
     if(rowcount<=3) {
 		bootbox.alert($.i18n.prop('msg.this.row.can.not.be.deleted'));
@@ -243,7 +398,7 @@ function deleteSubledgerRow(x) {
 	}
     
    // resetDebitCodes();
-}
+}*/
 
 function addCustomEvent(index,target,type,func){
 	target = target.replace('index',index);
@@ -285,3 +440,103 @@ function addFileInputField(x) {
 	calculateTotal();
 	document.getElementById("boq_div").focus();
 }
+
+
+function contengencyPercentage(estimateamount){
+	//var estimateamount=$('#estimatedCost').val();
+	if(estimateamount >= 10000000){
+		$('#contingentPercentage').val("3");
+		
+	var percAmount=	((estimateamount/100)*3).toFixed(2);
+	$('#contingentAmount').val(percAmount);
+	
+	}else{
+		$('#contingentPercentage').val("5");
+		
+		var percAmount=	((estimateamount/100)*5).toFixed(2);;
+		$('#contingentAmount').val(percAmount);
+	}
+}
+
+
+
+function valueChanged() {
+	var rowcount=$(".tableBoq tbody tr").length;
+		var estimateAmt = 0;
+		var amt = 0;
+		for (var i = 0; i <= rowcount; i++) {
+			if (document.getElementById("boQDetailsList[" + i + "].rate") !== null
+					&& document.getElementById("boQDetailsList[" + i + "].quantity") !== null
+					&& document.getElementById("boQDetailsList[" + i + "].quantity") !== "") {
+
+				var rate = document.getElementById("boQDetailsList[" + i + "].rate").value;
+				var quantity = document.getElementById("boQDetailsList[" + i + "].quantity").value;
+				amt = (quantity * rate).toFixed(2);
+				if (document.getElementById("boQDetailsList[" + i + "].amount") != null) {
+					document.getElementById("boQDetailsList[" + i + "].amount").value = amt;
+				}
+
+			}
+		}
+		
+		calculateTotal();
+	}
+
+	
+
+
+
+		
+		
+function calculateTotal() {
+	var rowcount=$(".tableBoq tbody tr").length;
+		var estimateAmt = 0;
+		var rate = 0;
+		var quantity = 0;
+		var amt = 0;
+		
+		var contingentAmount = 0;
+		var consultantFee = 0;
+		var unforseenCharges = 0;
+
+		for (var i = 0; i <= rowcount; i++) {
+			// get the selected row index
+
+			if (document.getElementById("boQDetailsList[" + i + "].rate") != null
+					&& document.getElementById("boQDetailsList[" + i
+							+ "].quantity") != null) {
+				rate = document
+						.getElementById("boQDetailsList[" + i + "].rate").value;
+			}
+
+			if (document.getElementById("boQDetailsList[" + i + "].quantity") != null) {
+				quantity = document.getElementById("boQDetailsList[" + i
+						+ "].quantity").value;
+			}
+
+			if (quantity != 0 && quantity != "" && rate != 0 && rate != "") {
+				amt = (quantity * rate).toFixed(2);
+				if (document.getElementById("boQDetailsList[" + i + "].amount") != null) {
+					document.getElementById("boQDetailsList[" + i + "].amount").value = amt;
+
+					estimateAmt = +estimateAmt + +amt;
+				}
+			}
+		}
+		
+		
+		
+		contengencyPercentage(estimateAmt);
+		contingentAmount=$('#contingentAmount').val();
+		consultantFee=$('#consultantFee').val();
+		unforseenCharges=$('#unforseenCharges').val();
+		
+		if(unforseenCharges==""||unforseenCharges==null||unforseenCharges=='null')
+		{unforseenCharges=0;}
+		if(consultantFee==""||consultantFee==null||consultantFee=='null')
+		{consultantFee=0;}
+		
+		estimateAmt=	parseFloat(estimateAmt)+ parseFloat(unforseenCharges)+parseFloat(consultantFee)+ parseFloat(contingentAmount);
+		
+		document.getElementById("estimatedCost").value = estimateAmt.toFixed(2);
+	}

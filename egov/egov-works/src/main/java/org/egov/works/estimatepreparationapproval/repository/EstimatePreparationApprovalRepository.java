@@ -31,9 +31,9 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 
 	@Query(" from EstimatePreparationApproval tep where tep.workStatus =:workStatus or tep.workCategory =:workCategory or tep.executingDivision =:executingDivision or tep.workName =:workName or tep.workLocation =:workLocation or tep.sectorNumber =:sectorNumber or tep.wardNumber =:wardNumber or tep.fundSource =:fundSource or tep.estimateAmount =:estimateAmount or tep.tenderCost =:tenderCost or tep.agencyWorkOrder =:agencyWorkOrder or tep.date =:date or tep.timeLimit =:timeLimit")
 	List<EstimatePreparationApproval> findByAllParameters(@Param("workStatus") Long workStatus,
-			@Param("workCategory") Long workCategory, @Param("executingDivision") Long executingDivision,
+			@Param("workCategory") String workCategory, @Param("executingDivision") Long executingDivision,
 			@Param("workName") String workName, @Param("workLocation") String workLocation,
-			@Param("sectorNumber") Long sectorNumber, @Param("wardNumber") Long wardNumber,
+			@Param("sectorNumber") String sectorNumber, @Param("wardNumber") String wardNumber,
 			@Param("fundSource") String fundSource, @Param("estimateAmount") Double estimateAmount,
 			@Param("tenderCost") String tenderCost, @Param("agencyWorkOrder") String agencyWorkOrder,
 			@Param("date") Date date, @Param("timeLimit") String timeLimit);

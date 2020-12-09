@@ -38,6 +38,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.Designation;
@@ -102,6 +103,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	private PersistenceService persistenceService;
     
     @Autowired
+	private AppConfigValueService appConfigValuesService;
+    
+    @Autowired
 	private DocumentUploadRepository documentUploadRepository;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
@@ -114,16 +118,16 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
-        
+        System.out.println("Starting");
 		return "estimatepreparationapproval-form";
 	}
 
 	private void prepareValidActionListByCutOffDate(Model model) {
             model.addAttribute("validActionList",
-                    Arrays.asList("Forward","Save As Draft"));
+                    Arrays.asList("Forward/Reassign","Save As Draft"));
 	}
 
-	@RequestMapping(value = "/estimate", params = "Forward", method = RequestMethod.POST)
+	@RequestMapping(value = "/estimate", params = "Forward/Reassign", method = RequestMethod.POST)
 	public String saveBoQDetailsData(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, @RequestParam("file1") MultipartFile[] files,@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost, final HttpServletRequest request)
@@ -166,8 +170,12 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
-	    String estimateNumber = v.getEstimateNumber(deptCode);
+		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"works_div_"+deptCode).get(0).getValue();
+	    String estimateNumber = v.getEstimateNumber(deptShortCode);
 		estimatePreparationApproval.setEstimateNumber(estimateNumber);
+		String aaNumber=v.getAANumber(deptShortCode);
+		estimatePreparationApproval.setAanumber(aaNumber);
 		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
 		//start of workflow
 		Long approvalPosition = 0l;
@@ -213,7 +221,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		{
 			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" is Saved as draft";
 		}
-		else if((workflowaction.equalsIgnoreCase("Forward") || workflowaction.equalsIgnoreCase("Approve")) && savedEstimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
+		else if(( workflowaction.equalsIgnoreCase("Approve")) && savedEstimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
 		{
 			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" TS is approved";
 		}
@@ -293,8 +301,12 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
-	    String estimateNumber = v.getEstimateNumber(deptCode);
+		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"works_div_"+deptCode).get(0).getValue();
+	    String estimateNumber = v.getEstimateNumber(deptShortCode);
 		estimatePreparationApproval.setEstimateNumber(estimateNumber);
+		String aaNumber=v.getAANumber(deptShortCode);
+		estimatePreparationApproval.setAanumber(aaNumber);
 		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
 		//start of workflow
 		Long approvalPosition = 0l;
@@ -433,18 +445,44 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
-		estimatePreparationApproval.setEstimateAmount(estAmt);
+		
+		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
+		if(estAmt >= 10000000){
+			BigDecimal  pct = new BigDecimal(3);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimatePreparationApproval.setContingentPercentage(3.0);
+			estimatePreparationApproval.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimatePreparationApproval.setEstimateAmount(dobestAmtPlusContingentAmt);
+		}
+		else {
+			BigDecimal  pct = new BigDecimal(5);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimatePreparationApproval.setContingentPercentage(5.0);
+			estimatePreparationApproval.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimatePreparationApproval.setEstimateAmount(dobestAmtPlusContingentAmt);
+		}
+		
+		
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("milestoneList",groupByMilesToneMap);
-
+		System.out.println("upload");
 		return "estimatepreparationapproval-form";
 
 	}
-
+	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
+		BigDecimal  bg100 = new BigDecimal(100);
+	    return base.multiply(pct).divide(bg100);
+	}
 	public Workbook getWorkbook(FileInputStream inputStream, String excelFilePath) throws IOException {
 		Workbook workbook = null;
 		if (excelFilePath.endsWith("xls")) {
@@ -477,6 +515,17 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
 
 		return "search-estimate-form";
+	}
+	
+	@RequestMapping(value = "/createDetailedEstimate", method = RequestMethod.POST)
+	public String createDetailedEstimate(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, HttpServletRequest request) {
+
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+
+		return "search-detailed-estimate-form";
 	}
 
 	@RequestMapping(value = "/workEstimateSearch", params = "workEstimateSearch", method = RequestMethod.POST)
@@ -515,19 +564,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         		 }
         		 if(object[2] != null)
         		 {
-        			 Long wkCat=Long.parseLong(object[0].toString());
-        			 if(wkCat == 1)
-        			 {
-        				 estimate.setWorkCategry("Road Work");
-        			 }
-        			 else if(wkCat == 2)
-        			 {
-        				 estimate.setWorkCategry("Bridge Work");
-        			 }
-        			 else
-        			 {
-        				 estimate.setWorkCategry("Maintenance Work");
-        			 }
+        			 estimate.setWorkCategry(object[2].toString());
         		 }
         		 if(object[3] != null)
         		 {
@@ -557,6 +594,74 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "search-estimate-form";
 
 	}
+	
+	@RequestMapping(value = "/workEstimateDetailedSearch",  method = RequestMethod.POST)
+	public String searchWorkDetailedEstimateData(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, final HttpServletRequest request) throws Exception {
+		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
+
+		// Convert input string into a date
+
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+		}
+		EstimatePreparationApproval estimate=null;
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es where es.status.description='TS Initiated' and  es.executingDivision = ? ")
+	        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
+	        .append(getMisQuery(estimatePreparationApproval));
+		 System.out.println("Query :: "+query.toString());
+         list = persistenceService.findAllBy(query.toString(),
+        		 estimatePreparationApproval.getExecutingDivision());
+		 
+         if (list.size() != 0) {
+        	 
+        	 for (final Object[] object : list) {
+        		 estimate = new EstimatePreparationApproval();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setWorkName(object[1].toString());
+        		 }
+        		 if(object[2] != null)
+        		 {
+        			 estimate.setWorkCategry(object[2].toString());
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setEstimateNumber(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setEstimateDt(object[4].toString());
+        		 }
+        		 if(object[5] != null)
+        		 {
+        			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
+        		 }
+        		 if(object[6] != null)
+        		 {
+        			 estimate.setStatusDescription(object[6].toString());
+        		 }
+        		 approvalList.add(estimate);
+        	 }
+        	 
+         }
+        estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setEstimateList(approvalList);
+
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+
+		return "search-detailed-estimate-form";
+
+	}
+
 
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable("id") final Long id, Model model) {
@@ -568,10 +673,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
 
 		
-		documentsall.addAll(documents);
-		documentsall.addAll(roughCostEstmatedocuments);
-		estimateDetails.setDocumentDetail(documentsall);
-
+		//documentsall.addAll(documents);
+		//documentsall.addAll(roughCostEstmatedocuments);
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
@@ -612,9 +717,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
 
 		
-		documentsall.addAll(documents);
-		documentsall.addAll(roughCostEstmatedocuments);
-		estimateDetails.setDocumentDetail(documentsall);
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
@@ -623,9 +727,16 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setExpHead(estimateDetails.getExpHead_est());
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
 		
-		boQDetailsList=	estimateDetails.getBoQDetailsList();
+		BoQDetails boq = new BoQDetails();
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList.size());
+				boQDetailsList.add(boq);
+			}
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
@@ -879,6 +990,55 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		}
 		return misQuery.toString();
 
+	}
+	private EstimatePreparationApproval getRoughWorkBillDocuments(final EstimatePreparationApproval estDetails) {
+		List<DocumentUpload> documentDetailsList = estimatePreparationApprovalService.findByObjectIdAndObjectType(estDetails.getId(),
+				"roughWorkFile");
+		estDetails.setDocumentDetail(documentDetailsList);
+		return estDetails;
+	}
+	
+	@RequestMapping(value = "/downloadRoughWorkBillDoc", method = RequestMethod.GET)
+	public void getBillDocRoughWork(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+		final ServletContext context = request.getServletContext();
+		final String fileStoreId = request.getParameter("fileStoreId");
+		String fileName = "";
+		final File downloadFile = fileStoreService.fetch(fileStoreId, "roughWorkFile");
+		final FileInputStream inputStream = new FileInputStream(downloadFile);
+		EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
+		estDetails = getRoughWorkBillDocuments(estDetails);
+
+		for (final DocumentUpload doc : estDetails.getDocumentDetail())
+			if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
+				fileName = doc.getFileStore().getFileName();
+
+		// get MIME type of the file
+		String mimeType = context.getMimeType(downloadFile.getAbsolutePath());
+		if (mimeType == null)
+			// set to binary type if MIME mapping not found
+			mimeType = "application/octet-stream";
+
+		// set content attributes for the response
+		response.setContentType(mimeType);
+		response.setContentLength((int) downloadFile.length());
+
+		// set headers for the response
+		final String headerKey = "Content-Disposition";
+		final String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+		response.setHeader(headerKey, headerValue);
+
+		// get output stream of the response
+		final OutputStream outStream = response.getOutputStream();
+
+		final byte[] buffer = new byte[BUFFER_SIZE];
+		int bytesRead = -1;
+
+		// write bytes read from the input stream into the output stream
+		while ((bytesRead = inputStream.read(buffer)) != -1)
+			outStream.write(buffer, 0, bytesRead);
+
+		inputStream.close();
+		outStream.close();
 	}
 
 }

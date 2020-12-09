@@ -5,7 +5,6 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%--<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %> --%>
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/fileupload.js'/>"></script>
 <style>
@@ -17,13 +16,8 @@
         padding:10px;
     }
 </style>
-<div class="panel panel-primary" data-collapsed="0" style=" scrollable:true;">
-   <%--  <div class="panel-heading">
-         <div class="panel-title">
-                <spring:message code="lbl.upload.document" text="Documents" />
-        </div> 
-      </div> --%>
-   <c:if test="${estimatePreparationApproval.documentDetail != null &&  !estimatePreparationApproval.documentDetail.isEmpty()}">
+<div class="" data-collapsed="0" style=" scrollable:true;">
+   <c:if test="${estimatePreparationApproval.roughCostdocumentDetail != null &&  !estimatePreparationApproval.roughCostdocumentDetail.isEmpty()}">
        
         <table id="table" class="table table-bordered">
 						<thead>
@@ -34,18 +28,16 @@
 							</tr>
 						</thead>
 						<tbody>
-        <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
+        <c:forEach items="${estimatePreparationApproval.roughCostdocumentDetail }" var="documentDetials" varStatus="loop">
         
-        	<c:if test="${documentDetials.objectType == 'roughWorkFile' }">
         
        
 						<tr>
-						<td>  <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+						<td>  <a href="/services/works/estimatePreparation/downloadRoughWorkBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
 						</td>
-						<td>Version 1</td>
+						<td><span style="color: #643d19;"> ${loop.index + 1}</span></td>
+						
 						</tr>
-<%-- 						 <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
- --%>      		 </c:if>
         </c:forEach>
 						</tbody>
 			</table>			

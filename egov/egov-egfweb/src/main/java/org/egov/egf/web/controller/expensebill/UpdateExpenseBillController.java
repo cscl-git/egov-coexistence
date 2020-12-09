@@ -213,8 +213,13 @@ public class UpdateExpenseBillController extends BaseBillController {
             model.addAttribute("currentState", egBillregister.getState().getValue());
         model.addAttribute("workflowHistory",
                 financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
-        List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
-        prepareWorkflow(model, egBillregister, new WorkflowContainer());
+        List<String>  validActions =null;
+        if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
+        {
+        	validActions = Arrays.asList("Forward","SaveAsDraft");
+            prepareWorkflow(model, egBillregister, new WorkflowContainer());
+        }
+          
        
 
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
@@ -238,6 +243,13 @@ public class UpdateExpenseBillController extends BaseBillController {
         /*originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
                 "from FileStoreMapper where fileName like '%"+egBillregister.getBillnumber()+"%' order by id desc ").setMaxResults(10).list();
         model.addAttribute(SUPPORTING_DOCS,originalFiles);*/
+        if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
+        {
+        	model.addAttribute("mode", "cancel");
+        	prepareWorkflow(model, egBillregister, new WorkflowContainer());
+        	return "expensebill-view";
+        	
+        }
         if (egBillregister.getState() != null
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
@@ -273,6 +285,12 @@ public class UpdateExpenseBillController extends BaseBillController {
 
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
+        
+        
+        if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
+        {
+        	mode="cancel";
+        }
         String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
         List<DocumentUpload> list = new ArrayList<>();
         UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");

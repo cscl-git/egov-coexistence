@@ -976,6 +976,7 @@ public class CreateAuditController extends GenericWorkFlowController {
     	audit.setType("Post-Audit");
     	audit.setEgBillregister(null);
     	audit.setDepartment(deptCode);
+    	audit.setPassUnderobjection(0);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode("Audit", "Created"));
     	if(type.equalsIgnoreCase("Receipt"))
     	{

@@ -110,6 +110,10 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @Length(max = 1024, message = "Maximum of 1024 Characters allowed for Narration")
     @OptionalPattern(regex = FinancialConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "Special Characters are not allowed in narration")
     private String narration;
+    
+    @Length(max = 1024, message = "Maximum of 1024 Characters allowed for Vigilance")
+    @OptionalPattern(regex = FinancialConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "Special Characters are not allowed in narration")
+    private String vigilance;
 
     @Length(max = 10, message = "PAN No Field length should be 10 and it should be in the format XXXXX1234X")
     @OptionalPattern(regex = Constants.PANNUMBER, message = "Enter the PAN No in correct format - XXXXX1234X")
@@ -364,5 +368,13 @@ public class Contractor extends AbstractAuditable implements EntityType {
     public void setGstRegisteredState(String gstRegisteredState) {
         this.gstRegisteredState = gstRegisteredState;
     }
+
+	public String getVigilance() {
+		return vigilance;
+	}
+
+	public void setVigilance(String vigilance) {
+		this.vigilance = vigilance;
+	}
 
 }

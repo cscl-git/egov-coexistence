@@ -48,6 +48,8 @@
   --%>
 
 <%@ include file="/includes/taglibs.jsp"%>
+<%@ taglib prefix="egov-authz" uri="/WEB-INF/taglib/egov-authz.tld" %> 
+<link rel="stylesheet" type="text/css" href="<egov:url path='/yui/assets/skins/sam/autocomplete.css'/>" />
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title><s:text name="cash.bankRemittance.title" /></title>
@@ -58,17 +60,19 @@
 			.ready(
 					function($) {
 						
-						if(jQuery("#finYearId").val()!=-1){
+					 			 
+						
+						/* if(jQuery("#finYearId").val()!=-1){
 							$("#dateDiv").hide();
 							$("#fromDate").val("");
 							$("#toDate").val("");
 						}
 						else if(jQuery("#finYearId").val()==-1){
 							$("#dateDiv").show();
-						}
+						} */
 						
 						//hide or show date fields on selecting year from drop down
-						jQuery("#finYearId").on("change",function(){
+						/* jQuery("#finYearId").on("change",function(){
 							if(jQuery("#finYearId").val()!=-1){
 								$("#dateDiv").hide();
 								$("#fromDate").val("");
@@ -77,7 +81,7 @@
 							else if(jQuery("#finYearId").val()==-1){
 								$("#dateDiv").show();
 							}
-						});
+						}); */
 
 						
 						jQuery('#remittanceDate').val("");
@@ -281,6 +285,11 @@
 	}
 
 	function searchDataToRemit() {
+		var serviceType=dom.get("serviceType").value;
+		if(serviceType==-1){
+			bootbox.alert("Please Select Service Type");
+			return false;
+		}
 		if(jQuery("#finYearId").val()==-1 && jQuery("#fromDate").val()=="" && jQuery("#toDate").val()==""){
 			bootbox.alert("Please enter either financial year or from date and to date");
 			return false;
@@ -449,6 +458,19 @@
 									</c:forEach>
 								</select>
 							</td>
+							 <td width="21%" class="bluebox">
+							 	<s:text name="searchreceipts.criteria.servicetype"/> 
+							 	<span class="mandatory">
+							 </td>
+	     					 <td width="24%" class="bluebox">
+	     					 	 <s:select headerKey="-1"  
+	     					 			headerValue="%{getText('searchreceipts.servicetype.select')}"  
+	     					 			name="serviceTypeId" 
+	     					 			id="serviceType" cssClass="selectwk" 
+	     					 			list="dropdownData.serviceTypeList" 
+	     					 			listKey="code" 
+	     					 			listValue="businessService" value="%{serviceTypeId}" />  
+	     					 </td>
 						</tr>
 						<tr>
 							<td width="4%" class="bluebox">&nbsp;</td>
@@ -477,18 +499,23 @@
 								<c:set var="rowNumber" value="${currentRow_rowNum-1}" ></c:set>
 								<input type='checkbox' name='finalList[${rowNumber}].selected'  id='selected_${rowNumber}' value ="false" onClick="handleReceiptSelectionEvent()" />
 								<input type="hidden" name="finalList[${rowNumber}].service"  id="service_${rowNumber}" value="${currentRow.service}" />
+								<input type="hidden" name="finalList[${rowNumber}].receiptNumber"  id="service_${rowNumber}" value="${currentRow.receiptNumber}" />
 								<input type="hidden" name="finalList[${rowNumber}].fund"  id="fund_${rowNumber}" value="${currentRow.fund}" />
-								<input type="hidden" name="finalList[${rowNumber}].department" id="department_${rowNumber}"  value="${currentRow.department}" />
+								<input type="hidden" name="finalList[${rowNumber}].department" id="department_${rowNumber}"  value="${currentRow.departmentName}" />
 								<input type="hidden" name="finalList[${rowNumber}].instrumentAmount"  id="instrumentAmount_${rowNumber}" value="${currentRow.instrumentAmount}" />
 								<input type="hidden" name="finalList[${rowNumber}].instrumentType"  id="instrumentType_${rowNumber}" value="${currentRow.instrumentType}" />
 								<input type="hidden" name="finalList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
 								<input type="hidden" name="instrumentAmount" disabled="disabled" id="instrumentAmount" value="${currentRow.instrumentAmount}" />
+								
+								
+								
 							</display:column>
-
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:10%;text-align: center" value="${currentRow.receiptNumber}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date" style="width:10%;text-align: center" value="${currentRow.receiptDate}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:20%;text-align: center" value="${currentRow.serviceName}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Fund" style="width:10%;text-align: center" value="${currentRow.fundName}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:20%;text-align: center" value="${currentRow.service}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Fund" style="width:10%;text-align: center" value="${currentRow.fund}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Department" style="width:10%;text-align: center" value="${currentRow.departmentName}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode Of Payment" style="width:10%;text-align: center" value="${currentRow.instrumentType}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Total Cash Collection" style="width:10%;text-align: center">
 									<div align="center">
 										<c:if test="${not empty currentRow.instrumentAmount}">
@@ -515,7 +542,20 @@
 							<td class="bluebox"><s:text name="bankremittance.remittanceamount" /></td>
 							<td class="bluebox"><s:textfield id="remittanceAmount" name="remittanceAmount" readonly="true" /></td>								
 							<td class="bluebox"><s:text name="bankremittance.accountnumber" /></td>
-							<td class="bluebox"><input type="text" name="remitAccountNumber" readonly="readonly" id="remitAccountNumber" value="${accountNumberId}" /></td>		
+							<%-- <td class="bluebox"><input type="text" name="remitAccountNumber" readonly="readonly" id="remitAccountNumber" value="${accountNumberId}" /></td> --%>
+							<td class="bluebox">
+								<select id="remitAccountNumber" name="remitAccountNumber" value="%{accountNumberId}">
+									<option value="-1">Select</option>
+									<c:forEach items="${dropdownData.accountNumberList}" var="accNum">
+										<c:if test="${accNum.bankAccount == accountNumberId }">
+											<option value="${accNum.bankAccount}" selected="selected">${accNum.bank} - ${accNum.bankAccount}</option>
+										</c:if>
+										<c:if test="${accNum.bankAccount != accountNumberId }">
+											<option value="${accNum.bankAccount}" >${accNum.bank} - ${accNum.bankAccount}</option>
+										</c:if>
+									</c:forEach>
+								</select>
+							</td>		
 						</tr>
 					</table>
 				</div>

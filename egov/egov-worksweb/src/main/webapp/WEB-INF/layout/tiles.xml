@@ -317,6 +317,11 @@
         <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate.jsp"/>
     </definition>
     
+    <definition name="search-detailed-estimate-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchDetailedEstimate.jsp"/>
+    </definition>
+    
     <definition name="view-estimate-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.view" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/viewsearchestimate.jsp"/>
@@ -405,6 +410,39 @@
         <put-attribute name="page-title" value="lbl.work.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/editmeasuredquantity.jsp"/>
     </definition>
+    <definition name="dnitCreation-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/dnitpreparationapproval.jsp"/>
+    </definition>
+
+
+   
+  <definition name="search-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/searchdnit.jsp"/>
+    </definition>
+   
+   
+   
+     <definition name="view-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/viewsearchdnit.jsp"/>
+    </definition>
+   
+   
+    <definition name="create-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/create-dnit.jsp"/>
+    </definition>
+    <definition name="dnitboqDetails" extends="base_layout">
+        <put-attribute name="page-title" value="title.boqDetails.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/dnitboqDetails.jsp"/>
+    </definition>
+    <definition name="search-work-estimate-dnitCreationform" extends="base_layout">
+        <put-attribute name="page-title" value="title.work.estimate.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/workestimate/searchworkestimate-dnitCreation.jsp"/>
+    </definition>
+    
 
 </tiles-definitions>
 

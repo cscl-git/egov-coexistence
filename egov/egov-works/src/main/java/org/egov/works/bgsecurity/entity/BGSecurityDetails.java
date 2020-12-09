@@ -31,6 +31,15 @@ public class BGSecurityDetails implements Serializable {
 
 	@Column(name = "security_validity")
 	private String security_validity;
+	
+	@Column(name = "project_name")
+	private String project_name;
+	
+	@Column(name = "security_tender_number")
+	private String security_tender_number;
+	
+	@Column(name = "narration")
+	private String narration;
 
 	@Column(name = "security_amount")
 	private Double security_amount;
@@ -178,6 +187,30 @@ public class BGSecurityDetails implements Serializable {
 
 	public void setBgEndDate(String bgEndDate) {
 		this.bgEndDate = bgEndDate;
+	}
+
+	public String getProject_name() {
+		return project_name;
+	}
+
+	public void setProject_name(String project_name) {
+		this.project_name = project_name;
+	}
+
+	public String getSecurity_tender_number() {
+		return security_tender_number;
+	}
+
+	public void setSecurity_tender_number(String security_tender_number) {
+		this.security_tender_number = security_tender_number;
+	}
+
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
 	}
 
 }

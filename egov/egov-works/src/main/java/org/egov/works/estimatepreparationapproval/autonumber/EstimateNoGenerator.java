@@ -6,5 +6,9 @@ import org.springframework.stereotype.Service;
 public interface EstimateNoGenerator {
 	
 	public String getEstimateNumber(String deptCode);
+	
+	public String getDNITNumber(String deptCode);
+	
+	public String getAANumber(String deptCode);
 
 }

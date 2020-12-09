@@ -1401,7 +1401,7 @@ jQuery(document).keypress(
 	 	jQuery('#myModal').modal('show'); 
 	 }
 	 else{
-		jQuery('#myModal').modal('show');
+		jQuery('#myModal').modal('hide');
 	} 
 	 
 }  
@@ -1417,4 +1417,6 @@ bobexample.init()
 <script>
 jQuery(":input").inputmask();
 </script>
+
+
 </body>

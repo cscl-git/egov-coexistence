@@ -40,6 +40,9 @@ public class Tender implements  java.io.Serializable {
 
 	@Column(name = "contractor_details")
 	private String contractorDetails;
+	
+	@Column(name = "project_name")
+	private String project_name;
 
 	@Column(name = "tender_number")
 	private String loaNumber;
@@ -58,6 +61,8 @@ public class Tender implements  java.io.Serializable {
 	
 	@Transient
 	private String tenderDate;
+	@Transient
+	private String project_name_search;
 	
 	@Transient
     private List<org.egov.model.bills.DocumentUpload> documentDetail = new ArrayList<>();
@@ -152,6 +157,22 @@ public class Tender implements  java.io.Serializable {
 
 	public void setTenderProNumber(String tenderProNumber) {
 		this.tenderProNumber = tenderProNumber;
+	}
+
+	public String getProject_name() {
+		return project_name;
+	}
+
+	public void setProject_name(String project_name) {
+		this.project_name = project_name;
+	}
+
+	public String getProject_name_search() {
+		return project_name_search;
+	}
+
+	public void setProject_name_search(String project_name_search) {
+		this.project_name_search = project_name_search;
 	}
 
 }

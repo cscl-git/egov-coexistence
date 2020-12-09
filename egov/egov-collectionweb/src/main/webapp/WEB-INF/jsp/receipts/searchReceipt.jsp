@@ -149,13 +149,15 @@ function checkselectedreceiptcount(obj)
 {
 	var cnt=document.getElementsByName('selectedReceipts');
 	var receiptstatus=document.getElementsByName('receiptstatus');
+	
 	var j=0;
 	for (i = 0; i < cnt.length; i++)
 	{
 		if (cnt[i].checked == true )
 		{
 			j++; 
-			if(obj=='cancel' && receiptstatus[i].value=="CANCELLED")
+			//if(obj=='cancel' && receiptstatus[i].value=="CANCELLED")
+				if(receiptstatus[i].value=="CANCELLED")
 			{
 				dom.get("selectedcancelledreceiptserror").style.display="block";
 				return -1;
@@ -294,6 +296,15 @@ function checkprintforselectedrecord()
 		window.scroll(0,0);
 		return false;
 	}
+	else if(check==-1)
+	{
+		dom.get("selectcancelerror").style.display="none";
+		dom.get("norecordselectederror").style.display="none";
+		dom.get("selectprinterror").style.display="none";
+		dom.get("selectedcancelledreceiptserror").style.display="block";
+		window.scroll(0,0);
+		return false;
+	}
 	// single receipt has been chosen. Print is allowed
 	else
 	{
@@ -421,8 +432,13 @@ function checkviewforselectedrecord()
 			//added for check Status CANCELLED
 			if(receiptstatus[i].value=="CANCELLED")
 			{
+				dom.get("norecordselectederror").style.display="none";
+				dom.get("selectprinterror").style.display="none";
+				dom.get("selectcancelerror").style.display="none";
 				dom.get("selectedcancelledreceiptserror").style.display="block";
 				j--;
+				window.scroll(0,0);
+				return false;
 		}
 	}
 	}
@@ -451,36 +467,6 @@ function onChangeServiceClass(obj)
     }
 }
 
-function ConfirmDialog(message) {
-	  $('<div></div>').appendTo('body')
-	    .html('<div><h6>' + message + '?</h6></div>')
-	    .dialog({
-	      modal: true,
-	      title: 'Delete message',
-	      zIndex: 10000,
-	      autoOpen: true,
-	      width: 'auto',
-	      resizable: false,
-	      buttons: {
-	        Yes: function() {
-	          // $(obj).removeAttr('onclick');                                
-	          // $(obj).parents('.Parent').remove();
-
-	          $('body').append('<h1>Confirm Dialog Result: <i>Yes</i></h1>');
-
-	          $(this).dialog("close");
-	        },
-	        No: function() {
-	          $('body').append('<h1>Confirm Dialog Result: <i>No</i></h1>');
-
-	          $(this).dialog("close");
-	        }
-	      },
-	      close: function(event, ui) {
-	        $(this).remove();
-	      }
-	    });
-	};
 
 
 </script> 
