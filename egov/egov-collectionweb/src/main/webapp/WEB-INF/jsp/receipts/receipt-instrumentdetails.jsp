@@ -343,8 +343,31 @@ function showInstrumentDetails(obj){
 		//clearManualReceiptData();
 	}
 }
+function checkAlphaNumericKey(e){
+	
+	 
+	        var k;
+	        document.all ? k = e.keyCode : k = e.which;
+	        return ((k > 64 && k < 91) || (k > 96 && k < 123) || k == 8 || k == 32 || (k >= 48 && k <= 57));
+	       
+	
+	/* 
+	if(document.getElementById("instrHeaderCard.transactionNumber")!=null){
+		document.getElementById("instrHeaderCard.transactionNumber").onkeypress = function (e) {
+			isAlphaNumeric(e.key, e)
+		};
+	} */
+}
+function isAlphaNumeric(key, e) {
+	var letters = /^[0-9a-zA-Z]/g; //g means global
+	if (!(key).match(letters)) {
+    e.preventDefault();
+    }
+    
+}
 function validateTransactionNumber()
 {
+	
 	document.getElementById("receipt_error_area").innerHTML="";    
 	document.getElementById("receipt_error_area").style.display="none";
 	 if(document.getElementById("cardradiobutton").checked || document.getElementById("posmohbdradiobutton").checked || document.getElementById("posmohcattleradiobutton").checked || document.getElementById("posmohslhradiobutton").checked)
@@ -668,13 +691,13 @@ loadBankDetailFailureHandler = function(){
 								class="mandatory1">*</span></td>
 							<td class="bluebox"><s:textfield
 									label="instrHeaderCard.transactionNumber"
-									id="instrHeaderCard.transactionNumber" maxlength="14"
+									id="instrHeaderCard.transactionNumber" maxlength="25"
 									name="instrHeaderCard.transactionNumber" size="18"
 									value="%{instrHeaderCard.transactionNumber}" onblur="validateTransactionNumber();" /></td>
 								<td class="bluebox"><s:text
 									name="billreceipt.payment.reenter.transactionnumber" /><span
 								class="mandatory1">*</span></td>									
-							<td class="bluebos"> <s:password id="confirmtransactionNumber"  maxlength="14"
+							<td class="bluebos"> <s:password id="confirmtransactionNumber"  maxlength="25"
 							                   name ="confirmtransactionNumber"  size="18" onblur="validateTransactionNumber();" /></td>		
 						</tr>
 

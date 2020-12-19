@@ -1003,6 +1003,14 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             List<AppConfigValues> appList;
 
             worksBillGlcodeList = populateGlCodeIds(Constants.WORKS_BILL_PURPOSE_IDS);
+            if(worksBillGlcodeList != null && !worksBillGlcodeList.isEmpty())
+            {
+            	for(CChartOfAccounts coa :worksBillGlcodeList)
+            	{
+            		LOGGER.info("coa ::::"+coa.toString());
+            	}
+            	
+            }
             purchaseBillGlcodeList = populateGlCodeIds(Constants.PURCHASE_BILL_PURPOSE_IDS);
             salaryBillGlcodeList = populateGlCodeIds("salaryBillPurposeIds");
             pensionBillGlcodeList = populateGlCodeIds(Constants.PENSION_BILL_PURPOSE_IDS);
@@ -1078,11 +1086,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.info(
                     "Calling getDeductionAmt..................................$$$$$$$$$$$$$$$$$$$$$$ " + list.size());
         for (final CChartOfAccounts coa : list)
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("#################################" + coa.getGlcode() + ":::::" + coa.getPurposeId());
+                LOGGER.info("#################################" + coa.getGlcode() + ":::::" + coa.getPurposeId());
         populateDeductionData(billList, deductionAmtMap, type, glCodeList.get(type));
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getDeductionAmt.");
+            LOGGER.info("Completed getDeductionAmt.");
         return deductionAmtMap;
     }
 
@@ -1110,8 +1116,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @SuppressWarnings("unchecked")
     private List<Object[]> getDeductionList(final String expendituretype, final List<CChartOfAccounts> glcodeList) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getDeductionList...");
+            LOGGER.info("Starting getDeductionList...");
         List<Object[]> dedList;
         final String mainquery = "select bill.id as id, sum (gl.creditAmount) from eg_Billregister bill,eg_billregistermis billmis left join "
                 + "voucherheader vh on vh.id=billmis.voucherheaderid left join (select sum(paidamount) as paidamount,billvhid as billvhid from miscbilldetail misc,voucherheader vh1 where  misc.payvhid=vh1.id and vh1.status not in (1,2,4) group by "
@@ -1120,14 +1125,12 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 + "' and gl.voucherHeaderId=billmis.voucherHeaderid and gl.glcodeId not in(:glCodeList) and "
                 + "gl.creditAmount>0 and (misc.billvhid is null or (bill.passedamount > misc.paidamount)) group by bill.id";
         dedList = getSession().createSQLQuery(mainquery).setParameterList("glCodeList", glcodeList).list();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getDeductionList.");
+            LOGGER.info("Completed getDeductionList.");
         return dedList;
     }
 
     private List<Object[]> getEarlierPaymentAmtList(final String expendituretype) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getEarlierPaymentAmtList...");
+            LOGGER.info("Starting getEarlierPaymentAmtList...");
         List<Object[]> dedList;
         final String mainquery = "select bill.id as id,misc.paidamount from eg_Billregister bill,eg_billregistermis billmis left join "
                 + "voucherheader vh on vh.id=billmis.voucherheaderid left join (select sum(paidamount) as paidamount,billvhid as billvhid from miscbilldetail  misc,voucherheader vh where  misc.payvhid=vh.id and vh.status not in (1,2,4)    group by "
@@ -1135,8 +1138,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 + "vh.status=0 and bill.expendituretype='" + expendituretype
                 + "' and (bill.passedamount > misc.paidamount)";
         dedList = getSession().createSQLQuery(mainquery).list();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getEarlierPaymentAmtList.");
+            LOGGER.info("Completed getEarlierPaymentAmtList.");
         return dedList;
     }
 
@@ -2841,8 +2843,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     public List<PaymentBean> getCSList(final List<EgBillregister> billList, final Map<Long, BigDecimal> deductionAmtMap,
             final Map<Long, BigDecimal> paidAmtMap) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getCSList...");
+            LOGGER.info("Starting getCSList...");
         final List<PaymentBean> contractorList = new ArrayList<PaymentBean>();
         PaymentBean paymentBean = null;
         if (billList != null && !billList.isEmpty())
@@ -2871,6 +2872,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         paymentBean.getDeductionAmt() == null ? BigDecimal.ZERO : paymentBean.getDeductionAmt()));
                 paymentBean.setEarlierPaymentAmt(paidAmtMap.get(paymentBean.getCsBillId()) == null ? BigDecimal.ZERO
                         : paidAmtMap.get(paymentBean.getCsBillId()));
+                
                 paymentBean.setPayableAmt(paymentBean.getNetAmt().subtract(paymentBean.getEarlierPaymentAmt()));
                 paymentBean.setPaymentAmt(paymentBean.getPayableAmt());
                 if (paymentBean.getPaymentAmt().compareTo(BigDecimal.ZERO) == 0)

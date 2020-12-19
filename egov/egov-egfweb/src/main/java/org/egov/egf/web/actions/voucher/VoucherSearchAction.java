@@ -59,6 +59,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 //import org.egov.commons.VoucherDetail;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -66,6 +67,9 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.commons.Accountdetailkey;
+import org.egov.commons.CGeneralLedger;
+import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
@@ -74,12 +78,14 @@ import org.egov.commons.Scheme;
 import org.egov.commons.SubScheme;
 import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FinancialYearDAO;
+import org.egov.commons.repository.AccountDetailKeyRepository;
 import org.egov.egf.commons.VoucherSearchUtil;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
+import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
 import org.egov.infra.validation.exception.ValidationError;
@@ -117,6 +123,9 @@ public class VoucherSearchAction extends BaseFormAction {
 	@Autowired
 	protected EgovMasterDataCaching masterDataCache;
 	@Autowired
+	AccountDetailKeyRepository accountDetailKeyRepository;
+	
+	@Autowired
         @Qualifier("voucherHelper")
         private VoucherHelper voucherHelpers;
 
@@ -125,6 +134,8 @@ public class VoucherSearchAction extends BaseFormAction {
 	public Date fromDate = new Date();
 	public Date toDate;
 	private String showMode;
+	private BigDecimal amount;
+	private String partyName;
 	private VoucherSearchUtil voucherSearchUtil;
 	private final Map<Integer, String> sourceMap = new HashMap<Integer, String>();
 	private Integer page = 1;
@@ -281,6 +292,8 @@ public class VoucherSearchAction extends BaseFormAction {
 		}
 
 		List<CVoucherHeader> list;
+		List<CVoucherHeader> filterlist =new ArrayList<>();
+		List<CVoucherHeader> finallist =new ArrayList<>();
 		List<Query> qryObj;
 		// for view voucher implementing paginated result
 		if (null == showMode || showMode.equals("")) {
@@ -296,8 +309,122 @@ public class VoucherSearchAction extends BaseFormAction {
 			list = voucherSearchUtil.search(voucherHeader, fromDate, toDate, showMode);
 		if (null == showMode || showMode.equals("")) {
 			paymentVoucherMap.clear();
-			populateVoucherMap(list);
-			for (final CVoucherHeader voucherheader : list) {
+			
+			List<String> recieptNo=new ArrayList<>();
+			for (CVoucherHeader cVoucherHeader : list) {
+				if(cVoucherHeader.getVouchermis()!=null)
+				{
+					recieptNo.add(cVoucherHeader.getVouchermis().getRecieptNumber());
+				}
+			}
+			
+			for (CVoucherHeader cVoucherHeader : list) {
+				
+				 if(amount!=null && !amount.equals("0")){
+					 
+					 if(partyName!=null && !partyName.equals("")){
+						 
+						 if (null != parameters.get("type") && !parameters.get("type")[0].equalsIgnoreCase("-1")&& !parameters.get("type")[0].equalsIgnoreCase("Receipt"))
+						 {
+							 Set<CGeneralLedger> generalLedger=cVoucherHeader.getGeneralLedger();
+							 for (CGeneralLedger cGeneralLedger : generalLedger) {
+							
+								 Set<CGeneralLedgerDetail> generalLedgerDetails= cGeneralLedger.getGeneralLedgerDetails();
+								 System.out.println(generalLedgerDetails); 
+								 for (CGeneralLedgerDetail cGeneralLedgerDetail : generalLedgerDetails) {
+									 System.out.println(cGeneralLedgerDetail.getDetailKeyName());
+									 
+									 Accountdetailkey accountdetailkey=null;
+									 if(cGeneralLedgerDetail.getDetailKeyId()!=null) {
+										  accountdetailkey= accountDetailKeyRepository.findById(cGeneralLedgerDetail.getDetailKeyId());
+									 }
+									 
+									 if(cVoucherHeader.getTotalAmount().equals(amount) && partyName.contains(accountdetailkey.getDetailname()) ) {
+										 
+										 filterlist.add(cVoucherHeader);
+									 }
+									 
+								} 
+							}
+						 }
+						else if (null != parameters.get("type") && !parameters.get("type")[0].equalsIgnoreCase("-1")){
+							List<Receipt> receipts = getReciept(recieptNo);
+
+							for (Receipt receipt : receipts) {
+
+								for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+
+									if (partyName.contains(bill.getPayerName())) {
+
+										filterlist.add(cVoucherHeader);
+									}
+								}
+							}
+						}
+						 
+					 }
+					 else {
+						 
+						 if(cVoucherHeader.getTotalAmount().equals(amount)) {
+							 
+							 filterlist.add(cVoucherHeader);
+						 }
+						
+					 }
+					 
+				 }
+				 else if(partyName!=null && !partyName.equals("")){
+					 if (null != parameters.get("type") && !parameters.get("type")[0].equalsIgnoreCase("-1")&& !parameters.get("type")[0].equalsIgnoreCase("Receipt"))
+					 {
+						 
+						 Set<CGeneralLedger> generalLedger=cVoucherHeader.getGeneralLedger();
+						 for (CGeneralLedger cGeneralLedger : generalLedger) {
+						
+							 Set<CGeneralLedgerDetail> generalLedgerDetails= cGeneralLedger.getGeneralLedgerDetails();
+							 System.out.println(generalLedgerDetails); 
+							 for (CGeneralLedgerDetail cGeneralLedgerDetail : generalLedgerDetails) {
+								 System.out.println(cGeneralLedgerDetail.getDetailKeyId());
+								 if(cGeneralLedgerDetail.getDetailKeyId()!=null) {
+								 Accountdetailkey accountdetailkey= accountDetailKeyRepository.findById(cGeneralLedgerDetail.getDetailKeyId());
+									 
+							            	if(partyName.contains(accountdetailkey.getDetailname()) ) {
+									 filterlist.add(cVoucherHeader);
+								 }
+								 }
+								 
+								 
+							} 
+						}
+						 
+						 
+					 }
+					 else  if (null != parameters.get("type") && !parameters.get("type")[0].equalsIgnoreCase("-1"))
+					 {
+							List<Receipt> receipts = getReciept(recieptNo);
+
+							for (Receipt receipt : receipts) {
+
+								for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+
+									if (bill.getPayerName()!=null && partyName.contains(bill.getPayerName())) {
+
+										filterlist.add(cVoucherHeader);
+									}
+								}
+							}
+						}
+					 
+				 }
+				 else {
+					 filterlist=list;
+				 }
+				
+			}
+			
+			
+			
+			populateVoucherMap(filterlist);
+			for (final CVoucherHeader voucherheader : filterlist) {
 				voucherMap = new HashMap<String, Object>();
 				final BigDecimal amt = voucherheader.getTotalAmount();
 				voucherMap.put("id", voucherheader.getId());
@@ -418,6 +545,17 @@ public class VoucherSearchAction extends BaseFormAction {
 		return SEARCH;
 	}
 
+	
+	
+	private List<Receipt> getReciept(List<String> recieptno){
+		
+		   List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", null, null, null,recieptno);
+		
+		return receipts;
+		
+	}
+	
+	
 	private void populateVoucherMap(List<CVoucherHeader> list) {
 		List<Long> vhIds=new ArrayList<Long>();
 		List<Paymentheader> paymentList =null;
@@ -653,6 +791,22 @@ public class VoucherSearchAction extends BaseFormAction {
 
 	public void setPaymentVoucherMap(Map<Long, String> paymentVoucherMap) {
 		this.paymentVoucherMap = paymentVoucherMap;
+	}
+
+	public BigDecimal getAmount() {
+		return amount;
+	}
+
+	public void setAmount(BigDecimal amount) {
+		this.amount = amount;
+	}
+
+	public String getPartyName() {
+		return partyName;
+	}
+
+	public void setPartyName(String partyName) {
+		this.partyName = partyName;
 	}
 
 }

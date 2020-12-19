@@ -904,7 +904,7 @@ var totaldbamt=0,totalcramt=0;
 							name="challan.narration" /></td>
 					<td width="24%" class="bluebox"><s:textarea
 							name="referenceDesc" id="referenceDesc" value="%{referenceDesc}"
-							cols="18" rows="3" style="width:200px;" maxlength="95"
+							cols="18" rows="3" style="width:200px;" maxlength="200"
 							onkeyup="return ismaxlength(this)" /></td>
 				</tr>
 				<tr>
