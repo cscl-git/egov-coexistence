@@ -859,9 +859,24 @@
         <put-attribute name="body"
                        value="/WEB-INF/views/approvebudget/approvebudget-searchSO.jsp"/>
     </definition> 
+
     <definition name="journalvoucher-search" extends="base_layout">
         <put-attribute name="page-title" value="title.journalvoucher.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/journalvoucher/journalvoucher-search.jsp"/>
     </definition>
     
+
+    <definition name="pr-voucher-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.voucher.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-voucher-search.jsp"/>
+    </definition>
+    <definition name="pr-voucher-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.voucher.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-voucher-view.jsp"/>
+    </definition>    
+    <definition name="pr-request-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-request-form.jsp"/>
+    </definition>
+
 </tiles-definitions>
