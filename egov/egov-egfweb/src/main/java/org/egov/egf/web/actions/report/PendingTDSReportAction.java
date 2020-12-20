@@ -849,11 +849,11 @@ public class PendingTDSReportAction extends BaseFormAction {
         if(pendingTDS != null && !pendingTDS.isEmpty())
         {
         	System.out.println("1 : "+pendingTDS.get(0).getDepartmentId());
-        	org.egov.infra.admin.master.entity.Department dept = departmentService.getDepartmentById(Long.parseLong(pendingTDS.get(0).getDepartmentId()));
-        	System.out.println("dept.getName() : "+dept.getName());
+        	org.egov.infra.admin.master.entity.Department dept =null;
         	for(RemittanceBean row:pendingTDS)
             {
         		System.out.println("3");
+        		dept = departmentService.getDepartmentById(Long.parseLong(row.getDepartmentId()));
         		bean =new DeductionReportBean();
         		bean.setSlNo(i++);
         		bean.setDivision(dept.getName());

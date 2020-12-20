@@ -693,7 +693,7 @@ loadBankDetailFailureHandler = function(){
 									label="instrHeaderCard.transactionNumber"
 									id="instrHeaderCard.transactionNumber" maxlength="25"
 									name="instrHeaderCard.transactionNumber" size="18"
-									value="%{instrHeaderCard.transactionNumber}" onblur="validateTransactionNumber();" onkeypress="return checkAlphaNumericKey(event)"/></td>
+									value="%{instrHeaderCard.transactionNumber}" onblur="validateTransactionNumber();" /></td>
 								<td class="bluebox"><s:text
 									name="billreceipt.payment.reenter.transactionnumber" /><span
 								class="mandatory1">*</span></td>									
