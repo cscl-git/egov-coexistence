@@ -582,8 +582,8 @@ public class ChartOfAccounts {
 						.find("from CChartOfAccounts where id=?", glAcc.getId());
 				gLedger.setGlcodeId(cChartOfAccounts);
 				gLedger.setGlcode(txn.getGlCode());
-				gLedger.setDebitAmount(Double.parseDouble(txn.getDrAmount()));
-				gLedger.setCreditAmount(Double.parseDouble(txn.getCrAmount()));
+				gLedger.setDebitAmount(new BigDecimal(txn.getDrAmount()));
+				gLedger.setCreditAmount(new BigDecimal(txn.getCrAmount()));
 				gLedger.setDescription(txn.getNarration());
 				CVoucherHeader cVoucherHeader = (CVoucherHeader) voucherService
 						.findById(Long.valueOf(txn.getVoucherHeaderId()), false);
@@ -676,7 +676,7 @@ public class ChartOfAccounts {
 									generalLedgerDetPersistenceService.persist(gLedgerDet);
 									try {
 										if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
-												&& gLedger.getCreditAmount() > 0) {
+												&& gLedger.getCreditAmount().compareTo(BigDecimal.ZERO) > 0) {
 											egRemitGldtl = new EgRemittanceGldtl();
 											egRemitGldtl.setGeneralledgerdetail(gLedgerDet);
 											egRemitGldtl.setGldtlamt(gLedgerDet.getAmount());
@@ -746,8 +746,8 @@ public class ChartOfAccounts {
 						.find("from CChartOfAccounts where id=?", glAcc.getId());
 				gLedger.setGlcodeId(cChartOfAccounts);
 				gLedger.setGlcode(txn.getGlCode());
-				gLedger.setDebitAmount(Double.parseDouble(txn.getDrAmount()));
-				gLedger.setCreditAmount(Double.parseDouble(txn.getCrAmount()));
+				gLedger.setDebitAmount(new BigDecimal(txn.getDrAmount()));
+				gLedger.setCreditAmount(new BigDecimal(txn.getCrAmount()));
 				gLedger.setDescription(txn.getNarration());
 				CVoucherHeader cVoucherHeader = voucherService.findById(Long.valueOf(txn.getVoucherHeaderId()), false);
 				if(cVoucherHeader.getGeneralledger() == null){
@@ -838,7 +838,7 @@ public class ChartOfAccounts {
 									generalLedgerDetPersistenceService.persist(gLedgerDet);
 									try {
 										if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
-												&& gLedger.getCreditAmount() > 0) {
+												&& gLedger.getCreditAmount().compareTo(BigDecimal.ZERO) > 0) {
 											LOGGER.info("bbbbbbbbbbbbbbbbbbbb");
 											egRemitGldtl = new EgRemittanceGldtl();
 											// if(LOGGER.isInfoEnabled())
@@ -890,10 +890,10 @@ public class ChartOfAccounts {
         final String query = "from CChartOfAccountDetail where glCodeId.id=" + glCode;
         Query pst = persistenceService.getSession().createQuery(query);
         // If it is not the controlled code And if it the recovery code and credit amount must be greater than zero
-        if (pst.list().isEmpty() && validRecoveryGlcode(String.valueOf(glCode)) && gLedger.getCreditAmount() > 0) {
+        if (pst.list().isEmpty() && validRecoveryGlcode(String.valueOf(glCode)) && gLedger.getCreditAmount().compareTo(BigDecimal.ZERO) > 0) {
             EgRemittanceGl egRemitGl = new EgRemittanceGl();
             egRemitGl.setGlid(gLedger);
-            egRemitGl.setGlamt(new BigDecimal(gLedger.getCreditAmount()));
+            egRemitGl.setGlamt(gLedger.getCreditAmount());
             Recovery tdsentry = tdsHibernateDAO.findActiveTdsByGlcodeId(glCode);
             egRemitGl.setRecovery(tdsentry);
             egRemitGl.setLastmodifieddate(new Date());
@@ -981,8 +981,8 @@ public class ChartOfAccounts {
 					.find("from CChartOfAccounts where id=?", glAcc.getId());
 			gLedger.setGlcodeId(cChartOfAccounts);
 			gLedger.setGlcode(txn.getGlCode());
-			gLedger.setDebitAmount(Double.parseDouble(txn.getDrAmount()));
-			gLedger.setCreditAmount(Double.parseDouble(txn.getCrAmount()));
+			gLedger.setDebitAmount(new BigDecimal(txn.getDrAmount()));
+			gLedger.setCreditAmount(new BigDecimal(txn.getCrAmount()));
 			gLedger.setDescription(txn.getNarration());
 			CVoucherHeader cVoucherHeader = (CVoucherHeader) persistenceService.find("from CVoucherHeader where id=?",
 					Long.parseLong(txn.getVoucherHeaderId()));
@@ -1047,7 +1047,7 @@ public class ChartOfAccounts {
 								generalLedgerDetPersistenceService.persist(gLedgerDet);
 								try {
 									if (validRecoveryGlcode(String.valueOf(gLedger.getGlcodeId().getId()))
-											&& gLedger.getCreditAmount() > 0) {
+											&& gLedger.getCreditAmount().compareTo(BigDecimal.ZERO) > 0) {
 										egRemitGldtl = new EgRemittanceGldtl();
 										if (LOGGER.isDebugEnabled())
 											LOGGER.debug("----------" + gLedger.getGlcode());

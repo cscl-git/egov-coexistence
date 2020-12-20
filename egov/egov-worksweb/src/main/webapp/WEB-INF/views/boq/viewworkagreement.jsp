@@ -6,7 +6,17 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
-
+<style>
+.table thead > tr > th {
+    color: black;
+    background-color: #acbfd0;
+    vertical-align: top;
+}
+.table tbody > tr > td {
+    color: black;
+    vertical-align: top;
+}
+</style> 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 <form:form name="workOrderAgreementForm" role="form" method="post"
@@ -36,7 +46,7 @@
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.estimate.number" /></label>
+							code="lbl.estimate.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="work_number" readonly="true" />
 					</div>
@@ -60,7 +70,20 @@
 							class="form-control datepicker" data-date-end-date="0d" readonly="true"
 							placeholder="DD/MM/YYYY" />
 					</div>
-
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.actualstart.date" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="actual_start_date" path="actual_start_date" readonly="true"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
+					</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.actualend.date" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="actual_end_date" path="actual_end_date" readonly="true"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
@@ -87,46 +110,17 @@
 					</div>
 
 
-					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.work.order.search.category" /></label>
-					<div class="col-sm-3 add-margin">
-						<form:select path="category" id="category"
-									cssClass="form-control" cssErrorClass="form-contro error" readonly="true"
-									>
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="Road Work">Road Work </form:option>
-									<form:option value="Bridge Work">Bridge Work</form:option>
-									<form:option value="Maintaince Work">Maintaince Work</form:option>
-								</form:select>
-					</div>
+					
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.search.sector.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="sector" id="sector" readonly="true"
-									cssClass="form-control" cssErrorClass="form-control error">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="Sector 1">Sector 1 </form:option>
-									<form:option value="Sector 2">Sector 2</form:option>
-									<form:option value="Sector 3">Sector 3</form:option>
-								</form:select>
+						<form:input type="text" class="form-control" path="sector" readonly="true" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.ward.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="wardNumber" id="wardNumber" readonly="true"
-									cssClass="form-control" cssErrorClass="form-control error">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="Ward 1">Ward 1 </form:option>
-									<form:option value="Ward 2">Ward 2</form:option>
-									<form:option value="Ward 3">Ward 3</form:option>
-								</form:select>
+				<form:input type="text" class="form-control" path="wardNumber" readonly="true" />
 							</div>
 
 					
@@ -150,6 +144,11 @@
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="workLocation" readonly="true" />
 					</div>
+					<label class="col-sm-3 control-label text-left-audit"></label>
+			<div class="col-sm-3 add-margin">
+				<input type="text" class="form-control" style="visibility:hidden"
+									 />
+							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.project.closure.comments" /></label>
 					<div class="col-sm-9 add-margin">
@@ -228,7 +227,59 @@
 		<br>
 		<br>
 		<br>
+<div class="panel panel-primary" data-collapsed="0"
+			style="scrollable: true;">
+			<div class="panel-heading">
+				<div class="panel-title">
+					 Milestones
+				</div>
+			</div>
 
+<c:if test="${workOrderAgreement.paymentDistribution != null &&  !workOrderAgreement.paymentDistribution.isEmpty()}">
+			
+<div class="panel-body">
+	<table class="table table-bordered" id="tblchecklist">
+		<thead>
+			<tr>
+				<th>Milestone Details</th>
+				<th>Payment Percentage(%)</th>
+				<th>Amount</th>
+				<th>Completed?</th>
+								
+			</tr>
+		</thead>
+		<tbody>
+		
+		<c:forEach items="${workOrderAgreement.paymentDistribution}" var="result" varStatus="status">
+
+			<tr id="tblchecklistRow">
+				<td>
+				<form:input type="text" style="width:200px;" path="paymentDistribution[${status.index}].payment_desc"	id="boQDetailsList[${status.index}].milestone" readonly="true"
+											 class="form-control payment_desc" ></form:input>
+					</td>
+				<td>
+				
+				<form:input type="text" style="width:200px;" path="paymentDistribution[${status.index}].payment_percent" readonly="true"	id="paymentDistribution[${status.index}].payment_percent" onchange="calcualtePerctAmount(this);"
+											 class="form-control payment_percent" ></form:input>
+											 
+				</td>
+				<td>
+				<form:input type="text" style="width:100px;" path="paymentDistribution[${status.index}].amount" readonly="true" id="paymentDistribution[${status.index}].amount"
+											 class="form-control amount" ></form:input>
+				</td> 
+				<td><form:checkbox 	path="paymentDistribution[${status.index}].payment_completed" readonly="true"	id="paymentDistribution[${status.index}].payment_completed" />
+												</td> 
+				
+			</tr>
+			</c:forEach>
+		</tbody>
+	</table>
+</div>			
+			
+			
+	</c:if>		
+			
+</div>
 		<!-- ========================code end=========== -->
 
 		<!-- ===========boq here below======== -->
@@ -257,9 +308,17 @@
 					</c:if>
 					<div>
 					<c:if test="${fileuploadAllowed == 'Y' }">
-						<table id="table" class="table table-bordered">
+						<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
+					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
+				
+				
+				
 							<thead>
 								<tr>
+							<th><c:out value="${mapboq.key}"/></th>
+							</tr>
+							<tr>
+								<th><spring:message code="lbl.item.Milestone" /></th>	
 									<th><spring:message code="lbl.item.description" /></th>
 									<th><spring:message code="lbl.ref.dsr" /></th>
 									<th><spring:message code="lbl.unit" /></th>
@@ -268,49 +327,61 @@
 									<th><spring:message code="lbl.amount" /></th>
 								</tr>
 							</thead>
+						
+				
 							<tbody>
-								<c:forEach var="boq"
-									items="${workOrderAgreement.boQDetailsList}" varStatus="status">
-									<tr id="detailsrow" class="repeat-address">
+					
+						
+						<c:forEach var="boq" items="${mapboq.value}" varStatus="status">
+						
+						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
+								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
 										<td>
-										<form:hidden path="boQDetailsList[${status.index}].slNo" id="boQDetailsList[${status.index}].slNo"/>
-										<form:input type="text" readonly="true"
-												path="boQDetailsList[${status.index}].item_description" style="width:300px;"
-												id="boQDetailsList[${status.index}].item_description"
-												required="required" class="form-control item_description"
-												maxlength="200"></form:input></td>
-										<td><form:input type="text" readonly="true"
-												path="boQDetailsList[${status.index}].ref_dsr" style="width:150px;"
-												id="boQDetailsList[${status.index}].ref_dsr"
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
+												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:input type="text" style="width:150px;"
+											path="boQDetailsList[${boq.sizeIndex}].milestone"
+											id="boQDetailsList[${boq.sizeIndex}].milestone"
+											required="required" readonly="true" class="form-control milestone" title="${boq.milestone}"></form:input></td>
+									<td><form:input type="text" style="width:200px;"
+											path="boQDetailsList[${boq.sizeIndex}].item_description"
+											id="boQDetailsList[${boq.sizeIndex}].item_description"
+											required="required" readonly="true" class="form-control item_description"
+											 title="${boq.item_description}"></form:input></td>
+									<td><form:input type="text" style="width:80px;"
+											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
+											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 												required="required" class="form-control ref_dsr"
+											maxlength="200" readonly="true" title="${boq.ref_dsr}"></form:input></td>
+									<td><form:input type="text" style="width:80px;"
+											path="boQDetailsList[${boq.sizeIndex}].unit"
+												id="boQDetailsList[${boq.sizeIndex}].unit"
+												required="required" readonly="true" class="form-control unit"
 												maxlength="200"></form:input></td>
-										<td><form:input type="text" readonly="true"
-												path="boQDetailsList[${status.index}].unit"
-												id="boQDetailsList[${status.index}].unit"
-												required="required" class="form-control unit"
-												maxlength="200"></form:input></td>
-										<td><form:input type="number" readonly="true"
-												path="boQDetailsList[${status.index}].rate" step=".01"
-												id="boQDetailsList[${status.index}].rate"
-												required="required" class="form-control rate"
+									<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].rate" step=".01"
+												id="boQDetailsList[${boq.sizeIndex}].rate"
+												required="required" readonly="true" class="form-control rate"
 												onchange="valueChanged()"></form:input></td>
-										<td><form:input type="number" readonly="true"
-												path="boQDetailsList[${status.index}].quantity" step=".01"
-												id="boQDetailsList[${status.index}].quantity"
-												required="required" class="form-control quantity"
+									<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].quantity" step=".01"
+											id="boQDetailsList[${boq.sizeIndex}].quantity"
+											required="required" readonly="true" class="form-control quantity"
 												name="quantity" onchange="valueChanged()"></form:input></td>
-										<td><form:input type="number" 
-												path="boQDetailsList[${status.index}].amount"
-												id="boQDetailsList[${status.index}].amount"
-												required="required" class="form-control amount"
-												maxlength="200" name="amount" readonly="true"></form:input>
-										</td>
-										
+										<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].amount"
+											id="boQDetailsList[${boq.sizeIndex}].amount"
+											required="required" readonly="true" class="form-control amount"
+											maxlength="200" name="amount" ></form:input></td>
 									</tr>
 								</c:forEach>
+							
 							</tbody>
+				</table>
+				
+					
 
-						</table>
+				</c:forEach>
 						</c:if>
 					</div>
 				</div>

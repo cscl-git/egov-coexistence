@@ -582,6 +582,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         		 {
         			 estimate.setStatusDescription(object[6].toString());
         		 }
+        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+        		 {
+        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        		 }
         		 approvalList.add(estimate);
         	 }
         	 
@@ -595,6 +599,22 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 	}
 	
+	private String populatePendingWith(Long id) {
+		String pendingWith="";
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		if(estimateDetails != null && estimateDetails.getState() != null && estimateDetails.getState().getOwnerPosition() != null && estimateDetails.getState().getOwnerPosition() != 0L)
+		{
+			try
+			{
+				pendingWith=getEmployeeName(estimateDetails.getState().getOwnerPosition());
+			}catch (Exception e) {
+				pendingWith="";
+			}
+			
+		}
+		return pendingWith;
+	}
+
 	@RequestMapping(value = "/workEstimateDetailedSearch",  method = RequestMethod.POST)
 	public String searchWorkDetailedEstimateData(
 			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
@@ -666,17 +686,16 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable("id") final Long id, Model model) {
 
-		List<DocumentUpload> documentsall=new ArrayList<>();
+	
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
 
 		
-		//documentsall.addAll(documents);
-		//documentsall.addAll(roughCostEstmatedocuments);
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
@@ -687,7 +706,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
 		
 		
-		boQDetailsList=	estimateDetails.getBoQDetailsList();
+		BoQDetails boq = new BoQDetails();
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList.size());
+				boQDetailsList.add(boq);
+			}
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
@@ -951,6 +976,24 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 		final StringBuffer misQuery = new StringBuffer(300);
 		if (null != estimate) {
+			
+			if ( estimate.getWorkStatusSearch() != null && !estimate.getWorkStatusSearch().isEmpty())
+			{
+				misQuery.append(" and es.status.description='")
+						.append(estimate.getWorkStatusSearch()).append("'");
+			}
+			if ( estimate.getWorkName() != null && !estimate.getWorkName().isEmpty())
+			{
+				misQuery.append(" and es.workName like '%")
+						.append(estimate.getWorkName()).append("%'");
+			}
+			if ( estimate.getFundSource() != null && !estimate.getFundSource().isEmpty())
+			{
+				misQuery.append(" and es.fundSource='")
+						.append(estimate.getFundSource()).append("'");
+			}
+			
+			
 			if ( estimate.getEstimateNumber() != null && !estimate.getEstimateNumber().isEmpty())
 			{
 				misQuery.append(" and es.estimateNumber='")
@@ -958,8 +1001,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			}
 			if(estimate.getWorksWing() != null)
 			{
-				misQuery.append(" and es.worksWing=")
-				.append(estimate.getWorksWing());
+				misQuery.append(" and es.worksWing='")
+				.append(estimate.getWorksWing()).append("'");
 			}
 			if(estimate.getWorkLocation() != null && !estimate.getWorkLocation().isEmpty())
 			{
@@ -968,13 +1011,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			}
 			if(estimate.getSectorNumber() != null)
 			{
-				misQuery.append(" and es.sectorNumber=")
-				.append(estimate.getSectorNumber());
+				misQuery.append(" and es.sectorNumber='")
+				.append(estimate.getSectorNumber()).append("'");
 			}
 			if(estimate.getWardNumber() != null)
 			{
-				misQuery.append(" and es.wardNumber=")
-				.append(estimate.getWardNumber());
+				misQuery.append(" and es.wardNumber='")
+				.append(estimate.getWardNumber()).append("'");
 			}
 			if(estimate.getWorkCategory() != null)
 			{
@@ -1040,5 +1083,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		inputStream.close();
 		outStream.close();
 	}
+	
+	
 
 }

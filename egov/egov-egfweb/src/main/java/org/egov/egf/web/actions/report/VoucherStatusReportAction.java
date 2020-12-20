@@ -296,7 +296,7 @@ public class VoucherStatusReportAction extends BaseFormAction {
 		}
 		for (final CVoucherHeader voucherheader : list) {
 			voucherMap = new HashMap<String, Object>();
-			Double amt = new Double(0);
+			BigDecimal amt = new BigDecimal(0);
 			voucherHeaderId = voucherheader.getId();
 			voucherMap.put("id", voucherHeaderId);
 			voucherMap.put("vouchernumber", voucherheader.getVoucherNumber());
@@ -305,7 +305,7 @@ public class VoucherStatusReportAction extends BaseFormAction {
 			voucherMap.put("voucherdate", voucherheader.getVoucherDate());
 			voucherMap.put("deptName", depMap.get(voucherheader.getVouchermis().getDepartmentcode()));
 			for (final CGeneralLedger detail : voucherheader.getGeneralledger())
-				amt = amt + detail.getDebitAmount();
+				amt = amt.add(detail.getDebitAmount());
 			voucherMap.put("amount", amt);
 			voucherMap.put("status", getVoucherStatus(voucherheader.getStatus()));
 			voucherMap.put("source", getVoucherModule(voucherheader.getModuleId()));
@@ -447,7 +447,7 @@ public class VoucherStatusReportAction extends BaseFormAction {
 			vhcrRptView.setVoucherDate(cVchrHdr.getVoucherDate());
 			vhcrRptView.setSource(getVoucherModule(cVchrHdr.getModuleId()));
 			for (final CGeneralLedger detail : cVchrHdr.getGeneralledger())
-				amt = amt.add(BigDecimal.valueOf(detail.getDebitAmount()).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+				amt = amt.add((detail.getDebitAmount()).setScale(2, BigDecimal.ROUND_HALF_EVEN));
 			vhcrRptView.setAmount(amt);
 			vhcrRptView.setOwner(getVoucherOwner(cVchrHdr));
 			vhcrRptView.setStatus(getVoucherStatus(cVchrHdr.getStatus()));

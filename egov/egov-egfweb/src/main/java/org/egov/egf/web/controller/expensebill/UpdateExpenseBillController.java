@@ -93,6 +93,7 @@ import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
@@ -147,6 +148,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     private static final String EXPENSEBILL_UPDATE_WORKFLOW = "expensebill-update-Workflow";
     
     private static final String NET_PAYABLE_ID = "netPayableId";
+    private static final String BILL_TYPES = "billTypes";
     @Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
@@ -208,6 +210,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
         setDropDownValues(model);
+        model.addAttribute(BILL_TYPES, BillType.values());
         model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
         if (egBillregister.getState() != null)
             model.addAttribute("currentState", egBillregister.getState().getValue());
@@ -415,6 +418,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         		approverName =populateEmpName();
         		
         	}
+            model.addAttribute(BILL_TYPES, BillType.values());
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
 
@@ -476,6 +480,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         setDropDownValues(model);
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
         model.addAttribute("mode", "readOnly");
+        model.addAttribute(BILL_TYPES, BillType.values());
         prepareBillDetailsForView(egBillregister);
         prepareCheckList(egBillregister);
         final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService

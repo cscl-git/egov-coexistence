@@ -181,19 +181,7 @@
 									<form:option value="Ward 3">Ward 3</form:option>
 								</form:select>
 							</div>
-					<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.work.category" /></label>
-					<div class="col-sm-3 add-margin">
-								<form:select path="workCategory" id="workCategory" 
-									cssClass="form-control-works" cssErrorClass="form-control-works error">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="Road Work">Road Work </form:option>
-									<form:option value="Bridge Work">Bridge Work</form:option>
-									<form:option value="Maintaince Work">Maintaince Work</form:option>
-								</form:select>
-							</div>
+					
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.dnit.amount" /></label>
 					<div class="col-sm-3 add-margin">
@@ -262,7 +250,11 @@
 				<!-- New field end here -->			
 							
 							
-							
+					<label class="col-sm-3 control-label text-left-audit1"></label>
+			<div class="col-sm-3 add-margin">
+				<input type="text" class="form-control-works" style="visibility:hidden"
+									 />
+							</div>		
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.name.work" /></label>
 					<div class="col-sm-9 block-colm">

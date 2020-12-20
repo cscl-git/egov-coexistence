@@ -567,7 +567,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 // in such condition throw error saying partial payment is not
                 // allowed for this
                 if (gl.getGeneralLedgerDetails().size() > 1 && tempBillList.get(i + conBillIdlength).getPaymentAmt()
-                        .compareTo(BigDecimal.valueOf(gl.getCreditAmount())) != 0)
+                        .compareTo((gl.getCreditAmount())) != 0)
                     throw new ValidationException(Arrays.asList(
                             new ValidationError("partial.payment.not.allowed.for", "Partial payment not allowed for "
                                     + tempBillList.get(i + conBillIdlength).getBillNumber())));
@@ -585,14 +585,14 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                     // if(billList.get(i+conBillIdlength).getPaymentAmt().compareTo(val))
                     if (tmpsublegDetailMap.get(tmp) == null) {
                         if (gl.getGeneralLedgerDetails().size() > 1 && tempBillList.get(i + conBillIdlength)
-                                .getPaymentAmt().compareTo(BigDecimal.valueOf(gl.getCreditAmount())) == 0)
+                                .getPaymentAmt().compareTo((gl.getCreditAmount())) == 0)
                             tmpsublegDetailMap.put(tmp, ledgerDetail.getAmount());
                         else
                             tmpsublegDetailMap.put(tmp, tempBillList.get(i + conBillIdlength).getPaymentAmt());
 
                     }
                     else if (gl.getGeneralLedgerDetails().size() > 1 && tempBillList.get(i + conBillIdlength)
-                            .getPaymentAmt().compareTo(BigDecimal.valueOf(gl.getCreditAmount())) == 0)
+                            .getPaymentAmt().compareTo((gl.getCreditAmount())) == 0)
                         tmpsublegDetailMap.put(tmp, tmpsublegDetailMap.get(tmp).add(ledgerDetail.getAmount()));
                     else
                         tmpsublegDetailMap.put(tmp,

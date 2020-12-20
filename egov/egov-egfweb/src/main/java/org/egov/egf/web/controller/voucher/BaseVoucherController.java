@@ -64,6 +64,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 
+import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -192,9 +193,9 @@ public abstract class BaseVoucherController extends GenericWorkFlowController {
             details.setVoucherHeaderId(voucherHeader);
             details.setGlcodeId(chartOfAccountsService.findById(details.getGlcodeId().getId(), false));
             if (details.getDebitAmount() != null)
-                details.setCreditAmount((double) 0);
+                details.setCreditAmount(BigDecimal.ZERO);
             else
-                details.setDebitAmount((double) 0);
+                details.setDebitAmount(BigDecimal.ZERO);
         }
     }
 

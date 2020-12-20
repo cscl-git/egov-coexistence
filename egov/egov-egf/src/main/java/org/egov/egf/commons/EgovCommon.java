@@ -638,7 +638,7 @@ public class EgovCommon {
     @SuppressWarnings("unchecked")
     public BigDecimal getAccountBalanceFromLedger(final Date VoucherDate,
             final Integer bankId, final BigDecimal amount, final Long paymentId) {
-            LOGGER.info("EgovCommon | getCashBalance");
+          LOGGER.info("EgovCommon | getCashBalance");
         BigDecimal opeAvailable = BigDecimal.ZERO;
         BigDecimal bankBalance = BigDecimal.ZERO;
         try {
@@ -689,8 +689,19 @@ public class EgovCommon {
 
             final CChartOfAccounts coa = (CChartOfAccounts) persistenceService.find(
                     "from CChartOfAccounts where id=?", Long.valueOf(glcodeid));
-            list = getPersistenceService().findAllBy(
-                    opBalncQuery2.toString(), coa);
+            LOGGER.info(" glcodeid  :::"+glcodeid);
+            try
+            {
+            	bankBalance = BigDecimal.valueOf(Double.parseDouble((getPersistenceService().findAllBy(
+                        opBalncQuery2.toString(), coa)).get(0).toString()));
+            }catch (Exception e) {
+				LOGGER.info("error in query ::: "+e.getMessage());
+				e.printStackTrace();
+			}
+            
+			/*
+			 * list = getPersistenceService().findAllBy( opBalncQuery2.toString(), coa);
+			 */
             LOGGER.info("query fetch 1");
             bankBalance = BigDecimal.valueOf(Double.parseDouble(list.get(0).toString()));
             LOGGER.info(" bankBalance 1 ::::"+bankBalance);

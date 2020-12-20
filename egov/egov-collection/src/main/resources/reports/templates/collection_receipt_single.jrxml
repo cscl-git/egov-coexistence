@@ -58,6 +58,7 @@
 	<field name="createdUser" class="java.lang.String"/>
 	<field name="manualReceiptNumber" class="java.lang.String"/>
 	<field name="manualReceiptDate" class="java.util.Date"/>
+	<field name="gstno" class="java.lang.String"/>
 	<variable name="amountReceived" class="java.math.BigDecimal">
 		<initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
 	</variable>
@@ -65,7 +66,7 @@
 		<groupExpression><![CDATA[$F{receiptNum}]]></groupExpression>
 	</group>
 	<title>
-		<band height="52">
+		<band height="50">
 			<staticText>
 				<reportElement x="248" y="25" width="100" height="16" printWhenGroupChanges="Receipt" uuid="2585456b-ee36-4775-9255-98203329e6a3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -95,7 +96,7 @@
 				<reportElement positionType="Float" x="90" y="1" width="379" height="24" uuid="0aca9374-d21f-4165-a042-03ea4cfe4a2d"/>
 				<imageExpression><![CDATA[$P{RECEIPT_HEADER}]]></imageExpression>
 			</image>
-			<textField textAdjust="StretchHeight">
+			<textField>
 				<reportElement x="380" y="27" width="186" height="23" uuid="acee5ad8-678c-48e5-a7ae-768ee26c89f4"/>
 				<textElement textAlignment="Right">
 					<font fontName="Times New Roman" size="9"/>
@@ -191,10 +192,31 @@
 				<text><![CDATA[Payee name & address:]]></text>
 			</staticText>
 		</band>
-		<band height="32" splitType="Stretch"/>
+		<band height="46" splitType="Stretch">
+			<staticText>
+				<reportElement x="20" y="31" width="119" height="15" uuid="69bd045d-a58b-402e-a6eb-15f951e729f9"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold" pdfEncoding=""/>
+				</textElement>
+				<text><![CDATA[GST No. :]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="140" y="31" width="426" height="15" uuid="74461ddf-4f62-4a9d-b770-39027ace4c6e"/>
+				<box leftPadding="5" rightPadding="5">
+					<pen lineWidth="0.5"/>
+				</box>
+				<textElement verticalAlignment="Middle">
+					<font fontName="Times New Roman" isBold="false"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{gstno}]]></textFieldExpression>
+			</textField>
+		</band>
 		<band height="15">
 			<textField pattern="" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="140" y="-31" width="426" height="31" uuid="5a23bdb1-ab29-45d4-83b3-0515d0e123c8"/>
+				<reportElement stretchType="RelativeToTallestObject" x="140" y="-45" width="426" height="30" uuid="5a23bdb1-ab29-45d4-83b3-0515d0e123c8"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -208,7 +230,7 @@
 				<textFieldExpression><![CDATA[$F{description}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" x="20" y="-31" width="120" height="31" uuid="8a65e4d4-5681-4c49-ab13-77c0bc28b8c0"/>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="-45" width="120" height="30" uuid="8a65e4d4-5681-4c49-ab13-77c0bc28b8c0"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -222,7 +244,7 @@
 				<text><![CDATA[Narration:]]></text>
 			</staticText>
 		</band>
-		<band height="30">
+		<band height="15">
 			<staticText>
 				<reportElement stretchType="RelativeToTallestObject" x="20" y="0" width="120" height="15" uuid="9c2e65a7-8362-4c9d-929f-66e5847c8ad2"/>
 				<box leftPadding="5" rightPadding="5">
@@ -249,7 +271,7 @@
 				<textElement verticalAlignment="Middle">
 					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA[$F{totalAmount}.setScale(2, BigDecimal.ROUND_UP)]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{totalAmount}.setScale(2, BigDecimal.ROUND_UP)+"      ("+ReportUtil.amountInWords($F{totalAmount})+")"]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
 				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="240" y="-15" width="326" height="15" uuid="f22db335-66d7-4162-8ba3-f69929989b37"/>
@@ -288,37 +310,7 @@
 				<text><![CDATA[Details of the receipt:]]></text>
 			</staticText>
 		</band>
-		<band height="15">
-			<printWhenExpression><![CDATA[$F{receiptInstrumentType}.equals("cheque/dd")]]></printWhenExpression>
-			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="15" uuid="41fb5c85-6d7e-4041-9da3-9d02b4ed5f21"/>
-				<box leftPadding="5" rightPadding="5">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
-				</textElement>
-				<text><![CDATA[Amount in words :]]></text>
-			</staticText>
-			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="15" uuid="0d23473a-2f27-41c9-9917-b4a7bdcb844b"/>
-				<box leftPadding="5" rightPadding="5">
-					<pen lineWidth="0.5"/>
-					<topPen lineWidth="0.5"/>
-					<leftPen lineWidth="0.5"/>
-					<bottomPen lineWidth="0.5"/>
-					<rightPen lineWidth="0.5"/>
-				</box>
-				<textElement verticalAlignment="Middle">
-					<font fontName="Times New Roman" size="10" pdfFontName="Times-Roman" isPdfEmbedded="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[ReportUtil.amountInWords($F{totalAmount})]]></textFieldExpression>
-			</textField>
-		</band>
+		<band height="15"/>
 		<band height="15">
 			<subreport>
 				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="20" y="-15" width="546" height="15" uuid="cdd7705f-a78c-4c85-af4b-46f238e6418f"/>
@@ -329,9 +321,9 @@
 				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("challan_receipt_instruments.jasper")]]></subreportExpression>
 			</subreport>
 		</band>
-		<band height="24">
+		<band height="12">
 			<textField isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="20" uuid="8f6f110b-2792-4006-a4b6-648c25ae8b59"/>
+				<reportElement stretchType="RelativeToTallestObject" x="140" y="-15" width="426" height="15" uuid="8f6f110b-2792-4006-a4b6-648c25ae8b59"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -345,7 +337,7 @@
 				<textFieldExpression><![CDATA[$F{createdUser}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="20" uuid="0ebd8cab-29d7-480a-ac3e-fed1c9a43303"/>
+				<reportElement stretchType="RelativeToTallestObject" x="20" y="-15" width="120" height="15" uuid="0ebd8cab-29d7-480a-ac3e-fed1c9a43303"/>
 				<box leftPadding="5" rightPadding="5">
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -359,7 +351,7 @@
 				<text><![CDATA[Collected by:]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="20" y="11" width="546" height="12" uuid="b0dc2940-1c40-4210-9f51-69e82ca79a97"/>
+				<reportElement positionType="Float" x="20" y="0" width="546" height="12" uuid="b0dc2940-1c40-4210-9f51-69e82ca79a97"/>
 				<textElement textAlignment="Right">
 					<font fontName="Times New Roman" size="9" isItalic="true"/>
 				</textElement>

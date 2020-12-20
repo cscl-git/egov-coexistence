@@ -332,8 +332,8 @@ public class JournalVoucherService {
             details = new EgBilldetails();
             details.setEgBillregister(egBillregister);
             details.setLastupdatedtime(new Date());
-            details.setDebitamount(BigDecimal.valueOf(gl.getDebitAmount()));
-            details.setCreditamount(BigDecimal.valueOf(gl.getCreditAmount()));
+            details.setDebitamount((gl.getDebitAmount()));
+            details.setCreditamount((gl.getCreditAmount()));
             if (gl.getFunctionId() != null)
                 details.setFunctionid(BigDecimal.valueOf(gl.getFunctionId()));
             details.setGlcodeid(BigDecimal.valueOf(gl.getGlcodeId().getId()));

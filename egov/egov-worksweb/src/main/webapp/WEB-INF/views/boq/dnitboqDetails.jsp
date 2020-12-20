@@ -335,12 +335,12 @@
 								<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
-								<form:input type="text" style="width:200px;"
+								<form:input type="text" style="width:150px;"
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"
 											required="required" class="form-control milestone"
 											maxlength="200"></form:input></td>
-									<td><form:input type="text" style="width:400px;"
+									<td><form:input type="text" style="width:350px;"
 											path="boQDetailsList[${boq.sizeIndex}].item_description"
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 											required="required" class="form-control item_description"

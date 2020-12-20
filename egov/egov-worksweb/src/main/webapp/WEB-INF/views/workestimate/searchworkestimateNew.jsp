@@ -8,7 +8,7 @@
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 	<form:form name="search-work-estimate-form" role="form" method="post"
-	action="workEstimateSearch" modelAttribute="workEstimateDetails"
+	action="workEstimateSearchNew" modelAttribute="workEstimateDetails"
 	id="workEstimateDetails" class="form-horizontal form-groups-bordered"
 	style="margin-top:-20px;">
 
@@ -50,8 +50,8 @@
 					</div>
 
 		<div class="buttonbottom" align="center">
-			<input type="submit" id="workEstimateSearch"
-							class="btn btn-primary" name="workEstimateSearch"
+			<input type="submit" id="workEstimateSearchNew"
+							class="btn btn-primary" name="workEstimateSearchNew"
 							code="lbl.search.work.estimate" value="Search" />
 				</div>
 
@@ -69,10 +69,10 @@
 								<th><spring:message
 										code="lbl.estimate.preparation.name.work" /></th>
 								<th><spring:message
-										code="lbl.dnit.number" /></th>
+										code="lbl.estimate.preparation.estimate.number" /></th>
 								
 								<th><spring:message
-										code="lbl.estimate.preparation.dnit.amount" /></th>
+										code="lbl.work.order.search.tendered.cost" /></th>
 							</tr>
 						</thead>
 						`
@@ -116,8 +116,8 @@
 					<c:if
 						test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
 							<div class="buttonbottom" align="center">
-								<input type="submit" id="save" class="btn btn-primary"
-									name="save" value="Search BOQ" />
+								<input type="submit" id="save1" class="btn btn-primary"
+									name="save1" value="Search BOQ" />
 				</div>
 					</c:if>
 				</div>
@@ -213,8 +213,8 @@
 					<c:if
 						test="${workEstimateDetails.newBoQDetailsList != null &&  !workEstimateDetails.newBoQDetailsList.isEmpty()}">
 							<div class="buttonbottom" align="center">
-								<input type="submit" id="saveboq" class="btn btn-primary"
-									name="saveboq" value="Submit" />
+								<input type="submit" id="saveboq1" class="btn btn-primary"
+									name="saveboq1" value="Submit" />
 						</div>
 					</c:if>
 				</div>

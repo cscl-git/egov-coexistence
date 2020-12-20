@@ -73,6 +73,7 @@ $(document).ready(function(){
 	});
 	
 	//$('#subLedgerType').trigger("change");
+	worksDiv();
 	$netPayableAccountCodeId = $('#netPayableId').val();
 	patternvalidation(); 
 	debitGlcode_initialize();
@@ -498,9 +499,13 @@ $('.subledgerGl_code').change(function () {
 
 
 $('#billSubType').change(function () {
+	
+	worksDiv();
 	$("#selectedCheckList").val("");
 	loadCheckListTable();
 });
+
+	
 
 
 
@@ -580,6 +585,9 @@ $('.subledgerGl_code').change(function () {
 });
 
 $('#billSubType').change(function () {
+	
+	worksDiv();
+	
 	$("#selectedCheckList").val("");
 	loadCheckListTable();
 });
@@ -1476,6 +1484,17 @@ function calcualteNetpaybleAmount(){
 function amountConverter(amt) {
 	var formattedAmt = amt.toFixed(2);
 	return formattedAmt;
+}
+
+function worksDiv(){
+	var billsubtype=$( "#billSubType option:selected" ).text();
+	if(billsubtype=='Works'){
+		
+		$('.works').show();
+	}
+	else{
+		$('.works').hide();
+	}
 }
 
 function populateBdgetDetails()

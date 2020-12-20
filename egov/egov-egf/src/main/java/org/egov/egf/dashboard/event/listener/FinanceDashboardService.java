@@ -62,6 +62,7 @@ public class FinanceDashboardService {
     private static final String DEFAULT_STRING = "";
 
     private static final Integer DEFAULT_INT = 0;
+    private static final BigDecimal DEFAULT_BIGDECIMAL = BigDecimal.ZERO;
     
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -291,8 +292,8 @@ public class FinanceDashboardService {
                     CGeneralLedgerData build = new CGeneralLedgerData.Builder()
                             .setGlcode(StringUtils.defaultIfBlank(gl.getGlcode(), DEFAULT_STRING))
                             .setCoaname(gl.getGlcode() != null ? gl.getGlcodeId().getName() : DEFAULT_STRING)
-                            .setCreditAmount(gl.getCreditAmount() != null ? gl.getCreditAmount() : DEFAULT_INT)
-                            .setDebitAmount(gl.getDebitAmount() != null ? gl.getDebitAmount() : DEFAULT_INT)
+                            .setCreditAmount(gl.getCreditAmount() != null ? gl.getCreditAmount() : DEFAULT_BIGDECIMAL)
+                            .setDebitAmount(gl.getDebitAmount() != null ? gl.getDebitAmount() : DEFAULT_BIGDECIMAL)
                             .setDescription(StringUtils.defaultIfBlank(gl.getDescription(), DEFAULT_STRING))
                             .setId(gl.getId())
                             .setIsSubLedger(gl.getIsSubLedger())

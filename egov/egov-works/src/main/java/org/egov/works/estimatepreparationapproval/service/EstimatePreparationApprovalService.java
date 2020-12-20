@@ -149,7 +149,12 @@ public class EstimatePreparationApprovalService {
         final String currState = "";
         String stateValue = "";
         WorkFlowMatrix wfmatrix;
-        org.egov.pims.commons.Designation designation = designationService.getDesignationById(Long.parseLong(approvalDesignation));
+        org.egov.pims.commons.Designation designation = null;
+        if(approvalDesignation != null && !approvalDesignation.isEmpty())
+        {
+        	designation = designationService.getDesignationById(Long.parseLong(approvalDesignation));
+        }
+         
         if(designation != null)
         {
      	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());

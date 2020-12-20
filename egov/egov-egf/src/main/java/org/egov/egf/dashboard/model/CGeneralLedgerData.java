@@ -1,5 +1,6 @@
 package org.egov.egf.dashboard.model;
 
+import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -7,13 +8,13 @@ public class CGeneralLedgerData {
     private Long id ;
     private String glcode;
     private String coaname;
-    private Double debitAmount;
-    private Double creditAmount;
+    private BigDecimal debitAmount;
+    private BigDecimal creditAmount;
     private String description;
     private Set<CGeneralLedgerDetailData> generalLedgerDetails = new HashSet<>();
     private Boolean isSubLedger;
     public CGeneralLedgerData(Long id, String glcode, String coaname,
-            Double debitAmount, Double creditAmount, String description, Boolean isSubLedger) {
+    		BigDecimal debitAmount, BigDecimal creditAmount, String description, Boolean isSubLedger) {
         this.id = id;
         this.glcode = glcode;
         this.coaname = coaname;
@@ -40,18 +41,7 @@ public class CGeneralLedgerData {
     public void setCoaname(String coaname) {
         this.coaname = coaname;
     }
-    public Double getDebitAmount() {
-        return debitAmount;
-    }
-    public void setDebitAmount(Double debitAmount) {
-        this.debitAmount = debitAmount;
-    }
-    public Double getCreditAmount() {
-        return creditAmount;
-    }
-    public void setCreditAmount(Double creditAmount) {
-        this.creditAmount = creditAmount;
-    }
+ 
     public String getDescription() {
         return description;
     }
@@ -74,8 +64,8 @@ public class CGeneralLedgerData {
         private Long id ;
         private String glcode;
         private String coaname;
-        private Double debitAmount;
-        private Double creditAmount;
+        private BigDecimal debitAmount;
+        private BigDecimal creditAmount;
         private String description;
         private Boolean isSubLedger;
         public Builder() {
@@ -93,11 +83,11 @@ public class CGeneralLedgerData {
             this.coaname = coaname;
             return this;
         }
-        public Builder setDebitAmount(Double debitAmount) {
+        public Builder setDebitAmount(BigDecimal debitAmount) {
             this.debitAmount = debitAmount;
             return this;
         }
-        public Builder setCreditAmount(Double creditAmount) {
+        public Builder setCreditAmount(BigDecimal creditAmount) {
             this.creditAmount = creditAmount;
             return this;
         }
@@ -113,4 +103,16 @@ public class CGeneralLedgerData {
             return new CGeneralLedgerData(id, glcode, coaname, debitAmount, creditAmount, description, isSubLedger);
         }
     }
+	public BigDecimal getDebitAmount() {
+		return debitAmount;
+	}
+	public void setDebitAmount(BigDecimal debitAmount) {
+		this.debitAmount = debitAmount;
+	}
+	public BigDecimal getCreditAmount() {
+		return creditAmount;
+	}
+	public void setCreditAmount(BigDecimal creditAmount) {
+		this.creditAmount = creditAmount;
+	}
 }

@@ -416,8 +416,8 @@ public class GeneralLedgerHibernateDAO  implements GeneralLedgerDAO {
                         CGeneralLedger ob;
                         ob = (CGeneralLedger) iterator.next();
 
-                        final BigDecimal debitamount = BigDecimal.valueOf(ob.getDebitAmount());
-                        final BigDecimal creditamount = BigDecimal.valueOf(ob.getCreditAmount());
+                        final BigDecimal debitamount = (ob.getDebitAmount());
+                        final BigDecimal creditamount = (ob.getCreditAmount());
                         
                         if (!debitamount.equals(0.0)) {
                             amount = amount.subtract(debitamount);

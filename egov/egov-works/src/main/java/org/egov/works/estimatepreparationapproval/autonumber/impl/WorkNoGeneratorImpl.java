@@ -31,7 +31,7 @@ public class WorkNoGeneratorImpl implements WorkNoGenerator {
 		final CFiscalPeriod fiscalPeriod = fiscalPeriodHibernateDAO.getFiscalPeriodByDate(currDate);
 		if (fiscalPeriod == null)
 			throw new ApplicationRuntimeException("Fiscal period is not defined for the audit date");
-		sequenceName = "sq_post1_" + fiscalPeriod.getName();
+		sequenceName = "sq_work_agreement_" + fiscalPeriod.getName();
 		final Serializable nextSequence = genericSequenceNumberGenerator.getNextSequence(sequenceName);
 
 		estimateNumber = String.format("%s/%s/%s/%06d", deptCode, "WO",

@@ -427,7 +427,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			voucherMap.put("fundname", voucherheader.getFundId().getName());
 			final Set<CGeneralLedger> vDetailSet = voucherheader.getGeneralledger();
 			for (final CGeneralLedger detail : vDetailSet)
-				amt = amt.add(new BigDecimal(detail.getDebitAmount()));
+				amt = amt.add(detail.getDebitAmount());
 			voucherMap.put("amount", amt);
 			if (voucherheader.getStatus() != null)
 				voucherMap.put("status",
@@ -473,8 +473,8 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 				voucherDetail.setGlcodeDetail(generalLedger.getGlcodeId().getGlcode());
 
 				voucherDetail.setAccounthead(coaDAO.findById(generalLedger.getGlcodeId().getId(), false).getName());
-				drAmount = new BigDecimal(generalLedger.getDebitAmount());
-				crAmount = new BigDecimal(generalLedger.getCreditAmount());
+				drAmount = generalLedger.getDebitAmount();
+				crAmount = generalLedger.getCreditAmount();
 				voucherDetail.setDebitAmountDetail(drAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
 				voucherDetail.setCreditAmountDetail(crAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
 				billDetailslist.add(voucherDetail);

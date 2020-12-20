@@ -77,6 +77,7 @@ public class BillReceiptReq {
     private String tenantId = null;
     private String receiptStatus;
     private String subdivison;
+    private String gstno;
     
     
 
@@ -92,6 +93,7 @@ public class BillReceiptReq {
         this.serviceName = billReceipt.getServiceName();
         this.paidBy = billReceipt.getPaidBy();
         this.subdivison=billReceipt.getSubdivison();
+        this.gstno=billReceipt.getGstno();
         this.description = billReceipt.getDescription();
         this.totalAmount = billReceipt.getTotalAmount();
         this.receiptURL = billReceipt.getReceiptURL();
@@ -262,6 +264,14 @@ public class BillReceiptReq {
 
 	public void setSubdivison(String subdivison) {
 		this.subdivison = subdivison;
+	}
+
+	public String getGstno() {
+		return gstno;
+	}
+
+	public void setGstno(String gstno) {
+		this.gstno = gstno;
 	}
 
 }

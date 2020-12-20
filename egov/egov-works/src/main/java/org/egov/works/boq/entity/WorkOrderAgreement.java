@@ -55,6 +55,12 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Column(name = "work_end_date")
 	private Date work_end_date;
 
+	@Column(name = "actual_start_date")
+	private Date actual_start_date;
+	
+	@Column(name = "actual_end_date")
+	private Date actual_end_date;
+
 	@Column(name = "executing_department")
 	private String executing_department;
 
@@ -645,6 +651,22 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setPaymentDistribution(List<PaymentDistribution> paymentDistribution) {
 		this.paymentDistribution = paymentDistribution;
+	}
+
+	public Date getActual_end_date() {
+		return actual_end_date;
+	}
+
+	public void setActual_end_date(Date actual_end_date) {
+		this.actual_end_date = actual_end_date;
+	}
+
+	public Date getActual_start_date() {
+		return actual_start_date;
+	}
+
+	public void setActual_start_date(Date actual_start_date) {
+		this.actual_start_date = actual_start_date;
 	}
 
 }

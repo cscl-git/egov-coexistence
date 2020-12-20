@@ -51,7 +51,39 @@ $(document).ready(function(){
 	
 });
 
+
+function calculateMeasuredAmount(x)
+{
+	var dataId = $(x).attr("data-idx");
+	var rate=document.getElementById("boQDetailsList["+x+ "].rate").value;
+	var measured_quantity=document.getElementById("boQDetailsList["+ x+ "].measured_quantity").value;
+	
+	if (null == rate || rate =='null'  )
+	{
+		rate=0;
+	}
+	else if (null == measured_quantity || measured_quantity =='null')
+	{
+		measured_quantity=0;
+	}
+	else {
+		var measuredAmount=rate*measured_quantity;
+		document.getElementById("boQDetailsList["+x+"].measured_amount").value=measuredAmount;
+	}
+	
+	
+	}
+
+
+
 function calcualtePerctAmount(x){
+	
+	var rowcount = $("#tblchecklist tbody tr").length;
+	var estimateAmt = 0;
+	var amt = 0;
+	var paymentval=0;
+	
+	
 	var work_amount=0;
 	var dataId = $(x).attr("data-idx");
 
@@ -74,17 +106,95 @@ function calcualtePerctAmount(x){
 	if (null != document.getElementById("paymentDistribution[" + dataId
 			+ "].payment_percent") && document.getElementById("paymentDistribution[" + dataId
 					+ "].payment_percent").value != 0) {
+		
+		for (var i = 0; i <= rowcount; i++) {
+			if (null != document.getElementById("paymentDistribution[" + i
+					+ "].payment_percent") && document.getElementById("paymentDistribution[" + i
+							+ "].payment_percent").value != 0) 
+			{
+			
+			paymentval = document.getElementById("paymentDistribution["+i+ "].payment_percent").value;
+			estimateAmt = +estimateAmt + +paymentval;
+			}
+		}
+		
+		if(estimateAmt <= 100)
+		{
 		var val = document.getElementById("paymentDistribution[" + dataId
 				+ "].payment_percent").value;
 		if (val != "" && !isNaN(val)) {
 			var amt=(val*work_amount)/100;
 			document.getElementById("paymentDistribution[" + dataId
 					+ "].amount").value=parseFloat(Number(amt)).toFixed(2);
-			//creditamt = parseFloat(Number(creditamt) + Number(amt)).toFixed(2);
+					}	
+		}
+		else{
+			bootbox.alert("Payment Milestone Percentage exceed 100%");
 		}	
 	}
 	
 }
+
+
+function calcualtePerctAmountedit(x){
+	
+	var rowcount = $("#tblchecklist tbody tr").length;
+	var estimateAmt = 0;
+	var amt = 0;
+	var paymentval=0;
+	
+	
+	var work_amount=0;
+	var dataId = $(x).attr("data-idx");
+
+	
+	  if (dataId==undefined)
+	  {
+	  	dataId=0;
+	  }
+	
+	
+	if (null != document.getElementById("work_amount")) {
+		var val = document.getElementById("work_amount").value;
+		if (val != "" && !isNaN(val)) {
+			work_amount = val;
+		}
+	}
+	
+
+	
+	if (null != document.getElementById("paymentDistribution[" + x
+			+ "].payment_percent") && document.getElementById("paymentDistribution[" + x
+					+ "].payment_percent").value != 0) {
+		
+		for (var i = 0; i <= rowcount; i++) {
+			if (null != document.getElementById("paymentDistribution[" + i
+					+ "].payment_percent") && document.getElementById("paymentDistribution[" + i
+							+ "].payment_percent").value != 0) 
+			{
+			
+			paymentval = document.getElementById("paymentDistribution["+i+ "].payment_percent").value;
+			estimateAmt = +estimateAmt + +paymentval;
+			}
+		}
+		
+		if(estimateAmt <= 100)
+		{
+				var val = document.getElementById("paymentDistribution[" + x
+						+ "].payment_percent").value;
+				if (val != "" && !isNaN(val)) {
+						var amt=(val*work_amount)/100;
+						document.getElementById("paymentDistribution[" + x
+								+ "].amount").value=parseFloat(Number(amt)).toFixed(2);
+					}	
+		}
+		else{
+			bootbox.alert("Payment Milestone Percentage exceed 100%");
+		}
+	}
+	
+}
+
 
 var subledgerrowcount=0;
 function addpaymentRow() { 
@@ -540,3 +650,24 @@ function calculateTotal() {
 		
 		document.getElementById("estimatedCost").value = estimateAmt.toFixed(2);
 	}
+
+
+function caluclateestamt(){
+
+	var estimateAmt=document.getElementById("estimatedCost").value;
+	
+		var consultantFee=$('#consultantFee').val();
+		var unforseenCharges=$('#unforseenCharges').val();
+	if(unforseenCharges==""||unforseenCharges==null||unforseenCharges=='null')
+		{unforseenCharges=0;}
+		if(consultantFee==""||consultantFee==null||consultantFee=='null')
+		{consultantFee=0;}
+		
+		estimateAmt=	parseFloat(estimateAmt)+ parseFloat(unforseenCharges)+parseFloat(consultantFee);
+		
+		document.getElementById("estimatedCost").value = estimateAmt;
+	 
+		contengencyPercentage(estimateAmt);
+
+}
+

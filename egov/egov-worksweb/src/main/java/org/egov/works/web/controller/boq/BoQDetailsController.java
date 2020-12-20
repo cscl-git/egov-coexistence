@@ -37,11 +37,13 @@ import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.masters.services.ContractorService;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
@@ -99,6 +101,12 @@ public class BoQDetailsController extends GenericWorkFlowController{
     @Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
+    
+    @Autowired
+	private AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+    private SecurityUtils securityUtils;
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
@@ -111,7 +119,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		return "boqDetails";
 	}
 
-	@RequestMapping(value = "/work", params = "Forward", method = RequestMethod.POST)
+	@RequestMapping(value = "/work", params = "Forward/Reassign", method = RequestMethod.POST)
 	public String saveBoQDetailsData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
@@ -136,8 +144,15 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
 		deptCode = workOrderAgreement.getDepartment();
-	    String estimateNumber = v.getWorkNumber(deptCode);
-	    workOrderAgreement.setWork_agreement_number(estimateNumber);
+		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"works_div_"+deptCode).get(0).getValue();
+		String estimateNumber ="";
+		if(workOrderAgreement.getWork_agreement_number() == null || (workOrderAgreement.getWork_agreement_number() != null && workOrderAgreement.getWork_agreement_number().isEmpty()))
+		{
+			estimateNumber = v.getWorkNumber(deptShortCode);
+		    workOrderAgreement.setWork_agreement_number(estimateNumber);
+		}
+	     
 		//start of workflow
 				Long approvalPosition = 0l;
 		        String approvalComment = "";
@@ -184,8 +199,14 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
 		deptCode = workOrderAgreement.getDepartment();
-	    String estimateNumber = v.getWorkNumber(deptCode);
-	    workOrderAgreement.setWork_agreement_number(estimateNumber);
+		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"works_div_"+deptCode).get(0).getValue();
+		String estimateNumber ="";
+		if(workOrderAgreement.getWork_agreement_number() == null || (workOrderAgreement.getWork_agreement_number() != null && workOrderAgreement.getWork_agreement_number().isEmpty()))
+		{
+			estimateNumber = v.getWorkNumber(deptShortCode);
+		    workOrderAgreement.setWork_agreement_number(estimateNumber);
+		}
 		//start of workflow
 				Long approvalPosition = 0l;
 		        String approvalComment = "";
@@ -221,7 +242,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 	@RequestMapping(value = "/successProgress", method = RequestMethod.GET)
     public String successProgress(final Model model,final HttpServletRequest request) {
 		
-		final String message = "BOQ Progress have been successfully updated.";
+		final String message = "Work Agreement Closure has been completed";
 
         model.addAttribute("message", message);
 
@@ -237,11 +258,11 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		{
 			msg="Work Agreement Number "+savedWorkOrderAgreement.getWork_agreement_number()+" is Saved as draft";
 		}
-		else if((workflowaction.equalsIgnoreCase("Forward") || workflowaction.equalsIgnoreCase("Approve")) && savedWorkOrderAgreement.getStatus().getCode().equalsIgnoreCase("Approved"))
+		else if((workflowaction.equalsIgnoreCase("Forward/Reassign") || workflowaction.equalsIgnoreCase("Approve")) && savedWorkOrderAgreement.getStatus().getCode().equalsIgnoreCase("Approved"))
 		{
 			msg="Work Agreement Number "+savedWorkOrderAgreement.getWork_agreement_number()+" is approved";
 		}
-		else if((workflowaction.equalsIgnoreCase("Forward") || workflowaction.equalsIgnoreCase("Approve")) && savedWorkOrderAgreement.getStatus().getCode().equalsIgnoreCase("Project Closed"))
+		else if((workflowaction.equalsIgnoreCase("Forward/Reassign") || workflowaction.equalsIgnoreCase("Approve")) && savedWorkOrderAgreement.getStatus().getCode().equalsIgnoreCase("Project Closed"))
 		{
 			msg="Work Agreement Number "+savedWorkOrderAgreement.getWork_agreement_number()+" is closed";
 		}
@@ -255,6 +276,11 @@ public class BoQDetailsController extends GenericWorkFlowController{
 	public String getEmployeeName(Long empId){
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
+	
+	public String getEmployeeDesig(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getAssignments().get(0).getDesignation();
 	    }
 
 	@RequestMapping(value = "/work", params = "save", method = RequestMethod.POST)
@@ -410,6 +436,20 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		
+		BoQDetails boq = new BoQDetails();
+        for (int i = 0; i < workOrderAgreement.getNewBoQDetailsList().size(); i++) {
+        		boq = workOrderAgreement.getNewBoQDetailsList().get(i);
+				boq.setSizeIndex(responseList.size());
+				responseList.add(boq);
+				
+			}
+        workOrderAgreement.setBoQDetailsList(responseList);
+        Map<String, List<BoQDetails>> groupByMilesToneMap = 
+        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+        model.addAttribute("milestoneList",groupByMilesToneMap);
+		
+		
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
@@ -434,7 +474,6 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
 		workOrderAgreement.setDocumentDetail(documents);
 
-		
 		workOrderAgreement.setBoQDetailsList(workOrderAgreement.getNewBoQDetailsList());
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
@@ -448,6 +487,20 @@ public class BoQDetailsController extends GenericWorkFlowController{
 				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareValidActionListByCutOffDate(model);
+        
+       
+		BoQDetails boq = new BoQDetails();
+        for (int i = 0; i < workOrderAgreement.getNewBoQDetailsList().size(); i++) {
+        		boq = workOrderAgreement.getNewBoQDetailsList().get(i);
+				boq.setSizeIndex(responseList.size());
+				responseList.add(boq);
+				
+			}
+        workOrderAgreement.setBoQDetailsList(responseList);
+        Map<String, List<BoQDetails>> groupByMilesToneMap = 
+        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+        model.addAttribute("milestoneList",groupByMilesToneMap);
+        
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 	
@@ -469,6 +522,23 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		
+		BoQDetails boq = new BoQDetails();
+        for (int i = 0; i < workOrderAgreement.getNewBoQDetailsList().size(); i++) {
+        		boq = workOrderAgreement.getNewBoQDetailsList().get(i);
+				boq.setSizeIndex(responseList.size());
+				responseList.add(boq);
+				
+			}
+        workOrderAgreement.setBoQDetailsList(responseList);
+        Map<String, List<BoQDetails>> groupByMilesToneMap = 
+        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+        model.addAttribute("milestoneList",groupByMilesToneMap);
+		
+		
+		
+		
+		
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
@@ -477,7 +547,6 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		model.addAttribute("workflowHistory",
 				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
-		prepareValidActionListByCutOffDate(model);
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("mode","view");
@@ -584,7 +653,31 @@ public class BoQDetailsController extends GenericWorkFlowController{
 				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
-		if(workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty())
+		org.egov.infra.admin.master.entity.User user =null;
+		
+		BoQDetails boq = new BoQDetails();
+        for (int i = 0; i < workOrderAgreement.getNewBoQDetailsList().size(); i++) {
+        		boq = workOrderAgreement.getNewBoQDetailsList().get(i);
+				boq.setSizeIndex(responseList.size());
+				responseList.add(boq);
+				
+			}
+        workOrderAgreement.setBoQDetailsList(responseList);
+        Map<String, List<BoQDetails>> groupByMilesToneMap = 
+        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+        model.addAttribute("milestoneList",groupByMilesToneMap);
+		
+		if((workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getDescription().equals("Approved"))
+		{
+			  user = securityUtils.getCurrentUser();
+			  String desig=getEmployeeDesig(user.getId());
+			  if(desig.equals("243"))
+			  {
+				  model.addAttribute("currentState", "Pending With SDO");  
+			  }
+			result="modify-work-agreement";
+		}
+		else if((workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty()) && !workOrderAgreement.getStatus().getDescription().equals("Approved"))
 		{
 			result="edit-work-agreement";
 		}
@@ -663,7 +756,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 	
 	private void prepareValidActionListByCutOffDate(Model model) {
         model.addAttribute("validActionList",
-                Arrays.asList("Forward","Save As Draft"));
+                Arrays.asList("Forward/Reassign","Save As Draft"));
 	}
 	public List<HashMap<String, Object>> getHistory(final State state, final List<StateHistory> history) {
         User user = null;

@@ -164,7 +164,11 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "expenditure_category")
 	private String expCategory;
 	
+	@Transient
+	private String workStatusSearch;
 	
+	@Transient
+	private String pendingWith;
 
 	public Double getContingentPercentage() {
 		return contingentPercentage;
@@ -751,6 +755,22 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setExpHead_est(String expHead_est) {
 		this.expHead_est = expHead_est;
+	}
+
+	public String getWorkStatusSearch() {
+		return workStatusSearch;
+	}
+
+	public void setWorkStatusSearch(String workStatusSearch) {
+		this.workStatusSearch = workStatusSearch;
+	}
+
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
 	}
 	
 	

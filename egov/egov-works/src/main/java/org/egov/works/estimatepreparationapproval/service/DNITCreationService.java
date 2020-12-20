@@ -199,7 +199,12 @@ public class DNITCreationService {
         String stateValue = "";
         WorkFlowMatrix wfmatrix;
         Position owenrPos = new Position();
-        org.egov.pims.commons.Designation designation = designationService.getDesignationById(Long.parseLong(approvalDesignation));
+        org.egov.pims.commons.Designation designation=null;
+        if( approvalDesignation != null &&  !approvalDesignation.isEmpty())
+        {
+        	designation = designationService.getDesignationById(Long.parseLong(approvalDesignation));
+        }
+         
         if(designation != null)
         {
      	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());

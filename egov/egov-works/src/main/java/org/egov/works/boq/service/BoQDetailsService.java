@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.eis.service.DesignationService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
@@ -21,6 +22,7 @@ import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.PaymentDistribution;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.joda.time.DateTime;
@@ -51,6 +53,8 @@ public class BoQDetailsService {
     private FileStoreService fileStoreService;
 	@Autowired
 	private DocumentUploadRepository documentUploadRepository;
+	@Autowired
+    private DesignationService designationService;
 	
 
 	@Transactional
@@ -61,20 +65,22 @@ public class BoQDetailsService {
 			boq.setWorkOrderAgreement(workOrderAgreement);
 			list.add(boq);
 		}
+		List<PaymentDistribution> PaymentDistributionlist = new ArrayList<PaymentDistribution>();
+		for (PaymentDistribution boq : workOrderAgreement.getPaymentDistribution()) {
+			boq.setWorkOrderAgreement(workOrderAgreement);
+			PaymentDistributionlist.add(boq);
+		}
+		workOrderAgreement.setPaymentDistribution(PaymentDistributionlist);
 		workOrderAgreement.setNewBoQDetailsList(list);
-		if((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equalsIgnoreCase("Save as Draft")) && workOrderAgreement.getStatus() == null)
-		{
-			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Created"));
-		}
-		else if (workFlowAction.equalsIgnoreCase("Save as Draft") && workOrderAgreement.getStatus().getCode().equals("Created"))
-		{
-			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Created"));
-		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Created"))
+		if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Save as Draft")) && workOrderAgreement.getStatus() == null)
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Pending for Approval"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Pending for Approval"))
+		else if (workFlowAction.equalsIgnoreCase("Save as Draft") && workOrderAgreement.getStatus().getCode().equals("Pending for Approval"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Pending for Approval"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign")) && workOrderAgreement.getStatus().getCode().equals("Pending for Approval"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Pending for Approval"));
 		}
@@ -82,15 +88,24 @@ public class BoQDetailsService {
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Approved"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && (workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign")) && (workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && (workOrderAgreement.getProject_closure_comments() != null && !workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		else if((workFlowAction.equalsIgnoreCase("Approve")) && (workOrderAgreement.getProject_closure_comments() == null || workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Approved"));
+		}
+		
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign")) && (workOrderAgreement.getProject_closure_comments() != null && !workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closure Initiated"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Approve")) && (workOrderAgreement.getProject_closure_comments() != null && !workOrderAgreement.getProject_closure_comments().isEmpty()) && workOrderAgreement.getStatus().getCode().equals("Approved"))
+		{
+			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closed"));
+		}
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign")) && workOrderAgreement.getStatus().getCode().equals("Project Modification Initiated"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Modification Initiated"));
 		}
@@ -98,7 +113,7 @@ public class BoQDetailsService {
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Approved"));
 		}
-		else if((workFlowAction.equalsIgnoreCase("Forward")) && workOrderAgreement.getStatus().getCode().equals("Project Closure Initiated"))
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign")) && workOrderAgreement.getStatus().getCode().equals("Project Closure Initiated"))
 		{
 			workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closure Initiated"));
 		}
@@ -188,6 +203,16 @@ public class BoQDetailsService {
         final String currState = "";
         String stateValue = "";
         WorkFlowMatrix wfmatrix;
+        org.egov.pims.commons.Designation designation = null;
+        if( approvalDesignation != null &&  !approvalDesignation.isEmpty())
+        {
+        	designation = designationService.getDesignationById(Long.parseLong(approvalDesignation));
+        }
+         
+        if(designation != null)
+        {
+     	   System.out.println("Designation:::::::::::"+designation.getName().toUpperCase());
+        }
         Position owenrPos = new Position();
         if(workFlowAction.equalsIgnoreCase("Save As Draft"))
         {
@@ -214,9 +239,10 @@ public class BoQDetailsService {
         {
         	wfmatrix = workAgreementWorkflowService.getWfMatrix(savedWorkOrderAgreement.getStateType(), null,
                     null, additionalRule, "NEW", null);
+        	String statetype="Pending With "+designation.getName().toUpperCase();
         	savedWorkOrderAgreement.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
@@ -227,13 +253,14 @@ public class BoQDetailsService {
         	wfmatrix = workAgreementWorkflowService.getWfMatrix(savedWorkOrderAgreement.getStateType(), null,
                     null, additionalRule, savedWorkOrderAgreement.getCurrentState().getValue(), null);
         	System.out.println("savedWorkOrderAgreement.getCurrentState().getValue() :: "+savedWorkOrderAgreement.getCurrentState().getValue());
-        	if(savedWorkOrderAgreement.getCurrentState().getValue().equals("END"))
+        	if(savedWorkOrderAgreement.getCurrentState().getValue().equals("END") && !workFlowAction.equalsIgnoreCase("Approve"))
         	{
         		wfmatrix = workAgreementWorkflowService.getWfMatrix(savedWorkOrderAgreement.getStateType(), null,
                         null, additionalRule, "NEW", null);
+        		String statetype="Pending With "+designation.getName().toUpperCase();
             	savedWorkOrderAgreement.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement")
                 .withCreatedBy(user.getId())
@@ -249,21 +276,21 @@ public class BoQDetailsService {
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
         	}
-        	else if(workFlowAction.equalsIgnoreCase("Forward") || (workFlowAction.equalsIgnoreCase("Approve") && !wfmatrix.getNextState().equals("END")))
+        	else if(workFlowAction.equalsIgnoreCase("Forward/Reassign"))
         	{
-        		
+        		String statetype="Pending With "+designation.getName().toUpperCase();
         		savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
 
         	}
-        	else if(workFlowAction.equalsIgnoreCase("Approve") && wfmatrix.getNextState().equals("END"))
+        	else if(workFlowAction.equalsIgnoreCase("Approve") && !savedWorkOrderAgreement.getCurrentState().getValue().equals("END"))
         	{
         		savedWorkOrderAgreement.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(wfmatrix.getNextState()).withDateInfo(new Date())
+                .withStateValue("END").withDateInfo(new Date())
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
 
@@ -317,7 +344,7 @@ public class BoQDetailsService {
 			list.add(boq);
 		}
 		workOrderAgreement.setNewBoQDetailsList(list);
-
+		workOrderAgreement.setStatus(egwStatusDAO.getStatusByModuleAndCode("WorkOrderAgreement", "Project Closed"));
 		WorkOrderAgreement savedWorkOrderAgreement = workOrderAgreementRepository.save(workOrderAgreement);
 		
 		return savedWorkOrderAgreement;

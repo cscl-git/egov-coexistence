@@ -100,7 +100,7 @@
 				<input type="text" class="form-control" style="visibility:hidden"
 									 />
 							</div>
-					<label class="col-sm-3 control-label text-left-audit1"><spring:message
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.tender.preparation.naration" /></label>
 					<div class="col-sm-9 block-colm">
 						<form:textarea class="form-control-works" path="narration" style="height: 100px;"

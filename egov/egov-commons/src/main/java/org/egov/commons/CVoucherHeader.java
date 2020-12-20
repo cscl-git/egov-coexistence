@@ -150,6 +150,14 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     @Transient
     private String fiscalName;
     
+    @Transient
+    private Integer deptId;
+    @Transient
+    private Date billFrom;
+    @Transient
+    private Date billTo;
+    
+    
     private String firstsignatory;
     private String secondsignatory;
     private String postauditprocessing;
@@ -416,7 +424,7 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     public BigDecimal getTotalAmount() {
         BigDecimal amount = BigDecimal.ZERO;
         for (final CGeneralLedger detail : generalLedger)
-            amount = amount.add(new BigDecimal(detail.getDebitAmount()));
+            amount = amount.add(detail.getDebitAmount());
         return amount;
     }
 
@@ -570,5 +578,29 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
 	public void setDocumentMode(String documentMode) {
 		this.documentMode = documentMode;
+	}
+
+	public Integer getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(Integer deptId) {
+		this.deptId = deptId;
+	}
+
+	public Date getBillFrom() {
+		return billFrom;
+	}
+
+	public void setBillFrom(Date billFrom) {
+		this.billFrom = billFrom;
+	}
+
+	public Date getBillTo() {
+		return billTo;
+	}
+
+	public void setBillTo(Date billTo) {
+		this.billTo = billTo;
 	}
 }

@@ -859,5 +859,9 @@
         <put-attribute name="body"
                        value="/WEB-INF/views/approvebudget/approvebudget-searchSO.jsp"/>
     </definition> 
+    <definition name="journalvoucher-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.journalvoucher.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/journalvoucher/journalvoucher-search.jsp"/>
+    </definition>
     
 </tiles-definitions>

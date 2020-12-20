@@ -83,6 +83,7 @@ import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.model.bills.BillType;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
 import org.egov.utils.FinancialConstants;
@@ -121,6 +122,7 @@ public class CreateExpenseBillController extends BaseBillController {
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
 
     private static final int BUFFER_SIZE = 4096;
+    private static final String BILL_TYPES = "billTypes";
 
     
     @Autowired
@@ -148,6 +150,7 @@ public class CreateExpenseBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+       
     }
 
     @RequestMapping(value = "/newform", method = RequestMethod.POST)
@@ -166,6 +169,7 @@ public class CreateExpenseBillController extends BaseBillController {
         model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
        model.addAttribute("validActionList", validActions);
+       model.addAttribute(BILL_TYPES, BillType.values());
         prepareValidActionListByCutOffDate(model);
         if(isBillDateDefaultValue){
             egBillregister.setBilldate(new Date());            

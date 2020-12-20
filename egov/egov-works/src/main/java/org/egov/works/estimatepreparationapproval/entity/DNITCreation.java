@@ -141,6 +141,12 @@ public class DNITCreation extends StateAware implements Serializable {
 	private EstimatePreparationApproval estimatePreparationApproval;
 	@Transient
 	private Long estimatePreparationApprovalid;
+	
+	@Transient
+	private String workStatusSearch;
+	
+	@Transient
+	private String pendingWith;
 
 	public Double getContingentPercentage() {
 		return contingentPercentage;
@@ -694,6 +700,22 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	public void setEstimatePreparationApprovalid(Long estimatePreparationApprovalid) {
 		this.estimatePreparationApprovalid = estimatePreparationApprovalid;
+	}
+
+	public String getWorkStatusSearch() {
+		return workStatusSearch;
+	}
+
+	public void setWorkStatusSearch(String workStatusSearch) {
+		this.workStatusSearch = workStatusSearch;
+	}
+
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
 	}
 	
 	

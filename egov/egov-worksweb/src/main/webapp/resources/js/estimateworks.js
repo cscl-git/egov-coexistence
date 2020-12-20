@@ -70,11 +70,6 @@ function setWorkflow(action)
 				}
 			else if (action == 'Approve')
 				{
-					if(document.getElementById('approvalPosition') != null && document.getElementById('approvalPosition').value == '')
-						{
-						bootbox.alert("Please select Approver");
-						return false;
-						}
 					if(document.getElementById('approvalComent') != null && document.getElementById('approvalComent').value == '')
 					{
 						bootbox.alert("Please select Approval Comment");
@@ -144,5 +139,9 @@ function openProgress(woId)
 	var url = "/services/works/boq/progress/"+ woId;
 	window.open(url,'','width=900, height=700');
 }
-
+function openDNIT(estId)
+{
+	var url = "/services/works/dnit/view/"+ estId;
+	window.open(url,'','width=900, height=700');
+}
 

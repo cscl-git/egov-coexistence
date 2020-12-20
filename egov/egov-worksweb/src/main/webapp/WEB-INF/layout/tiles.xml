@@ -296,6 +296,10 @@
         <put-attribute name="page-title" value="title.work.estimate.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/workestimate/searchworkestimate.jsp"/>
     </definition>
+    <definition name="search-work-estimate-form-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.work.estimate.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/workestimate/searchworkestimateNew.jsp"/>
+    </definition>
     
     <definition name="estimatepreparationapproval-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
@@ -381,6 +385,11 @@
     <definition name="edit-work-agreement" extends="base_layout">
         <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/editworkagreement.jsp"/>
+    </definition>
+    
+    <definition name="modify-work-agreement" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/modifyworkagreement.jsp"/>
     </definition>
     
     

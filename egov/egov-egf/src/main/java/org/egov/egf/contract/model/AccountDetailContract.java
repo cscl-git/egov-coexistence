@@ -47,6 +47,7 @@
  */
 package org.egov.egf.contract.model;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,8 +63,8 @@ public class AccountDetailContract {
 	private Long id;
     private Long orderId;
     private String glcode;
-    private Double debitAmount;
-    private Double creditAmount;
+    private BigDecimal debitAmount;
+    private BigDecimal creditAmount;
     private FunctionContract function;
     private List<SubledgerDetailContract> subledgerDetails = new ArrayList<>(0);
 
@@ -107,19 +108,19 @@ public class AccountDetailContract {
         this.glcode = glcode;
     }
 
-    public Double getDebitAmount() {
+    public BigDecimal getDebitAmount() {
         return debitAmount;
     }
 
-    public void setDebitAmount(final Double debitAmount) {
+    public void setDebitAmount(final BigDecimal debitAmount) {
         this.debitAmount = debitAmount;
     }
 
-    public Double getCreditAmount() {
+    public BigDecimal getCreditAmount() {
         return creditAmount;
     }
 
-    public void setCreditAmount(final Double creditAmount) {
+    public void setCreditAmount(final BigDecimal creditAmount) {
         this.creditAmount = creditAmount;
     }
 

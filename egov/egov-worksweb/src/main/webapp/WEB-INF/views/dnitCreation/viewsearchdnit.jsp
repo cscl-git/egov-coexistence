@@ -3,6 +3,17 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
+<style>
+.table thead > tr > th {
+    color: black;
+    background-color: #acbfd0;
+    vertical-align: top;
+}
+.table tbody > tr > td {
+    color: black;
+    vertical-align: top;
+}
+</style>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
@@ -11,54 +22,44 @@
 		<form:form name="create-estimate-form" role="form"
 		method="post" action="updateDnit"
 		modelAttribute="estimatePreparationApproval"
-		id="estimatePreparationApproval" enctype="multipart/form-data">
+		id="estimatePreparationApproval1" enctype="multipart/form-data">
 	
-	<spring:hasBindErrors name="estimatePreparationApproval">
-		<div class="alert alert-danger"
-			style="margin-top: 20px; margin-bottom: 10px;">
-			<form:errors path="*" />
-			<br />
-		</div>
-	</spring:hasBindErrors>
-<input type="hidden" name="estimatePreparationApproval"
-						value="${estimatePreparationApproval.id}" />
+	
 
 	<ul class="nav nav-tabs" id="settingstab">
 
 		<li class="active"><a data-toggle="tab" href="#estimatescreen"
 			data-tabidx=0><spring:message
-					code="title.estimate.preparation.create"
-					text="Estimate Details" /> </a></li>
-	<c:if test="${estimatePreparationApproval.status.code == 'AA Initiated' || estimatePreparationApproval.status.code == 'AA Pending for Approval' || estimatePreparationApproval.status.code == 'TS Initiated' || estimatePreparationApproval.status.code == 'TS Pending for Approval' || estimatePreparationApproval.status.code == 'Approved'}">
-		<li><a data-toggle="tab" href="#administration" data-tabidx=1><spring:message
-					code="title.estimate.administration.approval"
-					text="Administration Approval" /> </a></li>
-	</c:if>
+					code="title.dnit.preparation.create"
+					text="DNIT Details" /> </a></li>
 	</ul>
 	<div class="tab-content">
 	<div class="tab-pane fade in active" id="estimatescreen">
-	
-		
+	<c:if test="${estimatePreparationApproval.status.code == 'Created' }">
 			
-				<jsp:include page="viewestimate.jsp" />
+				<!--<jsp:include page="viewestimate.jsp" />-->
 			
-		
+	</c:if>
 
-		
+	<c:if test="${estimatePreparationApproval.status.code == 'Pending for Approval' }">
+			
+				<!--<jsp:include page="viewestimate.jsp" />-->
+	</c:if>
+
+		<c:if test="${estimatePreparationApproval.status.code == 'Approved' }">
+			
+				<!--<jsp:include page="viewestimate.jsp" />-->
+			
+		</c:if>
 
 	
 	
 	</div>
-	<div class="tab-pane fade" id="administration">
-
-				<jsp:include page="administrationapprovalview.jsp" />
-	</div>	
+	
 
 		<br><br><br>
-		<jsp:include page="fileupload.jsp" />
+		<!-- <jsp:include page="fileupload.jsp" /> -->
 		<br> <br>
-		
-		
 		 <jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
 		 <br>
 		 <br>

@@ -47,11 +47,13 @@
  */
 package org.egov.commons;
 
-import javax.persistence.Transient;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+
+import javax.persistence.Transient;
 
 public class CGeneralLedger implements Serializable {
 
@@ -60,8 +62,8 @@ public class CGeneralLedger implements Serializable {
     private Date effectiveDate;
     private CChartOfAccounts glcodeId;
     private String glcode;
-    private Double debitAmount;
-    private Double creditAmount;
+    private BigDecimal debitAmount;
+    private BigDecimal creditAmount;
     private String description;
     private CVoucherHeader voucherHeaderId;
     private Integer functionId;
@@ -190,31 +192,7 @@ public class CGeneralLedger implements Serializable {
      * @return Returns the debitAmount.
      */
 
-    public Double getDebitAmount() {
-        return debitAmount;
-    }
-
-    /**
-     * @param debitAmount The debitAmount to set.
-     */
-    public void setDebitAmount(final Double debitAmount) {
-        this.debitAmount = debitAmount;
-    }
-
-    /**
-     * @return Returns the creditAmount.
-     */
-
-    public Double getCreditAmount() {
-        return creditAmount;
-    }
-
-    /**
-     * @param creditAmount The creditAmount to set.
-     */
-    public void setCreditAmount(final Double creditAmount) {
-        this.creditAmount = creditAmount;
-    }
+    
 
     public Set<CGeneralLedgerDetail> getGeneralLedgerDetails() {
         return generalLedgerDetails;
@@ -231,5 +209,21 @@ public class CGeneralLedger implements Serializable {
     public void setIsSubLedger(final Boolean isSubLedger) {
         this.isSubLedger = isSubLedger;
     }
+
+	public BigDecimal getDebitAmount() {
+		return debitAmount;
+	}
+
+	public void setDebitAmount(BigDecimal debitAmount) {
+		this.debitAmount = debitAmount;
+	}
+
+	public BigDecimal getCreditAmount() {
+		return creditAmount;
+	}
+
+	public void setCreditAmount(BigDecimal creditAmount) {
+		this.creditAmount = creditAmount;
+	}
 
 }

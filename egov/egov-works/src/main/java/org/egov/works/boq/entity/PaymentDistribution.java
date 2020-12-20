@@ -44,6 +44,9 @@ public class PaymentDistribution implements Serializable {
 	@JoinColumn(name = "work_id")
 	private WorkOrderAgreement workOrderAgreement;
 	
+	@Column(name = "payment_completed")
+	private boolean payment_completed;
+	
 
 	public Long getId() {
 		return id;
@@ -83,6 +86,14 @@ public class PaymentDistribution implements Serializable {
 
 	public void setWorkOrderAgreement(WorkOrderAgreement workOrderAgreement) {
 		this.workOrderAgreement = workOrderAgreement;
+	}
+
+	public boolean isPayment_completed() {
+		return payment_completed;
+	}
+
+	public void setPayment_completed(boolean payment_completed) {
+		this.payment_completed = payment_completed;
 	}
 	
 	

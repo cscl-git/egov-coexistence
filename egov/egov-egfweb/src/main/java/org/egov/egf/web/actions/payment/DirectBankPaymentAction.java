@@ -388,14 +388,14 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         vd.setGlcodeDetail(netPay.getGlcode());
         vd.setGlcodeIdDetail(netPay.getGlcodeId().getId());
         vd.setAccounthead(netPay.getGlcodeId().getName());
-        vd.setDebitAmountDetail(BigDecimal.valueOf(netPay.getCreditAmount()));
+        vd.setDebitAmountDetail((netPay.getCreditAmount()));
         if (netPay.getFunctionId() != null) {
             vd.setFunctionIdDetail(Long.valueOf(netPay.getFunctionId()));
             final CFunction function = persistenceService.getSession().load(CFunction.class,
                     Long.valueOf(netPay.getFunctionId()));
             vd.setFunctionDetail(function.getId().toString());
         }
-        commonBean.setAmount(BigDecimal.valueOf(netPay.getCreditAmount()));
+        commonBean.setAmount((netPay.getCreditAmount()));
         billDetailslist.add(vd);
         final Set<CGeneralLedgerDetail> generalLedgerDetails = netPay.getGeneralLedgerDetails();
         final int i = 0;

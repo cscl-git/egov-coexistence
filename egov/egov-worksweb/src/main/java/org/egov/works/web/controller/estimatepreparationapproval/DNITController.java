@@ -649,28 +649,28 @@ public class DNITController extends GenericWorkFlowController {
         return designations;
     }
 
-	@RequestMapping(value = "/dnitSearch", method = RequestMethod.POST)
+	@RequestMapping(value = "/searchDnit", method = RequestMethod.POST)
 	public String showEstimateNewFormGet(
 			@ModelAttribute("workdnitDetails") final DNITCreation dnitCreation,
 			final Model model, HttpServletRequest request) {
 
 		dnitCreation.setDepartments(getDepartmentsFromMs());
-		model.addAttribute("workEstimateDetails", dnitCreation);
+		model.addAttribute("workdnitDetails", dnitCreation);
 
 		return "search-dnit-form";
 	}
 
 	@RequestMapping(value = "/workDnitSearch", params = "workDnitSearch", method = RequestMethod.POST)
 	public String searchWorkEstimateData(
-			@ModelAttribute("workdnitDetails") final DNITCreation dnitCreation,
+			@ModelAttribute("workdnitDetails") final DNITCreation estimatePreparationApproval,
 			final Model model, final HttpServletRequest request) throws Exception {
 		List<DNITCreation> approvalList = new ArrayList<DNITCreation>();
 
 		// Convert input string into a date
 
-		if (dnitCreation.getDepartment() != null && dnitCreation.getDepartment() != "" && !dnitCreation.getDepartment().isEmpty()) {
-		long department = Long.parseLong(dnitCreation.getDepartment());
-		dnitCreation.setExecutingDivision(department);
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
 		}
 		DNITCreation estimate=null;
 		
@@ -679,11 +679,11 @@ public class DNITController extends GenericWorkFlowController {
 		 query
 	        .append(
 	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from DNITCreation es where es.executingDivision = ? ")
-	        .append(getDateQuery(dnitCreation.getFromDt(), dnitCreation.getToDt()))
-	        .append(getMisQuery(dnitCreation));
+	        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
+	        .append(getMisQuery(estimatePreparationApproval));
 		 System.out.println("Query :: "+query.toString());
          list = persistenceService.findAllBy(query.toString(),
-        		 dnitCreation.getExecutingDivision());
+        		 estimatePreparationApproval.getExecutingDivision());
 		 
          if (list.size() != 0) {
         	 
@@ -714,14 +714,18 @@ public class DNITController extends GenericWorkFlowController {
         		 {
         			 estimate.setStatusDescription(object[6].toString());
         		 }
+        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+        		 {
+        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        		 }
         		 approvalList.add(estimate);
         	 }
         	 
          }
-         dnitCreation.setDepartments(getDepartmentsFromMs());
-         dnitCreation.setEstimateList(approvalList);
+        estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setEstimateList(approvalList);
 
-		model.addAttribute("workEstimateDetails", dnitCreation);
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
 
 		return "search-dnit-form";
 
@@ -775,7 +779,6 @@ public class DNITController extends GenericWorkFlowController {
 
 		return "view-dnit-form";
 	}
-
 	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
 	public String edit(@PathVariable("id") final Long id, Model model) {
 
@@ -1069,6 +1072,24 @@ public class DNITController extends GenericWorkFlowController {
 
 		final StringBuffer misQuery = new StringBuffer(300);
 		if (null != estimate) {
+			
+			if ( estimate.getWorkStatusSearch() != null && !estimate.getWorkStatusSearch().isEmpty())
+			{
+				misQuery.append(" and es.status.description='")
+						.append(estimate.getWorkStatusSearch()).append("'");
+			}
+			if ( estimate.getWorkName() != null && !estimate.getWorkName().isEmpty())
+			{
+				misQuery.append(" and es.workName like '%")
+						.append(estimate.getWorkName()).append("%'");
+			}
+			if ( estimate.getFundSource() != null && !estimate.getFundSource().isEmpty())
+			{
+				misQuery.append(" and es.fundSource='")
+						.append(estimate.getFundSource()).append("'");
+			}
+			
+			
 			if ( estimate.getEstimateNumber() != null && !estimate.getEstimateNumber().isEmpty())
 			{
 				misQuery.append(" and es.estimateNumber='")
@@ -1076,8 +1097,8 @@ public class DNITController extends GenericWorkFlowController {
 			}
 			if(estimate.getWorksWing() != null)
 			{
-				misQuery.append(" and es.worksWing=")
-				.append(estimate.getWorksWing());
+				misQuery.append(" and es.worksWing='")
+				.append(estimate.getWorksWing()).append("'");
 			}
 			if(estimate.getWorkLocation() != null && !estimate.getWorkLocation().isEmpty())
 			{
@@ -1086,13 +1107,13 @@ public class DNITController extends GenericWorkFlowController {
 			}
 			if(estimate.getSectorNumber() != null)
 			{
-				misQuery.append(" and es.sectorNumber=")
-				.append(estimate.getSectorNumber());
+				misQuery.append(" and es.sectorNumber='")
+				.append(estimate.getSectorNumber()).append("'");
 			}
 			if(estimate.getWardNumber() != null)
 			{
-				misQuery.append(" and es.wardNumber=")
-				.append(estimate.getWardNumber());
+				misQuery.append(" and es.wardNumber='")
+				.append(estimate.getWardNumber()).append("'");
 			}
 			if(estimate.getWorkCategory() != null)
 			{
@@ -1108,6 +1129,22 @@ public class DNITController extends GenericWorkFlowController {
 		}
 		return misQuery.toString();
 
+	}
+	
+	private String populatePendingWith(Long id) {
+		String pendingWith="";
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		if(estimateDetails != null && estimateDetails.getState() != null && estimateDetails.getState().getOwnerPosition() != null && estimateDetails.getState().getOwnerPosition() != 0L)
+		{
+			try
+			{
+				pendingWith=getEmployeeName(estimateDetails.getState().getOwnerPosition());
+			}catch (Exception e) {
+				pendingWith="";
+			}
+			
+		}
+		return pendingWith;
 	}
 
 }

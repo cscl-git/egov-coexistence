@@ -66,6 +66,18 @@ public class WorkEstimateController extends GenericWorkFlowController{
 
 		return "search-work-estimate-form";
 	}
+	
+	@RequestMapping(value = "/newformEstimate", method = RequestMethod.POST)
+	public String showNewFormEstimateGet(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, HttpServletRequest request) {
+		
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+
+		return "search-work-estimate-form-new";
+	}
+	
+	
 	/*forDnit creation from estimate*/
 	@RequestMapping(value = "/dnitsearchEstimate", method = RequestMethod.POST)
 	public String showNewDnitCreation(
@@ -101,6 +113,32 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		return "search-work-estimate-form";
 
 	}
+	
+	
+	@RequestMapping(value = "/workEstimateSearchNew", params = "workEstimateSearchNew", method = RequestMethod.POST)
+	public String searchWorkEstimateDataNew(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, final HttpServletRequest request) throws Exception {
+		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
+	
+
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != ""
+				&& !estimatePreparationApproval.getDepartment().isEmpty()) {
+			estimatePreparationApproval
+					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
+		}
+		
+		List<EstimatePreparationApproval> workEstimateDetails = workEstimateService.searchWorkEstimate(request,
+				estimatePreparationApproval);
+		approvalList.addAll(workEstimateDetails);
+		estimatePreparationApproval.setEstimateList(approvalList);
+
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+
+		return "search-work-estimate-form-new";
+
+	}
+
 
 	
 	/*forDnit creation from estimate*/
@@ -163,6 +201,43 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		}
 
 		return "search-work-estimate-form";
+
+	}
+	
+	@RequestMapping(value = "/workEstimateSearchNew", params = "save1", method = RequestMethod.POST)
+	public String saveWorkEstimateDataNew(
+			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, final HttpServletRequest request) throws Exception {
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+		for (int i = 0; i < estimatePreparationApproval.getEstimateList().size(); i++) {
+			if (estimatePreparationApproval.getEstimateList().get(i).isChecked() == true) {
+				
+				EstimatePreparationApproval	workEstimateDetails = workEstimateService.searchBoqData(request,
+						estimatePreparationApproval.getEstimateList().get(i).getId());
+				
+				List<BoQDetails> respList = new ArrayList<BoQDetails>();
+				BoQDetails boq = new BoQDetails();
+				for (int j = 0; j < workEstimateDetails.getNewBoQDetailsList().size(); j++) {
+					if (workEstimateDetails.getNewBoQDetailsList().get(j).getWorkOrderAgreement() == null) {
+						boq = workEstimateDetails.getNewBoQDetailsList().get(j);
+						boq.setSizeIndex(respList.size());
+						respList.add(boq);
+					}
+				}
+				estimatePreparationApproval.setId(workEstimateDetails.getId());
+				estimatePreparationApproval.setBoQDetailsList(workEstimateDetails.getNewBoQDetailsList());
+				// estimatePreparationApproval.setNewBoQDetailsList(workEstimateDetails.getNewBoQDetailsList());
+				estimatePreparationApproval.setNewBoQDetailsList(respList);
+				estimatePreparationApproval.setDepartment(workEstimateDetails.getExecutingDivision().toString());
+				Map<String, List<BoQDetails>> groupByMilesToneMap = 
+						respList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+
+				model.addAttribute("milestoneList",groupByMilesToneMap);
+				model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+			}
+		}
+
+		return "search-work-estimate-form-new";
 
 	}
 				
@@ -238,6 +313,61 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		DNITCreation saveBoqDetails = workEstimateService.searchDnitBoqData(request, id);
+		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		workOrderAgreement.setBoQDetailsList(responseList);
+		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
+		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
+		workOrderAgreement.setDepartment(String.valueOf(saveBoqDetails.getExecutingDivision()));
+		workOrderAgreement.setWork_amount(String.valueOf(amount));
+		workOrderAgreement.setCategory(saveBoqDetails.getWorkCategory());
+		workOrderAgreement.setWardNumber(saveBoqDetails.getWardNumber());
+		workOrderAgreement.setFund(saveBoqDetails.getFundSource());
+		workOrderAgreement.setSector(saveBoqDetails.getSectorNumber());
+		workOrderAgreement.setWorkLocation(saveBoqDetails.getWorkLocation());
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setContractors(getAllActiveContractors());
+		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+        prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
+        
+        Map<String, List<BoQDetails>> groupByMilesToneMap = 
+        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+		model.addAttribute("fileuploadAllowed","Y");
+		return "boqDetails";
+
+	}
+	
+	
+	@RequestMapping(value = "/workEstimateSearchNew", params = "saveboq1", method = RequestMethod.POST)
+	public String saveBoqData1(
+			@ModelAttribute("workOrderAgreement") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, final HttpServletRequest request, final RedirectAttributes redirectAttributes)
+			throws Exception {
+
+		Long id = 0l;
+		for (int i = 0; i < estimatePreparationApproval.getEstimateList().size(); i++) {
+			if (estimatePreparationApproval.getEstimateList().get(i).isChecked() == true) {
+				// estimatePreparationApproval.setId(estimatePreparationApproval.getEstimateList().get(i).getId());
+				id = estimatePreparationApproval.getEstimateList().get(i).getId();
+			}
+		}
+
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+		BoQDetails boq = new BoQDetails();
+		Double amount = 0d;
+
+		for (int i = 0; i < estimatePreparationApproval.getNewBoQDetailsList().size(); i++) {
+			if (estimatePreparationApproval.getNewBoQDetailsList().get(i).isCheckboxChecked()) {
+				boq = estimatePreparationApproval.getNewBoQDetailsList().get(i);
+				boq.setSizeIndex(responseList.size());
+				responseList.add(boq);
+				amount += estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount();
+			}
+		}
+		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
 		workOrderAgreement.setBoQDetailsList(responseList);
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());

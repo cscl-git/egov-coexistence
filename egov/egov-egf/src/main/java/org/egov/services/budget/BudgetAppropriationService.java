@@ -224,10 +224,10 @@ public class BudgetAppropriationService extends PersistenceService {
 
 	private BigDecimal getVoucherAmount(final CGeneralLedger detail) {
 		BigDecimal currentBillAmount = BigDecimal.ZERO;
-		if (detail.getDebitAmount() != null && detail.getDebitAmount() != 0)
-			currentBillAmount = new BigDecimal(detail.getDebitAmount());
+		if (detail.getDebitAmount() != null && detail.getDebitAmount().compareTo(BigDecimal.ZERO) != 0 )
+			currentBillAmount = detail.getDebitAmount();
 		else
-			currentBillAmount = new BigDecimal(detail.getCreditAmount());
+			currentBillAmount = detail.getCreditAmount();
 		return currentBillAmount;
 	}
 

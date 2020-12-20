@@ -2580,7 +2580,7 @@ public class CreateVoucher {
 				subledgerMap.put(VoucherConstant.DETAILTYPEID, ledgerDetail.getDetailTypeId().getId());
 				subledgerMap.put(VoucherConstant.DETAILKEYID, ledgerDetail.getDetailKeyId());
 				// even for subledger debit becomes credit ,credit becomes debit
-				if (BigDecimal.valueOf(ledger.getDebitAmount()).compareTo(BigDecimal.ZERO) != 0)
+				if ((ledger.getDebitAmount()).compareTo(BigDecimal.ZERO) != 0)
 					subledgerMap.put(VoucherConstant.CREDITAMOUNT, ledgerDetail.getAmount());
 				else
 					subledgerMap.put(VoucherConstant.DEBITAMOUNT,

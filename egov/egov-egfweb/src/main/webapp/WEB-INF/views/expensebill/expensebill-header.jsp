@@ -181,4 +181,36 @@
 			
 		</div>
 	</div>
+	
+	<div class="works">
+	
+	<div class="form-group">
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.billtype" text="Bill Type"/><span class="mandatory"></span>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<form:select path="billtype" data-first-option="false" id="billtype" class="form-control" >
+				<form:option value=""><spring:message code="lbl.select" text="Select"/></form:option>
+					<c:forEach items="${billTypes}" var="billType">
+						<form:option value="${billType}"> ${billType} </form:option>
+					</c:forEach>
+			</form:select>
+			<form:errors path="billtype" cssClass="add-margin error-msg" />
+		</div>
+		
+		<label class="col-sm-2 control-label text-right"><spring:message code="lbl.workorder" text="Work Order"/>
+			<span class="mandatory"></span>
+		</label>
+		<div class="col-sm-3 add-margin">
+<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" id="workOrder" path="workordernumber" maxlength="100" />
+			<form:errors path="workordernumber" cssClass="add-margin error-msg" />
+		</div>
+		
+		
+		
+	</div>
+	</div>
+	
+	
+	
 </div>
