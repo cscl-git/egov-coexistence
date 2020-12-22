@@ -1262,13 +1262,23 @@ public class MicroserviceUtils {
     
     public List<Receipt> searchRecieptsFinance(String classification, Date fromDate, Date toDate, String businessCode,
             String receiptNo,String type) {
+    	
+    	if(receiptNo != null && !receiptNo.isEmpty())
+    	{
+    		return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo.split(",")),type);
+    	}
+    	else
+    	{
+    		return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, null,type);
+    	}
 
-        return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo),type);
+        
 
     }
 
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,
             List<String> receiptNos) {
+    	LOGGER.info("receiptNos.size()     :::"+receiptNos.size());
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
@@ -1755,12 +1765,19 @@ public class MicroserviceUtils {
         PaymentResponse response = null;
          RequestInfo requestInfo = getRequestInfo();
          RequestInfoWrapper reqWrapper = null;
+         RequestInfoCancelWrapper reqReceiptWrapper=new RequestInfoCancelWrapper();
          RequestInfoSearchWrapper reqSearchWrapper = new RequestInfoSearchWrapper();
         StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentSearch()).append("?");
         if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
         {
         	reqSearchWrapper.setIds(searchCriteria.getIds());
         	reqSearchWrapper.setRequestInfo(requestInfo);
+        }
+        else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty())
+        {
+        	LOGGER.info("searchCriteria.getReceiptNumbers()     :::"+searchCriteria.getReceiptNumbers().size());
+        	reqReceiptWrapper.setIds(searchCriteria.getReceiptNumbers());
+        	reqReceiptWrapper.setRequestInfo(requestInfo);
         }
         else
         {
@@ -1773,6 +1790,10 @@ public class MicroserviceUtils {
             {
             	LOGGER.info("ids ; "+url.toString());
             	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
+            }
+            else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty()) {
+            	LOGGER.info("reqReceiptWrapper.getIds().size()    :::"+reqReceiptWrapper.getIds().size());
+            	response = restTemplate.postForObject(url.toString(), reqReceiptWrapper, PaymentResponse.class);
             }
             else
             {
@@ -1803,9 +1824,11 @@ public class MicroserviceUtils {
         if(StringUtils.isNotBlank(searchCriteria.getTenantId())){
             url.append("&tenantId=").append(searchCriteria.getTenantId());
         }
-        if(CollectionUtils.isNotEmpty(searchCriteria.getReceiptNumbers())){
-            url.append("&receiptNumbers=").append(StringUtils.join(searchCriteria.getReceiptNumbers(),","));
-        }
+		/*
+		 * if(CollectionUtils.isNotEmpty(searchCriteria.getReceiptNumbers())){
+		 * url.append("&receiptNumbers=").append(StringUtils.join(searchCriteria.
+		 * getReceiptNumbers(),",")); }
+		 */
         if(CollectionUtils.isNotEmpty(searchCriteria.getStatus())){
             url.append("&status=").append(StringUtils.join(searchCriteria.getStatus(),","));
         }

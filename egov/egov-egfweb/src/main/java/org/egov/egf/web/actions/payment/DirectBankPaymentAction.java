@@ -566,14 +566,21 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 .append(" order by ih.id");
         voucherHeader = persistenceService.getSession().load(CVoucherHeader.class,
                 voucherHeader.getId());
+        
+        LOGGER.info("vh Id :: "+voucherHeader.getId());
         paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
                 voucherHeader);
+        
+        LOGGER.info("paymentheader.getPaymentAmount() :: "+paymentheader.getPaymentAmount());
+        LOGGER.info("paymentheader.getBankaccount().getId().toString() :: "+paymentheader.getBankaccount().getId().toString());
+        LOGGER.info("paymentheader.getBankaccount().getNarration() :: "+voucherHeader.getId());
         commonBean.setAmount(paymentheader.getPaymentAmount());
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
 
         final String bankBranchId = paymentheader.getBankaccount().getBankbranch().getBank().getId() + "-"
                 + paymentheader.getBankaccount().getBankbranch().getId();
+        LOGGER.info("bankBranchId :: "+bankBranchId);
         commonBean.setBankId(bankBranchId);
         commonBean.setModeOfPayment(paymentheader.getType());
         final Miscbilldetail miscbillDetail = (Miscbilldetail) persistenceService
@@ -589,7 +596,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
         VoucherDetails bankdetail = null;
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
-
+        
         // voucherHeader =
         // (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);
         billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);

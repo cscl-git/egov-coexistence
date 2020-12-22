@@ -80,6 +80,7 @@ import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
+import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
@@ -317,9 +318,20 @@ public class VoucherSearchAction extends BaseFormAction {
 			paymentVoucherMap.clear();
 			
 			Map<Long,List<String>> voucherPartyMap=new HashMap<Long,List<String>>();
+			Map<String,String> receiptPaidByMapping=new HashMap<String,String>();
+			System.out.println("Type ::: "+voucherHeader.getType());
 			if(partyName != null && !partyName.isEmpty())
 			{
-				getParty(voucherPartyMap);
+				if(!voucherHeader.getType().equalsIgnoreCase("Receipt"))
+				{
+					System.out.println("for non receipt");
+					getParty(voucherPartyMap,voucherHeader.getType());
+				}
+				else
+				{
+					System.out.println("for receipts");
+					getReceiptMapping(receiptPaidByMapping,list);
+				}
 			}
 			
 			System.out.println("before filter");
@@ -337,21 +349,12 @@ public class VoucherSearchAction extends BaseFormAction {
 									 }
 						 }
 						else if (null != cVoucherHeader.getType() && cVoucherHeader.getType().equalsIgnoreCase("Receipt")){
-							List<Receipt> receipts = getReciept(cVoucherHeader.getVouchermis().getRecieptNumber());
-							String paidBy="";
-							if(receipts != null && !receipts.isEmpty()) {
-								for (Receipt receipt : receipts) {
-
-						            for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
-						                	paidBy = bill.getPaidBy();
-						            }
-								}
-								if(cVoucherHeader.getTotalAmount().compareTo(amount) == 0 && ((paidBy.toLowerCase()).contains((partyName.toLowerCase()))))
+							
+								if(cVoucherHeader.getTotalAmount().compareTo(amount) == 0 && checkReceiptParty(cVoucherHeader,partyName,receiptPaidByMapping))
 									{
 									filterlist.add(cVoucherHeader);
 									}
 							}
-						}
 						 
 					 }
 					 else {
@@ -367,30 +370,17 @@ public class VoucherSearchAction extends BaseFormAction {
 				 else if(partyName!=null && !partyName.isEmpty()){
 					 if (null != cVoucherHeader.getType() &&  !cVoucherHeader.getType().equalsIgnoreCase("Receipt"))
 					 {
-							String party=null;
-							 
-							 if( (party.toLowerCase()).contains(partyName.toLowerCase()) ) {
-								 
-								 filterlist.add(cVoucherHeader);
-							 }
+						 if(checkParty(cVoucherHeader.getId(),voucherPartyMap,partyName) ) {
+							 filterlist.add(cVoucherHeader);
+						 }
 							 
 						
 					
 				 }
 					else if (null != cVoucherHeader.getType() && cVoucherHeader.getType().equalsIgnoreCase("Receipt")){
-						List<Receipt> receipts = getReciept(cVoucherHeader.getVouchermis().getRecieptNumber());
-						String paidBy="";
-						if(receipts != null && !receipts.isEmpty()) {
-							for (Receipt receipt : receipts) {
-
-					            for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
-					                	paidBy = bill.getPaidBy();
-					            }
-							}
-							if((paidBy.toLowerCase()).contains((partyName.toLowerCase())))
-								{
-								filterlist.add(cVoucherHeader);
-								}
+						if(checkReceiptParty(cVoucherHeader,partyName,receiptPaidByMapping))
+						{
+						filterlist.add(cVoucherHeader);
 						}
 					}
 					 
@@ -532,6 +522,46 @@ public class VoucherSearchAction extends BaseFormAction {
 
 	
 	
+	private boolean checkReceiptParty(CVoucherHeader cVoucherHeader, String partyName,
+			Map<String, String> receiptPaidByMapping) {
+		boolean result=false;
+		String receiptParty="";
+		if(cVoucherHeader.getVouchermis().getRecieptNumber() != null && !cVoucherHeader.getVouchermis().getRecieptNumber().isEmpty()) {
+			receiptParty=receiptPaidByMapping.get(cVoucherHeader.getVouchermis().getRecieptNumber());
+			if(receiptParty != null && !receiptParty.isEmpty() && (receiptParty.toLowerCase()).contains((partyName.toLowerCase()))) {
+				result=true;
+			}
+		}
+		
+		
+		return result;
+	}
+
+	private void getReceiptMapping(Map<String, String> receiptPaidByMapping, List<CVoucherHeader> list) {
+		String receiptNumbers="";
+		for(CVoucherHeader voucher:list) {
+			if(voucher.getVouchermis().getRecieptNumber() != null && !voucher.getVouchermis().getRecieptNumber().isEmpty())
+			{
+				receiptNumbers=receiptNumbers+voucher.getVouchermis().getRecieptNumber()+",";
+			}
+		}
+		receiptNumbers=receiptNumbers.substring(0,receiptNumbers.length()-1);
+		List<Receipt> receipts = microserviceUtils.searchRecieptsFinance("MISCELLANEOUS", null, null, null,
+                (receiptNumbers != null && !receiptNumbers.isEmpty() && !"".equalsIgnoreCase(receiptNumbers))
+                        ? receiptNumbers : "","search");
+		
+		for (Receipt receipt : receipts) {
+
+            for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+
+                for (BillDetail billDetail : bill.getBillDetails()) {
+                	receiptPaidByMapping.put(billDetail.getReceiptNumber(), bill.getPaidBy());
+                }
+            }
+		}
+		
+	}
+
 	private boolean checkParty(Long id, Map<Long, List<String>> voucherPartyMap, String partyName) {
 		boolean result=false;
 		List<String> partyNames=voucherPartyMap.get(id);
@@ -550,15 +580,7 @@ public class VoucherSearchAction extends BaseFormAction {
 		return result;
 	}
 
-	private List<Receipt> getReciept(String recieptno){
-		
-		List<Receipt> receipts = microserviceUtils.searchRecieptsFinance("MISCELLANEOUS", null, null, null,
-                (recieptno != null && !recieptno.isEmpty() && !"".equalsIgnoreCase(recieptno))
-                        ? recieptno : null,"search");
-		
-		return receipts;
-		
-	}
+	
 	
 	
 	private void populateVoucherMap(List<CVoucherHeader> list) {
@@ -830,13 +852,14 @@ public class VoucherSearchAction extends BaseFormAction {
 		this.partyName = partyName;
 	}
 	
-	private void getParty(Map<Long,List<String>> voucherPartyMap) {
+	private void getParty(Map<Long,List<String>> voucherPartyMap,String type) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	List<String> partyName=null;
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select v.id,a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey");
+    		 query = this.persistenceService.getSession().createSQLQuery("select v.id,a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey and v.type =:type");
+    		 query.setString("type", type);
     	    rows = query.list();
     	    
     	    if(rows != null && !rows.isEmpty())
@@ -861,5 +884,7 @@ public class VoucherSearchAction extends BaseFormAction {
 			e.printStackTrace();
 		}
     }
+	
+	
 
 }

@@ -108,6 +108,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author venki
@@ -283,7 +284,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         vouchermis.setDepartmentcode("");
          Long preVoucherId;
          boolean isCompleteBillRegisterReport = false;
-         List<BillRegisterReportBean> billRegReportList = new ArrayList<>()  ;
+         List<BillRegisterReportBean> billRegReportList = new CopyOnWriteArrayList<>()  ;
         SQLQuery querye =  null;
         List<Object[]> list =null;
         StringBuffer query = new StringBuffer(1000);
@@ -350,10 +351,7 @@ try {
 					
                 	
                 	}
-                	/*if(instrumentHeaderList.size() > j) {
-                	billRegReport2.setPexNo(instrumentHeaderList.get(j).getTransactionNumber());
-                	billRegReport2.setPexNodate(instrumentHeaderList.get(j).getVoucherNumber());
-                	}*/
+                	
                 
      				
                 	}
@@ -397,8 +395,20 @@ try {
 
                 }
                 }*/
+             Boolean voucherPresent=true;
+             for (BillRegisterReportBean billRegisterReportBean : billRegReportList) {
+            	if(billRegisterReportBean.getVoucherNumber().equals(billRegReport.getVoucherNumber()))
+            		{
+            		voucherPresent=false;
+            			}
+			}
+                
 
+             if(voucherPresent) {
                 billRegReportList.add(billRegReport);
+             }
+             
+             
                 model.addAttribute("billRegReportList",billRegReportList);
             } catch (final Exception e) {
             	e.printStackTrace();
@@ -426,7 +436,7 @@ try {
         vouchermis.setDepartmentcode("");
          Long preVoucherId;
          boolean isCompleteBillRegisterReport = false;
-         List<BillRegisterReportBean> billRegReportList = new ArrayList<>()  ;
+         List<BillRegisterReportBean> billRegReportList = new CopyOnWriteArrayList<>()  ;
         SQLQuery querye =  null;
         List<Object[]> list =null;
         StringBuffer query = new StringBuffer(1000);
@@ -459,18 +469,21 @@ try {
 
                 billRegReport.setNetAmount(getnetAmount(Long.valueOf(object[2].toString()),billRegReport.getGrossAmount()));
                 
-                billRegReport.setDeductionAmount(billRegReport.getGrossAmount().subtract(billRegReport.getNetAmount()));
+                //billRegReport.setDeductionAmount(billRegReport.getGrossAmount().subtract(billRegReport.getNetAmount()));
               //  billRegReport.setStatus(null != object[5] ? object[5].toString().toUpperCase() : "");
               //  billRegReport.setBillDate(DDMMYYYYFORMATS.format((Date) object[6]));
                 billRegReport.setDepartmentCode(getDepartmentcode(object[1].toString()));
                 billRegReport.setBillDetailList(getbillDetails(Long.valueOf(object[2].toString()),billRegReport.getNetAmount()));
                 
                 List<Miscbilldetail> miscbilldetailList=getbillnum(billRegReport.getVoucherNumber());
-                List<InstrumentHeader> instrumentHeaderList=getPexNumber(Long.valueOf(object[2].toString()));
-                List<BillRegisterReportBean> billRegReportList2 = new ArrayList<>()  ;
+               // List<InstrumentHeader> instrumentHeaderList=getPexNumber(Long.valueOf(object[2].toString()));
                 
-                if(instrumentHeaderList!=null && !instrumentHeaderList.isEmpty() && miscbilldetailList!=null && !miscbilldetailList.isEmpty() ) {
-             for (int j = 0; j < miscbilldetailList.size(); j++) {
+                
+             for (Miscbilldetail miscbilldetail : miscbilldetailList) {
+				
+                	List<InstrumentHeader> instrumentHeaderList=getPexNumber(miscbilldetail.getId());
+                	
+                	for (InstrumentHeader instrumentHeader : instrumentHeaderList) {
                 
                 	BillRegisterReportBean billRegReport2 = new BillRegisterReportBean();
                 	
@@ -481,19 +494,21 @@ try {
                 	billRegReport2.setNetAmount(billRegReport.getNetAmount());
                 	billRegReport2.setBillDetailList(billRegReport.getBillDetailList());
                 	
-                	if(miscbilldetailList.get(j)!=null) {
-                	billRegReport2.setBillNumber(miscbilldetailList.get(j).getBillnumber());
-                	billRegReport2.setPaidAmount(miscbilldetailList.get(j).getPaidamount());
-                	}
-                	if(instrumentHeaderList.size() > j) {
-                	billRegReport2.setPexNo(instrumentHeaderList.get(j).getTransactionNumber());
-                	billRegReport2.setPexNodate(instrumentHeaderList.get(j).getVoucherNumber());
-                	}
+                    	billRegReport2.setBillNumber(miscbilldetail.getBillnumber());
+                    	billRegReport2.setPaidAmount(miscbilldetail.getPaidamount());
+                    	billRegReport2.setPexNo(instrumentHeader.getTransactionNumber());
+                    	billRegReport2.setPexNodate(instrumentHeader.getVoucherNumber());
+                		
                 	billRegReportList.add(billRegReport2);
      				
+                	
 				}
+                	
+                
+     				
                 }
-                if(miscbilldetailList.isEmpty())
+                
+              /*  if(miscbilldetailList.isEmpty())
                 {
                 	for (InstrumentHeader instrumentHeader : instrumentHeaderList) {
                     	 
@@ -531,9 +546,21 @@ try {
                 	billRegReportList.add(billRegReport2);
 
                 }
+                }*/
+             Boolean voucherPresent=true;
+             for (BillRegisterReportBean billRegisterReportBean : billRegReportList) {
+            	if(billRegisterReportBean.getVoucherNumber().equals(billRegReport.getVoucherNumber()))
+            		{
+            		voucherPresent=false;
                 }
+			}
+                
 
+             if(voucherPresent) {
                 billRegReportList.add(billRegReport);
+             }
+             
+             
                 model.addAttribute("billRegReportList",billRegReportList);
             } catch (final Exception e) {
             	e.printStackTrace();
@@ -887,8 +914,8 @@ try {
 	 	{
 	 		 LOGGER.debug("...........beforeotherDeductionAmount..Query........");
 	 		 
-	 query = this.persistenceService.getSession().createSQLQuery("select egb.voucherheaderid,sum(egb.creditamount)  from generalledger egb  where egb.glcode not in (select c.glcode from tds t2 inner join chartofaccounts c on t2.glcodeid =c.id where c.glcode in ('3502054','3502007','3502009','3502010','3502011','3502012','3502055','3502054','3502018','1408055','1405014','3502058','1402003','3401004'))\r\n" + 
-	 		" and egb.voucherheaderid =:voucherid and egb.creditamount >0 group by egb.voucherheaderid");
+	 query = this.persistenceService.getSession().createSQLQuery("select g.id,sum(g.creditamount) from generalledger g, tds t where	g.glcodeid = t.glcodeid	and g.voucherheaderid =:voucherid 	and g.creditamount > 0	and g.glcodeid not in (	select	id	from chartofaccounts c2 where	glcode in ('3502054','3502007',	'3502009','3502010','3502011','3502012','3502055','3502054','3502018','1408055','1405014','3502058','1402003','3401004')) group by g.id;\r\n" + 
+	 		"");
 	    query.setLong("voucherid", voucherid);
 	    rows = query.list();
 	   

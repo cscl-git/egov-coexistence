@@ -342,7 +342,7 @@ public class PaymentRefundController {
                         subledger.setDetailKeyId(gldetail.getDetailKeyId());
                         subledger.setAmount(gldetail.getAmount());
                         subledger.setFunctionDetail(temp.get("function") != null ? temp.get("function").toString() : "");
-                        if (gl.getDebitAmount() == null || gl.getDebitAmount() == 0) {
+                        if (gl.getDebitAmount() == null || gl.getDebitAmount().compareTo(BigDecimal.ZERO) == 0) {
                             subledger.setDebitAmount(BigDecimal.ZERO);
                             subledger.setCreditAmount(gldetail.getAmount());
                             crAmount = crAmount.add(gldetail.getAmount());
@@ -457,7 +457,7 @@ public class PaymentRefundController {
                         subledger.setDetailKeyId(gldetail.getDetailKeyId());
                         subledger.setAmount(gldetail.getAmount());
                         subledger.setFunctionDetail(temp.get("function") != null ? temp.get("function").toString() : "");
-                        if (gl.getDebitAmount() == null || gl.getDebitAmount() == 0) {
+                        if (gl.getDebitAmount() == null || gl.getDebitAmount().compareTo(BigDecimal.ZERO) == 0) {
                             subledger.setDebitAmount(BigDecimal.ZERO);
                             subledger.setCreditAmount(gldetail.getAmount());
                             crAmount = crAmount.add(gldetail.getAmount());
