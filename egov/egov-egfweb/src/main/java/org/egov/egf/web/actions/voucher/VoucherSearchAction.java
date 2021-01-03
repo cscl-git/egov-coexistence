@@ -58,6 +58,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -81,6 +82,7 @@ import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.microservice.models.BillDetail;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
@@ -393,6 +395,9 @@ public class VoucherSearchAction extends BaseFormAction {
 			
 			
 			System.out.println("fileter execution done");
+			
+			
+			
 			populateVoucherMap(filterlist);
 			System.out.println("populateVoucherMap execution done");
 			for (final CVoucherHeader voucherheader : filterlist) {
@@ -419,7 +424,8 @@ public class VoucherSearchAction extends BaseFormAction {
 				voucherMap.put("status", getVoucherStatus(voucherheader.getStatus()));
 				if(!(voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() != null)
 				{
-					voucherMap.put("pendingWith", this.getEmployeeName(voucherheader.getState().getOwnerPosition()));
+					System.out.println("pending with ::::"+voucherheader.getState().getOwnerPosition());
+					voucherMap.put("pendingWith", voucherheader.getState().getOwnerName());
 				}
 				else if((voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() == null)
 				{
@@ -494,7 +500,7 @@ public class VoucherSearchAction extends BaseFormAction {
 					voucherMap.put("status", getVoucherStatus(voucherheader.getStatus()));
 					if(!(voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() != null)
 					{
-						voucherMap.put("pendingWith", this.getEmployeeName(voucherheader.getState().getOwnerPosition()));
+						voucherMap.put("pendingWith", voucherheader.getState().getOwnerName());
 					}
 					else if((voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() == null)
 					{
@@ -614,7 +620,7 @@ public class VoucherSearchAction extends BaseFormAction {
 					{
 						try
 						{
-							paymentVoucherMap.put(ph.getVoucherheader().getId(),getEmployeeName(ph.getState().getOwnerPosition()));
+							paymentVoucherMap.put(ph.getVoucherheader().getId(),ph.getState().getOwnerName());
 						}catch (Exception e) {
 							e.printStackTrace();
 						}
@@ -826,6 +832,11 @@ public class VoucherSearchAction extends BaseFormAction {
 	public String getEmployeeName(Long empId){
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
+	
+	public List<EmployeeInfo> getEmployeeNameList(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null);
 	    }
 
 	public Map<Long, String> getPaymentVoucherMap() {

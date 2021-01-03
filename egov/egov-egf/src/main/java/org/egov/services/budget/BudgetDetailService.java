@@ -2287,7 +2287,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
                 budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(stateValue)
-                        .withDateInfo(new Date()).withOwner(wfInitiator.getPosition())
+                        .withDateInfo(new Date()).withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                         .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
             }
 
@@ -2295,7 +2295,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(" Approved").withDateInfo(new Date())
-                    .withOwner(pos);
+                    .withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
             budgetDetail.transition().end().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments()).withDateInfo(new Date());
             budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
@@ -2310,7 +2310,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             if (budgetDetail.getState() == null) {
                 budgetDetail.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(FinancialConstants.WORKFLOW_STATE_NEW)
-                        .withDateInfo(new Date()).withOwner(userAssignment.getPosition());
+                        .withDateInfo(new Date()).withOwner(userAssignment.getPosition()).withOwnerName((userAssignment.getPosition().getId() != null && userAssignment.getPosition().getId() > 0L) ? getEmployeeName(userAssignment.getPosition().getId()):"");
                 budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
                         FinancialConstants.WORKFLOW_STATE_NEW));
             }
@@ -2322,7 +2322,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 budgetDetail.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
                         .withStateValue(FinancialConstants.BUDGETDETAIL_CREATED_STATUS)
-                        .withDateInfo(new Date()).withOwner(pos);
+                        .withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
                 budgetDetail.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.BUDGETDETAIL,
                         FinancialConstants.BUDGETDETAIL_CREATED_STATUS));
             } else if (budgetDetail.getCurrentState().getNextAction() != null
@@ -2333,7 +2333,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
                         .withStateValue(FinancialConstants.BUDGETDETAIL_CREATED_STATUS)
-                        .withDateInfo(new Date()).withOwner(pos);
+                        .withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
         }
         return budgetDetail;
     }
@@ -2348,7 +2348,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
         budgetDetail.transition().progressWithStateCopy().withSenderName(user.getName())
                 .withStateValue(stateValue).withComments(comment)
-                .withDateInfo(currentDate.toDate()).withOwner(wfInitiator.getPosition())
+                .withDateInfo(currentDate.toDate()).withOwner(wfInitiator.getPosition()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                 .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
         applyAuditing(budgetDetail.getState());
         return budgetDetail;
@@ -2604,5 +2604,9 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
         return findAllBy("select bd from BudgetDetail bd where bd.status.code = 'REAPP MC'");
     }
 
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

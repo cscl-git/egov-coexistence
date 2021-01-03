@@ -81,11 +81,11 @@ public class CouncilMemberValidator implements Validator {
         CouncilMember member = (CouncilMember) target;
 
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "designation", "notempty.cncl.designation");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "qualification", "notempty.cncl.qualification");
+        //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "qualification", "notempty.cncl.qualification");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "name", "notempty.cncl.member.name");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "gender", "notempty.cncl.gender");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "mobileNumber", "notempty.cncl.mobileNumber");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "birthDate", "notempty.cncl.birthDate");
+        //ValidationUtils.rejectIfEmptyOrWhitespace(errors, "birthDate", "notempty.cncl.birthDate");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "emailId", "notempty.cncl.emailId");
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "residentialAddress", "notempty.cncl.residentialAddress");
 

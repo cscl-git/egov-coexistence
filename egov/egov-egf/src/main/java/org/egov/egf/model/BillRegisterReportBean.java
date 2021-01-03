@@ -88,6 +88,7 @@ public class BillRegisterReportBean {
     private String pexNodate;
     private List<ChartOfAccounts> chartOfAccounts;
     private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
+    private String budgetHead;
 
     public String getBillNumber() {
         return billNumber;
@@ -280,6 +281,14 @@ public class BillRegisterReportBean {
 
 	public void setBillDetailList(List<BillDetail> billDetailList) {
 		this.billDetailList = billDetailList;
+	}
+
+	public String getBudgetHead() {
+		return budgetHead;
+	}
+
+	public void setBudgetHead(String budgetHead) {
+		this.budgetHead = budgetHead;
 	}
 
 	

@@ -756,8 +756,8 @@ public class MicroserviceUtils {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
         empUrl.append("?tenantId=" + getTenentId());
-        List<EmployeeInfo> resultList=null;
-        if (empId != 0)
+        List<EmployeeInfo> resultList=new ArrayList<EmployeeInfo>();
+        if (empId != null && empId != 0)
             empUrl.append("&ids=" + empId);
         if (toDay != null)
             empUrl.append("&asOnDate=" + getEpochDate(toDay));
@@ -774,7 +774,7 @@ public class MicroserviceUtils {
         reqWrapper.setRequestInfo(requestInfo);
 
         EmployeeInfoResponse empResponse = restTemplate.postForObject(empUrl.toString(), reqWrapper, EmployeeInfoResponse.class);
-        	if(empResponse != null && empResponse.getEmployees() != null || !empResponse.getEmployees().isEmpty())
+        	if(empResponse != null && empResponse.getEmployees() != null && !empResponse.getEmployees().isEmpty())
             {
         		resultList=empResponse.getEmployees();
             }

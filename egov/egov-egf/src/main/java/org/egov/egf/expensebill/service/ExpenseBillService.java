@@ -174,6 +174,9 @@ public class ExpenseBillService {
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
     
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
+    
 
     @Autowired
     public ExpenseBillService(final ExpenseBillRepository expenseBillRepository, final ScriptService scriptExecutionService) {
@@ -534,7 +537,7 @@ public class ExpenseBillService {
             	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
@@ -603,7 +606,7 @@ public class ExpenseBillService {
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
-                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                     .withNextAction(wfmatrix.getNextAction())
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
 		        
@@ -620,7 +623,7 @@ public class ExpenseBillService {
 				{
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
             }
@@ -826,4 +829,8 @@ public class ExpenseBillService {
     	List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
     	return desgnList.get(0);
     }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

@@ -24,12 +24,12 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<label class="col-sm-3 control-label text-left-audit">From Date
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billFrom" path="billFrom" class="form-control datepicker" required="required" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+					<form:input id="billFrom" path="billFrom" class="form-control datepicker"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 				</div>
 				<label class="col-sm-3 control-label text-left-audit">To Date
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billTo" path="billTo" class="form-control datepicker" required="required" data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
+					<form:input id="billTo" path="billTo" class="form-control datepicker"  data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
 				</div>
 				
 				
@@ -74,17 +74,17 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
         <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  onclick="searchCheck()" value="Search"/>
         </div>
         
-          <div class="buttonbottom" align="center">
-        <input type="submit" id="export" class="btn btn-primary btn-wf-primary" name="export"  onclick="searchCheck()" value="Export"/>
-        </div>
+         
         
         <br>
         <br>
         <br>
         <div class="tab-pane fade in active" id="resultheader">
-        <h3> Search Result</h3>
+      
 	        <!-- <div class="panel panel-primary" data-collapsed="0">
 	        	<div style="padding: 0 15px;"> -->
+	        	 <c:if test="${billRegReportList != null &&  !billRegReportList.isEmpty()}">
+	        	   <h3> Search Result</h3>
 				<table class="table table-bordered" id="searchResult">
 					<thead>
 					<tr>
@@ -106,7 +106,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th>Status</th>
 					</tr>
 					</thead>
-`					 <c:if test="${billRegReportList != null &&  !billRegReportList.isEmpty()}">
+`					
 					<tbody>
 					<c:forEach items="${billRegReportList}" var="result" varStatus="status">
 						<tr>
@@ -122,7 +122,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 							${result.departmentCode }
 							</td>
 							<td>
-							${result.partyName }
+							${result.budgetHead }
 							</td>
 							<td>
 							${result.grossAmount }
@@ -260,21 +260,38 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						</tr>
 						</c:forEach>
 					<tbody>
-					</c:if>	
+					
 					<c:if test="${billRegReportList == null || billRegReportList.isEmpty()}">
 					No records found
 					</c:if>				
 				</table>
+				<div class="buttonbottom" align="center">
+        <input type="submit" id="export" class="btn btn-primary btn-wf-primary" name="export"  onclick="searchCheck()" value="Export"/>
+        </div>
+				</c:if>	
 				<!-- </div>
 			<br>
 			<br>
 	        </div> -->
         </div>
+         
     </div>
     
 </form:form>
 <script>
 	$('#search').click(function(e) {
+
+		if ($('form').valid()) {
+
+		} else {
+
+		e.preventDefault();
+
+	}  
+
+});
+
+	$('#export').click(function(e) {
 
 		if ($('form').valid()) {
 

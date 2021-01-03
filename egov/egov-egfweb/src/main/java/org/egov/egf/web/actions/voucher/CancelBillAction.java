@@ -374,7 +374,7 @@ public class CancelBillAction extends BaseFormAction {
 	                FinancialConstants.CONTINGENCYBILL_PENDING_CANCEL));
 		 egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
          .withComments("Send to Audit")
-         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos)
+         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
          .withNextAction("")
          .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
          .withCreatedBy(user.getId())
@@ -429,4 +429,9 @@ public class CancelBillAction extends BaseFormAction {
 		auditable.setLastModifiedBy(createdBy);
 		auditable.setLastModifiedDate(currentDate);
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 }

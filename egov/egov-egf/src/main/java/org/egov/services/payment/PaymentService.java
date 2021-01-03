@@ -438,7 +438,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(paymentheader.getState().getInitiatorPosition())
+                    .withOwner(paymentheader.getState().getInitiatorPosition()).withOwnerName((paymentheader.getState().getInitiatorPosition() != null && paymentheader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(paymentheader.getState().getInitiatorPosition()):"")
                     .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
         } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
 
@@ -467,7 +467,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         null, null, null, workflowBean.getCurrentState(), null);
                 paymentheader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
+                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
 
@@ -482,7 +482,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         null, null, null, paymentheader.getCurrentState().getValue(), null);
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
+                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -3329,6 +3329,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.debug("Completed createPaymentHeader.");
         return paymentheader;
     }
-    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
     
 }

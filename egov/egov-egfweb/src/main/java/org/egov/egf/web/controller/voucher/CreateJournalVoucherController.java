@@ -47,11 +47,14 @@
  */
 package org.egov.egf.web.controller.voucher;
 
+import org.apache.commons.collections4.MultiValuedMap;
+import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
 import org.egov.commons.Accountdetailkey;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
@@ -75,6 +78,7 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.instrument.InstrumentHeader;
@@ -149,6 +153,10 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     @Autowired
     @Qualifier("persistenceService")
     protected transient PersistenceService persistenceService;
+
+    
+    @Autowired
+    private EgovMasterDataCaching masterDataCache;
 
     public CreateJournalVoucherController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -282,18 +290,71 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         voucherHeader.setVoucherDate(new Date());
         Vouchermis vouchermis=new Vouchermis();
         vouchermis.setDepartmentcode("");
-         Long preVoucherId;
-         boolean isCompleteBillRegisterReport = false;
          List<BillRegisterReportBean> billRegReportList = new CopyOnWriteArrayList<>()  ;
         SQLQuery querye =  null;
         List<Object[]> list =null;
         StringBuffer query = new StringBuffer(1000);
         query=getQuery(voucherHeader);
-        List<Integer> cancelledChequeStatus = new ArrayList<Integer>();
         
         querye = this.persistenceService.getSession().createSQLQuery(query.toString());
         list=querye.list();
         
+    List<CFunction> functionlist= masterDataCache.get("egi-function");
+   // System.out.println(CFunction);
+    
+        
+        LOGGER.info("...........for getneamount..Query........");
+        SQLQuery netamountquery =  null;
+        List<Object[]> netamounlist =null;
+        netamountquery = this.persistenceService.getSession().createSQLQuery("select egb.id,egb.glcode,egb.creditamount,egb.voucherheaderid from generalledger egb");
+		 netamounlist = netamountquery.list();
+        
+		 LOGGER.info("...........ggetgrossAmount..Query........");
+		  SQLQuery grossAmountquery =  null;
+	        List<Object[]> grossAmountlist =null;
+	        grossAmountquery = this.persistenceService.getSession().createSQLQuery(" select egb.id,sum(egb.debitamount),egb.voucherheaderid from generalledger egb  where  debitamount > 0 group by id");
+ 		grossAmountlist = grossAmountquery.list();
+        
+ 		
+ 		
+ 		LOGGER.debug("...........billdetailsquery..Query........");
+ 		  SQLQuery billdetailsquery =  null;
+	        List<Object[]> billdetaillist =null;
+	        billdetailsquery = this.persistenceService.getSession().createSQLQuery("select egb.id, egb.glcode, egb.creditamount, egb.voucherheaderid from generalledger egb ");
+	        billdetaillist = billdetailsquery.list();
+	        
+	        LOGGER.info("...........billnumber..Query........");
+	 		  SQLQuery billnumberquery =  null;
+		        List<Object[]> billnumberlist =null;
+		        billnumberquery = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber,m.paidamount,m.payvhid,m.billvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v)");
+		        billnumberlist = billnumberquery.list();
+		        
+		  LOGGER.debug("...........partyname..Query........");      
+		  SQLQuery partynamequery =  null;
+	        List<Object[]> partynamelist =null;
+	        partynamequery = this.persistenceService.getSession().createSQLQuery("select v.id, a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey");
+	        partynamelist = partynamequery.list();     
+	        
+	        
+			  LOGGER.debug("...........pexnumber..Query........");      
+			  SQLQuery pexnumberquery =  null;
+		        List<Object[]> pexnumberlist =null;   
+		        pexnumberquery = this.persistenceService.getSession().createSQLQuery("select ei.id, ei.transactionnumber, ei.transactiondate, ei2.voucherheaderid from egf_instrumentheader ei, egf_instrumentvoucher ei2 where ei.id =ei2.instrumentheaderid and ei.id_status =2");
+		        pexnumberlist = pexnumberquery.list();
+		        
+		        LOGGER.debug("...........bvp..Query........");      
+				  SQLQuery bvpquery =  null;
+			        List<Object[]> bvplist =null;    
+			        bvpquery = this.persistenceService.getSession().createSQLQuery(" select v2.id,v2.vouchernumber from voucherheader v2");
+			        bvplist = bvpquery.list(); 
+			        
+			        LOGGER.debug("...........beforeotherDeductionAmount..Query........");
+			        SQLQuery otherDeductionAmountquery =  null;
+			        List<Object[]> otherDeductionAmountlist =null;
+			        otherDeductionAmountquery = this.persistenceService.getSession().createSQLQuery("select g.id, sum(g.creditamount), g.voucherheaderid from generalledger g, tds t where	g.glcodeid = t.glcodeid and g.creditamount > 0	and g.glcodeid not in (	select	id	from chartofaccounts c2 where	glcode in ('3502054','3502007',	'3502009','3502010','3502011','3502012','3502055','3502054','3502018','1408055','1405014','3502058','1402003','3401004')) group by g.id order by 1 desc ");
+			        otherDeductionAmountlist = otherDeductionAmountquery.list();        
+			        
+ 		
         //list = persistenceService.findAllBy(query.toString());
 		
         if (list.size() != 0) {
@@ -306,30 +367,28 @@ try {
 
                 final BillRegisterReportBean billRegReport = new BillRegisterReportBean();
                 billRegReport.setVoucherNumber(object[0] != null ? object[0].toString() : "");
-                billRegReport.setDeducVoucherNumber(getDeducVoucherNumber(billRegReport.getVoucherNumber()));
-                billRegReport.setDeducVhId(getDeducVoucId(billRegReport.getVoucherNumber()));
-                billRegReport.setVhId(getVoucId(billRegReport.getVoucherNumber()));
-                billRegReport.setPhId(getPayId(billRegReport.getVoucherNumber()));
-                
-
-               billRegReport.setPartyName(getPartyName(billRegReport.getVoucherNumber()));
-                billRegReport.setGrossAmount(getgrossAmount(Long.valueOf(object[2].toString())));
-                
-                billRegReport.setNetAmount(getnetAmount(Long.valueOf(object[2].toString()),billRegReport.getGrossAmount()));
-               
-                //billRegReport.setDeductionAmount(billRegReport.getGrossAmount().subtract(billRegReport.getNetAmount()));
+               billRegReport.setPartyName(getPartyName(Long.valueOf(object[2].toString()),partynamelist));
+                billRegReport.setGrossAmount(getgrossAmount(Long.valueOf(object[2].toString()),grossAmountlist));
+                billRegReport.setNetAmount(getnetAmount(Long.valueOf(object[2].toString()),billRegReport.getGrossAmount(),netamounlist,otherDeductionAmountlist));
               //  billRegReport.setStatus(null != object[5] ? object[5].toString().toUpperCase() : "");
-              //  billRegReport.setBillDate(DDMMYYYYFORMATS.format((Date) object[6]));
                 billRegReport.setDepartmentCode(getDepartmentcode(object[1].toString()));
-                billRegReport.setBillDetailList(getbillDetails(Long.valueOf(object[2].toString()),billRegReport.getNetAmount()));
-                
-                List<Miscbilldetail> miscbilldetailList=getbillnum(billRegReport.getVoucherNumber());
-               // List<InstrumentHeader> instrumentHeaderList=getPexNumber(Long.valueOf(object[2].toString()));
+                billRegReport.setBillDetailList(getbillDetails(Long.valueOf(object[2].toString()),billRegReport.getNetAmount(), billdetaillist, otherDeductionAmountlist));
               
+                for (CFunction function : functionlist) {
+					if(function !=null) {
+						if(function.getCode() !=null && function.getCode().equalsIgnoreCase(object[3] != null ? object[3].toString() : "")) {
+							
+							billRegReport.setBudgetHead(function.getName());
+						}
+					}
+				}
+             
+                
+                List<Miscbilldetail> miscbilldetailList=getbillnum(Long.valueOf(object[2].toString()),billnumberlist,bvplist);
                 
              for (Miscbilldetail miscbilldetail : miscbilldetailList) {
                 
-                	List<InstrumentHeader> instrumentHeaderList=getPexNumber(miscbilldetail.getId());
+                	List<InstrumentHeader> instrumentHeaderList=getPexNumber(miscbilldetail.getId(),pexnumberlist);
                 	
                 	for (InstrumentHeader instrumentHeader : instrumentHeaderList) {
 						
@@ -420,6 +479,7 @@ try {
         
        	 }
         }
+        System.out.println("------------------------------billRegReportListSize----"+billRegReportList.size());
         
         return JOURNALVOUCHER_SEARCH;
     }
@@ -434,18 +494,71 @@ try {
         voucherHeader.setVoucherDate(new Date());
         Vouchermis vouchermis=new Vouchermis();
         vouchermis.setDepartmentcode("");
-         Long preVoucherId;
-         boolean isCompleteBillRegisterReport = false;
          List<BillRegisterReportBean> billRegReportList = new CopyOnWriteArrayList<>()  ;
         SQLQuery querye =  null;
         List<Object[]> list =null;
         StringBuffer query = new StringBuffer(1000);
         query=getQuery(voucherHeader);
-        List<Integer> cancelledChequeStatus = new ArrayList<Integer>();
         
         querye = this.persistenceService.getSession().createSQLQuery(query.toString());
         list=querye.list();
         
+    List<CFunction> functionlist= masterDataCache.get("egi-function");
+   // System.out.println(CFunction);
+    
+        
+        LOGGER.debug("...........for getneamount..Query........");
+        SQLQuery netamountquery =  null;
+        List<Object[]> netamounlist =null;
+        netamountquery = this.persistenceService.getSession().createSQLQuery("select egb.id,egb.glcode,egb.creditamount,egb.voucherheaderid from generalledger egb");
+		 netamounlist = netamountquery.list();
+        
+		 LOGGER.debug("...........ggetgrossAmount..Query........");
+		  SQLQuery grossAmountquery =  null;
+	        List<Object[]> grossAmountlist =null;
+	        grossAmountquery = this.persistenceService.getSession().createSQLQuery(" select egb.id,sum(egb.debitamount),egb.voucherheaderid from generalledger egb  where  debitamount > 0 group by id");
+ 		grossAmountlist = grossAmountquery.list();
+        
+ 		
+ 		
+ 		LOGGER.debug("...........billdetailsquery..Query........");
+ 		  SQLQuery billdetailsquery =  null;
+	        List<Object[]> billdetaillist =null;
+	        billdetailsquery = this.persistenceService.getSession().createSQLQuery("select egb.id, egb.glcode, egb.creditamount, egb.voucherheaderid from generalledger egb ");
+	        billdetaillist = billdetailsquery.list();
+	        
+	        LOGGER.debug("...........billnumber..Query........");
+	 		  SQLQuery billnumberquery =  null;
+		        List<Object[]> billnumberlist =null;
+		        billnumberquery = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber,m.paidamount,m.payvhid,m.billvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v)");
+		        billnumberlist = billnumberquery.list();
+		        
+		  LOGGER.debug("...........partyname..Query........");      
+		  SQLQuery partynamequery =  null;
+	        List<Object[]> partynamelist =null;
+	        partynamequery = this.persistenceService.getSession().createSQLQuery("select v.id, a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey");
+	        partynamelist = partynamequery.list();     
+	        
+	        
+			  LOGGER.debug("...........pexnumber..Query........");      
+			  SQLQuery pexnumberquery =  null;
+		        List<Object[]> pexnumberlist =null;   
+		        pexnumberquery = this.persistenceService.getSession().createSQLQuery("select ei.id, ei.transactionnumber, ei.transactiondate, ei2.voucherheaderid from egf_instrumentheader ei, egf_instrumentvoucher ei2 where ei.id =ei2.instrumentheaderid and ei.id_status =2");
+		        pexnumberlist = pexnumberquery.list();
+		        
+		        LOGGER.debug("...........bvp..Query........");      
+				  SQLQuery bvpquery =  null;
+			        List<Object[]> bvplist =null;    
+			        bvpquery = this.persistenceService.getSession().createSQLQuery(" select v2.id,v2.vouchernumber from voucherheader v2");
+			        bvplist = bvpquery.list(); 
+			        
+			        LOGGER.debug("...........beforeotherDeductionAmount..Query........");
+			        SQLQuery otherDeductionAmountquery =  null;
+			        List<Object[]> otherDeductionAmountlist =null;
+			        otherDeductionAmountquery = this.persistenceService.getSession().createSQLQuery("select g.id, sum(g.creditamount), g.voucherheaderid from generalledger g, tds t where	g.glcodeid = t.glcodeid and g.creditamount > 0	and g.glcodeid not in (	select	id	from chartofaccounts c2 where	glcode in ('3502054','3502007',	'3502009','3502010','3502011','3502012','3502055','3502054','3502018','1408055','1405014','3502058','1402003','3401004')) group by g.id order by 1 desc ");
+			        otherDeductionAmountlist = otherDeductionAmountquery.list();        
+			        
+ 		
         //list = persistenceService.findAllBy(query.toString());
 		
         if (list.size() != 0) {
@@ -458,30 +571,29 @@ try {
 
                 final BillRegisterReportBean billRegReport = new BillRegisterReportBean();
                 billRegReport.setVoucherNumber(object[0] != null ? object[0].toString() : "");
-                billRegReport.setDeducVoucherNumber(getDeducVoucherNumber(billRegReport.getVoucherNumber()));
-                billRegReport.setDeducVhId(getDeducVoucId(billRegReport.getVoucherNumber()));
-                billRegReport.setVhId(getVoucId(billRegReport.getVoucherNumber()));
-                billRegReport.setPhId(getPayId(billRegReport.getVoucherNumber()));
-                
-                
-               billRegReport.setPartyName(getPartyName(billRegReport.getVoucherNumber()));
-                billRegReport.setGrossAmount(getgrossAmount(Long.valueOf(object[2].toString())));
-
-                billRegReport.setNetAmount(getnetAmount(Long.valueOf(object[2].toString()),billRegReport.getGrossAmount()));
-                
-                //billRegReport.setDeductionAmount(billRegReport.getGrossAmount().subtract(billRegReport.getNetAmount()));
+               billRegReport.setPartyName(getPartyName(Long.valueOf(object[2].toString()),partynamelist));
+                billRegReport.setGrossAmount(getgrossAmount(Long.valueOf(object[2].toString()),grossAmountlist));
+                billRegReport.setNetAmount(getnetAmount(Long.valueOf(object[2].toString()),billRegReport.getGrossAmount(),netamounlist,otherDeductionAmountlist));
               //  billRegReport.setStatus(null != object[5] ? object[5].toString().toUpperCase() : "");
-              //  billRegReport.setBillDate(DDMMYYYYFORMATS.format((Date) object[6]));
                 billRegReport.setDepartmentCode(getDepartmentcode(object[1].toString()));
-                billRegReport.setBillDetailList(getbillDetails(Long.valueOf(object[2].toString()),billRegReport.getNetAmount()));
+                billRegReport.setBillDetailList(getbillDetails(Long.valueOf(object[2].toString()),billRegReport.getNetAmount(), billdetaillist, otherDeductionAmountlist));
                 
-                List<Miscbilldetail> miscbilldetailList=getbillnum(billRegReport.getVoucherNumber());
-               // List<InstrumentHeader> instrumentHeaderList=getPexNumber(Long.valueOf(object[2].toString()));
+                for (CFunction function : functionlist) {
+					if(function !=null) {
+						if(function.getCode() !=null && function.getCode().equalsIgnoreCase(object[3] != null ? object[3].toString() : "")) {
+							
+							billRegReport.setBudgetHead(function.getName());
+						}
+						
+					}
+				}
+             
                 
+                List<Miscbilldetail> miscbilldetailList=getbillnum(Long.valueOf(object[2].toString()),billnumberlist,bvplist);
                 
              for (Miscbilldetail miscbilldetail : miscbilldetailList) {
 				
-                	List<InstrumentHeader> instrumentHeaderList=getPexNumber(miscbilldetail.getId());
+                	List<InstrumentHeader> instrumentHeaderList=getPexNumber(miscbilldetail.getId(),pexnumberlist);
                 	
                 	for (InstrumentHeader instrumentHeader : instrumentHeaderList) {
                 
@@ -572,7 +684,7 @@ try {
         
        	 }
         }
-        
+        System.out.println("------------------------------billRegReportListSize----"+billRegReportList.size());
         return JOURNALVOUCHER_SEARCH;
     }
     
@@ -635,7 +747,7 @@ try {
         final StringBuffer query = new StringBuffer(500);
 
         query.append(
-                " select  vh.vouchernumber, mis.departmentcode, vh.id as voucherid")
+                " select  vh.vouchernumber, mis.departmentcode, vh.id as voucherid, mis.functionid")
                 .
         		append(" from   voucherheader vh,vouchermis mis ")
                 .
@@ -652,8 +764,7 @@ try {
 
             // query to get bills for voucher is not created
             
-            query.append(
-            		 " select  vh.vouchernumber, mis.departmentcode, vh.id as voucherid")
+            query.append(" select  vh.vouchernumber, mis.departmentcode, vh.id as voucherid, mis.functionid")
             		.
     		append(" from   voucherheader vh,vouchermis mis ")
             		.
@@ -669,23 +780,32 @@ try {
  
  
  
- private List<InstrumentHeader> getPexNumber(Long deducVhId) {
- 	SQLQuery query =  null;
- 	List<Object[]> rows = null;
+ private List<InstrumentHeader> getPexNumber(Long voucherheaderid,List<Object[]> rows) {
  	String deducvh="";
  	
  	List<InstrumentHeader> instrumentHeaderList=new ArrayList<>();
  	
  	try
  	{
- 		 query = this.persistenceService.getSession().createSQLQuery("select ei.id,ei.transactionnumber,ei.transactiondate from egf_instrumentheader ei where ei.id_status =2 and ei.id in (select ei2.instrumentheaderid from egf_instrumentvoucher ei2  where ei2.voucherheaderid =:deducVhId)");
- 	    query.setLong("deducVhId", deducVhId);
- 	    rows = query.list();
+ 	    
+ 	   MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
  	    
  	    if(rows != null && !rows.isEmpty())
  	    {
  	    	for(Object[] element : rows)
  	    	{
+ 	    		if(element[3] !=null)
+ 	    		{
+ 	    			generalLedger.put(Long.valueOf(null != element[3] ? element[3].toString(): "0"), element);
+ 	    		}
+ 	    		
+ 	    	}
+ 	    	
+ 	    	
+ 	    	 List<Object[]> list = (List<Object[]>) generalLedger.get(voucherheaderid);
+	 	    	
+ 	    	 for (Object[] element : list) {
+
  	    		InstrumentHeader instrumentHeader=new InstrumentHeader();
  	    		if(element[1] !=null)
  	    		{
@@ -709,7 +829,6 @@ try {
  	    		}
  	    		
  	    		instrumentHeaderList.add(instrumentHeader);
- 	    		
  	    	}
  	    	
  	    	
@@ -721,28 +840,42 @@ try {
  }
 
  
- private BigDecimal getnetAmount( Long voucherheaderid,BigDecimal grossamt) {
-	 SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+ private BigDecimal getnetAmount( Long voucherheaderid,BigDecimal grossamt,List<Object[]> rows, List<Object[]> otherDeductionAmtrows) {
+	// SQLQuery query =  null;
+	// 	List<Object[]> rows = null;
 	 	String deducvh="";
 	 	
 	 	 BigDecimal totaltax=	BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
 	 	 BigDecimal netamount=	BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
 	 	 BigDecimal otherDeductionAmount=	BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
 	 	 
-	 	 
 	 	try
 	 	{
-	 		LOGGER.debug("...........g..Query........");
-	 		 query = this.persistenceService.getSession().createSQLQuery("select egb.id,egb.glcode,egb.creditamount from generalledger egb  where egb.voucherheaderid =:voucherheaderid");
-	 	    query.setLong("voucherheaderid", voucherheaderid);
-	 	    rows = query.list();
+	 	   MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
 	 	    
 	 	    if(rows != null && !rows.isEmpty())
 	 	    {
 	 	    	for(Object[] element : rows)
 	 	    	{
+	 	    		
+	 	    		
+	 	    		if(element[0] !=null)
+	 	    		{
+	 	    			
+	 	    		}
+	 	    		if(element[3] !=null)
+	 	    		{
+	 	    			generalLedger.put(Long.valueOf(null != element[3] ? element[3].toString(): "0"), element);
+	 	    			
+	 	    		}
+	 	    	}
+	 	    	
+	 	    	 List<Object[]> list = (List<Object[]>) generalLedger.get(voucherheaderid);
+	 	    	
+	 	    	 for (Object[] element : list) {
+	 	    		 
 	 	    		BillDetail billDetail=new BillDetail();
+	 	    		 
 	 	    		if(element[0] !=null)
 	 	    		{
 	 	    			billDetail.setId(null != element[0] ? element[0].toString(): "");
@@ -752,25 +885,29 @@ try {
 	 	    			billDetail.setConsumerCode(null != element[1] ? element[1].toString() : "");
 	 	    			
 	 	    			if(!billDetail.getConsumerCode().equalsIgnoreCase("")) {
-	 	    				if(billDetail.getConsumerCode().equals("3502007")||billDetail.getConsumerCode().equals("3502009")||
+	 	    				if(
+	 	    						/*tax codes*/
+	 	    						billDetail.getConsumerCode().equals("3502007")||billDetail.getConsumerCode().equals("3502009")||
 	 	    						billDetail.getConsumerCode().equals("3502010")||billDetail.getConsumerCode().equals("3502011")||
-	 	    						billDetail.getConsumerCode().equals("3502012")) {
+	 	    						billDetail.getConsumerCode().equals("3502012") ||
+	 	    						/*other glcodes*/
+	 	    						billDetail.getConsumerCode().equals("3502055")||billDetail.getConsumerCode().equals("3502054")||
+	 	    						billDetail.getConsumerCode().equals("3502018")||billDetail.getConsumerCode().equals("1408055")||
+	 	    						billDetail.getConsumerCode().equals("1405014")||billDetail.getConsumerCode().equals("3502058")||billDetail.getConsumerCode().equals("1402003")||
+	 	    						billDetail.getConsumerCode().equals("3401004")
+	 	    						) {
 	 	    					
 	 	    					totaltax =totaltax.add(null != element[2] ? new BigDecimal(element[2].toString()).setScale(2,BigDecimal.ROUND_HALF_EVEN)
 	 	                        : BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN));
 	 	    					billDetail.setConsumerType("Tax");
 	 	    					
 	 	    				}
-	 	    				
 	 	    			}
-	 	    			
-	 	    			
-	 	    			
 	 	    			
 	 	    		}
 	 	    	}
 	 	    	
-	 	    	otherDeductionAmount=otherdeductionAmt(voucherheaderid);
+	 	    	otherDeductionAmount=otherdeductionAmt(voucherheaderid,otherDeductionAmtrows);
 	 	    	totaltax=totaltax.add(otherDeductionAmount);
 	 	    	
 	 	    	netamount=grossamt.subtract(totaltax);
@@ -781,34 +918,38 @@ try {
  }
 
  
- private BigDecimal getgrossAmount( Long voucherheaderid) {
-	 SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+ private BigDecimal getgrossAmount( Long voucherheaderid,List<Object[]> rows) {
+	// SQLQuery query =  null;
 	 	String deducvh="";
 	 	
 	 	 BigDecimal grossamt=	BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
 	 	try
 	 	{
-	 		LOGGER.debug("...........ggetgrossAmount..Query........");
-	 		 query = this.persistenceService.getSession().createSQLQuery(" select egb.id,sum(egb.debitamount) from generalledger egb  where egb.voucherheaderid = :voucherheaderid and debitamount > 0 group by id;\r\n" + 
-	 		 		"");
-	 	    query.setLong("voucherheaderid", voucherheaderid);
-	 	    rows = query.list();
+	 		 MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
 	 	    
 	 	    if(rows != null && !rows.isEmpty())
 	 	    {
 	 	    	for(Object[] element : rows)
 	 	    	{
+	 	    		if(element[2] !=null)
+	 	    		{
+	 	    			generalLedger.put(Long.valueOf(null != element[2] ? element[2].toString(): "0"), element);
+	 	    		}
 	 	    		
+	 	    			}
+	 	    		}
+	 	    		
+	 	    
+	 	   List<Object[]> list = (List<Object[]>) generalLedger.get(voucherheaderid);
+	    	
+	    	 for (Object[] element : list) {
 	 	    		if(element[1] !=null)
 	 	    		{
 	 	    			grossamt =null != element[1] ? new BigDecimal(element[1].toString()).setScale(2,BigDecimal.ROUND_HALF_EVEN)
 	 	                        : BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
-	 	    					
 	 	    				}
 	 	    			}
 	 	    			
-	 	    		}
 	 	    	
 	 	}catch(Exception e) {e.printStackTrace();}
 	 	
@@ -816,9 +957,7 @@ try {
  }
  
  
- private List<BillDetail> getbillDetails(Long billid,BigDecimal netAmount) {
-	 	SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+ private List<BillDetail> getbillDetails(Long billid,BigDecimal netAmount,List<Object[]> rows, List<Object[]> otherDedictionAmtrows) {
 	 	String deducvh="";
 	 	List<ChartOfAccounts> ChartOfAccountsList=new ArrayList<>();
 	 	ChartOfAccounts ChartOfAccounts=new ChartOfAccounts();
@@ -828,15 +967,20 @@ try {
 	 BigDecimal totaltax=	BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
 	 	try
 	 	{
-	 		LOGGER.debug("...........g..Query........");
-	 		 query = this.persistenceService.getSession().createSQLQuery("select egb.id,egb.glcode,egb.creditamount from generalledger egb  where egb.voucherheaderid =:billid");
-	 	    query.setLong("billid", billid);
-	 	    rows = query.list();
 	 	    
 	 	    if(rows != null && !rows.isEmpty())
 	 	    {
+	 	    	MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
 	 	    	for(Object[] element : rows)
 	 	    	{
+	 	    		if(element[3] !=null)
+	 	    		{
+	 	    			generalLedger.put(Long.valueOf(null != element[3] ? element[3].toString(): "0"), element);
+	 	    		}
+	 	    	}
+	 	    	
+	 	    	 List<Object[]> list = (List<Object[]>) generalLedger.get(billid);
+	 	    	 for (Object[] element : list) {
 	 	    		BillDetail billDetail=new BillDetail();
 	 	    		if(element[0] !=null)
 	 	    		{
@@ -875,7 +1019,7 @@ try {
 	 	    						billDetail.getConsumerCode().equals("3401004"))) {
 	 	    					
 	 	    					 LOGGER.debug("...........beforeotherDeductionAmount........");
-	 	    					billDetail.setAmountPaid(otherdeductionAmt(billid));
+		 	    					billDetail.setAmountPaid(otherdeductionAmt(billid,otherDedictionAmtrows));
 	 	    					billDetail.setConsumerType("AnyOtherDeduction");
 	 	    				}
 	 	    				else {
@@ -892,7 +1036,6 @@ try {
 	 	    	
 	 	    		
 	 	    		billDetailList.add(billDetail);
-	 	    		
  	    	}
  	    }
 	 	    
@@ -906,29 +1049,39 @@ try {
 		    return billDetailList;
 	 }
 
- private BigDecimal otherdeductionAmt(Long voucherid) {
-	 SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+ private BigDecimal otherdeductionAmt(Long voucherheaderid,List<Object[]> rows) {
+	 
 	 	 BigDecimal totaltax=	BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
 	 	try
 	 	{
-	 		 LOGGER.debug("...........beforeotherDeductionAmount..Query........");
 	 		 
-	 query = this.persistenceService.getSession().createSQLQuery("select g.id,sum(g.creditamount) from generalledger g, tds t where	g.glcodeid = t.glcodeid	and g.voucherheaderid =:voucherid 	and g.creditamount > 0	and g.glcodeid not in (	select	id	from chartofaccounts c2 where	glcode in ('3502054','3502007',	'3502009','3502010','3502011','3502012','3502055','3502054','3502018','1408055','1405014','3502058','1402003','3401004')) group by g.id;\r\n" + 
-	 		"");
-	    query.setLong("voucherid", voucherid);
-	    rows = query.list();
 	   
+	  MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
 	    if(rows != null && !rows.isEmpty())
 	    {
 	    	for(Object[] element : rows)
 	    	{
+	    		if(element[2] !=null)
+ 	    		{
+ 	    			generalLedger.put(Long.valueOf(null != element[2] ? element[2].toString(): "0"), element);
+ 	    		}
+	    		
+	    	}
+	    	
+	    	
+	    	List<Object[]> list = (List<Object[]>) generalLedger.get(voucherheaderid);
+ 	    	
+	    	 for (Object[] element : list) {
+
 	    		if(element[1] !=null)
  	    		{
 	    			totaltax=null != element[1] ? new BigDecimal(element[1].toString()).setScale(2,BigDecimal.ROUND_HALF_EVEN)
  	                        : BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN);
  	    		}
 	    	}
+	    	
+	    	
+	    	
 	    }
 	    
 	 	}
@@ -968,28 +1121,32 @@ try {
 	    return deducvh;
  }
 
-	private List<Miscbilldetail>   getbillnum(String voucherNumber) {
-	 	SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+	private List<Miscbilldetail> getbillnum(Long voucherheaderid,List<Object[]> rows,List<Object[]> bpvrows) {
 	 	String deducvh="";
 	 	
 		List<Miscbilldetail> miscbilldetailList=new ArrayList<>();
-	
-	 	
 	 	try
 	 	{
-	 		 query = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber,m.paidamount,m.payvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v where v.vouchernumber =:vouchernumber)");
-	 	    query.setString("vouchernumber", voucherNumber);
-	 	    rows = query.list();
-	 	    
 	 	    if(rows != null && !rows.isEmpty())
 	 	    {
+	 	    	 MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
 	 	    	for(Object[] element : rows)
 	 	    	{
+	 	    		if(element[4] !=null)
+	 	    		{
+	 	    			generalLedger.put(Long.valueOf(null != element[4] ? element[4].toString(): "0"), element);
+	 	    		}
+	 	    	}
+	 	    	
+	 	    	
+	 	    	List<Object[]> list = (List<Object[]>) generalLedger.get(voucherheaderid);
+	 	    	
+	 	    	 for (Object[] element : list) {
+	 	    		 
 	 	    		Miscbilldetail miscbilldetail=new Miscbilldetail();
 	 	    		if(element[3] !=null)
 	 	    		{
-	 	    			deducvh= getBPVNumber(element[3].toString());
+	 	    			deducvh= getBPVNumber(element[3].toString(),bpvrows);
 	 	    			miscbilldetail.setBillnumber(deducvh);
 	 	    			miscbilldetail.setId(Long.valueOf(element[3].toString()));
 	 	    		}
@@ -1009,9 +1166,10 @@ try {
 	 	    		}
 	 	    		
 	 	    		miscbilldetailList.add(miscbilldetail);
+	 	    	 }
+	 	    	
 	 	    		
 	 	    	}
-	 	    }
 	 	}catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -1019,9 +1177,7 @@ try {
 	 }	
 	
 	
-	private String  getBPVNumber(String voucherNumber) {
-	 	SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+	private String  getBPVNumber(String voucherNumber,List<Object[]> rows) {
 	 	String deducvh="";
 	 	Long pavhid=0L;
 	 	if(voucherNumber.equals(""))
@@ -1032,34 +1188,36 @@ try {
 	 		pavhid=Long.valueOf(voucherNumber);
 	 		}
 	 	
-		List<Miscbilldetail> miscbilldetailList=new ArrayList<>();
-	
-	 	
 	 	try
 	 	{
-	 		 query = this.persistenceService.getSession().createSQLQuery(" select v2.id,v2.vouchernumber from voucherheader v2 where v2.id =:pavhid");
-	 	    query.setLong("pavhid", pavhid);
-	 	    rows = query.list();
+	 	   
+	 	   MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>(); 	    
 	 	    
 	 	    if(rows != null && !rows.isEmpty())
 	 	    {
 	 	    	for(Object[] element : rows)
 	 	    	{
-	 	    		//Miscbilldetail miscbilldetail=new Miscbilldetail();
+	 	    		if(element[0] !=null)
+	 	    		{
+	 	    			generalLedger.put(Long.valueOf(null != element[0] ? element[0].toString(): "0"), element);
+	 	    		}
+	 	    	}
+	 	    	
+	 	    	List<Object[]> list = (List<Object[]>) generalLedger.get(pavhid);
+	 	    	
+	 	    	 for (Object[] element : list) {
+	 	    		 
 	 	    		if(element[1] !=null)
 	 	    		{
 	 	    			deducvh= element[1].toString();
-	 	    			//miscbilldetail.setBillnumber(deducvh);
 	 	    		}
 	 	    		else
 	 	    		{
 	 	    			deducvh= "";
 	 	    		}
 	 	    		
+	 	    	 }
 	 	    		
-	 	    		//miscbilldetailList.add(miscbilldetail);
-	 	    		
-	 	    	}
 	 	    }
 	 	}catch (Exception e) {
 				e.printStackTrace();
@@ -1069,40 +1227,47 @@ try {
 	
 	
 	
-	private String getPartyName(String vouchernumber) {
-	 	SQLQuery query =  null;
-	 	List<Object[]> rows = null;
+	private String getPartyName(Long voucherheaderid,List<Object[]> rows) {
 	 	String deducvh="";
 	 	Long deailskey=0L;
 	 	
 	 	try
 	 	{
-	 		 query = this.persistenceService.getSession().createSQLQuery(" select actd.id,actd.detailname from accountdetailkey actd where actd.detailkey in (select glt.detailkeyid from generalledgerdetail glt where glt.generalledgerid in (select gl.id from generalledger gl where gl.voucherheaderid in (select v.id from voucherheader v where v.vouchernumber =:vouchernumber)))\r\n" + 
-	 		 		"");
-	 	    query.setString("vouchernumber", vouchernumber);
-	 	    rows = query.list();
-	 	    
 	 	    if(rows != null && !rows.isEmpty())
 	 	    {
+	 	    	 MultiValuedMap<Long,Object[]> generalLedger = new ArrayListValuedHashMap<>();
+	 	    	  
 	 	    	for(Object[] element : rows)
 	 	    	{
-	 	    		if(element[1] !=null)
+	 	    		if(element[0] !=null)
 	 	    		{
-	 	    			deducvh= element[1].toString();
-	 	    		}
-	 	    		else
-	 	    		{
-	 	    			deducvh= "";
+	 	    			generalLedger.put(Long.valueOf(null != element[0] ? element[0].toString(): "0"), element);
 	 	    		}
 	 	    		
 	 	    	}
-	 	    }
-	 	}catch (Exception e) {
-				e.printStackTrace();
-			}
-		    return deducvh;
-	 }	
 	
+	
+	 	   	List<Object[]> list = (List<Object[]>) generalLedger.get(voucherheaderid);
+ 	    
+	    	 for (Object[] element : list) {
+	    		 if(element[1] !=null)
+ 	    {
+	 	    			deducvh= element[1].toString();
+ 	    		}
+ 	    		else
+ 	    		{
+	 	    			deducvh= "";
+ 	    		}
+ 	    		
+ 	    	}
+	 	    	
+ 	    }
+ 	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+ }
+
 	
 	private Long getVoucId(String voucherNumber) {
  	SQLQuery query =  null;
@@ -1135,155 +1300,8 @@ try {
 	    return deducvh;
  }
 
-	private Long getDeducVoucId(String voucherNumber) {
- 	SQLQuery query =  null;
- 	List<Object[]> rows = null;
- 	Long deducvh=0L;
- 	try
- 	{
- 		 query = this.persistenceService.getSession().createSQLQuery("select dvm.ph_id,(select vouchernumber from voucherheader v where v.id=dvm.ph_id) from deduc_voucher_mpng dvm where dvm.vh_id in (select vh.id from voucherheader vh where vh.vouchernumber=:vouchernumber)");
- 	    query.setString("vouchernumber", voucherNumber);
- 	    rows = query.list();
  	    
- 	    if(rows != null && !rows.isEmpty())
- 	    {
- 	    	for(Object[] element : rows)
- 	    	{
- 	    		if(element[0] !=null)
- 	    		{
- 	    			deducvh= Long.parseLong(element[0].toString());
- 	    		}
- 	    		else
- 	    		{
- 	    			deducvh= 0L;
- 	    		}
- 	    		
- 	    	}
- 	    }
- 	}catch (Exception e) {
-			e.printStackTrace();
-		}
-	    return deducvh;
- }
-
-	private String getDeducVoucherNumber(String voucherNumber) {
- 	SQLQuery query =  null;
- 	List<Object[]> rows = null;
- 	String deducvh="";
- 	try
- 	{
- 		 query = this.persistenceService.getSession().createSQLQuery("select dvm.id,(select vouchernumber from voucherheader v where v.id=dvm.ph_id) from deduc_voucher_mpng dvm where dvm.vh_id in (select vh.id from voucherheader vh where vh.vouchernumber=:vouchernumber)");
- 	    query.setString("vouchernumber", voucherNumber);
- 	    rows = query.list();
- 	    
- 	    if(rows != null && !rows.isEmpty())
- 	    {
- 	    	for(Object[] element : rows)
- 	    	{
- 	    		if(element[1] !=null)
- 	    		{
- 	    			deducvh= element[1].toString();
- 	    		}
- 	    		else
- 	    		{
- 	    			deducvh= "";
- 	    		}
- 	    		
- 	    	}
- 	    }
- 	}catch (Exception e) {
-			e.printStackTrace();
-		}
-	    return deducvh;
- }
-
-	/*
-  * Get remittance payment detail for the voucher Below lines to get the cheque and cheque date for the voucher /* In case
-  * where for single payment multiple cheque are assigned we use chqdelimitSP / single slash separate cheque nos In case where
-  * for a voucher multiple BPVs are issued and for the BPVs different cheques are issued we seperate them with chqdelimitDP //
-  * double slash
-  */
- private void getRemittancePaymentDetail(final BillRegisterReportBean billRegReport) {
 	 
-	 StringBuffer getRemiitPaymentVoucherQry = new StringBuffer("");
-	 List<Integer> cancelledChequeStatus = new ArrayList<Integer>();
-	 List<String> chequeStatusCheckList = new ArrayList<String>();
-	   chequeStatusCheckList.add(FinancialConstants.INSTRUMENT_DISHONORED_STATUS);
-       chequeStatusCheckList.add(FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS);
-       chequeStatusCheckList.add(FinancialConstants.INSTRUMENT_SURRENDERED_STATUS);
-       chequeStatusCheckList.add(FinancialConstants.INSTRUMENT_CANCELLED_STATUS);
-	 
-	  getRemiitPaymentVoucherQry.append("select  distinct rm from EgRemittance rm join rm.egRemittanceDetail rdtl  " +
-              "where rdtl.egRemittanceGldtl.generalledgerdetail.generalLedgerId.voucherHeaderId.voucherNumber =?" +
-              "and rdtl.egRemittanceGldtl.generalledgerdetail.generalLedgerId.voucherHeaderId.status!=?" +
-              " and rm.voucherheader.status!=?")
-              .append(" order by rm.voucherheader.id");
-	  
-	  final Query query = persistenceService.getSession().createQuery("select status.id from EgwStatus status where " +
-              "status.description in (:surrenderedList) and status.moduletype='Instrument'");
-      query.setParameterList("surrenderedList", chequeStatusCheckList);
-      cancelledChequeStatus = query.list();
-	 
-     if (LOGGER.isDebugEnabled())
-         LOGGER.debug("...........Getting Remitance Payment details........");
-     List<EgRemittance> remittancePaymentItem = new ArrayList<EgRemittance>();
-     final StringBuffer remmitPaymentVoucherNumber = new StringBuffer("");
-
-     StringBuffer remittanceChequeNoAndDate = new StringBuffer("");
-     Long paymentVhId = null;
-     List<InstrumentVoucher> instrumentVoucherList = new ArrayList<InstrumentVoucher>();
-
-     if (billRegReport.getVoucherNumber() != null) {
-
-         remittancePaymentItem = persistenceService.findAllBy(getRemiitPaymentVoucherQry.toString()
-                 , billRegReport.getVoucherNumber(), FinancialConstants.CANCELLEDVOUCHERSTATUS,
-                 FinancialConstants.CANCELLEDVOUCHERSTATUS);
-
-         if (remittancePaymentItem.size() > 0) {
-             paymentVhId = remittancePaymentItem.get(0).getVoucherheader().getId();
-             remittanceChequeNoAndDate = new StringBuffer("");
-             for (int i = 0; i < remittancePaymentItem.size(); i++) {
-
-                 // if(remittancePaymentItem.get(i).getVoucherheader().getStatus())
-                 remmitPaymentVoucherNumber.append(remittancePaymentItem.get(i).getVoucherheader().getVoucherNumber() + "|");
-                 final Query qry = persistenceService.getSession().createQuery(
-                         "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
-                         " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
-                 qry.setLong("vhId", remittancePaymentItem.get(i).getVoucherheader().getId());
-                 qry.setParameterList("cancelledChequeList", cancelledChequeStatus);
-                 instrumentVoucherList = qry.list();
-
-                 if (instrumentVoucherList.size() > 0)
-                     for (final InstrumentVoucher inst : instrumentVoucherList)
-                         if (!StringUtils.isEmpty(remittanceChequeNoAndDate.toString())) {
-                             if (paymentVhId != null && paymentVhId.equals(inst.getVoucherHeaderId().getId()))
-                                 remittanceChequeNoAndDate
-                                 .append(chqdelimitSP)
-                                 .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                 .append(" ")
-                                 .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ? DDMMYYYYFORMATS
-                                         .format(inst.getInstrumentHeaderId().getInstrumentDate()) : "");
-                             else
-                                 remittanceChequeNoAndDate
-                                 .append(chqdelimitDP)
-                                 .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                 .append(" ")
-                                 .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ? DDMMYYYYFORMATS
-                                         .format(inst.getInstrumentHeaderId().getInstrumentDate()) : "");
-                         } else
-                             remittanceChequeNoAndDate
-                             .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                             .append(" ")
-                             .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ? DDMMYYYYFORMATS
-                                     .format(inst.getInstrumentHeaderId().getInstrumentDate()) : "");
-                 paymentVhId = remittancePaymentItem.get(i).getVoucherheader().getId();
-             }
-         }
-         billRegReport.setRemittanceVoucherNumber(remmitPaymentVoucherNumber.length() > 0 ? remmitPaymentVoucherNumber
-                 .substring(0, remmitPaymentVoucherNumber.length() - 1) : " ");
-         billRegReport.setRemittanceChequeNumberAndDate(remittanceChequeNoAndDate.toString());
-     }
- } 
  
     private String getMessageByStatus(final CVoucherHeader voucherHeader, final String approverName, final String nextDesign,
             final String workFlowAction) {
