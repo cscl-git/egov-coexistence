@@ -86,11 +86,10 @@
 			</div>
 			<div class="form-group">
 				<label class="col-sm-2 control-label text-right"><spring:message
-						code="lbl.qualification" /> <span class="mandatory"></span></label>
+						code="lbl.qualification" /> <!-- <span class="mandatory"></span> --></label>
 				<div class="col-sm-3 add-margin">
 					<form:select path="qualification" id="qualification"
-						cssClass="form-control" required="required"
-						cssErrorClass="form-control error">
+						cssClass="form-control"	cssErrorClass="form-control error">
 						<form:option value="">
 							<spring:message code="lbl.select" />
 						</form:option>
@@ -147,11 +146,10 @@
 					<form:errors path="mobileNumber" cssClass="error-msg" />
 				</div>
 				<label class="col-sm-2 control-label text-right"><spring:message
-						code="lbl.birthdate" /> <span class="mandatory"></span> </label>
+						code="lbl.birthdate" /><!--  <span class="mandatory"></span> --> </label>
 				<div class="col-sm-3 add-margin">
 					<form:input type="text" cssClass="form-control datepicker"
-						path="birthDate" id="birthDate" data-date-end-date="-18y"
-						required="required" />
+						path="birthDate" id="birthDate" data-date-end-date="-18y"/>
 					<form:errors path="birthDate" cssClass="error-msg" />
 				</div>
 			</div>

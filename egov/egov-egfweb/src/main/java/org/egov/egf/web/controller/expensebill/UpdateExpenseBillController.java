@@ -454,7 +454,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     	audit.setPassUnderobjection(0);
     	audit.transition().start().withSenderName(user.getUsername() + STRING + user.getName())
         .withComments(INITIATED_PRE_AUDIT)
-        .withStateValue(CREATED).withDateInfo(new Date()).withOwner(owenrPos)
+        .withStateValue(CREATED).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
         .withNextAction(PRE_AUDIT_PENDING)
         .withNatureOfTask(PRE_AUDIT)
         .withCreatedBy(user.getId())
@@ -583,4 +583,10 @@ public class UpdateExpenseBillController extends BaseBillController {
     	}
 		return empName;
 	}
+    
+    public String getEmployeeName(Long empId){
+        
+        return microServiceUtil.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
+ 	
 }

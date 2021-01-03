@@ -297,7 +297,7 @@ public class JournalVoucherActionHelper {
             voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(voucherHeader.getState().getInitiatorPosition())
+                    .withOwner(voucherHeader.getState().getInitiatorPosition()).withOwnerName((voucherHeader.getState().getInitiatorPosition() != null && voucherHeader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(voucherHeader.getState().getInitiatorPosition()):"")
                     .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
 
         } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -330,7 +330,7 @@ public class JournalVoucherActionHelper {
                         .withComments(workflowBean.getApproverComments())
                        // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
-                        .withOwner(workflowBean.getApproverPositionId())
+                        .withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
                         //.withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
@@ -359,7 +359,7 @@ public class JournalVoucherActionHelper {
                         .withComments(workflowBean.getApproverComments())
                         //.withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
-                        .withOwner(owner)
+                        .withOwner(owner).withOwnerName((owner != null && owner > 0L) ? getEmployeeName(owner):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -607,4 +607,9 @@ public class JournalVoucherActionHelper {
             LOGGER.debug("Posted to Ledger " + voucherHeader.getId());
         return voucherHeader;
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

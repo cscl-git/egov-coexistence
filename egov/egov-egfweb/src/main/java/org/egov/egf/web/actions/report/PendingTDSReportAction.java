@@ -1010,7 +1010,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 			note="Note: The responsibility for work done & GST No. lies with concerned Division.";
 			jasper="TDSOnGST";
 		}
-		else if(recoveryCode.equals("3502007") || recoveryCode.equals("3502009") || recoveryCode.equals("3502010") || recoveryCode.equals("3502013"))
+		else if(recoveryCode.equals("3502007") || recoveryCode.equals("3502009") || recoveryCode.equals("3502010") || recoveryCode.equals("3502013") )
 		{
 			heading="Detail of Income Tax for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
 			note="Note: The responsibility for work done & PAN No. lies with concerned Division.";

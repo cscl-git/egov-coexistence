@@ -80,6 +80,7 @@ import org.egov.eis.service.PositionMasterService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -98,7 +99,6 @@ import org.egov.model.voucher.CommonBean;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.pims.commons.Position;
-import org.egov.services.deduction.DeducVoucherMpngRepository;
 import org.egov.services.payment.MiscbilldetailService;
 import org.egov.services.payment.PaymentService;
 import org.egov.utils.FinancialConstants;
@@ -155,6 +155,9 @@ public class PaymentActionHelper {
     private ExpenseBillService expenseBillService;
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
+    
+	@Autowired
+	protected MicroserviceUtils microserviceUtils;
     
     //@Autowired
 	//private DeducVoucherMpngRepository deducVoucherMpngRepository;
@@ -491,7 +494,7 @@ public class PaymentActionHelper {
             } else {
                 final String stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
-                        .withStateValue(stateValue).withDateInfo(currentDate.toDate())
+                        .withStateValue(stateValue).withDateInfo(currentDate.toDate()).withOwnerName((wfInitiator.getPosition().getId() != null && wfInitiator.getPosition().getId() > 0L) ? getEmployeeName(wfInitiator.getPosition().getId()):"")
                         .withOwner(wfInitiator.getPosition()).withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
             }
 
@@ -512,7 +515,7 @@ public class PaymentActionHelper {
                         null, null, workflowBean.getCurrentState(), null);
                 paymentheader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             } else if (paymentheader.getCurrentState().getNextAction().equalsIgnoreCase("END"))
                 paymentheader.transition().end().withSenderName(user.getName())
@@ -522,7 +525,7 @@ public class PaymentActionHelper {
                 final WorkFlowMatrix wfmatrix = paymentHeaderWorkflowService.getWfMatrix(paymentheader.getStateType(), null,
                         null, null, paymentheader.getCurrentState().getValue(), null);
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName()).withComments(workflowBean.getApproverComments())
-                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos)
+                        .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -671,4 +674,9 @@ public class PaymentActionHelper {
         miscbilldetailService.persist(miscbillDetail);
 
     }
+    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }
