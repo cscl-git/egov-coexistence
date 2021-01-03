@@ -330,8 +330,11 @@ public class PaymentActionHelper {
         		for(Miscbilldetail row : miscBillList)
         		{
         			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
-        			 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
-            		 expenseBillService.create(expenseBill);
+        			 if(expenseBill != null)
+        			 {
+        				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+                		 expenseBillService.create(expenseBill);
+        			 }
         		}
         	}
         }
