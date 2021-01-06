@@ -128,20 +128,26 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class CouncilMeetingController {
 
     private static final String REDIRECT_COUNCILMEETING_RESULT = "redirect:/councilmeeting/result/";
+    private static final String REDIRECT_COUNCILNOTICE_RESULT = "redirect:/councilmeeting/resultNotice/";
     private static final String MEETING_NUMBER_AUTO = "MEETING_NUMBER_AUTO";
     private static final String APPLICATION_RTF = "application/rtf";
     private static final String DATA = "{ \"data\":";
     private static final int BUFFER_SIZE = 4096;
     private static final String MSG_ATTENDANCE_ALREADY_FINALIZD = "msg.attendance.already.finalizd";
     private static final String COUNCIL_MEETING = "councilMeeting";
+    private static final String COUNCIL_NOTICE = "councilNotice";
     private static final String MESSAGE = "message";
     private static final String COUNCILMEETING_NEW = "councilmeeting-new";
+    private static final String COUNCILNOTICE_NEW = "councilNotice-new";
     private static final String COMMONERRORPAGE = "common-error-page";
     private static final String COUNCILMEETING_RESULT = "councilmeeting-result";
+    private static final String COUNCILNOTICE_RESULT = "councilnotice-result";
     private static final String COUNCILMEETING_EDIT = "councilmeeting-edit";
     private static final String COUNCILMEETING_VIEW = "councilmeeting-view";
+    private static final String COUNCILNOTICE_VIEW = "councilnotice-view";
     private static final String COUNCILMEETING_SEARCH = "councilmeeting-search";
     private static final String COUNCIL_MEETING_AGENDA_SEARCH = "councilmeetingAgenda-search";
+    private static final String COUNCIL_MEETING_NOTICE_SEARCH = "councilmeetingNotice-search";
     private static final String COUNCILMEETING_ATTENDANCE_SEARCH = "councilmeeting-attendsearch";
     private static final String COUNCILMEETING_ATTENDANCE_VIEW = "councilmeeting-attendsearch-view";
     private static final String COUNCILMEETING_SEND_SMS_EMAIL = "councilmeetingsearch-tosendsms-email";
@@ -230,6 +236,34 @@ public class CouncilMeetingController {
 
     }
 
+	/* to create new Notice without approval */
+    @RequestMapping(value = "/newNotice/{id}", method = RequestMethod.GET)
+    public String newFormNotice(@ModelAttribute final CouncilMeeting councilMeeting, @PathVariable("id") final Long id,
+                          final Model model) {
+
+        CouncilAgenda councilAgenda = councilAgendaService.findOne(id);
+        model.addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
+        model.addAttribute(COUNCIL_NOTICE, councilMeeting);
+        if (councilAgenda != null && AGENDAUSEDINMEETING.equals(councilAgenda.getStatus().getCode())) {
+            model.addAttribute(MESSAGE, "msg.agenda.exist");
+            return COMMONERRORPAGE;
+        } else if (councilAgenda != null && councilAgenda.getCommitteeType() != null
+                && councilAgenda.getCommitteeType().getCommiteemembers().isEmpty()) {
+            model.addAttribute("errormessage", messageSource.getMessage("msg.committee.members.notadded",
+                    new String[] { councilAgenda.getCommitteeType().getName() }, null));
+            return COMMONERRORPAGE;
+        } else if (councilAgenda != null) {
+            councilMeeting.setCommitteeType(councilAgenda.getCommitteeType());
+            buildMeetingMomByUsingAgendaDetails(councilMeeting, councilAgenda);
+            return COUNCILNOTICE_NEW;
+
+        } else {
+            model.addAttribute(MESSAGE, "msg.invalid.agenda.details");
+            return COMMONERRORPAGE;
+        }
+
+    }
+
     private void buildMeetingMomByUsingAgendaDetails(final CouncilMeeting councilMeeting, CouncilAgenda councilAgenda) {
         Long itemNumber = Long.valueOf(1);
         for (CouncilAgendaDetails councilAgendaDetail : councilAgenda.getAgendaDetails()) {
@@ -244,6 +278,75 @@ public class CouncilMeetingController {
         }
     }
 
+    @RequestMapping(value = "/createNotice", method = RequestMethod.POST)
+    public String createNotice(@Valid @ModelAttribute final CouncilMeeting councilMeeting, final BindingResult errors,
+    					@RequestParam final MultipartFile attachments,
+                         final Model model, final RedirectAttributes redirectAttrs, final HttpServletRequest request) {
+
+        validateCouncilMeeting(councilMeeting, errors);
+        if (errors.hasErrors()) {
+            model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
+            model.addAttribute(COUNCIL_NOTICE, councilMeeting);
+            return COUNCILNOTICE_NEW;
+        }
+        
+        if (attachments != null && attachments.getSize() > 0) {
+            try {
+            	councilMeeting.setFilestoreid(fileStoreService.store(
+                        attachments.getInputStream(),
+                        attachments.getOriginalFilename(),
+                        attachments.getContentType(),
+                        CouncilConstants.MODULE_NAME));
+            } catch (IOException e) {
+                LOGGER.error("Error in loading documents" + e.getMessage(), e);
+            }
+        }
+        
+        if (councilMeeting.getStatus() == null)
+            councilMeeting.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(COUNCILMEETING, APPROVED));
+        if (isAutoMeetingNoGenEnabled()) {
+            CouncilMeetingNumberGenerator meetingNumberGenerator = autonumberServiceBeanResolver
+                    .getAutoNumberServiceFor(CouncilMeetingNumberGenerator.class);
+            councilMeeting.setMeetingNumber(meetingNumberGenerator.getNextNumber(councilMeeting));
+        }
+        for (MeetingMOM meetingMom : councilMeeting.getMeetingMOMs()) {
+            meetingMom.setMeeting(councilMeeting);
+            meetingMom.getAgenda()
+                    .setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(AGENDA_MODULENAME, AGENDAUSEDINMEETING));
+        }
+
+        councilMeetingService.create(councilMeeting);
+        
+        try {
+        	councilSmsAndEmailService.sendSms(councilMeeting, null);
+        }catch(Exception e) {
+        	LOGGER.error("Unable to send SMS to for meeting number "+councilMeeting.getMeetingNumber());
+        }
+        try {
+        	//Sent mail with of uploaded Meeting document
+            if(null != councilMeeting.getFilestoreid()) {
+            	Path file = fileStoreService.fetchAsPath(councilMeeting.getFilestoreid().getFileStoreId(), CouncilConstants.MODULE_NAME);
+        		try {
+    				byte[] data = Files.readAllBytes(file);
+    				String fileType = isBlank(councilMeeting.getFilestoreid().getContentType()) ? Files.probeContentType(file)
+                            : councilMeeting.getFilestoreid().getContentType();
+            		String fileName = councilMeeting.getFilestoreid().getFileName();
+            		councilSmsAndEmailService.sendEmail(councilMeeting, null, data,fileType, fileName);
+    			} catch (IOException e) {
+    				LOGGER.error("Error in sending email",e);
+    			}
+            }else {
+            	councilSmsAndEmailService.sendEmail(councilMeeting, null,councilReportService.generatePDFForAgendaDetails(councilMeeting));
+            }
+        }catch(Exception e) {
+        	LOGGER.error("Unable to send EMAIL of meeting number "+councilMeeting.getMeetingNumber());
+        }
+        
+        redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilNotice.success", null, null));
+        return REDIRECT_COUNCILNOTICE_RESULT + councilMeeting.getId();
+    }
+    
+    
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute final CouncilMeeting councilMeeting, final BindingResult errors,
     					@RequestParam final MultipartFile attachments,
@@ -311,6 +414,7 @@ public class CouncilMeetingController {
         redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilMeeting.success", null, null));
         return REDIRECT_COUNCILMEETING_RESULT + councilMeeting.getId();
     }
+
 
     private void validateCouncilMeeting(final CouncilMeeting councilMeeting, BindingResult errors) {
         ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingDate", "notempty.meeting.meetingDate");
@@ -385,6 +489,15 @@ public class CouncilMeetingController {
         return COUNCILMEETING_VIEW;
     }
 
+    @RequestMapping(value = "/viewNotice/{id}", method = RequestMethod.GET)
+    public String viewNotice(@PathVariable("id") final Long id, Model model) {
+        CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+        updateDepartment(councilMeeting);
+        councilMeetingService.sortMeetingMomByItemNumber(councilMeeting);
+        model.addAttribute(COUNCIL_NOTICE, councilMeeting);
+        return COUNCILNOTICE_VIEW;
+    }
+
     @RequestMapping(value = "/result/{id}", method = RequestMethod.GET)
     public String result(@PathVariable("id") final Long id, Model model) {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
@@ -392,6 +505,15 @@ public class CouncilMeetingController {
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
         model.addAttribute("commiteemembelist", councilMeeting.getCommitteeType().getCommiteemembers());
         return COUNCILMEETING_RESULT;
+    }
+    
+    @RequestMapping(value = "/resultNotice/{id}", method = RequestMethod.GET)
+    public String resultNotice(@PathVariable("id") final Long id, Model model) {
+        CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
+        updateDepartment(councilMeeting);
+        model.addAttribute(COUNCIL_MEETING, councilMeeting);
+        model.addAttribute("commiteemembelist", councilMeeting.getCommitteeType().getCommiteemembers());
+        return COUNCILNOTICE_RESULT;
     }
 
     @RequestMapping(value = "/search/{mode}", method = RequestMethod.POST)
@@ -406,6 +528,13 @@ public class CouncilMeetingController {
     public String searchagenda(@PathVariable("mode") final String mode, Model model) {
         model.addAttribute("councilAgenda", new CouncilAgenda());
         return COUNCIL_MEETING_AGENDA_SEARCH;
+
+    }
+    
+    @RequestMapping(value = "/noticesearch/{mode}", method = RequestMethod.POST)
+    public String searchnotice(@PathVariable("mode") final String mode, Model model) {
+        model.addAttribute("councilNotice", new CouncilAgenda());
+        return COUNCIL_MEETING_NOTICE_SEARCH;
 
     }
 

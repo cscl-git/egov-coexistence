@@ -335,6 +335,18 @@ public class CouncilAgendaController {
                 .append("}").toString();
     }
     
+    @RequestMapping(value = "/searchagenda-tocreatenotice", method = RequestMethod.POST, produces = MediaType.TEXT_PLAIN_VALUE)
+    @ResponseBody
+    public String searchAgendaToCreateNotice(Model model,
+            @ModelAttribute final CouncilAgenda councilAgenda) {
+        List<CouncilAgenda> searchResultList = councilAgendaService
+                .search(councilAgenda);
+        return new StringBuilder(DATA)
+                .append(toJSON(searchResultList, CouncilAgenda.class,
+                        CouncilAgendaJsonAdaptor.class))
+                .append("}").toString();
+    }
+    
     public Boolean isAutoAgendaNoGenEnabled() {
         return councilPreambleService.autoGenerationModeEnabled(
                 CouncilConstants.MODULE_FULLNAME, AGENDA_NUMBER_AUTO);
