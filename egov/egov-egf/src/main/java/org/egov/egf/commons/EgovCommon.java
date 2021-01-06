@@ -689,19 +689,8 @@ public class EgovCommon {
 
             final CChartOfAccounts coa = (CChartOfAccounts) persistenceService.find(
                     "from CChartOfAccounts where id=?", Long.valueOf(glcodeid));
-            LOGGER.info(" glcodeid  :::"+glcodeid);
-            try
-            {
-            	bankBalance = BigDecimal.valueOf(Double.parseDouble((getPersistenceService().findAllBy(
-                        opBalncQuery2.toString(), coa)).get(0).toString()));
-            }catch (Exception e) {
-				LOGGER.info("error in query ::: "+e.getMessage());
-				e.printStackTrace();
-			}
-            
-			/*
-			 * list = getPersistenceService().findAllBy( opBalncQuery2.toString(), coa);
-			 */
+            list = getPersistenceService().findAllBy(
+                    opBalncQuery2.toString(), coa);
             LOGGER.info("query fetch 1");
             bankBalance = BigDecimal.valueOf(Double.parseDouble(list.get(0).toString()));
             LOGGER.info(" bankBalance 1 ::::"+bankBalance);
