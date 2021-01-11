@@ -108,6 +108,14 @@
 								<spring:message code="msg.no.attach.found" />
 							</c:otherwise>
 						</c:choose>
+					</div>
+				</div>
+				<div class="row add-border">
+					<div class="col-xs-3 add-margin">
+						<spring:message code="lbl.committeetype" />
+					</div>
+					<div class="col-sm-3 add-margin view-content">
+						${councilMeeting.committeeType.name}</div>
 				</div>
 			</div>
 		</div>
@@ -150,7 +158,7 @@
 			</div>
 		</div>
 
-		<div class="panel panel-primary" data-collapsed="0">
+		<%-- <div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
 				<div class="panel-title">
 					<spring:message code="lbl.agenda.details" />
@@ -163,8 +171,8 @@
 							<th align="center"><spring:message code="lbl.serial.no" /></th>
 							<th width="40%"><spring:message code="lbl.department" /></th>
 							<th width="40%"><spring:message code="lbl.agenda.number" /></th>
-							<%-- <th width="9%"><spring:message code="lbl.preamble.number" /></th> --%>
-							<%-- <th><spring:message code="lbl.gistofpreamble" /></th> --%>
+							<th width="9%"><spring:message code="lbl.preamble.number" /></th>
+							<th><spring:message code="lbl.gistofpreamble" /></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -176,9 +184,9 @@
 										<td class="text-center">${mom.itemNumber}</td>
 										<td><c:out value="${mom.preamble.departmentName}" /></td>
 										<td class="text-center"><c:out value="${mom.agenda.agendaNumber}" /></td>
-										<%-- <td><c:out value="${mom.preamble.preambleNumber}" /></td> --%>
-										<%-- <td><span class="more"><c:out
-													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td> --%>
+										<td><c:out value="${mom.preamble.preambleNumber}" /></td>
+										<td><span class="more"><c:out
+													value="${mom.preamble.gistOfPreamble}" escapeXml="false"/></span></td>
 									</tr>
 								</c:forEach>
 							</c:when>
@@ -191,7 +199,7 @@
 					</tbody>
 				</table>
 			</div>
-		</div>
+		</div> --%>
 	</div>
 </div>
 

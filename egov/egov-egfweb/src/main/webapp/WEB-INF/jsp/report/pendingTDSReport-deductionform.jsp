@@ -56,6 +56,58 @@ function resetPage(){
 }
 </script>
 </head>
+<script>
+var callback = {
+		success: function(o){
+			document.getElementById('results').innerHTML=o.responseText;
+			//clearWaitingImage();
+			undoLoadingMask();
+			},
+			failure: function(o) {
+}
+		}
+function getDeductionData(){
+	var fromDate=document.getElementById("fromDate").value;
+	var asOnDate =  document.getElementById('asOnDate').value;
+	var department =  document.getElementById('department').value;
+	var fund =  document.getElementById('fund').value;
+	var recovery =  document.getElementById('recovery').value;
+
+	isValid = validateDeductionData();
+	if(isValid == false)
+		return false;
+	var url = '/services/EGF/report/pendingTDSReport-ajaxLoadDeductionData.action?skipPrepare=true&asOnDate='+asOnDate+'&department.code='+
+							department+'&fund.id='+fund+'&recovery.id='+recovery+'&fromDate='+fromDate;
+	YAHOO.util.Connect.asyncRequest('POST', url, callback, null);
+	//loadWaitingImage();
+	doLoadingMask();
+}
+
+function exportDeductionXls(){
+	var fromDate=document.getElementById("fromDate").value;
+	var asOnDate =  document.getElementById('asOnDate').value;
+	var department =  document.getElementById('department').value;
+	var fund =  document.getElementById('fund').value;
+	var recovery =  document.getElementById('recovery').value;
+	window.open('/services/EGF/report/pendingTDSReport-exportDeductionXls.action?skipPrepare=true&asOnDate='+asOnDate+'&department.code='+department+'&fund.id='+fund+
+	'&recovery.id='+recovery+'&fromDate='+fromDate,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+}
+
+function exportPdf(){
+	var asOnDate =  document.getElementById('asOnDate').value;
+	var department =  document.getElementById('department').value;
+	var fund =  document.getElementById('fund').value;
+	var recovery =  document.getElementById('recovery').value;
+	var detailKey =  document.getElementById('detailKey').value;
+	var partyName =  document.getElementById('partyName').value;
+	window.open('/services/EGF/report/pendingTDSReport-exportSummaryPdf.action?skipPrepare=true&asOnDate='+asOnDate+'&department.code='+department+'&fund.id='+
+	fund+'&recovery.id='+recovery+'&detailKey='+detailKey+'&partyName='+partyName,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+}
+function hideIncludeRemittance(){
+	document.getElementById('showRemittedEntries').style.display = "none";
+	document.getElementById('showRemittedEntrieslabel').style.display = "none";
+}
+</script>
 <div class="formmainbox">
 	<div class="formheading"></div>
 	<div class="subheadnew">Deduction report</div>

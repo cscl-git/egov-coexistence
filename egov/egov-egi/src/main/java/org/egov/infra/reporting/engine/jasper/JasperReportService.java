@@ -161,7 +161,8 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
                     reportInput.getReportParams(), dataSource);
             LOGGER.info("Jasper fillReport end->"+reportInput.getReportTemplate());
             return new ReportOutput(exportReport(reportInput, jasperPrint), reportInput);
-        } catch (JRException | IOException e) {
+        } catch (Exception e) {
+        	System.out.println("Error 1");
             e.printStackTrace();
             throw new ApplicationRuntimeException(EXCEPTION_IN_REPORT_CREATION, e);
         }
@@ -204,6 +205,7 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             System.out.println("export");
             return reportOutputStream.toByteArray();
         } catch (Exception e) {
+        	System.out.println("Error 2");
             e.printStackTrace();
             throw new ApplicationRuntimeException(EXCEPTION_IN_REPORT_CREATION, e);
         }

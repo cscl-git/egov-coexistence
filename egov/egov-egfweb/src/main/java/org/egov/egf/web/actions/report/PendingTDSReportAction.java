@@ -49,9 +49,12 @@ package org.egov.egf.web.actions.report;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +62,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -870,26 +878,97 @@ public class PendingTDSReportAction extends BaseFormAction {
             }
         }
         System.out.println("4");
-        paramMap.put("labourCessDataSource",getDataSource(reportList));
-        ReportRequest reportInput = null;
-        ReportOutput reportOutput = null;
+        System.out.println("report list size ::: "+reportList.size());
         System.out.println("5");
-        try
-        {
-        	reportInput = new ReportRequest(jasperName, reportList, paramMap);
-            reportInput.setReportFormat(ReportFormat.XLS);
-            reportOutput = reportService.createReport(reportInput);
-            System.out.println("end of report:::"+reportOutput.getReportOutputData().length);
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-            System.out.println("inputStream ::::"+inputStream);
+		try {
+			byte[] fileContent=populateExcel(reportList,paramMap);
+			inputStream = new ByteArrayInputStream(fileContent);
+				            
         }catch (Exception e) {
+        	System.out.println("ERROR2 ::: "+e.getMessage());
 			e.printStackTrace();
 		}
         System.out.println("END");
         return "deductionXLS";
     }
 
-    private String getPexNo(String billVoucherNo) {
+    private byte[] populateExcel(List<DeductionReportBean> reportList, Map<String, Object> paramMap) throws IOException {
+    	String jasper=(String)paramMap.get("jasper");
+    	String heading=(String)paramMap.get("heading");
+    	String note=(String)paramMap.get("note");
+    	
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(jasper);
+		HSSFRow row = sheet.createRow(1);
+		HSSFCell cell;
+		cell = row.createCell(0);
+		cell.setCellValue(heading);
+		HSSFRow rowhead = sheet.createRow(5);
+		if(jasper.equalsIgnoreCase("LaborCess"))
+		{
+			
+		}
+		else if(jasper.equalsIgnoreCase("WaterCharges"))
+		{
+			
+		}
+		else if(jasper.equalsIgnoreCase("TDSOnGST"))
+		{
+			
+		}
+		else if(jasper.equalsIgnoreCase("CollectionCharges"))
+		{
+			
+		}
+		else if(jasper.equalsIgnoreCase("IncomeTax"))
+		{
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("PAN no. of Agency");
+		    rowhead.createCell(8).setCellValue("Work Done");
+		    rowhead.createCell(9).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getPanNoOfAgency());
+		    	details.createCell(8).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(9).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(8).setCellValue("Total");
+		    details.createCell(9).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
+		}
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		System.out.println("XYZ");
+		wb.write(os);
+		System.out.println("UVW");
+		byte[] fileContent = os.toByteArray();
+		System.out.println("CCCC");
+
+		return fileContent;
+	}
+
+	private String getPexNo(String billVoucherNo) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	String pexNo="";
@@ -1178,7 +1257,55 @@ public class PendingTDSReportAction extends BaseFormAction {
     private static JRBeanCollectionDataSource getDataSource(List<DeductionReportBean> reportList) {
         return new JRBeanCollectionDataSource(reportList); 
     }
-    
+    public static void main(String[]args)   
+    {  
+    try   
+    {  
+    //declare file name to be create   
+    String filename = "/home/rajatp932/Documents/dee/abc.xls";  
+    //creating an instance of HSSFWorkbook class  
+    HSSFWorkbook workbook = new HSSFWorkbook();  
+    //invoking creatSheet() method and passing the name of the sheet to be created   
+    HSSFSheet sheet = workbook.createSheet("January");   
+    //creating the 0th row using the createRow() method  
+    HSSFRow rowhead = sheet.createRow((short)0);  
+    //creating cell by using the createCell() method and setting the values to the cell by using the setCellValue() method  
+    rowhead.createCell(0).setCellValue("S.No.");  
+    rowhead.createCell(1).setCellValue("Customer Name");  
+    rowhead.createCell(2).setCellValue("Account Number");  
+    rowhead.createCell(3).setCellValue("e-mail");  
+    rowhead.createCell(4).setCellValue("Balance");  
+    //creating the 1st row  
+    HSSFRow row = sheet.createRow((short)1);  
+    //inserting data in the first row  
+    row.createCell(0).setCellValue("1");  
+    row.createCell(1).setCellValue("John William");  
+    row.createCell(2).setCellValue("9999999");  
+    row.createCell(3).setCellValue("william.john@gmail.com");  
+    row.createCell(4).setCellValue("700000.00");  
+    row.createCell(10).setCellValue("testing");  
+    //creating the 2nd row  
+    HSSFRow row1 = sheet.createRow((short)2);  
+    //inserting data in the second row  
+    row1.createCell(0).setCellValue("2");  
+    row1.createCell(1).setCellValue("Mathew Parker");  
+    row1.createCell(2).setCellValue("22222222");  
+    row1.createCell(3).setCellValue("parker.mathew@gmail.com");  
+    row1.createCell(4).setCellValue("200000.00");  
+    FileOutputStream fileOut = new FileOutputStream(filename);  
+    workbook.write(fileOut);  
+    //closing the Stream  
+    fileOut.close();  
+    //closing the workbook  
+    //workbook.close();  
+    //prints the message on the console  
+    System.out.println("Excel file has been generated successfully.");  
+    }   
+    catch (Exception e)   
+    {  
+    e.printStackTrace();  
+    }  
+    }  
     
 
 }

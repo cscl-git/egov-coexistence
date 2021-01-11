@@ -237,31 +237,11 @@ public class CouncilMeetingController {
     }
 
 	/* to create new Notice without approval */
-    @RequestMapping(value = "/newNotice/{id}", method = RequestMethod.GET)
-    public String newFormNotice(@ModelAttribute final CouncilMeeting councilMeeting, @PathVariable("id") final Long id,
-                          final Model model) {
-
-        CouncilAgenda councilAgenda = councilAgendaService.findOne(id);
+    @RequestMapping(value = "/newNotice", method = RequestMethod.POST)
+    public String newFormNotice(@ModelAttribute final CouncilMeeting councilMeeting, final Model model) {
         model.addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
         model.addAttribute(COUNCIL_NOTICE, councilMeeting);
-        if (councilAgenda != null && AGENDAUSEDINMEETING.equals(councilAgenda.getStatus().getCode())) {
-            model.addAttribute(MESSAGE, "msg.agenda.exist");
-            return COMMONERRORPAGE;
-        } else if (councilAgenda != null && councilAgenda.getCommitteeType() != null
-                && councilAgenda.getCommitteeType().getCommiteemembers().isEmpty()) {
-            model.addAttribute("errormessage", messageSource.getMessage("msg.committee.members.notadded",
-                    new String[] { councilAgenda.getCommitteeType().getName() }, null));
-            return COMMONERRORPAGE;
-        } else if (councilAgenda != null) {
-            councilMeeting.setCommitteeType(councilAgenda.getCommitteeType());
-            buildMeetingMomByUsingAgendaDetails(councilMeeting, councilAgenda);
             return COUNCILNOTICE_NEW;
-
-        } else {
-            model.addAttribute(MESSAGE, "msg.invalid.agenda.details");
-            return COMMONERRORPAGE;
-        }
-
     }
 
     private void buildMeetingMomByUsingAgendaDetails(final CouncilMeeting councilMeeting, CouncilAgenda councilAgenda) {
@@ -286,7 +266,7 @@ public class CouncilMeetingController {
         validateCouncilMeeting(councilMeeting, errors);
         if (errors.hasErrors()) {
             model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
-            model.addAttribute(COUNCIL_NOTICE, councilMeeting);
+            model.addAttribute(COUNCIL_MEETING, councilMeeting);
             return COUNCILNOTICE_NEW;
         }
         

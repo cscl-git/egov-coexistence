@@ -16,6 +16,7 @@ import org.egov.eis.service.DesignationService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
@@ -55,6 +56,8 @@ public class BoQDetailsService {
 	private DocumentUploadRepository documentUploadRepository;
 	@Autowired
     private DesignationService designationService;
+	@Autowired
+	protected MicroserviceUtils microserviceUtils;
 	
 
 	@Transactional
@@ -228,7 +231,7 @@ public class BoQDetailsService {
                     null, additionalRule, "NEW", null);
         	savedWorkOrderAgreement.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
@@ -242,7 +245,7 @@ public class BoQDetailsService {
         	String statetype="Pending With "+designation.getName().toUpperCase();
         	savedWorkOrderAgreement.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
@@ -260,7 +263,7 @@ public class BoQDetailsService {
         		String statetype="Pending With "+designation.getName().toUpperCase();
             	savedWorkOrderAgreement.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement")
                 .withCreatedBy(user.getId())
@@ -272,7 +275,7 @@ public class BoQDetailsService {
                         null, additionalRule, "SaveAsDraft", null);
             	savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
         	}
@@ -281,7 +284,7 @@ public class BoQDetailsService {
         		String statetype="Pending With "+designation.getName().toUpperCase();
         		savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
 
@@ -350,6 +353,11 @@ public class BoQDetailsService {
 		return savedWorkOrderAgreement;
 
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 
 
 }

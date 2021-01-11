@@ -205,5 +205,11 @@
 		<form:textarea path="vigilance" cols="35" cssClass="form-control textfieldsvalidate" id="vigilance" maxlength = "250" />
 		<form:errors path="vigilance" cssClass="add-margin error-msg" />
 	</div>
+	<label class="col-sm-2 control-label text-right" for="adharnumber"> <spring:message code="contractor.adhaar" text='Adhaar Number'/>
+	</label>
+	<div class="col-sm-3 add-margin">
+		<form:input path="adharnumber" id="adharnumber" minlength="11" maxlength="11" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
+		<form:errors path="adharnumber" cssClass="add-margin error-msg" />
+	</div>
 </div>
 <input type="hidden" name="contractor" value="${contractor.id}" />

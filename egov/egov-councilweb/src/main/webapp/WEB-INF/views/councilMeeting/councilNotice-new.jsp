@@ -53,9 +53,9 @@
 <form:form role="form" action="/services/council/councilmeeting/createNotice" modelAttribute="councilNotice" 
 	id="councilMeetingform" cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
-	<%@ include file="councilmeeting-form.jsp"%>
+	<%@ include file="councilnotice-form.jsp"%>
 	
-	 <%@ include file="councilmeeting-agendaDetail.jsp"%> 
+	 <%-- <%@ include file="councilmeeting-agendaDetail.jsp"%>  --%>
 	<div class="form-group">
 		<div class="text-center">
 			<button type='submit' class='btn btn-primary' id="buttonSubmit">

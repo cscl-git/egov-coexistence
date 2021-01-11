@@ -203,6 +203,9 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Transient
 	private String percentCompletion;
+	
+	@Transient
+	private String pendingWith;
 
 	public Long getId() {
 		return id;
@@ -667,6 +670,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setActual_start_date(Date actual_start_date) {
 		this.actual_start_date = actual_start_date;
+	}
+
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
 	}
 
 }

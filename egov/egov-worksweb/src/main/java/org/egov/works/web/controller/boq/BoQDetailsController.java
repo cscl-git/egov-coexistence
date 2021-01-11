@@ -616,6 +616,10 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		{
        			agreement.setStatusDescp(object[7].toString());
        		}
+       		if(agreement.getStatusDescp() != null && !agreement.getStatusDescp().equalsIgnoreCase("Approved"))
+   		 {
+       			agreement.setPendingWith(populatePendingWith(agreement.getId()));
+   		 }
        		workList.add(agreement);
        		
        	 }
@@ -1153,6 +1157,21 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		}
 		return misQuery.toString();
 
+	}
+	private String populatePendingWith(Long id) {
+		String pendingWith="";
+		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
+		if(workOrderAgreement != null && workOrderAgreement.getState() != null && workOrderAgreement.getState().getOwnerName() != null && !workOrderAgreement.getState().getOwnerName().isEmpty())
+		{
+			try
+			{
+				pendingWith=workOrderAgreement.getState().getOwnerName();
+			}catch (Exception e) {
+				pendingWith="";
+			}
+			
+		}
+		return pendingWith;
 	}
 
 }

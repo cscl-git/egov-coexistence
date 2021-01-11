@@ -46,6 +46,8 @@ public class EstimatePreparationApprovalService {
 	@Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
 	@Autowired
+	protected MicroserviceUtils microserviceUtils;
+	@Autowired
     private SecurityUtils securityUtils;
 	@Autowired
     @Qualifier("workflowService")
@@ -174,7 +176,7 @@ public class EstimatePreparationApprovalService {
                     null, additionalRule, "NEW", null);
         	estimatePreparationApproval.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Estimate")
             .withCreatedBy(user.getId())
@@ -188,7 +190,7 @@ public class EstimatePreparationApprovalService {
         	String statetype="Pending With "+designation.getName().toUpperCase();
         	estimatePreparationApproval.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Estimate")
             .withCreatedBy(user.getId())
@@ -204,7 +206,7 @@ public class EstimatePreparationApprovalService {
                         null, additionalRule, "SaveAsDraft", null);
             	estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Estimate");
         	}
@@ -213,7 +215,7 @@ public class EstimatePreparationApprovalService {
         		String statetype="Pending With "+designation.getName().toUpperCase();
         		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Estimate");
 
@@ -337,6 +339,9 @@ public class EstimatePreparationApprovalService {
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
 		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
 	}
-	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 	
 }

@@ -52,3 +52,4 @@
 <div class="alert alert-success" role="alert"><strong>${message}</strong></div>
 <input type="hidden" id="mode" name="mode" value="${mode}" />
 <%@ include file="contractor-view.jsp"%>
+<jsp:include page="billdocument-upload.jsp"/>

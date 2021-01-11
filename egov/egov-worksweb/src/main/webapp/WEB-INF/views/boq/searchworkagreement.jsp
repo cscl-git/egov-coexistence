@@ -87,6 +87,7 @@
 									<th><spring:message code="lbl.intended.date" /></th>
 									<th><spring:message code="lbl.amount" /></th>
 									<th><spring:message code="lbl.works.status" /></th>
+									<th><spring:message code="lbl.estimate.preparation.work.pending" /></th>
 
 								</tr>
 							</thead>
@@ -126,6 +127,10 @@
 													path="workOrderList[${status.index}].statusDescp"
 													id="workOrderList[${status.index}].statusDescp" />
 												${result.statusDescp }</td>
+											<td><form:hidden
+													path="workOrderList[${status.index}].pendingWith"
+													id="workOrderList[${status.index}].pendingWith" />
+												${result.pendingWith }</td>
 										</tr>
 									</c:forEach>
 								<tbody>
