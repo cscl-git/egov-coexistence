@@ -679,7 +679,7 @@ public class BillRegisterReportAction extends SearchFormAction {
 	    return deducvh;
     }
 
-    /*
+	/*
      * Get remittance payment detail for the voucher Below lines to get the cheque and cheque date for the voucher /* In case
      * where for single payment multiple cheque are assigned we use chqdelimitSP / single slash separate cheque nos In case where
      * for a voucher multiple BPVs are issued and for the BPVs different cheques are issued we seperate them with chqdelimitDP //

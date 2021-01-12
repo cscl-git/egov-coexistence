@@ -47,10 +47,17 @@
  */
 package org.egov.services.budget;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.eis.service.PositionMasterService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -67,12 +74,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 @Component
 public class BudgetDetailActionHelper {
@@ -96,6 +97,8 @@ public class BudgetDetailActionHelper {
     private EgwStatusHibernateDAO egwStatusHibernateDAO;
     private static Logger LOGGER = Logger.getLogger(BudgetDetailActionHelper.class);
     private static final String REFERENCEBUDGET = "no.reference.budget";
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
 
     @Transactional
     public void create(final BudgetDetailHelperBean parameterObject) {
@@ -111,7 +114,7 @@ public class BudgetDetailActionHelper {
             parameterObject.budgetDetail.getBudget().transition().start()
                     .withSenderName(securityUtils.getCurrentUser().getName())
                     .withComments(parameterObject.workflowBean.getApproverComments()).withStateValue("Created")
-                    .withDateInfo(new Date()).withOwner(pos);
+                    .withDateInfo(new Date()).withOwner(pos).withOwnerName((pos.getId() != null && pos.getId() > 0L) ? getEmployeeName(pos.getId()):"");
         else
             parameterObject.budgetDetail.getBudget().transition()
                     .withSenderName(securityUtils.getCurrentUser().getName())
@@ -231,5 +234,9 @@ public class BudgetDetailActionHelper {
             budgetDetailService.update(be);
         }
     }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

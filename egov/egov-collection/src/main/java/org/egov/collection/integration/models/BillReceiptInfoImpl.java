@@ -556,4 +556,10 @@ public class BillReceiptInfoImpl implements BillReceiptInfo {
 		return receiptHeader.getSubdivison();
 	}
 
+	@Override
+	public String getGstno() {
+		// TODO Auto-generated method stub
+		return receiptHeader.getGstno();
+	}
+
 }

@@ -149,7 +149,7 @@ public class SearchReceiptAction extends SearchFormAction {
     private MicroserviceUtils microserviceUtils;
     
     private String collectionVersion;
-
+    
     private String subdivison;
     
     @Autowired
@@ -308,7 +308,7 @@ public class SearchReceiptAction extends SearchFormAction {
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null,type);
         
-
+        
         for (Receipt receipt : receipts) {
 
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
@@ -410,7 +410,7 @@ public class SearchReceiptAction extends SearchFormAction {
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null);
       
-       
+       System.out.println("XXXXX");
         List<RemittanceDepositWorkDetail> remittanceResponselist=null;
        
         
@@ -428,7 +428,7 @@ public class SearchReceiptAction extends SearchFormAction {
         if(receipts!=null && !receipts.isEmpty()) {
          remittanceResponselist =  getDepositWork(receipts);
         	}                   
-       
+
         for (Receipt receipt : receipts) {
 
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
@@ -485,7 +485,7 @@ public class SearchReceiptAction extends SearchFormAction {
                      
                     if (null != empInfo && empInfo.getUser().getUserName() != null && !empInfo.getUser().getUserName().isEmpty())
                     {
-                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    	receiptHeader.setCreatedUser(empInfo.getUser().getName());
                     }
                     else
                     {
@@ -721,7 +721,7 @@ public class SearchReceiptAction extends SearchFormAction {
 	    	List<Object[]> rows = null;
 	    	BigDecimal pAmount=new BigDecimal("0");
 	    	BigDecimal gstAmount=new BigDecimal("0");
-    BigDecimal totalAmount=new BigDecimal("0");
+	    	BigDecimal totalAmount=new BigDecimal("0");
 	    	try
 	    	{
 	    		 query = this.persistenceService.getSession().createSQLQuery("select gl.id,gl.glcode,gl.debitamount,gl.creditamount from generalledger gl where voucherheaderid =(select vmis.voucherheaderid from vouchermis vmis where vmis.reciept_number =:receipt_no)");
@@ -737,21 +737,21 @@ public class SearchReceiptAction extends SearchFormAction {
 	    	    			if(element[1].toString().equalsIgnoreCase("3502020") || element[1].toString().equalsIgnoreCase("3502019"))
 	    	    			{
 	    	    				gstAmount=gstAmount.add(new BigDecimal(element[3].toString()));
-	    	    		}
+	    	    			}
 	    	    			else
-	    	    		{
+	    	    			{
 	    	    				pAmount=pAmount.add(new BigDecimal(element[3].toString()));
 	    	    			}
 	    	    		}
-        else
-        {
-        totalAmount=totalAmount.add(new BigDecimal(element[2].toString()));
-        }
+	    	    		else
+	    	    		{
+	    	    			totalAmount=totalAmount.add(new BigDecimal(element[2].toString()));
+	    	    		}
 	    	    		
 	    	    	}
 	    	    	receiptHeader.setPrincipalAmount(pAmount);
 	    	    	receiptHeader.setGstAmount(gstAmount);
-        receiptHeader.setTotalAmount(totalAmount);
+	    	    	receiptHeader.setTotalAmount(totalAmount);
 	    	    }
 	    	}catch (Exception e) {
 				e.printStackTrace();
@@ -759,7 +759,7 @@ public class SearchReceiptAction extends SearchFormAction {
 		
 	}
 
-	 @Action(value = "/receipts/searchReceipt-downloadDayBookReport")
+	@Action(value = "/receipts/searchReceipt-downloadDayBookReport")
     public String downloadDayBookReport() {
         target = "searchresult";
         collectionVersion = ApplicationThreadLocals.getCollectionVersion();
@@ -813,8 +813,6 @@ public class SearchReceiptAction extends SearchFormAction {
                     {
                     	continue;
                     }
-                    System.out.println("subdivison ::: "+receipt.getSubdivison());
-                    System.out.println("gst ::: "+receipt.getGstNo());
                     receiptHeader.setSubdivison(receipt.getSubdivison());
                     receiptHeader.setGstno(receipt.getGstNo());
                     //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
@@ -844,7 +842,7 @@ public class SearchReceiptAction extends SearchFormAction {
                      
                     if (null != empInfo && empInfo.getUser().getUserName() != null && !empInfo.getUser().getUserName().isEmpty())
                     {
-                        receiptHeader.setCreatedUser(empInfo.getUser().getName());
+                    	receiptHeader.setCreatedUser(empInfo.getUser().getName());
                     }
                     else
                     {

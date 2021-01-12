@@ -73,6 +73,7 @@ $(document).ready(function(){
 	});
 	
 	//$('#subLedgerType').trigger("change");
+	worksDiv();
 	$netPayableAccountCodeId = $('#netPayableId').val();
 	patternvalidation(); 
 	debitGlcode_initialize();
@@ -192,7 +193,7 @@ $('.btn-wf-primary').click(function(){
 	            
 	            }
 	        
-		
+	    
 	}else if (button != null && (button == 'Create And Approve')) {
 		$('#approvalDepartment').removeAttr('required');
 		$('#approvalDesignation').removeAttr('required');
@@ -498,9 +499,13 @@ $('.subledgerGl_code').change(function () {
 
 
 $('#billSubType').change(function () {
+	
+	worksDiv();
 	$("#selectedCheckList").val("");
 	loadCheckListTable();
 });
+
+	
 
 
 
@@ -523,7 +528,7 @@ $('.netPayableAccount_Code').change(function () {
 
 
 
-	}
+}
 
 //only on change
 $('.subledgerGl_code').change(function () {
@@ -553,7 +558,7 @@ $('.subledgerGl_code').change(function () {
 		$('#subLedgerNameLabel').html("Code");
 		
 	}
-		
+	
 		
 					document.getElementById('tempSubLedger[0].netPayableAccountCode').value="";
 					
@@ -574,12 +579,15 @@ $('.subledgerGl_code').change(function () {
 						netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option(glcode + '-' +name + '~' + issubledger,  glcodeid);
 					
 							 }
-				});
-		
+					});
+
 		
 });
 
 $('#billSubType').change(function () {
+	
+	worksDiv();
+	
 	$("#selectedCheckList").val("");
 	loadCheckListTable();
 });
@@ -1476,6 +1484,17 @@ function calcualteNetpaybleAmount(){
 function amountConverter(amt) {
 	var formattedAmt = amt.toFixed(2);
 	return formattedAmt;
+}
+
+function worksDiv(){
+	var billsubtype=$( "#billSubType option:selected" ).text();
+	if(billsubtype=='Works'){
+		
+		$('.works').show();
+	}
+	else{
+		$('.works').hide();
+	}
 }
 
 function populateBdgetDetails()

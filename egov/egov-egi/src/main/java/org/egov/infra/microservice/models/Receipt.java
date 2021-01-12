@@ -24,7 +24,7 @@ public class Receipt {
 
     // Read only, populated during search
     private Long receiptDate;
-
+    
     private String subdivison;
     
     private String paymentStatus;

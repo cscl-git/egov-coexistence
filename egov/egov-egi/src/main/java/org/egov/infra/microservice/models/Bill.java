@@ -21,7 +21,7 @@ public class Bill {
 
     @JsonProperty("payerAddress")
     private String payerAddress = null;
-
+    
     @JsonProperty("narration")
     private String narration = null;
 

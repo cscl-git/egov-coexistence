@@ -238,7 +238,7 @@ public class PaymentAction extends BasePaymentAction {
     private String firstsignatory="-1";
     private String secondsignatory="-1";
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
- 
+   
     @Autowired
     private FinancialUtils financialUtils;
     public PaymentAction() {
@@ -280,7 +280,7 @@ public class PaymentAction extends BasePaymentAction {
         }
         else
         {
-            addDropdownData("bankbranchList", Collections.EMPTY_LIST);
+        	addDropdownData("bankbranchList", Collections.EMPTY_LIST);
         	bankBranchList=Collections.EMPTY_LIST;
         }
             
@@ -535,13 +535,14 @@ public class PaymentAction extends BasePaymentAction {
             // from external system
             egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("WORKSBILL", "Passed");
             final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("CONTRACTORBILL", "APPROVED"); // for 67
+            final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
             // external
             // systems
             String statusCheck = "";
-            if (egwStatus1 == null)
+            if (egwStatus1 == null && egwStatus2 == null)
                 statusCheck = " and bill.status in (" + egwStatus.getId() + ") ";
             else
-                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() + ") ";
+                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() +","+ egwStatus2.getId()+") ";
 
             final String contractorBillSql = mainquery + statusCheck + sql.toString() + " order by bill.billdate desc";
             final String contractorBillSql1 = mainquery1 + statusCheck + sql.toString()
@@ -1472,11 +1473,17 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/payment-ajaxGetAccountBalance")
     public String ajaxGetAccountBalance() throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Inside ajaxGetAccountBalance.");
-        getBankBalance(parameters.get("bankaccount")[0], parameters.get("voucherDate")[0], null, null, null);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed ajaxGetAccountBalance.");
+            LOGGER.info("Inside ajaxGetAccountBalance.");
+            LOGGER.info("bankaccount ::: "+parameters.get("bankaccount")[0]);
+            LOGGER.info("voucherDate ::: "+parameters.get("voucherDate")[0]);
+            try
+            {
+            	getBankBalance(parameters.get("bankaccount")[0], parameters.get("voucherDate")[0], null, null, null);
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+        
+            LOGGER.info("Completed ajaxGetAccountBalance.");
         return "balance";
     }
 

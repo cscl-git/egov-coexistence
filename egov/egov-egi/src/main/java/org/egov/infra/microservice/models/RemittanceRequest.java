@@ -12,7 +12,7 @@ public class RemittanceRequest {
 
     @JsonProperty("Remittance")
     private List<Remittance> remittances = null;
-
+    
     @JsonProperty("receiptNumbers")
     private Set<String> receiptNumbers=null;
 

@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+
+<!DOCTYPE tiles-definitions PUBLIC
+
+        "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN"
+
+        "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+
+<tiles-definitions>
+
+
+
+	<definition name="base_layout"
+		template="/WEB-INF/views/template/main.jsp">
+
+		<put-attribute name="title"
+			value="Chandigarh Municipal Corporation" />
+
+		<put-attribute name="body" value="" />
+
+	</definition>
+
+	<definition name="create" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/createAudit.jsp" />
+
+	</definition>
+	<definition name="audit-success" extends="base_layout">
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/audit-success.jsp" />
+	</definition>
+	<definition name="history" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/audit-checklist-popup.jsp" />
+
+	</definition>
+	<definition name="postAudit" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/postAuditSearch.jsp" />
+
+	</definition>
+	<definition name="auditSearch" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+			cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/auditSearch.jsp" />
+
+	</definition>
+	 <definition name="manageAuditor-form" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/manageAuditor-form.jsp"/>
+    </definition>
+   
+ <definition name="manageAuditor-formedit" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/manageAuditor-formedit.jsp"/>
+    </definition>
+<definition name="auditStateSearch" extends="base_layout">
+
+<put-attribute name="page-title" value="Audit"
+cascade="true" />
+
+<put-attribute name="body"
+value="/WEB-INF/views/audit/auditStateSearch.jsp" />
+
+</definition>
+<definition name="auditStateUpdate" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/auditStateUpdate.jsp"/>
+    </definition>
+
+
+
+
+
+
+</tiles-definitions>

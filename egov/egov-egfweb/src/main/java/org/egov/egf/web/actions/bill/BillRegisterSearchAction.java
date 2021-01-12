@@ -89,7 +89,8 @@ import java.util.Map;
  */
 @ParentPackage("egov")
 @Results({
-    @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp")
+    @Result(name = BillRegisterSearchAction.NEW, location = "billRegisterSearch-" + BillRegisterSearchAction.NEW + ".jsp"),
+    @Result(name = BillRegisterSearchAction.POST, location = "billRegisterSearch-" + BillRegisterSearchAction.POST + ".jsp")
 })
 public class BillRegisterSearchAction extends BaseFormAction {
     private static final long serialVersionUID = 1L;
@@ -167,6 +168,13 @@ public class BillRegisterSearchAction extends BaseFormAction {
     public String newform() {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterSearchAction | newform | Start");
+        return NEW;
+    }
+    
+    @Action(value = "/bill/billRegisterSearch-postAudit")
+    public String postAudit() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("BillRegisterSearchAction | postAudit | Start");
         return NEW;
     }
 

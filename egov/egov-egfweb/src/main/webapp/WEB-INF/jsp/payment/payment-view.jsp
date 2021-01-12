@@ -804,13 +804,13 @@ function openBudgetDtls()
 		return false;
 		}
 
-					document.forms[0].action='${pageContext.request.contextPath}/payment/payment-sendForApproval.action';
-		    		document.forms[0].submit();
-		    		return false;					
+		document.forms[0].action='${pageContext.request.contextPath}/payment/payment-sendForApproval.action';
+		    document.forms[0].submit();
+		    return false;
 		   
 
 					/*}*/
-		}
+		}	
 		/*function balanceCheck() {
 
 			if (document.getElementById('availableBalance')) {

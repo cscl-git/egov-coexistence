@@ -347,7 +347,7 @@ public abstract class ReportService {
         } else {
             financialYear = statement.getFinancialYear();
         return financialYear.getStartingDate();
-       }
+        }
        }
 
     public Date getToDate(final Statement statement) {

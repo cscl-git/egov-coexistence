@@ -438,7 +438,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(paymentheader.getState().getInitiatorPosition())
+                    .withOwner(paymentheader.getState().getInitiatorPosition()).withOwnerName((paymentheader.getState().getInitiatorPosition() != null && paymentheader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(paymentheader.getState().getInitiatorPosition()):"")
                     .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
         } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
 
@@ -467,7 +467,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         null, null, null, workflowBean.getCurrentState(), null);
                 paymentheader.transition().start().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
+                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
 
@@ -482,7 +482,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         null, null, null, paymentheader.getCurrentState().getValue(), null);
                 paymentheader.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments()).withStateValue(wfmatrix.getNextState())
-                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId())
+                        .withDateInfo(currentDate.toDate()).withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -2441,8 +2441,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     public List<InstrumentHeader> createInstrument(final List<ChequeAssignment> chequeAssignmentList,
             final String paymentMode, final Integer bankaccount, final Map<String, String[]> parameters,
             final String dept) throws ApplicationRuntimeException, Exception {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createInstrument...");
+            LOGGER.info("Starting creation of Instrument...");
         List<InstrumentHeader> instHeaderList = new ArrayList<InstrumentHeader>();
         final List<Long> selectedPaymentVHList = new ArrayList<Long>();
         final Map<String, BigDecimal> payeeMap = new HashMap<String, BigDecimal>();
@@ -2450,6 +2449,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
         for (final ChequeAssignment assignment : chequeAssignmentList)
             if (assignment.getIsSelected()) {
+            	LOGGER.info("assignment.getVoucherid()  ::: "+assignment.getVoucherid());
+            	LOGGER.info("assignment.getVoucherHeaderId()  ::: "+assignment.getVoucherHeaderId());
+            	LOGGER.info("assignment.getVoucherNumber()  ::: "+assignment.getVoucherNumber());
                 selectedPaymentVHList.add(assignment.getVoucherid());
                 if (payeeMap.containsKey(assignment.getPaidTo() + DELIMETER + assignment.getDetailtypeid() + DELIMETER
                         + assignment.getDetailkeyid())) // concatenate the
@@ -2465,8 +2467,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                             + assignment.getDetailkeyid(), assignment.getPaidAmount());
                 totalPaidAmt = totalPaidAmt.add(assignment.getPaidAmount());
             }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("selectedPaymentList===" + selectedPaymentVHList);
+            LOGGER.info("selectedPaymentList===" + selectedPaymentVHList);
         final Bankaccount account = (Bankaccount) persistenceService.find(" from Bankaccount where  id=?",
                 bankaccount.longValue());
         // get voucherList
@@ -2872,7 +2873,6 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                         paymentBean.getDeductionAmt() == null ? BigDecimal.ZERO : paymentBean.getDeductionAmt()));
                 paymentBean.setEarlierPaymentAmt(paidAmtMap.get(paymentBean.getCsBillId()) == null ? BigDecimal.ZERO
                         : paidAmtMap.get(paymentBean.getCsBillId()));
-                
                 paymentBean.setPayableAmt(paymentBean.getNetAmt().subtract(paymentBean.getEarlierPaymentAmt()));
                 paymentBean.setPaymentAmt(paymentBean.getPayableAmt());
                 if (paymentBean.getPaymentAmt().compareTo(BigDecimal.ZERO) == 0)
@@ -3331,6 +3331,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.debug("Completed createPaymentHeader.");
         return paymentheader;
     }
-    
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
     
 }

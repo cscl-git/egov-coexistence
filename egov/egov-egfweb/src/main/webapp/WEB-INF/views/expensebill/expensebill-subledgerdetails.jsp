@@ -107,7 +107,7 @@
 					
 				<td>
 				<form:input class="form-control subledger_Payto" id="tempSubLedger[0].payTo" path="egBillregistermis.payto" data-idx="0" maxlength="350" />
-		
+				
 				</td>
 				<td>
 				<input type="text" id="tempSubLedger[0].expense-netPayableAmount" name="tempSubLedger[0].netPayableAmount"  data-idx="0" class="form-control text-right netPayable_Amount" onkeyup="decimalvalue(this);" data-pattern="decimalvalue"> 

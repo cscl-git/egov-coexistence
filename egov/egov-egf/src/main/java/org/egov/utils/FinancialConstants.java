@@ -97,7 +97,7 @@ public interface FinancialConstants {
 	public static final String SALARYBILL_PASSED_STATUS = "Passed";
 	public static final String SALARYBILL_PAID_STATUS = "paid";
 	// Status for Contingent Bills
-	public static final String CONTINGENCYBILL_CREATED_STATUS = "CREATED";
+	public static final String CONTINGENCYBILL_CREATED_STATUS = "Created";
 	public static final String CONTINGENCYBILL_CANCELLED_STATUS = "Cancelled";
 	public static final String CONTINGENCYBILL_APPROVED_STATUS = "Approved";
 	public static final String CONTINGENCYBILL_PASSED_STATUS = "Voucher Created";
@@ -460,6 +460,7 @@ public interface FinancialConstants {
     public static final String CONTINGENCYBILL_PENDING_FINANCE = "Pending with Finance";
     public static final String AUDIT_ = "audit_";
     public static final String WORKFLOW_STATE_SAVEASDRAFT  = "SaveAsDraft";
+    public static final String CONTINGENCYBILL_PENDING_CANCEL = "Pending for Cancellation";
 
 	
 }

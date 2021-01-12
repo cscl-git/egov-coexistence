@@ -89,7 +89,7 @@ import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.DocumentUpload;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Relation;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
@@ -158,7 +158,6 @@ import com.exilant.eGov.src.transactions.VoucherTypeForULB;
         @Result(name = "editVoucher", type = "redirectAction", location = "journalVoucherModify-beforeModify", params = {
                 "namespace", "/voucher", "voucherId", "${voucherId}" }),
         @Result(name = "view", location = "preApprovedVoucher-view.jsp"),
-        @Result(name = "success", location = "stopPayment-success.jsp"),
         @Result(name = PreApprovedVoucherAction.VOUCHEREDIT, location = "preApprovedVoucher-voucheredit.jsp"),
         @Result(name = "billview", location = "preApprovedVoucher-billview.jsp"),
         @Result(name = "voucherview", location = "preApprovedVoucher-voucherview.jsp"),
@@ -218,7 +217,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private final PreApprovedVoucher preApprovedVoucher = new PreApprovedVoucher();
     private List<PreApprovedVoucher> billDetailslist;
     private List<PreApprovedVoucher> subLedgerlist;
-    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
     private ContraJournalVoucher contraVoucher;
     private static final String ERROR = "error";
 
@@ -619,7 +618,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 voucherHeader.getId());
 		 voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY,
                  Long.valueOf(parameters.get(VHID)[0]));
-         List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+         List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
          voucherHeader.setDocumentDetail(voucherDocList);
          voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
 		
@@ -662,7 +661,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         } else {
             voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY,
                     Long.valueOf(parameters.get(VHID)[0]));
-            List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+            List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
             voucherHeader.setDocumentDetail(voucherDocList);
             voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_VIEW_MODE);
             
@@ -693,10 +692,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
        
          inputStream = new FileInputStream(downloadFile);
          
-         List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(Long.valueOf(parameters.get("voucherHeaderId")[0]), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+         List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(Long.valueOf(parameters.get("voucherHeaderId")[0]), CommonConstants.JOURNAL_VOUCHER_OBJECT);
          voucherHeader.setDocumentDetail(voucherDocList);
 
-         for (final DocumentUpload doc : voucherHeader.getDocumentDetail())
+         for (final DocumentUploads doc : voucherHeader.getDocumentDetail())
              if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
              {
                  fileName = doc.getFileStore().getFileName();
@@ -939,7 +938,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 	                    Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
 	                    byte[] fileBytes = Files.readAllBytes(path);
 	                    ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
-	                    DocumentUpload upload = new DocumentUpload();
+	                    DocumentUploads upload = new DocumentUploads();
 	                    upload.setInputStream(bios);
 	                    upload.setFileName(fileName[i]);
 	                    upload.setContentType(contentType[i]);
@@ -1041,7 +1040,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug("voucher id=======" + vhid);
                 voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY, vhid);
-                voucherHeader.transition().start().withOwner(getPosition());
+                voucherHeader.transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
                 addActionMessage(getText("pjv.voucher.wc.created", new String[] { voucherHeader.getVoucherNumber() }));
             } else
                 addActionError(getText("pjv.budgetcheck.failed"));
@@ -1404,6 +1403,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 
     public Map<String, Object> getAccountDetails(final Integer detailtypeid, final Integer detailkeyid,
             final Map<String, Object> tempMap) throws ApplicationException {
+    	try {
         final Accountdetailtype detailtype = (Accountdetailtype) getPersistenceService().find(ACCDETAILTYPEQUERY,
                 detailtypeid);
         tempMap.put("detailtype", detailtype.getDescription());
@@ -1419,6 +1419,10 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             tempMap.put(Constants.DETAILKEY, entityType.getName());
             tempMap.put(Constants.DETAILCODE, entityType.getCode());
         }
+    	}catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
         return tempMap;
     }
 
@@ -1840,11 +1844,11 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 		this.fileFileName = fileFileName;
 	}
 
-	public List<DocumentUpload> getDocumentDetail() {
+	public List<DocumentUploads> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 

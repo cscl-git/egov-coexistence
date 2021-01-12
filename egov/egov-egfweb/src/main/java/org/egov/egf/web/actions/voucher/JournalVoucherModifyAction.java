@@ -77,7 +77,7 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.DocumentUpload;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.eis.service.EisCommonService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
@@ -125,7 +125,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
     private VoucherService voucherService;
     private List<VoucherDetails> billDetailslist;
     private List<VoucherDetails> subLedgerlist;
-    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
     private String voucherNumManual;
     private String target;
     private String saveMode;
@@ -200,7 +200,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
             voucherHeader = (CVoucherHeader) getPersistenceService().find(VOUCHERQUERY, Long.valueOf(voucherHeaderId));
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
         voucherHeader = (CVoucherHeader) vhInfoMap.get(Constants.VOUCHERHEADER);
-        List<DocumentUpload> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
+        List<DocumentUploads> voucherDocList = voucherService.findByObjectIdAndObjectType(voucherHeader.getId(), CommonConstants.JOURNAL_VOUCHER_OBJECT);
         voucherHeader.setDocumentDetail(voucherDocList);
         voucherHeader.setDocumentMode(CommonConstants.DOCUMENT_ADD_VIEW_MODE);
         try {
@@ -338,7 +338,7 @@ public class JournalVoucherModifyAction extends BaseVoucherAction {
  	                    Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
  	                    byte[] fileBytes = Files.readAllBytes(path);
  	                    ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
- 	                    DocumentUpload upload = new DocumentUpload();
+ 	                    DocumentUploads upload = new DocumentUploads();
  	                    upload.setInputStream(bios);
  	                    upload.setFileName(fileName[i]);
  	                    upload.setContentType(contentType[i]);

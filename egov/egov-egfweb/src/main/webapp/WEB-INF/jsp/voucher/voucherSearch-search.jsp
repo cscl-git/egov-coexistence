@@ -101,7 +101,8 @@
 				</tr>
 				<tr>
 					<td style="width: 5%"></td>
-					<td class="bluebox"><s:text name="voucher.type" /></td>
+					<td class="bluebox"><s:text name="voucher.type" /><span
+						class="mandatory1" id="disableVoucherType">*</span></td>
 					<td class="bluebox"><s:select name="type" id="type"
 							list="dropdownData.typeList" headerKey="-1"
 							headerValue="%{getText('lbl.choose.options')}"
@@ -174,7 +175,7 @@
 					<td width="100%"><display:table name="pagedResults"	uid="currentRowObject" cellpadding="0" cellspacing="0"
 							requestURI="" class="its" style=" border-left: 1px solid #C5C5C5; border-top: 1px solid #C5C5C5;border-right: 1px solid #C5C5C5;border-bottom: 1px solid #C5C5C5;">
 							<display:column title=" Sl No" style="text-align:center;">
-								<s:property	value="%{#attr.currentRowObject_rowNum+ (page-1)*pageSize}" />
+								<s:property	value="%{#attr.currentRowObject_rowNum+ 1}" />
 							</display:column>
 							<display:column title="Voucher Number" style="text-align:center;">
 								<a href="#"	onclick="openVoucher('<s:property value='%{#attr.currentRowObject.id}'/>','<s:property value="%{#attr.currentRowObject.vouchernumber}" />','<s:date name="%{#attr.currentRowObject.voucherdate}" format="dd/MM/yyyy"/>');"><s:property
@@ -220,17 +221,16 @@
 					<table width="100%" border="0" align="center" cellpadding="0"
 						cellspacing="0" class="tablebottom">
 						<tr>
-							<th class="bluebgheadtd"><s:text name="lbl.sr.no"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.voucher.number"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.type"/>Type</th>
-							<th class="bluebgheadtd"><s:text name="lbl.name"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.voucher.date"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.fund.name"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.department.name"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.amount"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.status"/></th>
-							<th class="bluebgheadtd"><s:text name="lbl.pending.with"/></th>
-							<!-- <th class="bluebgheadtd">Source</th> -->
+							<th class="bluebgheadtd">Sl No</th>
+							<th class="bluebgheadtd">Voucher Number</th>
+							<th class="bluebgheadtd">Voucher Type</th>
+							<th class="bluebgheadtd">Voucher Name</th>
+							<th class="bluebgheadtd">Voucher Date</th>
+							<th class="bluebgheadtd">Fund Name</th>
+							<th class="bluebgheadtd">Department Name</th>
+							<th class="bluebgheadtd">Total Amount</th>
+							<th class="bluebgheadtd">Status</th>
+							<th class="bluebgheadtd">Pending With</th>
 						</tr>
 						<c:set var="trclass" value="greybox" />
 
@@ -364,7 +364,14 @@
 			var toDate=document.getElementById('toDate').value;
 			var fundId=document.getElementById('fundId').value;
 			var voucherNumber=document.getElementById('voucherNumber').value;
+			var vType=document.getElementById('type').value;
 			console.log('fromDate : ',fromDate);
+			if(vType != null && vType == -1)
+				{
+				bootbox.alert("Please select voucher Type");
+				return false;
+				
+				}
 			if(!DateValidation(fromDate,toDate))
 				return false;
 			if(fromDate == "" && voucherNumber!=""){

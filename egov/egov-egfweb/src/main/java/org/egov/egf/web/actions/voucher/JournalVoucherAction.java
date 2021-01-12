@@ -57,7 +57,7 @@ import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.DocumentUpload;
+import org.egov.commons.DocumentUploads;
 import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.eis.service.EisCommonService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -104,7 +104,7 @@ public class JournalVoucherAction extends BaseVoucherAction
     private static final long serialVersionUID = 1L;
     private List<VoucherDetails> billDetailslist;
     private List<VoucherDetails> subLedgerlist;
-    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
     private String target;
     protected String showMode;
     @Autowired
@@ -244,7 +244,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                     Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
                     byte[] fileBytes = Files.readAllBytes(path);
                     ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
-                    DocumentUpload upload = new DocumentUpload();
+                    DocumentUploads upload = new DocumentUploads();
                     upload.setInputStream(bios);
                     upload.setFileName(fileName[i]);
                     upload.setContentType(contentType[i]);
@@ -296,7 +296,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 {
 					if (voucherHeader.getVouchermis().getBudgetaryAppnumber() == null) {
 						if(voucherHeader.getState().getValue()!=null && voucherHeader.getState().getValue().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
-                    {
+						{
 							message = "Voucher  " + voucherHeader.getVoucherNumber() + " Save As Draft Sucessfully" ;
 							target = "success";
 						}
@@ -318,19 +318,19 @@ public class JournalVoucherAction extends BaseVoucherAction
                     	}
                     	else
                     	{
-                        message = "Voucher  "
-                                + voucherHeader.getVoucherNumber()
-                                + " Created Sucessfully"
-                                + "\\n"
-                                + "And "
-                                + getText("budget.recheck.sucessful", new String[] { voucherHeader.getVouchermis()
-                                        .getBudgetaryAppnumber() })
-                                + "\\n"
-                                + getText("pjv.voucher.approved",
-                                        new String[] { this.getEmployeeName(voucherHeader.getState()
-                                        		.getOwnerPosition()) });
+                    	                        message = "Voucher  "
+                    	                                + voucherHeader.getVoucherNumber()
+                    	                                + " Created Sucessfully"
+                    	                                + "\\n"
+                    	                                + "And "
+                    	                                + getText("budget.recheck.sucessful", new String[] { voucherHeader.getVouchermis()
+                    	                                        .getBudgetaryAppnumber() })
+                    	                                + "\\n"
+                    	                                + getText("pjv.voucher.approved",
+                    	                                        new String[] { this.getEmployeeName(voucherHeader.getState()
+                    	                                        .getOwnerPosition()) });
 
-                        target = "success";
+                    	                        target = "success";
                     	}
 
                     }

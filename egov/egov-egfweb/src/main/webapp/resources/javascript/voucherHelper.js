@@ -2489,9 +2489,9 @@ function openBudget()
 			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=bpw&vhId='+vhId;
 			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 			}
-		}
-	
+}	
 
+	
 }
 
 function openBudgetDetails()

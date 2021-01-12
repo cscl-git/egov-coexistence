@@ -161,8 +161,9 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
                     reportInput.getReportParams(), dataSource);
             LOGGER.info("Jasper fillReport end->"+reportInput.getReportTemplate());
             return new ReportOutput(exportReport(reportInput, jasperPrint), reportInput);
-        } catch (JRException | IOException e) {
-            LOGGER.error(EXCEPTION_IN_REPORT_CREATION, e);
+        } catch (Exception e) {
+        	System.out.println("Error1 :::"+e.getMessage());
+            e.printStackTrace();
             throw new ApplicationRuntimeException(EXCEPTION_IN_REPORT_CREATION, e);
         }
 
@@ -198,19 +199,23 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
 
     private byte[] exportReport(ReportRequest reportInput, JasperPrint jasperPrint) throws JRException, IOException {
         try (ByteArrayOutputStream reportOutputStream = new ByteArrayOutputStream()) {
+        	System.out.println("start export");
             Exporter exporter = getExporter(reportInput, jasperPrint, reportOutputStream);
             exporter.exportReport();
+            System.out.println("export");
             return reportOutputStream.toByteArray();
         } catch (Exception e) {
-            LOGGER.error(EXCEPTION_IN_REPORT_CREATION, e);
+        	System.out.println("Error2 :::"+e.getMessage());
+            e.printStackTrace();
             throw new ApplicationRuntimeException(EXCEPTION_IN_REPORT_CREATION, e);
         }
     }
 
     private Exporter getExporter(ReportRequest reportInput, JasperPrint jasperPrint, OutputStream outputStream) {
-        Exporter exporter;
-        ExporterConfiguration exporterConfiguration;
+        Exporter exporter = null;
+        ExporterConfiguration exporterConfiguration = null;
         ExporterOutput exporterOutput = null;
+        System.out.println("reportInput.getReportFormat() :::"+reportInput.getReportFormat());
         if (PDF.equals(reportInput.getReportFormat())) {
             SimplePdfExporterConfiguration pdfExporterConfiguration = new SimplePdfExporterConfiguration();
             if (reportInput.isPrintDialogOnOpenReport())
@@ -218,8 +223,14 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             exporter = new JRPdfExporter();
             exporterConfiguration = pdfExporterConfiguration;
         } else if (XLS.equals(reportInput.getReportFormat())) {
-            exporter = new JRXlsExporter();
-            exporterConfiguration = new SimpleXlsExporterConfiguration();
+        	System.out.println("xls ::: "+XLS);
+        	try
+        	{
+        		exporter = new JRXlsExporter();
+                exporterConfiguration = new SimpleXlsExporterConfiguration();
+        	}catch (Exception e) {
+				e.printStackTrace();
+			}
         } else if (RTF.equals(reportInput.getReportFormat())) {
             exporter = new JRRtfExporter();
             exporterConfiguration = new SimpleRtfExporterConfiguration();
@@ -238,12 +249,19 @@ public class JasperReportService extends AbstractReportService<JasperReport> {
             exporter = new JRDocxExporter();
             exporterConfiguration = new SimpleDocxExporterConfiguration();
         } else {
+        	System.out.println("else");
             throw new ApplicationRuntimeException("Invalid report format [" + reportInput.getReportFormat() + "]");
         }
-
-        exporter.setConfiguration(exporterConfiguration);
-        exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-        exporter.setExporterOutput(exporterOutput == null ? new SimpleOutputStreamExporterOutput(outputStream) : exporterOutput);
+        try
+        {
+        	System.out.println("xxxx");
+        	exporter.setConfiguration(exporterConfiguration);
+            exporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+            exporter.setExporterOutput(exporterOutput == null ? new SimpleOutputStreamExporterOutput(outputStream) : exporterOutput);
+            
+        }catch (Exception e) {
+			e.printStackTrace(); 
+		}
         return exporter;
     }
 }

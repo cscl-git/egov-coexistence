@@ -293,7 +293,7 @@
 			document.rtgsIssueRegisterReport.submit();
 			return true;
 		}
-
+		
 		function loadBank(fund) {
 			if (fund.value != -1) {
 				populatebank({

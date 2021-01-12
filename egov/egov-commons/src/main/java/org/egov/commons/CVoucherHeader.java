@@ -115,7 +115,7 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     @Transient
     private List<CGeneralLedgerDetail> subLedgerDetails = new ArrayList<>();
     @Transient
-    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
   
     @Transient
     private String documentMode;
@@ -150,9 +150,26 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     @Transient
     private String fiscalName;
     
+    @Transient
+    private Integer deptId;
+    @Transient
+    private Date billFrom;
+    @Transient
+    private Date billTo;
+    
+    
     private String firstsignatory;
     private String secondsignatory;
-    public CVoucherHeader() {
+    private String postauditprocessing;
+    public String getPostauditprocessing() {
+		return postauditprocessing;
+	}
+
+	public void setPostauditprocessing(String postauditprocessing) {
+		this.postauditprocessing = postauditprocessing;
+	}
+
+	public CVoucherHeader() {
         // TODO Auto-generated constructor stub
     }
 
@@ -547,11 +564,11 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 		this.secondsignatory = secondsignatory;
 	}
 
-	public List<DocumentUpload> getDocumentDetail() {
+	public List<DocumentUploads> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 
@@ -561,5 +578,29 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
 	public void setDocumentMode(String documentMode) {
 		this.documentMode = documentMode;
+	}
+
+	public Integer getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(Integer deptId) {
+		this.deptId = deptId;
+	}
+
+	public Date getBillFrom() {
+		return billFrom;
+	}
+
+	public void setBillFrom(Date billFrom) {
+		this.billFrom = billFrom;
+	}
+
+	public Date getBillTo() {
+		return billTo;
+	}
+
+	public void setBillTo(Date billTo) {
+		this.billTo = billTo;
 	}
 }

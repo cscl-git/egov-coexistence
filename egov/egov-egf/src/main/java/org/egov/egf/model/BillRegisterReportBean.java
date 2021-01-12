@@ -51,7 +51,12 @@
 package org.egov.egf.model;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+
+import org.egov.infra.microservice.models.BillDetail;
+import org.egov.infra.microservice.models.ChartOfAccounts;
 
 /**
  * @author manoranjan
@@ -79,6 +84,11 @@ public class BillRegisterReportBean {
     private String deducVoucherNumber;
     private String pexNo;
     private String deducPexNo;
+    private String departmentCode;
+    private String pexNodate;
+    private List<ChartOfAccounts> chartOfAccounts;
+    private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
+    private String budgetHead;
 
     public String getBillNumber() {
         return billNumber;
@@ -241,4 +251,45 @@ public class BillRegisterReportBean {
 		this.deducPexNo = deducPexNo;
 	}
 
+	public String getDepartmentCode() {
+		return departmentCode;
+	}
+
+	public void setDepartmentCode(String departmentCode) {
+		this.departmentCode = departmentCode;
+	}
+
+	public String getPexNodate() {
+		return pexNodate;
+	}
+
+	public void setPexNodate(String pexNodate) {
+		this.pexNodate = pexNodate;
+	}
+
+	public List<ChartOfAccounts> getChartOfAccounts() {
+		return chartOfAccounts;
+	}
+
+	public void setChartOfAccounts(List<ChartOfAccounts> chartOfAccounts) {
+		this.chartOfAccounts = chartOfAccounts;
+	}
+
+	public List<BillDetail> getBillDetailList() {
+		return billDetailList;
+	}
+
+	public void setBillDetailList(List<BillDetail> billDetailList) {
+		this.billDetailList = billDetailList;
+	}
+
+	public String getBudgetHead() {
+		return budgetHead;
+	}
+
+	public void setBudgetHead(String budgetHead) {
+		this.budgetHead = budgetHead;
+	}
+
+	
 }

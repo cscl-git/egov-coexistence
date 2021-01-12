@@ -184,4 +184,26 @@
 		<form:errors path="esiNumber" cssClass="add-margin error-msg" />
 	</div>
 </div>
+<div class="form-group">
+	<label class="col-sm-2 control-label text-right" for="blckListFromDate"> <spring:message code="blacklisting.from.date" text='BlackListing From Date'/> 
+	</label>
+	<div class="col-sm-3 add-margin">
+		<form:input id="blckListFromDate" path="blckListFromDate" class="form-control datepicker"
+							data-date-start-date="0d" placeholder="DD/MM/YYYY" />
+	</div>
+	<label class="col-sm-2 control-label text-right" for="blckListToDate"> <spring:message code="blacklisting.to.date" text='BlackListing To Date'/> 
+	</label>
+	<div class="col-sm-3 add-margin">
+		<form:input id="blckListToDate" path="blckListToDate" class="form-control datepicker"
+							data-date-start-date="0d" placeholder="DD/MM/YYYY" />
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-sm-2 control-label text-right" for="vigilance"> <spring:message code="contractor.vigilance" text='Vigilance Case'/>
+	</label>
+	<div class="col-sm-3 add-margin">
+		<form:textarea path="vigilance" cols="35" cssClass="form-control textfieldsvalidate" id="vigilance" maxlength = "250" />
+		<form:errors path="vigilance" cssClass="add-margin error-msg" />
+	</div>
+</div>
 <input type="hidden" name="contractor" value="${contractor.id}" />

@@ -67,13 +67,13 @@
 			<font size="2" color="red"><b>
 			<s:if test="target=='view'">
 				<div align="center"><s:text name="billreceipt.payement.confirmatiommessage"/></div>
-			</s:if>		
+			</s:if>	
 			<s:if test="target=='alreadyCancelled'">
 				<div align="center"><s:text name="billreceipt.already.confirmatiommessage"/></div>
 			</s:if>
 			<s:if test="target=='noAccess'">
 				<div align="center"><s:text name="billreceipt.noaccess.confirmatiommessage"/></div>
-			</s:if>
+			</s:if>			
 			
 			</b></font>
 		</tr>

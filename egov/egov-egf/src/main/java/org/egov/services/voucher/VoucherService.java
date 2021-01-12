@@ -68,7 +68,7 @@ import org.egov.commons.CFiscalPeriod;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.DocumentUpload;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgModules;
 import org.egov.commons.EgfRecordStatus;
 import org.egov.commons.EgwStatus;
@@ -1233,13 +1233,13 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 
 	}
 
-	   public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
+	   public void persistDocuments(final List<DocumentUploads> documentDetailsList) {
 	        if (documentDetailsList != null && !documentDetailsList.isEmpty())
-	            for (final DocumentUpload doc : documentDetailsList)
+	            for (final DocumentUploads doc : documentDetailsList)
 	                documentUploadRepository.save(doc);
 	    }
 
-	    public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
+	    public List<DocumentUploads> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
 	        return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
 	    }
 	    

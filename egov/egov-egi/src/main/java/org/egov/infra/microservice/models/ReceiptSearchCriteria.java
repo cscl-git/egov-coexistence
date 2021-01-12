@@ -88,8 +88,8 @@ public class ReceiptSearchCriteria {
         contract.setToDate(this.toDate != null ? this.toDate.getTime() : null);
         if(type == null || type.isEmpty())
         {
-  //      contract.setReceiptNumbers(this.receiptNumbers);
-      contract.setIds(this.receiptNumbers);
+        	//contract.setReceiptNumbers(this.receiptNumbers);
+            contract.setIds(this.receiptNumbers);
         }
         else if (type.equals("search"))
         {

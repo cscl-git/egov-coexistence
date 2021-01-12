@@ -200,17 +200,16 @@ public class BankAdviceReportAction extends BaseFormAction {
 			  List<Object[]> resultList = new ArrayList<Object[]>(); final
 			  List<InstrumentHeader> instrumentHeaderList = new
 			  ArrayList<InstrumentHeader>(); 
-			
-			  //resultList = getPersistenceService() .findAllBy(RTGSPEXNUMBERSQUERY,
-			  //bankaccount.getId()); 
-			  //for (final Object[] obj : resultList) {
-			  InstrumentHeader ih = new InstrumentHeader(); 
-			  ih = (InstrumentHeader)persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
+			  //resultList = getPersistenceService()
+			  //.findAllBy(RTGSPEXNUMBERSQUERY, bankaccount.getId()); for (final Object[] obj
+			  //: resultList) { 
+				  InstrumentHeader ih = new InstrumentHeader(); ih =
+			  (InstrumentHeader)
+			  persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
 			  
 			  instrumentHeaderList.add(ih); 
-			  //}
-			 
-			  addDropdownData("chequeNumberList",
+			 // } 
+        addDropdownData("chequeNumberList",
 			  instrumentHeaderList);
 			 
         }
@@ -248,29 +247,26 @@ public class BankAdviceReportAction extends BaseFormAction {
 			
 			  List<Object[]> resultList = new ArrayList<Object[]>(); final
 			  List<InstrumentHeader> instrumentHeaderList = new
-			  ArrayList<InstrumentHeader>(); 
-			
-			/*
-			 * resultList = getPersistenceService() .findAllBy( "" +
-			 * "SELECT ih.id, ih.instrumentNumber FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "
-			 * +
-			 * "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
-			 * +
-			 * " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
-			 * +
-			 * "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
-			 * + FinancialConstants.MODEOFPAYMENT_PEX + "' " +
-			 * "GROUP BY ih.instrumentNumber,ih.id", bankaccount.getId());
-			 */ 
-			  //for (final Object[] obj : resultList) 
-			  //{ 
-				  InstrumentHeader ih = new InstrumentHeader(); 
-				  ih  = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
+			ArrayList<InstrumentHeader>(); /*
+											 * resultList = getPersistenceService() .findAllBy( "" +
+											 * "SELECT ih.id, ih.instrumentNumber FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "
+											 * +
+											 * "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
+											 * +
+											 * " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
+											 * +
+											 * "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
+											 * + FinancialConstants.MODEOFPAYMENT_PEX + "' " +
+											 * "GROUP BY ih.instrumentNumber,ih.id", bankaccount.getId()); for (final
+											 * Object[] obj : resultList) {
+											 */
+				  InstrumentHeader ih = new InstrumentHeader(); ih
+			  = (InstrumentHeader)
+			  persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
 			  
 			  instrumentHeaderList.add(ih);
-			  //}
-			  
-			  addDropdownData("chequeNumberList",
+		//	  }
+        addDropdownData("chequeNumberList",
 			  instrumentHeaderList);
 			 
         }
@@ -693,7 +689,7 @@ public class BankAdviceReportAction extends BaseFormAction {
         final StringBuffer letterContext = new StringBuffer();
         letterContext
         .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
-                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
+        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
         .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
         reportParams.put("bankName", getBankName(bank.getId()));
         reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
@@ -764,7 +760,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 
         return "reportview";
     }
-
+    
     @ValidationErrorPage(NEW)
     @Action(value = "/report/bankAdviceReport-exportPDFPex3")
     public String exportPDFPex3() {

@@ -157,7 +157,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     @Autowired
     @Qualifier("masterDataCache")
     private EgovMasterDataCaching masterDataCache;
-
+    
     private String dept;
     private String funds;
     private String func;
@@ -441,10 +441,10 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 			e.printStackTrace();
 		}
 	    return func;
-    }
+	}
 
 
-    public boolean shouldShowHeaderField(final String fieldName) {
+	public boolean shouldShowHeaderField(final String fieldName) {
         return (headerFields.contains(fieldName) || gridFields.contains(fieldName)) && mandatoryFields.contains(fieldName);
     }
 
@@ -584,24 +584,24 @@ public class BudgetVarianceReportAction extends BaseFormAction {
         if (budgetDetail.getExecutingDepartment() != null && !"".equals(budgetDetail.getExecutingDepartment()))
         {
         	System.out.println("department : "+budgetDetail.getExecutingDepartment());
-            query.append(" and executingDepartment='").append(budgetDetail.getExecutingDepartment()).append("' ");
+        	query.append(" and executingDepartment='").append(budgetDetail.getExecutingDepartment()).append("' ");
         }
         if (budgetDetail.getBudgetGroup() != null && budgetDetail.getBudgetGroup().getId() != null
                 && budgetDetail.getBudgetGroup().getId() != -1)
         {
         	System.out.println("budgetDetail.getBudgetGroup().getId() :: "+budgetDetail.getBudgetGroup().getId());
-            query.append(" and budgetGroup.id=").append(budgetDetail.getBudgetGroup().getId());
+        	query.append(" and budgetGroup.id=").append(budgetDetail.getBudgetGroup().getId());
         }
         if (budgetDetail.getFunction() != null && budgetDetail.getFunction().getId() != null
                 && budgetDetail.getFunction().getId() != -1)
         {
         	System.out.println("budgetDetail.getFunction().getId() :: "+budgetDetail.getFunction().getId());
-            query.append(" and function.id=").append(budgetDetail.getFunction().getId());
+        	query.append(" and function.id=").append(budgetDetail.getFunction().getId());
         }
         if (budgetDetail.getFund() != null && budgetDetail.getFund().getId() != null && budgetDetail.getFund().getId() != -1)
         {
         	System.out.println("budgetDetail.getFund().getId() ::"+budgetDetail.getFund().getId());
-            query.append(" and fund.id=").append(budgetDetail.getFund().getId());
+        	query.append(" and fund.id=").append(budgetDetail.getFund().getId());
         }
         if (budgetDetail.getFunctionary() != null && budgetDetail.getFunctionary().getId() != null
                 && budgetDetail.getFunctionary().getId() != -1)

@@ -473,33 +473,33 @@ public class RemitRecoveryService {
             remitBean = new RemittanceBean();
             try
             {
-            remitBean.setVoucherName(element[0].toString());
-            remitBean.setVoucherNumber(element[1].toString());
-            try {
-                remitBean.setVoucherDate(DDMMYYYY.format(YYYYMMDD.parse(element[2].toString())));
-            } catch (final ParseException e) {
-                LOGGER.error("Exception Occured while Parsing instrument date" + e.getMessage());
-            }
-            remitBean.setDeductionAmount(BigDecimal.valueOf(Double.parseDouble(element[3].toString())));
-            if (element[5] != null)
-                remitBean.setEarlierPayment(BigDecimal.valueOf(Double.parseDouble(element[5].toString())));
-            else
-                remitBean.setEarlierPayment(BigDecimal.ZERO);
-            if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
-                remitBean.setAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
-            else
-                remitBean.setAmount(remitBean.getDeductionAmount());
-            remitBean.setDepartmentId(element[6].toString());
-            if(element[7]!=null)
-                remitBean.setFunctionId(Long.valueOf(element[7].toString()));
-            if (voucherHeader == null){
-                if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
-                    remitBean.setPartialAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
-                else{
-                    remitBean.setPartialAmount(remitBean.getDeductionAmount());
+            	remitBean.setVoucherName(element[0].toString());
+                remitBean.setVoucherNumber(element[1].toString());
+                try {
+                    remitBean.setVoucherDate(DDMMYYYY.format(YYYYMMDD.parse(element[2].toString())));
+                } catch (final ParseException e) {
+                    LOGGER.error("Exception Occured while Parsing instrument date" + e.getMessage());
                 }
-            }
-            remitBean.setRemittance_gl_Id(Integer.valueOf(element[4].toString()));
+                remitBean.setDeductionAmount(BigDecimal.valueOf(Double.parseDouble(element[3].toString())));
+                if (element[5] != null)
+                    remitBean.setEarlierPayment(BigDecimal.valueOf(Double.parseDouble(element[5].toString())));
+                else
+                    remitBean.setEarlierPayment(BigDecimal.ZERO);
+                if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
+                    remitBean.setAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
+                else
+                    remitBean.setAmount(remitBean.getDeductionAmount());
+                remitBean.setDepartmentId(element[6].toString());
+                if(element[7]!=null)
+                    remitBean.setFunctionId(Long.valueOf(element[7].toString()));
+                if (voucherHeader == null){
+                    if (remitBean.getEarlierPayment() != null && remitBean.getEarlierPayment().compareTo(BigDecimal.ZERO) != 0)
+                        remitBean.setPartialAmount(remitBean.getDeductionAmount().subtract(remitBean.getEarlierPayment()));
+                    else{
+                        remitBean.setPartialAmount(remitBean.getDeductionAmount());
+                    }
+                }
+                remitBean.setRemittance_gl_Id(Integer.valueOf(element[4].toString()));
                 if(element[9] != null)
                 {
                 	remitBean.setNaration(element[9].toString());

@@ -274,7 +274,7 @@ public class ReceiptAction extends BaseFormAction {
      * payment that are not allowed during receipt creation
      */
     private List<String> collectionModesNotAllowed = new ArrayList<>(0);
-
+    
     @Autowired
     private SecurityUtils securityUtils;
 

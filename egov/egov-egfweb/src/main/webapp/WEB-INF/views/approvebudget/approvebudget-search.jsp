@@ -173,9 +173,9 @@
 
 		} else {
 
-			e.preventDefault();
+		e.preventDefault();
 
-		}
+	}  
 
 });
 

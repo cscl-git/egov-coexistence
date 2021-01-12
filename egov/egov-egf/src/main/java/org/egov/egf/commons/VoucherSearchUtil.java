@@ -277,6 +277,11 @@ public class VoucherSearchUtil {
 			sql = sql + " and vh.moduleId is null ";
 			else
 			sql = sql + " and vh.moduleId=" + voucherHeader.getModuleId();
+		
+		if (voucherHeader.getVouchermis().getRecieptNumber()!=null && !"".equals(voucherHeader.getVouchermis().getRecieptNumber()))
+			sql = sql + " and vh.vouchermis.recieptNumber like '%" + voucherHeader.getVouchermis().getRecieptNumber() + "%'";
+		if (voucherHeader.getVouchermis().getServiceName()!=null && !"".equals(voucherHeader.getVouchermis().getServiceName()))
+			sql = sql + " and vh.vouchermis.serviceName like '%" + voucherHeader.getVouchermis().getServiceName() + "%'";
 
 		return sql;
 	}

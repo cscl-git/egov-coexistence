@@ -566,14 +566,23 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 .append(" order by ih.id");
         voucherHeader = persistenceService.getSession().load(CVoucherHeader.class,
                 voucherHeader.getId());
+        
+        LOGGER.info("voucherHeader.getId()  ::"+voucherHeader.getId());
         paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
                 voucherHeader);
         commonBean.setAmount(paymentheader.getPaymentAmount());
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
-
+        
+        LOGGER.info("paymentheader.getPaymentAmount()  ::"+paymentheader.getPaymentAmount());
+        LOGGER.info("paymentheader.getBankaccount().getId().toString()  ::"+paymentheader.getBankaccount().getId().toString());
+        LOGGER.info("paymentheader.getBankaccount().getNarration()  ::"+paymentheader.getBankaccount().getNarration());
+        
+        
         final String bankBranchId = paymentheader.getBankaccount().getBankbranch().getBank().getId() + "-"
                 + paymentheader.getBankaccount().getBankbranch().getId();
+        
+        LOGGER.info("bankBranchId  ::"+bankBranchId);
         commonBean.setBankId(bankBranchId);
         commonBean.setModeOfPayment(paymentheader.getType());
         final Miscbilldetail miscbillDetail = (Miscbilldetail) persistenceService
@@ -587,6 +596,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         }
 
         final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
+        LOGGER.info("bankGlcode  ::"+bankGlcode);
         VoucherDetails bankdetail = null;
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
 
@@ -887,6 +897,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         if (paymentheader.getVoucherheader() != null)
             voucherHeader.setId(paymentheader.getVoucherheader().getId());
         prepareForViewModifyReverse();
+        System.out.println("END");
         return VIEW;
 
     }
@@ -895,11 +906,12 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/directBankPayment-sendForApproval")
     public String sendForApproval() {
-
+    	LOGGER.info("send for approval");
         if (paymentheader.getId() == null)
             paymentheader = getPayment();
-
+        LOGGER.info("before populate work flow bean");
         populateWorkflowBean();
+        LOGGER.info("before send for approval");
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))

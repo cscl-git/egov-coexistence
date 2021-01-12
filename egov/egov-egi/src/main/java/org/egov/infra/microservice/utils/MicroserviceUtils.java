@@ -756,8 +756,8 @@ public class MicroserviceUtils {
         DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
         StringBuilder empUrl = new StringBuilder(appConfigManager.getEgovHrmsSerHost()).append(approverSrvcUrl);
         empUrl.append("?tenantId=" + getTenentId());
-        List<EmployeeInfo> resultList=null;
-        if (empId != 0)
+        List<EmployeeInfo> resultList=new ArrayList<EmployeeInfo>();
+        if (empId != null && empId != 0)
             empUrl.append("&ids=" + empId);
         if (toDay != null)
             empUrl.append("&asOnDate=" + getEpochDate(toDay));
@@ -774,7 +774,7 @@ public class MicroserviceUtils {
         reqWrapper.setRequestInfo(requestInfo);
 
         EmployeeInfoResponse empResponse = restTemplate.postForObject(empUrl.toString(), reqWrapper, EmployeeInfoResponse.class);
-        	if(empResponse != null && empResponse.getEmployees() != null || !empResponse.getEmployees().isEmpty())
+        	if(empResponse != null && empResponse.getEmployees() != null && !empResponse.getEmployees().isEmpty())
             {
         		resultList=empResponse.getEmployees();
             }
@@ -1145,6 +1145,18 @@ public class MicroserviceUtils {
                 .build();
         return this.getReceipt(criteria);
     }
+
+	public List<Receipt> getReceipts(String ids, String status, String serviceCodes, Date fromDate, Date toDate,String serviceTypeId) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .status(Arrays.stream(status.split(",")).collect(Collectors.toSet()))
+                .fromDate(fromDate)
+                .toDate(toDate)
+                .businessCodes(serviceTypeId != null ? Arrays.stream(serviceTypeId.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
+                .receiptNumbers(Arrays.stream(ids.split(",")).collect(Collectors.toSet()))
+                .businessCodes(Arrays.stream(serviceCodes.split(",")).collect(Collectors.toSet()))
+                .build();
+        return this.getReceipt(criteria);
+    }
     
     public List<Receipt> getReceipt(ReceiptSearchCriteria rSearchcriteria) {
         // Checking for the collection version either older version or new version are getting used
@@ -1152,10 +1164,15 @@ public class MicroserviceUtils {
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
         case "VERSION2":
+        	System.out.println("DDDDD");
             PaymentSearchCriteria paySearchCriteria=new PaymentSearchCriteria();
+            System.out.println("EEEE");
             rSearchcriteria.toPayemntSerachCriteriaContract(paySearchCriteria);
+            System.out.println("FFFF");
             List<Payment> payments = this.getPayments(paySearchCriteria);
+            System.out.println("GGGG");
             paymentUtils.getReceiptsFromPayments(payments, receipts);
+            System.out.println("HHHH");
             break;
 
         default:
@@ -1228,15 +1245,16 @@ public class MicroserviceUtils {
         return this.searchReciepts(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo));
 
     }
-
+    
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
             String receiptNo) {
-
+    	System.out.println("AAAAA");
         return this.searchReciepts(classification, fromDate, toDate, businessCode,department, Arrays.asList(receiptNo));
 
     }
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
             List<String> receiptNos) {
+    	System.out.println("BBBB");
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
@@ -1245,18 +1263,29 @@ public class MicroserviceUtils {
                //.receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
                 //.classification(classification)
                 .build();
+        System.out.println("CCCCC");
         return this.getReceipt(criteria);
     }
     
     public List<Receipt> searchRecieptsFinance(String classification, Date fromDate, Date toDate, String businessCode,
             String receiptNo,String type) {
+    	
+    	if(receiptNo != null && !receiptNo.isEmpty())
+    	{
+    		return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo.split(",")),type);
+    	}
+    	else
+    	{
+    		return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, null,type);
+    	}
 
-        return this.searchRecieptsFin(classification, fromDate, toDate, businessCode, Arrays.asList(receiptNo),type);
+        
 
     }
 
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,
             List<String> receiptNos) {
+    	LOGGER.info("receiptNos.size()     :::"+receiptNos.size());
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
@@ -1266,7 +1295,7 @@ public class MicroserviceUtils {
                 .build();
         return this.getReceipt(criteria);
     }
-
+    
     public List<Receipt> searchRecieptsFin(String classification, Date fromDate, Date toDate, String businessCode,
             List<String> receiptNos,String type) {
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
@@ -1740,9 +1769,13 @@ public class MicroserviceUtils {
     }
     
     public List<Payment> getPayments(PaymentSearchCriteria searchCriteria){
+    	System.out.println("IIII");
+    	System.out.println("searchCriteria.getIds() ::: "+searchCriteria.getIds());
+    	System.out.println("searchCriteria.getReceiptNumbers()   ::: "+searchCriteria.getReceiptNumbers());
         PaymentResponse response = null;
          RequestInfo requestInfo = getRequestInfo();
          RequestInfoWrapper reqWrapper = null;
+         RequestInfoCancelWrapper reqReceiptWrapper=new RequestInfoCancelWrapper();
          RequestInfoSearchWrapper reqSearchWrapper = new RequestInfoSearchWrapper();
         StringBuilder url = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentSearch()).append("?");
         if(searchCriteria.getIds() != null && !searchCriteria.getIds().isEmpty())
@@ -1750,10 +1783,16 @@ public class MicroserviceUtils {
         	reqSearchWrapper.setIds(searchCriteria.getIds());
         	reqSearchWrapper.setRequestInfo(requestInfo);
         }
+        else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty())
+        {
+        	LOGGER.info("searchCriteria.getReceiptNumbers()     :::"+searchCriteria.getReceiptNumbers().size());
+        	reqReceiptWrapper.setIds(searchCriteria.getReceiptNumbers());
+        	reqReceiptWrapper.setRequestInfo(requestInfo);
+        }
         else
         {
             reqWrapper = new RequestInfoWrapper();
-            reqWrapper.setRequestInfo(requestInfo);
+        reqWrapper.setRequestInfo(requestInfo);
         }
         try {
             preparePaymentSearchQueryString(searchCriteria, url);
@@ -1762,10 +1801,14 @@ public class MicroserviceUtils {
             	LOGGER.info("ids ; "+url.toString());
             	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
             }
+            else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty()) {
+            	LOGGER.info("reqReceiptWrapper.getIds().size()    :::"+reqReceiptWrapper.getIds().size());
+            	response = restTemplate.postForObject(url.toString(), reqReceiptWrapper, PaymentResponse.class);
+            }
             else
             {
             	LOGGER.info("non ids : "+url.toString());
-            	response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
+            response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
             }
             
             return response.getPayments();
@@ -1791,9 +1834,11 @@ public class MicroserviceUtils {
         if(StringUtils.isNotBlank(searchCriteria.getTenantId())){
             url.append("&tenantId=").append(searchCriteria.getTenantId());
         }
-        if(CollectionUtils.isNotEmpty(searchCriteria.getReceiptNumbers())){
-            url.append("&receiptNumbers=").append(StringUtils.join(searchCriteria.getReceiptNumbers(),","));
-        }
+		/*
+		 * if(CollectionUtils.isNotEmpty(searchCriteria.getReceiptNumbers())){
+		 * url.append("&receiptNumbers=").append(StringUtils.join(searchCriteria.
+		 * getReceiptNumbers(),",")); }
+		 */
         if(CollectionUtils.isNotEmpty(searchCriteria.getStatus())){
             url.append("&status=").append(StringUtils.join(searchCriteria.getStatus(),","));
         }

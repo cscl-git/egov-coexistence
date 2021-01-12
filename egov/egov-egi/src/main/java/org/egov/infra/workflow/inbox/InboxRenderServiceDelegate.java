@@ -98,9 +98,11 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     private static final String WORKFLOW_MODULE_AGENDA="agenda";
     private static final String WORKFLOW_MODULE_APNIMANDI="apnimandi";
     private static final String WORKFLOW_MODULE_AUDIT="audit";
+	private static final String WORKFLOW_MODULE_WORKS="works";
     private static final List<String> WORKFLOW_MODULE_AGENDA_TYPES = Arrays.asList("CouncilPreamble","CouncilMeeting");
     private static final List<String> WORKFLOW_MODULE_APNIMANDI_TYPES = Arrays.asList("ApnimandiContractor","ApnimandiCollectionDetails");
     private static final List<String> WORKFLOW_MODULE_AUDIT_TYPES = Arrays.asList("AuditDetails");
+	private static final List<String> WORKFLOW_MODULE_WORKS_TYPES = Arrays.asList("EstimatePreparationApproval","WorkOrderAgreement","DNITCreation");
     private static final Logger LOG = LoggerFactory.getLogger(InboxRenderServiceDelegate.class);
     private static final String INBOX_RENDER_SERVICE_SUFFIX = "%sInboxRenderService";
     private static final Map<String, WorkflowTypes> WORKFLOW_TYPE_CACHE = new ConcurrentHashMap<>();
@@ -227,6 +229,9 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     		return true;
     	}else if(WORKFLOW_MODULE_AUDIT.equalsIgnoreCase(module)
     			&& WORKFLOW_MODULE_AUDIT_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_WORKS.equalsIgnoreCase(module)
+    			&& WORKFLOW_MODULE_WORKS_TYPES.contains(type)) {
     		return true;
     	}
     	return false;

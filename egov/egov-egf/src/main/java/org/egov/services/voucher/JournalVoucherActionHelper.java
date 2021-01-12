@@ -61,7 +61,7 @@ import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CFunction;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.DocumentUpload;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.utils.DocumentUtils;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.admin.master.entity.User;
@@ -163,8 +163,8 @@ public class JournalVoucherActionHelper {
    @Transactional
    public void saveDocuments(CVoucherHeader voucherHeader)
    {
-	   List<DocumentUpload> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
-       final List<DocumentUpload> documentDetails;
+	   List<DocumentUploads> files = voucherHeader.getDocumentDetail() == null ? null : voucherHeader.getDocumentDetail();
+       final List<DocumentUploads> documentDetails;
        documentDetails = docUtils.getDocumentDetails(files, voucherHeader,
                CommonConstants.JOURNAL_VOUCHER_OBJECT);
        if (!documentDetails.isEmpty()) {
@@ -272,7 +272,7 @@ public class JournalVoucherActionHelper {
             voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
                     .withComments(workflowBean.getApproverComments())
                     .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(voucherHeader.getState().getInitiatorPosition())
+                    .withOwner(voucherHeader.getState().getInitiatorPosition()).withOwnerName((voucherHeader.getState().getInitiatorPosition() != null && voucherHeader.getState().getInitiatorPosition() > 0L) ? getEmployeeName(voucherHeader.getState().getInitiatorPosition()):"")
                     .withNextAction(FinancialConstants.WF_STATE_EOA_Approval_Pending);
 
         } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
@@ -307,7 +307,7 @@ public class JournalVoucherActionHelper {
                         .withComments(workflowBean.getApproverComments())
                        // .withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
-                        .withOwner(workflowBean.getApproverPositionId())
+                        .withOwner(workflowBean.getApproverPositionId()).withOwnerName((workflowBean.getApproverPositionId() != null && workflowBean.getApproverPositionId() > 0L) ? getEmployeeName(workflowBean.getApproverPositionId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withInitiator(user.getId());
                         //.withInitiator((info != null && info.getAssignments() != null && !info.getAssignments().isEmpty())
@@ -336,7 +336,7 @@ public class JournalVoucherActionHelper {
                         .withComments(workflowBean.getApproverComments())
                         //.withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
                         .withStateValue(ststeValue).withDateInfo(currentDate.toDate())
-                        .withOwner(owner)
+                        .withOwner(owner).withOwnerName((owner != null && owner > 0L) ? getEmployeeName(owner):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
         }
@@ -474,4 +474,8 @@ public class JournalVoucherActionHelper {
 		}
 		return pos;
 	}
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

@@ -801,7 +801,7 @@ public class CreateVoucher {
 				final String billtype = egBillRegisterHibernateDAO.getBillTypeforVoucher(voucherheader);
 				if (billtype == null) {
 					applicationContext.getBean("voucherWorkflowService");
-					voucherheader.transition().start().withOwner(getPosition());
+					voucherheader.transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
 					// voucherWorkflowService.transition("aa_approve",
 					// voucherheader, "Created"); // action name need to pass
 					// Position position =
@@ -812,7 +812,7 @@ public class CreateVoucher {
 							.getBean("persistenceService");
 					final Position nextPosition = getNextPosition(voucherheader, vs, persistenceService, null);
 					voucherheader.transition().progressWithStateCopy().withStateValue("WORKFLOW INITIATED")
-							.withOwner(nextPosition).withComments("WORKFLOW STARTED");
+							.withOwner(nextPosition).withComments("WORKFLOW STARTED").withOwnerName((nextPosition.getId() != null && nextPosition.getId() > 0L) ? getEmployeeName(nextPosition.getId()):"");
 				}
 			}
 			/*
@@ -924,19 +924,19 @@ public class CreateVoucher {
 				applicationContext.getBean("voucherWorkflowService");
 				if (LOGGER.isDebugEnabled())
 					LOGGER.debug("completed voucherWorkflowService from application context.......");
-				cjv.getVoucherHeaderId().transition().start().withOwner(getPosition());
+				cjv.getVoucherHeaderId().transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
 				// voucherWorkflowService.transition("am_approve",
 				// cjv.getVoucherHeaderId(), "Created"); // action name need to
 				// pass
 				final Position position = eisCommonService.getPositionByUserId(ApplicationThreadLocals.getUserId());
 				cjv.transition().progressWithStateCopy().withStateValue("WORKFLOW INITIATED").withOwner(position)
-						.withComments("WORKFLOW STARTED");
+						.withComments("WORKFLOW STARTED").withOwnerName((position.getId() != null && position.getId() > 0L) ? getEmployeeName(position.getId()):"");
 				final VoucherService vs = (VoucherService) applicationContext.getBean("voucherService");
 				final PersistenceService persistenceService = (PersistenceService) applicationContext
 						.getBean("persistenceService");
 				final Position nextPosition = getNextPosition(cjv.getVoucherHeaderId(), vs, persistenceService, null);
 				cjv.transition().progressWithStateCopy().withStateValue("WORKFLOW INITIATED").withOwner(nextPosition)
-						.withComments("WORKFLOW STARTED");
+						.withComments("WORKFLOW STARTED").withOwnerName((nextPosition.getId() != null && nextPosition.getId() > 0L) ? getEmployeeName(nextPosition.getId()):"");
 			}
 		} catch (final Exception e) {
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -971,13 +971,13 @@ public class CreateVoucher {
 			applicationContext.getBean("voucherWorkflowService");
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("completed voucherWorkflowService from application context.......");
-			voucherHeader.transition().start().withOwner(getPosition());
+			voucherHeader.transition().start().withOwner(getPosition()).withOwnerName((getPosition().getId() != null && getPosition().getId() > 0L) ? getEmployeeName(getPosition().getId()):"");
 			final VoucherService vs = (VoucherService) applicationContext.getBean("voucherService");
 			final PersistenceService persistenceService = (PersistenceService) applicationContext
 					.getBean("persistenceService");
 			final Position nextPosition = getNextPosition(voucherHeader, vs, persistenceService, null);
 			voucherHeader.transition().progressWithStateCopy().withStateValue("Forwarded").withOwner(nextPosition)
-					.withComments("Forwarded");
+					.withComments("Forwarded").withOwnerName((nextPosition.getId() != null && nextPosition.getId() > 0L) ? getEmployeeName(nextPosition.getId()):"");
 
 		} catch (final Exception e) {
 			final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -2825,5 +2825,10 @@ public class CreateVoucher {
 		}
 		return fiscalPeriod;
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 
 }

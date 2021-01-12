@@ -157,7 +157,7 @@
 									value="%{#attr.currentRowObject_rowNum+ (page-1)*pageSize}" />
 							</display:column>
 
-							<display:column title="Bill Number"
+							<display:column title="Bill Number" 
 								style="width:10%;text-align:center" property="billNumber" />
 							<display:column title="Bill Date"
 								style="width:8%;text-align:center" property="billDate"
@@ -178,7 +178,7 @@
 								style="width:11%;text-align:center"
 								property="paymentVoucherNumber" sortProperty="vouchernumber" sortable="true"/>
 							<display:column title="Payment Pex number " 
-								style="width:11%;text-align:center" 	
+								style="width:11%;text-align:center"
 								property="pexNo" />
 							<display:column title="Deduction voucher number " href="javascript:openVoucher('${currentRowObject.deducVhId}');"
 								style="width:11%;text-align:center"
@@ -298,7 +298,7 @@
 		
 
 		}
-
+	
 		function openVoucher(vid)
 		{
 			var url = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+ vid;

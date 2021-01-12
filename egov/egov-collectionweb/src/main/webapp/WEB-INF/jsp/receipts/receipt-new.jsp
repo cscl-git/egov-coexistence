@@ -405,8 +405,8 @@ function validate()
 		}
 		if(instrTypeCard)
 			{
-		document.getElementById('instrumentTypeCashOrCard').value="card";
-	}
+			document.getElementById('instrumentTypeCashOrCard').value="card";
+			}
 		else if(instrTypePosmohbd)
 			{
 			document.getElementById('instrumentTypeCashOrCard').value="posmohbd";

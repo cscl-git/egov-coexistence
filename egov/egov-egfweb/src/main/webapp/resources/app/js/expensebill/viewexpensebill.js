@@ -51,6 +51,7 @@ var debitamount = 0;
 var creditamount = 0;
 $(document).ready(function(){
 	calculateBillAmount();
+	worksDiv();
 	});
 
 
@@ -79,6 +80,22 @@ $('.btn-primary').click(function(){
 	}else
 		return false;
 });
+
+
+
+
+
+
+function worksDiv(){
+	var billsubtype=$("#billSubType").val();
+	if(billsubtype=='Works'){
+		
+		$('.works').show();
+	}
+	else{
+		$('.works').hide();
+	}
+}
 
 
 function calculateBillAmount(){

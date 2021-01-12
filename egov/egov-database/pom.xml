@@ -116,7 +116,7 @@
                                 <resource>
                                     <directory>../egov-lcms/src/main/resources/db/migration</directory>
                                 </resource>
-								<resource>
+				<resource>
                                     <directory>../egov-council/src/main/resources/db/migration</directory>
                                 </resource>
 								<resource>

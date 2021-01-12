@@ -174,6 +174,9 @@ public class ExpenseBillService {
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
     
+    @Autowired
+	protected MicroserviceUtils microserviceUtils;
+    
 
     @Autowired
     public ExpenseBillService(final ExpenseBillRepository expenseBillRepository, final ScriptService scriptExecutionService) {
@@ -385,10 +388,17 @@ public class ExpenseBillService {
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode())
-            if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
-                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONAPPROVE))
-                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                        FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
+            if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
+                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
+            {
+            	egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT));
+            	
+            }
+			else if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
+                && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+            egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                    FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
             else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
@@ -400,6 +410,14 @@ public class ExpenseBillService {
                     && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
+            else if ("Pending for Cancellation".equals(egBillregister.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
+                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                        "Pending for Cancellation"));
+            else if ("Pending for Cancellation".equals(egBillregister.getStatus().getCode())
+                    && workFlowAction.equals(FinancialConstants.BUTTONAPPROVE))
+                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                        "Cancelled"));
 
     }
 
@@ -506,8 +524,8 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                         //       FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 	}
                     
@@ -515,11 +533,11 @@ public class ExpenseBillService {
 		if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
             	{
                 	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
-
+            		
             	}
                 egBillregister.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
@@ -531,7 +549,7 @@ public class ExpenseBillService {
                         .withStateValue(stateValue).withDateInfo(currentDate.toDate())
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-            } else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction)) {
+            } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
@@ -554,10 +572,11 @@ public class ExpenseBillService {
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
 
                 	
-                
+                System.out.println("stateValue ::: "+stateValue);
+                System.out.println("wfmatrix.getNextState() ::: "+wfmatrix.getNextState());
                 if (stateValue.isEmpty())
                 {
-                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
+                	if(!wfmatrix.getNextState().equalsIgnoreCase(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING) && !wfmatrix.getNextState().equalsIgnoreCase("Pending for Cancellation") && !wfmatrix.getNextState().equalsIgnoreCase("Final Cancellation Pending") && !wfmatrix.getNextState().equalsIgnoreCase("NEW"))
                 	{
                 		stateValue = wfmatrix.getNextState()+ " "+designation.getName().toUpperCase();
                 	}
@@ -568,8 +587,11 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
+                		{
+                			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                                    FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		}
                 		
                 	}
                     
@@ -577,26 +599,34 @@ public class ExpenseBillService {
 				if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
             	{
                 	stateValue = FinancialConstants.BUTTONSAVEASDRAFT;
-
+            		
             	}
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
-                egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
-                        .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
-                        .withNextAction(wfmatrix.getNextAction())
-                        .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
 		        
-            }
+		        }
+				else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction))
+				{
+					egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date())
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+				}
 				else
 				{
                 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                         .withNextAction(wfmatrix.getNextAction())
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-        }
+            }
         }
         
         if (LOG.isDebugEnabled())
@@ -799,4 +829,8 @@ public class ExpenseBillService {
     	List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
     	return desgnList.get(0);
     }
+    public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 }

@@ -196,17 +196,17 @@ table.its th {
 							<tr>
 								<td align="center"><input type="button"
 									class="buttonsubmit" value="EXPORT PAGE 1" id="exportpdf"
-									name="exportpdf" onclick="exportPDF();" /> 
+									name="exportpdf" onclick="exportPDF();" />
 									<input type="button"
 									class="buttonsubmit" value="EXPORT PAGE 2" id="exportpdf1"
-									name="exportpdf1" onclick="exportPDF1();" /> 
+									name="exportpdf1" onclick="exportPDF1();" />
 									<input type="button"
 									class="buttonsubmit" value="EXPORT PAGE 3" id="exportpdf3"
 									name="exportpdf3" onclick="exportPDF3();" />
 									<input type="button"
 									class="buttonsubmit" value="EXPORT PAGE 4" id="exportpdf4"
 									name="exportpdf4	" onclick="exportPDF4();" />
-									<input
+									 <input
 									type="button" class="buttonsubmit" value="EXPORT EXCEL"
 									id="exportpdf" name="exportpdf" onclick="exportExcel();" /> <!-- 	<input type="button" class="buttonsubmit" value="EXPORT HTM" id="exporthtml" name="exportpdf" onclick="exportHtml();"/>-->
 								</td>

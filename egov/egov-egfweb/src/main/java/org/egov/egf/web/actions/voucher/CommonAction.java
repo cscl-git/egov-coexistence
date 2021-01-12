@@ -777,6 +777,7 @@ public class CommonAction extends BaseFormAction {
             for (final Object[] obj : resultList) {
                 InstrumentHeader ih = new InstrumentHeader();
                 ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", (Long) obj[0]);
+
                 instrumentHeaderList.add(ih);
             }
         } catch (final HibernateException e) {

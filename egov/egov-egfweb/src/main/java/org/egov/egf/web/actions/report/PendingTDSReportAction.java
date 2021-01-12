@@ -49,9 +49,12 @@ package org.egov.egf.web.actions.report;
 
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -59,6 +62,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -109,7 +117,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
         @Result(name = "XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
                 "application/xls", "contentDisposition", "no-cache;filename=DeductionDetailedReport.xls" }),
         @Result(name = "deductionXLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream", "contentType",
-                "application/xls", "contentDisposition", "no-cache;filename=DeductionReport.xls" }),
+                "application/xls", "contentDisposition", "no-cache;filename=DeductionReports.xls" }),
         @Result(name = "summary-PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
                 "contentType", "application/pdf", "contentDisposition", "no-cache;filename=DeductionsRemittanceSummary.pdf" }),
         @Result(name = "summary-XLS", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
@@ -870,26 +878,227 @@ public class PendingTDSReportAction extends BaseFormAction {
             }
         }
         System.out.println("4");
-        paramMap.put("labourCessDataSource",getDataSource(reportList));
-        ReportRequest reportInput = null;
-        ReportOutput reportOutput = null;
+        System.out.println("report list size ::: "+reportList.size());
         System.out.println("5");
-        try
-        {
-        	reportInput = new ReportRequest(jasperName, reportList, paramMap);
-        reportInput.setReportFormat(ReportFormat.XLS);
-            reportOutput = reportService.createReport(reportInput);
-            System.out.println("end of report:::"+reportOutput.getReportOutputData().length);
-        inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-            System.out.println("inputStream ::::"+inputStream);
+		try {
+			byte[] fileContent=populateExcel(reportList,paramMap);
+			inputStream = new ByteArrayInputStream(fileContent);
+				            
         }catch (Exception e) {
+        	System.out.println("ERROR2 ::: "+e.getMessage());
 			e.printStackTrace();
 		}
         System.out.println("END");
         return "deductionXLS";
     }
 
-    private String getPexNo(String billVoucherNo) {
+    private byte[] populateExcel(List<DeductionReportBean> reportList, Map<String, Object> paramMap) throws IOException {
+    	String jasper=(String)paramMap.get("jasper");
+    	String heading=(String)paramMap.get("header");
+    	String note=(String)paramMap.get("note");
+    	
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet(jasper);
+		HSSFRow row = sheet.createRow(1);
+		HSSFCell cell;
+		cell = row.createCell(0);
+		cell.setCellValue(heading);
+		HSSFRow rowhead = sheet.createRow(5);
+		if(jasper.equalsIgnoreCase("LaborCess"))
+		{
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("Work Done");
+		    rowhead.createCell(8).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(8).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(7).setCellValue("Total");
+		    details.createCell(8).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
+		}
+		else if(jasper.equalsIgnoreCase("WaterCharges"))
+		{
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("Work Done");
+		    rowhead.createCell(8).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(8).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(7).setCellValue("Total");
+		    details.createCell(8).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
+		}
+		else if(jasper.equalsIgnoreCase("TDSOnGST"))
+		{
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("GST no. of Agency");
+		    rowhead.createCell(8).setCellValue("Work Done");
+		    rowhead.createCell(9).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getGstNoOfAgency());
+		    	details.createCell(8).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(9).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(8).setCellValue("Total");
+		    details.createCell(9).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
+		}
+		else if(jasper.equalsIgnoreCase("CollectionCharges"))
+		{
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("Work Done");
+		    rowhead.createCell(8).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(8).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(8).setCellValue("Total");
+		    details.createCell(9).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
+		}
+		else if(jasper.equalsIgnoreCase("IncomeTax"))
+		{
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("PAN no. of Agency");
+		    rowhead.createCell(8).setCellValue("Work Done");
+		    rowhead.createCell(9).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getPanNoOfAgency());
+		    	details.createCell(8).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(9).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(8).setCellValue("Total");
+		    details.createCell(9).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
+		}
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		System.out.println("XYZ");
+		wb.write(os);
+		System.out.println("UVW");
+		byte[] fileContent = os.toByteArray();
+		System.out.println("CCCC");
+
+		return fileContent;
+	}
+
+	private String getPexNo(String billVoucherNo) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	String pexNo="";
@@ -949,7 +1158,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 	    return desc;
 	}
 
-    private String getNarration(String voucherNumber) {
+	private String getNarration(String voucherNumber) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	String desc="";
@@ -964,8 +1173,8 @@ public class PendingTDSReportAction extends BaseFormAction {
     	    	{
     	    		if(element[1] != null)
     	    		{
-    	    		desc= element[1].toString();
-    	    	}
+    	    			desc= element[1].toString();
+    	    		}
     	    		else
     	    		{
     	    			desc="";
@@ -1004,7 +1213,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 			note="Note: The responsibility for work done lies with concerned Division.";
 			jasper="WaterCharges";
 		}
-		else if(recoveryCode.equals("3502054") || recoveryCode.equals("3502055") || recoveryCode.equals("3502002"))
+		else if(recoveryCode.equals("3502054") || recoveryCode.equals("3502055") || recoveryCode.equals("3502002") || recoveryCode.equals("3502019"))
 		{
 			heading="Detail of TDS on GST for the month of "+fDate+ " - "+tDate+ "of Engg. Wing, M.C.(Non Salary)";
 			note="Note: The responsibility for work done & GST No. lies with concerned Division.";
@@ -1022,7 +1231,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 		
 	}
 
-    @Action(value = "/report/pendingTDSReport-exportSummaryXls")
+	@Action(value = "/report/pendingTDSReport-exportSummaryXls")
     public String exportSummaryXls() throws JRException, IOException {
         populateSummaryData();
         final ReportRequest reportInput = new ReportRequest(summaryJasperpath, remittedTDS, getParamMap());

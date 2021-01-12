@@ -147,6 +147,22 @@
             </div>
             <div class="col-sm-3 add-margin view-content">${contractor.esiNumber}</div>
           </div>
+          <div class="row add-border">
+            <div class="col-xs-3 add-margin">
+              <spring:message code="blacklisting.from.date" text="BlackListing From Date"/>
+            </div>
+            <div class="col-sm-3 add-margin view-content">${contractor.blckListFromDate}</div>
+            <div class="col-xs-3 add-margin">
+              <spring:message code="blacklisting.to.date" text="BlackListing To Date"/>
+            </div>
+            <div class="col-sm-3 add-margin view-content">${contractor.blckListToDate}</div>
+          </div>
+          <div class="row add-border">
+            <div class="col-xs-3 add-margin">
+              <spring:message code="contractor.vigilance" text="Vigilance Case"/>
+            </div>
+            <div class="col-sm-3 add-margin view-content">${contractor.vigilance}</div>
+          </div>
         </div>
       </div>
     </div>
