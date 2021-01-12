@@ -894,7 +894,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 
     private byte[] populateExcel(List<DeductionReportBean> reportList, Map<String, Object> paramMap) throws IOException {
     	String jasper=(String)paramMap.get("jasper");
-    	String heading=(String)paramMap.get("heading");
+    	String heading=(String)paramMap.get("header");
     	String note=(String)paramMap.get("note");
     	
 		HSSFWorkbook wb = new HSSFWorkbook();
@@ -906,19 +906,149 @@ public class PendingTDSReportAction extends BaseFormAction {
 		HSSFRow rowhead = sheet.createRow(5);
 		if(jasper.equalsIgnoreCase("LaborCess"))
 		{
-			
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("Work Done");
+		    rowhead.createCell(8).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(8).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(7).setCellValue("Total");
+		    details.createCell(8).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
 		}
 		else if(jasper.equalsIgnoreCase("WaterCharges"))
 		{
-			
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("Work Done");
+		    rowhead.createCell(8).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(8).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(7).setCellValue("Total");
+		    details.createCell(8).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
 		}
 		else if(jasper.equalsIgnoreCase("TDSOnGST"))
 		{
-			
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("GST no. of Agency");
+		    rowhead.createCell(8).setCellValue("Work Done");
+		    rowhead.createCell(9).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getGstNoOfAgency());
+		    	details.createCell(8).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(9).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(8).setCellValue("Total");
+		    details.createCell(9).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
 		}
 		else if(jasper.equalsIgnoreCase("CollectionCharges"))
 		{
-			
+			rowhead.createCell(0).setCellValue("Sl No.");  
+		    rowhead.createCell(1).setCellValue("Recovery Code");  
+		    rowhead.createCell(2).setCellValue("Voucher No.");  
+		    rowhead.createCell(3).setCellValue("Bill Voucher No.");  
+		    rowhead.createCell(4).setCellValue("PEX Number");  
+		    rowhead.createCell(5).setCellValue("Division");
+		    rowhead.createCell(6).setCellValue("Name of Agency");
+		    rowhead.createCell(7).setCellValue("Work Done");
+		    rowhead.createCell(8).setCellValue("Amount");
+		    BigDecimal total=new BigDecimal("0");
+		    int index=1;
+		    int rowCount=6;
+		    HSSFRow details ;
+		    for(DeductionReportBean bean : reportList)
+		    {
+		    	details=sheet.createRow(rowCount++);
+		    	details.createCell(0).setCellValue(index++);  
+		    	details.createCell(1).setCellValue(bean.getRecoveryCode());  
+		    	details.createCell(2).setCellValue(bean.getVoucherNo());  
+		    	details.createCell(3).setCellValue(bean.getBillVoucherNo());  
+		    	details.createCell(4).setCellValue(bean.getPexNo());  
+		    	details.createCell(5).setCellValue(bean.getDivision());
+		    	details.createCell(6).setCellValue(bean.getNameOfAgency());
+		    	details.createCell(7).setCellValue(bean.getWorkDone());
+			    total=total.add(bean.getAmount());
+			    details.createCell(8).setCellValue(bean.getAmount().doubleValue());
+		    	
+		    }
+		    details=sheet.createRow(rowCount);
+		    details.createCell(8).setCellValue("Total");
+		    details.createCell(9).setCellValue(total.doubleValue());
+		    details=sheet.createRow(rowCount+5);
+		    details.createCell(0).setCellValue(note);
 		}
 		else if(jasper.equalsIgnoreCase("IncomeTax"))
 		{
