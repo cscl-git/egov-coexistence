@@ -121,8 +121,6 @@ public class PaymentUtils {
         //prepare billdetails
         this.prepareBillDetailsData(paymentDetail,bill);
         receipt.getBill().add(bill);
-        System.out.println("subdivison xxxx ::: "+payment.getSubdivison());
-        System.out.println("gst xxxx ::: "+payment.getGstno());
         receipt.setSubdivison(payment.getSubdivison());
         receipt.setGstNo(payment.getGstno());
         receipt.setPaymentStatus(payment.getPaymentStatus().name());

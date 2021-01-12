@@ -1043,9 +1043,6 @@ public class SearchReceiptAction extends SearchFormAction {
          
          
          }
-         
-        
-        
         
         List<ReceiptReportBean> receiptReportList = new ArrayList<ReceiptReportBean>();
         ReceiptReportBean bean=null;

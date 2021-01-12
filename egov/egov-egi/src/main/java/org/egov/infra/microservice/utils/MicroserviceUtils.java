@@ -1164,8 +1164,11 @@ public class MicroserviceUtils {
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
         case "VERSION2":
+        	System.out.println("CCCCC");
             PaymentSearchCriteria paySearchCriteria=new PaymentSearchCriteria();
+            System.out.println("DDDD");
             rSearchcriteria.toPayemntSerachCriteriaContract(paySearchCriteria);
+            System.out.println("EEEE");
             List<Payment> payments = this.getPayments(paySearchCriteria);
             paymentUtils.getReceiptsFromPayments(payments, receipts);
             break;
@@ -1243,19 +1246,18 @@ public class MicroserviceUtils {
     
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
             String receiptNo) {
-
+    	System.out.println("AAAA   ::: "+businessCode);
         return this.searchReciepts(classification, fromDate, toDate, businessCode,department, Arrays.asList(receiptNo));
 
     }
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
             List<String> receiptNos) {
+    	System.out.println("BBBB :::"+businessCode);
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
                 .department(department)
                 .businessCodes(businessCode != null ? Arrays.stream(businessCode.split(",")).collect(Collectors.toSet()) : Collections.EMPTY_SET)
-               //.receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
-                //.classification(classification)
                 .build();
         return this.getReceipt(criteria);
     }
@@ -1762,6 +1764,11 @@ public class MicroserviceUtils {
     }
     
     public List<Payment> getPayments(PaymentSearchCriteria searchCriteria){
+    	
+    	System.out.println("IIII");
+    	System.out.println("searchCriteria.getIds() ::: "+searchCriteria.getIds());
+    	System.out.println("searchCriteria.getReceiptNumbers()   ::: "+searchCriteria.getReceiptNumbers());
+    	System.out.println("searchCriteria.getBusinessServices()   ::: "+searchCriteria.getBusinessServices());
         PaymentResponse response = null;
          RequestInfo requestInfo = getRequestInfo();
          RequestInfoWrapper reqWrapper = null;

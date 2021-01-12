@@ -86,7 +86,6 @@ public class ReceiptSearchCriteria {
         contract.setBusinessServices(this.businessCodes);
         contract.setFromDate(this.fromDate != null ? this.fromDate.getTime() : null);
         contract.setToDate(this.toDate != null ? this.toDate.getTime() : null);
-        System.out.println("this.receiptNumbers.size()     :::"+this.receiptNumbers.size());
         if(type == null || type.isEmpty())
         {
         	//contract.setReceiptNumbers(this.receiptNumbers);

@@ -52,7 +52,7 @@ $(document)
 					//var fileformatsinclude = [ 'doc', 'docx', 'xls', 'xlsx',
 							//'rtf', 'pdf', 'jpeg', 'jpg', 'png', 'txt', 'zip',
 							//'rar' ];
-					var fileformatsinclude = ['jpeg', 'jpg', 'png'];
+					var fileformatsinclude = ['jpeg', 'jpg', 'png', 'doc', 'docx'];
 
 					$('.upload-file')
 							.change(
