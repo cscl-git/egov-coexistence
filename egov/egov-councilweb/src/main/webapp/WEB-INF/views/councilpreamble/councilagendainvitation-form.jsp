@@ -94,7 +94,7 @@
 				<form:textarea path="message" id="message" cols="8"
 					rows="4" class="form-control patternvalidation"
 					data-pattern="alphanumericwithspace" required="required"
-					minlength="5" maxlength="300" />
+					minlength="5" maxlength="500" />
 
 				<form:errors path="message" cssClass="error-msg" />
 			</div>

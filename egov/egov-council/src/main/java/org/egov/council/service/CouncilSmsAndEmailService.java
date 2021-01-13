@@ -332,6 +332,7 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
+                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
                 LocaleContextHolder.getLocale());
     }
@@ -349,6 +350,7 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
+                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
                 LocaleContextHolder.getLocale());
     }
@@ -378,6 +380,7 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
+                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()) },
                 LocaleContextHolder.getLocale());
     }

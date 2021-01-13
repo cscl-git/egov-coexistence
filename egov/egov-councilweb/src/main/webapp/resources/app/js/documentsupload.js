@@ -49,9 +49,10 @@ $(document)
 		.ready(
 				function() {
 
-					var fileformatsinclude = [ 'doc', 'docx', 'xls', 'xlsx',
-							'rtf', 'pdf', 'jpeg', 'jpg', 'png', 'txt', 'zip',
-							'rar' ];
+					//var fileformatsinclude = [ 'doc', 'docx', 'xls', 'xlsx',
+							//'rtf', 'pdf', 'jpeg', 'jpg', 'png', 'txt', 'zip',
+							//'rar' ];
+					var fileformatsinclude = ['jpeg', 'jpg', 'png', 'doc', 'docx'];
 
 					$('.upload-file')
 							.change(
@@ -70,8 +71,10 @@ $(document)
 										}
 
 										var fileInput = $(this);
-										var maxSize = 10485760; // file size in
+										//var maxSize = 10485760; // file size in
 																// bytes(10MB)
+										
+										var maxSize = 78643200; // file size increased to 75 MB
 										var inMB = maxSize / 1024 / 1024;
 										if (fileInput.get(0).files.length) {
 											var fileSize = this.files[0].size; // in

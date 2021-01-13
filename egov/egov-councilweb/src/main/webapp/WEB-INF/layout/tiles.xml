@@ -271,6 +271,12 @@
         <put-attribute name="page-title" value="title.meeting.agenda.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilmeeting-agendaSearch.jsp"/>
     </definition>
+    
+    <!-- search to create notice -->
+    <definition name="councilmeetingNotice-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.meeting.notice.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilmeeting-noticeSearch.jsp"/>
+    </definition>
 
     <definition name="agenda-edit" extends="base_layout">
         <put-attribute name="page-title" value="title.agenda.edit" cascade="true"/>
@@ -281,13 +287,35 @@
         <put-attribute name="page-title" value="title.councilmeeting.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilmeeting-new.jsp"/>
     </definition>
+    
+    <definition name="councilNotice-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.councilmeeting.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilNotice-new.jsp"/>
+    </definition>
+    
     <definition name="councilmeeting-result" extends="base_layout">
         <put-attribute name="page-title" value="title.councilmeeting.success" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilmeeting-result.jsp"/>
     </definition>
+    
+    <definition name="councilnotice-result" extends="base_layout">
+        <put-attribute name="page-title" value="title.councilmeeting.success" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilnotice-result.jsp"/>
+    </definition>
+    
     <definition name="councilmeeting-view" extends="base_layout">
         <put-attribute name="page-title" value="title.councilmeeting.view" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilmeeting-result.jsp"/>
+    </definition>
+    
+    <definition name="councilnotice-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.councilmeeting.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilnotice-result.jsp"/>
+    </definition>
+    
+    <definition name="councilnotice-view" extends="base_layout">
+        <put-attribute name="page-title" value="title.councilmeeting.view" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilnotice-result.jsp"/>
     </definition>
 
     <definition name="councilmeeting-search" extends="base_layout">
