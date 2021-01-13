@@ -227,7 +227,7 @@ function downloadExcel()
 	var dept=document.getElementById('deptId').value;
 	var subdivison=document.getElementById('subdivison').value;
 
-	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeId="+service+"&deptId="+dept+"&subdivison="+subdivison;
+	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeDuringDownload="+service+"&deptId="+dept+"&subdivison="+subdivison;
 	document.searchReceiptForm.submit();
 }
 
