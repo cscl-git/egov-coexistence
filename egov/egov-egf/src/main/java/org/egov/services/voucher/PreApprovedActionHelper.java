@@ -47,15 +47,19 @@
  */
 package org.egov.services.voucher;
 
-import com.exilant.exility.common.TaskFailedException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
-import org.egov.commons.dao.EgwStatusHibernateDAO;
-import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.commons.DocumentUploads;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.utils.DocumentUtils;
-import org.egov.eis.service.PositionMasterService;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.EmployeeInfo;
@@ -69,7 +73,6 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.voucher.WorkflowBean;
-import org.egov.pims.commons.Position;
 import org.egov.services.payment.MiscbilldetailService;
 import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,10 +80,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.exilant.exility.common.TaskFailedException;
 
 @Transactional(readOnly = true)
 @Service
@@ -157,6 +157,19 @@ public class PreApprovedActionHelper {
             {
                 voucherHeader = journalVoucherActionHelper.transitionWorkFlow(voucherHeader, workflowBean);
                 voucherService.applyAuditing(voucherHeader.getState());
+            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, 0);
+            calendar.set(Calendar.MINUTE, 0);
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
+            Date currentDate = calendar.getTime(); 
+            if(workflowBean.getWorkFlowAction().equals("Approve"))
+            {
+            	if(voucherHeader != null && voucherHeader.getBackdateentry() != null && voucherHeader.getBackdateentry().equalsIgnoreCase("N"))
+            	{
+            		voucherHeader.setVoucherDate(currentDate);
+            	}
             }
             voucherService.persist(voucherHeader);
             if(workflowBean.getWorkFlowAction().equals("Approve"))

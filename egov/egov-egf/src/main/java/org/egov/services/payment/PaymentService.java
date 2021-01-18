@@ -281,10 +281,12 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting createPayment...");
         Paymentheader paymentheader = null;
+        String backlogEntry=null;
         try {
             accountcodedetails = new ArrayList<HashMap<String, Object>>();
             subledgerdetails = new ArrayList<HashMap<String, Object>>();
             conBillIdlength = 0;
+             backlogEntry=parameters.get("backlogEntry")[0];
             getGlcodeIds();
 
             final HashMap<String, Object> headerdetails = new HashMap<String, Object>();
@@ -304,7 +306,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 headerdetails.put("firstsignatory", firstsignatory);
             if (secondsignatory != null)
                 headerdetails.put("secondsignatory", secondsignatory);
-
+            if (backlogEntry != null)
+                headerdetails.put("backdateentry", backlogEntry);
+            
             if (parameters.get(VoucherConstant.VOUCHERDATE) != null
                     && !parameters.get(VoucherConstant.VOUCHERDATE)[0].equals(EMPTY_STRING))
                 headerdetails.put(VoucherConstant.VOUCHERDATE,

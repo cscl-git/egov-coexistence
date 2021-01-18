@@ -374,6 +374,7 @@ public class JournalVoucherActionHelper {
         headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
         headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
         headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
+        headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)

@@ -177,6 +177,16 @@
 			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
 			id="secondsignatory" /></td>
 </tr>
+<tr>
+	<td class="greybox"></td>
+	<td class="greybox"><s:text name="backlog.entry" /><span
+		class="greybox"><span class="mandatory1">*</span></span></td>
+	<td class="greybox"><s:select name="backlogEntry" headerKey="-1"
+			headerValue="Select" value="%{backlogEntry}"
+			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
+	<td class="greybox">&nbsp;</td>
+	<td class="greybox">&nbsp;</td>
+</tr>
 </table>
 <div id="budgetSearchGrid">
 	<div align="center">
