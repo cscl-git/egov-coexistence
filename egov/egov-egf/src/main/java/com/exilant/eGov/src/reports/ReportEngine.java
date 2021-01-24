@@ -80,7 +80,7 @@ public class ReportEngine {
         String firstParam = "";
         final String andParam = " and ";
         final StringBuffer reportEngineQry = new StringBuffer("");
-
+        System.out.println("XXXXXXXXX");
         try {
             if (reBean.getSchemeId() != null || reBean.getSubSchemeId() != null || reBean.getFundsourceId() != null
                     || reBean.getDivisionId() != null || reBean.getDepartmentId() != null || reBean.getFunctionaryId() != null)
@@ -88,6 +88,11 @@ public class ReportEngine {
             if (reBean.getFunctionId() != null)
                 includeGeneralLedger = true;
 
+            System.out.println("includeVouchermis  ::: "+includeVouchermis);
+            System.out.println("includeGeneralLedger  ::: "+includeGeneralLedger);
+            System.out.println("includeGeneralLedger  ::: "+includeGeneralLedger);
+            System.out.println("reBean.getFunctionaryId()  ::: "+reBean.getFunctionaryId());
+            System.out.println("reBean.getFunctionId()  ::: "+reBean.getFunctionId());
             reportEngineQry.append("select ");
             /**
              * add fields which are to be fetched
@@ -218,6 +223,9 @@ public class ReportEngine {
     }
 
     public ReportEngineBean populateReportEngineBean(final GeneralLedgerReportBean reportBean) {
+    
+    	System.out.println("reportBean.getFunctionaryId()   ::::::"+reportBean.getFunctionaryId());
+    	System.out.println("reportBean.getFunctionCodeId()   ::::::"+reportBean.getFunctionCodeId());
         final ReportEngineBean reBean = new ReportEngineBean();
         reBean.setDepartmentId(reportBean.getDepartmentCode());
         reBean.setDivisionId(reportBean.getFieldId());

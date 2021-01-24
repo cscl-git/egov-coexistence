@@ -223,7 +223,9 @@ public class GeneralLedgerReport {
 
         // engine.setAppConfigValuesService(appConfigValuesService);
         final ReportEngineBean reBean = engine.populateReportEngineBean(reportBean);
+        System.out.println("1111111");
         engineQry = engine.getVouchersListQuery(reBean);
+        System.out.println("22222222   :::::"+engineQry);
 
         final String query = getQuery(glCode1, startDate, endDate, accEntityId, accEntityKey, reportBean.getFieldId(),
                 reBean.getFunctionId());
@@ -855,7 +857,7 @@ public class GeneralLedgerReport {
         String addTableToQuery = "";
         String entityCondition = "";
         String functionCondition = "";
-
+        System.out.println("functionId  ::: "+functionId);
         if (!accEntityId.equalsIgnoreCase("") && !accEntityKey.equalsIgnoreCase(""))
             entityCondition = " AND gl.id=gldet.generalledgerid  AND gldet.detailtypeid=" + accEntityId
             + " AND cdet.detailtypeid = " + accEntityId + " AND gldet.detailkeyid=" + accEntityKey + "";

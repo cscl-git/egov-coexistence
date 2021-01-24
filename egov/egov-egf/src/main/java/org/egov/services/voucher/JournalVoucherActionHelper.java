@@ -526,6 +526,10 @@ public class JournalVoucherActionHelper {
                 
                 if(workflowBean.getWorkFlowAction()!= null && !workflowBean.getWorkFlowAction().equalsIgnoreCase("SaveAsDraft"))
     			{
+                	if(voucherDetail!=null)
+                	{
+                		System.out.println("voucherDetail.getFunctionIdDetail()   :::: "+voucherDetail.getFunctionIdDetail());
+                	}
                 	 if(voucherDetail.getFunctionIdDetail()==null)
                 		 detailMap.put(VoucherConstant.FUNCTIONIDDETAILS, "");
                 	 else

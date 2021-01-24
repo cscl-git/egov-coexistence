@@ -724,8 +724,8 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 				transaction.setVoucherHeaderId(voucherHeader.getId().toString());
 				transaction.setCrAmount(accountDetails.getCreditAmountDetail().toString());
 				transaction.setDrAmount(accountDetails.getDebitAmountDetail().toString());
-				if (null != accountDetails.getFunctionIdDetail())
-					transaction.setFunctionId(accountDetails.getFunctionIdDetail().toString());
+				if (null != voucherHeader.getVouchermis().getFunction())
+					transaction.setFunctionId(voucherHeader.getVouchermis().getFunction().getId().toString());
 				/*
 				 * if(null!=voucherHeader.getIsRestrictedtoOneFunctionCenter()
 				 * && voucherHeader.getIsRestrictedtoOneFunctionCenter()){

@@ -263,6 +263,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 }
                 }
                 voucherHeader.setBackdateentry(backlogEntry);
+                System.out.println("before save");
               //  voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                //         voucherTypeBean, workflowBean);
                 if (workFlowAction.equalsIgnoreCase("Save As Draft")) 
