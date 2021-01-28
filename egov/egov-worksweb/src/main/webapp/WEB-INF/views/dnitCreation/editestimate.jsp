@@ -176,9 +176,31 @@
 									<form:option value="${estimatePreparationApproval.wardNumber}" label="${estimatePreparationApproval.wardNumber}">
 						
 					</form:option>
-									<form:option value="Ward 1">Ward 1 </form:option>
-									<form:option value="Ward 2">Ward 2</form:option>
-									<form:option value="Ward 3">Ward 3</form:option>
+									<form:option value="1">1 </form:option>
+									<form:option value="2">2</form:option>
+									<form:option value="3">3</form:option>
+									<form:option value="4">4</form:option>
+									<form:option value="5">5</form:option>
+									<form:option value="6">6</form:option>
+									<form:option value="7">7</form:option>
+									<form:option value="8">8</form:option>
+									<form:option value="9">9</form:option>
+									<form:option value="10">10</form:option>
+									<form:option value="11">11</form:option>
+									<form:option value="12">12</form:option>
+									<form:option value="13">13</form:option>
+									<form:option value="14">14</form:option>
+									<form:option value="15">15</form:option>
+									<form:option value="16">16</form:option>
+									<form:option value="17">17</form:option>
+									<form:option value="18">18</form:option>
+									<form:option value="19">19</form:option>
+									<form:option value="20">20</form:option>
+									<form:option value="21">21</form:option>
+									<form:option value="22">22</form:option>
+									<form:option value="23">23</form:option>
+									<form:option value="24">24</form:option>
+									<form:option value="25">25</form:option>
 								</form:select>
 							</div>
 			

@@ -27,7 +27,7 @@
         <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
         
         <c:if test="${documentDetials.objectType != 'roughWorkFile' }">
-            <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+            <a href="/services/works/dnit/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
        </c:if>
         </c:forEach>
     </c:if>

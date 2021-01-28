@@ -66,7 +66,7 @@
         padding:10px;
     }
 </style>
-<div class="panel panel-primary" data-collapsed="0" style=" scrollable:true;">
+<div class="col-md-12" style="padding-bottom: 20px;">
     <div class="panel-heading">
         <div class="panel-title">
                 <spring:message code="lbl.view.documents" text="Documents"/>

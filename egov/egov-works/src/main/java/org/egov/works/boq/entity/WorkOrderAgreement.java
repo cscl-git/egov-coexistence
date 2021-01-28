@@ -123,6 +123,9 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	@Column(name = "category")
 	private String category;
+	
+	@Column(name = "approval_competent_authority")
+	private String approval_competent_authority;
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
@@ -678,6 +681,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setPendingWith(String pendingWith) {
 		this.pendingWith = pendingWith;
+	}
+
+	public String getApproval_competent_authority() {
+		return approval_competent_authority;
+	}
+
+	public void setApproval_competent_authority(String approval_competent_authority) {
+		this.approval_competent_authority = approval_competent_authority;
 	}
 
 }

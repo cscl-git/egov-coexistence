@@ -616,7 +616,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		{
        			agreement.setStatusDescp(object[7].toString());
        		}
-       		if(agreement.getStatusDescp() != null && !agreement.getStatusDescp().equalsIgnoreCase("Approved"))
+       		if(agreement.getStatusDescp() != null && !agreement.getStatusDescp().equalsIgnoreCase("Approved") && !agreement.getStatusDescp().equalsIgnoreCase("Project Closed"))
    		 {
        			agreement.setPendingWith(populatePendingWith(agreement.getId()));
    		 }

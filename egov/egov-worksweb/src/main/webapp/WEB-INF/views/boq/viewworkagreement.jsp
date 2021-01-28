@@ -144,11 +144,11 @@
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="workLocation" readonly="true" />
 					</div>
-					<label class="col-sm-3 control-label text-left-audit"></label>
-			<div class="col-sm-3 add-margin">
-				<input type="text" class="form-control" style="visibility:hidden"
-									 />
-							</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.work.authority" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="approval_competent_authority" readonly="true"/>
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.project.closure.comments" /></label>
 					<div class="col-sm-9 add-margin">
