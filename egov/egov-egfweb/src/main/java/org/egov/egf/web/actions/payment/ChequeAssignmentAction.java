@@ -1141,7 +1141,9 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     {
 
         LOGGER.error("size--------" + parameters.size());
-        if (!paymentMode.equalsIgnoreCase("cash") && !paymentMode.equalsIgnoreCase("rtgs") && !paymentMode.equalsIgnoreCase("pex"))
+        LOGGER.info("paymentMode :::: "+paymentMode);
+        LOGGER.info("selectedRowsId ::: "+selectedRowsId);
+        if ((!paymentMode.equalsIgnoreCase("cash") && !paymentMode.equalsIgnoreCase("rtgs") && !paymentMode.equalsIgnoreCase("pex")))
             prepareChequeAssignmentList();
         final List<AppConfigValues> printAvailConfig = appConfigValuesService
                 .getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "chequeprintavailableat");
@@ -2181,8 +2183,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     }
 
     public void validateDataForManual() throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting validateDataForManual...");
+            LOGGER.info("Starting validateDataForManual...");
         int i = 0;
         final Map<String, String> chqNoMap = new HashMap<String, String>();
         if (paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
@@ -2259,8 +2260,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             if (null == getChequeDt())
                 addFieldError("chequeDt", getMessage("payment.chequedate.empty"));
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed validateDataForManual.");
+            LOGGER.info("Completed validateDataForManual.");
     }
 
     @SkipValidation
