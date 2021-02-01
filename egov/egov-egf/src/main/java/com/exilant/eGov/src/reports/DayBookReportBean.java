@@ -54,6 +54,7 @@ public class DayBookReportBean
     private String endDate;
     private String totalCount;
     private String fundId;
+    private String schemeId;
 
     /**
      *
@@ -65,6 +66,8 @@ public class DayBookReportBean
         endDate = "";
         totalCount = "";
         fundId = "0";
+        schemeId = "0";
+        
     }
 
     /**
@@ -123,4 +126,20 @@ public class DayBookReportBean
     public void setFundId(final String fundId) {
         this.fundId = fundId;
     }
+    
+    /**
+     * @return Returns the schemeId.
+     */
+	public String getSchemeId() {
+		return schemeId;
+	}
+	
+	/**
+     * @return schemeId the schemeId to set.
+     */
+	public void setSchemeId(String schemeId) {
+		this.schemeId = schemeId;
+	}
+    
+    
 }

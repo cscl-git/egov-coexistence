@@ -695,21 +695,14 @@ try {
         final StringBuffer whereQuery = new StringBuffer(200);
         new StringBuffer(50);
 
-        /*
-         * if(null != voucherHeader.getVoucherNumber() && !StringUtils.isEmpty(voucherHeader.getVoucherNumber())){
-         * whereQuery.append(" and vh.vouchernumber like '%"+voucherHeader.getVoucherNumber()+"%'"); }
-         */
+        
 
         if (null != voucherHeader.getFundId())
             whereQuery.append(" and vh.fundid=" + voucherHeader.getFundId().getId());
         if (null != voucherHeader.getVouchermis().getDepartmentcode() && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
             whereQuery.append(" and mis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode()+"'");
        
-      /*  if (null != voucherHeader.getBillFrom())
-            whereQuery.append(" and vh.voucherdate >= to_date('" + DDMMYYYYFORMATS.format(voucherHeader.getBillFrom()) + "','dd/MM/yyyy')");
-        if (null != voucherHeader.getBillTo())
-            whereQuery.append(" and vh.voucherdate <= to_date('" + DDMMYYYYFORMATS.format(voucherHeader.getBillTo()) + "','dd/MM/yyyy')");
-       */
+      
        
         if (null != voucherHeader.getBillFrom())
         	whereQuery.append(" and vh.voucherdate >='")

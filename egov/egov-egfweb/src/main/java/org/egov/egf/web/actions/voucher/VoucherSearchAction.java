@@ -449,6 +449,7 @@ public class VoucherSearchAction extends BaseFormAction {
 			Page page = new Page<Map<String, Object>>(1, voucherList.size(), voucherList);
 			pagedResults = new EgovPaginatedList(page, voucherList.size());
 			pagedResults.setList(voucherList);
+			System.out.println("size ::: "+pagedResults.getList().size());
 		} else
 		{
 			paymentVoucherMap.clear();
