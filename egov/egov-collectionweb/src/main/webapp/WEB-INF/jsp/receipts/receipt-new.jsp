@@ -596,6 +596,13 @@ function validate()
    		document.getElementById("receipt_error_area").innerHTML+='<s:text name="billreceipt.missingpayeename.errormessage" /> ' + '<br>';
 		validation = false;
    	}
+   	
+	var subdivison=document.getElementById("subdivison").value;
+	subdivison = trimAll(subdivison);
+	if(subdivison.length == 0 || subdivison==""){
+		document.getElementById("receipt_error_area").innerHTML+='<s:text name="billreceipt.missingsubdivison.errormessage" /> ' + '<br>';
+	validation = false;
+	}
 	
    	<s:if test="%{!isBillSourcemisc()}"> 
 	 if(eval(document.getElementById("totalamountdisplay").value)>eval(document.getElementById("totalamounttobepaid").value)){

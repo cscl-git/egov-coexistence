@@ -967,7 +967,7 @@ var totaldbamt=0,totalcramt=0;
 					<td class="bluebox" width="21%"><s:text
 							name="misc.receipt.sub.divison" /><span class="mandatory1">*</span></td>
 					<td class="bluebox">
-							<s:select headerKey="-1"
+							<s:select headerKey=""
 							headerValue="----Choose----" name="subdivison" id="subdivison"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivison}"/> </td>
 					<td width="21%" class="bluebox2"><s:text
 							name="misc.receipt.gst.no" /></td>
