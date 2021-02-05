@@ -110,7 +110,7 @@ public class PaymentUtils {
         bill.setPaidBy(StringUtils.defaultIfBlank(billv2.getPaidBy(), payment.getPaidBy()));
         bill.setPayerAddress(payment.getPayerAddress());
         bill.setNarration(payment.getNarration());
-        bill.setPayerAddress(billv2.getPayerAddress());
+        //bill.setPayerAddress(billv2.getPayerAddress());
         bill.setPayerEmail(billv2.getPayerEmail());
         bill.setPayerId(billv2.getPayerId());
         bill.setPayerName(billv2.getPayerName());

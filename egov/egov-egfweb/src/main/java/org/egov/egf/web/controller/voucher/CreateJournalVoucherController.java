@@ -47,48 +47,46 @@
  */
 package org.egov.egf.web.controller.voucher;
 
+import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.collections4.MultiValuedMap;
 import org.apache.commons.collections4.multimap.ArrayListValuedHashMap;
 import org.apache.commons.lang.StringUtils;
-import org.apache.http.util.TextUtils;
 import org.apache.log4j.Logger;
-import org.egov.commons.Accountdetailkey;
-import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
-import org.egov.commons.CGeneralLedger;
-import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Vouchermis;
-import org.egov.deduction.model.EgRemittance;
 import org.egov.egf.commons.VoucherSearchUtil;
 import org.egov.egf.model.BillRegisterReportBean;
+import org.egov.egf.model.VoucherDetailMain;
+import org.egov.egf.model.VoucherDetailMiscMapping;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.voucher.service.JournalVoucherService;
-import org.egov.egf.web.actions.report.BillRegisterReportAction;
 import org.egov.eis.web.contract.WorkflowContainer;
-import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.ChartOfAccounts;
 import org.egov.infra.microservice.models.Department;
-import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
-import org.egov.infra.persistence.utils.Page;
-import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
-import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
-import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.instrument.InstrumentHeader;
-import org.egov.model.instrument.InstrumentVoucher;
-import org.egov.model.payment.Paymentheader;
 import org.egov.utils.FinancialConstants;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.python.antlr.PythonParser.for_stmt_return;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
@@ -99,20 +97,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import javax.servlet.http.HttpServletRequest;
-
-import java.math.BigDecimal;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * @author venki
@@ -271,8 +255,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     
     @RequestMapping(value = "/searchVoucher", method = RequestMethod.POST)
     public String searchVoucher(@ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader, final Model model,final HttpServletRequest request) {
-       
-        voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
+    	voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
         model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
         prepareWorkflow(model, voucherHeader, new WorkflowContainer());
        
@@ -284,210 +267,189 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     @RequestMapping(value = "/searchVoucherResult",params = "search", method = RequestMethod.POST)
     public String searchVoucherResult(@ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader, final Model model,final HttpServletRequest request) {
        
-        voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
-        model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
-        prepareWorkflow(model, voucherHeader, new WorkflowContainer());
-        voucherHeader.setVoucherDate(new Date());
-        Vouchermis vouchermis=new Vouchermis();
-        vouchermis.setDepartmentcode("");
-         List<BillRegisterReportBean> billRegReportList = new CopyOnWriteArrayList<>()  ;
-        SQLQuery querye =  null;
-        List<Object[]> list =null;
-        StringBuffer query = new StringBuffer(1000);
-        query=getQuery(voucherHeader);
-        
-        querye = this.persistenceService.getSession().createSQLQuery(query.toString());
-        list=querye.list();
-        
-    List<CFunction> functionlist= masterDataCache.get("egi-function");
-   // System.out.println(CFunction);
-    
-        
-        LOGGER.info("...........for getneamount..Query........");
-        SQLQuery netamountquery =  null;
-        List<Object[]> netamounlist =null;
-        netamountquery = this.persistenceService.getSession().createSQLQuery("select egb.id,egb.glcode,egb.creditamount,egb.voucherheaderid from generalledger egb");
-		 netamounlist = netamountquery.list();
-        
-		 LOGGER.info("...........ggetgrossAmount..Query........");
-		  SQLQuery grossAmountquery =  null;
-	        List<Object[]> grossAmountlist =null;
-	        grossAmountquery = this.persistenceService.getSession().createSQLQuery(" select egb.id,sum(egb.debitamount),egb.voucherheaderid from generalledger egb  where  debitamount > 0 group by id");
- 		grossAmountlist = grossAmountquery.list();
-        
- 		
- 		
- 		LOGGER.debug("...........billdetailsquery..Query........");
- 		  SQLQuery billdetailsquery =  null;
-	        List<Object[]> billdetaillist =null;
-	        billdetailsquery = this.persistenceService.getSession().createSQLQuery("select egb.id, egb.glcode, egb.creditamount, egb.voucherheaderid from generalledger egb ");
-	        billdetaillist = billdetailsquery.list();
-	        
-	        LOGGER.info("...........billnumber..Query........");
-	 		  SQLQuery billnumberquery =  null;
-		        List<Object[]> billnumberlist =null;
-		        billnumberquery = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber,m.paidamount,m.payvhid,m.billvhid from miscbilldetail m where m.billvhid in (select v.id from voucherheader v)");
-		        billnumberlist = billnumberquery.list();
-		        
-		  LOGGER.debug("...........partyname..Query........");      
-		  SQLQuery partynamequery =  null;
-	        List<Object[]> partynamelist =null;
-	        partynamequery = this.persistenceService.getSession().createSQLQuery("select v.id, a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey");
-	        partynamelist = partynamequery.list();     
-	        
-	        
-			  LOGGER.debug("...........pexnumber..Query........");      
-			  SQLQuery pexnumberquery =  null;
-		        List<Object[]> pexnumberlist =null;   
-		        pexnumberquery = this.persistenceService.getSession().createSQLQuery("select ei.id, ei.transactionnumber, ei.transactiondate, ei2.voucherheaderid from egf_instrumentheader ei, egf_instrumentvoucher ei2 where ei.id =ei2.instrumentheaderid and ei.id_status =2");
-		        pexnumberlist = pexnumberquery.list();
-		        
-		        LOGGER.debug("...........bvp..Query........");      
-				  SQLQuery bvpquery =  null;
-			        List<Object[]> bvplist =null;    
-			        bvpquery = this.persistenceService.getSession().createSQLQuery(" select v2.id,v2.vouchernumber from voucherheader v2");
-			        bvplist = bvpquery.list(); 
-			        
-			        LOGGER.debug("...........beforeotherDeductionAmount..Query........");
-			        SQLQuery otherDeductionAmountquery =  null;
-			        List<Object[]> otherDeductionAmountlist =null;
-			        otherDeductionAmountquery = this.persistenceService.getSession().createSQLQuery("select g.id, sum(g.creditamount), g.voucherheaderid from generalledger g, tds t where	g.glcodeid = t.glcodeid and g.creditamount > 0	and g.glcodeid not in (	select	id	from chartofaccounts c2 where	glcode in ('3502054','3502007',	'3502009','3502010','3502011','3502012','3502055','3502054','3502018','1408055','1405014','3502058','1402003','3401004')) group by g.id order by 1 desc ");
-			        otherDeductionAmountlist = otherDeductionAmountquery.list();        
-			        
- 		
-        //list = persistenceService.findAllBy(query.toString());
-		
-        if (list.size() != 0) {
-       	 System.out.println(" data present");
-       	 for (final Object[] object : list) {
-       		
-       		if(object[1] != null)
-       		{
-try {
-
-                final BillRegisterReportBean billRegReport = new BillRegisterReportBean();
-                billRegReport.setVoucherNumber(object[0] != null ? object[0].toString() : "");
-               billRegReport.setPartyName(getPartyName(Long.valueOf(object[2].toString()),partynamelist));
-                billRegReport.setGrossAmount(getgrossAmount(Long.valueOf(object[2].toString()),grossAmountlist));
-                billRegReport.setNetAmount(getnetAmount(Long.valueOf(object[2].toString()),billRegReport.getGrossAmount(),netamounlist,otherDeductionAmountlist));
-              //  billRegReport.setStatus(null != object[5] ? object[5].toString().toUpperCase() : "");
-                billRegReport.setDepartmentCode(getDepartmentcode(object[1].toString()));
-                billRegReport.setBillDetailList(getbillDetails(Long.valueOf(object[2].toString()),billRegReport.getNetAmount(), billdetaillist, otherDeductionAmountlist));
-              
-                for (CFunction function : functionlist) {
-					if(function !=null) {
-						if(function.getCode() !=null && function.getCode().equalsIgnoreCase(object[3] != null ? object[3].toString() : "")) {
-							
-							billRegReport.setBudgetHead(function.getName());
-						}
-					}
+    	LOGGER.info("Start");
+    	List<BillRegisterReportBean> billRegReportList = new ArrayList<BillRegisterReportBean>()  ;
+    	Map<Long,VoucherDetailMain> voucherDetailMainMapping=new HashMap<Long,VoucherDetailMain>();
+    	Map<Long,CVoucherHeader> voucherDetailPartyMapping=new HashMap<Long,CVoucherHeader>();
+    	Map<Long,List<VoucherDetailMiscMapping>> voucherDetailMiscMapping=new HashMap<Long,List<VoucherDetailMiscMapping>>();
+    	Map<Long,CVoucherHeader> voucherDetailBpvMapping=new HashMap<Long,CVoucherHeader>();
+    	SQLQuery queryMain =  null;
+    	final StringBuffer query1 = new StringBuffer(500);
+    	
+    	List<Object[]> list= null;
+    	query1
+        .append("select vdm.voucherid ,vdm.vouchernumber ,vdm.status,vdm.head,vdm.department from voucher_detail_main vdm where vdm.fund ="+voucherHeader.getFundId().getId())
+        		.append(getDateQuery(voucherHeader.getBillFrom(), voucherHeader.getBillTo()))
+        		.append(getMisQuery(voucherHeader));
+    	LOGGER.info("Query 1 :: "+query1.toString());
+    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+    	list = queryMain.list();
+    	LOGGER.info("after execution");
+    	VoucherDetailMain voucherDetailMain=null;
+    	//voucher detail main mapping
+    	if (list.size() != 0) {
+    		LOGGER.info("size ::: "+list.size());
+    		for (final Object[] object : list)
+    		{
+    			voucherDetailMain=new VoucherDetailMain();
+    			voucherDetailMain.setId(Long.parseLong(object[0].toString()));
+    			voucherDetailMain.setVoucherNumber(object[1].toString());
+    			voucherDetailMain.setStatus(object[2].toString());
+    			if(object[3] != null)
+    			{
+    				voucherDetailMain.setHead(object[3].toString());
+    			}
+    			voucherDetailMain.setDepartment(object[4].toString());
+    			voucherDetailMainMapping.put(voucherDetailMain.getId(), voucherDetailMain);
+    		}
+    	}
+    	LOGGER.info("after main map");
+    	//voucher detail bpv mapping
+    	CVoucherHeader bpvMapping =null;
+    	SQLQuery queryBpv =  null;
+    	final StringBuffer query2 = new StringBuffer(500);
+    	 list= null;
+    	query2
+        .append("select vdb.id,vdb.vouchernumber,vdb.voucherdate from voucher_detail_bpvmapping vdb");
+    	LOGGER.info("Query 2 :: "+query2.toString());
+    	queryBpv=this.persistenceService.getSession().createSQLQuery(query2.toString());
+    	list = queryBpv.list();
+    	LOGGER.info("after exe");
+    	if (list.size() != 0) {
+    		LOGGER.info("size ::: "+list.size());
+    		for (final Object[] object : list)
+    		{
+    			bpvMapping=new CVoucherHeader();
+    			bpvMapping.setId(Long.parseLong(object[0].toString()));
+    			bpvMapping.setVoucherNumber(object[1].toString());
+    			voucherDetailBpvMapping.put(bpvMapping.getId(), bpvMapping);
+    		}
+    	}
+    	LOGGER.info("after map");
+    	//misc bill detail mapping
+    	SQLQuery queryMisc =  null;
+    	final StringBuffer query3 = new StringBuffer(500);
+   	 list= null;
+   	query3
+       .append("select vdm.id,vdm.billvhid,vdm.payvhid,vdm.paidamount from voucher_detail_miscbill vdm ");
+   	LOGGER.info("Query 3 :: "+query3.toString());
+   	queryMisc=this.persistenceService.getSession().createSQLQuery(query3.toString());
+   	list = queryMisc.list();
+   	LOGGER.info("1 map");
+   	VoucherDetailMiscMapping voucherDetailMisc=null;
+   	List<VoucherDetailMiscMapping> miscbillList=null;
+   	if (list.size() != 0) {
+   		LOGGER.info("size ::: "+list.size());
+   		for (final Object[] object : list)
+   		{
+   			voucherDetailMisc=new VoucherDetailMiscMapping();
+   			voucherDetailMisc.setId(Long.parseLong(object[0].toString()));
+   			if(object[1] != null)
+   			{
+   				voucherDetailMisc.setVoucherId(Long.parseLong(object[1].toString()));
+   			}
+   			if(object[2] != null)
+   			{
+   				voucherDetailMisc.setBpvId(Long.parseLong(object[2].toString()));
+   			}
+   			if(object[3] != null )
+   			{
+   				voucherDetailMisc.setAmountPaid(new BigDecimal(object[3].toString()));
+   			}
+   			if(voucherDetailMiscMapping.get(voucherDetailMisc.getVoucherId()) == null)
+   			{
+   				miscbillList=new ArrayList<VoucherDetailMiscMapping>();
+   				miscbillList.add(voucherDetailMisc);
+   				voucherDetailMiscMapping.put(voucherDetailMisc.getVoucherId(), miscbillList);
+   			}
+   			else
+   			{
+   				voucherDetailMiscMapping.get(voucherDetailMisc.getVoucherId()).add(voucherDetailMisc);
+   			}
+   		}
+   		
+   	}
+   	LOGGER.info("afterr map");
+   	//party
+   	SQLQuery queryParty =  null;
+   	final StringBuffer query4 = new StringBuffer(500);
+  	 list= null;
+  	query4
+      .append("select vdp.id,vdp.detailname from voucher_detail_party vdp  ");
+  	LOGGER.info("Query 4 :: "+query4.toString());
+  	queryParty=this.persistenceService.getSession().createSQLQuery(query4.toString());
+   	list = queryParty.list();
+  	LOGGER.info("1 map");
+  	CVoucherHeader partyDetail=null;
+  	
+  	if (list.size() != 0) {
+  		LOGGER.info("size ::: "+list.size());
+  		for (final Object[] object : list)
+  		{
+  			partyDetail=new CVoucherHeader();
+  			partyDetail.setId(Long.parseLong(object[0].toString()));
+  			partyDetail.setVoucherNumber(object[1].toString());
+  			voucherDetailPartyMapping.put(partyDetail.getId(), partyDetail);
+  		}
+  	}
+  	LOGGER.info("after party");
+   	//ledger
+   	
+   	
+   	//pex
+   	
+   	//results
+   	BillRegisterReportBean resultset=null;
+   	VoucherDetailMiscMapping voucherDetailMiscMappingCopy= null;
+   	Set<Long> keys=voucherDetailMainMapping.keySet();
+   	Long vhId;
+   	VoucherDetailMain result=null;
+   	for(Long key : keys)
+   	{
+   		result=voucherDetailMainMapping.get(key);
+   		if(voucherDetailMiscMapping.get(key) != null )
+   		{
+   			for(VoucherDetailMiscMapping row :voucherDetailMiscMapping.get(key))
+   			{
+   				resultset=new BillRegisterReportBean();
+   				if(voucherDetailPartyMapping.get(key) != null)
+   				{
+   					resultset.setPartyName(voucherDetailPartyMapping.get(key).getVoucherNumber());
+   				}
+   				resultset.setDepartmentCode(result.getDepartment());
+   				resultset.setBudgetHead(result.getHead());
+   				resultset.setVoucherNumber(result.getVoucherNumber());
+   				if(row.getBpvId() != null)
+   				{
+   					resultset.setPaymentVoucherNumber(voucherDetailBpvMapping.get(row.getBpvId()).getVoucherNumber());
+   				}
+   				
+   				
+   				billRegReportList.add(resultset);
+   			}
+   		}
+   		else
+   		{
+   			resultset=new BillRegisterReportBean();
+				if(voucherDetailPartyMapping.get(key) != null)
+				{
+					resultset.setPartyName(voucherDetailPartyMapping.get(key).getVoucherNumber());
 				}
-             
-                
-                List<Miscbilldetail> miscbilldetailList=getbillnum(Long.valueOf(object[2].toString()),billnumberlist,bvplist);
-                
-             for (Miscbilldetail miscbilldetail : miscbilldetailList) {
-                
-                	List<InstrumentHeader> instrumentHeaderList=getPexNumber(miscbilldetail.getId(),pexnumberlist);
-                	
-                	for (InstrumentHeader instrumentHeader : instrumentHeaderList) {
-						
-                	BillRegisterReportBean billRegReport2 = new BillRegisterReportBean();
-                	
-                	billRegReport2.setVoucherNumber(billRegReport.getVoucherNumber());
-                	billRegReport2.setPartyName(billRegReport.getPartyName());
-                	billRegReport2.setDepartmentCode(billRegReport.getDepartmentCode());
-                	billRegReport2.setGrossAmount(billRegReport.getGrossAmount());
-                	billRegReport2.setNetAmount(billRegReport.getNetAmount());
-                	billRegReport2.setBillDetailList(billRegReport.getBillDetailList());
-                	
-                    	billRegReport2.setBillNumber(miscbilldetail.getBillnumber());
-                    	billRegReport2.setPaidAmount(miscbilldetail.getPaidamount());
-                    	billRegReport2.setPexNo(instrumentHeader.getTransactionNumber());
-                    	billRegReport2.setPexNodate(instrumentHeader.getVoucherNumber());
-                		
-                    	billRegReportList.add(billRegReport2);
-					
-                	
-                	}
-                	
-                
-     				
-                	}
-     				
-              /*  if(miscbilldetailList.isEmpty())
-                {
-                	for (InstrumentHeader instrumentHeader : instrumentHeaderList) {
-                    	 
-                		 BillRegisterReportBean billRegReport2 = new BillRegisterReportBean();
-                     	
-                     	billRegReport2.setVoucherNumber(billRegReport.getVoucherNumber());
-                     	billRegReport2.setPartyName(billRegReport.getPartyName());
-                     	billRegReport2.setDepartmentCode(billRegReport.getDepartmentCode());
-                     	billRegReport2.setGrossAmount(billRegReport.getGrossAmount());
-                     	billRegReport2.setNetAmount(billRegReport.getNetAmount());
-                     	billRegReport2.setBillDetailList(billRegReport.getBillDetailList());
-                     	
-                     	
-                		billRegReport2.setPexNo(instrumentHeader.getTransactionNumber());
-                		billRegReport2.setPexNodate(instrumentHeader.getVoucherNumber());
-                     	billRegReportList.add(billRegReport2);
-          				}
-                                }
-                if(instrumentHeaderList.isEmpty())
-                {
-                	for (Miscbilldetail miscbilldetail : miscbilldetailList) {
-                       
-                       	 
-                		BillRegisterReportBean billRegReport2 = new BillRegisterReportBean();
-
-                    	billRegReport2.setVoucherNumber(billRegReport.getVoucherNumber());
-                    	billRegReport2.setPartyName(billRegReport.getPartyName());
-                    	billRegReport2.setDepartmentCode(billRegReport.getDepartmentCode());
-                    	billRegReport2.setGrossAmount(billRegReport.getGrossAmount());
-                    	billRegReport2.setNetAmount(billRegReport.getNetAmount());
-                    	billRegReport2.setBillDetailList(billRegReport.getBillDetailList());
-                               	
-                               	billRegReport2.setBillNumber(miscbilldetail.getBillnumber());
-                               	billRegReport2.setPaidAmount(miscbilldetail.getPaidamount());
-                	billRegReportList.add(billRegReport2);
-
-                }
-                }*/
-             Boolean voucherPresent=true;
-             for (BillRegisterReportBean billRegisterReportBean : billRegReportList) {
-            	if(billRegisterReportBean.getVoucherNumber().equals(billRegReport.getVoucherNumber()))
-            		{
-            		voucherPresent=false;
-            			}
-			}
-                
-
-             if(voucherPresent) {
-                billRegReportList.add(billRegReport);
-             }
-             
-             
-                model.addAttribute("billRegReportList",billRegReportList);
-            } catch (final Exception e) {
-            	e.printStackTrace();
-                if (LOGGER.isDebugEnabled())
-                    LOGGER.debug("Failed while processing bill number :" + object[0].toString());
-                throw e;
-            }
-       		}
-        
-       	 }
-        }
-        System.out.println("------------------------------billRegReportListSize----"+billRegReportList.size());
-        
+				resultset.setDepartmentCode(result.getDepartment());
+				resultset.setBudgetHead(result.getHead());
+				resultset.setVoucherNumber(result.getVoucherNumber());
+				billRegReportList.add(resultset);
+   		}
+   		
+   	}
+    	model.addAttribute("billRegReportList", billRegReportList);
         return JOURNALVOUCHER_SEARCH;
     }
     
     
     @RequestMapping(value = "/searchVoucherResult",params = "export", method = RequestMethod.POST)
     public String voucherExport(@ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader, final Model model,final HttpServletRequest request) {
-       
+       LOGGER.info("export");
         voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
         model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
         prepareWorkflow(model, voucherHeader, new WorkflowContainer());
@@ -1315,4 +1277,41 @@ try {
 
         return message;
     }
+    
+    public  String getDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" and vdm.voucherDate>='")
+						.append(DDMMYYYYFORMAT1.format(billDateFrom))
+						.append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and vdm.voucherDate<='")
+						.append(DDMMYYYYFORMAT1.format(billDateTo))
+						.append("'");
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing search instrument query");
+		}
+		return numDateQuery.toString();
+	}
+    
+    public String getMisQuery(final CVoucherHeader voucherHeader) {
+
+		final StringBuffer misQuery = new StringBuffer(300);
+		if (null != voucherHeader) {
+			if ( voucherHeader.getVouchermis() != null && voucherHeader.getVouchermis().getDepartmentcode() != null && !voucherHeader.getVouchermis().getDepartmentcode().isEmpty())
+			{
+				misQuery.append(" and vdm.department='")
+						.append(voucherHeader.getVouchermis().getDepartmentcode()+"'");
+			}		
+			if (null != voucherHeader.getVoucherNumber()) {
+				misQuery.append(" and vdm.vouchernumber='");
+				misQuery.append(voucherHeader.getVouchermis().getDepartmentcode()+"'");
+			}
+		}
+		return misQuery.toString();
+
+	}
 }

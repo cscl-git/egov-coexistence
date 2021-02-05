@@ -89,6 +89,15 @@ public class BillRegisterReportBean {
     private List<ChartOfAccounts> chartOfAccounts;
     private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
     private String budgetHead;
+    private BigDecimal taxAmount;
+    private BigDecimal igstAmount;
+    private BigDecimal cgstAmount;
+    private BigDecimal labourcessAmount;
+    private BigDecimal collectionchargesAmount;
+    private BigDecimal waterChargesAmount;
+    private BigDecimal qualityAmount;
+    private BigDecimal penaltyAmount;
+    private BigDecimal securitAmount;
 
     public String getBillNumber() {
         return billNumber;
@@ -289,6 +298,78 @@ public class BillRegisterReportBean {
 
 	public void setBudgetHead(String budgetHead) {
 		this.budgetHead = budgetHead;
+	}
+
+	public BigDecimal getTaxAmount() {
+		return taxAmount;
+	}
+
+	public void setTaxAmount(BigDecimal taxAmount) {
+		this.taxAmount = taxAmount;
+	}
+
+	public BigDecimal getIgstAmount() {
+		return igstAmount;
+	}
+
+	public void setIgstAmount(BigDecimal igstAmount) {
+		this.igstAmount = igstAmount;
+	}
+
+	public BigDecimal getCgstAmount() {
+		return cgstAmount;
+	}
+
+	public void setCgstAmount(BigDecimal cgstAmount) {
+		this.cgstAmount = cgstAmount;
+	}
+
+	public BigDecimal getLabourcessAmount() {
+		return labourcessAmount;
+	}
+
+	public void setLabourcessAmount(BigDecimal labourcessAmount) {
+		this.labourcessAmount = labourcessAmount;
+	}
+
+	public BigDecimal getCollectionchargesAmount() {
+		return collectionchargesAmount;
+	}
+
+	public void setCollectionchargesAmount(BigDecimal collectionchargesAmount) {
+		this.collectionchargesAmount = collectionchargesAmount;
+	}
+
+	public BigDecimal getWaterChargesAmount() {
+		return waterChargesAmount;
+	}
+
+	public void setWaterChargesAmount(BigDecimal waterChargesAmount) {
+		this.waterChargesAmount = waterChargesAmount;
+	}
+
+	public BigDecimal getQualityAmount() {
+		return qualityAmount;
+	}
+
+	public void setQualityAmount(BigDecimal qualityAmount) {
+		this.qualityAmount = qualityAmount;
+	}
+
+	public BigDecimal getPenaltyAmount() {
+		return penaltyAmount;
+	}
+
+	public void setPenaltyAmount(BigDecimal penaltyAmount) {
+		this.penaltyAmount = penaltyAmount;
+	}
+
+	public BigDecimal getSecuritAmount() {
+		return securitAmount;
+	}
+
+	public void setSecuritAmount(BigDecimal securitAmount) {
+		this.securitAmount = securitAmount;
 	}
 
 	

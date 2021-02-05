@@ -1688,7 +1688,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .paymentMode(getPaymentModeEnum(receiptHeader.getModOfPayment()))
                 .totalDue(receiptHeader.getTotalAmount())
                 .totalAmountPaid(receiptHeader.getTotalAmount())
-                .paidBy(receiptHeader.getPaidBy() +" & "+receiptHeader.getPayeeAddress())
+                .paidBy(receiptHeader.getPaidBy())
                 .gstno(receiptHeader.getGstno())
                 .subdivison(receiptHeader.getSubdivison())
                 .narration(receiptHeader.getReferenceDesc())

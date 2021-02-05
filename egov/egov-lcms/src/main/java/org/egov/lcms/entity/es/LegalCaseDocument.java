@@ -135,6 +135,9 @@ public class LegalCaseDocument {
 
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String advocateName;
+    
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String nodalOfficerDepartment;
 
     @Field(type = FieldType.Boolean)
     private boolean seniorAdvocate;
@@ -689,4 +692,12 @@ public class LegalCaseDocument {
         }
 
     }
+
+	public String getNodalOfficerDepartment() {
+		return nodalOfficerDepartment;
+	}
+
+	public void setNodalOfficerDepartment(String nodalOfficerDepartment) {
+		this.nodalOfficerDepartment = nodalOfficerDepartment;
+	}
 }

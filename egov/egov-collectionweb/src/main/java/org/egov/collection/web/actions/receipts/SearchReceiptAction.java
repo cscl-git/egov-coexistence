@@ -339,7 +339,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
-                    receiptHeader.setPaidBy(bill.getPaidBy());
+                    receiptHeader.setPaidBy((bill.getPaidBy()).split("&")[0]+"  "+bill.getPayerAddress());
                     receiptHeader.setPayeeName(bill.getPayerName());
                     System.out.println("subdivison ::: "+receipt.getSubdivison());
                     System.out.println("gst ::: "+receipt.getGstNo());

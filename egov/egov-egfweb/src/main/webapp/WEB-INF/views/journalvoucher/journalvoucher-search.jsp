@@ -59,11 +59,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="voucherNumber" path="voucherNumber" maxlength="50" />
 				</div>
 				
-				<%-- <label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.billnumber" text="Bill Number"/>
-				</label>
-				<div class="col-sm-3 add-margin">
-					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="billNumber" path="billNumber" maxlength="50" />
-				</div> --%>
+				
 				
     		</div>
     	</div>
@@ -113,150 +109,69 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 							<td>
 								${ status.index+1}
 						    </td>
-							
+						    <td>
+								${ result.partyName}
+						    </td>
+						    <td>
+								${ result.departmentCode}
+						    </td>
+						    <td>
+								${ result.budgetHead}
+						    </td>
+						    <td>
+								${ result.grossAmount}
+						    </td>
+						    <td>
+								${ result.taxAmount}
+						    </td>
+						    <td>
+								${ result.igstAmount}
+						    </td>
+						    <td>
+								${ result.cgstAmount}
+						    </td>
+						    <td>
+								${ result.labourcessAmount}
+						    </td>
+						    <td>
+								${ result.collectionchargesAmount}
+						    </td>
 							<td>
-							<%-- <a href="#" onclick="openAudit('${result.id}')" ></a> --%>
-							${result.partyName }
-							</td>
+								${ result.waterChargesAmount}
+						    </td>
 							<td>
-							${result.departmentCode }
-							</td>
-							<td>
-							${result.budgetHead }
-							</td>
-							<td>
-							${result.grossAmount }
-							</td>
-							<%-- <td>
-							${result.deductionAmount }
-							</td> --%>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							  <c:set var="continueExecuting" scope="request" value="true"/>
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerType =='Tax'}">
-								
-								<c:if test="${continueExecuting}">
-								${resultbilldetails.totalAmount }
-							</c:if>
-								
-								<c:set var="continueExecuting" scope="request" value="false"/>
-								
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='3502055'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='3502054'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='3502018'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='1408055'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='1405014'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='3502058'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='1402003'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerCode =='3401004'}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							<td>
-							 <c:if test="${result.billDetailList != null &&  !result.billDetailList.isEmpty()}">
-							 <c:set var="continueExecuting" scope="request" value="true"/>
-							 <c:forEach items="${result.billDetailList}" var="resultbilldetails" varStatus="resultbilldetailsstatus">
-							 <c:if test="${resultbilldetails.consumerCode != null &&  resultbilldetails.consumerType =='AnyOtherDeduction'}">
-								
-								<c:if test="${continueExecuting}">
-								${resultbilldetails.amountPaid }
-							</c:if>
-								
-								<c:set var="continueExecuting" scope="request" value="false"/>
-								
-							</c:if>
-							 </c:forEach>
-							 </c:if> 
-							</td>
-							
-							<td>
-							${result.netAmount }
-							</td>
-							<td>
-							${result.paidAmount }
-							</td>
-							<td>
-							${result.voucherNumber }
-							</td>
-							<td>
-							${result.billNumber }
-							</td>
-							<td>
-							${result.pexNo }
-							</td>
-							<td>
-							<!-- add pex date -->
-							${result.pexNodate }
-							</td>
-							<td>
-							${result.status }
-							</td>
+								${ result.qualityAmount}
+						    </td>
+						    <td>
+								${ result.penaltyAmount}
+						    </td>
+						    <td>
+								${ result.securitAmount}
+						    </td>
+						    <td>
+								${ result.deductionAmount}
+						    </td>
+						    <td>
+								${ result.netAmount}
+						    </td>
+						    <td>
+								${ result.paidAmount}
+						    </td>
+						    <td>
+								${ result.voucherNumber}
+						    </td>
+						    <td>
+								${ result.paymentVoucherNumber}
+						    </td>
+						    <td>
+								${ result.pexNo}
+						    </td>
+						    <td>
+								${ result.pexNodate}
+						    </td>
+						    <td>
+								${ result.status}
+						    </td>
 						</tr>
 						</c:forEach>
 					<tbody>
@@ -269,10 +184,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
         <input type="submit" id="export" class="btn btn-primary btn-wf-primary" name="export"  onclick="searchCheck()" value="Export"/>
         </div>
 				</c:if>	
-				<!-- </div>
-			<br>
-			<br>
-	        </div> -->
+				
         </div>
          
     </div>

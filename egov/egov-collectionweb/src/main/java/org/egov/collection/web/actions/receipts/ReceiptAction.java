@@ -1520,8 +1520,6 @@ public class ReceiptAction extends BaseFormAction {
         System.out.println("asdsadsadsa");
         receiptlist.stream().forEach(receipt -> {
         	System.out.println("1");
-        	System.out.println("subdivison ::: "+receipt.getSubdivison());
-            System.out.println("gst ::: "+receipt.getGstNo());
             receiptHeader.setSubdivison(receipt.getSubdivison());
             receiptHeader.setGstno(receipt.getGstNo());
             receipt.getBill().forEach(bill -> {
@@ -1533,7 +1531,7 @@ public class ReceiptAction extends BaseFormAction {
                     receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(businessServiceCode));
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
                     receiptHeader.setReferenceDesc(bill.getNarration());
-                    receiptHeader.setPaidBy(bill.getPaidBy());
+                    receiptHeader.setPaidBy((bill.getPaidBy()).split("&")[0]+ "  "+bill.getPayerAddress());
                     receiptHeader.setPayeeName(bill.getPayerName());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setTotalAmount(billDetail.getTotalAmount());
@@ -2763,4 +2761,6 @@ public class ReceiptAction extends BaseFormAction {
 	      .atZone(ZoneId.systemDefault())
 	      .toLocalDate();
 	}
+	
+	
 }

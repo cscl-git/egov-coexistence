@@ -147,6 +147,7 @@ public class GenericSubReportService {
                 aggregationField = OFFICERINCHRGE;
             else if (genericSubReport.getAggregatedBy().equals(LcmsConstants.JUDGEMENTOUTCOME))
                 aggregationField = JUDGEMENTOUTCOME;
+        	
         return aggregationField;
     }
 

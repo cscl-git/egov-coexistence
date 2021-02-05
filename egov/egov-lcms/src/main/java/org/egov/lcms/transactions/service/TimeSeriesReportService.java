@@ -85,6 +85,7 @@ public class TimeSeriesReportService {
     private static final String CASESTATUS = "status";
     private static final String OFFICERINCHRGE = "officerIncharge";
     private static final String STANDINGCOUNSEL = "advocateName";
+    private static final String CONCERNEDDEPARTMENT = "nodalOfficerDepartment";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
     public static final String MONTHLY = "monthly";
@@ -177,6 +178,8 @@ public class TimeSeriesReportService {
                 aggregationField = OFFICERINCHRGE;
             else if (timeSeriesReportResult.getAggregatedBy().equals(LcmsConstants.STANDINGCOUNSEL))
                 aggregationField = STANDINGCOUNSEL;
+            else if (timeSeriesReportResult.getAggregatedBy().equals(LcmsConstants.CONCERNEDDEPARTMENT))
+                aggregationField = CONCERNEDDEPARTMENT;
         return aggregationField;
     }
 
