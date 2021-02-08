@@ -612,4 +612,6 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 	public void setBackdateentry(String backdateentry) {
 		this.backdateentry = backdateentry;
 	}
+
+	
 }

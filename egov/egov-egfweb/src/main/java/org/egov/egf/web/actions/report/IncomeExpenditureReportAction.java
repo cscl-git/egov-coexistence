@@ -189,9 +189,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
             heading.append(" in " + incomeExpenditureStatement.getFund().getName());
         }
         if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null
-                && !"null".equalsIgnoreCase(incomeExpenditureStatement.getDepartment().getCode())) {
-//            incomeExpenditureStatement.setDepartment((Department) getPersistenceService().find("from Department where id=?",
-//                    incomeExpenditureStatement.getDepartment().getId()));
+                && !incomeExpenditureStatement.getDepartment().getCode().isEmpty()) {
+
             Department dept = microserviceUtils.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
             incomeExpenditureStatement.setDepartment(dept);
             heading.append(" in " + incomeExpenditureStatement.getDepartment().getName() + " Department");
@@ -332,7 +331,7 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     }
 
     protected void populateDataSource() {
-
+    	
         setRelatedEntitesOn();
 
         statementheading.append("Income And Expenditure Statement").append(heading);

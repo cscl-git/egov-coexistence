@@ -228,10 +228,8 @@ public class BalanceSheetReportAction extends BaseFormAction {
             balanceSheet.setFinancialYear((CFinancialYear) getPersistenceService().find("from CFinancialYear where id=?",
                     balanceSheet.getFinancialYear().getId()));
         if (balanceSheet.getDepartment() != null && balanceSheet.getDepartment().getCode() != null
-                && !"null".equalsIgnoreCase(balanceSheet.getDepartment().getCode())) {
+                && !balanceSheet.getDepartment().getCode().isEmpty()) {
             Department dept= microserviceUtils.getDepartmentByCode(balanceSheet.getDepartment().getCode());
-//            balanceSheet.setDepartment((Department) getPersistenceService().find("from Department where id=?",
-//                    balanceSheet.getDepartment().getId()));
             balanceSheet.setDepartment(dept);
             header.append(" in " + balanceSheet.getDepartment().getName());
         } else

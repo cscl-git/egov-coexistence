@@ -134,10 +134,10 @@ public abstract class ReportService {
     protected String getFilterQuery(final Statement balanceSheet) {
         String query = "";
         if (balanceSheet.getDepartment() != null
-                && balanceSheet.getDepartment().getId() != null
-                && balanceSheet.getDepartment().getId() != 0)
-            query = query + " and mis.departmentid="
-                    + balanceSheet.getDepartment().getId().toString();
+                && balanceSheet.getDepartment().getCode() != null
+                && !balanceSheet.getDepartment().getCode().isEmpty())
+            query = query + " and mis.departmentcode='"
+                    + balanceSheet.getDepartment().getCode()+"' ";
         if (balanceSheet.getFunction() != null
                 && balanceSheet.getFunction().getId() != null
                 && balanceSheet.getFunction().getId() != 0)
@@ -186,10 +186,10 @@ public abstract class ReportService {
     protected String getTransactionQuery(final Statement balanceSheet) {
         String query = "";
         if (balanceSheet.getDepartment() != null
-                && balanceSheet.getDepartment().getId() != null
-                && balanceSheet.getDepartment().getId() != 0)
-            query = query + " and ts.departmentid="
-                    + balanceSheet.getDepartment().getId().toString();
+                && balanceSheet.getDepartment().getCode() != null
+                && !balanceSheet.getDepartment().getCode().isEmpty())
+            query = query + " and ts.departmentCode='"
+                    + balanceSheet.getDepartment().getCode()+"' ";
         if (balanceSheet.getFunction() != null
                 && balanceSheet.getFunction().getId() != null
                 && balanceSheet.getFunction().getId() != 0)

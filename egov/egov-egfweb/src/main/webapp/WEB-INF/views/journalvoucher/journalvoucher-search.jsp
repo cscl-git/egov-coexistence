@@ -22,14 +22,16 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     			
 				
 				<label class="col-sm-3 control-label text-left-audit">From Date
+				<span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billFrom" path="billFrom" class="form-control datepicker"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+					<form:input id="billFrom" required="required" path="billFrom" class="form-control datepicker"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
 				</div>
 				<label class="col-sm-3 control-label text-left-audit">To Date
+				<span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billTo" path="billTo" class="form-control datepicker"  data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
+					<form:input id="billTo" path="billTo" required="required" class="form-control datepicker"  data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
 				</div>
 				
 				
@@ -49,7 +51,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 				<div class="col-sm-3 add-margin">
 					<form:select path="vouchermis.departmentcode" id="department" class="form-control">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${approverDepartmentList}" itemValue="code" itemLabel="name" />
+							<form:options items="${approverDepartmentList}" itemValue="name" itemLabel="name" />
 						</form:select>
 				</div>
 				
@@ -77,8 +79,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
         <br>
         <div class="tab-pane fade in active" id="resultheader">
       
-	        <!-- <div class="panel panel-primary" data-collapsed="0">
-	        	<div style="padding: 0 15px;"> -->
+	        
 	        	 <c:if test="${billRegReportList != null &&  !billRegReportList.isEmpty()}">
 	        	   <h3> Search Result</h3>
 				<table class="table table-bordered" id="searchResult">

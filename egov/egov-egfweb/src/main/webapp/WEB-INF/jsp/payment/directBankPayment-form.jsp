@@ -184,8 +184,9 @@
 	<td class="greybox"><s:select name="backlogEntry" headerKey="-1"
 			headerValue="Select" value="%{backlogEntry}"
 			list="#{'Y':'Yes' ,'N':'No'}" id="backlogEntry" /></td>
-	<td class="greybox">&nbsp;</td>
-	<td class="greybox">&nbsp;</td>
+	<td class="greybox"><s:text name="budget.link" /><span
+								class="mandatory1">*</span></td>
+	<td class="greybox"><a href="#" onClick="populateBudgetLink()">Click</a></td>
 </tr>
 </table>
 <div id="budgetSearchGrid">
@@ -208,6 +209,68 @@
 							makeVoucherDetailTable();
 							document.getElementById('billDetailTable')
 									.getElementsByTagName('table')[0].width = "95%";
+							
+							
+							function populateBudgetLink()
+							{
+
+								var dept=document.getElementById('vouchermis.departmentid');
+								var fund=document.getElementById('fundId');
+								var func=document.getElementById('vouchermis.function');
+								var status=false;
+								var accCode;
+								if(fund == null || fund.value == -1 || fund.value == '-1')
+									{
+									bootbox.alert("Select Fund to view Budget Details");
+									status=true;
+									}
+								else if(dept == null || dept.value == -1 || dept.value == '-1')
+								{
+									bootbox.alert("Select Department to view Budget Details");
+									status=true;
+								}
+								else if(func == null || func.value == -1 || func.value == '-1')
+								{
+									bootbox.alert("Select Function to view Budget Details");
+									status=true;
+								}
+								var accStatus=false;
+								if(status == false)
+									{
+									for(i=0;i<=25;i++)
+									{
+										if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0' ||document.getElementById('billDetailslist['+i+'].debitAmountDetail').value == '0.00'))
+										{
+											accStatus = false;
+										}
+										else if(document.getElementById('billDetailslist['+i+'].debitAmountDetail') != null && (document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0' && document.getElementById('billDetailslist['+i+'].debitAmountDetail').value != '0.00'))
+										{
+											
+											if(document.getElementById('billDetailslist['+i+'].glcodeDetail') != null && document.getElementById('billDetailslist['+i+'].glcodeDetail').value != '')
+												{
+													accStatus = true;
+													 accCode = document.getElementById('billDetailslist['+i+'].glcodeDetail').value;
+													 break;
+												}
+										}
+									
+									}
+									}
+								
+								if(accStatus == false)
+									{
+									bootbox.alert("Select Account Code and debit amout to view Budget Details");
+									}
+								if(status == false && accStatus == true)
+									{
+									var today = new Date();
+									var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+									var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=jv';
+									window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+									}
+								
+								
+							}
 						</script>
 					</td>
 				</tr>
