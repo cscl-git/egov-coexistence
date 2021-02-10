@@ -265,7 +265,7 @@
 									{
 									var today = new Date();
 									var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
-									var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=jv';
+									var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept.value+'&funds='+fund.value+'&func='+func.value+'&accCode='+accCode+'&vtype=jv';
 									window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 									}
 								

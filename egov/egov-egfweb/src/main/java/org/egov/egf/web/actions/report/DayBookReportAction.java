@@ -173,6 +173,8 @@ public class DayBookReportAction extends BaseFormAction {
         fundId = dayBookReport.getFundId();
         String schemeId=dayBookReport.getSchemeId();
     	System.out.println("scheme id"+dayBookReport.getSchemeId());
+    	String naration=dayBookReport.getNarration();
+    	System.out.println("naration ::: "+dayBookReport.getNarration());
     	String oderBy=" ORDER BY vdate,vouchernumber";
         try {
             startDate = sdf.format(formatter.parse(dayBookReport.getStartDate()));
@@ -191,10 +193,19 @@ public class DayBookReportAction extends BaseFormAction {
         
         if(schemeId != null && !schemeId.isEmpty())
         {
+        	if(naration != null && !naration.isEmpty())
+        	{
+        		query=query+" and vh.description like '%"+naration+"%' ";
+        	}
         	query=query+" and vmis.schemeid = "+schemeId+ oderBy;
+        	
         }
         else
         {
+        	if(naration != null && !naration.isEmpty())
+        	{
+        		query=query+" and vh.description like '%"+naration+"%' ";
+        	}
         	query=query+oderBy;
         }
         return query;

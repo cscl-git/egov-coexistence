@@ -554,10 +554,16 @@ public class PendingTDSReportAction extends BaseFormAction {
                 
             }
         }
+        org.egov.infra.admin.master.entity.Department dept =null;
         if(pendingTDS !=null && !pendingTDS.isEmpty())
         {
         	for(RemittanceBean row:pendingTDS)
             {
+        		if(row.getDepartmentId() != null && !row.getDepartmentId().isEmpty())
+        		{
+        			dept = departmentService.getDepartmentById(Long.parseLong(row.getDepartmentId()));
+        			row.setDeptName(dept.getName());
+        		}
         		
             	if(row.getDetailKeyid() != null && row.getDetailKeyid() != 0 && row.getDetailTypeId() != null && row.getDetailTypeId() != 0)
             	{

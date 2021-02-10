@@ -76,6 +76,7 @@
 							<th class="bluebgheadtd">Reference Number</th>
 							<th class="bluebgheadtd">Voucher Date</th>
 							<th class="bluebgheadtd">Party Name</th>
+							<th class="bluebgheadtd">Department</th>
 							<th class="bluebgheadtd">Pending(Rs)</th>
 						</tr>
 						<s:iterator value="pendingTDS" status="stat" var="p">
@@ -98,6 +99,10 @@
 									</div></td>
 								<td class="blueborderfortd"><div align="left">
 										<s:property value="partyName" />
+										&nbsp;
+									</div></td>
+									<td class="blueborderfortd"><div align="left">
+										<s:property value="deptName" />
 										&nbsp;
 									</div></td>
 								<td class="blueborderfortd"><div align="right">

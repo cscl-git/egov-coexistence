@@ -92,6 +92,7 @@ public class RemittanceBean implements Predicate {
     private Long generalLedId;
     private String panNumber;
     private String gstNo;
+    private String deptName;
 
     public Long getFunctionId() {
         return functionId;
@@ -355,6 +356,14 @@ public class RemittanceBean implements Predicate {
 
 	public void setPanNumber(String panNumber) {
 		this.panNumber = panNumber;
+	}
+
+	public String getDeptName() {
+		return deptName;
+	}
+
+	public void setDeptName(String deptName) {
+		this.deptName = deptName;
 	}
     
     

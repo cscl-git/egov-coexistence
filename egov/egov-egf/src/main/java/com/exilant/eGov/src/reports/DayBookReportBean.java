@@ -55,6 +55,7 @@ public class DayBookReportBean
     private String totalCount;
     private String fundId;
     private String schemeId;
+    private String narration;
 
     /**
      *
@@ -139,6 +140,14 @@ public class DayBookReportBean
      */
 	public void setSchemeId(String schemeId) {
 		this.schemeId = schemeId;
+	}
+
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
 	}
     
     

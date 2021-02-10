@@ -190,6 +190,13 @@
 								<option value=""> ----Choose----</option>
 						</select></td>
 					</tr>
+					<tr>
+						<td class="bluebox"><s:text name="daybook.naration" /></td>
+						<td class="bluebox"><s:textfield id="narrationText"
+								name="narrationText" value="%{narrationText}"/></td>
+						<td class="bluebox">&nbsp;</td>
+						<td class="bluebox">&nbsp;</td>
+					</tr>
 
 				</table>
 				<br />

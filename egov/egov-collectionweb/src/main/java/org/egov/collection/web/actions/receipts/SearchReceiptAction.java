@@ -153,6 +153,7 @@ public class SearchReceiptAction extends SearchFormAction {
     private String reportId;
     private ReportService reportService;
     private InputStream inputStream;
+    private String receiptType;
 
     @Autowired
     private AssignmentService assignmentService;
@@ -473,11 +474,16 @@ public class SearchReceiptAction extends SearchFormAction {
                     {
                     	continue;
                     }
+                    receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+                    if(receiptType != null && !receiptType.isEmpty() && !receiptType.equalsIgnoreCase("-1") && !receiptType.contains("-1") && !receiptType.equalsIgnoreCase(receiptHeader.getCurretnStatus()))
+                    {
+                    	continue;
+                    }
                     receiptHeader.setSubdivison(receipt.getSubdivison());
                     System.out.println("12");
                     receiptHeader.setGstno(receipt.getGstNo());
                     System.out.println("13");
-                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    
                     System.out.println("14");
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     System.out.println("15");
@@ -804,6 +810,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     {
                     	continue;
                     }
+                    
                     System.out.println("99");
                     receiptHeader.setSubdivison(receipt.getSubdivison());
                     System.out.println("10");
@@ -811,7 +818,13 @@ public class SearchReceiptAction extends SearchFormAction {
                     System.out.println("11");
                     receiptHeader.setTotalreciptAmount(totalReciptAmount);
                     System.out.println("12");
-                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+                    System.out.println("receiptType  ::::"+receiptType);
+                    System.out.println("receiptHeader.getCurretnStatus()  ::::"+receiptHeader.getCurretnStatus());
+                    if(receiptType != null && !receiptType.isEmpty() && !receiptType.equalsIgnoreCase("-1") && !receiptType.contains("-1") && !receiptType.equalsIgnoreCase(receiptHeader.getCurretnStatus()))
+                    {
+                    	continue;
+                    }
                     System.out.println("13");
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     System.out.println("Mid");
@@ -1027,6 +1040,7 @@ public class SearchReceiptAction extends SearchFormAction {
         		bean.setModeOfPayment(header.getModOfPayment());
         		bean.setParticulars(header.getReferenceDesc());
         		bean.setTotalReceiptAmount(header.getTotalAmount());
+        		bean.setStatus(header.getCurretnStatus());
         		if(header.getPrincipalAmount() != null)
         		{
         			bean.setPrincipalAmt(header.getPrincipalAmount());
@@ -1122,6 +1136,7 @@ public class SearchReceiptAction extends SearchFormAction {
 	    rowhead.createCell(13).setCellValue("Remittance No.");
 	    rowhead.createCell(14).setCellValue("Bank Account No.");
 	    rowhead.createCell(15).setCellValue("Deposit Amount");
+	    rowhead.createCell(16).setCellValue("Status");
 	    int index=1;
 	    int rowCount=6;
 	    HSSFRow details ;
@@ -1145,6 +1160,8 @@ public class SearchReceiptAction extends SearchFormAction {
 	    	details.createCell(13).setCellValue(bean.getRemitanceNo());
 	    	details.createCell(14).setCellValue(bean.getBankAccountNo());
 	    	details.createCell(15).setCellValue(bean.getDepositAmount().doubleValue());
+	    	details.createCell(16).setCellValue(bean.getStatus());
+	    	
 	    }
 	    ByteArrayOutputStream os = new ByteArrayOutputStream();
 		System.out.println("XYZ");
@@ -1424,5 +1441,13 @@ public class SearchReceiptAction extends SearchFormAction {
 
 	public void setSubdivison(String subdivison) {
 		this.subdivison = subdivison;
+	}
+
+	public String getReceiptType() {
+		return receiptType;
+	}
+
+	public void setReceiptType(String receiptType) {
+		this.receiptType = receiptType;
 	}
 }

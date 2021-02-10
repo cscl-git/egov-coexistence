@@ -197,6 +197,14 @@
 								<option value=""> ----Choose----</option>
 						</select></td>
 					</tr>
+					<tr>
+						<td style="width: 5%"></td>
+						<td class="greybox"><s:text name="daybook.naration" /></td>
+						<td class="greybox"><s:textfield id="narration"
+								name="narration" value="%{narration}"/></td>
+						<td class="greybox">&nbsp;</td>
+						<td class="greybox">&nbsp;</td>
+					</tr>
 					
 				</table>
 				<br />
