@@ -132,6 +132,36 @@ public class CouncilSmsAndEmailService {
         }
     }
     
+    public void sendSmsNotice(CouncilMeeting councilMeeting, String customMessage) {
+        String mobileNo;
+        Boolean smsEnabled = isSmsEnabled();
+
+        if (smsEnabled) {
+        	try {
+	            for (CommitteeMembers committeeMembers : committeeMemberService
+	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
+	                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
+	                if (mobileNo != null) {
+	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage);
+	                }
+	            }
+        	}catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to council members of meeting number "+councilMeeting.getMeetingNumber());
+            }
+            try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForNotice(councilMeeting);
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage);
+	                }
+	            }
+            }catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
+            }
+            buildCouncilSmsDetails(customMessage, councilMeeting);
+        }
+    }
+    
     public void sendSmsForAgendaInvitation(String customMessage) {
         Boolean smsEnabled = isSmsEnabled();
 
@@ -332,7 +362,6 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
-                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
                 LocaleContextHolder.getLocale());
     }
@@ -350,7 +379,6 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
-                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
                 LocaleContextHolder.getLocale());
     }
@@ -380,7 +408,6 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
-                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()) },
                 LocaleContextHolder.getLocale());
     }

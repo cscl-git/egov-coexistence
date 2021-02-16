@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -56,9 +57,13 @@ import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
+import org.egov.works.utils.ExcelGenerator;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -66,7 +71,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping(value = "/estimatePreparation")
@@ -1084,6 +1092,83 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		outStream.close();
 	}
 	
-	
+	// for Download estimate result written by sonu prajapati
+	@RequestMapping(value = "/workEstimateSearch",params="workEstimateSearchResult" ,method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<InputStreamResource> excelEstimateResult(@ModelAttribute("workEstimateDetails")
+	          final EstimatePreparationApproval estimatePreparationApproval,
+	             final Model model, final HttpServletRequest request) throws Exception {
+		
+             List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
+
+         // Convert input string into a date
+         if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+         long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+         estimatePreparationApproval.setExecutingDivision(department);
+         }
+         EstimatePreparationApproval estimate=null;
+
+        final StringBuffer query = new StringBuffer(500);
+        List<Object[]> list =null;
+        query
+        .append(
+            "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es where es.executingDivision = ? ")
+        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
+        .append(getMisQuery(estimatePreparationApproval));
+        System.out.println("Query :: "+query.toString());
+        list = persistenceService.findAllBy(query.toString(),
+		 estimatePreparationApproval.getExecutingDivision());
+ 
+       if (list.size() != 0) {
+	 
+	   for (final Object[] object : list) {
+		 estimate = new EstimatePreparationApproval();
+		 estimate.setId(Long.parseLong(object[0].toString()));
+		 if(object[1] != null)
+		 {
+			 estimate.setWorkName(object[1].toString());
+		 }
+		 if(object[2] != null)
+		 {
+			 estimate.setWorkCategry(object[2].toString());
+		 }
+		 if(object[3] != null)
+		 {
+			 estimate.setEstimateNumber(object[3].toString());
+		 }
+		 if(object[4] != null)
+		 {
+			 estimate.setEstimateDt(object[4].toString());
+		 }
+		 if(object[5] != null)
+		 {
+			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
+		 }
+		 if(object[6] != null)
+		 {
+			 estimate.setStatusDescription(object[6].toString());
+		 }
+		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+		 {
+			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+		 }
+		 approvalList.add(estimate);
+	   }
+	 
+    }
+      estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+      estimatePreparationApproval.setEstimateList(approvalList);
+		
+		String[] COLUMNS = {"Name Of Work", "Estimate Number", "Estimate Date", "Estimate Ammount", "Work Status", "Pending With"};
+		
+		ByteArrayInputStream in = ExcelGenerator.estimateResultToExcel(approvalList, COLUMNS);
+		
+		HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=EstimateResult.xlsx");
+		return ResponseEntity
+                .ok()
+                .headers(headers)
+                .body(new InputStreamResource(in));
+		
+	    }
 
 }

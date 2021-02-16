@@ -327,7 +327,14 @@
 					</c:if>
 					</table>
 				</div>
-
+				<c:if test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
+				 <div class="buttonbottom" align="center">
+			          <input type="submit" id="workEstimateSearchResult" class="btn btn-primary"
+						name="workEstimateSearchResult" code="lbl.search.work.estimate"
+						value="Export" />
+				</div>
+				</c:if>
+               
 			</div>
 		</div>
 	</div>

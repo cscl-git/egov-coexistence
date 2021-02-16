@@ -298,7 +298,7 @@ public class CouncilMeetingController {
         councilMeetingService.create(councilMeeting);
         
         try {
-        	councilSmsAndEmailService.sendSms(councilMeeting, null);
+        	councilSmsAndEmailService.sendSmsNotice(councilMeeting, null);
         }catch(Exception e) {
         	LOGGER.error("Unable to send SMS to for meeting number "+councilMeeting.getMeetingNumber());
         }
