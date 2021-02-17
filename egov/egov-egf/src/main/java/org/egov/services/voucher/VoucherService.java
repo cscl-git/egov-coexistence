@@ -1659,6 +1659,12 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		 System.out.println(vmis.toString());
 		 return vmis;
 	 }
-	    
+	 
+	    public void updateSourcePathForGJV(CVoucherHeader voucherHeader)
+	    {
+	    	voucherHeader.getVouchermis().setSourcePath(
+					"/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id=" + voucherHeader.getId());
+			update(voucherHeader);
+	    }
 
 }

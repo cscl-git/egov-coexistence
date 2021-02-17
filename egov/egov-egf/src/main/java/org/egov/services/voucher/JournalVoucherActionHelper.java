@@ -138,6 +138,10 @@ public class JournalVoucherActionHelper {
                 voucherService.createBillForVoucherSubType(billDetailslist, subLedgerlist, voucherHeader, voucherTypeBean,
                         new BigDecimal(voucherTypeBean.getTotalAmount()));
             }
+            else
+            {
+            	voucherService.updateSourcePathForGJV(voucherHeader);
+            }
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
                     && voucherHeader.getState() == null) {
                 voucherHeader.setStatus(FinancialConstants.CREATEDVOUCHERSTATUS);

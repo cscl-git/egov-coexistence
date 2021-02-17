@@ -151,7 +151,7 @@ public class ManualReconciliationAction extends BaseFormAction {
 		
 		Collections.sort(unReconciledCheques, new Comparator<ReconcileBean>() {
 		    public int compare(ReconcileBean m1, ReconcileBean m2) {
-		        return (getDate(m1.getChequeDate())).compareTo(getDate(m1.getChequeDate()));
+		        return (getDate(m1.getChequeDate())).compareTo(getDate(m2.getChequeDate()));
 		    }
 		});
 		return "search";

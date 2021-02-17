@@ -156,9 +156,14 @@ public class CreateContractorController {
         UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         if(uploadedFiles!=null)
+        {
         	System.out.println("file upload");
         for (int i = 0; i < uploadedFiles.length; i++) {
-
+        	System.out.println("loop1 :::"+i);
+        	if(uploadedFiles[i] == null || uploadedFiles[i].getAbsolutePath().isEmpty())
+			{
+				continue;
+			}
             Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
             byte[] fileBytes = Files.readAllBytes(path);
             ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
@@ -169,16 +174,21 @@ public class CreateContractorController {
             list.add(upload);
         }
         contractor.setDocumentDetail(list);
+        }
         Contractor savedContractor=contractorService.create(contractor);
         System.out.println("ID ::::"+savedContractor.getId());
         
         List<DocumentUpload> files = contractor.getDocumentDetail() == null ? null : contractor.getDocumentDetail();
         final List<DocumentUpload> documentDetails;
-        documentDetails = financialUtils.getDocumentDetails(files, savedContractor,
-                "egf_contractor");
-        if (!documentDetails.isEmpty()) {
-            persistDocuments(documentDetails);
+        if(files!=null && !files.isEmpty())
+        {
+        	documentDetails = financialUtils.getDocumentDetails(files, savedContractor,
+                    "egf_contractor");
+            if (!documentDetails.isEmpty()) {
+                persistDocuments(documentDetails);
+            }
         }
+        
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.contractor.success", null, null));
 
         return "redirect:/contractor/result/" + contractor.getId() + "/create";
@@ -207,9 +217,14 @@ public class CreateContractorController {
         UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         if(uploadedFiles!=null)
+        {
         	System.out.println("file upload");
         for (int i = 0; i < uploadedFiles.length; i++) {
-
+        	System.out.println("loop :::"+i);
+        	if(uploadedFiles[i] == null || uploadedFiles[i].getAbsolutePath().isEmpty())
+			{
+				continue;
+			}
             Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
             byte[] fileBytes = Files.readAllBytes(path);
             ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
@@ -220,16 +235,21 @@ public class CreateContractorController {
             list.add(upload);
         }
         contractor.setDocumentDetail(list);
+        }
         Contractor savedContractor = contractorService.update(contractor);
         System.out.println("ID ::::"+savedContractor.getId());
         
         List<DocumentUpload> files = contractor.getDocumentDetail() == null ? null : contractor.getDocumentDetail();
         final List<DocumentUpload> documentDetails;
-        documentDetails = financialUtils.getDocumentDetails(files, savedContractor,
-                "egf_contractor");
-        if (!documentDetails.isEmpty()) {
-            persistDocuments(documentDetails);
+        if(files !=null && !files.isEmpty())
+        {
+        	documentDetails = financialUtils.getDocumentDetails(files, savedContractor,
+                    "egf_contractor");
+            if (!documentDetails.isEmpty()) {
+                persistDocuments(documentDetails);
+            }
         }
+        
         redirectAttrs.addFlashAttribute("message", messageSource.getMessage("msg.contractor.success", null, null));
         return "redirect:/contractor/result/" + contractor.getId() + "/view";
     }
