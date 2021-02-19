@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CGeneralLedger;
@@ -22,7 +23,10 @@ import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.egf.billsubtype.service.EgBillSubTypeService;
 import org.egov.egf.commons.VoucherSearchUtil;
+import org.egov.egf.contract.model.RefundRequest;
+import org.egov.egf.contract.model.RefundResponse;
 import org.egov.egf.contract.model.VoucherDetailsResponse;
+import org.egov.egf.contract.model.VoucherRequest;
 import org.egov.egf.contract.model.VoucherSearch;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.infra.admin.master.service.AppConfigValueService;
@@ -45,6 +49,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -491,5 +497,24 @@ public class PaymentRefundController {
     
     public List<EgBillSubType> getBillSubTypes() {
         return egBillSubTypeService.getByExpenditureType(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
+    }
+    
+    @PostMapping(value = "/_processRefund")
+	@ResponseBody
+    public RefundResponse processRefund (@RequestBody RefundRequest refundRequest)
+    {
+    	System.out.println("1");
+    	RefundResponse response=new RefundResponse();
+    	try
+    	{
+    		
+        	response.setResponseStatus(refundRequest.getReceipt().getReceiptNumber());
+        	response.setResponseInfo(MicroserviceUtils.getResponseInfo(refundRequest.getRequestInfo(),
+    				HttpStatus.SC_CREATED, null));
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    	
+    	return response;
     }
 }

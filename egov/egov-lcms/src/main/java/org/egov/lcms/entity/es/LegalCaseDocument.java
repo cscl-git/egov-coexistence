@@ -90,6 +90,9 @@ public class LegalCaseDocument {
 
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String officerIncharge;
+    
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String nodalOfficerDepartment;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ES_DATE_FORMAT_WITHOUT_TS, timezone = DEFAULT_TIMEZONE)
     @Field(type = FieldType.Date, format = DateFormat.date_optional_time, pattern = ES_DATE_FORMAT_WITHOUT_TS)
@@ -136,8 +139,7 @@ public class LegalCaseDocument {
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String advocateName;
     
-    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
-    private String nodalOfficerDepartment;
+    
 
     @Field(type = FieldType.Boolean)
     private boolean seniorAdvocate;
@@ -304,7 +306,15 @@ public class LegalCaseDocument {
     public void setOfficerIncharge(final String officerIncharge) {
         this.officerIncharge = officerIncharge;
     }
+    
+    public String getNodalOfficerDepartment() {
+		return nodalOfficerDepartment;
+	}
 
+	public void setNodalOfficerDepartment(String nodalOfficerDepartment) {
+		this.nodalOfficerDepartment = nodalOfficerDepartment;
+	}
+	
     public Date getCaseDate() {
         return caseDate;
     }
@@ -513,6 +523,7 @@ public class LegalCaseDocument {
         private Date caseReceivingDate;
         private String previousCaseNumber;
         private String officerIncharge;
+        private String nodalOfficerDepartment;
         private Date nextDate;
         private Boolean filedByULB;
         private String status;
@@ -585,7 +596,11 @@ public class LegalCaseDocument {
             this.officerIncharge = officerIncharge;
             return this;
         }
-
+        public Builder withNodalOfficerDepartment(final String nodalOfficerDepartment) {
+            this.nodalOfficerDepartment = nodalOfficerDepartment;
+            return this;
+        }
+        
         public Builder withNextDate(final Date nextDate) {
             this.nextDate = nextDate;
             return this;
@@ -676,6 +691,7 @@ public class LegalCaseDocument {
             legalCaseIndex.setFiledByULB(filedByULB);
             legalCaseIndex.setNextDate(nextDate);
             legalCaseIndex.setOfficerIncharge(officerIncharge);
+            legalCaseIndex.setNodalOfficerDepartment(nodalOfficerDepartment);
             legalCaseIndex.setStatus(status);
             legalCaseIndex.setSubStatus(subStatus);
             legalCaseIndex.setPetitionerNames(petitionerNames);
@@ -693,11 +709,5 @@ public class LegalCaseDocument {
 
     }
 
-	public String getNodalOfficerDepartment() {
-		return nodalOfficerDepartment;
-	}
-
-	public void setNodalOfficerDepartment(String nodalOfficerDepartment) {
-		this.nodalOfficerDepartment = nodalOfficerDepartment;
-	}
+	
 }

@@ -403,7 +403,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
                 + "                                               ";
         final JasperPrint jasper = reportHelper.generateIncomeExpenditureReportJasperPrint(incomeExpenditureStatement, heading,
                 getPreviousYearToDate(), getCurrentYearToDate(), subtitle, true);
-        inputStream = reportHelper.exportXls(inputStream, jasper);
+        //bikash
+        //inputStream = reportHelper.exportXls(inputStream, jasper);
         return INCOME_EXPENSE_XLS;
     }
 
