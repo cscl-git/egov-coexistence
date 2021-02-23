@@ -152,7 +152,7 @@ today = dd+'/'+mm+'/'+yyyy;
 		var functionId = '<s:property value="functionId"/>';
 		var fieldId = '<s:property value="divisionId"/>';	   
 		var fundId='<s:property value="fundId"/>';
-                                             
+		var schemeId='<s:property value="schemeId"/>';                                    
 		
 		 var functionCode1=functionName+"~"+functionId;
 
@@ -162,7 +162,7 @@ today = dd+'/'+mm+'/'+yyyy;
 			functionId="";
 			}                   
 		
-		window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode+'&fund_id='+fundId+'&startDate='+startDate+'&endDate='+endDate+'&departmentCode='+deptCode+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+		window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode+'&fund_id='+fundId+'&schemeId='+schemeId+'&startDate='+startDate+'&endDate='+endDate+'&departmentCode='+deptCode+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 	}
 </script>
 </head>
@@ -253,6 +253,21 @@ today = dd+'/'+mm+'/'+yyyy;
 								id="divisionId" list="dropdownData.fieldList" listKey="id"
 								listValue="name" headerKey="" headerValue="%{getText('lbl.choose.options')}"
 								value="divisionId" /></td>
+								
+						
+						<td class="greybox"></td>
+						<td class="greybox"></td>
+					</tr>
+					<tr>
+						<td class="bluebox"></td>
+						<td class="greybox"><s:text name="scheme" /></span></td>
+						<td class="greybox"><s:select 
+						name="schemeId" id="schemeId"	list="dropdownData.schemeList" listKey="id" listValue="name" onchange="getval(this);"
+								headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
+						<td class="greybox"><s:text name="subscheme" /></td>
+						<td class="greybox"><select id="subschemeId">	
+								<option value=""> ----Choose----</option>
+						</select></td>
 					</tr>
 				</table>
 

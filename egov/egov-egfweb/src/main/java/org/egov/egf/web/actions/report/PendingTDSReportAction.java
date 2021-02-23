@@ -567,7 +567,7 @@ public class PendingTDSReportAction extends BaseFormAction {
         		
             	if(row.getDetailKeyid() != null && row.getDetailKeyid() != 0 && row.getDetailTypeId() != null && row.getDetailTypeId() != 0)
             	{
-            		row.setPartyName(getParty(row.getDetailKeyid()));
+            		row.setPartyName(getParty(row.getDetailKeyid(),row.getDetailTypeId()));
             		if(row.getDetailTypeId() == 11 && row.getPartyName() != null && !row.getPartyName().isEmpty())
             		{
             			 List<Object[]> list = getSupplier(row.getPartyName());
@@ -636,14 +636,15 @@ public class PendingTDSReportAction extends BaseFormAction {
 	    return list;
 	}
 
-	private String getParty(Integer dtlKey) {
+	private String getParty(Integer dtlKey, Integer detailType) {
     	SQLQuery query =  null;
     	List<Object[]> rows = null;
     	String partyName="";
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select acc.detailname,acc.detailtypeid from accountdetailkey acc where acc.detailkey=:detailKey");
+    		 query = this.persistenceService.getSession().createSQLQuery("select acc.detailname,acc.detailtypeid from accountdetailkey acc where acc.detailkey=:detailKey and acc.detailtypeid=:detailType");
     	    query.setInteger("detailKey", dtlKey);
+    	    query.setInteger("detailType", detailType);
     	    rows = query.list();
     	    
     	    if(rows != null && !rows.isEmpty())

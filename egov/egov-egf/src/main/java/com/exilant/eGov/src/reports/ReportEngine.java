@@ -232,7 +232,6 @@ public class ReportEngine {
         reBean.setFromDate(reportBean.getStartDate());
         reBean.setFromVoucherNumber(null);
         reBean.setFunctionId(reportBean.getFunctionCodeId());
-        reBean.setSchemeId(null);
         reBean.setSubSchemeId(null);
         reBean.setToDate(reportBean.getEndDate());
         reBean.setToVoucherNumber(null);
