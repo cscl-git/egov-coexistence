@@ -66,7 +66,6 @@ public class TimeSeriesReportResult {
     private String resName;
     private String caseStatus;
     private String aggregatedByValue;
-    private String nodalOfficerDepartment;
 
     public String getAggregatedByValue() {
         return aggregatedByValue;
@@ -203,13 +202,4 @@ public class TimeSeriesReportResult {
     public void setYear(final String year) {
         this.year = year;
     }
-
-	public String getNodalOfficerDepartment() {
-		return nodalOfficerDepartment;
-	}
-
-	public void setNodalOfficerDepartment(String nodalOfficerDepartment) {
-		this.nodalOfficerDepartment = nodalOfficerDepartment;
-	}
-
 }

@@ -83,7 +83,8 @@ public class LegalCommonReportService {
     private static final String CASESTATUS = "status";
     private static final String OFFICERINCHRGE = "officerIncharge";
     private static final String STANDINGCOUNSEL = "advocateName";
-    private static final String CONCERNEDDEPARTMENT = "nodalOfficerDepartment";
+    private static final String CONCERNEDDEPARTMENT = "concernedDepartment";
+    private static final String CONCERNEDBRANCH = "concernedBranch";
     public static final String MONTH = "month";
     public static final String YEAR = "year";
     public static final String MONTHLY = "monthly";
@@ -195,6 +196,8 @@ public class LegalCommonReportService {
                 boolQuery.filter(QueryBuilders.matchQuery(JUDGEMENTOUTCOME, searchRequest.getAggregatedByValue()));
             else if (searchRequest.getAggregatedBy().equals(LcmsConstants.CONCERNEDDEPARTMENT))
                 boolQuery.filter(QueryBuilders.matchQuery(CONCERNEDDEPARTMENT, searchRequest.getAggregatedByValue()));
+            else if (searchRequest.getAggregatedBy().equals(LcmsConstants.CONCERNEDBRANCH))
+                boolQuery.filter(QueryBuilders.matchQuery(CONCERNEDBRANCH, searchRequest.getAggregatedByValue()));
         }
         if (StringUtils.isNotBlank(searchRequest.getMonth()) && StringUtils.isNotBlank(searchRequest.getYear())) {
             final Integer monthName = monthValuesMapnumber.get(searchRequest.getMonth());
@@ -281,9 +284,6 @@ public class LegalCommonReportService {
         if (StringUtils.isNotBlank(searchRequest.getStandingCounsel()))
             boolQuery = boolQuery
                     .filter(QueryBuilders.termQuery("advocateName", searchRequest.getStandingCounsel()));
-        if (StringUtils.isNotBlank(searchRequest.getNodalOfficerDepartment()))
-            boolQuery = boolQuery
-                    .filter(QueryBuilders.termQuery("nodalOfficerDepartment", searchRequest.getNodalOfficerDepartment()));
         if (StringUtils.isNotBlank(searchRequest.getReportStatus()))
             boolQuery = boolQuery
                     .filter(QueryBuilders.termQuery("subStatus", searchRequest.getReportStatus()));
@@ -320,7 +320,6 @@ public class LegalCommonReportService {
                     hearingsDueReportResultObj.setRespondantName(legalcaseDocumentIndex.getRespondantNames());
                     hearingsDueReportResultObj.setStandingCounsel(legalcaseDocumentIndex.getAdvocateName());
                     hearingsDueReportResultObj.setOfficerIncharge(legalcaseDocumentIndex.getOfficerIncharge());
-                    hearingsDueReportResultObj.setNodalOfficerDepartment(legalcaseDocumentIndex.getNodalOfficerDepartment());
                     hearingsDueReportResultObj
                             .setNextDate(myFormat.format(dateFormat.parse(legalcaseDocumentIndex.getNextDate().toString())));
                     finalResult.add(hearingsDueReportResultObj);

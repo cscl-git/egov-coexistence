@@ -218,7 +218,8 @@ public class LcmsConstants {
     public static final String CASESTATUS = "Case Status";
     public static final String STANDINGCOUNSEL = "Defending Counsel";
     public static final String JUDGEMENTOUTCOME = "Judgment outcome";
-    public static final String CONCERNEDDEPARTMENT="Concerned Branch";
+    public static final String CONCERNEDDEPARTMENT="Concerned Department";
+    public static final String CONCERNEDBRANCH="Concerned Branch";
     public static final String DUEPWRREPORT = "PWR due date";
     public static final String DUECAREPORT = "CA Due date";
     public static final String DUEJUDGEMENTIMPLPREPORT = "Judgement Implementation";

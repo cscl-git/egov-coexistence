@@ -80,7 +80,6 @@ public class LegalCommonReportResult {
     private String aggregatedByValue;
     private String judgmentType;
     private String reportStatus;
-    private String nodalOfficerDepartment;
 
     public String getCaseFromDate() {
         return caseFromDate;
@@ -323,12 +322,5 @@ public class LegalCommonReportResult {
         this.reportStatus = reportStatus;
     }
 
-	public String getNodalOfficerDepartment() {
-		return nodalOfficerDepartment;
-	}
-
-	public void setNodalOfficerDepartment(String nodalOfficerDepartment) {
-		this.nodalOfficerDepartment = nodalOfficerDepartment;
-	}
 
 }
