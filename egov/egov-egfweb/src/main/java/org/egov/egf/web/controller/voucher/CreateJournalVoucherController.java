@@ -1000,7 +1000,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
  			}
  			if(object[4] != null)
  			{
- 				pexDetail.setCgvn(object[3].toString());
+ 				pexDetail.setCgvn(object[4].toString());
  			}
  			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
  		}
