@@ -80,6 +80,7 @@ public class LegalCommonReportResult {
     private String aggregatedByValue;
     private String judgmentType;
     private String reportStatus;
+	private String concernedBranch;
 
     public String getCaseFromDate() {
         return caseFromDate;
@@ -322,5 +323,12 @@ public class LegalCommonReportResult {
         this.reportStatus = reportStatus;
     }
 
+	public String getConcernedBranch() {
+		return concernedBranch;
+	}
+
+	public void setConcernedBranch(String concernedBranch) {
+		this.concernedBranch = concernedBranch;
+	}
 
 }

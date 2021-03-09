@@ -145,7 +145,7 @@ public class LegalCaseDocumentService {
         legalCaseDocument.setFiledByULB((null==legalCase.getIsFiledByCorporation())?false:legalCase.getIsFiledByCorporation());
         legalCaseDocument.setNextDate(legalCase.getNextDate());
         legalCaseDocument.setOfficerIncharge(legalCase.getOfficerIncharge() == null ? "" : legalCase.getOfficerIncharge().getName());
-        legalCaseDocument.setConcernedBranch((legalCase.getConcernedBranch() == null && legalCase.getConcernedBranch().getConcernedBranch() == null) ? "" : legalCase.getConcernedBranch().getConcernedBranch());
+        legalCaseDocument.setConcernedBranch(((legalCase.getConcernedBranch() == null) || (legalCase.getConcernedBranch() !=null && legalCase.getConcernedBranch().getConcernedBranch() == null)) ? "" : legalCase.getConcernedBranch().getConcernedBranch());
         legalCaseDocument.setConcernedDepartment(legalCase.getNodalOfficerDepartment() == null ? "" : legalCase.getNodalOfficerDepartment());
         legalCaseDocument.setPetitionerNames(legalCase.getPetitionersNames());
         legalCaseDocument.setRespondantNames(legalCase.getRespondantNames());

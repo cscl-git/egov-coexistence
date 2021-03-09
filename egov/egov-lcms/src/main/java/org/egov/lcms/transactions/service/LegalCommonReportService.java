@@ -163,6 +163,10 @@ public class LegalCommonReportService {
         legalCommonResultObj
                 .setNextDate(legalcaseDocument.getNextDate() == null
                         ? "" : myFormat.format(dateFormat.parse(legalcaseDocument.getNextDate().toString())));
+        
+        legalCommonResultObj.setConcernedBranch(legalcaseDocument.getConcernedBranch() == null ?"" :legalcaseDocument.getConcernedBranch());
+        
+      
         finalResult.add(legalCommonResultObj);
         return finalResult;
 

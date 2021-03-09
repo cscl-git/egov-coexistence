@@ -278,6 +278,11 @@ function callAjaxBydrillDownReport(aggregatedByValues,monthh,yearr) {
 							"className" : "text-left"
 						},
 						{
+							"data" : "concernedBranch",
+							"sTitle" : "Concern Branch",
+							"className" : "text-left"
+						},
+						{
 							"data" : "petitionerName",
 							"sTitle" : "Petitioners",
 							"className" : "text-left"

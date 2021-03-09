@@ -394,7 +394,8 @@ public class LegalCase extends AbstractAuditable {
     }
 
     /**
-     * @param errors Validation Check for Batch case:
+	 * @param errors
+	 *            Validation Check for Batch case:
      */
     protected void batchCaseValidation(final List<ValidationError> errors) {
         Boolean duplicateCaseNumberCheck = false;
@@ -562,8 +563,14 @@ public class LegalCase extends AbstractAuditable {
     }
 
     public EgwStatus getStatus() {
+
         return status;
     }
+
+	public String getStatusCode() {
+
+		return status.getCode();
+	}
 
     public void setStatus(final EgwStatus status) {
         this.status = status;
@@ -678,15 +685,17 @@ public class LegalCase extends AbstractAuditable {
     }
 
     /*
-     * public List<PaperBook> getPaperBookSet() { return paperBookSet; } public void setPaperBookSet(final List<PaperBook>
-     * paperBookSet) { this.paperBookSet = paperBookSet; } public List<ProcessRegister> getProcessRegisterSet() { return
-     * processRegisterSet; } public void setProcessRegisterSet(final List<ProcessRegister> processRegisterSet) {
-     * this.processRegisterSet = processRegisterSet; }
+	 * public List<PaperBook> getPaperBookSet() { return paperBookSet; } public void
+	 * setPaperBookSet(final List<PaperBook> paperBookSet) { this.paperBookSet =
+	 * paperBookSet; } public List<ProcessRegister> getProcessRegisterSet() { return
+	 * processRegisterSet; } public void setProcessRegisterSet(final
+	 * List<ProcessRegister> processRegisterSet) { this.processRegisterSet =
+	 * processRegisterSet; }
      */
 
     /*
-     * public Long getDocumentNum() { return documentNum; } public void setDocumentNum(final Long documentNum) { this.documentNum
-     * = documentNum; }
+	 * public Long getDocumentNum() { return documentNum; } public void
+	 * setDocumentNum(final Long documentNum) { this.documentNum = documentNum; }
      */
 
     public List<BipartisanDetails> getBipartisanDetails() {
@@ -714,8 +723,9 @@ public class LegalCase extends AbstractAuditable {
     }
 
     /*
-     * public Date getPetFirstAppDate() { return petFirstAppDate; } public void setPetFirstAppDate(final Date petFirstAppDate) {
-     * this.petFirstAppDate = petFirstAppDate; }
+	 * public Date getPetFirstAppDate() { return petFirstAppDate; } public void
+	 * setPetFirstAppDate(final Date petFirstAppDate) { this.petFirstAppDate =
+	 * petFirstAppDate; }
      */
 
     public String getStampNumber() {

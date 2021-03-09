@@ -90,13 +90,13 @@
 				<form:hidden path="type" id="type" value="${councilPreamble.type}" />
 				
 				<label class="col-sm-2 control-label text-right"><spring:message
-						code="lbl.department" /> <span class="mandatory"></span></label>
+						code="lbl.department" /> </label>
 				<div class="col-sm-3 add-margin">
 					<c:choose>
 						<c:when test="${isAgendaAdmin && currentState=='NEW'}">
 							<form:select path="department" id="department"
 								cssClass="form-control" cssErrorClass="form-control error"
-								required="required">
+								>
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>

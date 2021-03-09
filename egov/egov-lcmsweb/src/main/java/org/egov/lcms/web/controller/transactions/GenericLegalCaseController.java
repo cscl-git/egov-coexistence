@@ -51,15 +51,19 @@ import org.egov.lcms.masters.entity.CaseTypeMaster;
 import org.egov.lcms.masters.entity.CourtMaster;
 import org.egov.lcms.masters.entity.CourtTypeMaster;
 import org.egov.lcms.masters.entity.GovernmentDepartment;
+import org.egov.lcms.masters.entity.JudgmentType;
 import org.egov.lcms.masters.entity.PetitionTypeMaster;
 import org.egov.lcms.masters.entity.enums.LCNumberType;
+import org.egov.lcms.masters.repository.JudgmentTypeRepository;
 import org.egov.lcms.masters.service.CaseTypeMasterService;
 import org.egov.lcms.masters.service.CourtMasterService;
 import org.egov.lcms.masters.service.CourtTypeMasterService;
 import org.egov.lcms.masters.service.GovernmentDepartmentService;
+import org.egov.lcms.masters.service.JudgmentTypeService;
 import org.egov.lcms.masters.service.PetitionTypeMasterService;
 import org.egov.lcms.utils.constants.LcmsConstants;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import java.util.ArrayList;
@@ -85,6 +89,14 @@ public class GenericLegalCaseController {
     @Autowired
     private CourtMasterService courtMasterService;
 
+    //edited
+    @Autowired
+    private JudgmentTypeService judgmentTypeService;
+    
+    public @ModelAttribute("judgmentType") List<JudgmentType> findAll() {
+        return judgmentTypeService.findAll();
+    }
+//ended
     public @ModelAttribute("courtTypeList") List<CourtTypeMaster> courtTypeList() {
         return courtTypeMasterService.getActiveCourtTypes();
     }
