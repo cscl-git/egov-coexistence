@@ -1118,7 +1118,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   		
   	}
    	
-   	String[] COLUMNS = {"S.no.", "Party Name", "DIVISION", "BUDGET HEAD","Scheme" ,"Gross Amount", "TDS/I", "TDS ON IGST", "TDS ON CGST/UTGST", "Labour Cess", "Collection charges", "Water charges", "Quality Cess", "Penalty/Fine", "Security/Amt withheld","GPF","NPS/CPF","GSLIC/GIS","House Building Advance","Licence Fees","LIC","Bank Loan","Court Attachment","Pension Fund","" ,"Any other deduction", "Net Amount", "Paid Amount", "Journal Voucher number","Jounal Voucher Date", "Payment voucher number","BPV Date", "PEX NUMBER", "PEX DATE","Bank Account Number", "Status"};
+   	String[] COLUMNS = {"S.no.", "Party Name", "DIVISION", "BUDGET HEAD","Scheme" ,"Gross Amount", "TDS/I", "TDS ON IGST", "TDS ON CGST/UTGST", "Labour Cess", "Collection charges", "Water charges", "Quality Cess", "Penalty/Fine", "Security/Amt withheld","GPF","NPS/CPF","GSLIC/GIS","House Building Advance","Licence Fees","LIC","Bank Loan","Court Attachment","Pension Fund","Any other deduction", "Net Amount", "Paid Amount", "Journal Voucher number","Jounal Voucher Date", "Payment voucher number","BPV Date", "PEX NUMBER", "PEX DATE","Bank Account Number", "Status"};
 	
 	ByteArrayInputStream in = resultToExcel(billRegReportList, COLUMNS);
 	

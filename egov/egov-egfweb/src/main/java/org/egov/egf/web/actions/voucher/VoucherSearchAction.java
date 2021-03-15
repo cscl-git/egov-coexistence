@@ -295,6 +295,7 @@ public class VoucherSearchAction extends BaseFormAction {
 		List<CVoucherHeader> list = new ArrayList<CVoucherHeader>();
 		List<CVoucherHeader> filterlist =new ArrayList<CVoucherHeader>();
 		List<Query> qryObj;
+		
 		// for view voucher implementing paginated result
 		if (null == showMode || showMode.equals("")) {
 			System.out.println("before query search");
@@ -871,6 +872,39 @@ public class VoucherSearchAction extends BaseFormAction {
     	try
     	{
     		 query = this.persistenceService.getSession().createSQLQuery("select v.id,a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey and g2.detailtypeid=a.detailtypeid and v.type =:type");
+    		 query.setString("type", type);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		Long vhId =Long.parseLong(element[0].toString());
+    	    		String party=element[1].toString();
+    	    		if(voucherPartyMap.get(vhId) == null)
+    	    		{
+    	    			partyName= new ArrayList<String>();
+    	    			partyName.add(party);
+    	    			voucherPartyMap.put(vhId, partyName);
+    	    		}
+    	    		else
+    	    		{
+    	    			voucherPartyMap.get(vhId).add(party);
+    	    		}
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+    }
+	
+	private void getPartyReceiptJournal(Map<Long,List<String>> voucherPartyMap,String type) {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	List<String> partyName=null;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select v.id,a.detailname from voucherheader v,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id =g.voucherheaderid and g.id = g2.generalledgerid and g2.detailkeyid =a.detailkey and g2.detailtypeid=a.detailtypeid and v.name =:type");
     		 query.setString("type", type);
     	    rows = query.list();
     	    

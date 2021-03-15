@@ -1117,7 +1117,7 @@ public class CreateVoucher {
 	 *            recovery master.If the glcode used is mapped in the recovery
 	 *            master then this data is mandatory.
 	 * @return voucherheader object in case of success and null in case of fail.
-	 * @throws ApplicationRuntimeException
+	 * @throws ApplicationRuntimeExceptionRajat
 	 */
 	@Transactional
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,
