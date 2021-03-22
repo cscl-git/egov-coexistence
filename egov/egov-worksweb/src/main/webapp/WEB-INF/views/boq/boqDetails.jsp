@@ -350,8 +350,18 @@
 		<!-- ========================code end=========== -->
 
 <c:if test="${fileuploadAllowed == 'Y' }">
+
+
+<div class="panel panel-primary" onchange="milestoneshow">
+<label class="col-sm-3 control-label text-left-audit">Milestones ?</label></br>
+
+        <input type="radio" name="milestonestatus" id="mileYes" class="milestatus" value="Yes"><span>YES</span>
+        <input type="radio" name="milestonestatus" id="mileNo"  class="milestatus" value="No"><span>NO</span>
+
+</div>
+
 <div class="panel panel-primary" data-collapsed="0"
-			style="scrollable: true;">
+			style="scrollable: true;" name="mile" id="mile" style="display:none;">
 			<div class="panel-heading">
 				<div class="panel-title">
 					 Milestones
@@ -533,6 +543,25 @@
 </form:form>
 
 
+
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 
+<script>
+
+$(document).ready(function() {
+	$('#mile').fadeOut();
+    $('.milestatus').change(function() {
+        let mile_val = $(this).val();
+        
+        if(mile_val == 'Yes') {
+            $('#mile').css("display", "block");
+        } else {
+            $('#mile').css("display", "none");
+        }
+    })
+})
+
+</script>
+
+	

@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,8 +19,10 @@ import javax.persistence.Inheritance;
 import javax.persistence.InheritanceType;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -29,6 +33,46 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
+
+
+@SqlResultSetMapping(name = "AllDNITCreationresultset",classes = {
+@ConstructorResult(
+				targetClass = DNITCreationRESTPOJO.class, columns = {
+					@ColumnResult (name="id"),@ColumnResult (name="agency_work_order"),@ColumnResult (name="date"),
+					@ColumnResult (name="estimate_amount"),@ColumnResult (name="estimate_date"),
+					@ColumnResult (name="estimate_number"),@ColumnResult (name="estimate_percentage"),
+					@ColumnResult (name="estimate_prepared_by"),@ColumnResult (name="executing_division"),@ColumnResult (name="financial_year"),
+					@ColumnResult (name="financing_details"),@ColumnResult (name="fund_source"),@ColumnResult (name="necessity"),
+					@ColumnResult (name="preparation_designation"),@ColumnResult (name="sector_number"),@ColumnResult (name="tender_cost"),
+					@ColumnResult (name="time_limit"),@ColumnResult (name="ward_number"),@ColumnResult (name="work_category"),
+					@ColumnResult (name="work_location"),@ColumnResult (name="work_name"),@ColumnResult (name="work_scope"),
+					@ColumnResult (name="work_status"),@ColumnResult (name="work_type"),@ColumnResult (name="works_wing"),
+					@ColumnResult (name="state_id"),@ColumnResult (name="version"),@ColumnResult (name="statusid"),
+					@ColumnResult (name="createdby"),@ColumnResult (name="createddate"),@ColumnResult (name="lastmodifiedby"),
+					@ColumnResult (name="lastmodifieddate"),@ColumnResult (name="aanumber"),@ColumnResult (name="aadate"),
+					@ColumnResult (name="contingent_percentage"),@ColumnResult (name="contingent_amount"),
+					@ColumnResult (name="consultant_fee"),@ColumnResult (name="unforseen_charges"),@ColumnResult (name="status"), }
+				)
+})
+
+
+
+@NamedNativeQuery(name="DNITCreation.getAllDNITCreation", query = "select tep.id, tep.agency_work_order ,tep.date ," + 
+		"tep.estimate_amount,tep.estimate_date,tep.estimate_number," + 
+		"tep.estimate_percentage ,tep.estimate_prepared_by," + 
+		"dep.name as executing_division,tep.financial_year ,tep.financing_details," + 
+		"tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number," + 
+		"tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category ," + 
+		"tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status ," + 
+		"tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid," + 
+		"tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate," + 
+		"tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount," + 
+		"tep.consultant_fee ,tep.unforseen_charges ,es.code as status from ch.chandigarh.txn_dnit_creation tep," + 
+		"ch.chandigarh.eg_department dep,ch.chandigarh.egw_status es" + 
+		"where  tep.statusid =es.id " + 
+		"and tep.executing_division = dep.id ",
+		resultClass = DNITCreationRESTPOJO.class,resultSetMapping = "AllDNITCreationresultset")
+
 
 @Entity
 @Table(name = "txn_dnit_creation")
@@ -147,6 +191,12 @@ public class DNITCreation extends StateAware implements Serializable {
 	
 	@Transient
 	private String pendingWith;
+
+	@Column(name = "corriandumm_status")
+	private String corriandumm_status;
+	
+	@Transient
+	private String expHead_est;
 
 	public Double getContingentPercentage() {
 		return contingentPercentage;
@@ -284,10 +334,6 @@ public class DNITCreation extends StateAware implements Serializable {
 	public void setWorkLocation(String workLocation) {
 		this.workLocation = workLocation;
 	}
-
-	
-
-	
 
 	public String getWorkName() {
 		return workName;
@@ -716,6 +762,23 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	public void setPendingWith(String pendingWith) {
 		this.pendingWith = pendingWith;
+	}
+
+
+	public String getCorriandumm_status() {
+		return corriandumm_status;
+	}
+
+	public void setCorriandumm_status(String corriandumm_status) {
+		this.corriandumm_status = corriandumm_status;
+	}
+
+	public String getExpHead_est() {
+		return expHead_est;
+	}
+
+	public void setExpHead_est(String expHead_est) {
+		this.expHead_est = expHead_est;
 	}
 	
 	

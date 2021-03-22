@@ -9,7 +9,6 @@
     background-color: #acbfd0;
     vertical-align: top;
 }
-
 .table tbody > tr > td {
     color: black;
     vertical-align: top;
@@ -20,36 +19,45 @@
 
 
 	
-<form:form name="create-estimate-form" role="form" method="post"
-	action="updateDnit" modelAttribute="estimatePreparationApproval"
-		id="estimatePreparationApproval1" enctype="multipart/form-data">
+		<form:form name="create-estimate-form" role="form"
+		method="post" action="updateDnit"
+		modelAttribute="estimatePreparationApproval"
+		id="estimatePreparationApproval" enctype="multipart/form-data">
 	
-	
+	<spring:hasBindErrors name="estimatePreparationApproval">
+		<div class="alert alert-danger"
+			style="margin-top: 20px; margin-bottom: 10px;">
+			<form:errors path="*" />
+			<br />
+		</div>
+	</spring:hasBindErrors>
+<input type="hidden" name="estimatePreparationApproval"
+						value="${estimatePreparationApproval.id}" />
 
 	<ul class="nav nav-tabs" id="settingstab">
 
 		<li class="active"><a data-toggle="tab" href="#estimatescreen"
 			data-tabidx=0><spring:message
-					code="title.dnit.preparation.create" text="DNIT Details" /> </a></li>
+					code="title.dnit.preparation.create"
+					text="DNIT Details" /> </a></li>
 	</ul>
-	
-
 	<div class="tab-content">
 	<div class="tab-pane fade in active" id="estimatescreen">
-			
-		<jsp:include page="viewestimate.jsp" />
-			
-		</div>
+	
+	<jsp:include page="vieweditestimate.jsp" />
+	</div>
+	
 
-		<br>
+		<br><br><br>
 		<jsp:include page="fileupload.jsp" />
 		<br> <br>
-			
-
-			
-	<jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
-		<br> <br>
-		
+		 <jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
+		 <br>
+		 <br>
+		<jsp:include page="../common/commonWorkflowMatrix.jsp" />
+				<div class="buttonbottom" align="center">
+					<jsp:include page="../common/commonWorkflowMatrix-button.jsp" />
+				</div>
 	</div>
 
 </form:form>

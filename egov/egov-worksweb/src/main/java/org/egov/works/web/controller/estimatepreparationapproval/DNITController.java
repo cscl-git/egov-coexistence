@@ -97,6 +97,8 @@ public class DNITController extends GenericWorkFlowController {
 	private AppConfigValueService appConfigValuesService;
 	
 	
+	
+	
 	private static final String STATE_TYPE = "stateType";
 	private static final String APPROVAL_POSITION = "approvalPosition";
 
@@ -144,6 +146,7 @@ public class DNITController extends GenericWorkFlowController {
 			final Model model, @RequestParam("file1") MultipartFile[] files,@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost, final HttpServletRequest request)
 			throws Exception {
 		String workFlowAction=dnitCreation.getWorkFlowAction();
+		
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -189,6 +192,7 @@ public class DNITController extends GenericWorkFlowController {
 		    dnitCreation.setEstimateNumber(estimateNumber);
 		}
 	     
+		
 	    dnitCreation.setDepartment(dnitCreation.getDepartment());
 		//start of workflow
 		Long approvalPosition = 0l;
@@ -485,7 +489,7 @@ public class DNITController extends GenericWorkFlowController {
 		String extension = null;
 		String filePath = null;
 		File fileToUpload = null;
-		String FILE_PATH_PROPERTIES = "D:\\Upload\\";
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
 		Double estAmt= 0.0;
@@ -659,6 +663,88 @@ public class DNITController extends GenericWorkFlowController {
 
 		return "search-dnit-form";
 	}
+	//edited
+	@RequestMapping(value = "/workDnitSearch", params="workEditDnit" , method = RequestMethod.POST)
+	public String showEditEstimateNewFormGet(
+			@ModelAttribute("workdnitDetails") final DNITCreation dnitCreation,
+			final Model model, HttpServletRequest request) {
+
+		dnitCreation.setDepartments(getDepartmentsFromMs());
+		model.addAttribute("workdnitDetails", dnitCreation);
+
+		return "search-edit-dnit-form";
+	}
+	
+	@RequestMapping(value = "/searchEditDnit", params = "searchEditDnit", method = RequestMethod.POST)
+	public String searchWorkEditEstimateData(
+			@ModelAttribute("workdnitDetails") final DNITCreation estimatePreparationApproval,
+			final Model model, final HttpServletRequest request) throws Exception {
+		List<DNITCreation> approvalList = new ArrayList<DNITCreation>();
+
+		// Convert input string into a date
+
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setExecutingDivision(department);
+		}
+		DNITCreation estimate=null;
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from DNITCreation es where es.executingDivision = ? and es.status='686' or es.status='625'")
+	        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
+	        .append(getMisQuery(estimatePreparationApproval));
+		 System.out.println("Query :: "+query.toString());
+         list = persistenceService.findAllBy(query.toString(),
+        		 estimatePreparationApproval.getExecutingDivision());
+		 
+         if (list.size() != 0) {
+        	 
+        	 for (final Object[] object : list) {
+        		 estimate = new DNITCreation();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setWorkName(object[1].toString());
+        		 }
+        		 if(object[2] != null)
+        		 {
+        			 estimate.setWorkCategry(object[2].toString());
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setEstimateNumber(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setEstimateDt(object[4].toString());
+        		 }
+        		 if(object[5] != null)
+        		 {
+        			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
+        		 }
+        		 if(object[6] != null)
+        		 {
+        			 estimate.setStatusDescription(object[6].toString());
+        		 }
+        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+        		 {
+        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        		 }
+        		 approvalList.add(estimate);
+        	 }
+        	 
+         }
+        estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setEstimateList(approvalList);
+
+		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
+
+		return "search-edit-dnit-form";
+
+	}
 
 	@RequestMapping(value = "/workDnitSearch", params = "workDnitSearch", method = RequestMethod.POST)
 	public String searchWorkEstimateData(
@@ -760,6 +846,8 @@ public class DNITController extends GenericWorkFlowController {
 				boq = estimateDetails.getBoQDetailsList().get(j);
 				boq.setSizeIndex(boQDetailsList.size());
 				boQDetailsList.add(boq);
+				
+				
 			}
 		
 		
@@ -774,20 +862,21 @@ public class DNITController extends GenericWorkFlowController {
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 
 		return "view-dnit-form";
 	}
-	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
-	public String edit(@PathVariable("id") final Long id, Model model) {
+	
+	@RequestMapping(value = "/editdnit/{id}", method = RequestMethod.GET)
+	public String editDnit(@PathVariable("id") final Long id, Model model) {
 
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		
 		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
-
+		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
 		
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
@@ -801,6 +890,8 @@ public class DNITController extends GenericWorkFlowController {
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
 		
+		//System.out.println(estimateDetails.getStatus().getCode()+"+++++++++++++++++++++++++++++++++++++++++++");
+		
 		BoQDetails boq = new BoQDetails();
 		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
 			
@@ -812,15 +903,233 @@ public class DNITController extends GenericWorkFlowController {
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		 
+		 //System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
 		model.addAttribute("estimatePreparationApproval", estimateDetails);
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		return "edit-dnit-form";
+	}
+	@RequestMapping(value = "/deletednit/{id}/{slno}", method = RequestMethod.GET)
+	public String deleteDnit(@PathVariable("id") final Long id,@PathVariable("slno") final Long slno, Model model) {
+
+		if (id !=null && id != 0 && slno!= null && slno!=0 ) {
+			
+			final StringBuffer query = new StringBuffer(500);
+			query.append("delete from BoQDetails bq where bq.slNo=? and bq.dnitCreation.id=? ");
+			persistenceService.deleteAllBy(query.toString(),slno, id);
+		}
+		
+	List<BoQDetails> boQDetailsList = new ArrayList();
+		
+		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
+		
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
+		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		
+		System.out.println(estimateDetails.getStatus().getCode()+"+++++++++++++++++++++++++++++++++++++++++++");
+		
+		BoQDetails boq = new BoQDetails();
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList.size());
+				boQDetailsList.add(boq);
+			}
+		
+		
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		//model.addAttribute("workflowHistory",
+			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		return "edit-dnit-form";
+	}
+	@RequestMapping(value = "/editdnit/updateDnit",  method = RequestMethod.POST)
+	public String editDnitEstimateData(
+			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@RequestParam("file1") MultipartFile[] files,
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
+
+		String workFlowAction=dnitCreation.getWorkFlowAction();
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(dnitCreation.getObjectType());
+				list.add(upload2);
+			}
+		dnitCreation.setDocumentDetail(list);
+		if (dnitCreation.getDepartment() != null && dnitCreation.getDepartment() != ""
+				&& !dnitCreation.getDepartment().isEmpty()) {
+			dnitCreation
+					.setExecutingDivision(Long.parseLong(dnitCreation.getDepartment()));
+		}
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        
+		DNITCreation savedDNITCreation = dnitCreationService
+				.saveEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+
+		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
+        + savedDNITCreation.getId()+"&workflowaction="+workFlowAction;
+
+	}
+	
+	@RequestMapping(value = "/deletednit/{id}/updateDnit",  method = RequestMethod.POST)
+	public String updateDnitEstimateData(
+			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@PathVariable("id") final Long id,@RequestParam("file1") MultipartFile[] files,
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
+
+		String workFlowAction=dnitCreation.getWorkFlowAction();
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(dnitCreation.getObjectType());
+				list.add(upload2);
+			}
+		dnitCreation.setDocumentDetail(list);
+		if (dnitCreation.getDepartment() != null && dnitCreation.getDepartment() != ""
+				&& !dnitCreation.getDepartment().isEmpty()) {
+			dnitCreation
+					.setExecutingDivision(Long.parseLong(dnitCreation.getDepartment()));
+		}
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        
+		DNITCreation savedDNITCreation = dnitCreationService
+				.saveEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+
+		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
+        + savedDNITCreation.getId()+"&workflowaction="+workFlowAction;
+
+	}
+	@RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
+	public String edit(@PathVariable("id") final Long id, Model model) {
+
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		
+		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
+		
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
+		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		
+		System.out.println(estimateDetails.getStatus().getCode()+"+++++++++++++++++++++++++++++++++++++++++++");
+		
+		BoQDetails boq = new BoQDetails();
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList.size());
+				boQDetailsList.add(boq);
+			}
+		
+		
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		//model.addAttribute("workflowHistory",
+			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-dnit-form";
 	}
 
@@ -906,12 +1215,18 @@ public class DNITController extends GenericWorkFlowController {
                 workflowHistory.put("status", stateHistory.getValue());
                 final Long owner = stateHistory.getOwnerPosition();
                 final State _sowner = stateHistory.getState();
-               ownerobj=    this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
+	                if(owner != 0) {
+	                if(microserviceUtils.getEmployee(owner, null, null, null)!=null) {
+	                ownerobj = this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
+	                }
+	            }
                 if (null != ownerobj) {
                     workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
                     Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
                     if(null != department)
                         workflowHistory.put("department", department.getName());
+                    }
                 } else if (null != _sowner && null != _sowner.getDeptName()) {
                     user = microserviceUtils.getEmployee(owner, null, null, null).get(0).getUser();
                     workflowHistory
@@ -925,19 +1240,27 @@ public class DNITController extends GenericWorkFlowController {
             map.put("updatedBy", state.getLastModifiedBy() + "::" + getEmployeeName(state.getLastModifiedBy()));
             map.put("status", state.getValue());
             final Long ownerPosition = state.getOwnerPosition();
+            System.out.println(ownerPosition+"++++++++++++++++++++++++++++++++++++++++++++++++");
+         /* if(ownerPosition!=null) {
+            	if((this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0))!=null)
+            	{
             ownerobj=    this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0);
+            }}
             if(null != ownerobj){
                 map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+                if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
               Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
               if(null != department)
                   map.put("department", department.getName());
               //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
 //                        .getDepartmentForUser(user.getId()).getName() : "");
+                }
             } else if (null != ownerPosition && null != state.getDeptName()) {
                 user = microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0).getUser();
-                map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
+                */
+               // map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
                 map.put("department", null != state.getDeptName() ? state.getDeptName() : "");
-            }
+       // }
             historyTable.add(map);
             Collections.sort(historyTable, new Comparator<Map<String, Object>> () {
 

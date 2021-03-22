@@ -22,14 +22,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.validation.Valid;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -39,6 +41,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
@@ -46,6 +49,7 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.notification.service.NotificationService;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
@@ -74,8 +78,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 @Controller
 @RequestMapping(value = "/estimatePreparation")
 public class EstimatePreparationApprovalController extends GenericWorkFlowController {
@@ -98,6 +100,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
     @Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
+    private static final String MODULE_FULLNAME = "Council Management";
+    private static final String SENDSMSFORCOUNCIL = "SENDSMSFORCOUNCILMEMBER";
+    private static final String ROLE_MEETING_SENIOR_OFFICER = "WORKS_NOTIFICATION";
+    private static final String SENDEMAILFORCOUNCIL = "SENDEMAILFORCOUNCILMEMBER";
     
     private static final int BUFFER_SIZE = 4096;
     public static final Locale LOCALE = new Locale("en", "IN");
@@ -116,6 +122,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     @Autowired
 	private DocumentUploadRepository documentUploadRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
@@ -123,12 +132,18 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
+		//edited...
+		
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
         System.out.println("Starting");
 		return "estimatepreparationapproval-form";
 	}
+	/*public List<Designation> getDesignation() {
+		List<Designation> departments = microserviceUtils.getDesignation();
+		return departments;
+	}*/
 
 	private void prepareValidActionListByCutOffDate(Model model) {
             model.addAttribute("validActionList",
@@ -224,14 +239,19 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			String approverDetails, String workflowaction) {
 		String approverName="";
 		String msg="";
-		
+		boolean estimateSms=false;
+		String notMsg="";
 		if(workflowaction.equalsIgnoreCase("Save As Draft"))
 		{
 			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" is Saved as draft";
 		}
 		else if(( workflowaction.equalsIgnoreCase("Approve")) && savedEstimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
 		{
+			//sms
+			
 			msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" TS is approved";
+			
+			 
 		}
 		else 
 		{
@@ -239,9 +259,15 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			if(savedEstimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
 			{
 				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" has been approved and forwarded to "+approverName +" for AA inititation";
+				notMsg="Dear ? ,Estimate Id : "+savedEstimatePreparationApproval.getEstimateNumber()+"has been approved";
+				estimateSms=sendSmsAndEmailDetailsForApproval(notMsg);
+				if(estimateSms) {
+					System.out.println("+++++++++Approved Message sent Successfully+++++++");
+				}
 			}
 			else if(savedEstimatePreparationApproval.getStatus().getCode().equals("TS Initiated"))
 			{
+				
 				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" AA has been approved and  forwarded to "+approverName +" for TS inititation";
 			}
 			else
@@ -253,6 +279,145 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return msg;
 	}
 
+	 //SMS and Email Service
+    public Boolean sendSmsAndEmailDetailsForApproval(String msg) {
+    	
+          boolean successStatus=false;
+       
+        try {
+        	System.out.println("+++++++++++"+msg+"+++++++++++++++++");
+        	Boolean status=sendSmsForAgendaInvitation(msg);
+        	if(status) {
+        		successStatus=true;
+        	}
+        }catch(Exception e) {
+        	e.printStackTrace();
+        	//LOGGER.error("Unable to send SMS to for agenda invitation ");
+        	System.out.println("+++++++++++++Unable to send SMS to for agenda invitation+++++++++");
+        }
+            
+        
+	    		try {
+					
+	        	boolean emailStatus=sendEmailForAgendaInvitation(msg);
+	        	if(emailStatus) {
+	        		//System.out.println("++++++++++++++++++++++++++email Sent Successfully+++++++++++++++++++");
+	        	}
+				} catch (Exception e) {
+					//LOGGER.error("Error in sending email for agenda invitation",e);
+					e.printStackTrace();
+				}
+	        
+       
+        return successStatus;
+    }
+    //------------------------------------------------EMAIL-------------------------------------------------------------------
+    
+    public Boolean sendEmailForAgendaInvitation(String customMessage) {
+        Boolean emailEnabled = isEmailEnabled();
+        Boolean emailStatus=false;
+        if (emailEnabled) {
+        	try {
+	            List<User> listOfUsers = getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getEmailId() != null) {
+	                	customMessage=customMessage.replace("?", user.getName());
+	                	buildEmailForAgendaInvitation(user.getUserName(), user.getEmailId(), customMessage);
+	                }
+	                emailStatus=true;
+	            }
+	        }catch(Exception e) {
+	        	//LOGGER.error("Unable to send EMAIL to agenda invitation");
+	        }
+        }
+        return emailStatus;
+    }
+    
+    public Boolean isEmailEnabled() {
+
+        return getAppConfigValueByPassingModuleAndType(MODULE_FULLNAME, SENDEMAILFORCOUNCIL);
+
+    }
+    
+    public void buildEmailForAgendaInvitation(final String userName, final String email,
+            final String customMessage) {
+        String body = customMessage;
+        String subject;
+        subject = "Approval Notice:";
+        body = customMessage;
+        //System.out.println(customMessage);
+        if (email != null && body != null)
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject);
+    }
+    
+    public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody, final String emailSubject) {
+        if(!StringUtils.isBlank(email) && !StringUtils.isBlank(emailBody)) {
+        	notificationService.sendEmail(email, emailSubject, emailBody);
+        	
+        }else {
+        	System.out.println("++++++++Email not Sent+++++++");
+        }
+    }
+
+    
+    //-----------------------------------------------SMS----------------------------------------------------------------
+    public Boolean sendSmsForAgendaInvitation(String customMessage) {
+        Boolean smsEnabled = isSmsEnabled();
+         Boolean smsStatus=false;
+        if (smsEnabled) {
+            try {
+	            List<User> listOfUsers = getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                	
+	                	customMessage=customMessage.replace("?", user.getName());
+	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage);
+	                }
+	                smsStatus=true;
+	            }
+            }catch(Exception e) {
+            	e.printStackTrace();
+            	//LOGGER.error("Unable to send SMS to agenda invitation");
+            	System.out.println("Unable to send SMS to works");
+            }
+        }
+        return smsStatus;
+    }
+    
+    public Boolean isSmsEnabled() {
+
+        return getAppConfigValueByPassingModuleAndType(MODULE_FULLNAME, SENDSMSFORCOUNCIL);
+    }
+
+    private Boolean getAppConfigValueByPassingModuleAndType(String moduleName, String sendsmsoremail) {
+        final List<AppConfigValues> appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(moduleName,
+                sendsmsoremail);
+
+        return "YES".equalsIgnoreCase(
+                appConfigValue != null && !appConfigValue.isEmpty() ? appConfigValue.get(0).getValue() : "NO");
+    }
+    
+    public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
+            final String customMessage) {
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
+    }
+    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
+        notificationService.sendSMS(mobileNumber, smsBody);
+    }
+    public List<User> getUserListForAgendaInvitation() {
+        Set<User> usersListResult = new HashSet<>();
+        List<String> roles = new ArrayList<String>();
+        roles.add(ROLE_MEETING_SENIOR_OFFICER);
+        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+    	if(!CollectionUtils.isEmpty(employees)) {
+    		for(EmployeeInfo info : employees) {
+    			usersListResult.add(info.getUser());
+    		}
+    	}
+        return new ArrayList<>(usersListResult);
+    }
+    //------------------end--------------------------
+	
 	@RequestMapping(value = "/estimate", params = "Save As Draft", method = RequestMethod.POST)
 	public String saveBoQDetailsDataDraft(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
@@ -514,6 +679,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         return designations;
     }
 
+
 	@RequestMapping(value = "/formnew", method = RequestMethod.POST)
 	public String showEstimateNewFormGet(
 			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
@@ -733,8 +899,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 
 		return "view-estimate-form";
 	}
@@ -780,8 +946,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-estimate-form";
 	}
 
@@ -870,9 +1036,15 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
                ownerobj=    this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
                 if (null != ownerobj) {
                     workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    
+                    //edited....
+                    if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
+                   
                     Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+                
                     if(null != department)
                         workflowHistory.put("department", department.getName());
+                }
                 } else if (null != _sowner && null != _sowner.getDeptName()) {
                     user = microserviceUtils.getEmployee(owner, null, null, null).get(0).getUser();
                     workflowHistory
@@ -889,11 +1061,16 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
             ownerobj=    this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0);
             if(null != ownerobj){
                 map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+                //edited...
+               if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
               Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+             // Department department=   this.microserviceUtils.getDepartmentByCode(state.getDeptCode());
               if(null != department)
                   map.put("department", department.getName());
+              //
               //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
 //                        .getDepartmentForUser(user.getId()).getName() : "");
+               }
             } else if (null != ownerPosition && null != state.getDeptName()) {
                 user = microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0).getUser();
                 map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");

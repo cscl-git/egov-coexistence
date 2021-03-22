@@ -144,4 +144,29 @@ function openDNIT(estId)
 	var url = "/services/works/dnit/view/"+ estId;
 	window.open(url,'','width=900, height=700');
 }
+function editDNIT(estId)
+{
+	var url = "/services/works/dnit/editdnit/"+ estId;
+	window.open(url,'','width=900, height=700');
+}
+function deletedata(empid,slno)
+{
+	var data={
+			"empid":"empid",
+			"slno":"slno"
+	}
+	$.ajax({
+		type:"POST",
+		dataType:'json',
+	url:"/services/works/dnit/deleteAjaxdnit/",
+	data:data,
+	success:function(){
+		alert("success");
+	}
+	
+	})
+	/*var url = "/services/works/dnit/deletednit/"+ empid+"/"+slno;
+	window.open(url,'','width=900, height=700');
+	window.location.href = url;*/
+}
 

@@ -51,12 +51,12 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqDateUpdate;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.egov.works.boq.service.BoQDetailsService;
-import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
+import org.egov.works.boq.service.BoqDateUpdateService;
 import org.egov.works.estimatepreparationapproval.autonumber.WorkNoGenerator;
-import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -108,9 +108,13 @@ public class BoQDetailsController extends GenericWorkFlowController{
     @Autowired
     private SecurityUtils securityUtils;
 
+    @Autowired
+    BoqDateUpdateService boqDateUpdateService;
+
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
+		System.out.println("work  ----newform-");
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
@@ -122,11 +126,14 @@ public class BoQDetailsController extends GenericWorkFlowController{
 	@RequestMapping(value = "/work", params = "Forward/Reassign", method = RequestMethod.POST)
 	public String saveBoQDetailsData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
+		
+		System.out.println("work  ----Forward/Reassign-");
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
 		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
+		System.out.println("work  ----Forward/Reassign-2");
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -140,10 +147,12 @@ public class BoQDetailsController extends GenericWorkFlowController{
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
 			}
+		System.out.println("work  ----Forward/Reassign-3");
 		workOrderAgreement.setDocumentDetail(list);
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
 		deptCode = workOrderAgreement.getDepartment();
+		System.out.println("work  ----Forward/Reassign-4");
 		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 				"works_div_"+deptCode).get(0).getValue();
 		String estimateNumber ="";
@@ -152,7 +161,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 			estimateNumber = v.getWorkNumber(deptShortCode);
 		    workOrderAgreement.setWork_agreement_number(estimateNumber);
 		}
-	     
+		System.out.println("work  ----Forward/Reassign-5");
 		//start of workflow
 				Long approvalPosition = 0l;
 		        String approvalComment = "";
@@ -166,8 +175,9 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		        
 		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
 		            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
-		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
-
+		WorkOrderAgreement savedWorkOrderAgreement =
+				boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+		System.out.println("work  ----Forward/Reassign-6");
 		return "redirect:/boq/success?approverDetails=" + approvalPosition + "&estId="
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
 
@@ -177,11 +187,13 @@ public class BoQDetailsController extends GenericWorkFlowController{
 	@RequestMapping(value = "/work", params = "Save As Draft", method = RequestMethod.POST)
 	public String saveBoQDetailsDataDraft(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
+	System.out.println("work  -----Save As Draft--1");
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
 		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
+		System.out.println("work  -----Save As Draft-2-");
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -195,6 +207,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
 			}
+		System.out.println("work  -----Save As Draft--3");
 		workOrderAgreement.setDocumentDetail(list);
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
@@ -211,6 +224,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 				Long approvalPosition = 0l;
 		        String approvalComment = "";
 		        String approvalDesignation = "";
+		        System.out.println("work  -----Save As Draft-4-");
 		        if (request.getParameter("approvalComent") != null)
 		            approvalComment = request.getParameter("approvalComent");
 		        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
@@ -221,7 +235,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
 		            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
-
+		System.out.println("work  -----Save As Draft-5-");
 		return "redirect:/boq/success?approverDetails=" + approvalPosition + "&estId="
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
 
@@ -230,12 +244,10 @@ public class BoQDetailsController extends GenericWorkFlowController{
 	@RequestMapping(value = "/success", method = RequestMethod.GET)
     public String showSuccessPage(@RequestParam("approverDetails") final String approverDetails,@RequestParam("workflowaction") final String workflowaction, final Model model,
                                   final HttpServletRequest request,@RequestParam("estId") final String estId) {
-		
-		WorkOrderAgreement savedWorkOrderAgreement=workOrderAgreementRepository.getOne(Long.parseLong(estId));
+		WorkOrderAgreement savedWorkOrderAgreement=
+				workOrderAgreementRepository.getOne(Long.parseLong(estId));//null;
 		final String message = getMessageByStatus(savedWorkOrderAgreement, approverDetails,workflowaction);
-
         model.addAttribute("message", message);
-
         return "works-success";
     }
 	
@@ -455,8 +467,8 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("mode","view");
@@ -483,8 +495,8 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareValidActionListByCutOffDate(model);
         
@@ -544,8 +556,8 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		//model.addAttribute("workflowHistory",
+			//	getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
@@ -653,8 +665,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		//model.addAttribute("workflowHistory",getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 		org.egov.infra.admin.master.entity.User user =null;
@@ -732,11 +743,30 @@ public class BoQDetailsController extends GenericWorkFlowController{
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
-
+		long id =savedWorkOrderAgreement.getId();//Added by kundan for ID
+		saveModifyDateDate(id,request);//Added by kundan 
 		return "redirect:/boq/success?approverDetails=" + approvalPosition + "&estId="
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
 
 	}
+	
+	/* Added By Kundan Kumar for save Modify Date on date change */	
+	public void saveModifyDateDate(long id,HttpServletRequest request)
+	{
+		org.egov.infra.admin.master.entity.User user = securityUtils.getCurrentUser();
+		String desig=getEmployeeName(user.getId()); 
+		System.out.println("desig............................"+desig);
+		BoqDateUpdate boqDateUpdate = new BoqDateUpdate();
+		boqDateUpdate.setCreatedby(desig);
+		boqDateUpdate.setActualEndDate(request.getParameter("actual_end_date"));
+		boqDateUpdate.setReason(request.getParameter("reason"));
+		boqDateUpdate.setSl_no(id);
+		Date date=new Date();
+		boqDateUpdate.setCreatedDate(date);
+		boqDateUpdateService.saveUpdateDate(boqDateUpdate);
+	}
+	
+	/* Ended By Kundan Kumar for save Modify Date on date change */	
 	
 	@RequestMapping(value = "/progress/updateProgress", method = RequestMethod.POST)
 	public String updateProgress(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
@@ -782,9 +812,11 @@ public class BoQDetailsController extends GenericWorkFlowController{
                ownerobj=    this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
                 if (null != ownerobj) {
                     workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
                     Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
                     if(null != department)
                         workflowHistory.put("department", department.getName());
+                    }
                 } else if (null != _sowner && null != _sowner.getDeptName()) {
                     user = microserviceUtils.getEmployee(owner, null, null, null).get(0).getUser();
                     workflowHistory
@@ -801,11 +833,13 @@ public class BoQDetailsController extends GenericWorkFlowController{
             ownerobj=    this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0);
             if(null != ownerobj){
                 map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+                if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
               Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
               if(null != department)
                   map.put("department", department.getName());
               //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
 //                        .getDepartmentForUser(user.getId()).getName() : "");
+                }
             } else if (null != ownerPosition && null != state.getDeptName()) {
                 user = microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0).getUser();
                 map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
@@ -987,7 +1021,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
 		 List<Object[]> list =null;
 		 query
 	        .append(
-	                "select wo.id,wo.name_work_order,wo.work_number,wo.work_agreement_number,wo.work_start_date,wo.work_intended_date,wo.work_amount,wo.status.description from WorkOrderAgreement wo where wo.status.description ='Approved' and wo.executing_department = ? ")
+	                "select wo.id,wo.name_work_order,wo.work_number,wo.work_agreement_number,wo.work_start_date,wo.work_intended_date,wo.work_amount,wo.status.description,wo.milestonestatus from WorkOrderAgreement wo where wo.status.description ='Approved' and wo.executing_department = ? ")
 	        .append(getDateQuery(workOrderAgreement.getFromDate(), workOrderAgreement.getToDate()))
 	        .append(getMisQuery(workOrderAgreement));
         list = persistenceService.findAllBy(query.toString(),
@@ -1024,6 +1058,10 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		if(object[7] != null)
        		{
        			agreement.setStatusDescp(object[7].toString());
+       		}
+       		if(object[8] != null)
+       		{
+       			agreement.setMilestonestatus(object[8].toString());;
        		}
        		workList.add(agreement);
        		

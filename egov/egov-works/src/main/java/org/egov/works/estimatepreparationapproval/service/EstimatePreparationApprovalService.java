@@ -28,6 +28,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApprovalRESTPOJO;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -343,5 +344,9 @@ public class EstimatePreparationApprovalService {
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
+	
+	public List<EstimatePreparationApprovalRESTPOJO>getAllEstimationPreparationNative(){
+		return estimatePreparationApprovalRepository.getEstimatePreparationApprovalRESTPOJO();
+	}
 	
 }

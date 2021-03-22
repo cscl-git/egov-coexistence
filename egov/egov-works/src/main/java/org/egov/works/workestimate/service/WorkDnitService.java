@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
+import org.egov.works.estimatepreparationapproval.entity.DNITCreationRESTPOJO;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
@@ -95,6 +96,14 @@ public class WorkDnitService {
 		DNITCreation saveBoqDetails = dNITCreationRepository.save(boqList);
 
 		return saveBoqDetails;
+	}
+	
+	public List<DNITCreationRESTPOJO>getAllDnitList(){
+		List<DNITCreationRESTPOJO> dnitCreations =  null;
+		
+		dnitCreations = dNITCreationRepository.getAllDNITCreation();
+		
+		return dnitCreations;
 	}
 
 }

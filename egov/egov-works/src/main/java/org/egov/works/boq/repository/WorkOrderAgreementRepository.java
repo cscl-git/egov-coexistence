@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.egov.works.boq.entity.WorkOrderAgreement;
+import org.egov.works.boq.entity.WorkOrderAgreementRESTPOJO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -36,4 +37,8 @@ public interface WorkOrderAgreementRepository extends JpaRepository<WorkOrderAgr
 	@Query(" from WorkOrderAgreement w where w.work_start_date =:work_start_date and w.work_end_date =:work_end_date and w.work_agreement_status =:work_agreement_status")
 	List<WorkOrderAgreement> findByParam(@Param("work_start_date") Date work_start_date,
 			@Param("work_end_date") Date work_end_date, @Param("work_agreement_status") String work_agreement_status);
+	
+	
+	@Query(nativeQuery = true)
+	List<WorkOrderAgreementRESTPOJO> getAllWorkOrderAgreement();
 }

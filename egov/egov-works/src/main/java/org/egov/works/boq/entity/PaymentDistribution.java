@@ -47,6 +47,9 @@ public class PaymentDistribution implements Serializable {
 	@Column(name = "payment_completed")
 	private boolean payment_completed;
 	
+	@Column(name = "completion_percent")
+	private Integer completion_percent;
+	
 
 	public Long getId() {
 		return id;
@@ -95,6 +98,16 @@ public class PaymentDistribution implements Serializable {
 	public void setPayment_completed(boolean payment_completed) {
 		this.payment_completed = payment_completed;
 	}
+
+	public Integer getCompletion_percent() {
+		return completion_percent;
+	}
+
+	public void setCompletion_percent(Integer completion_percent) {
+		this.completion_percent = completion_percent;
+	}
+
+	
 	
 	
 	

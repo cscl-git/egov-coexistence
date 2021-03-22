@@ -16,9 +16,30 @@
     color: black;
     vertical-align: top;
 }
+
+.popup {
+    display: inline-block;
+}
+.popup .popuptext {
+    visibility: hidden;
+   /*  background-color: #b1b1b1;
+    text-align: right;
+    border-radius: 6px;
+    padding: 20px; */
+}
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
 </style> 
+<script>
+	
+</script>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+<%-- <form:input type="hidden" class="form-control" path="estId"  /> --%>
+
 <form:form name="workOrderAgreementForm" role="form" method="post"
 	action="work1" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
@@ -31,7 +52,6 @@
 			<br />
 		</div>
 	</spring:hasBindErrors>
-
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
@@ -49,6 +69,7 @@
 							code="lbl.estimate.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="work_number"  />
+						
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
@@ -76,14 +97,27 @@
 						<form:input id="actual_start_date" path="actual_start_date"
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
+							
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualend.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="actual_end_date" path="actual_end_date"
+						<form:input id="actual_end_date" path="actual_end_date" onblur="pop()"
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
+					<div style="text-align:center;"> 
+					 <div class="popup">
+					    <span class="popuptext" id="myPopup">
+					     <!--  <input type="text" id="reason" name="reason" required="required"/> -->
+					     <div class="form-group purple-border">
+						  <label for="exampleFormControlTextarea4"><spring:message
+							code="lbl.reason.extenstion" /></label>
+						  <textarea class="form-control" id="reason" name="reason" required="required" rows="3"></textarea>
+						</div>
+					    </span>
+ 						 </div>
+ 						 </div> 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
@@ -517,13 +551,55 @@
 		</div>
 
 	</div>
+
 </form:form>
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Reason</h4>
+            </div>
+            <div class="modal-body">
+            <div class="form-group">
+	            <label for="message-text" class="col-form-label">Reason:</label>
+	            <textarea class="form-control" id="reason" path="reason" id="message-text"></textarea>
+	          </div>
+          <!--       <input type="text" path="reason" id="reason" required="true"> -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+    </button>   -->
+    
+  
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 <script type="text/javascript">
 	
+function pop() {
+/* 	alert("ok"); */
+    var popup = document.getElementById('myPopup');
+    popup.classList.toggle('show');
+}
+	
+/*  $(document).ready(function () {
+    // Attach Button click event listener 
+   $("#actual_end_date").keyup(function(){
+	   alert("open model");
+        // show Modal
+        $('#myModal').modal('show');
+   });
+});  */
+
+
 	
 	function getContractorDetails(obj){
 		var id=obj.value;

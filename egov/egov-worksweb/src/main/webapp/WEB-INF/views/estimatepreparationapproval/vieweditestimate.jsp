@@ -183,10 +183,16 @@
 					code="lbl.estimate.preparation.scope.work" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-9 block-colm">
-				<form:textarea class="form-control" path="workScope"
+				<form:textarea class="form-control" path="workScope" 
 					maxlength="2000" readonly="true" style="height: 100px;" />
 			</div> 
-			
+			<label class="col-sm-3 control-label text-left-audit1">Corrigendum Comment
+					<span
+				class="mandatory"></span>:</label>
+			<div class="col-sm-9 block-colm">
+				<form:textarea class="form-control" id="corrigendum" path="corriandumm_status" maxlength="2000"
+					 style="height: 100px;" required="required" />
+			</div>
 			
 		</div>
 	</div>
@@ -220,7 +226,7 @@
 									<th><spring:message code="lbl.rate" /></th>
 									<th><spring:message code="lbl.quantity" /></th>
 									<th><spring:message code="lbl.amount" /></th>
-
+									<th><spring:message code="lbl.action" /></th>
 								</tr>
 							</thead>
 						
@@ -239,38 +245,42 @@
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"
 											required="required" class="form-control milestone"
-											  readonly="true"  title="${boq.milestone}"></form:input></td>
+											    title="${boq.milestone}"></form:input></td>
 									<td><form:input type="text" style="width:400px;"
 											path="boQDetailsList[${boq.sizeIndex}].item_description"
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 											required="required" class="form-control item_description"
-											  readonly="true"  title="${boq.item_description}" ></form:input></td>
+											   title="${boq.item_description}" ></form:input></td>
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											required="required" class="form-control ref_dsr"
-											maxlength="200"   readonly="true" title="${boq.ref_dsr}"></form:input></td>
+											maxlength="200"    title="${boq.ref_dsr}"></form:input></td>
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].unit"
 												id="boQDetailsList[${boq.sizeIndex}].unit"
-												required="required"  readonly="true" class="form-control unit"
+												required="required"   class="form-control unit"
 												maxlength="200"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].rate" step=".01"
 												id="boQDetailsList[${boq.sizeIndex}].rate"
-												required="required"  readonly="true" class="form-control rate"
+												required="required"   class="form-control rate"
 												onchange="valueChanged()"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].quantity" step=".01"
 											id="boQDetailsList[${boq.sizeIndex}].quantity"
-											required="required"  readonly="true" class="form-control quantity"
+											required="required"   class="form-control quantity"
 											name="quantity" onchange="valueChanged()"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].amount"
 											id="boQDetailsList[${boq.sizeIndex}].amount"
 											required="required" class="form-control amount"
-											  readonly="true" name="amount" ></form:input></td>
-									
+											   name="amount" ></form:input></td>
+									<td class="text-center"><span style=" cursor:pointer;  color: black;" onclick="addcheckListRow(${mapstatus.index});" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
+				 				<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="deletedata(${estimatePreparationApproval.id},${boq.slNo})"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
+				 				
+				 		
+								</td>
 
 										</tr>
 						<%-- 	</c:if>	 --%>
@@ -681,4 +691,6 @@
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 <script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
+
+
 	

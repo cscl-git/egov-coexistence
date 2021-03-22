@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,8 +16,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -25,6 +29,45 @@ import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
+
+
+@SqlResultSetMapping(name = "AllWorkOrderAgreementresultset",classes = {
+		@ConstructorResult(
+				targetClass = WorkOrderAgreementRESTPOJO.class, columns = {
+
+				@ColumnResult(name="id"),@ColumnResult(name="agency_work_order"),
+				@ColumnResult(name="agreement_details"),@ColumnResult(name="contractor_address"),@ColumnResult(name="contractor_code"),
+				@ColumnResult(name="contractor_email"),@ColumnResult(name="contractor_name"),@ColumnResult(name="contractor_phone"),
+				@ColumnResult(name="date"),@ColumnResult(name="estimated_cost"),@ColumnResult(name="executing_division"),@ColumnResult(name="fund"),
+				@ColumnResult(name="name_work_order"),@ColumnResult(name="sector"),@ColumnResult(name="tender_cost"),
+				@ColumnResult(name="time_limit"),@ColumnResult(name="work_location"),@ColumnResult(name="work_type"),
+				@ColumnResult(name="work_agreement_status"),@ColumnResult(name="work_amount"),@ColumnResult(name="work_details"),
+				@ColumnResult(name="work_end_date"),@ColumnResult(name="work_intended_date"),@ColumnResult(name="work_number"),
+				@ColumnResult(name="work_start_date"),@ColumnResult(name="work_status"),@ColumnResult(name="ward_number"),
+				@ColumnResult(name="statusid"),@ColumnResult(name="version"),@ColumnResult(name="createdby"),
+				@ColumnResult(name="createddate"),@ColumnResult(name="lastmodifiedby"),@ColumnResult(name="lastmodifieddate"),
+				@ColumnResult(name="state_id"),@ColumnResult(name="work_agreement_number"),@ColumnResult(name="project_closure_comments"),
+				@ColumnResult(name="contractor_performance_comments"),@ColumnResult(name="actual_start_date"),@ColumnResult(name="actual_end_date"),
+				@ColumnResult(name="approval_competent_authority"),@ColumnResult(name="status"),@ColumnResult(name="Percentage_Completion"),}
+				)
+	})
+
+
+	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address,\n" + 
+			"aw.contractor_code,aw.contractor_email,aw.contractor_name,\n" + 
+			"aw.contractor_phone,aw.date,aw.estimated_cost,dep.\"name\" as executing_division,aw.fund,aw.name_work_order,aw.sector,\n" + 
+			"aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type,\n" + 
+			"aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date,\n" + 
+			"aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status,\n" + 
+			"aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate,\n" + 
+			"aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number,\n" + 
+			"aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date,\n" + 
+			"aw.actual_end_date,aw.approval_competent_authority,\n" + 
+			"es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage \n" + 
+			"from \"ch.chandigarh\".txn_work_agreement aw, \"ch.chandigarh\".eg_department dep,\"ch.chandigarh\".egw_status es ,\n" + 
+			"\"ch.chandigarh\".txn_boqdetails tb,\"ch.chandigarh\".txn_estimate_preparation tep where  aw.statusid =es.id and aw.executing_department::Integer = dep.id and  \n" + 
+			"aw.id=tb.work_id and tep.id = tb.work_id  group  by aw.id,dep.\"name\" ,es.code  ",
+		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
 
 @Entity
 @Table(name = "txn_work_agreement")
@@ -126,6 +169,10 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Column(name = "approval_competent_authority")
 	private String approval_competent_authority;
+
+	//edited
+	@Column(name="milestonestatus")
+	private String milestonestatus;
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
@@ -689,6 +736,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setApproval_competent_authority(String approval_competent_authority) {
 		this.approval_competent_authority = approval_competent_authority;
+	}
+
+	public String getMilestonestatus() {
+		return milestonestatus;
+	}
+
+	public void setMilestonestatus(String milestonestatus) {
+		this.milestonestatus = milestonestatus;
 	}
 
 }

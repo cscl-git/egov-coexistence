@@ -431,7 +431,16 @@
         <put-attribute name="body" value="/WEB-INF/views/dnitCreation/searchdnit.jsp"/>
     </definition>
    
+   <!-- Added edititable DNIT -->
+   <definition name="search-edit-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/searcheditdnit.jsp"/>
+    </definition>
    
+    <definition name="edit-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/editDnitestimate.jsp"/>
+    </definition>
    
      <definition name="view-dnit-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.view" cascade="true"/>

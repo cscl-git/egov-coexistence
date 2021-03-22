@@ -242,6 +242,7 @@ public class DayBookReportAction extends BaseFormAction {
                 .addScalar("debitamount", StringType.INSTANCE)
                 .addScalar("vhId", StringType.INSTANCE)
                 .addScalar("dept", StringType.INSTANCE)
+                .addScalar("func", StringType.INSTANCE)
                 .setResultTransformer(Transformers.aliasToBean(DayBook.class));
         dayBookDisplayList = query.list();
         for (DayBook bean : dayBookDisplayList) {

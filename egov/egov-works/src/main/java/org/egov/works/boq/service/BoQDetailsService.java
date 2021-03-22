@@ -25,6 +25,7 @@ import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.PaymentDistribution;
 import org.egov.works.boq.entity.WorkOrderAgreement;
+import org.egov.works.boq.entity.WorkOrderAgreementRESTPOJO;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -359,5 +360,8 @@ public class BoQDetailsService {
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
 
+	public List<WorkOrderAgreementRESTPOJO>getAllWorkOrderAgreementRest(){
+		return workOrderAgreementRepository.getAllWorkOrderAgreement();
+	}
 
 }
