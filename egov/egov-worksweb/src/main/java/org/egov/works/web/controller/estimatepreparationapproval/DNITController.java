@@ -664,7 +664,7 @@ public class DNITController extends GenericWorkFlowController {
 		return "search-dnit-form";
 	}
 	//edited
-	@RequestMapping(value = "/workDnitSearch", params="workEditDnit" , method = RequestMethod.POST)
+	@RequestMapping(value = "/workDnitSearch",  method = RequestMethod.POST)
 	public String showEditEstimateNewFormGet(
 			@ModelAttribute("workdnitDetails") final DNITCreation dnitCreation,
 			final Model model, HttpServletRequest request) {
