@@ -151,22 +151,19 @@ function editDNIT(estId)
 }
 function deletedata(empid,slno)
 {
-	var data={
-			"empid":"empid",
-			"slno":"slno"
-	}
-	$.ajax({
-		type:"POST",
-		dataType:'json',
-	url:"/services/works/dnit/deleteAjaxdnit/",
-	data:data,
-	success:function(){
-		alert("success");
-	}
+	var url = "/services/works/dnit/deletednit/"+ empid+"/"+slno;
 	
-	})
-	/*var url = "/services/works/dnit/deletednit/"+ empid+"/"+slno;
+	window.location.href = url;
+	}
+function openBOQ(estId)
+{
+	alert(estId);
+	var url = "/services/works/boq/viewBoq/"+ estId;
 	window.open(url,'','width=900, height=700');
-	window.location.href = url;*/
+	}
+function updateBOQ(estId)
+{
+	alert(estId);
+	var url = "/services/works/boq/updateBoq/"+ estId;
+	window.open(url,'','width=900, height=700');
 }
-

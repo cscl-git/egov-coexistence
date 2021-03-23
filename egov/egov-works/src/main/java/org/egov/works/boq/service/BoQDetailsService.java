@@ -23,9 +23,11 @@ import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqNewDetails;
 import org.egov.works.boq.entity.PaymentDistribution;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.entity.WorkOrderAgreementRESTPOJO;
+import org.egov.works.boq.repository.BoqNewDetailsRepository;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -43,6 +45,8 @@ public class BoQDetailsService {
 
 	@Autowired
 	private WorkOrderAgreementRepository workOrderAgreementRepository;
+	@Autowired
+private BoqNewDetailsRepository boqNewDetailsRepository;
 	@Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
 	
@@ -65,10 +69,12 @@ public class BoQDetailsService {
 	public WorkOrderAgreement saveBoQDetailsData(HttpServletRequest request, WorkOrderAgreement workOrderAgreement,Long approvalPosition,String approvalComment,String approvalDesignation,String workFlowAction) {
 		// TODO Auto-generated method stub
 		List<BoQDetails> list = new ArrayList<BoQDetails>();
+		//edited
+		if(workOrderAgreement.getBoQDetailsList()!=null) {
 		for (BoQDetails boq : workOrderAgreement.getBoQDetailsList()) {
 			boq.setWorkOrderAgreement(workOrderAgreement);
 			list.add(boq);
-		}
+		}}
 		List<PaymentDistribution> PaymentDistributionlist = new ArrayList<PaymentDistribution>();
 		for (PaymentDistribution boq : workOrderAgreement.getPaymentDistribution()) {
 			boq.setWorkOrderAgreement(workOrderAgreement);
@@ -185,6 +191,32 @@ public class BoQDetailsService {
 		WorkOrderAgreement saveBoqDetails = workOrderAgreementRepository.save(boqList);
 
 		return saveBoqDetails;
+	}
+	@Transactional
+	public BoqNewDetails viewBoqData(Long id) {
+		// TODO Auto-generated method stub
+
+		
+		BoqNewDetails viewboqNewDetails = boqNewDetailsRepository.findById(id);
+		
+		return viewboqNewDetails;
+	}
+	@Transactional
+	public Boolean updateBoqData(BoqNewDetails boqNewDetails) {
+		// TODO Auto-generated method stub
+		
+		boqNewDetailsRepository.updateById(boqNewDetails.getId(),boqNewDetails.getItem_description(), boqNewDetails.getRef_dsr(),boqNewDetails.getUnit(),boqNewDetails.getRate());
+		
+		return true;
+	}
+	@Transactional
+	public BoqNewDetails saveNewBoqData(HttpServletRequest request, BoqNewDetails boqNewDetails) {
+		// TODO Auto-generated method stub
+
+		
+		boqNewDetailsRepository.save(boqNewDetails);
+		
+		return boqNewDetails;
 	}
 
 	@Transactional
@@ -361,7 +393,13 @@ public class BoQDetailsService {
 	    }
 
 	public List<WorkOrderAgreementRESTPOJO>getAllWorkOrderAgreementRest(){
-		return workOrderAgreementRepository.getAllWorkOrderAgreement();
+		List<WorkOrderAgreementRESTPOJO> w=null;
+		try {
+			w=workOrderAgreementRepository.getAllWorkOrderAgreement();
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return w;
 	}
 
 }

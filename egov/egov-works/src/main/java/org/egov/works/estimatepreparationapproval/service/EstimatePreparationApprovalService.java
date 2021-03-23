@@ -17,7 +17,6 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
-import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
@@ -346,7 +345,14 @@ public class EstimatePreparationApprovalService {
 	    }
 	
 	public List<EstimatePreparationApprovalRESTPOJO>getAllEstimationPreparationNative(){
-		return estimatePreparationApprovalRepository.getEstimatePreparationApprovalRESTPOJO();
+		System.out.println("HERE");
+		List<EstimatePreparationApprovalRESTPOJO> a=null;
+		try {
+			a=estimatePreparationApprovalRepository.getEstimatePreparationApprovalRESTPOJO();
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return a;
 	}
 	
 }

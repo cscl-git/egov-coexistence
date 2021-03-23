@@ -39,25 +39,25 @@ import org.egov.works.boq.entity.BoQDetails;
 @SqlResultSetMapping(name = "AllEstimatePreparationApprovalresultset",classes = {
 		@ConstructorResult(
 				targetClass = EstimatePreparationApprovalRESTPOJO.class, columns = {
-				@ColumnResult (name="id"),@ColumnResult (name="agency_work_order"),@ColumnResult (name="date"),
-				@ColumnResult (name="estimate_amount"),@ColumnResult (name="estimate_date"),
-				@ColumnResult (name="estimate_number"),@ColumnResult (name="estimate_percentage"),
-				@ColumnResult (name="estimate_prepared_by"),@ColumnResult (name="executing_division"),@ColumnResult (name="financial_year"),
-				@ColumnResult (name="financing_details"),@ColumnResult (name="fund_source"),@ColumnResult (name="necessity"),
-				@ColumnResult (name="preparation_designation"),@ColumnResult (name="sector_number"),@ColumnResult (name="tender_cost"),
-				@ColumnResult (name="time_limit"),@ColumnResult (name="ward_number"),@ColumnResult (name="work_category"),
-				@ColumnResult (name="work_location"),@ColumnResult (name="work_name"),@ColumnResult (name="work_scope"),
-				@ColumnResult (name="work_status"),@ColumnResult (name="work_type"),@ColumnResult (name="works_wing"),
-				@ColumnResult (name="state_id"),@ColumnResult (name="version"),@ColumnResult (name="statusid"),
-				@ColumnResult (name="createdby"),@ColumnResult (name="createddate"),@ColumnResult (name="lastmodifiedby"),
-				@ColumnResult (name="lastmodifieddate"),@ColumnResult (name="aanumber"),@ColumnResult (name="aadate"),
-				@ColumnResult (name="contingent_percentage"),@ColumnResult (name="contingent_amount"),@ColumnResult (name="consultant_fee"),
-				@ColumnResult (name="unforseen_charges"),@ColumnResult (name="expenditure_head"),@ColumnResult (name="expenditure_sub_category"),
-				@ColumnResult (name="expenditure_category"),@ColumnResult (name="meetnumber"),@ColumnResult (name="meetcategory"),
-				@ColumnResult (name="meetdate"),@ColumnResult (name="expenditure_head_est"),@ColumnResult (name="status"), }
+				@ColumnResult (name="id",type=String.class),@ColumnResult (name="agency_work_order",type=String.class),@ColumnResult (name="date",type=String.class),
+				@ColumnResult (name="estimate_amount",type=String.class),@ColumnResult (name="estimate_date",type=String.class),
+				@ColumnResult (name="estimate_number",type=String.class),@ColumnResult (name="estimate_percentage",type=String.class),
+				@ColumnResult (name="estimate_prepared_by",type=String.class),@ColumnResult (name="executing_division",type=String.class),@ColumnResult (name="financial_year",type=String.class),
+				@ColumnResult (name="financing_details",type=String.class),@ColumnResult (name="fund_source",type=String.class),@ColumnResult (name="necessity",type=String.class),
+				@ColumnResult (name="preparation_designation",type=String.class),@ColumnResult (name="sector_number",type=String.class),@ColumnResult (name="tender_cost",type=String.class),
+				@ColumnResult (name="time_limit",type=String.class),@ColumnResult (name="ward_number",type=String.class),@ColumnResult (name="work_category",type=String.class),
+				@ColumnResult (name="work_location",type=String.class),@ColumnResult (name="work_name",type=String.class),@ColumnResult (name="work_scope",type=String.class),
+				@ColumnResult (name="work_status",type=String.class),@ColumnResult (name="work_type",type=String.class),@ColumnResult (name="works_wing",type=String.class),
+				@ColumnResult (name="state_id",type=String.class),@ColumnResult (name="version",type=String.class),@ColumnResult (name="statusid",type=String.class),
+				@ColumnResult (name="createdby",type=String.class),@ColumnResult (name="createddate",type=String.class),@ColumnResult (name="lastmodifiedby",type=String.class),
+				@ColumnResult (name="lastmodifieddate",type=String.class),@ColumnResult (name="aanumber",type=String.class),@ColumnResult (name="aadate",type=String.class),
+				@ColumnResult (name="contingent_percentage",type=String.class),@ColumnResult (name="contingent_amount",type=String.class),@ColumnResult (name="consultant_fee",type=String.class),
+				@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="expenditure_head",type=String.class),@ColumnResult (name="expenditure_sub_category",type=String.class),
+				@ColumnResult (name="expenditure_category",type=String.class),@ColumnResult (name="meetnumber",type=String.class),@ColumnResult (name="meetcategory",type=String.class),
+				@ColumnResult (name="meetdate",type=String.class),@ColumnResult (name="expenditure_head_est",type=String.class),@ColumnResult (name="status",type=String.class) }
 				)
 })
-@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = " select tep.id, tep.agency_work_order ,tep.\"date\", tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.\"name\" as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.\"version\" ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status from txn_estimate_preparation tep , egw_status es, eg_department dep where tep.statusid =es.id and tep.executing_division = dep.id",
+@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = " select tep.id, tep.agency_work_order ,tep.date, tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status from txn_estimate_preparation tep , egw_status es, eg_department dep where tep.statusid =es.id and tep.executing_division = dep.id",
 			resultClass = EstimatePreparationApprovalRESTPOJO.class,resultSetMapping = "AllEstimatePreparationApprovalresultset")
 
 

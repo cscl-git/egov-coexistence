@@ -95,6 +95,11 @@ public class DNITCreationService {
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
 		}
+		//edited
+		else if ((workFlowAction.equalsIgnoreCase("Forward/Reassign") )&& dNITCreation.getStatus().getCode().equals("Approved"))
+		{
+			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
+		}
 		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& dNITCreation.getStatus().getCode().equals("Pending for Approval"))
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
@@ -103,6 +108,8 @@ public class DNITCreationService {
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Approved"));
 		}
+		
+		
 		
 		DNITCreation savedDNITCreation = dNITCreationRepository
 				.save(dNITCreation);

@@ -95,7 +95,6 @@ public class EmailConfiguration {
         mailProperties.setProperty("mail.smtps.auth", mailSMTPSAuth);
         mailProperties.setProperty("mail.smtps.starttls.enable", mailStartTLSEnabled);
         mailProperties.setProperty("mail.smtps.debug", mailSMTPSDebug);
-        mailProperties.setProperty("mail.smtps.sendername", "chd.egov.helpdesk@gmail.com");
         mailSender.setJavaMailProperties(mailProperties);
         return mailSender;
     }

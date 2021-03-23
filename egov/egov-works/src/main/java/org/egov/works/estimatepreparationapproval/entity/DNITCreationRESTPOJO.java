@@ -1,24 +1,22 @@
 package org.egov.works.estimatepreparationapproval.entity;
 
-import java.math.BigDecimal;
-import java.util.Date;
-
 public class DNITCreationRESTPOJO {
+
 	
-	private Long id;
+	private String id;
 	private String agency_work_order;
-	private Date date;
-	private Double estimate_amount;
+	private String date;
+	private String estimate_amount;
 	private String estimate_date;
 	private String estimate_number;
 	private String estimate_percentage;
 	private String estimate_prepared_by;
-	private Long executing_division;
+	private String executing_division;
 	private String financial_year;
-	private Long financing_details;
+	private String financing_details;
 	private String fund_source;
 	private String necessity;
-	private Long preparation_designation;
+	private String preparation_designation;
 	private String sector_number;
 	private String tender_cost;
 	private String time_limit;
@@ -30,32 +28,32 @@ public class DNITCreationRESTPOJO {
 	private String work_status;
 	private String work_type;
 	private String works_wing;
-	private Long state_id;
-	private Long version;
-	private Long statusid;
+	private String state_id;
+	private String version;
+	private String statusid;
 	private String createdby;
 	private String createddate;
 	private String lastmodifiedby;
 	private String lastmodifieddate;
 	private String aanumber;
-	private Date aadate;
-	private Double contingent_percentage;
-	private BigDecimal contingent_amount;
-	private BigDecimal consultant_fee;
-	private BigDecimal unforseen_charges;
+	private String aadate;
+	private String contingent_percentage;
+	private String contingent_amount;
+	private String consultant_fee;
+	private String unforseen_charges;
 	private String status;
 	
 	
-	
-	public DNITCreationRESTPOJO(Long id, String agency_work_order, Date date, Double estimate_amount,
+	public DNITCreationRESTPOJO() {}
+	public DNITCreationRESTPOJO(String id, String agency_work_order, String date, String estimate_amount,
 			String estimate_date, String estimate_number, String estimate_percentage, String estimate_prepared_by,
-			Long executing_division, String financial_year, Long financing_details, String fund_source,
-			String necessity, Long preparation_designation, String sector_number, String tender_cost, String time_limit,
-			String ward_number, String work_category, String work_location,String work_name, String work_scope, String work_status,
-			String work_type,String works_wing,
-			Long state_id, Long version, Long statusid, String createdby,String createddate, String lastmodifiedby,String lastmodifieddate, String aanumber,
-			Date aadate, Double contingent_percentage, BigDecimal contingent_amount, BigDecimal consultant_fee,
-			BigDecimal unforseen_charges, String status) {
+			String executing_division, String financial_year, String financing_details, String fund_source,
+			String necessity, String preparation_designation, String sector_number, String tender_cost,
+			String time_limit, String ward_number, String work_category, String work_location, String work_name,
+			String work_scope, String work_status, String work_type, String works_wing, String state_id, String version,
+			String statusid, String createdby, String createddate, String lastmodifiedby, String lastmodifieddate,
+			String aanumber, String aadate, String contingent_percentage, String contingent_amount,
+			String consultant_fee, String unforseen_charges, String status) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -97,10 +95,10 @@ public class DNITCreationRESTPOJO {
 		this.unforseen_charges = unforseen_charges;
 		this.status = status;
 	}
-	public Long getId() {
+	public String getId() {
 		return id;
 	}
-	public void setId(Long id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getAgency_work_order() {
@@ -109,16 +107,16 @@ public class DNITCreationRESTPOJO {
 	public void setAgency_work_order(String agency_work_order) {
 		this.agency_work_order = agency_work_order;
 	}
-	public Date getDate() {
+	public String getDate() {
 		return date;
 	}
-	public void setDate(Date date) {
+	public void setDate(String date) {
 		this.date = date;
 	}
-	public Double getEstimate_amount() {
+	public String getEstimate_amount() {
 		return estimate_amount;
 	}
-	public void setEstimate_amount(Double estimate_amount) {
+	public void setEstimate_amount(String estimate_amount) {
 		this.estimate_amount = estimate_amount;
 	}
 	public String getEstimate_date() {
@@ -145,10 +143,10 @@ public class DNITCreationRESTPOJO {
 	public void setEstimate_prepared_by(String estimate_prepared_by) {
 		this.estimate_prepared_by = estimate_prepared_by;
 	}
-	public Long getExecuting_division() {
+	public String getExecuting_division() {
 		return executing_division;
 	}
-	public void setExecuting_division(Long executing_division) {
+	public void setExecuting_division(String executing_division) {
 		this.executing_division = executing_division;
 	}
 	public String getFinancial_year() {
@@ -157,10 +155,10 @@ public class DNITCreationRESTPOJO {
 	public void setFinancial_year(String financial_year) {
 		this.financial_year = financial_year;
 	}
-	public Long getFinancing_details() {
+	public String getFinancing_details() {
 		return financing_details;
 	}
-	public void setFinancing_details(Long financing_details) {
+	public void setFinancing_details(String financing_details) {
 		this.financing_details = financing_details;
 	}
 	public String getFund_source() {
@@ -175,10 +173,10 @@ public class DNITCreationRESTPOJO {
 	public void setNecessity(String necessity) {
 		this.necessity = necessity;
 	}
-	public Long getPreparation_designation() {
+	public String getPreparation_designation() {
 		return preparation_designation;
 	}
-	public void setPreparation_designation(Long preparation_designation) {
+	public void setPreparation_designation(String preparation_designation) {
 		this.preparation_designation = preparation_designation;
 	}
 	public String getSector_number() {
@@ -211,6 +209,12 @@ public class DNITCreationRESTPOJO {
 	public void setWork_category(String work_category) {
 		this.work_category = work_category;
 	}
+	public String getWork_location() {
+		return work_location;
+	}
+	public void setWork_location(String work_location) {
+		this.work_location = work_location;
+	}
 	public String getWork_name() {
 		return work_name;
 	}
@@ -223,35 +227,59 @@ public class DNITCreationRESTPOJO {
 	public void setWork_scope(String work_scope) {
 		this.work_scope = work_scope;
 	}
+	public String getWork_status() {
+		return work_status;
+	}
+	public void setWork_status(String work_status) {
+		this.work_status = work_status;
+	}
 	public String getWork_type() {
 		return work_type;
 	}
 	public void setWork_type(String work_type) {
 		this.work_type = work_type;
 	}
-	public Long getState_id() {
+	public String getWorks_wing() {
+		return works_wing;
+	}
+	public void setWorks_wing(String works_wing) {
+		this.works_wing = works_wing;
+	}
+	public String getState_id() {
 		return state_id;
 	}
-	public void setState_id(Long state_id) {
+	public void setState_id(String state_id) {
 		this.state_id = state_id;
 	}
-	public Long getVersion() {
+	public String getVersion() {
 		return version;
 	}
-	public void setVersion(Long version) {
+	public void setVersion(String version) {
 		this.version = version;
 	}
-	public Long getStatusid() {
+	public String getStatusid() {
 		return statusid;
 	}
-	public void setStatusid(Long statusid) {
+	public void setStatusid(String statusid) {
 		this.statusid = statusid;
+	}
+	public String getCreatedby() {
+		return createdby;
+	}
+	public void setCreatedby(String createdby) {
+		this.createdby = createdby;
 	}
 	public String getCreateddate() {
 		return createddate;
 	}
 	public void setCreateddate(String createddate) {
 		this.createddate = createddate;
+	}
+	public String getLastmodifiedby() {
+		return lastmodifiedby;
+	}
+	public void setLastmodifiedby(String lastmodifiedby) {
+		this.lastmodifiedby = lastmodifiedby;
 	}
 	public String getLastmodifieddate() {
 		return lastmodifieddate;
@@ -265,34 +293,34 @@ public class DNITCreationRESTPOJO {
 	public void setAanumber(String aanumber) {
 		this.aanumber = aanumber;
 	}
-	public Date getAadate() {
+	public String getAadate() {
 		return aadate;
 	}
-	public void setAadate(Date aadate) {
+	public void setAadate(String aadate) {
 		this.aadate = aadate;
 	}
-	public Double getContingent_percentage() {
+	public String getContingent_percentage() {
 		return contingent_percentage;
 	}
-	public void setContingent_percentage(Double contingent_percentage) {
+	public void setContingent_percentage(String contingent_percentage) {
 		this.contingent_percentage = contingent_percentage;
 	}
-	public BigDecimal getContingent_amount() {
+	public String getContingent_amount() {
 		return contingent_amount;
 	}
-	public void setContingent_amount(BigDecimal contingent_amount) {
+	public void setContingent_amount(String contingent_amount) {
 		this.contingent_amount = contingent_amount;
 	}
-	public BigDecimal getConsultant_fee() {
+	public String getConsultant_fee() {
 		return consultant_fee;
 	}
-	public void setConsultant_fee(BigDecimal consultant_fee) {
+	public void setConsultant_fee(String consultant_fee) {
 		this.consultant_fee = consultant_fee;
 	}
-	public BigDecimal getUnforseen_charges() {
+	public String getUnforseen_charges() {
 		return unforseen_charges;
 	}
-	public void setUnforseen_charges(BigDecimal unforseen_charges) {
+	public void setUnforseen_charges(String unforseen_charges) {
 		this.unforseen_charges = unforseen_charges;
 	}
 	public String getStatus() {
@@ -301,36 +329,11 @@ public class DNITCreationRESTPOJO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getWork_location() {
-		return work_location;
-	}
-	public void setWork_location(String work_location) {
-		this.work_location = work_location;
-	}
-	public String getWork_status() {
-		return work_status;
-	}
-	public void setWork_status(String work_status) {
-		this.work_status = work_status;
-	}
-	public String getWorks_wing() {
-		return works_wing;
-	}
-	public void setWorks_wing(String works_wing) {
-		this.works_wing = works_wing;
-	}
-	public String getCreatedby() {
-		return createdby;
-	}
-	public void setCreatedby(String createdby) {
-		this.createdby = createdby;
-	}
-	public String getLastmodifiedby() {
-		return lastmodifiedby;
-	}
-	public void setLastmodifiedby(String lastmodifiedby) {
-		this.lastmodifiedby = lastmodifiedby;
-	}
+	
+	
+	 
+
+	
 	
 	
 }

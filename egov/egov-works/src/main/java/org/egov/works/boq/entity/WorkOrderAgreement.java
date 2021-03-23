@@ -35,25 +35,25 @@ import org.egov.model.masters.Contractor;
 		@ConstructorResult(
 				targetClass = WorkOrderAgreementRESTPOJO.class, columns = {
 
-				@ColumnResult(name="id"),@ColumnResult(name="agency_work_order"),
-				@ColumnResult(name="agreement_details"),@ColumnResult(name="contractor_address"),@ColumnResult(name="contractor_code"),
-				@ColumnResult(name="contractor_email"),@ColumnResult(name="contractor_name"),@ColumnResult(name="contractor_phone"),
-				@ColumnResult(name="date"),@ColumnResult(name="estimated_cost"),@ColumnResult(name="executing_division"),@ColumnResult(name="fund"),
-				@ColumnResult(name="name_work_order"),@ColumnResult(name="sector"),@ColumnResult(name="tender_cost"),
-				@ColumnResult(name="time_limit"),@ColumnResult(name="work_location"),@ColumnResult(name="work_type"),
-				@ColumnResult(name="work_agreement_status"),@ColumnResult(name="work_amount"),@ColumnResult(name="work_details"),
-				@ColumnResult(name="work_end_date"),@ColumnResult(name="work_intended_date"),@ColumnResult(name="work_number"),
-				@ColumnResult(name="work_start_date"),@ColumnResult(name="work_status"),@ColumnResult(name="ward_number"),
-				@ColumnResult(name="statusid"),@ColumnResult(name="version"),@ColumnResult(name="createdby"),
-				@ColumnResult(name="createddate"),@ColumnResult(name="lastmodifiedby"),@ColumnResult(name="lastmodifieddate"),
-				@ColumnResult(name="state_id"),@ColumnResult(name="work_agreement_number"),@ColumnResult(name="project_closure_comments"),
-				@ColumnResult(name="contractor_performance_comments"),@ColumnResult(name="actual_start_date"),@ColumnResult(name="actual_end_date"),
-				@ColumnResult(name="approval_competent_authority"),@ColumnResult(name="status"),@ColumnResult(name="Percentage_Completion"),}
+				@ColumnResult(name="id",type=String.class),@ColumnResult(name="agency_work_order",type=String.class),
+				@ColumnResult(name="agreement_details",type=String.class),@ColumnResult(name="category",type=String.class),@ColumnResult(name="contractor_address",type=String.class),@ColumnResult(name="contractor_code",type=String.class),
+				@ColumnResult(name="contractor_email",type=String.class),@ColumnResult(name="contractor_name",type=String.class),@ColumnResult(name="contractor_phone",type=String.class),
+				@ColumnResult(name="date",type=String.class),@ColumnResult(name="estimated_cost",type=String.class),@ColumnResult(name="executing_department",type=String.class),@ColumnResult(name="fund",type=String.class),
+				@ColumnResult(name="name_work_order",type=String.class),@ColumnResult(name="sector",type=String.class),@ColumnResult(name="tender_cost",type=String.class),
+				@ColumnResult(name="time_limit",type=String.class),@ColumnResult(name="work_location",type=String.class),@ColumnResult(name="work_type",type=String.class),
+				@ColumnResult(name="work_agreement_status",type=String.class),@ColumnResult(name="work_amount",type=String.class),@ColumnResult(name="work_details",type=String.class),
+				@ColumnResult(name="work_end_date",type=String.class),@ColumnResult(name="work_intended_date",type=String.class),@ColumnResult(name="work_number",type=String.class),
+				@ColumnResult(name="work_start_date",type=String.class),@ColumnResult(name="work_status",type=String.class),@ColumnResult(name="ward_number",type=String.class),
+				@ColumnResult(name="statusid",type=String.class),@ColumnResult(name="version",type=String.class),@ColumnResult(name="createdby",type=String.class),
+				@ColumnResult(name="createddate",type=String.class),@ColumnResult(name="lastmodifiedby",type=String.class),@ColumnResult(name="lastmodifieddate",type=String.class),
+				@ColumnResult(name="state_id",type=String.class),@ColumnResult(name="work_agreement_number",type=String.class),@ColumnResult(name="project_closure_comments",type=String.class),
+				@ColumnResult(name="contractor_performance_comments",type=String.class),@ColumnResult(name="actual_start_date",type=String.class),@ColumnResult(name="actual_end_date",type=String.class),
+				@ColumnResult(name="approval_competent_authority",type=String.class),@ColumnResult(name="status",type=String.class),@ColumnResult(name="percentage_completion",type=String.class)}
 				)
 	})
 
 
-	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address,aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_division,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast(aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
+	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address, aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_department,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast (aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
 		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
 
 @Entity

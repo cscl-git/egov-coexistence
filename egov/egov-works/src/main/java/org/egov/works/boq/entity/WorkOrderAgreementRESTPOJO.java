@@ -43,7 +43,14 @@ public class WorkOrderAgreementRESTPOJO {
 	private String actual_end_date;
 	private String approval_competent_authority;
 	private String status;
-	private String Percentage_Completion;
+	private String percentage_completion;
+	
+	
+	public WorkOrderAgreementRESTPOJO() {}
+	
+	
+	
+	
 	public WorkOrderAgreementRESTPOJO(String id, String agency_work_order, String agreement_details, String category,
 			String contractor_address, String contractor_code, String contractor_email, String contractor_name,
 			String contractor_phone, String date, String estimated_cost, String executing_department, String fund,
@@ -54,7 +61,7 @@ public class WorkOrderAgreementRESTPOJO {
 			String createddate, String lastmodifiedby, String lastmodifieddate, String state_id,
 			String work_agreement_number, String project_closure_comments, String contractor_performance_comments,
 			String actual_start_date, String actual_end_date, String approval_competent_authority, String status,
-			String percentage_Completion) {
+			String percentage_completion) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -98,8 +105,12 @@ public class WorkOrderAgreementRESTPOJO {
 		this.actual_end_date = actual_end_date;
 		this.approval_competent_authority = approval_competent_authority;
 		this.status = status;
-		this.Percentage_Completion = percentage_Completion;
+		this.percentage_completion = percentage_completion;
 	}
+
+
+
+
 	public String getId() {
 		return id;
 	}
@@ -352,12 +363,21 @@ public class WorkOrderAgreementRESTPOJO {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	public String getPercentage_Completion() {
-		return Percentage_Completion;
+
+
+
+
+	public String getPercentage_completion() {
+		return percentage_completion;
 	}
-	public void setPercentage_Completion(String percentage_Completion) {
-		Percentage_Completion = percentage_Completion;
+
+
+
+
+	public void setPercentage_completion(String percentage_completion) {
+		this.percentage_completion = percentage_completion;
 	}
+	
 	
 	
 	

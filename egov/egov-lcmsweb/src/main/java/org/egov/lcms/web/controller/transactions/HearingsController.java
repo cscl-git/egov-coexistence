@@ -180,16 +180,17 @@ public class HearingsController {
         }
             
         
-	    		try {
-					
-	        	boolean emailStatus=sendEmailForAgendaInvitation(msg,legalCase);
-	        	if(emailStatus) {
-	        		//System.out.println("++++++++++++++++++++++++++email Sent Successfully+++++++++++++++++++");
-	        	}
-				} catch (Exception e) {
-					//LOGGER.error("Error in sending email for agenda invitation",e);
-					
-				}
+		/*
+		 * try {
+		 * 
+		 * boolean emailStatus=sendEmailForAgendaInvitation(msg,legalCase);
+		 * if(emailStatus) { //System.out.
+		 * println("++++++++++++++++++++++++++email Sent Successfully+++++++++++++++++++"
+		 * ); } } catch (Exception e) {
+		 * //LOGGER.error("Error in sending email for agenda invitation",e);
+		 * 
+		 * }
+		 */
 	        
        
         

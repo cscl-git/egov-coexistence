@@ -52,6 +52,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.BoqDateUpdate;
+import org.egov.works.boq.entity.BoqNewDetails;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.egov.works.boq.service.BoQDetailsService;
@@ -138,6 +139,159 @@ private static Map<String, String> map;
 		return "boqDetails";
 	}
 
+	@RequestMapping(value = "/newboqform", method = RequestMethod.POST)
+	public String newBoqFormGet(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
+			final Model model, HttpServletRequest request) {
+	
+		
+		return "newboqDetails-form";
+	}
+	@RequestMapping(value = "/saveboqform", method = RequestMethod.POST)
+	public String savenewBoqFormGet(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
+			final Model model, HttpServletRequest request) {
+		
+		BoqNewDetails boqdetail = boQDetailsService.saveNewBoqData(request, boqNewDetails);
+		
+		return "redirect:/boq/savesuccess?ref_dsr=" + boqNewDetails.getRef_dsr();
+	}
+	@RequestMapping(value = "/editboqnew",  method = RequestMethod.POST)
+	public String editBoqData(
+			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
+			final Model model, HttpServletRequest request) throws Exception {
+	
+		return "editnew-boq-details";
+	}
+	@RequestMapping(value = "/editboqnew", params = "editboqnew", method = RequestMethod.POST)
+	public String editnewBoqData(
+			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
+			final Model model, HttpServletRequest request) throws Exception {
+		List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
+
+		// Convert input string into a date
+
+		
+		BoqNewDetails estimate=null;
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		 if (boqNewDetails.getRef_dsr() != null && boqNewDetails.getRef_dsr() != "" && !boqNewDetails.getRef_dsr().isEmpty()) {
+				query.append("where bq.ref_dsr = ? ");
+				
+				System.out.println("Query :: "+query.toString());
+				list = persistenceService.findAllBy(query.toString(),
+		        		 boqNewDetails.getRef_dsr());
+			}
+		 else {
+			 list = persistenceService.findAllBy(query.toString());
+		 }
+		 
+        
+         if (list.size() != 0) {
+        	 
+        	 for (final Object[] object : list) {
+        		 estimate = new BoqNewDetails();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setItem_description(object[1].toString());
+        		 }
+        		 if(object[2] != null)
+        		 {
+        			 estimate.setRef_dsr(object[2].toString());
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setUnit(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setRate(Double.parseDouble(object[4].toString()));
+        		 }
+        		 
+        		 approvalList.add(estimate);
+        	 }
+        	 
+         }
+       boqNewDetails.setEstimateList(approvalList);
+		
+
+		model.addAttribute("boqNewDetails",boqNewDetails);
+
+		return "editnew-boq-details";
+
+	}
+	@RequestMapping(value = "/searchboqnew",  method = RequestMethod.POST)
+	public String searcBoqData(
+			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
+			final Model model, HttpServletRequest request) throws Exception {
+	
+		return "search-boq-details";
+	}
+	@RequestMapping(value = "/searchboqnew", params = "searchboqnew", method = RequestMethod.POST)
+	public String searchBoqData(
+			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
+			final Model model, HttpServletRequest request) throws Exception {
+		List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
+
+		// Convert input string into a date
+
+		
+		BoqNewDetails estimate=null;
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		 if (boqNewDetails.getRef_dsr() != null && boqNewDetails.getRef_dsr() != "" && !boqNewDetails.getRef_dsr().isEmpty()) {
+				query.append("where bq.ref_dsr = ? ");
+				
+				System.out.println("Query :: "+query.toString());
+				list = persistenceService.findAllBy(query.toString(),
+		        		 boqNewDetails.getRef_dsr());
+			}
+		 else {
+			 list = persistenceService.findAllBy(query.toString());
+		 }
+		 
+        
+         if (list.size() != 0) {
+        	 
+        	 for (final Object[] object : list) {
+        		 estimate = new BoqNewDetails();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setItem_description(object[1].toString());
+        		 }
+        		 if(object[2] != null)
+        		 {
+        			 estimate.setRef_dsr(object[2].toString());
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setUnit(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setRate(Double.parseDouble(object[4].toString()));
+        		 }
+        		 
+        		 approvalList.add(estimate);
+        	 }
+        	 
+         }
+       boqNewDetails.setEstimateList(approvalList);
+		
+
+		model.addAttribute("boqNewDetails",boqNewDetails);
+
+		return "search-boq-details";
+
+	}
 	@RequestMapping(value = "/work", params = "Forward/Reassign", method = RequestMethod.POST)
 	public String saveBoQDetailsData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
@@ -259,10 +413,21 @@ private static Map<String, String> map;
 	@RequestMapping(value = "/success", method = RequestMethod.GET)
     public String showSuccessPage(@RequestParam("approverDetails") final String approverDetails,@RequestParam("workflowaction") final String workflowaction, final Model model,
                                   final HttpServletRequest request,@RequestParam("estId") final String estId) {
-		WorkOrderAgreement savedWorkOrderAgreement=
-				workOrderAgreementRepository.getOne(Long.parseLong(estId));//null;
+		
+		WorkOrderAgreement savedWorkOrderAgreement=workOrderAgreementRepository.getOne(Long.parseLong(estId));
 		final String message = getMessageByStatus(savedWorkOrderAgreement, approverDetails,workflowaction);
+
         model.addAttribute("message", message);
+
+        return "works-success";
+    }
+	@RequestMapping(value = "/savesuccess", method = RequestMethod.GET)
+    public String showSavePage(@RequestParam("ref_dsr") final String ref_dsr, final Model model,final HttpServletRequest request) {
+		
+		String message="BOQ Detail is successfully saved with Ref_Dsr/NS id : " +ref_dsr;
+
+        model.addAttribute("message", message);
+
         return "works-success";
     }
 	
@@ -447,6 +612,36 @@ private static Map<String, String> map;
 		List<Department> departments = microserviceUtils.getDepartments();
 		return departments;
 	}
+	@RequestMapping(value = "/viewBoq/{id}", method = RequestMethod.GET)
+	public String viewBoq(@PathVariable("id") final Long id, Model model) {
+		
+		System.out.println(id+"+++++++++++++++++++++++++++");
+		BoqNewDetails boqNewDetails=boQDetailsService.viewBoqData(id);
+		
+		model.addAttribute("boqNewDetails",boqNewDetails);
+		return "view-edit-page";
+	}
+	@RequestMapping(value = "/updateBoq/{id}", method = RequestMethod.GET)
+	public String viewupdateBoq(@PathVariable("id") final Long id, Model model) {
+		
+		BoqNewDetails boqNewDetails=boQDetailsService.viewBoqData(id);
+		
+		model.addAttribute("boqNewDetails",boqNewDetails);
+		return "update-edit-page";
+	}
+	@RequestMapping(value = "/updateBoq/updateBoq",method = RequestMethod.POST)
+	public String updateBoq(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, Model model,HttpServletRequest request) {
+		
+		System.out.println(boqNewDetails.getId()+"+++++++++++++++++++++++++++++++==");
+		System.out.println(boqNewDetails.getItem_description()+"++++++++++++++");
+		System.out.println(boqNewDetails.getRef_dsr()+"++++++++++++++++++");
+		
+		
+	boQDetailsService.updateBoqData(boqNewDetails);
+		
+		
+		return "redirect:/boq/savesuccess?ref_dsr=" + boqNewDetails.getRef_dsr();
+	}
 
 	@RequestMapping(value = "/view/{id}", method = RequestMethod.GET)
 	public String view(@PathVariable("id") final Long id, Model model) {
@@ -540,7 +735,7 @@ private static Map<String, String> map;
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 
 		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
-			System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
+			//System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
 		workOrderAgreement.setDocumentDetail(documents);
 
@@ -1084,7 +1279,7 @@ private static Map<String, String> map;
        		
        	 }
         }
-		
+		//System.out.println("========++++++++++========");
 		workOrderAgreement.setWorkOrderList(workList);
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 

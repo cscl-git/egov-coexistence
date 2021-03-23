@@ -8,9 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreationRESTPOJO;
-import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
-import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -101,7 +99,12 @@ public class WorkDnitService {
 	public List<DNITCreationRESTPOJO>getAllDnitList(){
 		List<DNITCreationRESTPOJO> dnitCreations =  null;
 		
+		try{
 		dnitCreations = dNITCreationRepository.getAllDNITCreation();
+		}catch(Exception ex){
+			ex.printStackTrace();
+		}
+		
 		
 		return dnitCreations;
 	}

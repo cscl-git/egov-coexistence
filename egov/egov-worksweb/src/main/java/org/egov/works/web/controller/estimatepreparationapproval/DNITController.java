@@ -63,6 +63,7 @@ import org.egov.works.workestimate.service.WorkDnitService;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -70,7 +71,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.multipart.MultipartFile;
+
+import javaxt.utils.string;
 
 @Controller
 @RequestMapping(value = "/dnit")
@@ -675,7 +679,7 @@ private static Map<String, String> map;
 		return "search-dnit-form";
 	}
 	//edited
-	@RequestMapping(value = "/workDnitSearch",  method = RequestMethod.POST)
+	@RequestMapping(value = "/workEditDnit", method = RequestMethod.POST)
 	public String showEditEstimateNewFormGet(
 			@ModelAttribute("workdnitDetails") final DNITCreation dnitCreation,
 			final Model model, HttpServletRequest request) {
@@ -927,6 +931,19 @@ private static Map<String, String> map;
 			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "edit-dnit-form";
 	}
+	/*@RequestMapping(value = "/deleteajaxdnit/{id}/{slno}", method = RequestMethod.GET)
+	public @ResponseBody String deleteajaxDnit(@PathVariable("id") final Long id,@PathVariable("slno") final Long slno, Model model) {
+System.out.println("++++++++++"+id+"++++++++++++++++++");
+System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
+		if (id !=null && id != 0 && slno!= null && slno!=0 ) {
+			
+			final StringBuffer query = new StringBuffer(500);
+			query.append("delete from BoQDetails bq where bq.slNo=? and bq.dnitCreation.id=? ");
+			persistenceService.deleteAllBy(query.toString(),slno, id);
+		}
+		return "success";
+				}*/
+		
 	@RequestMapping(value = "/deletednit/{id}/{slno}", method = RequestMethod.GET)
 	public String deleteDnit(@PathVariable("id") final Long id,@PathVariable("slno") final Long slno, Model model) {
 

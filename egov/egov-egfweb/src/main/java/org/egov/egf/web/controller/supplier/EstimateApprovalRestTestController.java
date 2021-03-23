@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -22,7 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/dashboard/")
-public class EstimateApprovalTEstController {
+public class EstimateApprovalRestTestController {
+	
 	@Autowired
 	EstimatePreparationApprovalService estimatePreparationApprovalService;
 	@Autowired
@@ -31,40 +33,43 @@ public class EstimateApprovalTEstController {
 	BoQDetailsService boQDetailsService;
 	
 	public static final String SUCCESS = "Success";
+	@GetMapping(value = "/_get")
+	public ModelMap getData() {
+		ModelMap m = new ModelMap();
+		m.addAttribute("Test", "Hello");
+		return  m;
+	}
+	
+	
+	
+	
 	@ResponseBody
 	@RequestMapping(value = "getAllEstimationPreparation", method = RequestMethod.GET)
 	public ResponseEntity<ResponseInfoWrapper> getAllEstimationPreparationPOJO(HttpServletRequest req,HttpServletResponse res) {
 			System.out.println("TESTING");
 		  List<EstimatePreparationApprovalRESTPOJO> fetchedData =estimatePreparationApprovalService.getAllEstimationPreparationNative();
-		  ModelMap m = new ModelMap(); 
-		 // m.put("allestimation", fetchedData);
+		  
 		  return new ResponseEntity<>(ResponseInfoWrapper.builder()
 					.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
 					.responseBody(fetchedData).build(), HttpStatus.OK);
-		
 	}
 	@ResponseBody
 	@RequestMapping(value = "getAllDnit", method = RequestMethod.GET)
-	public ResponseEntity<ResponseInfoWrapper> getAllDnit(){
+	public ResponseEntity<ResponseInfoWrapper>  getAllDnit(){
 		ModelMap m = new ModelMap();
-		//m.put("allestimation", workDnitService.getAllDnitList());
+		m.put("allestimation", workDnitService.getAllDnitList());
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
 				.responseBody(workDnitService.getAllDnitList()).build(), HttpStatus.OK);
 	}
 	
-	
-	  @ResponseBody
-	  @RequestMapping(value = "getAllWorkAgreement", method = RequestMethod.GET)
-	  public ResponseEntity<ResponseInfoWrapper> getAllWorkAgreement()
-	  { 
-		 ModelMap m = new ModelMap();
-	 // m.put("allestimation", boQDetailsService.getAllWorkOrderAgreementRest());
-	  return new ResponseEntity<>(ResponseInfoWrapper.builder()
+	@ResponseBody
+	@RequestMapping(value = "getAllWorkAgreement", method = RequestMethod.GET)
+	public ResponseEntity<ResponseInfoWrapper>  getAllWorkAgreement(){
+		ModelMap m = new ModelMap();
+		
+		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
 				.responseBody(boQDetailsService.getAllWorkOrderAgreementRest()).build(), HttpStatus.OK);
-	  }
-	 
-	
-
+	}
 }

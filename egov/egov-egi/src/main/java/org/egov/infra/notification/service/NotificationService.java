@@ -48,6 +48,7 @@
 
 package org.egov.infra.notification.service;
 
+import org.apache.commons.codec.binary.Base64;
 import org.egov.infra.admin.common.service.MessageTemplateService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.notification.entity.NotificationPriority;
@@ -57,8 +58,21 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 
+import com.sendgrid.Method;
+import com.sendgrid.Request;
+import com.sendgrid.Response;
+import com.sendgrid.helpers.mail.Mail;
+import com.sendgrid.helpers.mail.objects.Attachments;
+import com.sendgrid.helpers.mail.objects.Content;
+import com.sendgrid.helpers.mail.objects.Email;
+
 import javax.jms.Destination;
 import javax.jms.MapMessage;
+
+import org.springframework.mail.*;
+import org.egov.infra.sendgrid.*;
+
+import java.io.IOException;
 
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
 import static org.egov.infra.notification.NotificationConstants.ATTACHMENT;
@@ -98,6 +112,12 @@ public class NotificationService {
 
     @Value("${sms.enabled}")
     private boolean smsEnabled;
+    
+    @Value("${mail.sender.username}")
+    private String emailFrom;
+    
+    @Value("${mail.sender.password}")
+    private String apiKey;
 
     public void sendEmail(User user, String subject, String templateName,
                           Object... messageValues) {
@@ -130,6 +150,41 @@ public class NotificationService {
                 return mapMessage;
             });
     }
+    
+    public void sendEmailWithAttachmentNew(String email, String subject, String message,
+            String fileType, String fileName, byte[] attachment) throws IOException {
+			if (mailEnabled && isNoneBlank(email, subject, message))
+			{
+				Email from= new Email(emailFrom);
+				Email to=new Email(email);
+				Content content=new Content("text/plain",message);
+				Mail mail = new Mail(from, subject, to, content);
+				Attachments attachments3 = new Attachments();
+				Base64 x = new Base64();
+				String imageDataString = x.encodeAsString(attachment);
+				attachments3.setContent(imageDataString);
+				attachments3.setType(fileType);
+				attachments3.setFilename(fileName);
+				attachments3.setDisposition("attachment");
+				attachments3.setContentId("Banner");
+				mail.addAttachments(attachments3);
+				SendGrid sg = new SendGrid(apiKey);
+			    Request request = new Request();
+			    try {
+			        request.setMethod(Method.POST);
+			        request.setEndpoint("mail/send");
+			        request.setBody(mail.build());
+			        Response response = sg.api(request);
+			        System.out.println(response.getStatusCode());
+			        System.out.println(response.getBody());
+			        System.out.println(response.getHeaders());
+			      } catch (IOException ex) {
+			    	  ex.printStackTrace();
+			        throw ex;
+			      }
+    		}
+			
+		}
 
     public void sendSMS(String mobileNo, String message) {
         sendSMS(mobileNo, message, MEDIUM);

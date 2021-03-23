@@ -18,7 +18,7 @@
 </style>
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 870px;">
+		<div class="form-group" style="padding: 50px 20px 1000px;">
 
 			
 			<input type="hidden" name="estimatePreparationApproval"
@@ -179,6 +179,7 @@
 				<form:textarea class="form-control" path="necessity"
 					maxlength="2000" readonly="true" style="height: 100px;" />
 			</div>
+			
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.scope.work" /><span
 				class="mandatory"></span></label>
@@ -186,6 +187,13 @@
 				<form:textarea class="form-control" path="workScope"
 					maxlength="2000" readonly="true" style="height: 100px;" />
 			</div> 
+			<label class="col-sm-3 control-label text-left-audit1">Corrigendum Comment
+					<span
+				class="mandatory"></span>:</label>
+			<div class="col-sm-9 block-colm">
+				<form:textarea class="form-control" id="corrigendum" path="corriandumm_status" maxlength="2000"
+					 style="height: 100px;"  readonly="true" />
+			</div>
 			
 			
 		</div>

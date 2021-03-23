@@ -45,13 +45,13 @@
 	<div class="tab-pane fade in active" id="estimatescreen">
 	<c:if test="${estimatePreparationApproval.status.code == 'Created' }">
 			
-				<jsp:include page="editestimate.jsp" />
+				<jsp:include page="editestimatenew.jsp" />
 			
 	</c:if>
 
 	<c:if test="${estimatePreparationApproval.status.code == 'Pending for Approval' }">
 			
-				<jsp:include page="editestimate.jsp" />
+				<jsp:include page="editestimatenew.jsp" />
 	</c:if>
 
 		<c:if test="${estimatePreparationApproval.status.code == 'Approved' }">
