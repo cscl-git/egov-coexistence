@@ -15,6 +15,7 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.PaymentDistribution;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.service.BoQDetailsService;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
@@ -174,14 +175,36 @@ public class SearchEstimateController {
 		DecimalFormat df = new DecimalFormat("0.00");
 		Double sumAmount=0.0;
 		Double measuredSumAmount=0.0;
-		for (BoQDetails boq : workOrderAgreement.getNewBoQDetailsList()) {
-			sumAmount=sumAmount +boq.getAmount();
-			if (boq.getMeasured_amount() != null) {
-				measuredSumAmount=measuredSumAmount+boq.getMeasured_amount();
+		Double completion=0.0;
+		Double payment=0.0;
+		Double progress=0.0;
+		Double percent=100.0;
+		
+		if(workOrderAgreement.getMilestonestatus() != null && workOrderAgreement.getMilestonestatus().equalsIgnoreCase("YES"))
+		{
+			if(workOrderAgreement.getPaymentDistribution() != null && !workOrderAgreement.getPaymentDistribution().isEmpty())
+			{
+				for(PaymentDistribution row :workOrderAgreement.getPaymentDistribution())
+				{
+					payment=Double.valueOf(row.getPayment_percent());
+					progress=Double.valueOf(row.getCompletion_percent());
+					measuredSumAmount=(payment/percent)*progress;
+					completion=completion+measuredSumAmount;
+				}
 			}
-			
 		}
-		Double completion=(measuredSumAmount/sumAmount)*100;
+		else
+		{
+			for (BoQDetails boq : workOrderAgreement.getNewBoQDetailsList()) {
+				sumAmount=sumAmount +boq.getAmount();
+				if (boq.getMeasured_amount() != null) {
+					measuredSumAmount=measuredSumAmount+boq.getMeasured_amount();
+				}
+				
+			}
+			 completion=(measuredSumAmount/sumAmount)*100;
+		}
+		
 		
 		return df.format(completion);
 	}
