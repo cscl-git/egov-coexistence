@@ -29,9 +29,7 @@
 			e.preventDefault();
 		}
 	});
-	});
 		$('#buttonSubmit').on('click',function(){
-		     /*  $('#department').val(""); */
 			$("form").trigger("reset");
 		});
 </script>
