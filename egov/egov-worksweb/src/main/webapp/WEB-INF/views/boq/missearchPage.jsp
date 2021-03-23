@@ -62,7 +62,7 @@
 						</form:select>
 					</div>
 					<!-- //edited... -->
-					<label class="col-sm-3 control-label text-left-audit" >Contractor Name<span class="mandatory"></span></label>
+					<label class="col-sm-3 control-label text-left-audit" >Contractor Name</label>
 				<div class="col-sm-3 add-margin">
 					 <form:select path="contractor_name" id="contractor_name"
 						class="form-control"  onchange="getContractorDetails(this)">

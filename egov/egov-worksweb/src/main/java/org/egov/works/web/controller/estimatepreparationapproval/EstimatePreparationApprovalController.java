@@ -124,6 +124,21 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
     @Autowired
     private NotificationService notificationService;
+    
+    private static Map<String, String> map; 
+    
+    // Instantiating the static map 
+    static
+    { 
+        map = new HashMap<>(); 
+        map.put("Created", "Under Rough Estate approval process"); 
+        map.put("Pending for Approval", "Under Rough Estate approval process");
+        map.put("AA Initiated", "Rough cost Estimate Approved");
+        map.put("AA Pending for Approval", "Estimate under Administrative approval process");
+        map.put("TS Initiated", "Administrative Approval Received");
+        map.put("TS Pending for Approval", "Under Detailed Estate approval process");
+        map.put("Approved", "Detailed cost Estimate Approved");
+    }
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -258,7 +273,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			approverName=getEmployeeName(Long.parseLong(approverDetails));
 			if(savedEstimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
 			{
-				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" has been approved and forwarded to "+approverName +" for AA inititation";
+				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" has been approved and forwarded to "+approverName +" for Administrative Approval process";
 				notMsg="Dear ? ,Estimate Id : "+savedEstimatePreparationApproval.getEstimateNumber()+"has been approved";
 				estimateSms=sendSmsAndEmailDetailsForApproval(notMsg);
 				if(estimateSms) {
@@ -268,7 +283,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			else if(savedEstimatePreparationApproval.getStatus().getCode().equals("TS Initiated"))
 			{
 				
-				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" AA has been approved and  forwarded to "+approverName +" for TS inititation";
+				msg="Estimate Number "+savedEstimatePreparationApproval.getEstimateNumber()+" Administrative Approval has been approved and  forwarded to "+approverName +" for Detailed Cost Estimate Approval process";
 			}
 			else
 			{
@@ -752,11 +767,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         		 {
         			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
         		 }
+        		 String status=null;
         		 if(object[6] != null)
         		 {
-        			 estimate.setStatusDescription(object[6].toString());
+        			 status=object[6].toString();
+        			 estimate.setStatusDescription(map.get(status));
         		 }
-        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+        		 if(status != null && !status.equalsIgnoreCase("Approved"))
         		 {
         			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
         		 }
@@ -841,7 +858,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         		 }
         		 if(object[6] != null)
         		 {
-        			 estimate.setStatusDescription(object[6].toString());
+        			 estimate.setStatusDescription(map.get(object[6].toString()));
         		 }
         		 approvalList.add(estimate);
         	 }
@@ -1320,11 +1337,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		 {
 			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
 		 }
+		 String status=null;
 		 if(object[6] != null)
 		 {
-			 estimate.setStatusDescription(object[6].toString());
+			 status=object[6].toString();
+			 estimate.setStatusDescription(map.get(status));
 		 }
-		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+		 if(status != null && !status.equalsIgnoreCase("Approved"))
 		 {
 			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
 		 }

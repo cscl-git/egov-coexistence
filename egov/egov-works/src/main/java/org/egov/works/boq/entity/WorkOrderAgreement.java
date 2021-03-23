@@ -53,20 +53,7 @@ import org.egov.model.masters.Contractor;
 	})
 
 
-	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address,\n" + 
-			"aw.contractor_code,aw.contractor_email,aw.contractor_name,\n" + 
-			"aw.contractor_phone,aw.date,aw.estimated_cost,dep.\"name\" as executing_division,aw.fund,aw.name_work_order,aw.sector,\n" + 
-			"aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type,\n" + 
-			"aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date,\n" + 
-			"aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status,\n" + 
-			"aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate,\n" + 
-			"aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number,\n" + 
-			"aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date,\n" + 
-			"aw.actual_end_date,aw.approval_competent_authority,\n" + 
-			"es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage \n" + 
-			"from \"ch.chandigarh\".txn_work_agreement aw, \"ch.chandigarh\".eg_department dep,\"ch.chandigarh\".egw_status es ,\n" + 
-			"\"ch.chandigarh\".txn_boqdetails tb,\"ch.chandigarh\".txn_estimate_preparation tep where  aw.statusid =es.id and aw.executing_department::Integer = dep.id and  \n" + 
-			"aw.id=tb.work_id and tep.id = tb.work_id  group  by aw.id,dep.\"name\" ,es.code  ",
+	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address,aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_division,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast(aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
 		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
 
 @Entity
@@ -216,6 +203,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	private Double progressCompletion;
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
+	@Transient
+    private List<DocumentUpload> documents = new ArrayList<>();
+	@Transient
+    private List<DocumentUpload> estDocuments = new ArrayList<>();
+	@Transient
+	private Long dnitId;
+	@Transient
+	private Long estId;
 	@Transient
 	private List<Contractor> contractors = new ArrayList<Contractor>();
 	
@@ -744,6 +739,38 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setMilestonestatus(String milestonestatus) {
 		this.milestonestatus = milestonestatus;
+	}
+
+	public List<DocumentUpload> getDocuments() {
+		return documents;
+	}
+
+	public void setDocuments(List<DocumentUpload> documents) {
+		this.documents = documents;
+	}
+
+	public Long getDnitId() {
+		return dnitId;
+	}
+
+	public void setDnitId(Long dnitId) {
+		this.dnitId = dnitId;
+	}
+
+	public List<DocumentUpload> getEstDocuments() {
+		return estDocuments;
+	}
+
+	public void setEstDocuments(List<DocumentUpload> estDocuments) {
+		this.estDocuments = estDocuments;
+	}
+
+	public Long getEstId() {
+		return estId;
+	}
+
+	public void setEstId(Long estId) {
+		this.estId = estId;
 	}
 
 }

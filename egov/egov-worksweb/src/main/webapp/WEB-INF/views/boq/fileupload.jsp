@@ -23,6 +23,16 @@
                 <spring:message code="lbl.upload.document" text="Documents" />
         </div> 
       </div>
+      <c:if test="${workOrderAgreement.estDocuments != null &&  !workOrderAgreement.estDocuments.isEmpty()}">
+        <c:forEach items="${workOrderAgreement.estDocuments }" var="documentDetials2">
+            <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${workOrderAgreement.estId}&fileStoreId=${documentDetials2.fileStore.fileStoreId }">${documentDetials2.fileStore.fileName }</a><br />
+        </c:forEach>
+    </c:if>
+      <c:if test="${workOrderAgreement.documents != null &&  !workOrderAgreement.documents.isEmpty()}">
+        <c:forEach items="${workOrderAgreement.documents }" var="documentDetials1">
+            <a href="/services/works/dnit/downloadBillDoc?estDetailsId=${workOrderAgreement.dnitId}&fileStoreId=${documentDetials1.fileStore.fileStoreId }">${documentDetials1.fileStore.fileName }</a><br />
+        </c:forEach>
+    </c:if>
    <c:if test="${workOrderAgreement.documentDetail != null &&  !workOrderAgreement.documentDetail.isEmpty()}">
         <c:forEach items="${workOrderAgreement.documentDetail }" var="documentDetials">
             <a href="/services/works/boq/downloadBillDoc?workDetailsId=${workOrderAgreement.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />

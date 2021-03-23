@@ -57,25 +57,7 @@ import org.egov.works.boq.entity.BoQDetails;
 				@ColumnResult (name="meetdate"),@ColumnResult (name="expenditure_head_est"),@ColumnResult (name="status"), }
 				)
 })
-@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = "select tep.id, tep.agency_work_order ,tep.date " + 
-			"tep.estimate_amount,tep.estimate_date,tep.estimate_number," + 
-			"tep.estimate_percentage ,tep.estimate_prepared_by, " + 
-			"dep.name as executing_division,tep.financial_year ,tep.financing_details, " + 
-			"tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, " + 
-			"tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , " + 
-			"tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status ," + 
-			"tep.work_type ,tep.works_wing ,tep.state_id,tep.'version' ,tep.statusid, " + 
-			"tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, " + 
-			"tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, " + 
-			"tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, " + 
-			"tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber," + 
-			"tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status" + 
-			"from ch.chandigarh.txn_estimate_preparation tep" + 
-			"ch.chandigarh.egw_status es," + 
-			"ch.chandigarh.eg_department dep " + 
-			"where  tep.statusid =es.id " + 
-			"and " + 
-			" tep.executing_division = dep.id ",
+@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = " select tep.id, tep.agency_work_order ,tep.\"date\", tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.\"name\" as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.\"version\" ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status from txn_estimate_preparation tep , egw_status es, eg_department dep where tep.statusid =es.id and tep.executing_division = dep.id",
 			resultClass = EstimatePreparationApprovalRESTPOJO.class,resultSetMapping = "AllEstimatePreparationApprovalresultset")
 
 

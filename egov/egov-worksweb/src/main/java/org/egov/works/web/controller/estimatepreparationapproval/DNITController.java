@@ -120,6 +120,17 @@ public class DNITController extends GenericWorkFlowController {
     
     @Autowired
 	private DocumentUploadRepository documentUploadRepository;
+    
+private static Map<String, String> map; 
+    
+    // Instantiating the static map 
+    static
+    { 
+        map = new HashMap<>(); 
+        map.put("Created", "Under DNIT approval process"); 
+        map.put("Pending for Approval", "Under DNIT approval process");
+        map.put("Approved", "DNIT Approved");
+    }
 
 	@RequestMapping(value = "/createDnit", method = RequestMethod.POST)
 	public String showNewFormGet(
@@ -796,11 +807,13 @@ public class DNITController extends GenericWorkFlowController {
         		 {
         			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
         		 }
+        		 String status=null;
         		 if(object[6] != null)
         		 {
-        			 estimate.setStatusDescription(object[6].toString());
+        			 status=object[6].toString();
+        			 estimate.setStatusDescription(map.get(status));
         		 }
-        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
+        		 if(status != null && !status.equalsIgnoreCase("Approved"))
         		 {
         			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
         		 }

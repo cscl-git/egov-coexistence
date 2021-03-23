@@ -536,6 +536,7 @@ public class LegalCaseDocument {
         private String officerIncharge;
         private String concernedBranch;
         private String concernedDepartment;
+        private String advocateName;
         private Date nextDate;
         private Boolean filedByULB;
         private String status;
@@ -615,6 +616,11 @@ public class LegalCaseDocument {
         
         public Builder withConcernedDepartment(final String concernedDepartment) {
             this.concernedDepartment = concernedDepartment;
+            return this;
+        }
+        
+        public Builder withAdvocateName(final String advocateName) {
+            this.advocateName = advocateName;
             return this;
         }
         
@@ -710,6 +716,7 @@ public class LegalCaseDocument {
             legalCaseIndex.setOfficerIncharge(officerIncharge);
             legalCaseIndex.setConcernedBranch(concernedBranch);
             legalCaseIndex.setConcernedDepartment(concernedDepartment);
+            legalCaseIndex.setAdvocateName(advocateName);
             legalCaseIndex.setStatus(status);
             legalCaseIndex.setSubStatus(subStatus);
             legalCaseIndex.setPetitionerNames(petitionerNames);

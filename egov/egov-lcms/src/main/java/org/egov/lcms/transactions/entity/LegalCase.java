@@ -191,6 +191,16 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private String representedby;
 
+	@Length(max = 10)
+	@Column(name = "counselphoneno")
+	@Audited
+	private String counselPhoneNo;
+	
+	@Length(max = 64)
+	@Column(name = "counselemailno")
+	@Audited
+	private String counselEmailNo;
+ 
     @Temporal(TemporalType.DATE)
     @Column(name = "previousDate")
     @Audited
@@ -1051,4 +1061,20 @@ public class LegalCase extends AbstractAuditable {
 	public void setPrevPetitionType(PetitionTypeMaster prevPetitionType) {
 		this.prevPetitionType = prevPetitionType;
 	}	
+
+	public String getCounselPhoneNo() {
+		return counselPhoneNo;
+	}
+
+	public void setCounselPhoneNo(String counselPhoneNo) {
+		this.counselPhoneNo = counselPhoneNo;
+	}
+
+	public String getCounselEmailNo() {
+		return counselEmailNo;
+	}
+
+	public void setCounselEmailNo(String counselEmailNo) {
+		this.counselEmailNo = counselEmailNo;
+	}
 }

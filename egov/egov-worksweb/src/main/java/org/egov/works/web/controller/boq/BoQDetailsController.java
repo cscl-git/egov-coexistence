@@ -110,6 +110,21 @@ public class BoQDetailsController extends GenericWorkFlowController{
 
     @Autowired
     BoqDateUpdateService boqDateUpdateService;
+private static Map<String, String> map; 
+    
+    // Instantiating the static map 
+    static
+    { 
+        map = new HashMap<>(); 
+        map.put("Created", "Under Work Agreement Approval"); 
+        map.put("Pending for Approval", "Under Work Agreement Approval");
+        map.put("Approved", "Work agreement approved");
+        map.put("Project Modification Initiated", "Work monitoring in progress");
+        map.put("Project Closed", "Work completed");
+        map.put("Project Closure Initiated", "Work monitoring in progress");
+        map.put("Project Progress Initiated", "Work monitoring in progress");
+        
+    }
 
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
@@ -624,11 +639,13 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		{
        			agreement.setWork_amount(object[6].toString());
        		}
+       		String status=null;
        		if(object[7] != null)
        		{
-       			agreement.setStatusDescp(object[7].toString());
+       			status=object[7].toString();
+       			agreement.setStatusDescp(map.get(status));
        		}
-       		if(agreement.getStatusDescp() != null && !agreement.getStatusDescp().equalsIgnoreCase("Approved") && !agreement.getStatusDescp().equalsIgnoreCase("Project Closed"))
+       		if(status != null && !status.equalsIgnoreCase("Approved") && !status.equalsIgnoreCase("Project Closed"))
    		 {
        			agreement.setPendingWith(populatePendingWith(agreement.getId()));
    		 }
@@ -935,7 +952,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		}
        		if(object[7] != null)
        		{
-       			agreement.setStatusDescp(object[7].toString());
+       			agreement.setStatusDescp(map.get(object[7].toString()));
        		}
        		workList.add(agreement);
        		
@@ -996,7 +1013,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		}
        		if(object[7] != null)
        		{
-       			agreement.setStatusDescp(object[7].toString());
+       			agreement.setStatusDescp(map.get(object[7].toString()));
        		}
        		workList.add(agreement);
        		
@@ -1057,7 +1074,7 @@ public class BoQDetailsController extends GenericWorkFlowController{
        		}
        		if(object[7] != null)
        		{
-       			agreement.setStatusDescp(object[7].toString());
+       			agreement.setStatusDescp(map.get(object[7].toString()));
        		}
        		if(object[8] != null)
        		{

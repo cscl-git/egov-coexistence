@@ -474,8 +474,10 @@
 									<th><spring:message code="lbl.rate" /></th>
 									<th><spring:message code="lbl.quantity" /></th>
 									<th><spring:message code="lbl.amount" /></th>
-											<!-- <th>Measured Quantity</th>
-								<th>Measured Amount</th> -->
+											<c:if test="${workOrderAgreement.milestonestatus != 'Yes' }">
+												<th>Measured Quantity</th>
+												<th>Measured Amount</th>
+											</c:if>
 								</tr>
 							</thead>
 						
@@ -533,17 +535,23 @@
 											id="boQDetailsList[${boq.sizeIndex}].amount"
 											required="required"  class="form-control amount"
 											maxlength="200" name="amount" ></form:input></td>
-												<%-- <td><form:input type="number"  style="width:100px;"  step=".01"
+														
+												<c:if test="${workOrderAgreement.milestonestatus != 'Yes' }">
+													<td><form:input type="number" style="width:100px;"
+															step=".01"
 											path="boQDetailsList[${boq.sizeIndex}].measured_quantity"
 											id="boQDetailsList[${boq.sizeIndex}].measured_quantity"
-											required="required"  class="form-control measured_quantity"
-											maxlength="200" name="measured_quantity" onchange="calculateMeasuredAmount(${boq.sizeIndex})" ></form:input></td>
-										<td><form:input type="number" style="width:100px;" readonly="true"
+															required="required"
+															class="form-control measured_quantity" maxlength="200"
+															name="measured_quantity"
+															onchange="calculateMeasuredAmount(${boq.sizeIndex})"></form:input></td>
+													<td><form:input type="number" style="width:100px;"
+															readonly="true"
 											path="boQDetailsList[${boq.sizeIndex}].measured_amount"
 											id="boQDetailsList[${boq.sizeIndex}].measured_amount"
 											required="required"  class="form-control measured_amount"
-											maxlength="200" name="measured_amount" ></form:input></td>		 --%>
-											
+															maxlength="200" name="measured_amount"></form:input></td>
+												</c:if>
 										
 									</tr>
 						<%-- 	</c:if>	 --%>
