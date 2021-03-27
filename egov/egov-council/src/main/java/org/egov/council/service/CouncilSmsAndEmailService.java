@@ -62,6 +62,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -120,6 +121,36 @@ public class CouncilSmsAndEmailService {
             }
             try {
 	            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage);
+	                }
+	            }
+            }catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
+            }
+            buildCouncilSmsDetails(customMessage, councilMeeting);
+        }
+    }
+    
+    public void sendSmsNotice(CouncilMeeting councilMeeting, String customMessage) {
+        String mobileNo;
+        Boolean smsEnabled = isSmsEnabled();
+
+        if (smsEnabled) {
+        	try {
+	            for (CommitteeMembers committeeMembers : committeeMemberService
+	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
+	                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
+	                if (mobileNo != null) {
+	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage);
+	                }
+	            }
+        	}catch(Exception e) {
+            	LOGGER.error("Unable to send SMS to council members of meeting number "+councilMeeting.getMeetingNumber());
+            }
+            try {
+	            List<User> listOfUsers = councilMeetingService.getUserListForNotice(councilMeeting);
 	            for (User user : listOfUsers) {
 	                if (user.getMobileNumber() != null) {
 	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage);
@@ -311,7 +342,6 @@ public class CouncilSmsAndEmailService {
         String body = customMessage;
         String subject;
         subject = emailSubjectforEmailByCodeAndArgs("email.council.agenda.invitation.subject");
-        body = customMessage;
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
@@ -332,7 +362,6 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
-                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
                 LocaleContextHolder.getLocale());
     }
@@ -350,7 +379,6 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
-                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
                 LocaleContextHolder.getLocale());
     }
@@ -380,7 +408,6 @@ public class CouncilSmsAndEmailService {
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
-                        String.valueOf(councilMeeting.getCommitteeType().getName()),
                         String.valueOf(councilMeeting.getMeetingLocation()) },
                 LocaleContextHolder.getLocale());
     }
@@ -403,12 +430,29 @@ public class CouncilSmsAndEmailService {
     
     public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,
             final String emailSubject, final byte[] attachment, String fileType, String fileName) {
+		/*
+		 * if(!StringUtils.isBlank(fileType) && !StringUtils.isBlank(fileName)) {
+		 * notificationService.sendEmailWithAttachment(email, emailSubject, emailBody,
+		 * fileType, fileName, attachment); }else {
+		 * notificationService.sendEmailWithAttachment(email, emailSubject, emailBody,
+		 * "application/rtf", AGENDAATTACHFILENAME, attachment); }
+		 */
         if(!StringUtils.isBlank(fileType) && !StringUtils.isBlank(fileName)) {
-        	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, fileType, fileName,
+        	try {
+				notificationService.sendEmailWithAttachmentNew(email, emailSubject, emailBody, fileType, fileName,
                     attachment);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }else {
-        	notificationService.sendEmailWithAttachment(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
+        	try {
+				notificationService.sendEmailWithAttachmentNew(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
                     attachment);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
         }
     }
 

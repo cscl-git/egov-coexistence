@@ -237,6 +237,7 @@ public class PaymentAction extends BasePaymentAction {
     private List<Bankbranch> bankBranchList = new ArrayList<Bankbranch>();
     private String firstsignatory="-1";
     private String secondsignatory="-1";
+    private String backlogEntry="";
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
    
     @Autowired
@@ -582,19 +583,26 @@ public class PaymentAction extends BasePaymentAction {
                                                                                                    // financial
                                                                                                    // expense
                                                                                                    // bills
-            final String cBillSql = cBillmainquery + " and bill.status in (?) " + sql.toString()
+            final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
+            final String cBillSql = cBillmainquery + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
-            final String cBillSql1 = cBillmainquery1 + " and bill.status in (?) " + sql.toString()
+            final String cBillSql1 = cBillmainquery1 + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
-            contingentBillList = getPersistenceService()
-                    .findPageBy(cBillSql, 1, 1000, FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus)
-                    .getList();
-            if (contingentBillList != null)
-                contingentBillList.addAll(getPersistenceService().findPageBy(cBillSql1, 1, 1000,
-                        FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus).getList());
-            else
-                contingentBillList = getPersistenceService().findPageBy(cBillSql1, 1, 1000,
-                        FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus).getList();
+            try
+            {
+            	contingentBillList = getPersistenceService()
+                        .findPageBy(cBillSql, 1, 1000, FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)
+                        .getList();
+                if (contingentBillList != null)
+                    contingentBillList.addAll(getPersistenceService().findPageBy(cBillSql1, 1, 1000,
+                            FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT).getList());
+                else
+                    contingentBillList = getPersistenceService().findPageBy(cBillSql1, 1, 1000,
+                            FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT).getList();
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+            
             final Set<EgBillregister> tempBillList = new LinkedHashSet<EgBillregister>(contingentBillList);
             contingentBillList.clear();
             contingentBillList.addAll(tempBillList);
@@ -1061,6 +1069,9 @@ public class PaymentAction extends BasePaymentAction {
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
+            String backLogArr[]=new String[1];
+            backLogArr[0]=backlogEntry;
+            parameters.put("backlogEntry", backLogArr);
             paymentheader = paymentService.createPayment(parameters, billList, billregister, workflowBean,firstsignatory,secondsignatory);
             miscBillList = paymentActionHelper.getPaymentBills(paymentheader);
             if(miscBillList!=null)
@@ -2615,6 +2626,14 @@ public List<HashMap<String, Object>> getWorkflowHistory() {
 
 public void setWorkflowHistory(List<HashMap<String, Object>> workflowHistory) {
 	this.workflowHistory = workflowHistory;
+}
+
+public String getBacklogEntry() {
+	return backlogEntry;
+}
+
+public void setBacklogEntry(String backlogEntry) {
+	this.backlogEntry = backlogEntry;
 }
 
 

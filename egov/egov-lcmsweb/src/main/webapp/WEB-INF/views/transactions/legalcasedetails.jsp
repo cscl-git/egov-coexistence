@@ -87,6 +87,9 @@
 			<form:option value="">
 				<spring:message code="lbls.select" />
 			</form:option>
+			<!-- //Edited by me.. -->
+			<form:options items="${petitiontypeList}" itemValue="id"
+								itemLabel="petitionType" />
 		</form:select>
 		<form:errors path="petitionTypeMaster" cssClass="add-margin error-msg" />
 	</div>

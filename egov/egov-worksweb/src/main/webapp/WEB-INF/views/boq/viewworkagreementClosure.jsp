@@ -212,7 +212,7 @@
 		<br>
 		<br>
 		<br>
-		
+		<c:if test="${workOrderAgreement.milestonestatus == 'Yes' }">
 		
 <div class="panel panel-primary" data-collapsed="0"
 			style="scrollable: true;">
@@ -263,11 +263,12 @@
 		</tbody>
 	</table>
 </div>			
-			
-			
 	</c:if>		
 			
+			
+			
 </div>
+</c:if>
 
 		<!-- ========================code end=========== -->
 

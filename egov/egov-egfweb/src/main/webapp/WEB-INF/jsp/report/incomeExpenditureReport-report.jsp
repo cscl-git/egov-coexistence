@@ -230,7 +230,7 @@ th.bluebgheadtd {
 					<td class="bluebox"><s:text name="report.department" />:</td>
 					<td class="bluebox"><s:select name="department"
 							id="department" list="dropdownData.departmentList" listKey="code"
-							listValue="name" headerKey="null" headerValue="%{getText('lbl.choose.options')}"
+							listValue="name" headerKey="" headerValue="%{getText('lbl.choose.options')}"
 							value="model.department.code" /></td>
 					
 					<%-- <td class="bluebox"><s:text name="report.fund" />:</td>

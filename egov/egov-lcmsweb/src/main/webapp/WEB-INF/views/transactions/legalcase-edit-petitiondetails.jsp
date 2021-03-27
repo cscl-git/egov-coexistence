@@ -90,7 +90,7 @@
 					class="form-control table-input text-left"
 					id="bipartisanPetitionerDetailsList[${status.index}].name"
 					name="bipartisanPetitionerDetailsList[${status.index}].name"
-					value="${bipartisanPetitionerDetailsList.name}" maxlength="50"
+					value="${bipartisanPetitionerDetailsList.name}" maxlength="250"  <!-- (Edited By Me) -->
 					required="required" /></td>
 
 				<td class="text-right"><input type="text"

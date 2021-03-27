@@ -16,14 +16,18 @@ import org.egov.eis.service.DesignationService;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqNewDetails;
 import org.egov.works.boq.entity.PaymentDistribution;
 import org.egov.works.boq.entity.WorkOrderAgreement;
+import org.egov.works.boq.entity.WorkOrderAgreementRESTPOJO;
+import org.egov.works.boq.repository.BoqNewDetailsRepository;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -42,6 +46,8 @@ public class BoQDetailsService {
 	@Autowired
 	private WorkOrderAgreementRepository workOrderAgreementRepository;
 	@Autowired
+private BoqNewDetailsRepository boqNewDetailsRepository;
+	@Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
 	
 	@Autowired
@@ -55,16 +61,20 @@ public class BoQDetailsService {
 	private DocumentUploadRepository documentUploadRepository;
 	@Autowired
     private DesignationService designationService;
+	@Autowired
+	protected MicroserviceUtils microserviceUtils;
 	
 
 	@Transactional
 	public WorkOrderAgreement saveBoQDetailsData(HttpServletRequest request, WorkOrderAgreement workOrderAgreement,Long approvalPosition,String approvalComment,String approvalDesignation,String workFlowAction) {
 		// TODO Auto-generated method stub
 		List<BoQDetails> list = new ArrayList<BoQDetails>();
+		//edited
+		if(workOrderAgreement.getBoQDetailsList()!=null) {
 		for (BoQDetails boq : workOrderAgreement.getBoQDetailsList()) {
 			boq.setWorkOrderAgreement(workOrderAgreement);
 			list.add(boq);
-		}
+		}}
 		List<PaymentDistribution> PaymentDistributionlist = new ArrayList<PaymentDistribution>();
 		for (PaymentDistribution boq : workOrderAgreement.getPaymentDistribution()) {
 			boq.setWorkOrderAgreement(workOrderAgreement);
@@ -182,6 +192,32 @@ public class BoQDetailsService {
 
 		return saveBoqDetails;
 	}
+	@Transactional
+	public BoqNewDetails viewBoqData(Long id) {
+		// TODO Auto-generated method stub
+
+		
+		BoqNewDetails viewboqNewDetails = boqNewDetailsRepository.findById(id);
+		
+		return viewboqNewDetails;
+	}
+	@Transactional
+	public Boolean updateBoqData(BoqNewDetails boqNewDetails) {
+		// TODO Auto-generated method stub
+		
+		boqNewDetailsRepository.updateById(boqNewDetails.getId(),boqNewDetails.getItem_description(), boqNewDetails.getRef_dsr(),boqNewDetails.getUnit(),boqNewDetails.getRate());
+		
+		return true;
+	}
+	@Transactional
+	public BoqNewDetails saveNewBoqData(HttpServletRequest request, BoqNewDetails boqNewDetails) {
+		// TODO Auto-generated method stub
+
+		
+		boqNewDetailsRepository.save(boqNewDetails);
+		
+		return boqNewDetails;
+	}
 
 	@Transactional
 	public List<WorkOrderAgreement> searchclosure(HttpServletRequest request, WorkOrderAgreement workOrderAgreement) {
@@ -228,7 +264,7 @@ public class BoQDetailsService {
                     null, additionalRule, "NEW", null);
         	savedWorkOrderAgreement.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
@@ -242,7 +278,7 @@ public class BoQDetailsService {
         	String statetype="Pending With "+designation.getName().toUpperCase();
         	savedWorkOrderAgreement.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("Works Agreement")
             .withCreatedBy(user.getId())
@@ -260,7 +296,7 @@ public class BoQDetailsService {
         		String statetype="Pending With "+designation.getName().toUpperCase();
             	savedWorkOrderAgreement.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement")
                 .withCreatedBy(user.getId())
@@ -272,7 +308,7 @@ public class BoQDetailsService {
                         null, additionalRule, "SaveAsDraft", null);
             	savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
         	}
@@ -281,7 +317,7 @@ public class BoQDetailsService {
         		String statetype="Pending With "+designation.getName().toUpperCase();
         		savedWorkOrderAgreement.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("Works Agreement");
 
@@ -350,6 +386,20 @@ public class BoQDetailsService {
 		return savedWorkOrderAgreement;
 
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 
+	public List<WorkOrderAgreementRESTPOJO>getAllWorkOrderAgreementRest(){
+		List<WorkOrderAgreementRESTPOJO> w=null;
+		try {
+			w=workOrderAgreementRepository.getAllWorkOrderAgreement();
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return w;
+	}
 
 }

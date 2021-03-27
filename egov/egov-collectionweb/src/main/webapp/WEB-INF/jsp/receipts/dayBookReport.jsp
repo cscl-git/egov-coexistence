@@ -226,8 +226,9 @@ function downloadExcel()
 	var service=document.getElementById('serviceTypeIdforExcel').value;
 	var dept=document.getElementById('deptId').value;
 	var subdivison=document.getElementById('subdivison').value;
+	var receiptType=document.getElementById('receiptType').value;
 
-	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeDuringDownload="+service+"&deptId="+dept+"&subdivison="+subdivison;
+	document.searchReceiptForm.action="searchReceipt-downloadDayBookReport.action?fromDate="+fromDate+"&toDate="+toDate+"&serviceTypeDuringDownload="+service+"&deptId="+dept;
 	document.searchReceiptForm.submit();
 }
 
@@ -604,8 +605,12 @@ function onBodyLoad(){
 							headerValue="----Choose----" name="subdivison" id="subdivison"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivison}"/></td>
 	    
 	    
-	    <td width="21%" class="bluebox2">&nbsp;</td>
-		  <td width="24%" class="bluebox2">&nbsp;</td>
+	    <td width="21%" class="bluebox2"><s:text name="misc.receipt.type"/></td>
+		  <td width="24%" class="bluebox2"><s:select name="receiptType"
+							headerKey="-1" headerValue="Select"
+							value="%{receiptType}"
+							list="#{'NEW':'NEW' ,'DEPOSITED':'DEPOSITED' ,'CANCELLED':'CANCELLED'}"
+							id="receiptType" /></td>
 	    
 	    </tr>	    
 	 <%--    <tr>
@@ -698,6 +703,7 @@ function onBodyLoad(){
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Remitance No." style="width:16%;text-align:left" property="referencenumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bank Account No." style="width:12%;text-align:left" property="bankAccountNumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Deposit Amount." style="width:27%;text-align:left" property="depositAmount" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Status" style="width:27%;text-align:left" property="curretnStatus" />
 
 
 

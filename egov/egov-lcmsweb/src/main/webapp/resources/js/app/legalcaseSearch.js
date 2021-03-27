@@ -143,9 +143,9 @@ function submitForm() {
 							"className" : "text-left"
 						},
 						{
-							title : 'Actions',
+							"sTitle" : "Actions",
 							"className" : "text-right",
-							render : function(data, type, full) {
+							"render" : function(data, type, full) {
 								if(full.legalViewAccess)
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option></select>');
 

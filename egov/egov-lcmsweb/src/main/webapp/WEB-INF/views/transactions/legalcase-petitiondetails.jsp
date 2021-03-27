@@ -326,13 +326,32 @@
 	</div>
 
 	<label class="col-sm-2 control-label text-right" id="persons">
-		<spring:message
-			code="lbl.standingcounselname" />:</label>
+		<spring:message code="lbl.standingcounselname" />:<span class="mandatory"></span>
+	</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
 		<form:input class="form-control patternvalidation"
 			data-pattern="string" maxlength="50" id="oppPartyAdvocate"
-			path="oppPartyAdvocate" />
+			path="oppPartyAdvocate" required="required" />
 		<form:errors path="oppPartyAdvocate" cssClass="add-margin error-msg" />
+	</div>
+
+</div>
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right" id="persons">Def.Counsel
+		Phone No:<span class="mandatory"></span></label>
+	<div class="col-sm-3 add-margin" id="personsdiv">
+		<form:input class="form-control patternvalidation"
+			data-pattern="number" maxlength="10" id="counselPhoneNo" path="counselPhoneNo"
+			required="required" placeholder="Mobile No."/>
+		
+	</div>
+	<label class="col-sm-2 control-label text-right" id="persons">
+		Def.Councel Email ID:<span class="mandatory"></span></label>
+	<div class="col-sm-3 add-margin">
+		<form:input path="counselEmailNo" class="form-control text-left patternvalidation"
+			data-pattern="alphanumericwithspecialcharacters" maxlength="64"
+			placeholder="abc@xyz.com" />
+		
 	</div>
 
 </div>

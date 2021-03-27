@@ -90,7 +90,13 @@ public class LegalCaseDocument {
 
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String officerIncharge;
-
+    
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String concernedDepartment;
+    
+    @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
+    private String concernedBranch;
+    
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = ES_DATE_FORMAT_WITHOUT_TS, timezone = DEFAULT_TIMEZONE)
     @Field(type = FieldType.Date, format = DateFormat.date_optional_time, pattern = ES_DATE_FORMAT_WITHOUT_TS)
     private Date caseDate;
@@ -135,6 +141,8 @@ public class LegalCaseDocument {
 
     @Field(type = FieldType.String, index = FieldIndex.not_analyzed)
     private String advocateName;
+    
+    
 
     @Field(type = FieldType.Boolean)
     private boolean seniorAdvocate;
@@ -301,7 +309,8 @@ public class LegalCaseDocument {
     public void setOfficerIncharge(final String officerIncharge) {
         this.officerIncharge = officerIncharge;
     }
-
+    
+	
     public Date getCaseDate() {
         return caseDate;
     }
@@ -493,6 +502,21 @@ public class LegalCaseDocument {
     public void setCaDueDate(final Date caDueDate) {
         this.caDueDate = caDueDate;
     }
+    public String getConcernedDepartment() {
+		return concernedDepartment;
+	}
+
+	public void setConcernedDepartment(String concernedDepartment) {
+		this.concernedDepartment = concernedDepartment;
+	}
+
+	public String getConcernedBranch() {
+		return concernedBranch;
+	}
+
+	public void setConcernedBranch(String concernedBranch) {
+		this.concernedBranch = concernedBranch;
+	}
 
     public static Builder builder() {
         return new Builder();
@@ -510,6 +534,9 @@ public class LegalCaseDocument {
         private Date caseReceivingDate;
         private String previousCaseNumber;
         private String officerIncharge;
+        private String concernedBranch;
+        private String concernedDepartment;
+        private String advocateName;
         private Date nextDate;
         private Boolean filedByULB;
         private String status;
@@ -582,7 +609,21 @@ public class LegalCaseDocument {
             this.officerIncharge = officerIncharge;
             return this;
         }
-
+        public Builder withConcernedBranch(final String concernedBranch) {
+            this.concernedBranch = concernedBranch;
+            return this;
+        }
+        
+        public Builder withConcernedDepartment(final String concernedDepartment) {
+            this.concernedDepartment = concernedDepartment;
+            return this;
+        }
+        
+        public Builder withAdvocateName(final String advocateName) {
+            this.advocateName = advocateName;
+            return this;
+        }
+        
         public Builder withNextDate(final Date nextDate) {
             this.nextDate = nextDate;
             return this;
@@ -673,6 +714,9 @@ public class LegalCaseDocument {
             legalCaseIndex.setFiledByULB(filedByULB);
             legalCaseIndex.setNextDate(nextDate);
             legalCaseIndex.setOfficerIncharge(officerIncharge);
+            legalCaseIndex.setConcernedBranch(concernedBranch);
+            legalCaseIndex.setConcernedDepartment(concernedDepartment);
+            legalCaseIndex.setAdvocateName(advocateName);
             legalCaseIndex.setStatus(status);
             legalCaseIndex.setSubStatus(subStatus);
             legalCaseIndex.setPetitionerNames(petitionerNames);
@@ -689,4 +733,8 @@ public class LegalCaseDocument {
         }
 
     }
+
+	
+
+	
 }

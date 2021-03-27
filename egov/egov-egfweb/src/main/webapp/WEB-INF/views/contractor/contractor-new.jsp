@@ -58,6 +58,7 @@
 					 <div class="panel-title"><spring:message code="title.contractor.create" text="Contractor Master"/></div>
 				</div>
 			    <%@ include file="contractor-form.jsp"%>
+			    <jsp:include page="billdocument-upload.jsp"/>
 			    <div class="form-group">
 			      <div class="text-center">
 			        <button type='submit' class='btn btn-primary' id="buttonSubmit"> <spring:message code='lbl.create' text="Create"/> </button>

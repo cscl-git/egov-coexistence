@@ -473,9 +473,8 @@ public class IncomeExpenditureService extends ReportService {
         if (incomeExpenditureStatement.getFund() != null && incomeExpenditureStatement.getFund().getId() != null
                 && incomeExpenditureStatement.getFund().getId() != 0)
             queryStr.append(" and bd.fund=" + incomeExpenditureStatement.getFund().getId());
-        if (incomeExpenditureStatement.getDepartment() != null && !"null".equals(incomeExpenditureStatement.getDepartment().getCode())){
-            Department dept =this.microserviceUtils.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
-            queryStr.append(" and bd.executing_department=" + dept.getId());
+        if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null && !incomeExpenditureStatement.getDepartment().getCode().isEmpty()){
+            queryStr.append(" and bd.executing_department='" + incomeExpenditureStatement.getDepartment().getCode()+"' ");
         }
         if (incomeExpenditureStatement.getFunction() != null && incomeExpenditureStatement.getFunction().getId() != null
                 && incomeExpenditureStatement.getFunction().getId() != 0)
@@ -508,9 +507,8 @@ public class IncomeExpenditureService extends ReportService {
         if (incomeExpenditureStatement.getFund() != null && incomeExpenditureStatement.getFund().getId() != null
                 && incomeExpenditureStatement.getFund().getId() != 0)
             queryStr.append(" and bd.fund=" + incomeExpenditureStatement.getFund().getId());
-        if (incomeExpenditureStatement.getDepartment() != null && !"null".equals(incomeExpenditureStatement.getDepartment().getCode())){
-            Department dept =this.microserviceUtils.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
-            queryStr.append(" and bd.executing_department=" + dept.getId());
+        if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null &&  !incomeExpenditureStatement.getDepartment().getCode().isEmpty()){
+            queryStr.append(" and bd.executing_department='" + incomeExpenditureStatement.getDepartment().getCode()+"' ");
         }
         if (incomeExpenditureStatement.getFunction() != null && incomeExpenditureStatement.getFunction().getId() != null
                 && incomeExpenditureStatement.getFunction().getId() != 0)

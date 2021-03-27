@@ -124,16 +124,31 @@ public class JournalVoucherActionHelper {
 			CVoucherHeader voucherHeader, VoucherTypeBean voucherTypeBean, WorkflowBean workflowBean) {
 		// TODO Auto-generated method stub
         try {
+        	LOGGER.info("Name ::: "+voucherTypeBean.getVoucherName());
+        	LOGGER.info("Type ::: "+voucherTypeBean.getVoucherType());
+        	LOGGER.info("Sub -Type ::: "+voucherTypeBean.getVoucherSubType());
             voucherHeader.setName(voucherTypeBean.getVoucherName());
-            voucherHeader.setType(voucherTypeBean.getVoucherType());
+            if("Receipt Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName()))
+            {
+            	voucherHeader.setType("Receipt");
+            	voucherHeader.setVoucherSubType(voucherTypeBean.getVoucherSubType());
+            }
+            else
+            {
+            	voucherHeader.setType(voucherTypeBean.getVoucherType());
+            }
             voucherHeader.setVoucherSubType(voucherTypeBean.getVoucherSubType());
            
             voucherHeader = createVoucherAndledger(billDetailslist, subLedgerlist, voucherHeader);
-            if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
+            if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName()) && !"Receipt Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug(" Journal Voucher Action | Bill create | voucher name = " + voucherTypeBean.getVoucherName());
                 voucherService.createBillForVoucherSubType(billDetailslist, subLedgerlist, voucherHeader, voucherTypeBean,
                         new BigDecimal(voucherTypeBean.getTotalAmount()));
+            }
+            else
+            {
+            	voucherService.updateSourcePathForGJV(voucherHeader);
             }
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
                     && voucherHeader.getState() == null) {
@@ -351,6 +366,7 @@ public class JournalVoucherActionHelper {
         headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
         headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
         headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
+        headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());
         if (voucherHeader.getFundId() != null)

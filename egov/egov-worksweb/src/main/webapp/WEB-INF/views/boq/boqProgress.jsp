@@ -87,6 +87,7 @@
 									<th><spring:message code="lbl.intended.date" /></th>
 									<th><spring:message code="lbl.amount" /></th>
 									<th><spring:message code="lbl.works.status" /></th>
+									<th>Milestone Status</th>
 
 								</tr>
 							</thead>
@@ -126,6 +127,10 @@
 													path="workOrderList[${status.index}].statusDescp"
 													id="workOrderList[${status.index}].statusDescp" />
 												${result.statusDescp }</td>
+												<td><form:hidden
+													path="workOrderList[${status.index}].milestonestatus"
+													id="workOrderList[${status.index}].milestonestatus" />
+												${result.milestonestatus }</td>
 										</tr>
 									</c:forEach>
 								<tbody>

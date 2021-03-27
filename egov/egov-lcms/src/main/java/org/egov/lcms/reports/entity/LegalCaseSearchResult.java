@@ -47,9 +47,9 @@
  */
 package org.egov.lcms.reports.entity;
 
-import org.egov.lcms.transactions.entity.LegalCase;
-
 import java.util.Date;
+
+import org.egov.lcms.transactions.entity.LegalCase;
 
 public class LegalCaseSearchResult {
     private String caseNumber;
@@ -79,6 +79,7 @@ public class LegalCaseSearchResult {
     private String fromDate;
     private String toDate;
     private Boolean legalViewAccess=false;
+    private String judgmentType;
 
     public String getFromDate() {
         return fromDate;
@@ -295,6 +296,18 @@ public class LegalCaseSearchResult {
     public void setLegalViewAccess(Boolean legalViewAccess) {
         this.legalViewAccess = legalViewAccess;
     }
+
+	public String getJudgmentType() {
+		return judgmentType;
+	}
+
+	public void setJudgmentType(String judgmentType) {
+		this.judgmentType = judgmentType;
+	}
+
+	
+
+	
 
    
 }

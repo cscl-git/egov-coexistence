@@ -159,6 +159,13 @@ public class PersistenceService<T, ID extends Serializable> {
 		final Query q = getQueryWithParams(query, params);
 		return q.list();
 	}
+	public void deleteAllBy(final String query, final Object... params) {
+		final Query q=getQueryWithParams(query, params);
+		
+		int de = q.executeUpdate();
+		//System.out.println("++++++++++++++"+de+"++++++++++++++++++++++++");
+		
+	}
 
 	/**
 	 * @param query

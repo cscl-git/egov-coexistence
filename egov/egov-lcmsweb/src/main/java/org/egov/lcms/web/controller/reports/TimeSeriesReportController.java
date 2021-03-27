@@ -89,6 +89,8 @@ public class TimeSeriesReportController {
         aggregatedByList.add(LcmsConstants.COURTTYPE);
         aggregatedByList.add(LcmsConstants.OFFICERINCHRGE);
         aggregatedByList.add(LcmsConstants.STANDINGCOUNSEL);
+        aggregatedByList.add(LcmsConstants.CONCERNEDBRANCH);
+        aggregatedByList.add(LcmsConstants.CONCERNEDDEPARTMENT);
         return aggregatedByList;
     }
 

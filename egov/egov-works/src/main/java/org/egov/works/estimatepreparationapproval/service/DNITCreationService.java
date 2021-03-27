@@ -17,6 +17,7 @@ import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -45,6 +46,9 @@ public class DNITCreationService {
 
 	@Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
+	
+	@Autowired
+	protected MicroserviceUtils microserviceUtils;
 	@Autowired
 	DNITCreationRepository dNITCreationRepository;
 	
@@ -91,6 +95,11 @@ public class DNITCreationService {
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
 		}
+		//edited
+		else if ((workFlowAction.equalsIgnoreCase("Forward/Reassign") )&& dNITCreation.getStatus().getCode().equals("Approved"))
+		{
+			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
+		}
 		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& dNITCreation.getStatus().getCode().equals("Pending for Approval"))
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
@@ -99,6 +108,8 @@ public class DNITCreationService {
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Approved"));
 		}
+		
+		
 		
 		DNITCreation savedDNITCreation = dNITCreationRepository
 				.save(dNITCreation);
@@ -223,7 +234,7 @@ public class DNITCreationService {
                     null, additionalRule, "NEW", null);
         	estimatePreparationApproval.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("DNIT")
             .withCreatedBy(user.getId())
@@ -237,7 +248,7 @@ public class DNITCreationService {
         	String statetype="Pending With "+designation.getName().toUpperCase();
         	estimatePreparationApproval.transition().start().withSenderName(user.getUsername() + "::" + user.getName())
             .withComments(approvalComent)
-            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+            .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
             .withNextAction(wfmatrix.getNextAction())
             .withNatureOfTask("DNIT")
             .withCreatedBy(user.getId())
@@ -253,7 +264,7 @@ public class DNITCreationService {
                         null, additionalRule, "SaveAsDraft", null);
             	estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue("SaveAsDraft").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("DNIT");
         	}
@@ -262,7 +273,7 @@ public class DNITCreationService {
         		String statetype="Pending With "+designation.getName().toUpperCase();
         		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
-                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos)
+                .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                 .withNextAction(wfmatrix.getNextAction())
                 .withNatureOfTask("DNIT");
         		
@@ -378,4 +389,9 @@ public class DNITCreationService {
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
 		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 }

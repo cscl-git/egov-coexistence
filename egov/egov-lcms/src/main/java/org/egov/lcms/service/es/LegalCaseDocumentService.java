@@ -112,6 +112,9 @@ public class LegalCaseDocumentService {
                     .withRespondantNames(legalCase.getRespondantNames()).withNextDate(legalCase.getNextDate())
                     .withPreviousCaseNumber(legalCase.getAppealNum() == null ? "" : legalCase.getAppealNum())
                     .withOfficerIncharge(legalCase.getOfficerIncharge() == null ? "" : legalCase.getOfficerIncharge().getName())
+                    .withConcernedBranch(((legalCase.getConcernedBranch() == null) || (legalCase.getConcernedBranch() !=null && legalCase.getConcernedBranch().getConcernedBranch() == null)) ? "" : legalCase.getConcernedBranch().getConcernedBranch())
+                    .withAdvocateName(legalCase.getOppPartyAdvocate() == null ? "" : legalCase.getOppPartyAdvocate())
+                    .withConcernedDepartment(legalCase.getNodalOfficerDepartment() == null ? "":legalCase.getNodalOfficerDepartment())
                     .withSubStatus(legalCase.getReportStatus() ==null ? "" : legalCase.getReportStatus().getName())
                     .withPwrDueDate((legalCase.getPwrList() != null && !legalCase.getPwrList().isEmpty())?legalCase.getPwrList().get(0).getPwrDueDate():null)
                     .withCaDueDate((legalCase.getPwrList() != null && !legalCase.getPwrList().isEmpty())?legalCase.getPwrList().get(0).getCaDueDate():null)
@@ -143,6 +146,9 @@ public class LegalCaseDocumentService {
         legalCaseDocument.setFiledByULB((null==legalCase.getIsFiledByCorporation())?false:legalCase.getIsFiledByCorporation());
         legalCaseDocument.setNextDate(legalCase.getNextDate());
         legalCaseDocument.setOfficerIncharge(legalCase.getOfficerIncharge() == null ? "" : legalCase.getOfficerIncharge().getName());
+        legalCaseDocument.setConcernedBranch(((legalCase.getConcernedBranch() == null) || (legalCase.getConcernedBranch() !=null && legalCase.getConcernedBranch().getConcernedBranch() == null)) ? "" : legalCase.getConcernedBranch().getConcernedBranch());
+        legalCaseDocument.setConcernedDepartment(legalCase.getNodalOfficerDepartment() == null ? "" : legalCase.getNodalOfficerDepartment());
+        legalCaseDocument.setAdvocateName(legalCase.getOppPartyAdvocate() == null ? "" : legalCase.getOppPartyAdvocate());
         legalCaseDocument.setPetitionerNames(legalCase.getPetitionersNames());
         legalCaseDocument.setRespondantNames(legalCase.getRespondantNames());
         legalCaseDocument.setPreviousCaseNumber(legalCase.getAppealNum() == null ? "" : legalCase.getAppealNum());
@@ -154,7 +160,6 @@ public class LegalCaseDocumentService {
             legalCaseDocument.setCaDueDate(legalCase.getPwrList().get(0).getCaDueDate());
         }
         if (legalCase.getLegalCaseAdvocates() != null && !legalCase.getLegalCaseAdvocates().isEmpty()) {
-            legalCaseDocument.setAdvocateName(legalCase.getLegalCaseAdvocates().get(0).getAdvocateMaster().getName());
             legalCaseDocument.setSeniorAdvocate(
                     legalCase.getLegalCaseAdvocates().get(0).getAdvocateMaster().getIsSenioradvocate());
         }

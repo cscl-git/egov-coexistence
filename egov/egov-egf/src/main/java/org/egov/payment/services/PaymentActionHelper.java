@@ -51,6 +51,7 @@ package org.egov.payment.services;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -320,6 +321,22 @@ public class PaymentActionHelper {
         {
             paymentService.transitionWorkFlow(paymentheader, workflowBean);
             paymentService.applyAuditing(paymentheader.getState());
+        }
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        Date currentDate = calendar.getTime(); 
+        CVoucherHeader voucherHeader =null;
+        if(workflowBean.getWorkFlowAction().equals("Approve"))
+        {
+        	voucherHeader = paymentheader.getVoucherheader();
+        	if(voucherHeader!= null && voucherHeader.getBackdateentry() != null && voucherHeader.getBackdateentry().equalsIgnoreCase("N"))
+        	{
+        		voucherHeader.setVoucherDate(currentDate);
+        		paymentheader.setVoucherheader(voucherHeader);
+        	}
         }
         paymentService.persist(paymentheader);
         if(workflowBean.getWorkFlowAction().equals("Approve"))
@@ -640,6 +657,10 @@ public class PaymentActionHelper {
         if(voucherHeader.getSecondsignatory() != null && !voucherHeader.getSecondsignatory().isEmpty() && !voucherHeader.getSecondsignatory().equalsIgnoreCase("-1"))
         {
         	headerdetails.put("secondsignatory", voucherHeader.getSecondsignatory());
+        }
+        if(voucherHeader.getBackdateentry() != null && !voucherHeader.getBackdateentry().isEmpty() && !voucherHeader.getBackdateentry().equalsIgnoreCase("-1"))
+        {
+        	headerdetails.put("backdateentry", voucherHeader.getBackdateentry());
         }
         if (voucherHeader.getVouchermis().getDepartmentcode() != null)
             headerdetails.put(VoucherConstant.DEPARTMENTCODE,voucherHeader.getVouchermis().getDepartmentcode());

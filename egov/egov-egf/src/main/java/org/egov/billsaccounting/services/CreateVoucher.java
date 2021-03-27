@@ -1598,6 +1598,11 @@ public class CreateVoucher {
 			{
 				cVoucherHeader.setSecondsignatory(headerdetails.get("secondsignatory").toString());
 			}
+			if(headerdetails.containsKey("backdateentry")
+					&& null != headerdetails.get("backdateentry"))
+			{
+				cVoucherHeader.setBackdateentry(headerdetails.get("backdateentry").toString());
+			}
 			// -- Voucher Type checking. --START
 			if (FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL.equalsIgnoreCase(voucherType))
 				vNumGenMode = voucherTypeForULB.readVoucherTypes("Journal");

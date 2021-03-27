@@ -47,7 +47,23 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.notification.service.NotificationService;
 import org.egov.lcms.transactions.entity.Hearings;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.HearingsService;
@@ -63,25 +79,29 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.ParseException;
-import java.util.List;
-
 @Controller
 @RequestMapping(value = "/hearing")
 public class HearingsController {
     
     private static final String HEARINGS = "hearings";
-
+    private static final String ROLE_MEETING_SENIOR_OFFICER = "LEGAL_NODAL_OFFICER";
     @Autowired
     private HearingsService hearingsService;
     
     @Autowired
     MicroserviceUtils microserviceUtils;
 
+    
     @Autowired
     private LegalCaseService legalCaseService;
+    
+    @Autowired
+    private AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+    private NotificationService notificationService;
+    
+    
     
     @RequestMapping(value = "/new/", method = RequestMethod.GET)
     public String newForm(@ModelAttribute("hearings") final Hearings hearings, final Model model,
@@ -111,6 +131,11 @@ public class HearingsController {
         }
         hearings.setLegalCase(legalCase);
         hearingsService.persistHearings(hearings);
+        
+        Boolean hearingsmsStatus=sendSmsAndEmailDetailsForAgendaInvitation(hearings, lcNumber);
+        if(hearingsmsStatus) {
+        	System.out.println("+++++++++++++++++++++++++++Sms Sent Successfully..++++++++++++++++++++++++++++++++");
+        }
         redirectAttrs.addFlashAttribute(HEARINGS, hearings);
         model.addAttribute("message", "Hearing created successfully.");
         model.addAttribute(LcmsConstants.MODE, "create");
@@ -122,6 +147,7 @@ public class HearingsController {
             @Valid @ModelAttribute final Hearings hearings, final HttpServletRequest request) {
         final LegalCase legalCase = getLegalCase(lcNumber, request);
         final List<Hearings> hearingsList = hearingsService.findByLCNumber(lcNumber);
+        
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
         model.addAttribute("lcNumber", legalCase.getLcNumber());
         model.addAttribute("hearingsId", legalCase.getHearings());
@@ -130,4 +156,146 @@ public class HearingsController {
         model.addAttribute("hearingsList", hearingsList);
         return "hearings-list";
     }
+    
+    
+    //SMS and Email Service
+    public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Hearings hearings, final String lcNumber) {
+    	final LegalCase legalCase =legalCaseService.findByLcNumber(lcNumber);
+          boolean successStatus=false;
+    final String msg="Dear Member,\r\n" + 
+    			"This is to inform you that hearing for Court Type-" +legalCase.getCourtMaster().getName()+" has been scheduled on Date-"+legalCase.getNextDate() +"\r\n" + 
+    			"Thanks & Regards\r\n" + 
+    			"Legal Branch";
+            	
+            
+        try {
+        	//System.out.println("+++++++++++"+msg+"+++++++++++++++++");
+        	Boolean status=sendSmsForAgendaInvitation(msg,legalCase);
+        	if(status) {
+        		successStatus=true;
+        	}
+        }catch(Exception e) {
+        	//LOGGER.error("Unable to send SMS to for agenda invitation ");
+        	System.out.println("+++++++++++++Unable to send SMS to for agenda invitation+++++++++");
+        }
+            
+        
+		/*
+		 * try {
+		 * 
+		 * boolean emailStatus=sendEmailForAgendaInvitation(msg,legalCase);
+		 * if(emailStatus) { //System.out.
+		 * println("++++++++++++++++++++++++++email Sent Successfully+++++++++++++++++++"
+		 * ); } } catch (Exception e) {
+		 * //LOGGER.error("Error in sending email for agenda invitation",e);
+		 * 
+		 * }
+		 */
+	        
+       
+        
+        
+        
+        return successStatus;
+    }
+    //------------------------------------------------EMAIL-------------------------------------------------------------------
+    
+    public Boolean sendEmailForAgendaInvitation(String customMessage,LegalCase legalCase) {
+        Boolean emailEnabled = true;
+        Boolean emailStatus=false;
+        if (emailEnabled) {
+        	try {
+	            List<User> listOfUsers = getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getEmailId() != null) {
+	                	buildEmailForAgendaInvitation(user.getUserName(), user.getEmailId(), customMessage);
+	                	if(legalCase.getCounselEmailNo()!=null && !legalCase.getCounselEmailNo().equalsIgnoreCase("0") && !legalCase.getCounselEmailNo().isEmpty()) {
+	                		buildEmailForAgendaInvitation(legalCase.getOppPartyAdvocate(), legalCase.getCounselEmailNo(), customMessage);
+	                		
+	                	}
+	                }
+	                emailStatus=true;
+	            }
+	        }catch(Exception e) {
+	        	//LOGGER.error("Unable to send EMAIL to agenda invitation");
+	        }
+        }
+        return emailStatus;
+    }
+    
+    
+    public void buildEmailForAgendaInvitation(final String userName, final String email,
+            final String customMessage) {
+        String body = customMessage;
+        String subject;
+        subject = "Updated Hearring date";
+        body = customMessage;
+        //System.out.println(customMessage);
+        if (email != null && body != null)
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject);
+    }
+    
+    public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody, final String emailSubject) {
+        if(!StringUtils.isBlank(email) && !StringUtils.isBlank(emailBody)) {
+        	notificationService.sendEmail(email, emailSubject, emailBody);
+        	
+        }else {
+        	System.out.println("++++++++Email not Sent+++++++");
+        }
+    }
+
+    
+    //-----------------------------------------------SMS----------------------------------------------------------------
+    public Boolean sendSmsForAgendaInvitation(String customMessage,LegalCase legalCase) {
+        Boolean smsEnabled = true;
+         Boolean smsStatus=false;
+        if (smsEnabled) {
+            try {
+	            List<User> listOfUsers = getUserListForAgendaInvitation();
+	            for (User user : listOfUsers) {
+	                if (user.getMobileNumber() != null) {
+	                	
+	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage);
+	                	if(legalCase.getCounselPhoneNo()!=null && legalCase.getCounselPhoneNo()!="0") {
+	                		buildSmsForAgendaInvitation(legalCase.getOppPartyAdvocate(), legalCase.getCounselPhoneNo(), customMessage);
+	                	}
+	                }
+	                smsStatus=true;
+	            }
+            }catch(Exception e) {
+            	System.out.println("Unable to send Legal");
+            }
+        }
+        return smsStatus;
+    }
+    
+
+    private Boolean getAppConfigValueByPassingModuleAndType(String moduleName, String sendsmsoremail) {
+        final List<AppConfigValues> appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(moduleName,
+                sendsmsoremail);
+
+        return "YES".equalsIgnoreCase(
+                appConfigValue != null && !appConfigValue.isEmpty() ? appConfigValue.get(0).getValue() : "NO");
+    }
+    
+    public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
+            final String customMessage) {
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
+    }
+    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
+        notificationService.sendSMS(mobileNumber, smsBody);
+    }
+    public List<User> getUserListForAgendaInvitation() {
+        Set<User> usersListResult = new HashSet<>();
+        List<String> roles = new ArrayList<String>();
+        roles.add(ROLE_MEETING_SENIOR_OFFICER);
+        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+    	if(!CollectionUtils.isEmpty(employees)) {
+    		for(EmployeeInfo info : employees) {
+    			usersListResult.add(info.getUser());
+    		}
+    	}
+        return new ArrayList<>(usersListResult);
+    }
+    
 }

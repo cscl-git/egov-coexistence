@@ -61,6 +61,12 @@
 				listValue="name" headerKey="-1" headerValue="----Choose----"
 				value="%{egBillregistermis.fund.id}"
 				onChange="populateSchemes(this);" /></td>
+				
+		<td class="bluebox"><s:text name="bill.search.amount" /></td>
+
+		<td class="bluebox"> <s:textfield id="amount"
+				name="amount" value="%{amount}"  cssClass="form-control"
+				 /></td>
 	</s:if>
 	<s:if test="%{shouldShowHeaderField('fundsource')}">
 		<td class="bluebox"><s:text name="bill.search..fundsource" /> <s:if
@@ -125,6 +131,12 @@
 				list="dropdownData.departmentList" listKey="code" listValue="name"
 				headerKey="-1" headerValue="----Choose----"
 				value="%{egBillregistermis.departmentcode}" /></td>
+				
+		<td class="bluebox"><s:text name="bill.search.party" /></td>
+
+		<td class="bluebox"> <s:textfield id="partyName"
+				name="partyName" value="%{partyName}"  cssClass="form-control"
+				 /></td>
 	</s:if>
 </tr>
 <tr>

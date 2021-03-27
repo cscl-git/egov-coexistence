@@ -108,9 +108,17 @@ public class PaymentUtils {
         bill.setIsCancelled(billv2.getIsCancelled());
         bill.setMobileNumber(billv2.getMobileNumber());
         bill.setPaidBy(StringUtils.defaultIfBlank(billv2.getPaidBy(), payment.getPaidBy()));
-        bill.setPayerAddress(payment.getPayerAddress());
+        if(payment.getPayerAddress() != null && !payment.getPayerAddress().isEmpty())
+        {
+        	bill.setPayerAddress(payment.getPayerAddress());
+        }
+        else
+        {
+        	bill.setPayerAddress("");
+        }
+        
         bill.setNarration(payment.getNarration());
-        bill.setPayerAddress(billv2.getPayerAddress());
+        //bill.setPayerAddress(billv2.getPayerAddress());
         bill.setPayerEmail(billv2.getPayerEmail());
         bill.setPayerId(billv2.getPayerId());
         bill.setPayerName(billv2.getPayerName());
@@ -121,8 +129,6 @@ public class PaymentUtils {
         //prepare billdetails
         this.prepareBillDetailsData(paymentDetail,bill);
         receipt.getBill().add(bill);
-        System.out.println("subdivison xxxx ::: "+payment.getSubdivison());
-        System.out.println("gst xxxx ::: "+payment.getGstno());
         receipt.setSubdivison(payment.getSubdivison());
         receipt.setGstNo(payment.getGstno());
         receipt.setPaymentStatus(payment.getPaymentStatus().name());

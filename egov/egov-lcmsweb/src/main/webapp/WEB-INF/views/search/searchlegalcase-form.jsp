@@ -58,7 +58,8 @@
 			name="searchlegalcaseForm" id="searchlegalcaseForm"
 			class="form-horizontal form-groups-bordered">
 			<div class="panel panel-primary" data-collapsed="0">
-		<input type="hidden" value="${loggedInUserViewAccess}" id="loggedInUserViewAccess" />
+				<input type="hidden" value="${loggedInUserViewAccess}"
+					id="loggedInUserViewAccess" />
 			
 				<div class="panel-heading">
 					<div class="panel-title">Search Legal Case</div>
@@ -190,6 +191,22 @@
 						</form:select>
 					</div>
 				</div>
+				<!-- Judgement Type -->
+				<div class="form-group">
+					<label class="col-sm-3 control-label text-right"><spring:message
+							code="lbl.judgmentype" /> :</span> </label>
+					<div class="col-sm-3 add-margin">
+						<form:select name="judgmentType" path="" data-first-option="false" id="judgmentType"
+							 cssClass="form-control">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${judgmentType }" itemValue="name"
+								itemLabel="name" />
+						</form:select>
+						
+					</div>
+
 				<div class="form-group">
 					<label class="col-sm-3 control-label text-right"></label>
 					<div class="col-sm-3 add-margin"></div>

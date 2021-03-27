@@ -638,7 +638,7 @@ public class EgovCommon {
     @SuppressWarnings("unchecked")
     public BigDecimal getAccountBalanceFromLedger(final Date VoucherDate,
             final Integer bankId, final BigDecimal amount, final Long paymentId) {
-            LOGGER.info("EgovCommon | getCashBalance");
+          LOGGER.info("EgovCommon | getCashBalance");
         BigDecimal opeAvailable = BigDecimal.ZERO;
         BigDecimal bankBalance = BigDecimal.ZERO;
         try {
@@ -763,7 +763,7 @@ public class EgovCommon {
                 // transaction amount to it.
                 if (amountTobeInclude)
                     bankBalance = bankBalance.add(amount);
-
+                
                 LOGGER.info(" bankBalance 4 ::::"+bankBalance);
 
             }

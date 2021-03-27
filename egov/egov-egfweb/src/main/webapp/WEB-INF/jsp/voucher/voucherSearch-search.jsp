@@ -170,7 +170,8 @@
 		</div>
 		<br />
 		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-			<s:if test="%{pagedResults!=null}">
+			<s:if test="%{pagedResults!=null && pagedResults.list != null && pagedResults.list.size !=0}">
+			
 				<tr>
 					<td width="100%"><display:table name="pagedResults"	uid="currentRowObject" cellpadding="0" cellspacing="0"
 							requestURI="" class="its" style=" border-left: 1px solid #C5C5C5; border-top: 1px solid #C5C5C5;border-right: 1px solid #C5C5C5;border-bottom: 1px solid #C5C5C5;">
@@ -216,65 +217,10 @@
 
 				</tr>
 			</s:if>
-			<s:elseif test="%{voucherList.size!=0 || voucherList!=null}">
-				<div id="listid" style="display: none">
-					<table width="100%" border="0" align="center" cellpadding="0"
-						cellspacing="0" class="tablebottom">
-						<tr>
-							<th class="bluebgheadtd">Sl No</th>
-							<th class="bluebgheadtd">Voucher Number</th>
-							<th class="bluebgheadtd">Voucher Type</th>
-							<th class="bluebgheadtd">Voucher Name</th>
-							<th class="bluebgheadtd">Voucher Date</th>
-							<th class="bluebgheadtd">Fund Name</th>
-							<th class="bluebgheadtd">Department Name</th>
-							<th class="bluebgheadtd">Total Amount</th>
-							<th class="bluebgheadtd">Status</th>
-							<th class="bluebgheadtd">Pending With</th>
-						</tr>
-						<c:set var="trclass" value="greybox" />
-
-						<s:iterator var="p" value="voucherList" status="s">
-							<tr>
-								<td class="<c:out value="${trclass}"/>"><s:property
-										value="#s.index+1" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><a
-									href="#"
-									onclick="openVoucher(<s:property value='%{id}'/>,'<s:text name="%{name}.%{showMode}" />','<s:property value="%{vouchernumber}" /> ' ,'<s:date name="%{voucherdate}" format="dd/MM/yyyy"/>');"><s:property
-											value="%{vouchernumber}" /> </a></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{type}" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{name}" /></td>
-								<td class="<c:out value="${trclass}"/>"><s:date
-										name="%{voucherdate}" format="dd/MM/yyyy" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{fundname}" /></td>
-								<td align="left" class="<c:out value="${trclass}"/>"><s:property
-										value="%{deptName}" /></td>
-								<td style="text-align: right"
-									class="<c:out value="${trclass}"/>"><s:text
-										name="format.number">
-										<s:param value="%{amount}" />
-									</s:text></td>
-								<td class="<c:out value="${trclass}"/>"><s:text
-										name="%{status}" /></td>
-								<td class="<c:out value="${trclass}"/>"><s:text
-										name="%{pendingWith}" /></td>
-								<c:choose>
-									<c:when test="${trclass=='greybox'}">
-										<c:set var="trclass" value="bluebox" />
-									</c:when>
-									<c:when test="${trclass=='bluebox'}">
-										<c:set var="trclass" value="greybox" />
-									</c:when>
-								</c:choose>
-							</tr>
-						</s:iterator>
-						<s:hidden name="targetvalue" value="%{target}" id="targetvalue" />
-					</table>
-				</div>
-			</s:elseif>
+			<s:if test="%{pagedResults!=null && pagedResults.list != null && pagedResults.list.size ==0}">
+			No records found
+			
+			</s:if>
 		</table>
 		<br />
 		<br />

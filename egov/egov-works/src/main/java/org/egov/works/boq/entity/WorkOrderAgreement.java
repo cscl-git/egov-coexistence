@@ -7,6 +7,8 @@ import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ColumnResult;
+import javax.persistence.ConstructorResult;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -14,8 +16,10 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
+import javax.persistence.SqlResultSetMapping;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
@@ -25,6 +29,32 @@ import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
+
+
+@SqlResultSetMapping(name = "AllWorkOrderAgreementresultset",classes = {
+		@ConstructorResult(
+				targetClass = WorkOrderAgreementRESTPOJO.class, columns = {
+
+				@ColumnResult(name="id",type=String.class),@ColumnResult(name="agency_work_order",type=String.class),
+				@ColumnResult(name="agreement_details",type=String.class),@ColumnResult(name="category",type=String.class),@ColumnResult(name="contractor_address",type=String.class),@ColumnResult(name="contractor_code",type=String.class),
+				@ColumnResult(name="contractor_email",type=String.class),@ColumnResult(name="contractor_name",type=String.class),@ColumnResult(name="contractor_phone",type=String.class),
+				@ColumnResult(name="date",type=String.class),@ColumnResult(name="estimated_cost",type=String.class),@ColumnResult(name="executing_department",type=String.class),@ColumnResult(name="fund",type=String.class),
+				@ColumnResult(name="name_work_order",type=String.class),@ColumnResult(name="sector",type=String.class),@ColumnResult(name="tender_cost",type=String.class),
+				@ColumnResult(name="time_limit",type=String.class),@ColumnResult(name="work_location",type=String.class),@ColumnResult(name="work_type",type=String.class),
+				@ColumnResult(name="work_agreement_status",type=String.class),@ColumnResult(name="work_amount",type=String.class),@ColumnResult(name="work_details",type=String.class),
+				@ColumnResult(name="work_end_date",type=String.class),@ColumnResult(name="work_intended_date",type=String.class),@ColumnResult(name="work_number",type=String.class),
+				@ColumnResult(name="work_start_date",type=String.class),@ColumnResult(name="work_status",type=String.class),@ColumnResult(name="ward_number",type=String.class),
+				@ColumnResult(name="statusid",type=String.class),@ColumnResult(name="version",type=String.class),@ColumnResult(name="createdby",type=String.class),
+				@ColumnResult(name="createddate",type=String.class),@ColumnResult(name="lastmodifiedby",type=String.class),@ColumnResult(name="lastmodifieddate",type=String.class),
+				@ColumnResult(name="state_id",type=String.class),@ColumnResult(name="work_agreement_number",type=String.class),@ColumnResult(name="project_closure_comments",type=String.class),
+				@ColumnResult(name="contractor_performance_comments",type=String.class),@ColumnResult(name="actual_start_date",type=String.class),@ColumnResult(name="actual_end_date",type=String.class),
+				@ColumnResult(name="approval_competent_authority",type=String.class),@ColumnResult(name="status",type=String.class),@ColumnResult(name="percentage_completion",type=String.class)}
+				)
+	})
+
+
+	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address, aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_department,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast (aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
+		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
 
 @Entity
 @Table(name = "txn_work_agreement")
@@ -123,6 +153,13 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	@Column(name = "category")
 	private String category;
+	
+	@Column(name = "approval_competent_authority")
+	private String approval_competent_authority;
+
+	//edited
+	@Column(name="milestonestatus")
+	private String milestonestatus;
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
@@ -167,6 +204,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
 	@Transient
+    private List<DocumentUpload> documents = new ArrayList<>();
+	@Transient
+    private List<DocumentUpload> estDocuments = new ArrayList<>();
+	@Transient
+	private Long dnitId;
+	@Transient
+	private Long estId;
+	@Transient
 	private List<Contractor> contractors = new ArrayList<Contractor>();
 	
 	@Column(name = "work_agreement_number")
@@ -203,6 +248,9 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Transient
 	private String percentCompletion;
+	
+	@Transient
+	private String pendingWith;
 
 	public Long getId() {
 		return id;
@@ -667,6 +715,62 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setActual_start_date(Date actual_start_date) {
 		this.actual_start_date = actual_start_date;
+	}
+
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
+	}
+
+	public String getApproval_competent_authority() {
+		return approval_competent_authority;
+	}
+
+	public void setApproval_competent_authority(String approval_competent_authority) {
+		this.approval_competent_authority = approval_competent_authority;
+	}
+
+	public String getMilestonestatus() {
+		return milestonestatus;
+	}
+
+	public void setMilestonestatus(String milestonestatus) {
+		this.milestonestatus = milestonestatus;
+	}
+
+	public List<DocumentUpload> getDocuments() {
+		return documents;
+	}
+
+	public void setDocuments(List<DocumentUpload> documents) {
+		this.documents = documents;
+	}
+
+	public Long getDnitId() {
+		return dnitId;
+	}
+
+	public void setDnitId(Long dnitId) {
+		this.dnitId = dnitId;
+	}
+
+	public List<DocumentUpload> getEstDocuments() {
+		return estDocuments;
+	}
+
+	public void setEstDocuments(List<DocumentUpload> estDocuments) {
+		this.estDocuments = estDocuments;
+	}
+
+	public Long getEstId() {
+		return estId;
+	}
+
+	public void setEstId(Long estId) {
+		this.estId = estId;
 	}
 
 }

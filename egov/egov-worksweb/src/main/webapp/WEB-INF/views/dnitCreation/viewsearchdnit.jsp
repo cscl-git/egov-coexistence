@@ -9,6 +9,7 @@
     background-color: #acbfd0;
     vertical-align: top;
 }
+
 .table tbody > tr > td {
     color: black;
     vertical-align: top;
@@ -19,9 +20,8 @@
 
 
 	
-		<form:form name="create-estimate-form" role="form"
-		method="post" action="updateDnit"
-		modelAttribute="estimatePreparationApproval"
+<form:form name="create-estimate-form" role="form" method="post"
+	action="updateDnit" modelAttribute="estimatePreparationApproval"
 		id="estimatePreparationApproval1" enctype="multipart/form-data">
 	
 	
@@ -30,39 +30,25 @@
 
 		<li class="active"><a data-toggle="tab" href="#estimatescreen"
 			data-tabidx=0><spring:message
-					code="title.dnit.preparation.create"
-					text="DNIT Details" /> </a></li>
+					code="title.dnit.preparation.create" text="DNIT Details" /> </a></li>
 	</ul>
+	
+
 	<div class="tab-content">
 	<div class="tab-pane fade in active" id="estimatescreen">
-	<c:if test="${estimatePreparationApproval.status.code == 'Created' }">
 			
-				<!--<jsp:include page="viewestimate.jsp" />-->
+		<jsp:include page="viewestimate.jsp" />
 			
-	</c:if>
+		</div>
 
-	<c:if test="${estimatePreparationApproval.status.code == 'Pending for Approval' }">
-			
-				<!--<jsp:include page="viewestimate.jsp" />-->
-	</c:if>
-
-		<c:if test="${estimatePreparationApproval.status.code == 'Approved' }">
-			
-				<!--<jsp:include page="viewestimate.jsp" />-->
-			
-		</c:if>
-
-	
-	
-	</div>
-	
-
-		<br><br><br>
-		<!-- <jsp:include page="fileupload.jsp" /> -->
+		<br>
+		<jsp:include page="fileupload.jsp" />
 		<br> <br>
-		 <jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
-		 <br>
-		 <br>
+			
+
+			
+	<jsp:include page="../common/commonWorkflowhistory-view.jsp" /> 
+		<br> <br>
 		
 	</div>
 

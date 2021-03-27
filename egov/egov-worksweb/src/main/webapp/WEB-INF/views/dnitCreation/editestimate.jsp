@@ -16,16 +16,15 @@
 
 
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 870px;">
+	<div class="form-group" style="padding: 50px 20px 1000px;">
 
 					<input type="hidden" name="estimatePreparationApproval"
-				value="${estimatePreparationApproval.id}" />
-				
-				 <label
+			value="${estimatePreparationApproval.id}" /> <label
 				class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.works.wing" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="worksWing" id="worksWing" cssClass="form-control-works"
+			<form:select path="worksWing" id="worksWing"
+				cssClass="form-control-works"
 					cssErrorClass="form-control-works error" >
 									<form:option value="">
 										<spring:message code="lbl.select" />
@@ -39,8 +38,8 @@
 									code="lbl.estimate.preparation.executing.division" /><span
 								class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="department" id="department" class="form-control-works"
-					required="required">
+			<form:select path="department" id="department"
+				class="form-control-works" required="required">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
@@ -59,22 +58,25 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.work.location" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" path="workLocation" />
+			<form:input type="text" class="form-control-works"
+				path="workLocation" />
 							</div>
 
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.dnit.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="text" class="form-control-works" path="estimateNumber"
-					readonly="true" />
+			<form:input type="text" class="form-control-works"
+				path="estimateNumber" readonly="true" />
 					</div>
 
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="sectorNumber" id="sectorNumber" multiple="multiple"
-									cssClass="form-control-works" cssErrorClass="form-control-works error">
-								<form:option value="${estimatePreparationApproval.sectorNumber}" label="${estimatePreparationApproval.sectorNumber}">
+			<form:select path="sectorNumber" id="sectorNumber"
+				multiple="multiple" cssClass="form-control-works"
+				cssErrorClass="form-control-works error">
+				<form:option value="${estimatePreparationApproval.sectorNumber}"
+					label="${estimatePreparationApproval.sectorNumber}">
 						
 					</form:option>
 									<form:option value="1">1 </form:option>
@@ -172,13 +174,37 @@
 									code="lbl.estimate.preparation.ward.number" /></label>
 			<div class="col-sm-3 add-margin">
 				<form:select path="wardNumber" id="wardNumber" multiple="multiple"
-									cssClass="form-control-works" cssErrorClass="form-control-works error">
-									<form:option value="${estimatePreparationApproval.wardNumber}" label="${estimatePreparationApproval.wardNumber}">
+				cssClass="form-control-works"
+				cssErrorClass="form-control-works error">
+				<form:option value="${estimatePreparationApproval.wardNumber}"
+					label="${estimatePreparationApproval.wardNumber}">
 						
 					</form:option>
-									<form:option value="Ward 1">Ward 1 </form:option>
-									<form:option value="Ward 2">Ward 2</form:option>
-									<form:option value="Ward 3">Ward 3</form:option>
+									<form:option value="1">1 </form:option>
+									<form:option value="2">2</form:option>
+									<form:option value="3">3</form:option>
+									<form:option value="4">4</form:option>
+									<form:option value="5">5</form:option>
+									<form:option value="6">6</form:option>
+									<form:option value="7">7</form:option>
+									<form:option value="8">8</form:option>
+									<form:option value="9">9</form:option>
+									<form:option value="10">10</form:option>
+									<form:option value="11">11</form:option>
+									<form:option value="12">12</form:option>
+									<form:option value="13">13</form:option>
+									<form:option value="14">14</form:option>
+									<form:option value="15">15</form:option>
+									<form:option value="16">16</form:option>
+									<form:option value="17">17</form:option>
+									<form:option value="18">18</form:option>
+									<form:option value="19">19</form:option>
+									<form:option value="20">20</form:option>
+									<form:option value="21">21</form:option>
+									<form:option value="22">22</form:option>
+									<form:option value="23">23</form:option>
+									<form:option value="24">24</form:option>
+									<form:option value="25">25</form:option>
 								</form:select>
 							</div>
 			
@@ -186,7 +212,8 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.dnit.amount" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input type="number" class="form-control-works" path="estimateAmount" readonly="true"/>
+			<form:input type="number" class="form-control-works"
+				path="estimateAmount" readonly="true" />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.dnit.prepared.by" /></label>
@@ -198,8 +225,8 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.designation" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="preparationDesignation" id="preparationDesignation"
-									class="form-control-works">
+			<form:select path="preparationDesignation"
+				id="preparationDesignation" class="form-control-works">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
@@ -223,8 +250,8 @@
 <label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.Contingency.amount" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" path="contingentAmount"
-							id="contingentAmount" value="" cssClass="form-control-works" readonly="true"
+			<form:input type="text" path="contingentAmount" id="contingentAmount"
+				value="" cssClass="form-control-works" readonly="true"
 							cssErrorClass="form-control-works error" />
 							</div>	
 										
@@ -232,16 +259,16 @@
 									code="lbl.estimate.preparation.estimate.Consultancy.fee" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="number" path="consultantFee" value=""
-							id="consultantFee" cssClass="form-control-works" onchange="valueChanged()"
-							cssErrorClass="form-control-works error" />
+				id="consultantFee" cssClass="form-control-works"
+				onchange="valueChanged()" cssErrorClass="form-control-works error" />
 							</div>
 							
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.Unforeseen.charges" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="number" path="unforseenCharges" value=""
-							id="unforseenCharges" cssClass="form-control-works" onchange="valueChanged()"
-							cssErrorClass="form-control-works error" />
+				id="unforseenCharges" cssClass="form-control-works"
+				onchange="valueChanged()" cssErrorClass="form-control-works error" />
 							</div>
 				
 													
@@ -253,21 +280,24 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.name.work" /></label>
 			<div class="col-sm-9 block-colm">
-				<form:textarea class="form-control-works" path="workName" maxlength="2000" style="height: 100px;"
-					 />
+			<form:textarea class="form-control-works" path="workName"
+				maxlength="2000" style="height: 100px;" />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.necessity" /></label>
 			<div class="col-sm-9 block-colm">
-					<form:textarea class="form-control-works" path="necessity" maxlength="2000" style="height: 100px;"
-					 />
+			<form:textarea class="form-control-works" path="necessity"
+				maxlength="2000" style="height: 100px;" />
 							</div>
+		
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.scope.work" /></label>
 			<div class="col-sm-9 block-colm">
-					 <form:textarea class="form-control-works" path="workScope" maxlength="2000" style="height: 100px;"
-					 />
-			</div>
+			<form:textarea class="form-control-works" path="workScope"
+				maxlength="2000" style="height: 100px;" />
+		</div>
+		
+
 							</div>
 						</div>
 					
@@ -282,8 +312,10 @@
 		<div>
 			
 			<div>
-				<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
-					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
+				<c:forEach var="mapboq" items="${milestoneList}"
+					varStatus="mapstatus">
+					<table id="boq${mapstatus.index}tableBoq"
+						class="table table-bordered tableBoq">
 				
 				
 				
@@ -310,11 +342,12 @@
 						<c:forEach var="boq" items="${mapboq.value}" varStatus="status">
 						
 						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
-								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
-								<td>
-								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
-												id="boQDetailsList[${boq.sizeIndex}].slNo" />
-								<form:input type="text" style="width:200px;"
+								<tr id="boq${mapstatus.index}tableBoqrow"
+									class="boq${status.index}repeat-address">
+									<td><form:hidden
+											path="boQDetailsList[${boq.sizeIndex}].slNo"
+											id="boQDetailsList[${boq.sizeIndex}].slNo" /> <form:input
+											type="text" style="width:200px;"
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"
 											required="required" class="form-control milestone"
@@ -332,8 +365,7 @@
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].unit"
 												id="boQDetailsList[${boq.sizeIndex}].unit"
-												required="required" class="form-control unit"
-												maxlength="200"></form:input></td>
+											required="required" class="form-control unit" maxlength="200"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].rate" step=".01"
 												id="boQDetailsList[${boq.sizeIndex}].rate"
@@ -349,10 +381,17 @@
 											id="boQDetailsList[${boq.sizeIndex}].amount"
 											required="required" class="form-control amount"
 											maxlength="200" name="amount" ></form:input></td>
-									<td class="text-center"><span style=" cursor:pointer;  color: black;" onclick="addcheckListRow(${mapstatus.index});" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
-				 				<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="$(this).closest('tr').remove();"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
-				 		
-				 				 </td>
+									<td class="text-center"><span
+										style="cursor: pointer; color: black;"
+										onclick="addcheckListRow(${mapstatus.index});" tabindex="0"
+										id="tempSubLedger[0].addButton" data-toggle="tooltip" title=""
+										data-original-title="" aria-hidden="true"><i
+											class="fa fa-plus"></i></span> <span
+										style="cursor: pointer; color: black;"
+										class="add-padding subledge-delete-row"
+										onClick="$(this).closest('tr').remove();"><i
+											class="fa fa-trash" aria-hidden="true" data-toggle="tooltip"
+											title="" data-original-title="Delete!"></i></span></td>
 			
 								</tr>
 							</c:forEach>
@@ -365,12 +404,11 @@
 				</c:forEach>
 				</div>
 				</div>
-				<br>
-				<br>
+		<br> <br>
 				
 			</div>
 		</div>
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
-	
+<script
+	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>

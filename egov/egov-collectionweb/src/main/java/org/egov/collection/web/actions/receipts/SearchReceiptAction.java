@@ -153,6 +153,7 @@ public class SearchReceiptAction extends SearchFormAction {
     private String reportId;
     private ReportService reportService;
     private InputStream inputStream;
+    private String receiptType;
 
     @Autowired
     private AssignmentService assignmentService;
@@ -339,7 +340,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
-                    receiptHeader.setPaidBy(bill.getPaidBy());
+                    receiptHeader.setPaidBy((bill.getPaidBy()).split("&")[0]+"  "+bill.getPayerAddress());
                     receiptHeader.setPayeeName(bill.getPayerName());
                     System.out.println("subdivison ::: "+receipt.getSubdivison());
                     System.out.println("gst ::: "+receipt.getGstNo());
@@ -473,11 +474,16 @@ public class SearchReceiptAction extends SearchFormAction {
                     {
                     	continue;
                     }
+                    receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+                    if(receiptType != null && !receiptType.isEmpty() && !receiptType.equalsIgnoreCase("-1") && !receiptType.contains("-1") && !receiptType.equalsIgnoreCase(receiptHeader.getCurretnStatus()))
+                    {
+                    	continue;
+                    }
                     receiptHeader.setSubdivison(receipt.getSubdivison());
                     System.out.println("12");
                     receiptHeader.setGstno(receipt.getGstNo());
                     System.out.println("13");
-                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    
                     System.out.println("14");
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     System.out.println("15");
@@ -817,7 +823,13 @@ public class SearchReceiptAction extends SearchFormAction {
                     System.out.println("11");
                     receiptHeader.setTotalreciptAmount(totalReciptAmount);
                     System.out.println("12");
-                    receiptHeader.setCurretnStatus(billDetail.getStatus());
+                    receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+                    System.out.println("receiptType  ::::"+receiptType);
+                    System.out.println("receiptHeader.getCurretnStatus()  ::::"+receiptHeader.getCurretnStatus());
+                    if(receiptType != null && !receiptType.isEmpty() && !receiptType.equalsIgnoreCase("-1") && !receiptType.contains("-1") && !receiptType.equalsIgnoreCase(receiptHeader.getCurretnStatus()))
+                    {
+                    	continue;
+                    }
                     System.out.println("13");
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     System.out.println("Mid");
@@ -1033,6 +1045,7 @@ public class SearchReceiptAction extends SearchFormAction {
         		bean.setModeOfPayment(header.getModOfPayment());
         		bean.setParticulars(header.getReferenceDesc());
         		bean.setTotalReceiptAmount(header.getTotalAmount());
+        		bean.setStatus(header.getCurretnStatus());
         		if(header.getPrincipalAmount() != null)
         		{
         			bean.setPrincipalAmt(header.getPrincipalAmount());
@@ -1128,6 +1141,7 @@ public class SearchReceiptAction extends SearchFormAction {
 	    rowhead.createCell(13).setCellValue("Remittance No.");
 	    rowhead.createCell(14).setCellValue("Bank Account No.");
 	    rowhead.createCell(15).setCellValue("Deposit Amount");
+	    rowhead.createCell(16).setCellValue("Status");
 	    int index=1;
 	    int rowCount=6;
 	    HSSFRow details ;
@@ -1147,25 +1161,85 @@ public class SearchReceiptAction extends SearchFormAction {
 	    	details.createCell(6).setCellValue(bean.getServiceType());
 	    	details.createCell(7).setCellValue(bean.getModeOfPayment());
 	    	details.createCell(8).setCellValue(bean.getParticulars());
-	    	details.createCell(9).setCellValue(bean.getPrincipalAmt().doubleValue());
-	    	principalAmt=principalAmt.add(bean.getPrincipalAmt());
-	    	details.createCell(10).setCellValue(bean.getGstAmount().doubleValue());
-	    	gstAmt=gstAmt.add(bean.getGstAmount());
-	    	details.createCell(11).setCellValue(bean.getTotalReceiptAmount().doubleValue());
-	    	receiptAmt=receiptAmt.add(bean.getTotalReceiptAmount());
+	    	if(bean.getPrincipalAmt() != null)
+	    	{
+	    		details.createCell(9).setCellValue(bean.getPrincipalAmt().doubleValue());
+		    	principalAmt=principalAmt.add(bean.getPrincipalAmt());
+	    	}
+	    	else
+	    	{
+	    		details.createCell(9).setCellValue("");
+	    	}
+	    	if(bean.getGstAmount() != null)
+	    	{
+	    		details.createCell(10).setCellValue(bean.getGstAmount().doubleValue());
+		    	gstAmt=gstAmt.add(bean.getGstAmount());
+	    	}
+	    	else
+	    	{
+	    		details.createCell(10).setCellValue("");
+	    	}
+	    	if(bean.getTotalReceiptAmount() != null)
+	    	{
+	    		details.createCell(11).setCellValue(bean.getTotalReceiptAmount().doubleValue());
+		    	receiptAmt=receiptAmt.add(bean.getTotalReceiptAmount());
+	    	}
+	    	else
+	    	{
+	    		details.createCell(11).setCellValue("");
+	    	}
+	    	
 	    	details.createCell(12).setCellValue(bean.getDateOfDeposite());
 	    	details.createCell(13).setCellValue(bean.getRemitanceNo());
 	    	details.createCell(14).setCellValue(bean.getBankAccountNo());
-	    	details.createCell(15).setCellValue(bean.getDepositAmount().doubleValue());
-	    	depositAmt=depositAmt.add(bean.getDepositAmount());
+	    	if(bean.getDepositAmount() != null)
+	    	{
+	    		details.createCell(15).setCellValue(bean.getDepositAmount().doubleValue());
+		    	depositAmt=depositAmt.add(bean.getDepositAmount());
+	    	}
+	    	else
+	    	{
+	    		details.createCell(15).setCellValue("");
+	    	}
+	    	details.createCell(16).setCellValue(bean.getStatus());
 	    }
 	    details=sheet.createRow(rowCount);
 	    details.createCell(8).setCellValue("Total");
-	    details.createCell(9).setCellValue(principalAmt.doubleValue());
-	    details.createCell(10).setCellValue(gstAmt.doubleValue());
-	    details.createCell(11).setCellValue(receiptAmt.doubleValue());
+	    if(principalAmt != null)
+	    {
+	    	details.createCell(9).setCellValue(principalAmt.doubleValue());
+	    }
+	    else
+	    {
+	    	details.createCell(9).setCellValue("");
+	    }
+	    
+	    if(gstAmt != null) 
+	    {
+	    	details.createCell(10).setCellValue(gstAmt.doubleValue());
+	    }
+	    else
+	    {
+	    	details.createCell(10).setCellValue("");
+	    }
+	    if(receiptAmt != null)
+	    {
+	    	details.createCell(11).setCellValue(receiptAmt.doubleValue());
+	    }
+	    else
+	    {
+	    	details.createCell(11).setCellValue("");
+	    }
 	    details.createCell(14).setCellValue("Total");
-    	details.createCell(15).setCellValue(depositAmt.doubleValue());
+	    if(depositAmt != null) 
+	    {
+	    	details.createCell(15).setCellValue(depositAmt.doubleValue());
+	    }
+	    else
+	    {
+	    	details.createCell(15).setCellValue("");
+	    }
+		
 	    ByteArrayOutputStream os = new ByteArrayOutputStream();
 		System.out.println("XYZ");
 		wb.write(os);
@@ -1444,5 +1518,13 @@ public class SearchReceiptAction extends SearchFormAction {
 
 	public void setSubdivison(String subdivison) {
 		this.subdivison = subdivison;
+	}
+
+	public String getReceiptType() {
+		return receiptType;
+	}
+
+	public void setReceiptType(String receiptType) {
+		this.receiptType = receiptType;
 	}
 }

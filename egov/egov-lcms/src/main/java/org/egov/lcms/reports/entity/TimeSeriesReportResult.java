@@ -202,5 +202,4 @@ public class TimeSeriesReportResult {
     public void setYear(final String year) {
         this.year = year;
     }
-
 }

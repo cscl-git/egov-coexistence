@@ -186,6 +186,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     Date date;
     private String firstsignatory="-1";
     private String secondsignatory="-1";
+    private String backlogEntry="";
 
     public BigDecimal getBalance() {
         return balance;
@@ -294,6 +295,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                                 voucherHeader.getId());
                 voucherHeader.setId(null);
                 populateWorkflowBean();
+                voucherHeader.setBackdateentry(backlogEntry);
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
@@ -1169,5 +1171,13 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
 	public void setSecondsignatory(String secondsignatory) {
 		this.secondsignatory = secondsignatory;
+	}
+
+	public String getBacklogEntry() {
+		return backlogEntry;
+	}
+
+	public void setBacklogEntry(String backlogEntry) {
+		this.backlogEntry = backlogEntry;
 	}
 }

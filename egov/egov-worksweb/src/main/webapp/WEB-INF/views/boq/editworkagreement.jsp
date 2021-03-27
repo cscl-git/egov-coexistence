@@ -16,9 +16,30 @@
     color: black;
     vertical-align: top;
 }
+
+.popup {
+    display: inline-block;
+}
+.popup .popuptext {
+    visibility: hidden;
+   /*  background-color: #b1b1b1;
+    text-align: right;
+    border-radius: 6px;
+    padding: 20px; */
+}
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
 </style> 
+<script>
+	
+</script>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+<%-- <form:input type="hidden" class="form-control" path="estId"  /> --%>
+
 <form:form name="workOrderAgreementForm" role="form" method="post"
 	action="work1" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
@@ -31,7 +52,6 @@
 			<br />
 		</div>
 	</spring:hasBindErrors>
-
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
@@ -49,6 +69,7 @@
 							code="lbl.estimate.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="work_number"  />
+						
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
@@ -76,14 +97,27 @@
 						<form:input id="actual_start_date" path="actual_start_date"
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
+							
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualend.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="actual_end_date" path="actual_end_date"
+						<form:input id="actual_end_date" path="actual_end_date" onblur="pop()"
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
+					<div style="text-align:center;"> 
+					 <div class="popup">
+					    <span class="popuptext" id="myPopup">
+					     <!--  <input type="text" id="reason" name="reason" required="required"/> -->
+					     <div class="form-group purple-border">
+						  <label for="exampleFormControlTextarea4"><spring:message
+							code="lbl.reason.extenstion" /></label>
+						  <textarea class="form-control" id="reason" name="reason" required="required" rows="3"></textarea>
+						</div>
+					    </span>
+ 						 </div>
+ 						 </div> 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
@@ -216,9 +250,31 @@
 									<form:option value="${workOrderAgreement.wardNumber}" label="${workOrderAgreement.wardNumber}">
 						
 									</form:option>
-									<form:option value="Ward 1">Ward 1 </form:option>
-									<form:option value="Ward 2">Ward 2</form:option>
-									<form:option value="Ward 3">Ward 3</form:option>
+									<form:option value="1">1 </form:option>
+									<form:option value="2">2</form:option>
+									<form:option value="3">3</form:option>
+									<form:option value="4">4</form:option>
+									<form:option value="5">5</form:option>
+									<form:option value="6">6</form:option>
+									<form:option value="7">7</form:option>
+									<form:option value="8">8</form:option>
+									<form:option value="9">9</form:option>
+									<form:option value="10">10</form:option>
+									<form:option value="11">11</form:option>
+									<form:option value="12">12</form:option>
+									<form:option value="13">13</form:option>
+									<form:option value="14">14</form:option>
+									<form:option value="15">15</form:option>
+									<form:option value="16">16</form:option>
+									<form:option value="17">17</form:option>
+									<form:option value="18">18</form:option>
+									<form:option value="19">19</form:option>
+									<form:option value="20">20</form:option>
+									<form:option value="21">21</form:option>
+									<form:option value="22">22</form:option>
+									<form:option value="23">23</form:option>
+									<form:option value="24">24</form:option>
+									<form:option value="25">25</form:option>
 								</form:select>
 							</div>
 
@@ -243,7 +299,11 @@
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="workLocation" />
 					</div>
-
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.work.order.search.work.authority" /></label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" path="approval_competent_authority" />
+					</div>
 					
 				</div>
 				</div>
@@ -491,13 +551,55 @@
 		</div>
 
 	</div>
+
 </form:form>
+	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">Reason</h4>
+            </div>
+            <div class="modal-body">
+            <div class="form-group">
+	            <label for="message-text" class="col-form-label">Reason:</label>
+	            <textarea class="form-control" id="reason" path="reason" id="message-text"></textarea>
+	          </div>
+          <!--       <input type="text" path="reason" id="reason" required="true"> -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--  <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
+    </button>   -->
+    
+  
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 <script type="text/javascript">
 	
+function pop() {
+/* 	alert("ok"); */
+    var popup = document.getElementById('myPopup');
+    popup.classList.toggle('show');
+}
+	
+/*  $(document).ready(function () {
+    // Attach Button click event listener 
+   $("#actual_end_date").keyup(function(){
+	   alert("open model");
+        // show Modal
+        $('#myModal').modal('show');
+   });
+});  */
+
+
 	
 	function getContractorDetails(obj){
 		var id=obj.value;

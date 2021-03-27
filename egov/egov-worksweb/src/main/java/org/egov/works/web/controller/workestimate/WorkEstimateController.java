@@ -165,16 +165,20 @@ public class WorkEstimateController extends GenericWorkFlowController{
 
 	}	
 	
-	
+	//edited workEstimateSearchNew in place of workEstimateSearchNew
 
 	@RequestMapping(value = "/workEstimateSearch", params = "save", method = RequestMethod.POST)
 	public String saveWorkEstimateData(
 			@ModelAttribute("workEstimateDetails") final DNITCreation estimatePreparationApproval,
 			final Model model, final HttpServletRequest request) throws Exception {
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+		
+		//System.out.println(estimatePreparationApproval.getEstimateList().size()+"+++++++++++++++++++++++");
+		
 		for (int i = 0; i < estimatePreparationApproval.getEstimateList().size(); i++) {
+			//System.out.println(estimatePreparationApproval.getEstimateList().get(i).isChecked()+"+++++++++++++++++++++++");
 			if (estimatePreparationApproval.getEstimateList().get(i).isChecked() == true) {
-				
+			//	System.out.println(estimatePreparationApproval.getEstimateList().get(i).getId()+"+++++++++++++++++++++++++++");
 				DNITCreation	workEstimateDetails = workEstimateService.searchDnitBoqData(request,
 						estimatePreparationApproval.getEstimateList().get(i).getId());
 				
@@ -203,6 +207,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		return "search-work-estimate-form";
 
 	}
+	//After search 
 	
 	@RequestMapping(value = "/workEstimateSearchNew", params = "save1", method = RequestMethod.POST)
 	public String saveWorkEstimateDataNew(
@@ -313,8 +318,11 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		DNITCreation saveBoqDetails = workEstimateService.searchDnitBoqData(request, id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",saveBoqDetails.getId());
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		workOrderAgreement.setDocuments(documents);
 		workOrderAgreement.setBoQDetailsList(responseList);
+		workOrderAgreement.setDnitId(saveBoqDetails.getId());
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
 		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
 		workOrderAgreement.setDepartment(String.valueOf(saveBoqDetails.getExecutingDivision()));
@@ -368,7 +376,10 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",saveBoqDetails.getId());
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		workOrderAgreement.setEstDocuments(documents);
+		workOrderAgreement.setEstId(saveBoqDetails.getId());
 		workOrderAgreement.setBoQDetailsList(responseList);
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
 		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());

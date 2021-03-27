@@ -353,7 +353,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
     	String partyName="";
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select a.id,a.detailname from accountdetailkey a  where a.detailkey in (select gd.detailkeyid from generalledgerdetail gd where gd.generalledgerid in (select g.id from generalledger g where g.debitamount <> 0 and g.voucherheaderid in (select vh.id from voucherheader vh where vh.vouchernumber =:paymentNumber)))");
+    		 query = this.persistenceService.getSession().createSQLQuery("select a.id,a.detailname from voucherheader v ,generalledger g ,generalledgerdetail g2 ,accountdetailkey a where v.id=g.voucherheaderid and g.id=g2.generalledgerid and g2.detailkeyid=a.detailkey and g2.detailtypeid=a.detailtypeid and v.vouchernumber =:paymentNumber");
     	    query.setString("paymentNumber", paymentNumber);
     	    rows = query.list();
     	    

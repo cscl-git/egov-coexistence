@@ -4,7 +4,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
+import org.egov.works.estimatepreparationapproval.entity.DNITCreationRESTPOJO;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApprovalRESTPOJO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -39,4 +41,8 @@ public interface DNITCreationRepository extends JpaRepository<DNITCreation, Long
 			@Param("tenderCost") String tenderCost, @Param("agencyWorkOrder") String agencyWorkOrder,
 			@Param("date") Date date, @Param("timeLimit") String timeLimit);
 
+	@Query(nativeQuery = true)
+	List<DNITCreationRESTPOJO> getAllDNITCreation();
+	
+	
 }

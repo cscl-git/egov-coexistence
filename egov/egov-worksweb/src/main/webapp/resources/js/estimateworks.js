@@ -144,4 +144,26 @@ function openDNIT(estId)
 	var url = "/services/works/dnit/view/"+ estId;
 	window.open(url,'','width=900, height=700');
 }
-
+function editDNIT(estId)
+{
+	var url = "/services/works/dnit/editdnit/"+ estId;
+	window.open(url,'','width=900, height=700');
+}
+function deletedata(empid,slno)
+{
+	var url = "/services/works/dnit/deletednit/"+ empid+"/"+slno;
+	
+	window.location.href = url;
+	}
+function openBOQ(estId)
+{
+	alert(estId);
+	var url = "/services/works/boq/viewBoq/"+ estId;
+	window.open(url,'','width=900, height=700');
+	}
+function updateBOQ(estId)
+{
+	alert(estId);
+	var url = "/services/works/boq/updateBoq/"+ estId;
+	window.open(url,'','width=900, height=700');
+}

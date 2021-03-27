@@ -166,6 +166,7 @@
         </div>
       </div>
     </div>
+    <jsp:include page="billdocument-upload.jsp"/>
     <div class="row text-center">
       <div class="add-margin">
       <c:if test="${mode == 'view'}">

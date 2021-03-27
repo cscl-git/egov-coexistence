@@ -132,6 +132,15 @@
 								class="mandatory1">*</span></td>
 							<td class="greybox" colspan="3"><a href="#" onClick="populateBudgetLink()">Click</a></td>
 						</tr>
+						<tr>
+							<td style="width: 5%"></td>
+							<td class="greybox"><s:text name="backdated.entry" /><span
+								class="mandatory1">*</span></td>
+							<td class="greybox" colspan="3"><s:select name="backlogEntry"
+																	headerKey="-1" headerValue="Select" value="%{backlogEntry}"
+																	list="#{'Y':'Yes' ,'N':'No'}"
+																			id="backlogEntry" /></td>
+						</tr>
 						</tr>
 					</table>
 				</div>
@@ -258,8 +267,10 @@
 			}
 	function onSubmit()
 	{
+		var backlog=document.getElementById('backlogEntry');
 		if(validateJV()){
-			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action';
+			console.log("backlog  ::: "+backlog.value);
+			document.jvcreateform.action='/services/EGF/voucher/journalVoucher-create.action?backlogEntry='+backlog.value;
 	    	return true;
 				
 		}else{
@@ -303,7 +314,6 @@
 	}
 	function validateJV()
 	{
-
 	   //document.getElementById("buttonValue").value=btnval;
 		document.getElementById('lblError').innerHTML ="";
 		
@@ -313,7 +323,7 @@
 		var vhDate=document.getElementById('voucherDate').value;
 		var vhType=document.getElementById('vType').value;
 		var narration=document.getElementById('narration');
-
+		var backlog=document.getElementById('backlogEntry');
 		console.log(vhType);
 		
 		if(vhType =='-1' )	{
@@ -332,6 +342,12 @@
 			document.getElementById('narration').focus();
 			return false;
 			}
+		if(backlog == null || backlog.value == '-1')
+		{
+		document.getElementById('lblError').innerHTML = "Please select whether it is a backlog entry";
+		document.getElementById('voucherDate').focus();
+		return false;
+		}
 		if(document.getElementById('vouchermis.function') == null || document.getElementById('vouchermis.function').value == '-1')
 		{
 		document.getElementById('lblError').innerHTML = 'Please select Function';

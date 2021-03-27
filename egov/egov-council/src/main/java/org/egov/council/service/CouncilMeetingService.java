@@ -336,10 +336,27 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
         return new ArrayList<>(usersListResult);
     }
     
+    public List<User> getUserListForNotice(CouncilMeeting councilMeeting) {
+        Set<User> usersListResult = new HashSet<>();
+        List<String> roles = new ArrayList<String>();
+        //roles.add(CouncilConstants.ROLE_MEETING_SPECIAL_OFFICER);
+        roles.add(CouncilConstants.ROLE_MEETING_SENIOR_OFFICER);
+        roles.add(CouncilConstants.ROLE_MEETING_DEPARTMENT_USER);
+        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+    	if(!CollectionUtils.isEmpty(employees)) {
+    		for(EmployeeInfo info : employees) {
+    			usersListResult.add(info.getUser());
+    		}
+    	}
+        return new ArrayList<>(usersListResult);
+    }
+    
     public List<User> getUserListForAgendaInvitation() {
         Set<User> usersListResult = new HashSet<>();
         List<String> roles = new ArrayList<String>();
-        roles.add(CouncilConstants.ROLE_MEETING_SENIOR_OFFICER);
+        //roles.add(CouncilConstants.ROLE_MEETING_SENIOR_OFFICER);
+		/* Agenda notification only sent to dept users */
+        roles.add(CouncilConstants.ROLE_MEETING_DEPARTMENT_USER);
         List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
     	if(!CollectionUtils.isEmpty(employees)) {
     		for(EmployeeInfo info : employees) {

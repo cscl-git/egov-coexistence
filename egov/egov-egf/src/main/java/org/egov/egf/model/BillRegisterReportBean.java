@@ -89,7 +89,28 @@ public class BillRegisterReportBean {
     private List<ChartOfAccounts> chartOfAccounts;
     private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
     private String budgetHead;
-
+    private String scheme;
+    private String voucherDate;
+    private String bpvDate;
+    private String bankaccount;
+    private BigDecimal taxAmount;
+    private BigDecimal igstAmount;
+    private BigDecimal cgstAmount;
+    private BigDecimal labourcessAmount;
+    private BigDecimal collectionchargesAmount;
+    private BigDecimal waterChargesAmount;
+    private BigDecimal qualityAmount;
+    private BigDecimal penaltyAmount;
+    private BigDecimal securitAmount;
+    private BigDecimal gpfAmount;
+    private BigDecimal npsAmount;
+    private BigDecimal gslicAmount;
+    private BigDecimal hbaAmount;
+    private BigDecimal licenseAmount;
+    private BigDecimal licAmount;
+    private BigDecimal bankAmount;
+    private BigDecimal courtAmount;
+    private BigDecimal pensionAmount;
     public String getBillNumber() {
         return billNumber;
     }
@@ -289,6 +310,182 @@ public class BillRegisterReportBean {
 
 	public void setBudgetHead(String budgetHead) {
 		this.budgetHead = budgetHead;
+	}
+
+	public BigDecimal getTaxAmount() {
+		return taxAmount;
+	}
+
+	public void setTaxAmount(BigDecimal taxAmount) {
+		this.taxAmount = taxAmount;
+	}
+
+	public BigDecimal getIgstAmount() {
+		return igstAmount;
+	}
+
+	public void setIgstAmount(BigDecimal igstAmount) {
+		this.igstAmount = igstAmount;
+	}
+
+	public BigDecimal getCgstAmount() {
+		return cgstAmount;
+	}
+
+	public void setCgstAmount(BigDecimal cgstAmount) {
+		this.cgstAmount = cgstAmount;
+	}
+
+	public BigDecimal getLabourcessAmount() {
+		return labourcessAmount;
+	}
+
+	public void setLabourcessAmount(BigDecimal labourcessAmount) {
+		this.labourcessAmount = labourcessAmount;
+	}
+
+	public BigDecimal getCollectionchargesAmount() {
+		return collectionchargesAmount;
+	}
+
+	public void setCollectionchargesAmount(BigDecimal collectionchargesAmount) {
+		this.collectionchargesAmount = collectionchargesAmount;
+	}
+
+	public BigDecimal getWaterChargesAmount() {
+		return waterChargesAmount;
+	}
+
+	public void setWaterChargesAmount(BigDecimal waterChargesAmount) {
+		this.waterChargesAmount = waterChargesAmount;
+	}
+
+	public BigDecimal getQualityAmount() {
+		return qualityAmount;
+	}
+
+	public void setQualityAmount(BigDecimal qualityAmount) {
+		this.qualityAmount = qualityAmount;
+	}
+
+	public BigDecimal getPenaltyAmount() {
+		return penaltyAmount;
+	}
+
+	public void setPenaltyAmount(BigDecimal penaltyAmount) {
+		this.penaltyAmount = penaltyAmount;
+	}
+
+	public BigDecimal getSecuritAmount() {
+		return securitAmount;
+	}
+
+	public void setSecuritAmount(BigDecimal securitAmount) {
+		this.securitAmount = securitAmount;
+	}
+
+	public String getScheme() {
+		return scheme;
+	}
+
+	public void setScheme(String scheme) {
+		this.scheme = scheme;
+	}
+
+	public String getVoucherDate() {
+		return voucherDate;
+	}
+
+	public void setVoucherDate(String voucherDate) {
+		this.voucherDate = voucherDate;
+	}
+
+	public String getBpvDate() {
+		return bpvDate;
+	}
+
+	public void setBpvDate(String bpvDate) {
+		this.bpvDate = bpvDate;
+	}
+
+	public String getBankaccount() {
+		return bankaccount;
+	}
+
+	public void setBankaccount(String bankaccount) {
+		this.bankaccount = bankaccount;
+	}
+
+	public BigDecimal getGpfAmount() {
+		return gpfAmount;
+	}
+
+	public void setGpfAmount(BigDecimal gpfAmount) {
+		this.gpfAmount = gpfAmount;
+	}
+
+	public BigDecimal getNpsAmount() {
+		return npsAmount;
+	}
+
+	public void setNpsAmount(BigDecimal npsAmount) {
+		this.npsAmount = npsAmount;
+	}
+
+	public BigDecimal getGslicAmount() {
+		return gslicAmount;
+	}
+
+	public void setGslicAmount(BigDecimal gslicAmount) {
+		this.gslicAmount = gslicAmount;
+	}
+
+	public BigDecimal getHbaAmount() {
+		return hbaAmount;
+	}
+
+	public void setHbaAmount(BigDecimal hbaAmount) {
+		this.hbaAmount = hbaAmount;
+	}
+
+	public BigDecimal getLicenseAmount() {
+		return licenseAmount;
+	}
+
+	public void setLicenseAmount(BigDecimal licenseAmount) {
+		this.licenseAmount = licenseAmount;
+	}
+
+	public BigDecimal getLicAmount() {
+		return licAmount;
+	}
+
+	public void setLicAmount(BigDecimal licAmount) {
+		this.licAmount = licAmount;
+	}
+
+	public BigDecimal getBankAmount() {
+		return bankAmount;
+	}
+
+	public void setBankAmount(BigDecimal bankAmount) {
+		this.bankAmount = bankAmount;
+	}
+
+	public BigDecimal getCourtAmount() {
+		return courtAmount;
+	}
+
+	public void setCourtAmount(BigDecimal courtAmount) {
+		this.courtAmount = courtAmount;
+	}
+
+	public BigDecimal getPensionAmount() {
+		return pensionAmount;
+	}
+
+	public void setPensionAmount(BigDecimal pensionAmount) {
+		this.pensionAmount = pensionAmount;
 	}
 
 	

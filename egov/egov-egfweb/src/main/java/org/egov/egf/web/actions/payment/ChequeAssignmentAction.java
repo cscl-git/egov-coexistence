@@ -1168,11 +1168,15 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         	System.out.println("Before");
             validateData();
             System.out.println("Before After");
+            System.out.println("reassignSurrenderChq    :::"+reassignSurrenderChq);
+            System.out.println("isChequeNoGenerationAuto()   ::: "+isChequeNoGenerationAuto());
+            
             if (reassignSurrenderChq || !isChequeNoGenerationAuto())
                 validateDataForManual();
             System.out.println("Before After All");
             //final String[] dateArray1 = new String[]{parameters.get("chequeDt")[0]};
         	//System.out.println("date : "+dateArray1[0]);
+            System.out.println("mode :::"+paymentMode);
             if(paymentMode.equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS))
             {
             	final String[] dateArray = new String[]{parameters.get("chequeDt")[0]};
@@ -1279,6 +1283,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     }
 
     public List<ChequeAssignment> prepareChequeAssignmentList() {
+    	System.out.println("XXXX");
         chequeAssignmentList = new ArrayList<>();
         String[] selectedRowsIdArray;
         if (selectedRowsId != null)
@@ -1286,6 +1291,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         else
             selectedRowsIdArray = new String[0];
         int length = selectedRowsIdArray.length;
+        System.out.println("length ::::"+length);
         for (int i = 0; i < length; i++) {
             ChequeAssignment chequeAssignment = new ChequeAssignment();
             String[] items = selectedRowsIdArray[i].split("\\~");
@@ -1307,6 +1313,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             chequeAssignment.setIsSelected(true);
             chequeAssignmentList.add(chequeAssignment);
         }
+        System.out.println("chequeAssignmentList.size() ::::"+chequeAssignmentList.size());
         return chequeAssignmentList;
     }
 
@@ -2240,15 +2247,19 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             if (StringUtils.isEmpty(parameters.get("chequeNo")[0]))
                 addFieldError("chequeNo", getMessage("payment.chequeno.empty"));
             else {
-                for (int j = 0; j < chequeAssignmentList.size(); j++)
-                    if (parameters.get("chequeAssignmentList[" + j + "].isSelected") != null
-                            && parameters.get("chequeAssignmentList[" + j + "].isSelected")[0].equals("true")) {
-                        final String paymentdt = parameters.get("chequeAssignmentList[" + j + "].tempPaymentDate")[0];
-
-                        if (formatter.parse(chequedt).compareTo(formatter.parse(paymentdt)) < 0)
-                            addFieldError("Cheque date cannot be less than paymnet date",
-                                    getMessage("payment.chequedate.invalid"));
-                    }
+            	System.out.println("size ::: "+chequeAssignmentList.size());
+            	System.out.println("");
+				/*
+				 * for (int j = 0; j < chequeAssignmentList.size(); j++) if
+				 * (parameters.get("chequeAssignmentList[" + j + "].isSelected") != null &&
+				 * parameters.get("chequeAssignmentList[" + j +
+				 * "].isSelected")[0].equals("true")) { final String paymentdt =
+				 * parameters.get("chequeAssignmentList[" + j + "].tempPaymentDate")[0];
+				 * 
+				 * if (formatter.parse(chequedt).compareTo(formatter.parse(paymentdt)) < 0)
+				 * addFieldError("Cheque date cannot be less than paymnet date",
+				 * getMessage("payment.chequedate.invalid")); }
+				 */
                 if (reassignSurrenderChq) {
                     if (!instrumentService.isReassigningChequeNumberValid(parameters.get("chequeNo")[0], bankaccount.longValue(),
                             voucherHeader.getVouchermis().getDepartmentcode(), parameters.get("serialNo")[0]))

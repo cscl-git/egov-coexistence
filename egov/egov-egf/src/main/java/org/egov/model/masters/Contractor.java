@@ -47,7 +47,9 @@
  */
 package org.egov.model.masters;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -57,6 +59,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 
 import org.egov.commons.Bank;
@@ -67,6 +70,7 @@ import org.egov.infra.persistence.validator.annotation.OptionalPattern;
 import org.egov.infra.persistence.validator.annotation.Required;
 import org.egov.infra.persistence.validator.annotation.Unique;
 import org.egov.infra.validation.regex.Constants;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.validator.constraints.Length;
 
@@ -117,6 +121,8 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @OptionalPattern(regex = FinancialConstants.ALPHANUMERICWITHALLSPECIALCHAR, message = "Special Characters are not allowed in narration")
     private String vigilance;
     
+    private String adharnumber;
+    
     private Date blckListFromDate;
     
     private Date blckListToDate;
@@ -164,6 +170,9 @@ public class Contractor extends AbstractAuditable implements EntityType {
     @ManyToOne
     @JoinColumn(name = "status")
     private EgwStatus status;
+    
+    @Transient
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
 
     @Override
     public String getCode() {
@@ -397,6 +406,22 @@ public class Contractor extends AbstractAuditable implements EntityType {
 
 	public void setBlckListToDate(Date blckListToDate) {
 		this.blckListToDate = blckListToDate;
+	}
+
+	public String getAdharnumber() {
+		return adharnumber;
+	}
+
+	public void setAdharnumber(String adharnumber) {
+		this.adharnumber = adharnumber;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
 	}
 
 }

@@ -46,7 +46,6 @@
  *
  */
 function validate() {
-	console.log("validate");
 	if (!validateForm_directBankPayment()) {
 		undoLoadingMask();
 		return false;
@@ -111,9 +110,6 @@ function loadDocumentNoAndDate(billVhId) {
  */
 
 function populateAvailableBalance(accnumObj) {
-	console.log("populateAvailableBalance");
-	console.log("accnumObj.options[accnumObj.selectedIndex].value   :::"+accnumObj.options[accnumObj.selectedIndex].value);
-	console.log("document.getElementById('voucherDate').value   :::"+document.getElementById('voucherDate').value);
 	if (document.getElementById('voucherDate').value == '') {
 		bootbox.alert("Please Select the Voucher Date!!");
 		accnumObj.options.value = -1;

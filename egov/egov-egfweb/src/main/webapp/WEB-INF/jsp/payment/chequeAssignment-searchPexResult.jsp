@@ -183,6 +183,9 @@
 			<div class="subheadsmallnew" id="noRecordsDiv"
 				style="visibility: hidden">No Records Found</div>
 			<br />
+			<div>
+			Total Amount (Rs) : <input type="text" name="caltotalamount" readonly="readonly" id="caltotalamount">
+			</div>
 
 			<div class="buttonbottom">
 				<s:hidden id="selectedRows" name="selectedRows"
@@ -202,12 +205,27 @@
 		<s:token />
 	</s:form>
 	<script>
+	var sum=0;
 			function update(obj)
 			{
+				//alert(obj)		
+ 				var id ="";
+ 				var index = "";
+				
 				if(obj.checked){
+					
+					 id = obj.id;
+					 index  = parseInt(id.replace("isSelected",""));					
+					
+					sum = sum + parseInt(document.getElementsByName("pexList["+index+"].paidAmount")[0].value);
+					document.getElementById("caltotalamount").value = sum;
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)+1;
 				}
 				else{
+					 id = obj.id;
+					 index  = parseInt(id.replace("isSelected",""));
+					sum = sum - parseInt(document.getElementsByName("pexList["+index+"].paidAmount")[0].value);
+					document.getElementById("caltotalamount").value = sum;
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)-1;
 				}
 			}

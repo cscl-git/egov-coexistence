@@ -161,6 +161,7 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     private String firstsignatory;
     private String secondsignatory;
     private String postauditprocessing;
+    private String backdateentry;
     public String getPostauditprocessing() {
 		return postauditprocessing;
 	}
@@ -602,5 +603,13 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 
 	public void setBillTo(Date billTo) {
 		this.billTo = billTo;
+	}
+
+	public String getBackdateentry() {
+		return backdateentry;
+	}
+
+	public void setBackdateentry(String backdateentry) {
+		this.backdateentry = backdateentry;
 	}
 }

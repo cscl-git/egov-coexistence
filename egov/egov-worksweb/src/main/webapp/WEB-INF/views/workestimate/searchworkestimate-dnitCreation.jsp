@@ -71,8 +71,6 @@
 								<th><spring:message
 										code="lbl.estimate.preparation.estimate.number" /></th>
 								<th><spring:message
-										code="lbl.estimate.preparation.work.status" /></th>
-								<th><spring:message
 										code="lbl.estimate.preparation.estimate.amount" /></th>
 							</tr>
 						</thead>
@@ -94,10 +92,6 @@
 												path="estimateList[${status.index}].estimateNumber"
 												id="estimateList[${status.index}].estimateNumber" />
 											${result.estimateNumber }</td>
-										<td><form:hidden
-												path="estimateList[${status.index}].workStatus"
-												id="estimateList[${status.index}].workStatus" />
-											${result.workStatus }</td>
 										<td><form:hidden
 												path="estimateList[${status.index}].estimateAmount"
 												id="estimateList[${status.index}].estimateAmount" />

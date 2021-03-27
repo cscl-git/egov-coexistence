@@ -140,6 +140,8 @@ public class JournalVoucherAction extends BaseVoucherAction
 
     @Autowired
     private ScriptService scriptService;
+    
+    private String backlogEntry;
 
     @SuppressWarnings("unchecked")
     @Override
@@ -210,6 +212,7 @@ public class JournalVoucherAction extends BaseVoucherAction
     public String create() throws Exception {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("VoucherAction | create Method | Start");
+        LOGGER.info("Backlog entry :::"+backlogEntry);
         String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
         removeEmptyRowsAccoutDetail(billDetailslist);
@@ -251,7 +254,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                     documentDetail.add(upload);
                 }
                 }
-               
+               voucherHeader.setBackdateentry(backlogEntry);
                 voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                         voucherTypeBean, workflowBean);
                 voucherHeader.setDocumentDetail(documentDetail);               
@@ -618,6 +621,14 @@ public class JournalVoucherAction extends BaseVoucherAction
 
 	public void setFileFileName(String[] fileFileName) {
 		this.fileFileName = fileFileName;
+	}
+
+	public String getBacklogEntry() {
+		return backlogEntry;
+	}
+
+	public void setBacklogEntry(String backlogEntry) {
+		this.backlogEntry = backlogEntry;
 	}
 
 	

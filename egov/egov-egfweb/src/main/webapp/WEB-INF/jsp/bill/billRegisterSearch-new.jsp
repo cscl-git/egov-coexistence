@@ -191,6 +191,8 @@
 	</s:form>
 	<script>
 	 function validateFormAndSubmit(){
+		 var amount=document.getElementById('amount').value;
+		 var party=document.getElementById('partyName').value;
 		 if(jQuery('#billnumber').val()!="")
 			 {
 				 if(jQuery('#expType').val()==-1)

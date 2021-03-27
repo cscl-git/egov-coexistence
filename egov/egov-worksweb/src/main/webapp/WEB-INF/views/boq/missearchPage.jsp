@@ -61,9 +61,21 @@
 								itemValue="code" itemLabel="name" />
 						</form:select>
 					</div>
+					<!-- //edited... -->
+					<label class="col-sm-3 control-label text-left-audit" >Contractor Name</label>
+				<div class="col-sm-3 add-margin">
+					 <form:select path="contractor_name" id="contractor_name"
+						class="form-control"  onchange="getContractorDetails(this)">
+						<form:option value="">
+							<spring:message code="lbl.select" text="Select" />
+						</form:option>
+						<form:options items="${workOrderAgreement.contractors}" itemValue="id"
+							itemLabel="name" />
+					</form:select>
 					
 							</div>
 						</div>
+					</div>
 					</div>
 
 		<div class="buttonbottom" align="center">
@@ -87,6 +99,7 @@
 									<th><spring:message code="lbl.intended.date" /></th>
 									<th><spring:message code="lbl.amount" /></th>
 									<th><spring:message code="lbl.works.status" /></th>
+									<th>Milestone Status</th>
 									<th><spring:message code="lbl.works.completion" /></th>
 
 								</tr>
@@ -127,6 +140,10 @@
 													path="workOrderList[${status.index}].statusDescp"
 													id="workOrderList[${status.index}].statusDescp" />
 												${result.statusDescp }</td>
+												<td><form:hidden
+													path="workOrderList[${status.index}].milestonestatus"
+													id="workOrderList[${status.index}].milestonestatus" />
+												${result.milestonestatus }</td>
 											<td><form:hidden
 													path="workOrderList[${status.index}].percentCompletion"
 													id="workOrderList[${status.index}].percentCompletion" />

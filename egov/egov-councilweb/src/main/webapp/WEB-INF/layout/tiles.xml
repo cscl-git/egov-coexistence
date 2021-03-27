@@ -434,5 +434,17 @@
         <put-attribute name="page-title" value="title.council.router.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilrouter/councilrouter-search.jsp"/>
     </definition>
+     <!--  Added  kundan kumar -->
+     <definition name="councilagenda-upload" extends="base_layout">
+        <put-attribute name="page-title" value="title.agendaUpload.new" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilpreamble/councilagenda-upload.jsp"/>
+    </definition>
+    
+     <definition name="councilagendaUpload-search" extends="base_layout">
+        <put-attribute name="page-title" value="title.agendaUpload.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilpreamble/councilagendaUpload-search.jsp"/>
+    </definition>
+    
+   <!--  Ended  kundan kumar --> 
     
 </tiles-definitions>

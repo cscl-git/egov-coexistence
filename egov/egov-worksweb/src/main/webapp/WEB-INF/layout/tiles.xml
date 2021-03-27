@@ -281,6 +281,10 @@
         <put-attribute name="page-title" value="title.boqDetails.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/boqDetails.jsp"/>
     </definition>
+     <definition name="newboqDetails-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.boqDetails.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/newboqDetails.jsp"/>
+    </definition>
     
     <definition name="tender-form" extends="base_layout">
         <put-attribute name="page-title" value="title.tenderDetails.create" cascade="true"/>
@@ -391,6 +395,18 @@
         <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/modifyworkagreement.jsp"/>
     </definition>
+     <definition name="editnew-boq-details" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/editnewboq.jsp"/>
+    </definition>
+     <definition name="view-edit-page" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/viewboqdetail.jsp"/>
+    </definition>
+     <definition name="update-edit-page" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/updateboq.jsp"/>
+    </definition>
     
     
     <definition name="closure-work-agreement" extends="base_layout">
@@ -431,7 +447,21 @@
         <put-attribute name="body" value="/WEB-INF/views/dnitCreation/searchdnit.jsp"/>
     </definition>
    
+    <definition name="search-boq-details" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/viewnewboqdetails.jsp"/>
+    </definition>
+    
+   <!-- Added edititable DNIT -->
+   <definition name="search-edit-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/searcheditdnit.jsp"/>
+    </definition>
    
+    <definition name="edit-dnit-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/dnitCreation/editDnitestimate.jsp"/>
+    </definition>
    
      <definition name="view-dnit-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.view" cascade="true"/>

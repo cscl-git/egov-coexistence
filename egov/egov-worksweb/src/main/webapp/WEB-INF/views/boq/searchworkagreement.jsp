@@ -17,22 +17,23 @@
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="form-group" style="padding: 50px 20px 0;">
 
-					<label
-						class="col-sm-3 control-label text-left-audit"><spring:message
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.name.work" /></label>
 					<div class="col-sm-9 add-margin">
-							<form:textarea class="form-control" path="name_work_order_search" maxlength="2000" style="height: 100px;"
-					 />
+						<form:textarea class="form-control" path="name_work_order_search"
+							maxlength="2000" style="height: 100px;" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_number_search"  />
+						<form:input type="text" class="form-control"
+							path="work_number_search" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_agreement_number_search" />
+						<form:input type="text" class="form-control"
+							path="work_agreement_number_search" />
 					</div>
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -61,6 +62,19 @@
 								itemValue="code" itemLabel="name" />
 						</form:select>
 					</div>
+					<%-- <label class="col-sm-3 control-label text-left-audit"
+						value="Contractor Name"> <span class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="contractor_name" id="contractor_name"
+							class="form-control" onchange="getContractorDetails(this)">
+							<form:option value="">
+								<spring:message code="lbl.select" text="Select" />
+							</form:option>
+							<form:options items="${workOrderAgreement.contractors}"
+								itemValue="name" itemLabel="name" />
+						</form:select>
+
+					</div> --%>
 					
 							</div>
 						</div>
@@ -68,8 +82,7 @@
 
 		<div class="buttonbottom" align="center">
 			<input type="submit" id="searchclosure" class="btn btn-primary"
-							name="searchclosure" code="lbl.search.work.estimate"
-							value="Search" />
+				name="searchclosure" code="lbl.search.work.estimate" value="Search" />
 				</div>
 
 		<br> <br> <br>
@@ -87,6 +100,8 @@
 									<th><spring:message code="lbl.intended.date" /></th>
 									<th><spring:message code="lbl.amount" /></th>
 									<th><spring:message code="lbl.works.status" /></th>
+								<th><spring:message
+										code="lbl.estimate.preparation.work.pending" /></th>
 
 								</tr>
 							</thead>
@@ -108,8 +123,8 @@
 											<td><form:hidden
 													path="workOrderList[${status.index}].work_agreement_number"
 													id="workOrderList[${status.index}].work_agreement_number" />
-												<a href="#" onclick="openWorkView('${result.id}')" > ${result.work_agreement_number }</a>
-												</td>
+											<a href="#" onclick="openWorkView('${result.id}')">
+												${result.work_agreement_number }</a></td>
 												<td><form:hidden
 													path="workOrderList[${status.index}].startDate"
 													id="workOrderList[${status.index}].startDate" />
@@ -126,6 +141,10 @@
 													path="workOrderList[${status.index}].statusDescp"
 													id="workOrderList[${status.index}].statusDescp" />
 												${result.statusDescp }</td>
+											<td><form:hidden
+													path="workOrderList[${status.index}].pendingWith"
+													id="workOrderList[${status.index}].pendingWith" />
+												${result.pendingWith }</td>
 										</tr>
 									</c:forEach>
 								<tbody>
