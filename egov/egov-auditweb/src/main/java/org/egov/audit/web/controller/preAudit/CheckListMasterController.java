@@ -43,7 +43,7 @@ public class CheckListMasterController extends GenericWorkFlowController {
 	        return egBillSubTypeService.getByExpenditureType(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
 	    }
     
-    @RequestMapping(value = "/checklist", method = RequestMethod.POST)
+    @RequestMapping(value = "/checklist", method = {RequestMethod.GET,RequestMethod.POST})
     public String showcheckList(@ModelAttribute("billTypeCheckListdata") final BillTypeCheckListData billTypeCheckListdata,
     		final Model model,HttpServletRequest requests) {
         LOGGER.info("New Bill Type List request created");
@@ -54,18 +54,18 @@ public class CheckListMasterController extends GenericWorkFlowController {
         return "check-list-master";
     }
     
-    @RequestMapping(value = "/checklist", method = RequestMethod.GET)
-    public String showcheckListGET(@ModelAttribute("billTypeCheckListdata") final BillTypeCheckListData billTypeCheckListdata,
-    		final Model model,HttpServletRequest requests) {
-        LOGGER.info("New Bill Type List request created");
-        EgBillSubType sub=new EgBillSubType();
-        sub.setName("Post Audit");
-        getBillSubTypes().add(sub);
-        model.addAttribute("billSubTypes", getBillSubTypes());
-        System.out.println(billTypeCheckListdata.getMessege());
-        model.addAttribute("billTypeCheckListdata", billTypeCheckListdata);
-        return "check-list-master";
-    }
+	/*
+	 * @RequestMapping(value = "/checklist", method = RequestMethod.GET) public
+	 * String showcheckListGET(@ModelAttribute("billTypeCheckListdata") final
+	 * BillTypeCheckListData billTypeCheckListdata, final Model
+	 * model,HttpServletRequest requests) {
+	 * LOGGER.info("New Bill Type List request created"); EgBillSubType sub=new
+	 * EgBillSubType(); sub.setName("Post Audit"); getBillSubTypes().add(sub);
+	 * model.addAttribute("billSubTypes", getBillSubTypes());
+	 * System.out.println(billTypeCheckListdata.getMessege());
+	 * model.addAttribute("billTypeCheckListdata", billTypeCheckListdata); return
+	 * "check-list-master"; }
+	 */
     
     
     @RequestMapping(value = "/showBillCheckList", method = RequestMethod.POST)
