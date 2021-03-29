@@ -68,11 +68,27 @@ jQuery(document).ready(
 				submitForm();
 			});
 			
+			$('#legalcaseReportSearchExcel').click(function() {
+					submitFormForExcel();
+		});
+			
 		});
 $('#searchapp').keyup(function(){
 	tableContainer.fnFilter(this.value);
 });
 
+function submitFormForExcel(){
+	url : "/services/lcms/search/legalsearchResultExcel?"+$('#searchlegalcaseForm').serialize();
+	
+		$.ajax({
+			 type: "GET",
+			  url: "/services/lcms/search/legalsearchResultExcel?"+$('#searchlegalcaseForm').serialize(),
+			  cache: false,
+			  success: function(){
+				  window.location ="/services/lcms/search/legalsearchResultExcel?"+$('#searchlegalcaseForm').serialize();
+			  }
+			});
+}
 function submitForm() {
 
 	var caseNumber = $("#caseNumber").val();
@@ -143,9 +159,14 @@ function submitForm() {
 							"className" : "text-left"
 						},
 						{
-							"sTitle" : "Actions",
+							"data" : "concernedBranch",
+							"sTitle" : "Concerned Branch",
+							"className" : "text-left"
+						},
+						{
+							title : 'Actions',
 							"className" : "text-right",
-							"render" : function(data, type, full) {
+							render : function(data, type, full) {
 								if(full.legalViewAccess)
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option></select>');
 

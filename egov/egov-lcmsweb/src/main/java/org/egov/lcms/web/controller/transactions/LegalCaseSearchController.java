@@ -64,8 +64,13 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import java.io.OutputStream;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping(value = "/search")
@@ -101,8 +106,46 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
             @ModelAttribute final LegalCaseSearchResult legalCaseSearchResult, final HttpServletRequest request) {
         final List<LegalCaseSearchResult> legalcaseSearchList = searchLegalCaseService
                 .getLegalCaseReport(legalCaseSearchResult);
+       
         return new StringBuilder("{ \"data\":").append(
                 JsonUtils.toJSON(legalcaseSearchList, LegalCaseSearchResult.class, LegalCaseSearchJsonAdaptor.class))
                 .append("}").toString();
+    }
+    
+    
+    @RequestMapping(value = "/legalsearchResultExcel")
+    @ResponseBody
+    public void getLegalCaseSearchResultExcel(final Model model,
+            @ModelAttribute final LegalCaseSearchResult legalCaseSearchResult, final HttpServletRequest request,HttpServletResponse response) {
+        final List<LegalCaseSearchResult> legalcaseSearchList = searchLegalCaseService.getLegalCaseReport(legalCaseSearchResult);
+        if(null!=legalcaseSearchList) {
+        	
+        	Map<String, String> headerData = new HashMap<>();
+			 headerData.put("h1","File Number");
+			 headerData.put("h2","Case Number");
+			 headerData.put("h3","Case Title");
+			 headerData.put("h4","Court Name");
+			 headerData.put("h5","Defending Counsel");
+			 headerData.put("h6","Case Status");
+			 headerData.put("h7","Petitioners");
+			 headerData.put("h8","Respondents");
+			 headerData.put("h9","Concerned Branch");
+			 
+			 byte[] fileContent =searchLegalCaseService.getSearchLegalCaseExcelSheet(headerData,legalcaseSearchList);
+			 response.setContentType("application/ms-excel");
+			  response.setContentLength(fileContent.length); 
+			  response.setHeader("Expires:","0"); 
+			  response.setHeader("Content-Disposition","attachment; filename=Legal Case Search.xls");
+			  try { 
+				  OutputStream outStream = response.getOutputStream();
+				  outStream.write(fileContent); outStream.flush();
+			  }catch(Exception ex) {
+				  ex.printStackTrace();
+				  
+			  }
+			  
+        }
+			
+        
     }
 }

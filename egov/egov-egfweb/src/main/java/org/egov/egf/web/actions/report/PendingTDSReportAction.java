@@ -593,15 +593,15 @@ public class PendingTDSReportAction extends BaseFormAction {
             		{
             			 if(supplierMap.get(row.getPartyName()) != null)
             			 {
-            				 row.setGstNo(supplierMap.get(row.getPartyName()).getTinNumber());
-            				 row.setPanNo(supplierMap.get(row.getPartyName()).getPanNumber());
+            				 row.setGstNo(supplierMap.get(row.getPartyName().trim()).getTinNumber());
+            				 row.setPanNo(supplierMap.get(row.getPartyName().trim()).getPanNumber());
             			 }
             			
             		}
             		else if(row.getDetailTypeId() == 12 && row.getPartyName() != null && !row.getPartyName().isEmpty())
             		{
-            			row.setGstNo(contractorMap.get(row.getPartyName()).getTinNumber());
-       				 	row.setPanNo(contractorMap.get(row.getPartyName()).getPanNumber());
+            			row.setGstNo(contractorMap.get(row.getPartyName().trim()).getTinNumber());
+       				 	row.setPanNo(contractorMap.get(row.getPartyName().trim()).getPanNumber());
             		}
             	}
             }

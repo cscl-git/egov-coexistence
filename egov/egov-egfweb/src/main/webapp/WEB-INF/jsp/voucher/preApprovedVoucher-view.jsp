@@ -101,6 +101,14 @@
 	}
 }
 
+
+ 
+ @media print {
+    html, body {
+        height: 95%;    
+    }
+}
+
 </style>
 </head>
 

@@ -353,9 +353,9 @@
 
 
 <div class="panel panel-primary" onchange="milestoneshow">
-<label class="col-sm-3 control-label text-left-audit">Milestones ?</label></br>
+<label class="col-sm-3 control-label text-left-audit">Is progress Milestone based ?</label></br>
 
-        <input type="radio" name="milestonestatus" id="mileYes" class="milestatus" value="Yes"><span>YES</span>
+        <input type="radio" name="milestonestatus" id="mileYes" class ="milestatus" value="Yes"><span>YES</span>
         <input type="radio" name="milestonestatus" id="mileNo"  class="milestatus" value="No"><span>NO</span>
 
 </div>

@@ -483,5 +483,11 @@
     </definition>
     
 
+<definition name="view-data" extends="base_layout">
+        <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/boq/viewdata.jsp"/>
+    </definition>
+    
+    
 </tiles-definitions>
 

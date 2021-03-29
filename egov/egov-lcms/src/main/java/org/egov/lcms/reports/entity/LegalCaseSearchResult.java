@@ -80,6 +80,7 @@ public class LegalCaseSearchResult {
     private String toDate;
     private Boolean legalViewAccess=false;
     private String judgmentType;
+	private String concernedBranch;
 
     public String getFromDate() {
         return fromDate;
@@ -304,10 +305,14 @@ public class LegalCaseSearchResult {
 	public void setJudgmentType(String judgmentType) {
 		this.judgmentType = judgmentType;
 	}
-
 	
+	public String getConcernedBranch() {
+		return concernedBranch;
+	}
 
-	
+	public void setConcernedBranch(String concernedBranch) {
+		this.concernedBranch = concernedBranch;
+	}
 
    
 }

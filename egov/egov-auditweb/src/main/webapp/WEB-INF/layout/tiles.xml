@@ -88,7 +88,10 @@ value="/WEB-INF/views/audit/auditStateSearch.jsp" />
         <put-attribute name="body" value="/WEB-INF/views/audit/auditStateUpdate.jsp"/>
     </definition>
 
-
+    <definition name="check-list-master" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/checkbill-list.jsp"/>
+    </definition>
 
 
 

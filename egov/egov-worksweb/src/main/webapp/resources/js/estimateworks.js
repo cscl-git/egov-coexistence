@@ -157,13 +157,13 @@ function deletedata(empid,slno)
 	}
 function openBOQ(estId)
 {
-	alert(estId);
+	
 	var url = "/services/works/boq/viewBoq/"+ estId;
 	window.open(url,'','width=900, height=700');
 	}
 function updateBOQ(estId)
 {
-	alert(estId);
+	
 	var url = "/services/works/boq/updateBoq/"+ estId;
 	window.open(url,'','width=900, height=700');
 }

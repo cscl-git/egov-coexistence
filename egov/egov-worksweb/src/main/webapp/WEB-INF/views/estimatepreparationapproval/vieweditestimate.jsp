@@ -278,6 +278,7 @@
 											   name="amount" ></form:input></td>
 									<td class="text-center"><span style=" cursor:pointer;  color: black;" onclick="addcheckListRow(${mapstatus.index});" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 				<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="deletedata(${estimatePreparationApproval.id},${boq.slNo})"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
+				 				<%-- <span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="deleteajax(${estimatePreparationApproval.id},${boq.slNo})"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> --%>
 				 				
 				 		
 								</td>
@@ -302,7 +303,26 @@
 
 
 
+<!-- <script type="text/javascript">
 
+	
+	function deleteajax(id,slno){
+		var id=id;
+		var slno=slno;
+		$.ajax({
+			type : "GET",
+			data: 'html',
+			url : "/services/works/dnit/deletednit/"+ empid+"/"+slno,
+			success : function(result) {
+				alert("done");
+				
+				
+			}   
+				});
+			}
+		
+	
+</script> -->
 
 
 

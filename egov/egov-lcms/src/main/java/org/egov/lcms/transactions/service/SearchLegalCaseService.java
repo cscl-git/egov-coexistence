@@ -47,13 +47,23 @@
  */
 package org.egov.lcms.transactions.service;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.egov.infra.admin.master.entity.Role;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.security.utils.SecurityUtils;
@@ -89,13 +99,14 @@ public class SearchLegalCaseService {
         final Boolean loggedInUserViewAccess = checkLoggedInUser(securityUtils.getCurrentUser());
 System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()+"+++++++++++++++");
         final StringBuilder queryStr = new StringBuilder();
-        queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,");
+        queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,concernedmaster.concernedBranch as concernedBranch ,");
         queryStr.append(" egwStatus.code  as  caseStatus ");
 
 		queryStr.append(" from LegalCase legalObj left join Judgment judgment on legalObj.id=judgment.legalCase ");
 		queryStr.append(" left join JudgmentType judtype on judgment.judgmentType=judtype.id ");
 
 		queryStr.append(" left join CourtMaster courtmaster on legalObj.id=courtmaster.id ");
+		queryStr.append(" left join ConcernedBranchMaster concernedmaster on legalObj.id=concernedmaster.id ");
 		queryStr.append(" left join CaseTypeMaster casetypemaster on legalObj.id=casetypemaster.id ");
 		queryStr.append(" left join PetitionTypeMaster petmaster on legalObj.id=petmaster.id ");
 		queryStr.append("left join EgwStatus egwStatus on legalObj.id=egwStatus.id  ");
@@ -208,4 +219,143 @@ System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()
         return false;
     }
 
+    public byte[] getSearchLegalCaseExcelSheet(Map<String,String>headerData,	List<LegalCaseSearchResult> legalcaseSearchList) {		
+		byte[]fileContent=null;
+		try {
+			HSSFWorkbook wb = new HSSFWorkbook();
+			Sheet sheet = wb.createSheet("Legal Case Report");
+			sheet.getPrintSetup().setLandscape(true);
+			sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE); 
+			HSSFCellStyle style = wb.createCellStyle();  
+			HSSFFont font = wb.createFont();
+			 font.setFontHeightInPoints((short)11);  
+	         font.setFontName("Times New Roman");  
+	         //font.setBoldweight((short)10);
+	        style.setFont(font);  
+			int i =0;
+
+			Row row1 = sheet.createRow(i++);	  
+			Cell c1=  row1.createCell(0);
+			c1.setCellStyle(style);
+			c1.setCellValue(headerData.get("h1"));
+			
+			
+			Cell c2=  row1.createCell(1);
+			c2.setCellStyle(style);
+			c2.setCellValue(headerData.get("h2"));
+
+			
+			Cell c3=  row1.createCell(2);
+			c3.setCellStyle(style);
+			c3.setCellValue(headerData.get("h3"));
+
+			Cell c4=  row1.createCell(3);
+			c4.setCellStyle(style);
+			c4.setCellValue(headerData.get("h4"));
+			
+			Cell c5=  row1.createCell(4);
+			c5.setCellStyle(style);
+			c5.setCellValue(headerData.get("h5"));
+			
+			Cell c6=  row1.createCell(5);
+			c6.setCellStyle(style);
+			c6.setCellValue(headerData.get("h6"));
+			
+			Cell c7=  row1.createCell(6);
+			c7.setCellStyle(style);
+			c7.setCellValue(headerData.get("h7"));
+
+			Cell c8=  row1.createCell(7);
+			c8.setCellStyle(style);
+			c8.setCellValue(headerData.get("h8"));
+
+			Cell c9=  row1.createCell(8);
+			c9.setCellStyle(style);
+			c9.setCellValue(headerData.get("h9"));
+					
+			for(LegalCaseSearchResult s : legalcaseSearchList) {
+				String casenumber="";
+				String casetitle="";
+				String concernedBranch="";
+				String courtname="";
+				String standingcouncil="";
+				String legalcaseno="";
+				String petitioners="";
+				String respondants="";
+				String statusDesc="";
+				
+				 Row row = sheet.createRow(i++);
+				 	Cell cell0 = row.createCell(0);
+					Cell cell1 = row.createCell(1);
+					Cell cell2= row.createCell(2);
+					Cell cell3= row.createCell(3);
+					Cell cell4= row.createCell(4);
+					Cell cell5= row.createCell(5);
+					Cell cell6= row.createCell(6);
+					Cell cell7= row.createCell(7);
+					Cell cell8= row.createCell(8);
+						
+					if(s.getLegalCase().getLcNumber()!=null) {
+						legalcaseno = s.getLegalCase().getLcNumber();
+					}
+					if(s.getLegalCase().getCaseNumber()!=null) {
+						casenumber= s.getLegalCase().getCaseNumber();
+					}
+					if(s.getLegalCase().getCaseTitle()!=null) {
+						casetitle=s.getLegalCase().getCaseTitle();
+					}
+					
+					if(s.getCourtName()!=null) {
+						courtname=s.getCourtName();
+					}
+					if(s.getLegalCase().getOppPartyAdvocate()!=null) {
+						standingcouncil=s.getLegalCase().getOppPartyAdvocate();
+					}
+					if(s.getLegalCase().getStatus().getDescription()!=null) {
+						statusDesc=s.getLegalCase().getStatus().getDescription();
+					}
+					if(s.getLegalCase().getPetitionersNames()!=null) {
+						petitioners=s.getLegalCase().getPetitionersNames();
+					}
+					
+					if(s.getLegalCase().getRespondantNames()!=null) {
+						respondants=s.getLegalCase().getRespondantNames();
+					}
+					if(s.getConcernedBranch()!=null) {
+						concernedBranch=s.getConcernedBranch();
+					}
+					
+					cell0.setCellValue(legalcaseno);
+					cell1.setCellValue(casenumber);
+					cell2.setCellValue(casetitle);
+					cell3.setCellValue(courtname);
+					cell4.setCellValue(standingcouncil);
+					cell5.setCellValue(statusDesc);
+					cell6.setCellValue(petitioners);
+					cell7.setCellValue(respondants);
+					cell8.setCellValue(concernedBranch);
+		        } 
+			int numberOfSheets = wb.getNumberOfSheets();
+		    for (int x = 0; x < numberOfSheets; x++) {
+		        Sheet sheet1 = wb.getSheetAt(x);
+		        if (sheet1.getPhysicalNumberOfRows() > 0) {
+		            Row row = sheet1.getRow(sheet1.getFirstRowNum());
+		            Iterator<Cell> cellIterator = row.cellIterator();
+		            while (cellIterator.hasNext()) {
+		                Cell cell = cellIterator.next();
+		                int columnIndex = cell.getColumnIndex();
+		                sheet1.autoSizeColumn(columnIndex);
+		            }
+		        }
+		    }
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			wb.write(os);
+			fileContent = os.toByteArray();
+			
+			
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		 return fileContent;
+	}
 }

@@ -58,8 +58,7 @@
 			name="searchlegalcaseForm" id="searchlegalcaseForm"
 			class="form-horizontal form-groups-bordered">
 			<div class="panel panel-primary" data-collapsed="0">
-				<input type="hidden" value="${loggedInUserViewAccess}"
-					id="loggedInUserViewAccess" />
+		<input type="hidden" value="${loggedInUserViewAccess}" id="loggedInUserViewAccess" />
 			
 				<div class="panel-heading">
 					<div class="panel-title">Search Legal Case</div>
@@ -240,6 +239,14 @@
 
 				</table>
 			</div>
+			
+		</div>
+		
+		<div class="row">
+					<div class="text-center">
+						<a href="javascript:void(0);" id="legalcaseReportSearchExcel"
+							class="btn btn-primary">Download Excel</a>
+					</div>
 		</div>
 	</div>
 </div>

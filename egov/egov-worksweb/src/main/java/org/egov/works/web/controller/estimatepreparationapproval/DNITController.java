@@ -537,17 +537,30 @@ private static Map<String, String> map;
 			Workbook workbook = getWorkbook(inputStream, filePath);
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> iterator = firstSheet.iterator();
-			
+			boolean check=false;
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
+				int rowNum = nextRow.getRowNum();
+				
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
+				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
 				 
+					String string=firstSheet.getRow(rowNum).getCell(2).toString();
+				 check=checkAvailableBoq(string);
+				
+				}else {
+					check=false;
+				}
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
 
+
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+//edited	
+						
+
 
 						if (cell.getColumnIndex() == 0) {
 							aBoQDetails.setMilestone(cell.getStringCellValue());
@@ -555,22 +568,53 @@ private static Map<String, String> map;
 						}
 						
 						else if (cell.getColumnIndex() == 1) {
+							
+							if(check) {
+							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
+							}else {
+								aBoQDetails.setItem_description(" ");
+							}
+							
 						} else if (cell.getColumnIndex() == 2) {
+							
+							if(check) {
+							
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							}else {
+								aBoQDetails.setRef_dsr(" ");
+							}
 						}else if (cell.getColumnIndex() == 3) {
+							
+							if(check) {
+								
 							aBoQDetails.setUnit(cell.getStringCellValue());
+							}else {
+								aBoQDetails.setUnit(" ");
+							}
+							
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
 						 if (cell.getColumnIndex() == 4) {
+							 
+							 if(check) {
+								 
 							aBoQDetails.setRate(cell.getNumericCellValue());
+							 }else {
+								 aBoQDetails.setRate(0.0); 
+							 }
 						} else if (cell.getColumnIndex() == 5) {
+							
+							if(check) {
+							
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							}else {
+								aBoQDetails.setQuantity(0.0);
+							}
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
-							
 						}
 
 					}
@@ -580,6 +624,7 @@ private static Map<String, String> map;
 							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
 						count=boQDetailsList.size();
 						aBoQDetails.setSlNo(Long.valueOf(count));
+						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
 						
 					
@@ -638,7 +683,30 @@ private static Map<String, String> map;
 		return "dnitCreation-form";
 
 	}
+	public boolean checkAvailableBoq(final String ref) {
+		boolean b=false;
 
+		if(ref!=null && ref !="")
+		{
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		
+				query.append("where bq.ref_dsr = ? ");
+				
+				System.out.println("Query :: "+query.toString());
+				list = persistenceService.findAllBy(query.toString(),ref);
+			
+	     if (list.size() != 0) {
+	    	 
+	    	 b=true; 
+	     }
+	     }
+		return b;
+	}
 	
 	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
 		BigDecimal  bg100 = new BigDecimal(100);
@@ -879,8 +947,8 @@ private static Map<String, String> map;
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 
 		return "view-dnit-form";
 	}
@@ -927,8 +995,8 @@ private static Map<String, String> map;
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "edit-dnit-form";
 	}
 	/*@RequestMapping(value = "/deleteajaxdnit/{id}/{slno}", method = RequestMethod.GET)
@@ -993,8 +1061,8 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "edit-dnit-form";
 	}
 	@RequestMapping(value = "/editdnit/updateDnit",  method = RequestMethod.POST)
@@ -1002,7 +1070,7 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@RequestParam("file1") MultipartFile[] files,
 			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
 
-		String workFlowAction=dnitCreation.getWorkFlowAction();
+		String workFlowAction="Forward/Reassign";
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -1062,7 +1130,7 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@PathVariable("id") final Long id,@RequestParam("file1") MultipartFile[] files,
 			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
 
-		String workFlowAction=dnitCreation.getWorkFlowAction();
+		String workFlowAction="Forward/Reassign";
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -1158,8 +1226,8 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-dnit-form";
 	}
 

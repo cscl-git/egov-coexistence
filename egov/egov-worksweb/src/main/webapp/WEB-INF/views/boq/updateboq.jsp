@@ -20,27 +20,26 @@
 					<div class="text-center">Update the BOQ Details</div>
 					
 					 
-					 
 					<label class="col-sm-3 control-label text-left-audit">Item
 						Description<span class="mandatory"></span>:
 					</label>
 					<div class="col-sm-9 add-margin">
 						<form:textarea class="form-control" path="item_description"
-							maxlength="2000" style="height: 100px;" required="required" />
+							maxlength="2000" style="height: 100px;" required="required"/>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit">Ref
 						DSR/NS<span class="mandatory"></span>:
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="ref_dsr"
-							required="required"  />
+							required="required" readonly="true" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit">Unit<span
 						class="mandatory"></span>:
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="unit"
-							required="required" />
+							required="required"/>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit">Rate<span
 						class="mandatory"></span>:
@@ -49,12 +48,7 @@
 						<form:input type="number" class="form-control" path="rate"
 							required="required" />
 					</div>
-					
-					
-					<div class="col-sm-3 add-margin">
-						<form:hidden type="number" class="form-control" path="id"
-							required="required" />
-					</div>
+
 
 
 				</div>

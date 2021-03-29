@@ -68,6 +68,7 @@ import org.egov.audit.entity.AuditChecklistHistory;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.entity.AuditPostBillMpng;
 import org.egov.audit.entity.AuditPostVoucherMpng;
+import org.egov.audit.entity.BillTypeCheckList;
 import org.egov.audit.model.AuditBillDetails;
 import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditEmployee;
@@ -75,6 +76,7 @@ import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.model.PostAuditResult;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditService;
+import org.egov.audit.service.BillTypeCheckListService;
 import org.egov.audit.service.ManageAuditorService;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.audit.utils.AuditUtils;
@@ -138,6 +140,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 	@Autowired
 	private FileStoreService fileStoreService;
+	
+	@Autowired
+	 private BillTypeCheckListService billTypeCheckListService;
 
 	@Autowired
 	private AuditService auditService;
@@ -193,12 +198,11 @@ public class CreateAuditController extends GenericWorkFlowController {
 			HttpServletRequest request, @PathVariable final String auditId) {
 		LOGGER.info("Test");
 		AuditCheckList checklistDetail = null;
-		List<AppConfigValues> appConfigValuesList =null;
-		
+		//List<AppConfigValues> appConfigValuesList =null;
+		List<BillTypeCheckList> checkListbill= null;
 		checkList=new ArrayList<AuditCheckList>();
 		List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
 		AuditBillDetails billDetails=null;
-		List<AppConfigValues> appConfigValuesEmpList =null;
 		AuditEmployee emp=null;
 		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
 		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("RSA");
@@ -274,32 +278,30 @@ public class CreateAuditController extends GenericWorkFlowController {
 			System.out.println("status :::"+auditDetails.getStatus().getCode());
 			if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
 			{
-				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
-						"checklist_" + bill.getEgBillregistermis().getEgBillSubType().getName());
+				checkListbill=billTypeCheckListService.findByBillType(bill.getEgBillregistermis().getEgBillSubType().getName());
 			}
 			else
 			{
-				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
-						"checklist_postAudit");
+				checkListbill=billTypeCheckListService.findByBillType("Post Audit");
 				
 			}
 			if(auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
 			{
 				System.out.println("created");
-				for (AppConfigValues value : appConfigValuesList) {
+				for (BillTypeCheckList row : checkListbill) {
 					checklistDetail = new AuditCheckList();
 					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))
 					{
-						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,value.getValue(),"ID"));
-						checklistDetail.setSeverity(getAuditCheckList(auditDetails,value.getValue(),"Sev"));
-						checklistDetail.setStatus(getAuditCheckList(auditDetails,value.getValue(),"Stat"));
-						checklistDetail.setChecklist_date(getAuditCheckListDate(auditDetails,value.getValue(),"Date"));
+						checklistDetail.setCheckListId(getAuditCheckList(auditDetails,row.getBilltypedescrip(),"ID"));
+						checklistDetail.setSeverity(getAuditCheckList(auditDetails,row.getBilltypedescrip(),"Sev"));
+						checklistDetail.setStatus(getAuditCheckList(auditDetails,row.getBilltypedescrip(),"Stat"));
+						checklistDetail.setChecklist_date(getAuditCheckListDate(auditDetails,row.getBilltypedescrip(),"Date"));
 					}
 					else
 					{
 						checklistDetail.setCheckListId("0");
 					}
-					checklistDetail.setChecklist_description(value.getValue());
+					checklistDetail.setChecklist_description(row.getBilltypedescrip());
 					checkList.add(checklistDetail);
 				}
 			}
@@ -1128,7 +1130,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 			HttpServletRequest request, @PathVariable final String auditId) {
 		LOGGER.info("View");
 		AuditCheckList checklistDetail = null;
-		List<AppConfigValues> appConfigValuesList =null;
 		checkList=new ArrayList<AuditCheckList>();
 		String mode="view";
 		List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
@@ -1178,17 +1179,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 		}
 		if(mode.equals("view"))
 		{
-			if(auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit"))
-			{
-				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
-						"checklist_" + bill.getEgBillregistermis().getEgBillSubType().getName());
-			}
-			else
-			{
-				appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("Audit",
-						"checklist_postAudit");
-			}
-				
 				for (AuditCheckList value : auditDetails.getCheckList()) {
 					checklistDetail = new AuditCheckList();
 					if(!auditDetails.getStatus().getCode().equalsIgnoreCase("Created"))

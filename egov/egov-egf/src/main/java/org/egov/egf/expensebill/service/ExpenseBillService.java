@@ -474,19 +474,7 @@ public class ExpenseBillService {
         String stateValue = "";
         System.out.println("desig********:"+approvalDesignation);
         if (null != egBillregister.getId())
-//            wfInitiator = assignmentService.getPrimaryAssignmentForUser(egBillregister.getCreatedBy());
         	wfInitiator = this.getCurrentUserAssignmet(egBillregister.getCreatedBy());
-      /*  if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
-            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
-            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
-                    .withComments(approvalComent)
-                    .withStateValue(stateValue).withDateInfo(currentDate.toDate())
-                    .withOwner(wfInitiator.getPosition())
-                    .withNextAction("")
-                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-        } else {*/
-//            if (null != approvalPosition && approvalPosition != -1 && !approvalPosition.equals(Long.valueOf(0)))
-//                wfInitiator = assignmentService.getAssignmentsForPosition(approvalPosition).get(0);
             WorkFlowMatrix wfmatrix;
            Designation designation = this.getDesignationDetails(approvalDesignation);
            if(designation != null)
