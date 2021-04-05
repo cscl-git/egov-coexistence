@@ -239,9 +239,9 @@
 		<form:errors path="nodalOfficerDepartment" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
-			code="lbl.nodalofficer" />:</label>
+			code="lbl.nodalofficer" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" />
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" required="required"/>
 		<form:errors path="nodalOfficer" cssClass="add-margin error-msg" />
 	</div>	
 </div>

@@ -546,8 +546,8 @@ private static Map<String, String> map;
 				BoQDetails aBoQDetails = new BoQDetails();
 				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
 				 
-					String string=firstSheet.getRow(rowNum).getCell(2).toString();
-				 check=checkAvailableBoq(string);
+					//String string=firstSheet.getRow(rowNum).getCell(2).toString();
+				 //check=checkAvailableBoq(string);
 				
 				}else {
 					check=false;
@@ -569,29 +569,29 @@ private static Map<String, String> map;
 						
 						else if (cell.getColumnIndex() == 1) {
 							
-							if(check) {
+							//if(check) {
 							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-							}else {
-								aBoQDetails.setItem_description(" ");
-							}
+							//}else {
+							//	aBoQDetails.setItem_description(" ");
+							//}
 							
 						} else if (cell.getColumnIndex() == 2) {
 							
-							if(check) {
+							//if(check) {
 							
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-							}else {
-								aBoQDetails.setRef_dsr(" ");
-							}
+							//}else {
+							//	aBoQDetails.setRef_dsr(" ");
+						//	}
 						}else if (cell.getColumnIndex() == 3) {
 							
-							if(check) {
+							//if(check) {
 								
 							aBoQDetails.setUnit(cell.getStringCellValue());
-							}else {
-								aBoQDetails.setUnit(" ");
-							}
+							//}else {
+							//	aBoQDetails.setUnit(" ");
+						//	}
 							
 						} 
 
@@ -599,20 +599,20 @@ private static Map<String, String> map;
 
 						 if (cell.getColumnIndex() == 4) {
 							 
-							 if(check) {
+							 //if(check) {
 								 
 							aBoQDetails.setRate(cell.getNumericCellValue());
-							 }else {
-								 aBoQDetails.setRate(0.0); 
-							 }
+							 //}else {
+							//	 aBoQDetails.setRate(0.0); 
+							// }
 						} else if (cell.getColumnIndex() == 5) {
 							
-							if(check) {
+							//if(check) {
 							
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
-							}else {
-								aBoQDetails.setQuantity(0.0);
-							}
+							//}else {
+							//	aBoQDetails.setQuantity(0.0);
+						//	}
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 						}

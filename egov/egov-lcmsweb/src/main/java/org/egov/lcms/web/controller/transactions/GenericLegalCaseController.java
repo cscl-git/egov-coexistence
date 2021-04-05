@@ -102,7 +102,17 @@ public class GenericLegalCaseController {
     }
 
     public @ModelAttribute("petitiontypeList") List<PetitionTypeMaster> getPetitionList() {
-        return petitionTypeMasterService.getActivePetitionTypes();
+    	List<PetitionTypeMaster> displayList=new ArrayList<PetitionTypeMaster>();
+    	List<PetitionTypeMaster> listfromDB=petitionTypeMasterService.getActivePetitionTypes();
+    	PetitionTypeMaster petition=null;
+    	for(PetitionTypeMaster row :listfromDB)
+    	{
+    		petition=new PetitionTypeMaster();
+    		petition.setId(row.getId());
+    		petition.setPetitionType(row.getCourtType().getCourtType()+" - "+row.getPetitionType());
+    		displayList.add(petition);
+    	}
+        return displayList;
     }
 
     public @ModelAttribute("courtsList") List<CourtMaster> getCourtNameList() {

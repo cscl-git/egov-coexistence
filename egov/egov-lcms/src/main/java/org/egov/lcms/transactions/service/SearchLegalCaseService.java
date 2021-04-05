@@ -97,27 +97,20 @@ public class SearchLegalCaseService {
 
     public List<LegalCaseSearchResult> getLegalCaseReport(final LegalCaseSearchResult legalCaseSearchResultObj) {
         final Boolean loggedInUserViewAccess = checkLoggedInUser(securityUtils.getCurrentUser());
-System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()+"+++++++++++++++");
         final StringBuilder queryStr = new StringBuilder();
-        queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,concernedmaster.concernedBranch as concernedBranch ,");
-        queryStr.append(" egwStatus.code  as  caseStatus ");
-
-		queryStr.append(" from LegalCase legalObj left join Judgment judgment on legalObj.id=judgment.legalCase ");
-		queryStr.append(" left join JudgmentType judtype on judgment.judgmentType=judtype.id ");
-
-		queryStr.append(" left join CourtMaster courtmaster on legalObj.id=courtmaster.id ");
-		queryStr.append(" left join ConcernedBranchMaster concernedmaster on legalObj.id=concernedmaster.id ");
-		queryStr.append(" left join CaseTypeMaster casetypemaster on legalObj.id=casetypemaster.id ");
-		queryStr.append(" left join PetitionTypeMaster petmaster on legalObj.id=petmaster.id ");
-		queryStr.append("left join EgwStatus egwStatus on legalObj.id=egwStatus.id  ");
-
+        queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,");
+        queryStr.append(" egwStatus.code  as  caseStatus ,");
+        queryStr.append(" cb.concernedBranch  as  concernedBranch");
+        queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
+        queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
+        queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
+        queryStr.append(
+                " legalObj.caseTypeMaster.id=casetypemaster.id and legalObj.petitionTypeMaster.id=petmaster.id and ");
+        queryStr.append(" legalObj.status.id=egwStatus.id and egwStatus.moduletype =:moduleType ");
         if (legalCaseSearchResultObj.getReportStatusId() != null)
-			queryStr.append(" left join ReportStatus reportStatus on legalObj.id = reportStatus.id ");
+            queryStr.append("  and legalObj.reportStatus.id = reportStatus.id ");
 
-		queryStr.append("where legalObj.id=legalObj.id ");
-		System.out.println(queryStr);
         getAppendQuery(legalCaseSearchResultObj, queryStr);
-		System.out.println(queryStr);
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
         queryResult = setParametersToQuery(legalCaseSearchResultObj, queryResult);
         final List<LegalCaseSearchResult> legalcaseSearchList = queryResult.list();
@@ -129,7 +122,7 @@ System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()
     }
 
     private Query setParametersToQuery(final LegalCaseSearchResult legalCaseSearchResultObj, final Query queryResult) {
-		// queryResult.setString("moduleType", LcmsConstants.MODULE_TYPE_LEGALCASE);
+        queryResult.setString("moduleType", LcmsConstants.MODULE_TYPE_LEGALCASE);
         if (StringUtils.isNotBlank(legalCaseSearchResultObj.getLcNumber()))
             queryResult.setString("lcNumber", legalCaseSearchResultObj.getLcNumber());
         if (StringUtils.isNotBlank(legalCaseSearchResultObj.getCaseNumber()))
@@ -153,21 +146,12 @@ System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()
             queryResult.setInteger("petiontionType", legalCaseSearchResultObj.getPetitionTypeId());
         if (legalCaseSearchResultObj.getReportStatusId() != null)
             queryResult.setInteger("reportStatus", legalCaseSearchResultObj.getReportStatusId());
-
-		if (legalCaseSearchResultObj.getJudgmentType() != null)
-			queryResult.setString("judgmentType", legalCaseSearchResultObj.getJudgmentType());
-
-		
-		/*if (legalCaseSearchResultObj.getIsStatusExcluded() != null) {
+        if (legalCaseSearchResultObj.getIsStatusExcluded() != null) {
             final List<String> statusCodeList = new ArrayList<>();
-			//statusCodeList.add(LcmsConstants.LEGALCASE_STATUS_CLOSED);
-			statusCodeList.add("127");
-			statusCodeList.add("128");
-			//statusCodeList.add(LcmsConstants.LEGALCASE_STATUS_JUDGMENT_IMPLIMENTED);
-
+            statusCodeList.add(LcmsConstants.LEGALCASE_STATUS_CLOSED);
+            statusCodeList.add(LcmsConstants.LEGALCASE_STATUS_JUDGMENT_IMPLIMENTED);
             queryResult.setParameterList("statusCodeList", statusCodeList);
-		}*/
-		
+        }
         queryResult.setResultTransformer(new AliasToBeanResultTransformer(LegalCaseSearchResult.class));
         return queryResult;
     }
@@ -178,34 +162,25 @@ System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()
         if (StringUtils.isNotBlank(legalCaseSearchResultOblj.getCaseNumber()))
             queryStr.append(" and legalObj.caseNumber like :caseNumber ");
         if (legalCaseSearchResultOblj.getCourtId() != null)
-			// queryStr.append(" and courtmaster.id =:court ");
-			queryStr.append(" and legalObj.courtMaster =:court ");
+            queryStr.append(" and courtmaster.id =:court ");
         if (legalCaseSearchResultOblj.getCasecategory() != null)
-			// queryStr.append(" and casetypemaster.id =:casetype");
-			queryStr.append(" and legalObj.caseTypeMaster =:casetype");
+            queryStr.append(" and casetypemaster.id =:casetype");
         if (legalCaseSearchResultOblj.getCourtType() != null)
-			// queryStr.append(" and courtmaster.id =:courttype ");
-			queryStr.append(" and legalObj.courtMaster =:courttype ");
+            queryStr.append(" and courtmaster.id =:courttype ");
         if (StringUtils.isNotBlank(legalCaseSearchResultOblj.getStandingCouncil()))
             queryStr.append(" and legalObj.oppPartyAdvocate like :standingcoouncil ");
         if (legalCaseSearchResultOblj.getStatusId() != null)
-			queryStr.append(" and legalObj.status =:status ");
+            queryStr.append(" and egwStatus.id =:status ");
         if (legalCaseSearchResultOblj.getCaseFromDate() != null)
             queryStr.append(" and legalObj.caseDate >=:fromdate ");
         if (legalCaseSearchResultOblj.getCaseToDate() != null)
             queryStr.append(" and legalObj.caseDate <=:toDate ");
         if (legalCaseSearchResultOblj.getPetitionTypeId() != null)
-			// queryStr.append(" and petmaster.id =:petiontionType ");
-			queryStr.append(" and legalObj.petitionTypeMaster =:petiontionType ");
+            queryStr.append(" and petmaster.id =:petiontionType ");
         if (legalCaseSearchResultOblj.getIsStatusExcluded() != null)
-			queryStr.append(" and legalObj.status not in (127,128 ) ");
-
+            queryStr.append(" and egwStatus.code not in (:statusCodeList ) ");
         if (legalCaseSearchResultOblj.getReportStatusId() != null)
             queryStr.append(" and reportStatus.id =:reportStatus ");
-
-		if (legalCaseSearchResultOblj.getJudgmentType() != null)
-			queryStr.append(" and judtype.name =:judgmentType ");
-		
     }
 
     public List<ReportStatus> getReportStatus() {
@@ -358,4 +333,34 @@ System.out.println("++++++++++++"+legalCaseSearchResultObj.getIsStatusExcluded()
 		}
 		 return fileContent;
 	}
+
+
+	public List<LegalCaseSearchResult> getLegalCaseReportRestData(final LegalCaseSearchResult legalCaseSearchResultObj) {
+        final Boolean loggedInUserViewAccess = false;
+        final StringBuilder queryStr = new StringBuilder();
+        queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,");
+        queryStr.append(" egwStatus.code  as  caseStatus ,");
+        queryStr.append(" cb.concernedBranch  as  concernedBranch");
+        queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
+        queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
+        queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
+        queryStr.append(
+                " legalObj.caseTypeMaster.id=casetypemaster.id and legalObj.petitionTypeMaster.id=petmaster.id and ");
+        queryStr.append(" legalObj.status.id=egwStatus.id and egwStatus.moduletype =:moduleType ");
+        if (legalCaseSearchResultObj.getReportStatusId() != null)
+            queryStr.append("  and legalObj.reportStatus.id = reportStatus.id ");
+
+        getAppendQuery(legalCaseSearchResultObj, queryStr);
+        Query queryResult = getCurrentSession().createQuery(queryStr.toString());
+        queryResult = setParametersToQuery(legalCaseSearchResultObj, queryResult);
+        final List<LegalCaseSearchResult> legalcaseSearchList = queryResult.list();
+        if (loggedInUserViewAccess)
+            for (final LegalCaseSearchResult searchResults : legalcaseSearchList)
+                searchResults.setLegalViewAccess(loggedInUserViewAccess);
+        return legalcaseSearchList;
+
+    }
+	
+	
+	
 }

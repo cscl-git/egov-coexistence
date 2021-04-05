@@ -400,6 +400,25 @@
 									<c:out value="${legalCase.oppPartyAdvocate}" />
 								</div>
 							</div>
+							
+						<!-- Added By Kundan -->	
+							<div class="row add-border">
+								<div class="col-md-2 col-xs-6 add-margin">
+									<spring:message code="lbl.defCounselPhone" />
+								</div>
+								<div class="col-md-3 col-xs-6 add-margin view-content">
+									<c:out value="${legalCase.counselPhoneNo}" />
+								</div>
+								<div class="col-md-2 col-xs-6 add-margin">
+									<spring:message code="lbl.defCounselEmial" />
+									:
+								</div>
+								<div class="col-md-3 col-xs-6 add-margin view-content">
+									<c:out value="${legalCase.counselEmailNo}" />
+								</div>
+							</div>
+						<!-- Ended By Kundan -->		
+							
 							<div class="row add-border">
 								<div class="col-md-2 col-xs-6 add-margin">
 									<spring:message code="lbl.remarks" />

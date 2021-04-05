@@ -49,7 +49,7 @@ var tableContainer;
 var reportdatatable;
 jQuery(document).ready(
 		function($) {
-			
+			$("#downloadexcel").hide();
 			loadsubreportstatus();
 			$('#statusId').change(function(){
 				loadsubreportstatus();
@@ -189,8 +189,10 @@ function submitForm() {
 					var api = this.api(), data;
 					if (data.length == 0) {
 						$('#report-footer').hide();
+						$("#downloadexcel").hide();
 					} else {
 						$('#report-footer').show();
+						$("#downloadexcel").show();
 					}
 
 				},

@@ -242,7 +242,7 @@
 			
 		</div>
 		
-		<div class="row">
+		<div class="row" id="downloadexcel">
 					<div class="text-center">
 						<a href="javascript:void(0);" id="legalcaseReportSearchExcel"
 							class="btn btn-primary">Download Excel</a>

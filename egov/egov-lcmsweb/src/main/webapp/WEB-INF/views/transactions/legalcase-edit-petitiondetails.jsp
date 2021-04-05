@@ -235,6 +235,33 @@
 	</div>
 
 </div>
+
+
+<!-- Added By Kundan -->
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
+			code="lbl.defCounselPhone" /><span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin" id="personsdiv">
+		<form:input class="form-control patternvalidation"
+			data-pattern="number" maxlength="10" id="counselphoneNo"
+			path="counselPhoneNo" required="required" placeholder="Mobile No." />
+		<form:errors path="counselPhoneNo" cssClass="add-margin error-msg" />
+	</div>
+
+	<label class="col-sm-2 control-label text-right" id="persons">
+		<spring:message
+			code="lbl.defCounselEmial" />:</label>
+	<div class="col-sm-3 add-margin" id="personsdiv">
+		<form:input class="form-control patternvalidation"
+			data-pattern="alphanumericwithspecialcharacters" maxlength="50" id="counselEmail"
+			path="counselEmailNo" placeholder="abc@xyz.com"/>
+		<form:errors path="counselEmailNo" cssClass="add-margin error-msg" />
+	</div>
+
+</div>
+
+<!-- Ended By Kundan -->
+
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.remarks" />:</label>
