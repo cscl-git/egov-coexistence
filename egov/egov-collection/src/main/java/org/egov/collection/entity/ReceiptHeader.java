@@ -140,6 +140,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Date rrDate;
     private String subdivison;
     private String gstno;
+    private String createdByName;
     public ReceiptHeader() {
     }
 
@@ -972,6 +973,14 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setServiceBusinessName(String serviceBusinessName) {
 		this.serviceBusinessName = serviceBusinessName;
+	}
+
+	public String getCreatedByName() {
+		return createdByName;
+	}
+
+	public void setCreatedByName(String createdByName) {
+		this.createdByName = createdByName;
 	}
 
 	

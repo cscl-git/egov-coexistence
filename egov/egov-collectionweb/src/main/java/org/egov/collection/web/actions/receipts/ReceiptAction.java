@@ -771,7 +771,7 @@ public class ReceiptAction extends BaseFormAction {
                 // currentDate.
                 // Thus overridding the manualReceiptDate set above
                 receiptHeader.setCreatedBy(collectionsUtil.getLoggedInUser().getId());
-                receiptHeader.setCreatedByName(getEmployeeName(receiptHeader.getCreatedBy()));
+                //receiptHeader.setCreatedByName(getEmployeeName(receiptHeader.getCreatedBy()));
                 receiptHeader.setManualreceiptdate(manualReceiptDate);
                 receiptHeader.setReceiptdate(manualReceiptDate);
                 receiptHeader.setVoucherDate(manualReceiptDate);
@@ -810,6 +810,8 @@ public class ReceiptAction extends BaseFormAction {
             receiptHeader.setSource(Source.SYSTEM.toString());
             receiptHeader.setModOfPayment(instrumentType);
             receiptHeader.setSubdivison(subdivison);
+            User user = securityUtils.getCurrentUser();
+            receiptHeader.setCreatedByName(getEmployeeName(user.getId()));
             receiptHeader.setGstno(gstno);
 
             // If this is a new receipt in lieu of cancelling old
