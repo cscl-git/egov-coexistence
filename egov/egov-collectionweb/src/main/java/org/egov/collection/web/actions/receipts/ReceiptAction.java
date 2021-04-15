@@ -597,6 +597,7 @@ public class ReceiptAction extends BaseFormAction {
         receiptHeader.setPartPaymentAllowed(false);
         serviceId = (serviceId != null && !serviceId.isEmpty())? serviceCategory + "."+serviceId : serviceCategory;
         receiptHeader.setService(serviceId);
+        receiptHeader.setServiceBusinessName(microserviceUtils.getBusinessServiceNameByCode(receiptHeader.getService()));
         receiptHeader.setServiceIdText(serviceIdText);
         totalAmntToBeCollected = BigDecimal.ZERO;
         int m = 0;
@@ -726,29 +727,7 @@ public class ReceiptAction extends BaseFormAction {
         ReceiptHeader rhForValidation = null;
         final long startTimeMillis = System.currentTimeMillis();
 
-        /*
-         * if (manualReceiptNumber != null && manualReceiptDate != null) { final CFinancialYear financialYear =
-         * collectionsUtil.getFinancialYearforDate(manualReceiptDate); rhForValidation = receiptHeaderService.findByNamedQuery(
-         * CollectionConstants.QUERY_RECEIPT_BY_SERVICE_MANUALRECEIPTNO_AND_DATE, manualReceiptNumber, receiptHeader.getService(),
-         * financialYear.getStartingDate(), financialYear.getEndingDate(), CollectionConstants.RECEIPT_STATUS_CODE_CANCELLED); }
-         */
-
-        /* if (rhForValidation == null) { */
-        // For interday cancellation
-        /*
-         * if (oldReceiptId != null) { final ReceiptHeader receiptHeaderToBeCancelled =
-         * receiptHeaderService.findById(oldReceiptId, false); receiptHeaderToBeCancelled
-         * .setStatus(statusDAO.getStatusByModuleAndCode(CollectionConstants.MODULE_NAME_RECEIPTHEADER,
-         * CollectionConstants.RECEIPT_STATUS_CODE_CANCELLED));
-         * receiptHeaderToBeCancelled.setReasonForCancellation(reasonForCancellation); // set isReconciled to false before calling
-         * update to // billing system for // cancel receipt receiptHeaderToBeCancelled.setIsReconciled(false);
-         * receiptHeader.setLocation(receiptHeaderToBeCancelled.getLocation());
-         * receiptHeaderService.persist(receiptHeaderToBeCancelled); if (receiptHeaderToBeCancelled.getReceipttype() ==
-         * CollectionConstants.RECEIPT_TYPE_BILL) { populateReceiptModelWithExistingReceiptInfo(receiptHeaderToBeCancelled);
-         * LOGGER.info("Receipt Cancelled with Receipt Number(recreateNewReceiptOnCancellation): " +
-         * receiptHeaderToBeCancelled.getReceiptnumber() + "; Consumer Code: " + receiptHeaderToBeCancelled.getConsumerCode()); }
-         * }
-         */
+        
 
         if ("misc".equalsIgnoreCase(billSource)) {
             createMisc();
@@ -792,6 +771,7 @@ public class ReceiptAction extends BaseFormAction {
                 // currentDate.
                 // Thus overridding the manualReceiptDate set above
                 receiptHeader.setCreatedBy(collectionsUtil.getLoggedInUser().getId());
+                receiptHeader.setCreatedByName(getEmployeeName(receiptHeader.getCreatedBy()));
                 receiptHeader.setManualreceiptdate(manualReceiptDate);
                 receiptHeader.setReceiptdate(manualReceiptDate);
                 receiptHeader.setVoucherDate(manualReceiptDate);
@@ -825,15 +805,11 @@ public class ReceiptAction extends BaseFormAction {
                             CollectionConstants.RECEIPT_STATUS_CODE_TO_BE_SUBMITTED));
             receiptHeader.setPaidBy(StringEscapeUtils.unescapeHtml(paidBy));
             //receiptHeader.setPayeeName(StringEscapeUtils.unescapeHtml(paidBy));
-            LOGGER.info("payeeAddress ::::"+payeeAddress);
             receiptHeader.setPayeeAddress(payeeAddress);
             receiptHeader.setReferenceDesc(referenceDesc);
             receiptHeader.setSource(Source.SYSTEM.toString());
-            LOGGER.info("instrumentType ::"+instrumentType);
             receiptHeader.setModOfPayment(instrumentType);
-            LOGGER.info("subdivison ::"+subdivison);
             receiptHeader.setSubdivison(subdivison);
-            LOGGER.info("gstno ::"+gstno);
             receiptHeader.setGstno(gstno);
 
             // If this is a new receipt in lieu of cancelling old
@@ -874,18 +850,8 @@ public class ReceiptAction extends BaseFormAction {
 
             if (cashOrCardInstrumenttotal != null && cashOrCardInstrumenttotal.compareTo(BigDecimal.ZERO) != 0)
                 receiptHeader.setTotalAmount(cashOrCardInstrumenttotal);
-            /*
-             * DebitAccountHeadDetailsService debitAccountHeadService = (DebitAccountHeadDetailsService) beanProvider
-             * .getBean(collectionsUtil.getBeanNameForDebitAccountHead()); if (isBillSourcemisc()) receiptHeader.addReceiptDetail(
-             * debitAccountHeadService.addDebitAccountHeadDetails(totalDebitAmount, receiptHeader, chequeInstrumenttotal,
-             * cashOrCardInstrumenttotal, instrumentTypeCashOrCard)); else receiptHeader.addReceiptDetail(
-             * debitAccountHeadService.addDebitAccountHeadDetails(debitAmount, receiptHeader, chequeInstrumenttotal,
-             * cashOrCardInstrumenttotal, instrumentTypeCashOrCard));
-             */
 
         }
-        // }// end of looping through receipt headers
-        // }// end of looping through model receipt payee list
 
         LOGGER.info("Call back for apportioning is completed");
         // billing system
@@ -2761,6 +2727,11 @@ public class ReceiptAction extends BaseFormAction {
 	      .atZone(ZoneId.systemDefault())
 	      .toLocalDate();
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+	    }
 	
 	
 }

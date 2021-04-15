@@ -71,6 +71,8 @@ public abstract class AbstractAuditable extends AbstractPersistable<Long> {
 	// @CreatedBy
 	// private User createdBy;
 	private Long createdBy;
+	
+	private String createdByName;
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreatedDate
@@ -118,5 +120,13 @@ public abstract class AbstractAuditable extends AbstractPersistable<Long> {
 
 	public void setLastModifiedDate(final Date lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getCreatedByName() {
+		return createdByName;
+	}
+
+	public void setCreatedByName(String createdByName) {
+		this.createdByName = createdByName;
 	}
 }

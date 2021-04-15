@@ -477,7 +477,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    	final StringBuffer query5 = new StringBuffer(500);
   	 list= null;
   	query5
-      .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+      .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
   	LOGGER.info("Query 5 :: "+query5.toString());
   	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
    	list = queryInstru.list();
@@ -504,6 +504,14 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   			if(object[4] != null)
   			{
   				pexDetail.setCgvn(object[4].toString());
+  			}
+  			if(object[5] != null)
+  			{
+  				pexDetail.setFirstsignatory(object[5].toString());
+  			}
+  			if(object[6] != null)
+  			{
+  				pexDetail.setSecondsignatory(object[6].toString());
   			}
   			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
   		}
@@ -569,6 +577,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    					{
    						resultset.setPexNodate(voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
    					}
+   					//cheque
+   					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory().isEmpty())
+   					{
+   						resultset.setChqNo(voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory());
+   					}
+   					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory().isEmpty())
+   					{
+   						resultset.setChqDate(voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory());
+   					}
+   					//
    					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn().isEmpty())
    					{
    						resultset.setBankaccount(voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn());
@@ -611,6 +629,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					{
 						resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
 					}
+					//checque
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory().isEmpty())
+					{
+						resultset.setChqNo(voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory());
+					}
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory().isEmpty())
+					{
+						resultset.setChqDate(voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory());
+					}
+					//
 					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(result.getId()).getCgvn().isEmpty())
 					{
 						resultset.setBankaccount(voucherDetailIntrumentMapping.get(result.getId()).getCgvn());
@@ -974,7 +1002,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   	final StringBuffer query5 = new StringBuffer(500);
  	 list= null;
  	query5
-     .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+     .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
  	LOGGER.info("Query 5 :: "+query5.toString());
  	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
   	list = queryInstru.list();
@@ -1001,6 +1029,14 @@ public class CreateJournalVoucherController extends BaseVoucherController {
  			if(object[4] != null)
  			{
  				pexDetail.setCgvn(object[4].toString());
+ 			}
+ 			if(object[5] != null)
+ 			{
+ 				pexDetail.setFirstsignatory(object[5].toString());
+ 			}
+ 			if(object[6] != null)
+ 			{
+ 				pexDetail.setSecondsignatory(object[6].toString());
  			}
  			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
  		}
@@ -1066,6 +1102,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   					{
   						resultset.setPexNodate(voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
   					}
+  					//cheque
+  					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory().isEmpty())
+  					{
+  						resultset.setChqNo(voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory());
+  					}
+  					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory().isEmpty())
+  					{
+  						resultset.setChqDate(voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory());
+  					}
+  					//
   					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn().isEmpty())
   					{
   						resultset.setBankaccount(voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn());
@@ -1108,6 +1154,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					{
 						resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
 					}
+					//cheque
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory().isEmpty())
+					{
+						resultset.setChqNo(voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory());
+					}
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory().isEmpty())
+					{
+						resultset.setChqDate(voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory());
+					}
+					//
 					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(result.getId()).getCgvn().isEmpty())
 					{
 						resultset.setBankaccount(voucherDetailIntrumentMapping.get(result.getId()).getCgvn());
@@ -1118,7 +1174,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   		
   	}
    	
-   	String[] COLUMNS = {"S.no.", "Party Name", "DIVISION", "BUDGET HEAD","Scheme" ,"Gross Amount", "TDS/I", "TDS ON IGST", "TDS ON CGST/UTGST", "Labour Cess", "Collection charges", "Water charges", "Quality Cess", "Penalty/Fine", "Security/Amt withheld","GPF","NPS/CPF","GSLIC/GIS","House Building Advance","Licence Fees","LIC","Bank Loan","Court Attachment","Pension Fund","Any other deduction", "Net Amount", "Paid Amount", "Journal Voucher number","Jounal Voucher Date", "Payment voucher number","BPV Date", "PEX NUMBER", "PEX DATE","Bank Account Number", "Status"};
+   	String[] COLUMNS = {"S.no.", "Party Name", "DIVISION", "BUDGET HEAD","Scheme" ,"Gross Amount", "TDS/I", "TDS ON IGST", "TDS ON CGST/UTGST", "Labour Cess", "Collection charges", "Water charges", "Quality Cess", "Penalty/Fine", "Security/Amt withheld","GPF","NPS/CPF","GSLIC/GIS","House Building Advance","Licence Fees","LIC","Bank Loan","Court Attachment","Pension Fund","Any other deduction", "Net Amount", "Paid Amount", "Journal Voucher number","Jounal Voucher Date", "Payment voucher number","BPV Date", "PEX NUMBER", "PEX DATE", "CHEQUE NUMBER", "CHEQUE DATE","Bank Account Number", "Status"};
 	
 	ByteArrayInputStream in = resultToExcel(billRegReportList, COLUMNS);
 	
@@ -1914,11 +1970,17 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 				if(detail.getPexNodate() != null) {
 					row.createCell(32).setCellValue(detail.getPexNodate());
 				}
+				if(detail.getChqNo() != null) {
+					row.createCell(33).setCellValue(detail.getChqNo());
+				}
+				if(detail.getChqDate() != null) {
+					row.createCell(34).setCellValue(detail.getChqDate());
+				}
 				if(detail.getBankaccount() != null) {
-					row.createCell(33).setCellValue(detail.getBankaccount());
+					row.createCell(35).setCellValue(detail.getBankaccount());
 				}
 				if(detail.getStatus() != null) {
-					row.createCell(34).setCellValue(detail.getStatus());
+					row.createCell(36).setCellValue(detail.getStatus());
 				}
 			}
 	 

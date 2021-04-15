@@ -86,6 +86,8 @@ public class BillRegisterReportBean {
     private String deducPexNo;
     private String departmentCode;
     private String pexNodate;
+    private String chqNo;
+    private String chqDate;
     private List<ChartOfAccounts> chartOfAccounts;
     private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
     private String budgetHead;
@@ -486,6 +488,22 @@ public class BillRegisterReportBean {
 
 	public void setPensionAmount(BigDecimal pensionAmount) {
 		this.pensionAmount = pensionAmount;
+	}
+
+	public String getChqNo() {
+		return chqNo;
+	}
+
+	public void setChqNo(String chqNo) {
+		this.chqNo = chqNo;
+	}
+
+	public String getChqDate() {
+		return chqDate;
+	}
+
+	public void setChqDate(String chqDate) {
+		this.chqDate = chqDate;
 	}
 
 	

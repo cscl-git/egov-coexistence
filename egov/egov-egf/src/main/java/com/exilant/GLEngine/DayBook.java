@@ -72,6 +72,8 @@ public class DayBook
     private String bpvDate;
     private String pexno;
     private String pexDate;
+    private String chqNo;
+    private String chqDate;
     		
     
 
@@ -240,6 +242,22 @@ public class DayBook
 
 	public void setFunc(String func) {
 		this.func = func;
+	}
+
+	public String getChqNo() {
+		return chqNo;
+	}
+
+	public void setChqNo(String chqNo) {
+		this.chqNo = chqNo;
+	}
+
+	public String getChqDate() {
+		return chqDate;
+	}
+
+	public void setChqDate(String chqDate) {
+		this.chqDate = chqDate;
 	}
 
 }

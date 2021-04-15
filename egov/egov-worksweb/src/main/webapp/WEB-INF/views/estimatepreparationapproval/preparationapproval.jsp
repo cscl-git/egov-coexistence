@@ -320,10 +320,10 @@
 					<a target="_blank" style="float:right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br>
-					<input type="file" name="file" style="color: #000000;"> <br>
+					<input type="file" name="file" id="file" style="color: #000000;"> <br>
 					<br>
 					<div class="buttonbottom" align="center">
-						<input type="submit" id="save" class="btn btn-primary" name="save"
+						<input type="submit" id="save" class="btn btn-primary" name="save" onclick="return filecheck();"
 							value="Upload" /> <br>
 					</div>
 					</c:if>

@@ -1691,6 +1691,8 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .totalAmountPaid(receiptHeader.getTotalAmount())
                 .paidBy(receiptHeader.getPaidBy())
                 .gstno(receiptHeader.getGstno())
+                .servicename(receiptHeader.getServiceBusinessName())
+                .collectedbyname(receiptHeader.getCreatedByName())
                 .subdivison(receiptHeader.getSubdivison())
                 .narration(receiptHeader.getReferenceDesc())
                 .payerAddress(receiptHeader.getPayeeAddress())

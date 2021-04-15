@@ -103,6 +103,8 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th>BPV Date</th>
 						<th>PEX NUMBER</th>
 						<th>PEX DATE </th>
+						<th>CHEQUE NUMBER</th>
+						<th>CHEQUE DATE </th>
 						<th>Bank Account Number</th>
 						<th>Status</th>
 					</tr>
@@ -209,6 +211,12 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						    </td>
 						    <td>
 								${ result.pexNodate}
+						    </td>
+						    <td>
+								${ result.chqNo}
+						    </td>
+						    <td>
+								${ result.chqDate}
 						    </td>
 						     <td>
 								${ result.bankaccount}
