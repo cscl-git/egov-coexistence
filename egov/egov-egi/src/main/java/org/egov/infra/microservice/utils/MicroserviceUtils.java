@@ -1161,14 +1161,19 @@ public class MicroserviceUtils {
     public List<Receipt> getReceipt(ReceiptSearchCriteria rSearchcriteria) {
         // Checking for the collection version either older version or new version are getting used
         List<Receipt> receipts = new ArrayList<>();
+        System.out.println("ApplicationThreadLocals.getCollectionVersion().toUpperCase() "+ApplicationThreadLocals.getCollectionVersion().toUpperCase());
+        System.out.println("fromDate "+rSearchcriteria.getFromDate());
+        System.out.println("toDate "+rSearchcriteria.getToDate());
+        System.out.println("type "+rSearchcriteria.getType());
+        System.out.println("businessCode "+rSearchcriteria.getBusinessCodes());
+        System.out.println("receiptNos "+rSearchcriteria.getReceiptNumbers());
+        System.out.println("classification "+rSearchcriteria.getClassification());
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
         case "VERSION2":
-        	System.out.println("CCCCC");
+        	System.out.println("version2");
             PaymentSearchCriteria paySearchCriteria=new PaymentSearchCriteria();
-            System.out.println("DDDD");
             rSearchcriteria.toPayemntSerachCriteriaContract(paySearchCriteria);
-            System.out.println("EEEE");
             List<Payment> payments = this.getPayments(paySearchCriteria);
             paymentUtils.getReceiptsFromPayments(payments, receipts);
             break;
@@ -1182,6 +1187,7 @@ public class MicroserviceUtils {
             requestInfo.setUserInfo(getUserInfo());
             //:Bhushan
             //change by Bhushan -add setids
+            System.out.println("in default");
             reqWrapper.setIds(rSearchcriteria.getIds());
             reqWrapper.setRequestInfo(requestInfo);
             StringBuilder url = new StringBuilder();
@@ -1237,6 +1243,21 @@ public class MicroserviceUtils {
         return this.getReceipt(criteria);
     }
 
+    //////added by Abhishek on 15032021
+    public List<Receipt> getReceipts(String status, String serviceCode, String fund, String department, String receiptDate, String receiptNumbers) {
+        ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
+                .status(Arrays.stream(status.split(",")).collect(Collectors.toSet()))
+                .businessCodes(Arrays.stream(serviceCode.split(",")).collect(Collectors.toSet()))
+                .fund(fund)
+                .department(department)
+                .fromDate(DateUtils.toDateUsingDefaultPattern(receiptDate))
+                .toDate(DateUtils.toDateUsingDefaultPattern(receiptDate))
+                .receiptNumbers(Arrays.stream(receiptNumbers.split(",")).collect(Collectors.toSet()))
+                .build();
+        return this.getReceipt(criteria);
+    }
+    /////
+
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,
             String receiptNo) {
 
@@ -1246,13 +1267,12 @@ public class MicroserviceUtils {
     
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
             String receiptNo) {
-    	System.out.println("AAAA   ::: "+businessCode);
+
         return this.searchReciepts(classification, fromDate, toDate, businessCode,department, Arrays.asList(receiptNo));
 
     }
     public List<Receipt> searchReciepts(String classification, Date fromDate, Date toDate, String businessCode,String department,
             List<String> receiptNos) {
-    	System.out.println("BBBB :::"+businessCode);
         ReceiptSearchCriteria criteria = new ReceiptSearchCriteria().builder()
                 .fromDate(fromDate)
                 .toDate(toDate)
@@ -1301,6 +1321,10 @@ public class MicroserviceUtils {
                 .receiptNumbers(receiptNos != null ? receiptNos.stream().collect(Collectors.toSet()) : Collections.EMPTY_SET)
                 .classification(classification)
                 .build();
+        System.out.println("fromDate "+fromDate);
+        System.out.println("toDate "+toDate);
+        System.out.println("type "+type);
+        System.out.println("classification "+classification);
         return this.getReceipt(criteria);
     }
 
@@ -1764,11 +1788,6 @@ public class MicroserviceUtils {
     }
     
     public List<Payment> getPayments(PaymentSearchCriteria searchCriteria){
-    	
-    	System.out.println("IIII");
-    	System.out.println("searchCriteria.getIds() ::: "+searchCriteria.getIds());
-    	System.out.println("searchCriteria.getReceiptNumbers()   ::: "+searchCriteria.getReceiptNumbers());
-    	System.out.println("searchCriteria.getBusinessServices()   ::: "+searchCriteria.getBusinessServices());
         PaymentResponse response = null;
          RequestInfo requestInfo = getRequestInfo();
          RequestInfoWrapper reqWrapper = null;
@@ -2020,6 +2039,8 @@ class FilterRequest {
 	public void setGlcode(String glcode) {
 		this.glcode = glcode;
 	}
+    
+    
     
     
     

@@ -58,7 +58,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Transient;
+
 import org.egov.collection.constants.CollectionConstants;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.Location;
 import org.egov.infra.persistence.entity.Auditable;
@@ -140,7 +143,18 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Date rrDate;
     private String subdivison;
     private String gstno;
-    private String createdByName;
+    @Transient
+    private List<DocumentUploads> documentDetail = new ArrayList<>();//added abhishek
+	private String createdByName;
+    
+    public List<DocumentUploads> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
     public ReceiptHeader() {
     }
 

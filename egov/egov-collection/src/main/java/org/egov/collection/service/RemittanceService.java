@@ -58,12 +58,23 @@ import org.egov.collection.bean.ReceiptBean;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.CollectionBankRemittanceReport;
 import org.egov.collection.entity.ReceiptHeader;
+import org.egov.common.contstants.CommonConstants;
+import org.egov.commons.CVoucherHeader;
+import org.egov.commons.DocumentUploads;
+import org.egov.commons.repository.CommonDocumentUploadRepository;
+import org.egov.commons.utils.DocumentUtils;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.utils.DateUtils;
 import org.egov.model.instrument.InstrumentHeader;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 public abstract class RemittanceService implements Serializable {
     private static final long serialVersionUID = 1849734164810403255L;
+    @Autowired
+    private DocumentUtils docUtils; // added abhishek 24032021
+    @Autowired
+    private static CommonDocumentUploadRepository documentUploadRepository;// added abhishek 24032021
 
     public abstract List<Receipt> createCashBankRemittance(List<ReceiptBean> receiptList, final String accountNumberId,
             final Date remittanceDate);
@@ -140,6 +151,26 @@ public abstract class RemittanceService implements Serializable {
         return reportList;
     }
 
+    //added by Abhishek on 24032021
+    @Transactional
+    public void saveDocuments(ReceiptHeader receiptHeader)
+    {
+ 	   List<DocumentUploads> files = receiptHeader.getDocumentDetail() == null ? null : receiptHeader.getDocumentDetail();
+        final List<DocumentUploads> documentDetails;
+        documentDetails = docUtils.getDocumentDetails(files, receiptHeader,
+                CommonConstants.REMITTANCE_OBJECT);
+        if (!documentDetails.isEmpty()) {
+        	receiptHeader.setDocumentDetail(documentDetails);
+        	RemittanceService.persistDocuments(documentDetails);
+        }
+    }
+    
+    public static void persistDocuments(final List<DocumentUploads> documentDetailsList) {
+        if (documentDetailsList != null && !documentDetailsList.isEmpty())
+            for (final DocumentUploads doc : documentDetailsList)
+                documentUploadRepository.save(doc);
+    }
+    //end
     
 	public abstract List<ReceiptBean> findChequeRemittanceDetailsForServiceAndFund(String classification, Date fromDate, Date toDate, String businessCode,
     	    String receiptNo,String type);

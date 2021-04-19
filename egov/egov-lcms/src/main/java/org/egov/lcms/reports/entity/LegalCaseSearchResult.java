@@ -47,6 +47,10 @@
  */
 package org.egov.lcms.reports.entity;
 
+import org.egov.lcms.transactions.entity.LegalCase;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import java.util.Date;
 
 import org.egov.lcms.transactions.entity.LegalCase;
@@ -79,8 +83,9 @@ public class LegalCaseSearchResult {
     private String fromDate;
     private String toDate;
     private Boolean legalViewAccess=false;
-    private String judgmentType;
 	private String concernedBranch;
+    private String statusDesc;
+    private Integer judgmentTypeId;
 
     public String getFromDate() {
         return fromDate;
@@ -298,13 +303,6 @@ public class LegalCaseSearchResult {
         this.legalViewAccess = legalViewAccess;
     }
 
-	public String getJudgmentType() {
-		return judgmentType;
-	}
-
-	public void setJudgmentType(String judgmentType) {
-		this.judgmentType = judgmentType;
-	}
 	
 	public String getConcernedBranch() {
 		return concernedBranch;
@@ -312,6 +310,22 @@ public class LegalCaseSearchResult {
 
 	public void setConcernedBranch(String concernedBranch) {
 		this.concernedBranch = concernedBranch;
+	}
+
+	public String getStatusDesc() {
+		return statusDesc;
+	}
+
+	public void setStatusDesc(String statusDesc) {
+		this.statusDesc = statusDesc;
+	}
+
+	public Integer getJudgmentTypeId() {
+		return judgmentTypeId;
+	}
+
+	public void setJudgmentTypeId(Integer judgmentTypeId) {
+		this.judgmentTypeId = judgmentTypeId;
 	}
 
    

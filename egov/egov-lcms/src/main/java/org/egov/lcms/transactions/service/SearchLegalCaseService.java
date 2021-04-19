@@ -103,6 +103,7 @@ public class SearchLegalCaseService {
         queryStr.append(" cb.concernedBranch  as  concernedBranch");
         queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
         queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
+        queryStr.append(" LEFT JOIN   legalObj.judgment jt");
         queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
         queryStr.append(
                 " legalObj.caseTypeMaster.id=casetypemaster.id and legalObj.petitionTypeMaster.id=petmaster.id and ");
@@ -146,6 +147,10 @@ public class SearchLegalCaseService {
             queryResult.setInteger("petiontionType", legalCaseSearchResultObj.getPetitionTypeId());
         if (legalCaseSearchResultObj.getReportStatusId() != null)
             queryResult.setInteger("reportStatus", legalCaseSearchResultObj.getReportStatusId());
+        
+        if (legalCaseSearchResultObj.getJudgmentTypeId() != null)
+            queryResult.setInteger("judgmentid", legalCaseSearchResultObj.getJudgmentTypeId());
+        
         if (legalCaseSearchResultObj.getIsStatusExcluded() != null) {
             final List<String> statusCodeList = new ArrayList<>();
             statusCodeList.add(LcmsConstants.LEGALCASE_STATUS_CLOSED);
@@ -181,6 +186,8 @@ public class SearchLegalCaseService {
             queryStr.append(" and egwStatus.code not in (:statusCodeList ) ");
         if (legalCaseSearchResultOblj.getReportStatusId() != null)
             queryStr.append(" and reportStatus.id =:reportStatus ");
+        if (legalCaseSearchResultOblj.getJudgmentTypeId() != null)
+            queryStr.append(" and jt.judgmentType.id =:judgmentid ");
     }
 
     public List<ReportStatus> getReportStatus() {
@@ -343,6 +350,7 @@ public class SearchLegalCaseService {
         queryStr.append(" cb.concernedBranch  as  concernedBranch");
         queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
         queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
+        queryStr.append(" LEFT JOIN   legalObj.judgment jt");
         queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
         queryStr.append(
                 " legalObj.caseTypeMaster.id=casetypemaster.id and legalObj.petitionTypeMaster.id=petmaster.id and ");

@@ -47,6 +47,12 @@
  */
 package org.egov.collection.web.actions.receipts;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -75,6 +81,7 @@ import org.egov.collection.service.RemittanceServiceImpl;
 import org.egov.collection.utils.CollectionsUtil;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.dao.BankaccountHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -151,6 +158,42 @@ public class BankRemittanceAction extends BaseFormAction {
     private String remitAccountNumber;
     private List<ReceiptBean> resultList = new ArrayList<>();
     private List<ReceiptBean> finalList = new ArrayList<>();
+    private File[] file; //added abhishek
+    private String[] fileContentType; //added abhishek
+	private String[] fileFileName; //added abhishek
+	private List<DocumentUploads> documentDetail = new ArrayList<>(); //added abhishek
+	
+    public List<DocumentUploads> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public File[] getFile() {
+		return file;
+	}
+
+	public void setFile(File[] file) {
+		this.file = file;
+	}
+
+	public String[] getFileContentType() {
+		return fileContentType;
+	}
+
+	public void setFileContentType(String[] fileContentType) {
+		this.fileContentType = fileContentType;
+	}
+
+	public String[] getFileFileName() {
+		return fileFileName;
+	}
+
+	public void setFileFileName(String[] fileFileName) {
+		this.fileFileName = fileFileName;
+	}
 
     Map<String,String> serviceCategoryNames = new HashMap<String,String>();
     Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
@@ -314,6 +357,35 @@ public class BankRemittanceAction extends BaseFormAction {
         bankAccount = bankAcc.getAccountnumber();
         bank = bankAcc.getBankbranch().getBank().getName();
         totalCashAmount = getSum(finalList);
+        //added by abhishek on 24032021
+        File[] uploadedFiles = getFile();
+        String[] fileName = getFileFileName();
+        String[] contentType = getFileContentType();
+        
+        if(uploadedFiles!=null)
+        {
+        	//byte[] fileBytes;
+            for (int i = 0; i < uploadedFiles.length; i++)
+            {
+
+            Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+            
+			try {
+				byte[] fileBytes = Files.readAllBytes(path);
+				ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+	            DocumentUploads upload = new DocumentUploads();
+	            upload.setInputStream(bios);
+	            upload.setFileName(fileName[i]);
+	            upload.setContentType(contentType[i]);
+	            documentDetail.add(upload);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+           receiptHeaderIntsance.setDocumentDetail(documentDetail);
+        }
+        }
+        //end
         return INDEX;
     }
 

@@ -54,6 +54,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,6 +62,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -83,7 +85,6 @@ import org.egov.eis.service.AssignmentService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
-import org.egov.infra.microservice.models.BifurcationDetail;
 import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.BillDetailAdditional;
 import org.egov.infra.microservice.models.BusinessService;
@@ -93,7 +94,11 @@ import org.egov.infra.microservice.models.RemittanceDepositWorkDetail;
 import org.egov.infra.microservice.models.RemittanceResponseDepositWorkDetails;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
+import org.egov.infra.reporting.engine.ReportFormat;
+import org.egov.infra.reporting.engine.ReportOutput;
+import org.egov.infra.reporting.engine.ReportRequest;
 import org.egov.infra.reporting.engine.ReportService;
+import org.egov.infra.utils.DateUtils;
 import org.egov.infra.web.struts.actions.SearchFormAction;
 import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.search.SearchQuery;
@@ -318,8 +323,8 @@ public class SearchReceiptAction extends SearchFormAction {
         List<Receipt> receipts = microserviceUtils.searchRecieptsFinance("MISCELLANEOUS", getFromDate(), getToDate(), getServiceTypeId(),
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null,type);
-        Map<String,List<BifurcationDetail>> bifurcationDetailsListMap=new HashMap<String,List<BifurcationDetail>>();
-        populateReceiptBifurcationAmount(bifurcationDetailsListMap);
+        
+        
         for (Receipt receipt : receipts) {
 
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
@@ -329,16 +334,19 @@ public class SearchReceiptAction extends SearchFormAction {
                     ReceiptHeader receiptHeader = new ReceiptHeader();
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
-                    populateBifurcationAmount(bifurcationDetailsListMap.get(billDetail.getReceiptNumber()),receiptHeader);
+                    populateBifurcationAmount(receiptHeader);
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
-                    receiptHeader.setService(receipt.getServicename());
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
                     receiptHeader.setReferencenumber(billDetail.getBillNumber());
                     receiptHeader.setReferenceDesc(bill.getNarration());
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
                     receiptHeader.setPaidBy((bill.getPaidBy()).split("&")[0]+"  "+bill.getPayerAddress());
                     receiptHeader.setPayeeName(bill.getPayerName());
+                    System.out.println("subdivison ::: "+receipt.getSubdivison());
+                    System.out.println("gst ::: "+receipt.getGstNo());
                     receiptHeader.setSubdivison(receipt.getSubdivison());
                     receiptHeader.setGstno(receipt.getGstNo());
+                    //receiptHeader.setTotalAmount(billDetail.getTotalAmount());
                     receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
                     if (null != billDetail.getManualReceiptNumber()) {
@@ -356,11 +364,36 @@ public class SearchReceiptAction extends SearchFormAction {
                     receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
 
                     JsonNode jsonNode = billDetail.getAdditionalDetails();
+                    BillDetailAdditional additional = null;
+                    try {
+                        if (null != jsonNode)
+                            additional = (BillDetailAdditional) new ObjectMapper().readValue(jsonNode.toString(),
+                                    BillDetailAdditional.class);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    if (null != additional) {
+//                        if (null != additional.getBusinessReason()) {
+//                            if (additional.getBusinessReason().contains("-")) {
+//                                receiptHeader.setService(additional.getBusinessReason().split("-")[0]);
+//                            } else {
+//                                receiptHeader.setService(additional.getBusinessReason());
+//                            }
+//                        }
+
+                        //if (null != additional.getNarration())
+                          //  receiptHeader.setReferenceDesc(additional.getNarration());
+                        //if (null != additional.getPayeeaddress())
+                          //  receiptHeader.setPayeeAddress(additional.getPayeeaddress());
+                    }
+
                     receiptList.add(receiptHeader);
-                    List<ReceiptHeader> test = receiptList.stream()
+
+                    List<ReceiptHeader> beerDrinkers = receiptList.stream()
                     	    .filter(p -> p.getModOfPayment() == "").collect(Collectors.toList());
                 }
             }
+
         }
 
         if (searchResult == null) {
@@ -376,49 +409,15 @@ public class SearchReceiptAction extends SearchFormAction {
     }
 
     
-    private void populateReceiptBifurcationAmount(Map<String, List<BifurcationDetail>> bifurcationDetailsList) {
-    	SQLQuery query =  null;
-    	List<Object[]> rows = null;
-    	BifurcationDetail row=null;
-    	List<BifurcationDetail> rowList=null;
-    	try
-    	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select rbd.id,rbd.glcode,rbd.creditamount,rbd.debitamount,rbd.reciept_number from receipt_bifurcation_details rbd ");
-    	    rows = query.list();
-    	    
-    	    if(rows != null && !rows.isEmpty())
-    	    {
-    	    	for(Object[] element : rows)
-    	    	{
-    	    		row=new BifurcationDetail();
-    	    		row.setReceiptNumber(element[4].toString());
-    	    		row.setGlcode(element[1].toString());
-    	    		row.setDebitAMount(element[3].toString());
-    	    		row.setCreditAmount(element[2].toString());
-    	    		if(bifurcationDetailsList.get(row.getReceiptNumber()) == null)
-    	    		{
-    	    			rowList=new ArrayList<BifurcationDetail>();
-    	    			bifurcationDetailsList.put(row.getReceiptNumber(),rowList);
-    	    		}
-    	    		else
-    	    		{
-    	    			bifurcationDetailsList.get(row.getReceiptNumber()).add(row);
-    	    		}
-    	    		
-    	    	}
-    	    }
-    	}catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-	}
-
-	@Action(value = "/receipts/searchReceipt-searchDayBookReport")
+    @Action(value = "/receipts/searchReceipt-searchDayBookReport")
     public String searchDayBookReport() {
         target = "searchresult";
         collectionVersion = ApplicationThreadLocals.getCollectionVersion();
 
         List<ReceiptHeader> receiptList = new ArrayList<>();
+        System.out.println("from date ::"+getFromDate());
+        System.out.println("to date :::"+getToDate());
+        System.out.println("getServiceTypeId() :::"+getServiceTypeId());
         if(getServiceTypeId().equalsIgnoreCase("")) {
         setServiceTypeId(null);
         }
@@ -427,16 +426,17 @@ public class SearchReceiptAction extends SearchFormAction {
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null);
       
-        Map<String,List<BifurcationDetail>> bifurcationDetailsListMap=new HashMap<String,List<BifurcationDetail>>();
-        populateReceiptBifurcationAmount(bifurcationDetailsListMap);
-        
+       
         List<RemittanceDepositWorkDetail> remittanceResponselist=null;
+       
+        
         BigDecimal totalReciptAmount=BigDecimal.ZERO;
         BigDecimal totalReciptAmount2= BigDecimal.ZERO; 
         totalReciptAmount2= totalReciptAmount.setScale(2, BigDecimal.ROUND_DOWN);
         System.out.println("check total amount="+totalReciptAmount2);
         
         
+        BigDecimal totalDepositAmount=BigDecimal.ZERO;
         BigDecimal totalDepositAmount2=BigDecimal.ZERO;
         totalDepositAmount2= totalDepositAmount2.setScale(2, BigDecimal.ROUND_DOWN);
         
@@ -446,19 +446,30 @@ public class SearchReceiptAction extends SearchFormAction {
         	}                   
 
         for (Receipt receipt : receipts) {
+        	System.out.println("1");
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+            	System.out.println("2");
                 for (BillDetail billDetail : bill.getBillDetails()) {
+                	System.out.println("3");
                     ReceiptHeader receiptHeader = new ReceiptHeader();
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
-                    populateBifurcationAmount(bifurcationDetailsListMap.get(billDetail.getReceiptNumber()),receiptHeader);
+                    populateBifurcationAmount(receiptHeader);
+                    System.out.println("4");
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
-                    receiptHeader.setService(receipt.getServicename());
+                    System.out.println("5");
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
+                    System.out.println("6");
                     receiptHeader.setReferencenumber("");
+                    System.out.println("7");
                     receiptHeader.setReferenceDesc(bill.getNarration());
+                    System.out.println("8");
                     receiptHeader.setPayeeName(bill.getPayerName());
+                    System.out.println("9");
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
+                    System.out.println("10");
                     receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
+                    System.out.println("11");
                     if(subdivison != null && !subdivison.isEmpty() && !subdivison.equalsIgnoreCase("-1") && !subdivison.contains("-1") && !subdivison.equalsIgnoreCase(receipt.getSubdivison()))
                     {
                     	continue;
@@ -469,18 +480,32 @@ public class SearchReceiptAction extends SearchFormAction {
                     	continue;
                     }
                     receiptHeader.setSubdivison(receipt.getSubdivison());
+                    System.out.println("12");
                     receiptHeader.setGstno(receipt.getGstNo());
-                    receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
-                    receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
+                    System.out.println("13");
                     
-                    if (receipt.getCollectedbyname() != null && !receipt.getCollectedbyname().isEmpty())
+                    System.out.println("14");
+                    receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
+                    System.out.println("15");
+                    receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
+                    System.out.println("16");
+                    EmployeeInfo empInfo = null;
+                    try
                     {
-                    	receiptHeader.setCreatedUser(receipt.getCollectedbyname());
+                    	empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    }catch (Exception e) {
+                    	System.out.println("employee not found");
+					}
+                    System.out.println("17");
+                    if (null != empInfo && empInfo.getUser().getUserName() != null && !empInfo.getUser().getUserName().isEmpty())
+                    {
+                    	receiptHeader.setCreatedUser(empInfo.getUser().getName());
                     }
                     else
                     {
                     	receiptHeader.setCreatedUser("");
                     }
+                    System.out.println("18");    
                     
                     //add Work Deposit
                     
@@ -495,19 +520,27 @@ public class SearchReceiptAction extends SearchFormAction {
 	                    		
 	                    		BigDecimal depositAmount = new BigDecimal(remittance.getCreditAmount());
 	                    		receiptHeader.setTotalDepositAmount(depositAmount);
+	                    		//totalDepositAmount2=totalDepositAmount2.add(depositAmount.setScale(4, BigDecimal.ROUND_DOWN));
+	                    		
+	                    		
 	                    	}
 	                    	else
 	                    	{
 	                    		receiptHeader.setReferencenumber("");
 	                    	}
+	                    		
 						}
                     }
 
+                    System.out.println("19");  
                     receiptList.add(receiptHeader);
+
+                    
                 }
             }
 
         }
+        System.out.println("20");
         System.out.println("receiptList  :::::"+receiptList.size());
         ///Bhushan :added filter to list
        List<ReceiptHeader> receiptListfilterList=receiptList;
@@ -528,8 +561,11 @@ public class SearchReceiptAction extends SearchFormAction {
         	
         
         if(searchAmount!=null && !searchAmount.equals("0") && !searchAmount.isEmpty()){
+        	System.out.println("L1");
         	if(collectedBy!=null && !collectedBy.isEmpty()){
+        		System.out.println("L2");
         		if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
+        			System.out.println("L3");
         			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
                     {
         				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -543,6 +579,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     }
         		}
         		else {
+        			System.out.println("L4");
         			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
                     {
         				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -558,6 +595,7 @@ public class SearchReceiptAction extends SearchFormAction {
         		}
         	}
         	else if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
+        		System.out.println("L5");
 	        		if(searchamtbig.equals(searchamt) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
 	                {
 	        			if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -570,6 +608,7 @@ public class SearchReceiptAction extends SearchFormAction {
 	               
 	                }
 	    		}else{
+	    			System.out.println("L6");
 	    			if(searchamtbig.equals(searchamt))
 	                {
 	    				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -584,7 +623,9 @@ public class SearchReceiptAction extends SearchFormAction {
 	        	}
         }
         else if(collectedBy!=null && !collectedBy.isEmpty()) {
+        	System.out.println("L7");
 			if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
+				System.out.println("L8");		
 			        		if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
 			                {
 			        			if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -597,6 +638,7 @@ public class SearchReceiptAction extends SearchFormAction {
 			               
 			                }
 			    		}else {
+			    			System.out.println("L9");
 			    			if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
 			                {
 			    				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -612,6 +654,7 @@ public class SearchReceiptAction extends SearchFormAction {
         	
         }
         else if(modeOfPayment!=null && !modeOfPayment.isEmpty()){
+        	System.out.println("L10");
         	if(receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
             {
         		if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -626,6 +669,7 @@ public class SearchReceiptAction extends SearchFormAction {
         	
             }
         else {
+        	System.out.println("L11");
         	if(receiptHeader2.getTotalDepositAmount()!=null) {
         		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
 			}
@@ -661,36 +705,43 @@ public class SearchReceiptAction extends SearchFormAction {
     
     
 
-	 private void populateBifurcationAmount(List<BifurcationDetail> list, ReceiptHeader receiptHeader) {
+	 private void populateBifurcationAmount(ReceiptHeader receiptHeader) {
+		 SQLQuery query =  null;
+	    	List<Object[]> rows = null;
 	    	BigDecimal pAmount=new BigDecimal("0");
 	    	BigDecimal gstAmount=new BigDecimal("0");
 	    	BigDecimal totalAmount=new BigDecimal("0");
 	    	try
 	    	{
-	    	    if(list != null && !list.isEmpty())
+	    		 query = this.persistenceService.getSession().createSQLQuery("select gl.id,gl.glcode,gl.debitamount,gl.creditamount from generalledger gl where voucherheaderid =(select vmis.voucherheaderid from vouchermis vmis where vmis.reciept_number =:receipt_no)");
+	    	    query.setString("receipt_no", receiptHeader.getReceiptnumber());
+	    	    rows = query.list();
+	    	    
+	    	    if(rows != null && !rows.isEmpty())
 	    	    {
-	    	    	for(BifurcationDetail element : list)
+	    	    	for(Object[] element : rows)
 	    	    	{
-	    	    		if(!(element.getCreditAmount()).equalsIgnoreCase("0.00"))
+	    	    		if(!element[3].toString().equalsIgnoreCase("0.00"))
 	    	    		{
-	    	    			if((element.getGlcode()).equalsIgnoreCase("3502020") || (element.getGlcode()).equalsIgnoreCase("3502019"))
+	    	    			if(element[1].toString().equalsIgnoreCase("3502020") || element[1].toString().equalsIgnoreCase("3502019"))
 	    	    			{
-	    	    				gstAmount=gstAmount.add(new BigDecimal(element.getCreditAmount()));
+	    	    				gstAmount=gstAmount.add(new BigDecimal(element[3].toString()));
 	    	    			}
 	    	    			else
 	    	    			{
-	    	    				pAmount=pAmount.add(new BigDecimal(element.getCreditAmount()));
+	    	    				pAmount=pAmount.add(new BigDecimal(element[3].toString()));
 	    	    			}
 	    	    		}
 	    	    		else
 	    	    		{
-	    	    			totalAmount=totalAmount.add(new BigDecimal(element.getDebitAMount()));
+	    	    			totalAmount=totalAmount.add(new BigDecimal(element[2].toString()));
 	    	    		}
+	    	    		
 	    	    	}
+	    	    	receiptHeader.setPrincipalAmount(pAmount);
+	    	    	receiptHeader.setGstAmount(gstAmount);
+	    	    	receiptHeader.setTotalAmount(totalAmount);
 	    	    }
-	    	    receiptHeader.setPrincipalAmount(pAmount);
-    	    	receiptHeader.setGstAmount(gstAmount);
-    	    	receiptHeader.setTotalAmount(totalAmount);
 	    	}catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -714,8 +765,7 @@ public class SearchReceiptAction extends SearchFormAction {
         List<Receipt> receipts = microserviceUtils.searchReciepts("MISCELLANEOUS", getFromDate(), getToDate(), serviceTypeDuringDownload,getDeptId(),
                 (getReceiptNumber() != null && !getReceiptNumber().isEmpty() && !"".equalsIgnoreCase(getReceiptNumber()))
                         ? getReceiptNumber() : null);
-        Map<String,List<BifurcationDetail>> bifurcationDetailsListMap=new HashMap<String,List<BifurcationDetail>>();
-        populateReceiptBifurcationAmount(bifurcationDetailsListMap);
+      
         
         List<RemittanceDepositWorkDetail> remittanceResponselist=null;
         
@@ -733,36 +783,63 @@ public class SearchReceiptAction extends SearchFormAction {
 
         System.out.println("subdivison ::::"+subdivison);
         for (Receipt receipt : receipts) {
+        	System.out.println("R");
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
+            	System.out.println("R1");
                 for (BillDetail billDetail : bill.getBillDetails()) {
+                	System.out.println("R2");
                     ReceiptHeader receiptHeader = new ReceiptHeader();
                     receiptHeader.setPaymentId(receipt.getPaymentId());
                     receiptHeader.setReceiptnumber(billDetail.getReceiptNumber());
-                    populateBifurcationAmount(bifurcationDetailsListMap.get(billDetail.getReceiptNumber()),receiptHeader);
+                    System.out.println("11");
+                    populateBifurcationAmount(receiptHeader);
+                    System.out.println("22");
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
-                    receiptHeader.setService(billDetail.getBusinessService());
+                    System.out.println("33");
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
+                    System.out.println("44");
                     receiptHeader.setReferencenumber("");
+                    System.out.println("55");
                     receiptHeader.setReferenceDesc(bill.getNarration());
+                    System.out.println("66");
                     receiptHeader.setPayeeAddress(bill.getPayerAddress());
+                    System.out.println("77");
                     receiptHeader.setPaidBy(bill.getPaidBy().split("&")[0]);
+                    System.out.println("88");
                     if(subdivison != null && !subdivison.isEmpty() && !subdivison.equalsIgnoreCase("-1") && !subdivison.contains("-1") && !subdivison.equalsIgnoreCase(receipt.getSubdivison()))
                     {
                     	continue;
                     }
+                    
+                    System.out.println("99");
                     receiptHeader.setSubdivison(receipt.getSubdivison());
+                    System.out.println("10");
                     receiptHeader.setGstno(receipt.getGstNo());
+                    System.out.println("11");
                     receiptHeader.setTotalreciptAmount(totalReciptAmount);
+                    System.out.println("12");
                     receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
+                    System.out.println("receiptType  ::::"+receiptType);
+                    System.out.println("receiptHeader.getCurretnStatus()  ::::"+receiptHeader.getCurretnStatus());
                     if(receiptType != null && !receiptType.isEmpty() && !receiptType.equalsIgnoreCase("-1") && !receiptType.contains("-1") && !receiptType.equalsIgnoreCase(receiptHeader.getCurretnStatus()))
                     {
                     	continue;
                     }
+                    System.out.println("13");
                     receiptHeader.setCurrentreceipttype(billDetail.getReceiptType());
+                    System.out.println("Mid");
                     receiptHeader.setModOfPayment(receipt.getInstrument().getInstrumentType().getName());
-                    
-                    if (receipt.getCollectedbyname() != null && !receipt.getCollectedbyname().isEmpty())
+                    EmployeeInfo empInfo = null;
+                    try
                     {
-                    	receiptHeader.setCreatedUser(receipt.getCollectedbyname());
+                    	empInfo =microserviceUtils.getEmployee(Long.parseLong(receipt.getAuditDetails().getCreatedBy()), null, null, null).get(0);
+                    }catch (Exception e) {
+                    	System.out.println("employee not found");
+					}
+                    System.out.println("after employee");
+                    if (null != empInfo && empInfo.getUser().getUserName() != null && !empInfo.getUser().getUserName().isEmpty())
+                    {
+                    	receiptHeader.setCreatedUser(empInfo.getUser().getName());
                     }
                     else
                     {
@@ -818,11 +895,15 @@ public class SearchReceiptAction extends SearchFormAction {
               {
             	  searchamtbig = receiptHeader2.getTotalAmount().setScale(4, BigDecimal.ROUND_DOWN);
               }
+               
               searchamt = searchamt.setScale(4, BigDecimal.ROUND_DOWN);
          
          if(searchAmount!=null && !searchAmount.equals("0") && !searchAmount.isEmpty()){
+         	System.out.println("111111");
          	if(collectedBy!=null && !collectedBy.isEmpty()){
+         		System.out.println("222222");
          		if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
+         			System.out.println("333333");
          			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
                      {
          				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -832,9 +913,11 @@ public class SearchReceiptAction extends SearchFormAction {
                          totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
          				}
          				receiptListnew.add(receiptHeader2);
+                    
                      }
          		}
          		else {
+         			System.out.println("55555");
          			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
                      {
          				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -844,10 +927,13 @@ public class SearchReceiptAction extends SearchFormAction {
                          totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
          				}
          				receiptListnew.add(receiptHeader2);
+                    
                      }
+         			
          		}
          	}
          	else if(modeOfPayment!=null && !modeOfPayment.equals("")) {
+         		System.out.println("XXXXX");
  	        		if(searchamtbig.equals(searchamt) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
  	                {
  	        			if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -860,6 +946,7 @@ public class SearchReceiptAction extends SearchFormAction {
  	               
  	                }
  	    		}else{
+ 	    			System.out.println("AAAA");
  	    			if(searchamtbig.equals(searchamt))
  	                {
  	    				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -874,7 +961,9 @@ public class SearchReceiptAction extends SearchFormAction {
  	        	}
          }
          else if(collectedBy!=null && !collectedBy.isEmpty()) {
+        	 System.out.println("777777");
  			if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
+ 				System.out.println("888888");
  			        		if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
  			                {
  			        			if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -887,6 +976,7 @@ public class SearchReceiptAction extends SearchFormAction {
  			               
  			                }
  			    		}else {
+ 			    			System.out.println("9999");
  			    			if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
  			                {
  			    				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -902,6 +992,7 @@ public class SearchReceiptAction extends SearchFormAction {
          	
          }
          else if(modeOfPayment!=null && !modeOfPayment.isEmpty()){
+        	 System.out.println("WWWWWW");
          	if(receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
              {
          		if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -911,9 +1002,12 @@ public class SearchReceiptAction extends SearchFormAction {
                  totalReciptAmount2= totalReciptAmount2.add(receiptHeader2.getTotalAmount().setScale(2, BigDecimal.ROUND_DOWN));
  				}
  				receiptListnew.add(receiptHeader2);
+            
              }
+         	
          }
          else {
+        	 System.out.println("GGGG");
          	if(receiptHeader2.getTotalDepositAmount()!=null) {
          		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
  			}
@@ -1088,7 +1182,10 @@ public class SearchReceiptAction extends SearchFormAction {
             for (org.egov.infra.microservice.models.Bill bill : receipt.getBill()) {
 
                 for (BillDetail billDetail : bill.getBillDetails()) {
+                	
                 	reciptNumber.add(billDetail.getReceiptNumber());
+                	
+                	
                 }
                 
                 }

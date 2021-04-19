@@ -53,6 +53,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 <title><s:text name="cash.bankRemittance.title" /></title>
+
 <script type="text/javascript">
 	jQuery.noConflict();
 	var isDatepickerOpened = false;
@@ -559,7 +560,9 @@
 						</tr>
 					</table>
 				</div>
-
+				<div  align="center">
+					<jsp:include page="common-documentsUpload.jsp" />
+				</div>
 				<div align="left" class="mandatorycoll">
 					<s:text name="common.mandatoryfields" />
 				</div>

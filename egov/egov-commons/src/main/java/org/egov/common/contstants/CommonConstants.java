@@ -5,6 +5,8 @@ public interface CommonConstants {
 
 	public static final String JOURNAL_VOUCHER_OBJECT = "journalVoucher";
 	
+	public static final String REMITTANCE_OBJECT = "Remittance";//added abhishek on 24032021
+	
 	public static final String DOCUMENT_VIEW_MODE="VIEW";
 	public static final String DOCUMENT_ADD_MODE="ADD";
 	

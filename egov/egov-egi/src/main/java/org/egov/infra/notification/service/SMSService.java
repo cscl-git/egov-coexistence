@@ -65,6 +65,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,14 +128,20 @@ public class SMSService {
 
     public boolean sendSMS(String mobileNumber, String message, NotificationPriority priority) {
         try {
+        	LOGGER.info("XXXXXXXX");
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(smsProviderURL);
             List<NameValuePair> urlParameters = new ArrayList<>();
+            //String genratedhashKey = hashGenerator(senderUserName, sender, message, "50e47b3f-6dd7-4938-883e-6cbdb37df7aa");
+
             urlParameters.add(new BasicNameValuePair(senderUserNameReqParamName, senderUserName));
             urlParameters.add(new BasicNameValuePair(senderPasswordReqParamName, senderPassword));
             urlParameters.add(new BasicNameValuePair(senderReqParamName, sender));
             urlParameters.add(new BasicNameValuePair(mobileNumberReqParamName, countryCode() + mobileNumber));
-            urlParameters.add(new BasicNameValuePair(messageReqParamName, message));
+            urlParameters.add(new BasicNameValuePair(messageReqParamName, "Agenda Test Message"));
+            urlParameters.add(new BasicNameValuePair("smsservicetype", "singlemsg"));
+            urlParameters.add(new BasicNameValuePair("templateid", "1007113536229611739"));
+            urlParameters.add(new BasicNameValuePair("key", "50e47b3f-6dd7-4938-883e-6cbdb37df7aa"));
             setAdditionalParameters(urlParameters, priority);
             post.setEntity(new UrlEncodedFormEntity(urlParameters, encoding()));
             HttpResponse response = client.execute(post);
@@ -161,4 +169,50 @@ public class SMSService {
             ));
         }
     }
+    
+	private String hashGenerator(String userName, String senderId, String content, String secureKey) {
+
+		// TODO Auto-generated method stub
+
+		StringBuffer finalString = new StringBuffer();
+
+		finalString.append(userName.trim()).append(senderId.trim()).append(content.trim()).append(secureKey.trim());
+
+		// logger.info("Parameters for SHA-512 : "+finalString);
+
+		String hashGen = finalString.toString();
+
+		StringBuffer sb = null;
+
+		MessageDigest md;
+
+		try {
+
+			md = MessageDigest.getInstance("SHA-512");
+
+			md.update(hashGen.getBytes());
+
+			byte byteData[] = md.digest();
+
+			// convert the byte to hex format method 1
+
+			sb = new StringBuffer();
+
+			for (int i = 0; i < byteData.length; i++) {
+
+				sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
+
+			}
+
+		} catch (NoSuchAlgorithmException e) {
+
+			// TODO Auto-generated catch block
+
+			e.printStackTrace();
+
+		}
+
+		return sb.toString();
+
+	}
 }

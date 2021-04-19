@@ -72,6 +72,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.egov.lcms.masters.entity.JudgmentType;
+import org.egov.lcms.masters.service.JudgmentTypeService;
 @Controller
 @RequestMapping(value = "/search")
 public class LegalCaseSearchController extends GenericLegalCaseController {
@@ -79,6 +81,9 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
     @Autowired
     private SearchLegalCaseService searchLegalCaseService;
 
+    @Autowired
+    JudgmentTypeService JudgmentTypeService;
+    
     @Autowired
     private LegalCaseUtil legalCaseUtil;
 
@@ -89,6 +94,10 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
 
     public @ModelAttribute("statusList") List<EgwStatus> getStatusList() {
         return legalCaseUtil.getStatusForModule();
+    }
+    
+    public @ModelAttribute("judgementTypeList") List<JudgmentType> getJudgmentTypeist() {
+        return JudgmentTypeService.findAll();
     }
 
     public @ModelAttribute("reportStatusList") List<ReportStatus> getReportStatusList() {

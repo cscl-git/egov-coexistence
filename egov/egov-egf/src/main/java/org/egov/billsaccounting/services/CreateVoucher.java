@@ -493,8 +493,8 @@ public class CreateVoucher {
 			// TODO- read the fnction from billdetails. We can remove this
 			if (billMis.getFunction() != null)
 				headerDetails.put(VoucherConstant.FUNCTIONCODE, billMis.getFunction().getCode());
-			if (billMis.getBudgetaryAppnumber() != null)
-				headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
+			//if (billMis.getBudgetaryAppnumber() != null)
+				//headerDetails.put(VoucherConstant.BUDGETARYAPPNUMBER, billMis.getBudgetaryAppnumber());
 
 			for (final EgBilldetails egBilldetails : billDetailslist) {
 
@@ -1117,7 +1117,7 @@ public class CreateVoucher {
 	 *            recovery master.If the glcode used is mapped in the recovery
 	 *            master then this data is mandatory.
 	 * @return voucherheader object in case of success and null in case of fail.
-	 * @throws ApplicationRuntimeExceptionRajat
+	 * @throws ApplicationRuntimeException
 	 */
 	@Transactional
 	public CVoucherHeader createVoucher(final HashMap<String, Object> headerdetails,

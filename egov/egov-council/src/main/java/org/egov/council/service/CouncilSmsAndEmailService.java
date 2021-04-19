@@ -276,8 +276,10 @@ public class CouncilSmsAndEmailService {
             body = emailBodyByCodeAndArgsWithType("email.resolution.body", name, councilMeeting, customMessage);
             subject = emailSubjectforEmailByCodeAndArgs("email.resolution.subject", name, councilMeeting);
         } else {
-            body = emailBodyByCodeAndArgsWithType("email.meeting.body", name, councilMeeting, customMessage);
-            subject = emailSubjectforEmailByCodeAndArgs("email.meeting.subject", name, councilMeeting);
+            //body = emailBodyByCodeAndArgsWithType("email.meeting.body", name, councilMeeting, customMessage);
+        	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
+        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
@@ -329,9 +331,9 @@ public class CouncilSmsAndEmailService {
             body = emailBodyByCodeAndArgsWithType("email.council.roles.resolution.body", userName, councilMeeting,
                     customMessage);
         } else {
-            subject = emailSubjectforEmailByCodeAndArgs("email.council.roles.meeting.subject", userName, councilMeeting);
-            body = emailBodyByCodeAndArgsWithType("email.council.roles.meeting.body", userName, councilMeeting,
-                    customMessage);
+        	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
+        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
@@ -358,11 +360,17 @@ public class CouncilSmsAndEmailService {
     public String emailBodyByCodeAndArgsWithType(final String code, final String name, final CouncilMeeting councilMeeting,
             final String customMessage) {
         final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
-        return councilMessageSource.getMessage(code,
+        /*return councilMessageSource.getMessage(code,
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
+                LocaleContextHolder.getLocale());*/
+        return councilMessageSource.getMessage(code,
+                new String[] { councilMeeting.getCommitteeType().getName(),councilMeeting.getMeetingNumber(),councilMeeting.getCommitteeType().getName(),
+                        sf.format(councilMeeting.getMeetingDate()),
+                        String.valueOf(councilMeeting.getMeetingTime()),
+                        String.valueOf(councilMeeting.getMeetingLocation()) },
                 LocaleContextHolder.getLocale());
     }
 

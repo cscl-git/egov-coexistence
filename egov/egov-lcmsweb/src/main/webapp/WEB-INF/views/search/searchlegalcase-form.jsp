@@ -190,22 +190,22 @@
 						</form:select>
 					</div>
 				</div>
-				<!-- Judgement Type -->
-				<div class="form-group">
-					<label class="col-sm-3 control-label text-right"><spring:message
-							code="lbl.judgmentype" /> :</span> </label>
+				<!-- Newly Added For Judgement By Bikash Dhal-->
+				<div class="form-group" id="reportstatus">
+					<label class="col-sm-3 control-label text-right">Judgment Type:</label>
 					<div class="col-sm-3 add-margin">
-						<form:select name="judgmentType" path="" data-first-option="false" id="judgmentType"
+						<form:select name="judgmentTypeId" path=""
+							data-first-option="false" id="judgmentTypeId"
 							 cssClass="form-control">
 							<form:option value="">
-								<spring:message code="lbl.select" />
+								<spring:message code="lbls.select" />
 							</form:option>
-							<form:options items="${judgmentType }" itemValue="name"
+							<form:options items="${judgementTypeList}" itemValue="id"
 								itemLabel="name" />
 						</form:select>
-						
 					</div>
-
+				</div>
+				<!-- End -->
 				<div class="form-group">
 					<label class="col-sm-3 control-label text-right"></label>
 					<div class="col-sm-3 add-margin"></div>

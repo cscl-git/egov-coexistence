@@ -338,6 +338,7 @@ public class FinancialUtils {
     public List<HashMap<String, Object>> getWorkflowHistory(final State state, final List<StateHistory> history) {
         org.egov.infra.microservice.models.User user = null;
         EmployeeInfo ownerobj = null;
+        EmployeeInfo updatebyobj = null;
         final List<HashMap<String, Object>> historyTable = new ArrayList<>();
         final HashMap<String, Object> map = new HashMap<>(0);
         if (null != state) {
@@ -347,8 +348,19 @@ public class FinancialUtils {
                 final HashMap<String, Object> workflowHistory = new HashMap<>(0);
                 workflowHistory.put("date", stateHistory.getDateInfo());
                 workflowHistory.put("comments", stateHistory.getComments());
-                workflowHistory.put("updatedBy", stateHistory.getLastModifiedBy() + "::"
-                        + stateHistory.getLastModifiedBy());
+                
+                
+                final Long lastModifyBy = stateHistory.getLastModifiedBy();
+                
+                if(null!=lastModifyBy) {
+                	updatebyobj = this.microServiceUtil.getEmployee(lastModifyBy, null, null, null).get(0);
+                	
+                	 workflowHistory.put("updatedBy",updatebyobj.getUser().getUserName()+"::"+updatebyobj.getUser().getName());
+                	
+                }
+               // workflowHistory.put("updatedBy", stateHistory.getLastModifiedBy() + "::" + stateHistory.getLastModifiedBy());
+               
+                
                 workflowHistory.put("status", stateHistory.getValue());
                 final Long owner = stateHistory.getOwnerPosition();
                 final State _sowner = stateHistory.getState();
@@ -366,9 +378,19 @@ public class FinancialUtils {
                 }
                 historyTable.add(workflowHistory);
             }
+            final Long lastModifyBy = state.getLastModifiedBy();
             map.put("date", state.getDateInfo());
             map.put("comments", state.getComments() != null ? state.getComments() : "");
-            map.put("updatedBy", state.getLastModifiedBy() + "::" + state.getLastModifiedBy());
+            
+            
+			//map.put("updatedBy", state.getLastModifiedBy() + "::" + state.getLastModifiedBy());
+            if(null!=lastModifyBy) {
+            	updatebyobj = this.microServiceUtil.getEmployee(lastModifyBy, null, null, null).get(0);
+            	
+            	 map.put("updatedBy",updatebyobj.getUser().getUserName()+"::"+updatebyobj.getUser().getName());
+            	
+            }
+            
             map.put("status", state.getValue());
             final Long ownerPosition = state.getOwnerPosition();
             ownerobj=    this.microServiceUtil.getEmployee(ownerPosition, null, null, null).get(0);
