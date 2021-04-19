@@ -278,8 +278,8 @@ public class CouncilSmsAndEmailService {
         } else {
             //body = emailBodyByCodeAndArgsWithType("email.meeting.body", name, councilMeeting, customMessage);
         	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
-        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
-            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
+        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
@@ -332,8 +332,8 @@ public class CouncilSmsAndEmailService {
                     customMessage);
         } else {
         	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
-        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
-            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +"Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
+        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
