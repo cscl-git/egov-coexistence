@@ -136,6 +136,8 @@ public class SMSService {
 
     public boolean sendSMS(String mobileNumber, String message, NotificationPriority priority,String templateId) {
     	LOGGER.info("Template :::"+templateId);
+    	LOGGER.info("original poattern  ::: Dear {#var#} Members, {#var#} {#var#} Meeting scheduled on {#var#} at {#var#} at {#var#}. Agenda sent to your mail. Chandigarh Smart City Ltd.");
+    	LOGGER.info("creted poattern  :::"+message);
     	SSLSocketFactory sf=null;
 		SSLContext context=null;
         try {

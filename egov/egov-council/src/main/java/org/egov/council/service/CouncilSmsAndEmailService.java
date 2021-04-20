@@ -306,8 +306,7 @@ public class CouncilSmsAndEmailService {
             smsMsg = smsBodyByCodeAndArgsWithType("msg.council.roles.resolution.sms", userName, councilMeeting,
                     customMessage);
         } else {
-            smsMsg = smsBodyByCodeAndArgsWithType("msg.council.roles.meeting.sms", userName, councilMeeting,
-                    customMessage);
+        	smsMsg="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Agenda sent to your mail. Chandigarh Smart City Ltd.";
         }
         if (mobileNumber != null && smsMsg != null)
             sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
