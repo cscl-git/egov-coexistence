@@ -56,6 +56,10 @@
 		
 	</div>
 	<div class="form-group">
+	<c:if test="${viewBudget == 'Y' }">
+	<input type="hidden" id="viewBudgetIndicator" value="Y"/>
+	<input type="hidden" name="paId" id="paId" value="${paId }"/>
+    	</c:if>
 		<c:choose>
 			<c:when test="${!billNumberGenerationAuto}">
 				<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billnumber" text="Bill Number"/>

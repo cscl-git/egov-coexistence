@@ -310,7 +310,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     			System.out.println("amt = "+amt);
     			if(amt != null && amt != "" && !(amt.equalsIgnoreCase("0") || amt.equalsIgnoreCase("0.00")) )
     			{
-    				glcodeId = row.getChartOfAccounts().getId();
+    				glcodeId = (row.getGlcodeid()).longValue();
     				break;
     			}
     		}

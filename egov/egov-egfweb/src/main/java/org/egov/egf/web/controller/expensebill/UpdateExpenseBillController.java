@@ -252,16 +252,19 @@ public class UpdateExpenseBillController extends BaseBillController {
         	return "expensebill-view";
         	
         }
+        model.addAttribute("paId",egBillregister.getId());
         if (egBillregister.getState() != null
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("viewBudget", "Y");
             return "expensebill-update";
         } 
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
             model.addAttribute("validActionList", validActions);
+            model.addAttribute("viewBudget", "Y");
             return "expensebill-update";
         }
         else {
@@ -272,6 +275,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
 
             model.addAttribute("budgetDetails", budgetDetails);
+            model.addAttribute("viewBudget", "Y");
             return EXPENSEBILL_UPDATE_WORKFLOW;
         }
     }
