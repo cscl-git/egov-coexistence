@@ -187,6 +187,7 @@ public class NotificationService {
 		}
 
     public void sendSMS(String mobileNo, String message) {
+    	System.out.println("D");
         sendSMS(mobileNo, message, MEDIUM);
     }
 
@@ -196,12 +197,14 @@ public class NotificationService {
     }
 
     public void sendSMS(String mobileNo, String message, NotificationPriority priority) {
+    	System.out.println("f");
         if (smsEnabled && isNoneBlank(mobileNo, message))
             jmsTemplate.send(HIGH.equals(priority) ? flashQueue : smsQueue, session -> {
                 MapMessage mapMessage = session.createMapMessage();
                 mapMessage.setString(MOBILE, mobileNo);
                 mapMessage.setString(MESSAGE, message);
                 mapMessage.setString(PRIORITY, priority.name());
+                mapMessage.setString("template","1007113536229611739");
                 return mapMessage;
             });
     }

@@ -54,6 +54,8 @@ import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.egov.infra.notification.entity.NotificationPriority;
@@ -65,10 +67,13 @@ import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.security.KeyManagementException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.net.ssl.SSLContext;
 
 import static org.egov.infra.config.core.LocalizationSettings.countryCode;
 import static org.egov.infra.config.core.LocalizationSettings.encoding;
@@ -112,6 +117,9 @@ public class SMSService {
 
     @Value("${sms.destination.mobile.req.param.name}")
     private String mobileNumberReqParamName;
+    
+    @Value("${sms.sender.securekey}")
+    private String smsKey;
 
     @Value("${sms.message.req.param.name}")
     private String messageReqParamName;
@@ -122,27 +130,32 @@ public class SMSService {
     @Value("#{'${sms.error.codes}'.split(',')}")
     private List<String> smsErrorCodes;
 
-    public boolean sendSMS(String mobileNumber, String message) {
-        return sendSMS(mobileNumber, message, MEDIUM);
+    public boolean sendSMS(String mobileNumber, String message,String templateId) {
+        return sendSMS(mobileNumber, message, MEDIUM,templateId);
     }
 
-    public boolean sendSMS(String mobileNumber, String message, NotificationPriority priority) {
+    public boolean sendSMS(String mobileNumber, String message, NotificationPriority priority,String templateId) {
+    	LOGGER.info("Template :::"+templateId);
+    	SSLSocketFactory sf=null;
+		SSLContext context=null;
         try {
-        	LOGGER.info("XXXXXXXX");
+        	context=SSLContext.getInstance("TLSv1.2"); // Use this line for Java version 7 and above
+			context.init(null, null, null);
+			sf=new SSLSocketFactory(context, SSLSocketFactory.STRICT_HOSTNAME_VERIFIER);
+			Scheme scheme=new Scheme("https",443,sf);
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = new HttpPost(smsProviderURL);
             List<NameValuePair> urlParameters = new ArrayList<>();
-            //String genratedhashKey = hashGenerator(senderUserName, sender, message, "50e47b3f-6dd7-4938-883e-6cbdb37df7aa");
-
+            String genratedhashKey = hashGenerator(senderUserName, sender, message, smsKey);
             urlParameters.add(new BasicNameValuePair(senderUserNameReqParamName, senderUserName));
             urlParameters.add(new BasicNameValuePair(senderPasswordReqParamName, senderPassword));
             urlParameters.add(new BasicNameValuePair(senderReqParamName, sender));
             urlParameters.add(new BasicNameValuePair(mobileNumberReqParamName, countryCode() + mobileNumber));
-            urlParameters.add(new BasicNameValuePair(messageReqParamName, "Agenda Test Message"));
+            urlParameters.add(new BasicNameValuePair(messageReqParamName, message));
             urlParameters.add(new BasicNameValuePair("smsservicetype", "singlemsg"));
-            urlParameters.add(new BasicNameValuePair("templateid", "1007113536229611739"));
-            urlParameters.add(new BasicNameValuePair("key", "50e47b3f-6dd7-4938-883e-6cbdb37df7aa"));
-            setAdditionalParameters(urlParameters, priority);
+            urlParameters.add(new BasicNameValuePair("key", genratedhashKey));
+            urlParameters.add(new BasicNameValuePair("templateid", templateId));
+            //setAdditionalParameters(urlParameters, priority);
             post.setEntity(new UrlEncodedFormEntity(urlParameters, encoding()));
             HttpResponse response = client.execute(post);
             String responseCode = IOUtils.toString(response.getEntity().getContent(), encoding());
@@ -151,7 +164,13 @@ public class SMSService {
             return smsErrorCodes.parallelStream().noneMatch(responseCode::startsWith);
         } catch (UnsupportedOperationException | IOException e) {
             LOGGER.error("Error occurred while sending SMS [{}]", mobileNumber, e);
-        }
+        } catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (KeyManagementException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         return false;
     }
 
@@ -170,49 +189,28 @@ public class SMSService {
         }
     }
     
-	private String hashGenerator(String userName, String senderId, String content, String secureKey) {
-
+    protected String hashGenerator(String userName, String senderId, String content, String secureKey) {
 		// TODO Auto-generated method stub
-
-		StringBuffer finalString = new StringBuffer();
-
+		StringBuffer finalString=new StringBuffer();
 		finalString.append(userName.trim()).append(senderId.trim()).append(content.trim()).append(secureKey.trim());
-
-		// logger.info("Parameters for SHA-512 : "+finalString);
-
-		String hashGen = finalString.toString();
-
+		//		logger.info("Parameters for SHA-512 : "+finalString);
+		String hashGen=finalString.toString();
 		StringBuffer sb = null;
-
 		MessageDigest md;
-
 		try {
-
 			md = MessageDigest.getInstance("SHA-512");
-
 			md.update(hashGen.getBytes());
-
 			byte byteData[] = md.digest();
-
-			// convert the byte to hex format method 1
-
+			//convert the byte to hex format method 1
 			sb = new StringBuffer();
-
 			for (int i = 0; i < byteData.length; i++) {
-
 				sb.append(Integer.toString((byteData[i] & 0xff) + 0x100, 16).substring(1));
-
 			}
 
 		} catch (NoSuchAlgorithmException e) {
-
 			// TODO Auto-generated catch block
-
 			e.printStackTrace();
-
 		}
-
 		return sb.toString();
-
 	}
 }
