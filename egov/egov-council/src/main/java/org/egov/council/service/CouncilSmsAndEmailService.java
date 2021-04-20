@@ -302,6 +302,7 @@ public class CouncilSmsAndEmailService {
             final CouncilMeeting councilMeeting,
             final String customMessage) {
         String smsMsg;
+        final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
             smsMsg = smsBodyByCodeAndArgsWithType("msg.council.roles.resolution.sms", userName, councilMeeting,
                     customMessage);
