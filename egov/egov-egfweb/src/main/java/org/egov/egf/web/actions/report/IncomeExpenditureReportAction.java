@@ -66,11 +66,17 @@ import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
+import org.egov.commons.service.CFinancialYearService;
+import org.egov.commons.service.FunctionService;
+import org.egov.commons.service.FunctionaryService;
+import org.egov.commons.service.FundService;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.CityService;
+import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.reporting.util.ReportUtil;
@@ -84,23 +90,23 @@ import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
+@Component
 @ParentPackage("egov")
 @Results({
     @Result(name = "report", location = "incomeExpenditureReport-report.jsp"),
@@ -138,14 +144,11 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     private String asOnDateRange;
     private String period;
     private Integer fundId;
-    private String schemeId;
     private final StringBuffer heading = new StringBuffer();
     private StringBuffer scheduleheading = new StringBuffer();
     private StringBuffer statementheading = new StringBuffer();
-    
     List<CChartOfAccounts> listChartOfAccounts;
     private boolean detailReport = false;
-   
     //Added By Bikash Dhal For IncomeExpenditureExcelSheet
     private byte[]excelData=null;
    
@@ -157,6 +160,25 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
  
      @Autowired
      private CityService cityService;
+    
+     
+     @Autowired
+  private   FundService fundService;
+     
+     @Autowired
+  private   CFinancialYearService cFinancialYearService;
+     
+     @Autowired
+   private  FunctionService functionService;
+     
+     @Autowired
+    private  BoundaryService boundaryService;
+     @Autowired
+     private FunctionaryService functionaryService;
+     
+     @Autowired
+     private  DepartmentService departmentService;
+     
     
     public void setIncomeExpenditureService(final IncomeExpenditureService incomeExpenditureService) {
         this.incomeExpenditureService = incomeExpenditureService;
@@ -194,15 +216,18 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         super.prepare();
         if (!parameters.containsKey("showDropDown")) {
             addDropdownData("departmentList", masterDataCache.get("egi-department"));
-            addDropdownData("functionList", masterDataCache.get("egi-function"));
-//            addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
-            addDropdownData("fundDropDownList", masterDataCache.get("egi-fund"));
-//            addDropdownData("fieldList", masterDataCache.get("egi-ward"));
-            addDropdownData("financialYearList",
-                    getPersistenceService().findAllBy("from CFinancialYear where isActive=true  order by finYearRange desc "));
-            addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
+				  addDropdownData("functionList", masterDataCache.get("egi-function")); //
+				  addDropdownData("functionaryList", masterDataCache.get("egi-functionary"));
+				  addDropdownData("fundDropDownList", masterDataCache.get("egi-fund")); //
+				  addDropdownData("fieldList", masterDataCache.get("egi-ward"));
+				  addDropdownData("financialYearList", getPersistenceService().findAllBy("from CFinancialYear where isActive=true  order by finYearRange desc " ));
+			  
         }
+			  
+		 
+	 
     }
+
 
     protected void setRelatedEntitesOn() {
         setTodayDate(new Date());
@@ -347,7 +372,6 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     public String ajaxPrintIncomeExpenditureReport() {
     	try {
         populateDataSource();
-
     	}catch(Exception e)
     	{
     		e.printStackTrace();
@@ -355,10 +379,12 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         return "results";
     }
 
-    protected void populateDataSource() {
+    public void populateDataSource() {
     	
         setRelatedEntitesOn();
-
+       // System.out.println(incomeExpenditureStatement.getFund().getId());
+       // System.out.println(incomeExpenditureStatement.getFinancialYear().getId());
+       // System.out.println(incomeExpenditureStatement.getDepartment().getCode());
         statementheading.append("Income And Expenditure Statement").append(heading);
         if (incomeExpenditureStatement.getFund() != null && incomeExpenditureStatement.getFund().getId() != null
                 && incomeExpenditureStatement.getFund().getId() != 0) {
@@ -366,8 +392,12 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
             fundlist.add(incomeExpenditureStatement.getFund());
             incomeExpenditureStatement.setFunds(fundlist);
             incomeExpenditureService.populateIEStatement(incomeExpenditureStatement);
+            System.out.println("Inside If");
         } else {
+        	// System.out.println("Inside Else");
+        	// System.out.println(incomeExpenditureService.getFunds().size());
             incomeExpenditureStatement.setFunds(incomeExpenditureService.getFunds());
+           // System.out.println("FUND SIZE:::::::-----"+incomeExpenditureService.getFunds().size());
             incomeExpenditureService.populateIEStatement(incomeExpenditureStatement);
         }
     }
@@ -400,7 +430,19 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     @Action(value = "/report/incomeExpenditureReport-generateDetailCodeXls")
     public String generateDetailCodeXls() throws Exception {
         populateSchedulewiseDetailCodeReport();
-        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + statementheading.toString();
+		/*
+		 * final String heading = ReportUtil.getCityName()
+		 * +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) +
+		 * "\\n" + statementheading.toString(); final String subtitle =
+		 * "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate()) +
+		 * "                                               "; final JasperPrint jasper =
+		 * reportHelper.generateIncomeExpenditureReportJasperPrint(
+		 * incomeExpenditureStatement, heading, getPreviousYearToDate(),
+		 * getCurrentYearToDate(), subtitle, true); inputStream =
+		 * reportHelper.exportXls(inputStream, jasper);
+		 */
+        
+        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + " " + statementheading.toString();
         final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate())
                 + "                                               ";
 		 
@@ -414,6 +456,7 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         headerData.put("h5","Head Of Account");
         byte[]excelData = getScheduleResultsExcelSheet(headerData,incomeExpenditureStatement);
         inputStream = new ByteArrayInputStream(excelData);
+        
         return INCOME_EXPENSE_XLS;
     }
 
@@ -430,14 +473,16 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     @ReadOnly
     @Action(value = "/report/incomeExpenditureReport-generateIncomeExpenditureXls")
     public String generateIncomeExpenditureXls() throws Exception {
+       
+    	try {
         populateDataSource();
-        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + statementheading.toString();
+        System.out.println(incomeExpenditureStatement.getFunds().get(0));
+        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + " " + statementheading.toString();
         final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate())
                 + "                                               ";
+		System.out.println(incomeExpenditureStatement.getIeEntries().size());
 		
         
-        if( incomeExpenditureStatement.getIeEntries().size()>0) {
-			
         	Map<String, String> headerData = new HashMap<>();
             headerData.put("h1", heading);
             headerData.put("h2", subtitle);
@@ -449,17 +494,27 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
             headerData.put("h8",getPreviousYearToDate());
             headerData.put("h9", getCurrentYearToDate());
             
+            System.out.println("TEST 2"); 
+			 
+           
+			  
+			  //inputStream = new ByteArrayInputStream(excelData);
+            
            excelData = getIncomeExpenditureExcelSheet(headerData,incomeExpenditureStatement);
+            	System.out.println(excelData.length);
+            	if(excelData.length>0) {
            inputStream = new ByteArrayInputStream(excelData);
-		}else {
-			System.out.println("TEST 2");
-			Map<String, String> headerData = new HashMap<>();
-            headerData.put("h1", heading);
-            headerData.put("h2", subtitle);
-            headerData.put("h3", "Amount in Rupees");
+            	}
+            		
+            	else {
             excelData = noDataExcel(headerData);
-            inputStream = new ByteArrayInputStream(excelData);
 		}
+    	}	
+            	
+            catch(Exception ex) {
+            	return "report";
+            }
+            	
         
 		
         return INCOME_EXPENSE_XLS;
@@ -487,6 +542,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 		 * getPreviousYearToDate(), getCurrentYearToDate(), false); inputStream =
 		 * reportHelper.exportXls(inputStream, jasper);
 		 */
+        
+        
         final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + " " + scheduleheading.toString();
         // Blank space for space didvidion between left and right corner
         final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate()) + "					  						 ";
@@ -504,8 +561,6 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         headerData.put("h5","Head Of Account");
         byte[]excelData = getMinorScheduleResultsExcelSheet(headerData,incomeExpenditureStatement);
         inputStream = new ByteArrayInputStream(excelData);
-       
-        
         return INCOME_EXPENSE_XLS;
     }
 
@@ -526,7 +581,21 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     @Action(value = "/report/incomeExpenditureReport-generateIncomeExpenditureScheduleXls")
     public String generateIncomeExpenditureScheduleXls() throws Exception {
         populateDataSourceForSchedule();
-        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + "\\n" + scheduleheading.toString();
+		/*
+		 * final String heading = ReportUtil.getCityName()
+		 * +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) +
+		 * "\\n" + scheduleheading.toString(); // Blank space for space didvidion
+		 * between left and right corner final String subtitle = "Report Run Date-" +
+		 * FORMATDDMMYYYY.format(getTodayDate()) +
+		 * "					  						 "; final JasperPrint jasper =
+		 * reportHelper.generateIncomeExpenditureReportJasperPrint(
+		 * incomeExpenditureStatement, heading, getPreviousYearToDate(),
+		 * getCurrentYearToDate(), subtitle, false); inputStream =
+		 * reportHelper.exportXls(inputStream, jasper);
+		 */
+        
+        
+        final String heading = ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()) + " " + scheduleheading.toString();
         // Blank space for space didvidion between left and right corner
         final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate()) + "					  						 ";
 		
@@ -539,7 +608,6 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         headerData.put("h5","Head Of Account");
         byte[]excelData = getScheduleResultsExcelSheet(headerData,incomeExpenditureStatement);
         inputStream = new ByteArrayInputStream(excelData);
-       
         return INCOME_EXPENSE_XLS;
     }
 
@@ -711,35 +779,94 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 		this.toDate = toDate;
 	}
 
-	public String getSchemeId() {
-		return schemeId;
-	}
+public void populateDataSource2(Statement s) {
+	incomeExpenditureStatement =s;
+    	
+    		
+    		incomeExpenditureStatement= setRelatedEntitesOn2(incomeExpenditureStatement);
+    	        System.out.println(incomeExpenditureStatement.getFund().getId());
+    	        System.out.println(incomeExpenditureStatement.getFinancialYear().getId());
+    	        System.out.println(incomeExpenditureStatement.getDepartment().getCode());
+    	        
+    	        	 System.out.println("Inside populateDataSource2");
+    	            incomeExpenditureStatement.setFunds(fundService.findAll());
+    	            System.out.println(incomeExpenditureStatement.getFunds().size());
+    	            System.out.println(incomeExpenditureStatement.getFunds().get(0).getName());
+    	            
+    	            incomeExpenditureService.populateIEStatement(incomeExpenditureStatement);
+    	
+       
+        
+    }
 
-	public void setSchemeId(String schemeId) {
-		this.schemeId = schemeId;
+protected Statement setRelatedEntitesOn2(Statement incomeExpenditureStatement) {
+    setTodayDate(new Date());
+    if (incomeExpenditureStatement.getFund() != null && incomeExpenditureStatement.getFund().getId() != null
+            && incomeExpenditureStatement.getFund().getId() != 0) {
+        incomeExpenditureStatement.setFund((Fund) fundService.findOne(incomeExpenditureStatement.getFund().getId()));
+        heading.append(" in " + incomeExpenditureStatement.getFund().getName());
+    }
+    if (incomeExpenditureStatement.getDepartment() != null && incomeExpenditureStatement.getDepartment().getCode() != null
+            && !incomeExpenditureStatement.getDepartment().getCode().isEmpty()) {
+    	System.out.println(incomeExpenditureStatement.getDepartment().getCode());
+    	org.egov.infra.admin.master.entity.Department dep = departmentService.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
+    	
+    	System.out.println("Fetched id"+dep.getId());
+    	System.out.println("Fetched code"+dep.getCode());
+    	System.out.println("Fetched name"+dep.getName());
+        Department dept =new Department(dep.getId(),dep.getName(),dep.getCode());
+        
+			/*
+			 * dept.setCode(dep.getCode()); dept.setId(dept.getId());
+			 * dept.setName(dept.getName());
+			 */
+        		
+        		System.out.println("TESTING DEPT namse"+dept.getName());
+        		System.out.println("TESTING DEPT id "+dept.getId());
+        		System.out.println("TESTING DEPT code"+dept.getCode());
+        incomeExpenditureStatement.setDepartment(dept);
+        heading.append(" in " + incomeExpenditureStatement.getDepartment().getName() + " Department");
+    } else
+        incomeExpenditureStatement.setDepartment(null);
+    if (incomeExpenditureStatement.getFinancialYear() != null
+            && incomeExpenditureStatement.getFinancialYear().getId() != null
+            && incomeExpenditureStatement.getFinancialYear().getId() != 0) {
+        incomeExpenditureStatement.setFinancialYear((CFinancialYear)cFinancialYearService.findOne(incomeExpenditureStatement.getFinancialYear().getId()) );
+        heading.append(" for the Financial Year " + incomeExpenditureStatement.getFinancialYear().getFinYearRange());
+    }
+    if (incomeExpenditureStatement.getFunction() != null && incomeExpenditureStatement.getFunction().getId() != null
+            && incomeExpenditureStatement.getFunction().getId() != 0) {
+        incomeExpenditureStatement.setFunction((CFunction)functionService.findOne(incomeExpenditureStatement.getFunction().getId()));
+        heading.append(" in Function Code " + incomeExpenditureStatement.getFunction().getName());
+	}
+    if (incomeExpenditureStatement.getField() != null && incomeExpenditureStatement.getField().getId() != null
+            && incomeExpenditureStatement.getField().getId() != 0) {
+        incomeExpenditureStatement.setField((Boundary) boundaryService.getBoundaryById(incomeExpenditureStatement.getField().getId()));
+        heading.append(" in the field value" + incomeExpenditureStatement.getField().getName());
+    }
+
+    
+    if (incomeExpenditureStatement.getFunctionary() != null && incomeExpenditureStatement.getFunctionary().getId() != null
+            && incomeExpenditureStatement.getFunctionary().getId() != 0) {
+        incomeExpenditureStatement.setFunctionary((Functionary)functionaryService.findOne(
+        		(Long.parseLong(incomeExpenditureStatement.getFunctionary().getId().toString()))));
+        heading.append(" and " + incomeExpenditureStatement.getFunctionary().getName() + " Functionary");
+    }
+    System.out.println(heading);
+    return incomeExpenditureStatement;
 	}
 	
+
 	//Added By Bikash For Income Expenditure EXcel Sheet 1722021
 	private byte[] getIncomeExpenditureExcelSheet(Map<String,String>headerData,Statement incomExpenditureStatement) {
-		System.out.println("Inside getInComeExpenditureExcelSheet");
-		
 		
 		byte[]fileContent=null;
+		
 		try {
 			HSSFWorkbook wb = new HSSFWorkbook();
 			Sheet sheet = wb.createSheet("Income And Expenditure Report");
-			sheet.getPrintSetup().setLandscape(true);
-			sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE); 
 			HSSFCellStyle style = wb.createCellStyle();  
-			HSSFFont font = wb.createFont();
-			 font.setFontHeightInPoints((short)11);  
-	         font.setFontName("Times New Roman");  
-	         font.setBoldweight((short)10);
-	        style.setFont(font);  
 			int i =0;
-			
-			
-			
 			Row row1 = sheet.createRow(i++);	  
 			Cell c1=  row1.createCell(0);
 			c1.setCellStyle(style);
@@ -787,9 +914,6 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 						Cell c9=  row4.createCell(j++);
 						c9.setCellStyle(style);
 						c9.setCellValue(getPreviousYearToDate());
-						
-				
-	
 			}
 			
 			 for(IEStatementEntry s : incomeExpenditureStatement.getIeEntries()) {
@@ -817,9 +941,6 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 					}
 					
 					
-					
-				
-					
 					if(null!=s.getGlCode()) {
 						glcode =s.getGlCode().toString();
 					}
@@ -841,26 +962,41 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 						cell3.setCellValue(net_amount);
 						cell4.setCellValue(prev_amount);
 					}
-					
-					
-					
-					
 					cell0.setCellValue(glcode);
 					cell1.setCellValue(account_name);
 					cell2.setCellValue(schedule_num);
 					
 		        } 
 			
+			 int numberOfSheets = wb.getNumberOfSheets();
+			 for (int x = 0; x < numberOfSheets; x++) {
+			        Sheet sheet1 = wb.getSheetAt(x);
+			        int total_row=6;
+			        if (sheet1.getPhysicalNumberOfRows() > 0) {
+			        	
+			        		Row row = sheet1.getRow(total_row);
+				            Iterator<Cell> cellIterator = row.cellIterator();
+				            while (cellIterator.hasNext()) {
+				                Cell cell = cellIterator.next();
+				                int columnIndex = cell.getColumnIndex();
+				               // System.out.println(columnIndex);
+				                sheet1.autoSizeColumn(columnIndex);
+				            }
+			        	
+			            
+			        }
+			    }
 			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			
 			wb.write(os);
 			 
 			
 			   fileContent = os.toByteArray();
 			
 			
-		}catch(Exception ex) {
-			ex.printStackTrace();
-		}
+		  }catch(Exception ex) {  }
+		 
+		
 		 return fileContent;
 	}
 	
@@ -870,11 +1006,11 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 			HSSFWorkbook wb = new HSSFWorkbook();
 			Sheet sheet = wb.createSheet("Income And Expenditure Report");
 			HSSFCellStyle style = wb.createCellStyle(); // Creating Style  
-			HSSFFont font = wb.createFont();
-			 font.setFontHeightInPoints((short)11);  
-	         font.setFontName("Times New Roman");  
-	         font.setBoldweight((short)10);
-	        style.setFont(font);  
+			/*
+			 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
+			 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
+			 * style.setFont(font);
+			 */ 
 			int i =0;
 			Row row1 = sheet.createRow(i++);	  
 			Cell c1=  row1.createCell(0);
@@ -905,6 +1041,8 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 		return fileContent;
 	}
 	
+	
+	
 	//Added By Bikash For Income Expenditure EXcel Sheet 1722021
 		private byte[] getScheduleResultsExcelSheet(Map<String,String>headerData,Statement incomExpenditureStatement) {
 			System.out.println("Inside Schedule Action");
@@ -912,18 +1050,17 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 			try {
 				HSSFWorkbook wb = new HSSFWorkbook();
 				Sheet sheet = wb.createSheet("Income And Expenditure Report");
-				sheet.getPrintSetup().setLandscape(true);
-				sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE); 
+			/*
+			 * sheet.getPrintSetup().setLandscape(true);
+			 * sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE);
+			 */
 				HSSFCellStyle style = wb.createCellStyle();  
-				HSSFFont font = wb.createFont();
-				 font.setFontHeightInPoints((short)11);  
-		         font.setFontName("Times New Roman");  
-		         font.setBoldweight((short)10);
-		        style.setFont(font);  
+			/*
+			 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
+			 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
+			 * style.setFont(font);
+			 */
 				int i =0;
-				
-				
-				
 				Row row1 = sheet.createRow(i++);	  
 				Cell c1=  row1.createCell(0);
 				c1.setCellStyle(style);
@@ -1028,7 +1165,24 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 						cell2.setCellValue(schedule_num);
 						
 			        } 
+					 int numberOfSheets = wb.getNumberOfSheets();
+					 for (int x = 0; x < numberOfSheets; x++) {
+					        Sheet sheet1 = wb.getSheetAt(x);
+					        int total_row=6;
+					        if (sheet1.getPhysicalNumberOfRows() > 0) {
 				
+					        		Row row = sheet1.getRow(total_row);
+						            Iterator<Cell> cellIterator = row.cellIterator();
+						            while (cellIterator.hasNext()) {
+						                Cell cell = cellIterator.next();
+						                int columnIndex = cell.getColumnIndex();
+						               // System.out.println(columnIndex);
+						                sheet1.autoSizeColumn(columnIndex);
+						            }
+					        	
+					            
+					        }
+					    }
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
 				wb.write(os);
 				 
@@ -1043,8 +1197,6 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 		}
 		
 		
-		
-
 		//Added By Bikash For Income Expenditure EXcel Sheet 1722021
 		private byte[] getMinorScheduleResultsExcelSheet(Map<String,String>headerData,Statement incomExpenditureStatement) {
 			System.out.println("Inside Schedule Action");
@@ -1052,14 +1204,16 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 			try {
 				HSSFWorkbook wb = new HSSFWorkbook();
 				Sheet sheet = wb.createSheet("Income And Expenditure Report");
-				sheet.getPrintSetup().setLandscape(true);
-				sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE); 
+			/*
+			 * sheet.getPrintSetup().setLandscape(true);
+			 * sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE);
+			 */
 				HSSFCellStyle style = wb.createCellStyle();  
-				HSSFFont font = wb.createFont();
-				 font.setFontHeightInPoints((short)11);  
-		         font.setFontName("Times New Roman");  
-		         font.setBoldweight((short)10);
-		        style.setFont(font);  
+			/*
+			 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
+			 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
+			 * style.setFont(font);
+			 */
 				int i =0;
 				Row row1 = sheet.createRow(i++);	  
 				Cell c1=  row1.createCell(0);
@@ -1086,6 +1240,7 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 				
 				int j =2;
 				int fund_size=incomeExpenditureStatement.getFunds().size();
+					System.out.println(fund_size);
 				if(fund_size>0) {
 					
 					for(Fund f:incomeExpenditureStatement.getFunds()) {
@@ -1179,7 +1334,24 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 						cell4.setCellValue(currentYearTotal);
 						cell5.setCellValue(previousYearTotal);	
 			        } 
+					int numberOfSheets = wb.getNumberOfSheets();
+					 for (int x = 0; x < numberOfSheets; x++) {
+					        Sheet sheet1 = wb.getSheetAt(x);
+					        int total_row=6;
+					        if (sheet1.getPhysicalNumberOfRows() > 0) {
 				
+					        		Row row = sheet1.getRow(total_row);
+						            Iterator<Cell> cellIterator = row.cellIterator();
+						            while (cellIterator.hasNext()) {
+						                Cell cell = cellIterator.next();
+						                int columnIndex = cell.getColumnIndex();
+						               // System.out.println(columnIndex);
+						                sheet1.autoSizeColumn(columnIndex);
+						            }
+					        	
+					            
+					        }
+					    }
 				ByteArrayOutputStream os = new ByteArrayOutputStream();
 				wb.write(os);
 				fileContent = os.toByteArray();

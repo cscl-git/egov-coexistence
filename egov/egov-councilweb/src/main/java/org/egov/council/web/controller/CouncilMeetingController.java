@@ -263,12 +263,12 @@ public class CouncilMeetingController {
     					@RequestParam final MultipartFile attachments,
                          final Model model, final RedirectAttributes redirectAttrs, final HttpServletRequest request) {
 
-        validateCouncilMeeting(councilMeeting, errors);
-        if (errors.hasErrors()) {
-            model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
-            model.addAttribute(COUNCIL_MEETING, councilMeeting);
-            return COUNCILNOTICE_NEW;
-        }
+//        validateCouncilMeeting(councilMeeting, errors);
+//        if (errors.hasErrors()) {
+//            model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
+//            model.addAttribute(COUNCIL_MEETING, councilMeeting);
+//            return COUNCILNOTICE_NEW;
+//        }
         
         if (attachments != null && attachments.getSize() > 0) {
             try {
@@ -332,12 +332,12 @@ public class CouncilMeetingController {
     					@RequestParam final MultipartFile attachments,
                          final Model model, final RedirectAttributes redirectAttrs, final HttpServletRequest request) {
 
-        validateCouncilMeeting(councilMeeting, errors);
-        if (errors.hasErrors()) {
-            model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
-            model.addAttribute(COUNCIL_MEETING, councilMeeting);
-            return COUNCILMEETING_NEW;
-        }
+//        validateCouncilMeeting(councilMeeting, errors);
+//        if (errors.hasErrors()) {
+//            model .addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
+//            model.addAttribute(COUNCIL_MEETING, councilMeeting);
+//            return COUNCILMEETING_NEW;
+//        }
         
         if (attachments != null && attachments.getSize() > 0) {
             try {
@@ -396,13 +396,13 @@ public class CouncilMeetingController {
     }
 
 
-    private void validateCouncilMeeting(final CouncilMeeting councilMeeting, BindingResult errors) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingDate", "notempty.meeting.meetingDate");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingTime", "notempty.meeting.meetingTime");
-        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingLocation", "notempty.meeting.committeeType");
-        if (councilMeeting.getAttachments().getSize() == 0 && councilMeeting.getFilestoreid() == null)
-            errors.rejectValue("attachments", "notempty.preamble.attachments");
-    }
+//    private void validateCouncilMeeting(final CouncilMeeting councilMeeting, BindingResult errors) {
+//        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingDate", "notempty.meeting.meetingDate");
+//        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingTime", "notempty.meeting.meetingTime");
+//        ValidationUtils.rejectIfEmptyOrWhitespace(errors, "meetingLocation", "notempty.meeting.committeeType");
+//        if (councilMeeting.getAttachments().getSize() == 0 && councilMeeting.getFilestoreid() == null)
+//            errors.rejectValue("attachments", "notempty.preamble.attachments");
+//    }
 
     @RequestMapping(value = "/edit/{id}", method = RequestMethod.GET)
     public String edit(@PathVariable("id") final Long id, final Model model) {
@@ -419,12 +419,12 @@ public class CouncilMeetingController {
     public String update(@Valid @ModelAttribute final CouncilMeeting councilMeeting, final BindingResult errors,
     		 			@RequestParam final MultipartFile attachments,
                          final Model model, final RedirectAttributes redirectAttrs) {
-        validateCouncilMeeting(councilMeeting, errors);
-        if (errors.hasErrors()) {
-            councilMeetingService.sortMeetingMomByItemNumber(councilMeeting);
-            model.addAttribute("autoMeetingNoGenEnabled", true);
-            return COUNCILMEETING_EDIT;
-        }
+//        validateCouncilMeeting(councilMeeting, errors);
+//        if (errors.hasErrors()) {
+//            councilMeetingService.sortMeetingMomByItemNumber(councilMeeting);
+//            model.addAttribute("autoMeetingNoGenEnabled", true);
+//            return COUNCILMEETING_EDIT;
+//        }
         
         if (attachments != null && attachments.getSize() > 0) {
             try {

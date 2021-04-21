@@ -41,9 +41,22 @@ public class AuditChecklistHistory extends AbstractAuditable implements java.io.
     @ManyToOne
     @JoinColumn(name = "audit_id")
     private AuditDetails auditDetails;
-	
-	
 
+public AuditChecklistHistory() {
+		
+	}
+    
+
+	public AuditChecklistHistory(AuditChecklistHistory auditChecklistHistory) {
+		super();
+		this.id = auditChecklistHistory.id;
+		this.checklist_description = auditChecklistHistory.checklist_description;
+		this.user_comments = auditChecklistHistory.user_comments;
+		this.auditor_comments = auditChecklistHistory.auditor_comments;
+		this.severity = auditChecklistHistory.severity;
+		this.checklist_date = auditChecklistHistory.checklist_date;
+		this.status = auditChecklistHistory.status;
+	}
 	public AuditCheckList getAuditCheckList() {
 		return auditCheckList;
 	}

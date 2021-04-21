@@ -406,7 +406,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
     }
     public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
-        notificationService.sendSMS(mobileNumber, smsBody);
+        notificationService.sendSMS(mobileNumber, smsBody,null);
     }
     public List<User> getUserListForAgendaInvitation() {
         Set<User> usersListResult = new HashSet<>();

@@ -62,35 +62,35 @@
 	</div>
 <div class="panel-body history-slide display-hide">
 	<div class="row add-margin hidden-xs visible-sm visible-md visible-lg header-color">
-		<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.date" text="Date"/></div>
-		<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.updatedby" text="Updated By"/></div>
-		<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.view.status" text="Status"/></div>
-		<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.currentowner" text="Current Owner"/></div>
-		<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.department" text="Department"/></div>
-		<div class="col-sm-2 col-xs-6 add-margin"><spring:message code="lbl.comments" text="Comments" /></div>
+		<div class="col-sm-2 col-xs-6 add-margin-audit"><spring:message code="lbl.date" text="Date"/></div>
+		<div class="col-sm-2 col-xs-6 add-margin-audit"><spring:message code="lbl.updatedby" text="Updated By"/></div>
+		<div class="col-sm-2 col-xs-6 add-margin-audit"><spring:message code="lbl.view.status" text="Status"/></div>
+		<div class="col-sm-2 col-xs-6 add-margin-audit"><spring:message code="lbl.currentowner" text="Current Owner"/></div>
+		<div class="col-sm-2 col-xs-6 add-margin-audit"><spring:message code="lbl.department" text="Department"/></div>
+		<div class="col-sm-2 col-xs-6 add-margin-audit"><spring:message code="lbl.comments" text="Comments" /></div>
 	</div>
 		<c:choose>
 			<c:when test="${!workflowHistory.isEmpty()}">
 				<c:forEach items="${workflowHistory}" var="history">
 				<div class="row add-margin">
-					<div class="col-sm-2 col-xs-12 add-margin">
+					<div class="col-sm-2 col-xs-6 add-margin-audit">
 						<fmt:formatDate value="${history.date}" var="historyDate"
 							pattern="dd-MM-yyyy HH:mm a E" />
 						<c:out value="${historyDate}" />
 					</div>
-					<div class="col-sm-2 col-xs-12 add-margin">
+					<div class="col-sm-2 col-xs-6 add-margin-audit">
 						<c:out value="${history.updatedBy}" />
 					</div>
-					<div class="col-sm-2 col-xs-12 add-margin">
+					<div class="col-sm-2 col-xs-6 add-margin-audit">
 						<c:out value="${history.status}" />
 					</div>
-					<div class="col-sm-2 col-xs-12 add-margin">
+					<div class="col-sm-2 col-xs-6 add-margin-audit">
 						<c:out value="${history.user}" />
 					</div>
-					<div class="col-sm-2 col-xs-12 add-margin">
+					<div class="col-sm-2 col-xs-6 add-margin-audit">
 						<c:out value="${history.department}" />
 					</div>
-					<div class="col-sm-2 col-xs-12 add-margin">
+					<div class="col-sm-2 col-xs-6 add-margin-audit">
 						<c:out value="${history.comments}" />&nbsp;
 					</div>
 				</div>

@@ -216,7 +216,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (egBillregister.getState() != null)
             model.addAttribute("currentState", egBillregister.getState().getValue());
         model.addAttribute("workflowHistory",
-                financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
+                financialUtils.getWorkflowHistory(egBillregister.getState(), egBillregister.getStateHistory()));
         List<String>  validActions =null;
         if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
@@ -429,7 +429,8 @@ public class UpdateExpenseBillController extends BaseBillController {
             
             System.out.println("Update save method YYYYY :: ");
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
-                    + updatedEgBillregister.getBillnumber();
+                    + updatedEgBillregister.getBillnumber()+"&billId="
+                    + updatedEgBillregister.getId();
         }
     }
 

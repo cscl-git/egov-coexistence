@@ -433,5 +433,9 @@ public class AuditService {
     	List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
     	return desgnList.get(0);
     }
+	
+	public List<AuditDetails>getAllAudit(){
+		 return auditRepository.findAll();
+	}
 
 }

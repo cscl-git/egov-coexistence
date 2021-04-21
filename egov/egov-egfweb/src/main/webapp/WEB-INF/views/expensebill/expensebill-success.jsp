@@ -54,10 +54,13 @@
 <script>
 			function processRequest(){
 		
-				
-				
-				
 		console.log('posted the message');
+	}
+				
+	function openBill(url) {
+				
+		window.open(url, '', 'width=900, height=700,scrollbars=1');
+				
 	}
 </script>
 <div id="main">
@@ -74,6 +77,11 @@
 			</div>
 		</div>
 	</div>			
-	<div class="text-center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/></div>		
+	
+	<div class="buttonbottom">
+	<input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/bill/billView-view.action?billId=${billd}')" class="btn btn-default">
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
+	</div>
 </div>					
 </div>

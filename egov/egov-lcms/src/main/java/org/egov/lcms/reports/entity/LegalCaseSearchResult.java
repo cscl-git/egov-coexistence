@@ -50,6 +50,7 @@ package org.egov.lcms.reports.entity;
 import org.egov.lcms.transactions.entity.LegalCase;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import java.util.Date;
 
@@ -59,6 +60,7 @@ public class LegalCaseSearchResult {
     private String caseNumber;
     private String lcNumber;
     private Date caseFromDate;
+    @JsonIgnore 
     private LegalCase legalCase;
     private Date caseToDate;
     private String standingCouncil;

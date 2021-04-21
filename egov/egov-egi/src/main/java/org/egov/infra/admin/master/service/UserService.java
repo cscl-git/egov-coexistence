@@ -115,7 +115,7 @@ public class UserService {
             String passwordResetMessage = messageSource.getMessage("msg.password.reset",
                     new String[]{user.getName(), currentUser.getName(), getMunicipalityName()}, Locale.getDefault());
             notificationService.sendEmail(user.getEmailId(), "Password Reset", passwordResetMessage);
-            notificationService.sendSMS(user.getMobileNumber(), passwordResetMessage);
+            notificationService.sendSMS(user.getMobileNumber(), passwordResetMessage,null);
         }
         return user;
     }

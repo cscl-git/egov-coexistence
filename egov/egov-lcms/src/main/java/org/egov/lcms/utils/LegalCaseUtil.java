@@ -199,7 +199,7 @@ public class LegalCaseUtil {
     }
 
     public void sendSMSOnLegalCase(final String mobileNumber, final String smsBody) {
-        notificationService.sendSMS(mobileNumber, smsBody);
+        notificationService.sendSMS(mobileNumber, smsBody,null);
     }
 
     public String getOfficerInchargeName(final LegalCase legalcase) {

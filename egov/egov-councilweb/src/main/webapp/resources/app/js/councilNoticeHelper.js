@@ -149,9 +149,9 @@ $("#resultTable").on(
 
 		});
 
-$('#meetingNumber').blur(function() {
+/*$('#meetingNumber').blur(function() {
 	validateMeetingNumber();
-});
+});*/
 
 $('#meetingLocation').on('mouseleave', function() {
 	var place = $('#meetingLocation').val().trim();
@@ -161,7 +161,7 @@ $('#meetingLocation').on('mouseleave', function() {
 	}
 });
 
-function validateMeetingNumber() {
+/*function validateMeetingNumber() {
 	var meetingNumber = $('#meetingNumber').val();
 	if (meetingNumber != '') {
 		$
@@ -186,3 +186,4 @@ function validateMeetingNumber() {
 				});
 	}
 }
+*/

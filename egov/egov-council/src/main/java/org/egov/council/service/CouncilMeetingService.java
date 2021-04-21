@@ -406,4 +406,8 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
             meetingMOMList.add(meetingMoMs);
         }
     }
+    //Added By Bikash
+    public List<MeetingMOM> getAllMoM() {
+        return councilMoMRepository.findAll();
+    }
 }
