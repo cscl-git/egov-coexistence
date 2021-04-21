@@ -46,7 +46,7 @@ public class EstimateApprovalRestTestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllEstimationPreparation", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = "https://egov-uat.chandigarhsmartcity.in")
 	public ResponseEntity<ResponseInfoWrapper> getAllEstimationPreparationPOJO(HttpServletRequest req,HttpServletResponse res) {
 			System.out.println("TESTING");
 		  List<EstimatePreparationApprovalRESTPOJO> fetchedData =estimatePreparationApprovalService.getAllEstimationPreparationNative();
@@ -57,7 +57,7 @@ public class EstimateApprovalRestTestController {
 	}
 	@ResponseBody
 	@RequestMapping(value = "getAllDnit", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = "https://egov-uat.chandigarhsmartcity.in")
 	public ResponseEntity<ResponseInfoWrapper>  getAllDnit(){
 		ModelMap m = new ModelMap();
 		m.put("allestimation", workDnitService.getAllDnitList());
@@ -68,7 +68,7 @@ public class EstimateApprovalRestTestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllWorkAgreement", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = "https://egov-uat.chandigarhsmartcity.in")
 	public ResponseEntity<ResponseInfoWrapper>  getAllWorkAgreement(){
 		ModelMap m = new ModelMap();
 		
