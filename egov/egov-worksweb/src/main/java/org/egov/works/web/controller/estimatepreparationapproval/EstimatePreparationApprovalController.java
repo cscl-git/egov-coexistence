@@ -56,6 +56,8 @@ import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqDetailsPop;
+import org.egov.works.boq.service.BoqDetailsPopService;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
@@ -122,6 +124,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     @Autowired
 	private DocumentUploadRepository documentUploadRepository;
 
+	@Autowired
+    BoqDetailsPopService boqDetailsPopService;
+
     @Autowired
     private NotificationService notificationService;
     
@@ -144,21 +149,47 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	public String showNewFormGet(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		BoQDetails aBoQDetails = new BoQDetails();
+		String milestone="BoqDetails";
+		String item_description =null;
+		String ref_dsr=null;
+		String unit=null;
+		Double rate=0.0;
+		Double quantity=0.0;
+		Double amount=0.0;
+		int count = 0;
+		
+		
+		aBoQDetails.setMilestone(milestone);
+		aBoQDetails.setItem_description(item_description);
+		aBoQDetails.setRef_dsr(ref_dsr);
+		aBoQDetails.setUnit(unit);
+		aBoQDetails.setRate(rate);
+		aBoQDetails.setQuantity(quantity);
+		aBoQDetails.setAmount(amount);
+		aBoQDetails.setSlNo(Long.valueOf(count));
+		boQDetailsList.add(aBoQDetails);
+		
+		count=boQDetailsList.size();
+		System.out.println("count-------"+count);
+		
+		
 
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
-		//edited...
-		
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
+        model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
+		model.addAttribute("fileuploadAllowed","Y");
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		System.out.println("before -upload ");
         System.out.println("Starting");
 		return "estimatepreparationapproval-form";
 	}
-	/*public List<Designation> getDesignation() {
-		List<Designation> departments = microserviceUtils.getDesignation();
-		return departments;
-	}*/
 
 	private void prepareValidActionListByCutOffDate(Model model) {
             model.addAttribute("validActionList",
@@ -206,6 +237,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		}
 		
 		String deptCode = "";
+		
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
 		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
@@ -516,7 +548,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		
+		List<BoqDetailsPop> arrayboqDetailsPop =new ArrayList();
 		HashSet<String> milesstoneList=new HashSet<>();
+		String refNo=null;
+		
 		int count = 0;
 		String fileName = null;
 		String extension = null;
@@ -555,23 +591,19 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			Workbook workbook = getWorkbook(inputStream, filePath);
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> iterator = firstSheet.iterator();
-			boolean check=false;
+			List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+			
+			
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
-				int rowNum = nextRow.getRowNum();
-				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
-
-					//String string=firstSheet.getRow(rowNum).getCell(2).toString();
-				 //check=checkAvailableBoq(string);
-				
-				}else {
-					check=false;
-				}
+				BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
+				
+
 
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
@@ -581,43 +613,29 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 						}
 						
 						else if (cell.getColumnIndex() == 1) {
-							//if(check) {
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setItem_description("");
-						//	}
 							
 						} else if (cell.getColumnIndex() == 2) {
-							//if(check) {
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-							//}else {
-								//aBoQDetails.setRef_dsr("");
-							//}
-							
+							boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
 						}else if (cell.getColumnIndex() == 3) {
-							//if(check) {
 							aBoQDetails.setUnit(cell.getStringCellValue());
-							//}else {
-								//aBoQDetails.setUnit("");
-							//}
+							boqDetailsPop.setItem_description(cell.getStringCellValue());
 							
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
 						 if (cell.getColumnIndex() == 4) {
-							 //if(check) {
 							aBoQDetails.setRate(cell.getNumericCellValue());
-							 //}else {
-								// aBoQDetails.setRate(0.0);
-							 //}
+							boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+							
+							
 							
 						} else if (cell.getColumnIndex() == 5) {
-							//if(check) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
-							//}else {
-								//aBoQDetails.setQuantity(0.0);
-							//}
+							boqDetailsPop.setUnit((int)cell.getNumericCellValue());
 							
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
@@ -632,16 +650,23 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 						count=boQDetailsList.size();
 						aBoQDetails.setSlNo(Long.valueOf(count));
 						boQDetailsList.add(aBoQDetails);
+						arrayboqDetailsPop.add(boqDetailsPop);
 
 					
 
 					}
+					
+					
 				}
+				
 				
 			}
 
+			
 			// workbook.close();
 			inputStream.close();
+
+			
 
 		} else {
 			// response = "Please choose a file.";
@@ -678,7 +703,20 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			estimatePreparationApproval.setEstimateAmount(dobestAmtPlusContingentAmt);
 		}
 		
+		try {
+			List<BoqDetailsPop> boQCheck= boqDetailsPopService.checkRecordsExists(refNo);
+			if(boQCheck.size()>0)
+			{
+				System.out.println("Already Exists");
+				
+			}else {
+				boqDetailsPopService.saveExcelDate(arrayboqDetailsPop);
+				System.out.println("Excel data saved successfully.. ");
+			}
 		
+		}catch(Exception e) {
+			e.getMessage();
+		}
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
@@ -688,30 +726,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		System.out.println("upload");
 		return "estimatepreparationapproval-form";
 
-	}
-	public boolean checkAvailableBoq(final String ref) {
-		boolean b=false;
-		
-		if(ref!=null && ref !="")
-		{
-		
-		final StringBuffer query = new StringBuffer(500);
-		 List<Object[]> list =null;
-		 query
-	        .append(
-	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
-		
-				query.append("where bq.ref_dsr = ? ");
-				
-				System.out.println("Query :: "+query.toString());
-				list = persistenceService.findAllBy(query.toString(),ref);
-			
-	     if (list.size() != 0) {
-	    	 
-	    	 b=true; 
-	     }
-	     }
-		return b;
 	}
 	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
 		BigDecimal  bg100 = new BigDecimal(100);
@@ -739,7 +753,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		List<Designation> designations = microserviceUtils.getDesignations();
         return designations;
     }
-
 
 	@RequestMapping(value = "/formnew", method = RequestMethod.POST)
 	public String showEstimateNewFormGet(

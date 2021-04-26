@@ -16,6 +16,21 @@
     background-color: #acbfd0;
     vertical-align: top;
 }
+
+
+.dropdown-content option{
+	BACKGROUND-COLOR: LIGHTGRAY;
+    BORDER: 1PX SOLID GRAY;
+    WIDTH: 90PX;
+    padding: 5px;
+}
+.dropdown-content option:hover{
+	background-color: gray;
+	color: white;
+}
+
+
+
 </style>
 
 <form:form name="estimatepreparationapproval-form" role="form"
@@ -60,7 +75,7 @@
 									code="lbl.estimate.preparation.estimate.date" /></label>
 					<div class="col-sm-3 add-margin">
 									<form:input id="estimateDate" path="estimateDate"
-									class="form-control-works datepicker" data-date-end-date="0d"
+									class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>
@@ -315,18 +330,18 @@
 		</div>
 
 				<br>
-				<div>
-				<c:if test="${fileuploadAllowed != 'Y' }">
+				<div id="mainContainerDiv">
+				<%-- <c:if test="${fileuploadAllowed != 'Y' }"> --%> 
 					<a target="_blank" style="float:right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br>
-					<input type="file" name="file" id="file" style="color: #000000;"> <br>
+					<input type="file" name="file" style="color: #000000;"> <br>
 					<br>
 					<div class="buttonbottom" align="center">
-						<input type="submit" id="save" class="btn btn-primary" name="save" onclick="return filecheck();"
+						<input type="submit" id="save" class="btn btn-primary" name="save"
 							value="Upload" /> <br>
 					</div>
-					</c:if>
+			<%-- 	</c:if>  --%>
 					<br>
 				
 				<div>
@@ -369,11 +384,16 @@
 											id="boQDetailsList[${boq.slNo}].item_description"
 											required="required" class="form-control item_description"
 											 title="${boq.item_description}"></form:input></td>
-									<td><form:input type="text" style="width:75px;"
+									<td>
+									 	 <div class="dropdown-content" id="autocomplete">
+											<form:input type="text" style="width:75px;"
 											path="boQDetailsList[${boq.slNo}].ref_dsr"
 											id="boQDetailsList[${boq.slNo}].ref_dsr"
 											required="required" class="form-control ref_dsr"
-											  title="${boq.ref_dsr}"></form:input></td>
+													  title="${boq.ref_dsr}"></form:input>
+											<div id="worklist_${boq.sizeIndex}" ></div>  
+										</div>	  
+								    </td>
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.slNo}].unit"
 												id="boQDetailsList[${boq.slNo}].unit"

@@ -136,11 +136,14 @@
 			</table>
 			<jsp:include page="voucherViewHeader.jsp" />
 			<table align="center" id="sourceIcon">
+			<s:if test="%{getMasterName('narration')=='ECHALLAN Receipt'}">  				
+ 			</s:if>
+			<s:else>				
 				<tr>
 					<td class="bluebox"><a href="#" id="sourceLink"
 						onclick=" return openSource();">Source</a></td>
-
 				</tr>
+      		</s:else>
 			</table>
 
 
