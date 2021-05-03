@@ -45,7 +45,7 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-package org.egov.egf.web.actions.report;
+package org.egov.egf.expensebill.service;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -891,6 +891,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 	public void setVhId(String vhId) {
 		this.vhId = vhId;
 	}
+	
 	public  BudgetVarianceEntry  loadDataVariance(String vhId) {
     	System.out.println(" dept::"+ dept);
     	System.out.println("funds  :::"+funds);
@@ -904,6 +905,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     		budgetDetail.setFund(fundService.findOne(eg.getEgBillregistermis().getFund().getId()));
     		Long glcodeId=0L;
     		System.out.println("id ; "+eg.getId());
+    		asOnDate=eg.getBilldate();
     		for(EgBilldetails row :eg.getEgBilldetailes())
     		{
     			

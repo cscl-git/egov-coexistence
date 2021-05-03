@@ -118,6 +118,21 @@
 									</c:otherwise>
 								</c:choose>
 							</div>
+							<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+								<label>Is Case Important ?</label>
+							</div>
+							<div class="col-sm-3 add-margin view-content">
+								<c:choose>
+									<c:when test="${legalCase.caseImportant != null && legalCase.caseImportant == 'Yes'}">
+										<c:out value="YES" />
+									</c:when> 
+									<c:otherwise>
+										<c:out value="NO" />
+									</c:otherwise>
+								</c:choose>
+							</div>
+						</div>
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.previouscaseNumber" />
 							</div>

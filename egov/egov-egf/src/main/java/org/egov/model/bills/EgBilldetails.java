@@ -99,6 +99,8 @@ public class EgBilldetails extends AbstractPersistable<Integer> implements java.
     @Length(max = 250)
     private String narration;
 
+    
+
     @Transient
     private CChartOfAccounts chartOfAccounts;
     
@@ -107,7 +109,7 @@ public class EgBilldetails extends AbstractPersistable<Integer> implements java.
 
     @OrderBy("id")
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "egBilldetailsId", targetEntity = EgBillPayeedetails.class)
-    private Set<EgBillPayeedetails> egBillPaydetailes = new HashSet<EgBillPayeedetails>(0);
+    private Set<EgBillPayeedetails> egBillPaydetailes = new HashSet<EgBillPayeedetails>();
 
     public EgBilldetails() {
     }
@@ -234,5 +236,7 @@ public class EgBilldetails extends AbstractPersistable<Integer> implements java.
     public void setFunction(CFunction function) {
         this.function = function;
     }
+
+	
 
 }

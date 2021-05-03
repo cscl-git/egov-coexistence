@@ -72,6 +72,7 @@ import org.egov.commons.SubScheme;
 import org.egov.egf.model.VoucherDetailMain;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infstr.services.PersistenceService;
@@ -147,6 +148,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS);
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE);
+        expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND);
         /*expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_PENSION);
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_SALARY);*/
         addDropdownData("expType", expTypeList);

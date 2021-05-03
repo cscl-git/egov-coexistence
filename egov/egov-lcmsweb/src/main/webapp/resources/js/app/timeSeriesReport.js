@@ -66,7 +66,7 @@ function submitForm() {
 		
 		$('#timeSeriesReportResult-header').show();
 		$('#reportgeneration-header').show();
-		var isMonthColVisibile = ($("#period").val()==="Month");
+		var isMonthColVisibile = ($("#period").val()==="Month" || $("#period").val()==="" );
 		oDataTable=oTable.DataTable({
 			dom : "<'row'<'col-xs-4 pull-right'f>r>t<'row add-margin'<'col-md-3 col-xs-6'i><'col-md-2 col-xs-6'l><'col-md-3 col-xs-6 text-right'B><'col-md-4 col-xs-6 text-right'p>>",
 			"autoWidth": false,
@@ -112,7 +112,7 @@ function submitForm() {
 				         { "data" : "count", "title": "Number of Cases","sClass" : "text-center"}
 				  ],
 				  "fnRowCallback" : function(row, data, index) {
-					 if ($("#period").val()==="Month"){
+					 if ($("#period").val()==="Month" || $("#period").val()===""){
 
 						$('td:eq(4)', row).html(
 								'<a href="javascript:void(0);" onclick="setHiddenValueByLink(\''

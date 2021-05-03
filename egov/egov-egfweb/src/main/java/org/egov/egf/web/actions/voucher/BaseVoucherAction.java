@@ -227,6 +227,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 	}
 
 	public void populateWorkflowBean() {
+		
 		workflowBean.setApproverPositionId(approverPositionId);
 		workflowBean.setApproverComments(approverComments);
 		workflowBean.setWorkFlowAction(workFlowAction);
@@ -519,6 +520,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 																			// details
 																			// about
 		// the account code those are detail codes.
+		
 		final List<String> repeatedglCodes = VoucherHelper.getRepeatedGlcodes(billDetailslist);
 		for (final VoucherDetails voucherDetails : billDetailslist) {
 			final CChartOfAccountDetail chartOfAccountDetail = (CChartOfAccountDetail) getPersistenceService().find(

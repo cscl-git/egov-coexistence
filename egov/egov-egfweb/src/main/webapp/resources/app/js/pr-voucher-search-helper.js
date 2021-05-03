@@ -150,7 +150,8 @@ function callAjaxSearch() {
 				"className" : "text-left",
 				"render" : function(data, type, full, meta) {
 					if(full.receiptNo != 'NA'){
-						return '<a href="javascript:void(0);" onclick="refundRequest(\''+ full.id +'\')">Refund Request</a>';
+						/*return '<a href="javascript:void(0);" onclick="refundRequest(\''+ full.id +'\')">Refund Request</a>';*/
+						return '<a href="/services/EGF/refund/_paymentRequestForm?vhid='+full.id+'">Refund Request</a>';
 					}else{
 						return 'NA';
 					}					

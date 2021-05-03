@@ -201,6 +201,11 @@ public class LegalCase extends AbstractAuditable {
 	@Audited
 	private String counselEmailNo;
  
+	@Length
+	@Column(name = "caseimportant")
+	@Audited
+	private String caseImportant;
+ 
     @Temporal(TemporalType.DATE)
     @Column(name = "previousDate")
     @Audited
@@ -1076,5 +1081,13 @@ public class LegalCase extends AbstractAuditable {
 
 	public void setCounselEmailNo(String counselEmailNo) {
 		this.counselEmailNo = counselEmailNo;
+	}
+	
+	public String getCaseImportant() {
+		return caseImportant;
+	}
+
+	public void setCaseImportant(String caseImportant) {
+		this.caseImportant = caseImportant;
 	}
 }

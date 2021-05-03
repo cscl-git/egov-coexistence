@@ -239,8 +239,13 @@ public class AjaxCommonController {
             entitiesList = new ArrayList<>();
         }
         for (final EntityType entity : entitiesList)
+        	
             entityNames.add(entity.getCode() + " - " + entity.getName() + "~" + entity.getEntityId());
-
+        System.out.println(name);
+        System.out.println(accountDetailType);
+        for(String responcename:entityNames) {
+        	System.out.println(responcename);
+        }
         return entityNames;
     }
 

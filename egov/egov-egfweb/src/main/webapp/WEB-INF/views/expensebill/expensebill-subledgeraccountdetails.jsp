@@ -68,7 +68,7 @@
 			</thead>
 			<tbody>
 				<c:choose>
-					<c:when test="${egBillregister.billPayeedetails.size() == 0}">
+					<c:when test="${empty egBillregister.billPayeedetails}">
 						<tr id="subledhgerrow" subledgerinvisible="true" hidden="true">
 							<td>
 								<form:hidden path="billPayeedetails[0].id" id="subLedgerDetailsId_0" class ="subLedgerDetailsId"/>

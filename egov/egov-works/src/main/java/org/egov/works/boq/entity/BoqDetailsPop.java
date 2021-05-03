@@ -20,7 +20,7 @@ public class BoqDetailsPop {
 	private Long id;
 	private String item_description;
 	private String ref_dsr;
-	private int unit;
+	private String unit;
 	private int rate;
 	
 	
@@ -33,7 +33,7 @@ public class BoqDetailsPop {
 	public String getRef_dsr() {
 		return ref_dsr;
 	}
-	public int getUnit() {
+	public String getUnit() {
 		return unit;
 	}
 	public int getRate() {
@@ -48,7 +48,7 @@ public class BoqDetailsPop {
 	public void setRef_dsr(String ref_dsr) {
 		this.ref_dsr = ref_dsr;
 	}
-	public void setUnit(int unit) {
+	public void setUnit(String unit) {
 		this.unit = unit;
 	}
 	public void setRate(int rate) {

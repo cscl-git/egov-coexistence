@@ -158,6 +158,8 @@ public abstract class BaseBillController extends BaseVoucherController {
                         new String[] { details.getChartOfAccounts().getGlcode() }, null);
             }
 
+            
+
             if (details.getDebitamount() != null && details.getCreditamount() != null
                     && details.getDebitamount().compareTo(BigDecimal.ZERO) == 1
                     && details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
@@ -225,15 +227,19 @@ public abstract class BaseBillController extends BaseVoucherController {
     @SuppressWarnings("unchecked")
     protected void populateBillDetails(final EgBillregister egBillregister) {
         egBillregister.getEgBilldetailes().clear();
-
+        //
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
             egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
-        } else {
+        } 
+        else if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+            egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
+        }
+        else {
             egBillregister.getEgBilldetailes().addAll(egBillregister.getDebitDetails());
             egBillregister.getEgBilldetailes().addAll(egBillregister.getCreditDetails());
             egBillregister.getEgBilldetailes().addAll(egBillregister.getNetPayableDetails());
         }
-
+        
         for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
             if (details.getGlcodeid() != null) {
                 if (egBillregister.getEgBillregistermis().getFunction() != null){
@@ -245,6 +251,7 @@ public abstract class BaseBillController extends BaseVoucherController {
                 details.setChartOfAccounts(chartOfAccountsService.findById(details.getGlcodeid().longValue(), false));
             }
         }
+        
         if (!egBillregister.getBillPayeedetails().isEmpty())
             populateBillPayeeDetails(egBillregister);
     }

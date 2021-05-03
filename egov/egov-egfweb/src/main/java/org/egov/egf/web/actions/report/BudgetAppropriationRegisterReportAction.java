@@ -195,6 +195,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         CFinancialYear financialYear = new CFinancialYear();
         if (parameters.get("asOnDate")[0] != null) {
             strAsOnDate = parameters.get("asOnDate")[0];
+            LOGGER.info("as on date ::::"+strAsOnDate);
             try {
                 dtAsOnDate = Constants.DDMMYYYYFORMAT2.parse(strAsOnDate);
                 financialYear = financialYearDAO.getFinancialYearByDate(dtAsOnDate);
@@ -222,6 +223,11 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             totalGrant = beAmount.add(addtionalAppropriationForBe);
         }
         generateReport();
+        if(updatedBdgtAppropriationRegisterList != null && !updatedBdgtAppropriationRegisterList.isEmpty())
+        {
+        	BudgetAppDisplay row=updatedBdgtAppropriationRegisterList.get((updatedBdgtAppropriationRegisterList.size())-1);
+        	LOGGER.info("cumilative :::"+row.getCumulativeAmount());
+        }
         return "result";
     }
 
@@ -240,6 +246,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
 
         if (budgetGroup != null) {
             budgetHead = budgetGroup.getName();
+            LOGGER.info("head :::"+budgetHead);
             StringBuilder strQuery = new StringBuilder();
             strQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
@@ -546,19 +553,23 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
     {
         if (function.getId() != null && function.getId() != -1)
         {
+        	System.out.println("function.getId() :"+function.getId());
             query.setLong("functionId", function.getId()) ; 
         }
-        System.out.println("dept :"+department.getCode());
+        
         if (department.getCode() != null )
         {
+        	System.out.println("dept :"+department.getCode());
             query.setString("departmentcode", department.getCode()) ; 
         }
         if (fund.getId() != null && fund.getId() != -1)
         {
+        	System.out.println("fundId :"+fund.getId());
             query.setLong("fundId", fund.getId()) ; 
         }
         if (budgetGroup.getMinCode().getId() != null )
         {
+        	System.out.println("budgetGroup.getMinCode().getId() :"+budgetGroup.getMinCode().getId());
             query.setLong("glCodeId", budgetGroup.getMinCode().getId()) ; 
         }
         if (asOnDate != null )

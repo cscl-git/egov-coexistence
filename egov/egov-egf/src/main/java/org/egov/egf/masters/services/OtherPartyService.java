@@ -151,4 +151,9 @@ public class OtherPartyService implements EntityTypeService {
         return null;
     }
 
+	public OtherParty getByNameOrAccount(String name, String bankAccount) {
+		
+		return otherpartyRepository.getByNameOrAccount(name,bankAccount);
+	}
+
 }

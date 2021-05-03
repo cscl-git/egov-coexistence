@@ -91,7 +91,7 @@ public class RestServiceAuthFilter implements Filter {
         if (httpRequest.getRequestURI().contains("/ClearToken")||httpRequest.getRequestURI().contains("/refreshToken")){
             LOGGER.info("Clear Token request recieved " + httpRequest.getServletPath());
             httpRequest.getRequestDispatcher(httpRequest.getServletPath()+StringUtils.defaultString(httpRequest.getPathInfo())).forward(req, res);
-        }else if(httpRequest.getRequestURI().contains("/rest/voucher/")  ){
+        }else if(httpRequest.getRequestURI().contains("/rest/voucher/") || httpRequest.getRequestURI().contains("/rest/") ){
             try {
                 // TODO : Need to identify the external and internal to enable/disable authentication.
                 RestRequestWrapper request = new RestRequestWrapper(httpRequest);

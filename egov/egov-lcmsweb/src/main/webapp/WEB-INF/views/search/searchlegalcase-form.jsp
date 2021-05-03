@@ -208,6 +208,14 @@
 				<!-- End -->
 				<div class="form-group">
 					<label class="col-sm-3 control-label text-right"></label>
+						<div class="col-sm-3 add-margin"></div>
+						<label class="col-sm-5 control-label text-right">Include Important Cases Only :</label>
+						<div class="col-sm-1 add-margin">
+							<input type="checkbox" name="iscaseImp"
+								value="iscaseImp" />
+						</div>
+						
+					<label class="col-sm-3 control-label text-right"></label>
 					<div class="col-sm-3 add-margin"></div>
 					<label class="col-sm-5 control-label text-right"><spring:message
 							code="lbl.exclude.closed.case" />:</label>

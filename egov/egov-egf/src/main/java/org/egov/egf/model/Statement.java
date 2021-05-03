@@ -76,6 +76,22 @@ public class Statement {
     private List<Fund> fundList = new ArrayList<Fund>();
     private List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
     private List<StatementEntry> entries = new ArrayList<StatementEntry>();
+    private boolean restData=false;
+    
+    
+    
+    public Statement(CFinancialYear financialYear, Department department, Fund fund) {
+		super();
+		this.financialYear = financialYear;
+		this.department = department;
+		this.fund = fund;
+	}
+    
+    public Statement() {
+		
+	}
+    
+    
 
     public void setEntries(final List<StatementEntry> entries) {
         this.entries = entries;
@@ -283,5 +299,13 @@ public class Statement {
     public BigDecimal getCurrencyInAmount() {
         return currencyInAmount;
     }
+    
+    public boolean isRestData() {
+		return restData;
+	}
+
+	public void setRestData(boolean restData) {
+		this.restData = restData;
+	}
 
 }

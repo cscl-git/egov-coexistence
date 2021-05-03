@@ -635,7 +635,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 							
 						} else if (cell.getColumnIndex() == 5) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
-							boqDetailsPop.setUnit((int)cell.getNumericCellValue());
+							//boqDetailsPop.setUnit((int)cell.getNumericCellValue());
 							
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();

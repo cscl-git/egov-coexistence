@@ -46,10 +46,8 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
+/*Added By Kundan For Solved Date Picker Issue*/
 
-$(document).ready(function(){
-	
-});
 
 
 function calculateMeasuredAmount(x)
@@ -459,8 +457,17 @@ function getRow(obj) {
 
 
 var subledgerrowcount=0;
+var milestone;
 function addcheckListRow(x) { 
 	var dataId = $(x).attr("data-idx");
+//debugger;
+var mainTable = $('#mainContainerDiv');
+var tr = mainTable.find('tbody tr');
+tr.each(function() {
+milestone = $(this).closest('tr').find('input[type="text"][id$="milestone"]').val();
+console.log("milestone--"+milestone);
+});
+
 
 	
   if (dataId==undefined)
@@ -478,7 +485,9 @@ function addcheckListRow(x) {
 	if (rowcount < 30) {
 		if (document.getElementById('boq'+x+'tableBoqrow') != null) {
 			addRow('boq'+x+'tableBoq','boq'+x+'tableBoqrow');
-			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('input[type="text"][id$="milestone"]').val(milestone);
+			console.log('milestone-rowcount'+milestone);
+//			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.item_description').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.unit').val('');

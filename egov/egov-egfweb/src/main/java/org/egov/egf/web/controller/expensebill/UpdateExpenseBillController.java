@@ -49,12 +49,14 @@ package org.egov.egf.web.controller.expensebill;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -69,12 +71,14 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.ManageAuditorService;
+import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
+import org.egov.egf.expensebill.service.RefundBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -176,7 +180,8 @@ public class UpdateExpenseBillController extends BaseBillController {
     private SecurityUtils securityUtils;
     @Autowired
 	private AuditRepository auditRepository;
-    
+    @Autowired
+    private RefundBillService refundBillService;
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
     
@@ -202,11 +207,17 @@ public class UpdateExpenseBillController extends BaseBillController {
     @RequestMapping(value = "/update/{billId}", method = RequestMethod.GET)
     public String updateForm(final Model model, @PathVariable final String billId,
             final HttpServletRequest request) throws ApplicationException {
+    	
+    	System.out.println("from update controller"+  billId);
+    	
         final EgBillregister egBillregister = expenseBillService.getById(Long.parseLong(billId));
+        
+        if(egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()) {
+              model.addAttribute("refundable", egBillregister.getRefundable());
+        }
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE)) {
             return "redirect:/supplierbill/update/" + billId;
         }
-        System.out.println("Update method");
         final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(billId));
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
@@ -227,6 +238,17 @@ public class UpdateExpenseBillController extends BaseBillController {
        
 
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
+        
+		/*
+		 * Set<EgBillPayeedetails> egBillPaydetaileslist = new
+		 * HashSet<EgBillPayeedetails>();
+		 * 
+		 * for (final EgBilldetails details : egBillregister.getBillDetails()) {
+		 * egBillPaydetaileslist.add(details.getEgBillPaydetailes());
+		 * egBillPaydetaileslist.addAll(details.getEgBillPaydetailes()); }
+		 */
+        
+        //egBillregister.getBillPayeedetails().addAll(egBillPaydetaileslist);
         prepareBillDetailsForView(egBillregister);
         expenseBillService.validateSubledgeDetails(egBillregister);
         final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService
@@ -244,7 +266,9 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (department != null)
             egBillregister.getEgBillregistermis().setDepartmentName(department);
         model.addAttribute(EG_BILLREGISTER, egBillregister);
-        System.out.println("Update method mid");
+        /*originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
+                "from FileStoreMapper where fileName like '%"+egBillregister.getBillnumber()+"%' order by id desc ").setMaxResults(10).list();
+        model.addAttribute(SUPPORTING_DOCS,originalFiles);*/
         if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
         	model.addAttribute("mode", "cancel");
@@ -258,11 +282,13 @@ public class UpdateExpenseBillController extends BaseBillController {
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
             model.addAttribute("viewBudget", "Y");
+			model.addAttribute("egBillregister", egBillregister);
             return "expensebill-update";
         } 
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("egBillregister", egBillregister);
             model.addAttribute("validActionList", validActions);
             model.addAttribute("viewBudget", "Y");
             return "expensebill-update";
@@ -276,6 +302,7 @@ public class UpdateExpenseBillController extends BaseBillController {
 
             model.addAttribute("budgetDetails", budgetDetails);
             model.addAttribute("viewBudget", "Y");
+			model.addAttribute("egBillregister", egBillregister);
             return EXPENSEBILL_UPDATE_WORKFLOW;
         }
     }
@@ -286,13 +313,15 @@ public class UpdateExpenseBillController extends BaseBillController {
             final HttpServletRequest request, @RequestParam final String workFlowAction)
             throws ApplicationException, IOException {
 
+    	System.out.println("In update controller");
+    	
         String mode = "";
         EgBillregister updatedEgBillregister = null;
 
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
         
-        System.out.println("Update save method 1");
+        
         if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
         	mode="cancel";
@@ -303,6 +332,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         if(uploadedFiles!=null)
         for (int i = 0; i < uploadedFiles.length; i++) {
+
             Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
             byte[] fileBytes = Files.readAllBytes(path);
             ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
@@ -343,14 +373,26 @@ public class UpdateExpenseBillController extends BaseBillController {
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             populateBillDetails(egBillregister);
             validateBillNumber(egBillregister, resultBinder);
+            if(egBillregister.getRefundable()!= null) {
+            	refundvalidateLedgerAndSubledger(egBillregister, resultBinder);
+            }else {
             validateLedgerAndSubledger(egBillregister, resultBinder);
+        }
+        
+            
         }
         
         if(!egBillregister.getBillPayeedetails().isEmpty())
     	{
         populateBillDetails(egBillregister);
         validateBillNumber(egBillregister, resultBinder);
+        if(egBillregister.getRefundable()!= null) {
+        	 refundvalidateLedgerAndSubledger(egBillregister, resultBinder);
+        }else {
         validateLedgerAndSubledger(egBillregister, resultBinder);
+    	}
+        
+       
     	}
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);
@@ -373,18 +415,21 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
         } else {
             try {
-            	System.out.println("Update save method 2 :: "+workFlowAction);
                 if (null != workFlowAction)
                 {
                 	egBillregister.setDocumentDetail(list);
+                	 if(egBillregister.getRefundable()!= null) {
+                		 updatedEgBillregister = refundBillService.update(egBillregister, approvalPosition, approvalComment, null,
+                                 workFlowAction, mode, apporverDesignation);
+                	 }else {
                     updatedEgBillregister = expenseBillService.update(egBillregister, approvalPosition, approvalComment, null,
                             workFlowAction, mode, apporverDesignation);
+                	 }
+                    
                     if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
                     {
-                    	System.out.println("Update save method 3 :: ");
                     	populateauditWorkFlow(updatedEgBillregister);
                     }
-                    System.out.println("After audit  ");
                 }   
                 
             } catch (final ValidationException e) {
@@ -407,7 +452,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                     return EXPENSEBILL_VIEW;
                 }
             }
-            System.out.println("Update save method XXX :: ");
+
             redirectAttributes.addFlashAttribute(EG_BILLREGISTER, updatedEgBillregister);
 
             // For Get Configured ApprovalPosition from workflow history
@@ -427,7 +472,6 @@ public class UpdateExpenseBillController extends BaseBillController {
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
             
-            System.out.println("Update save method YYYYY :: ");
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
                     + updatedEgBillregister.getBillnumber()+"&billId="
                     + updatedEgBillregister.getId();
@@ -439,10 +483,8 @@ public class UpdateExpenseBillController extends BaseBillController {
     	final User user = securityUtils.getCurrentUser();
     	Position owenrPos = new Position();
     	List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(updatedEgBillregister.getEgBillregistermis().getDepartmentcode()), "Auditor");
-    	System.out.println("Update save method 4 :: ");
     	if(auditorList != null && !auditorList.isEmpty())
     	{
-    		System.out.println("Update save method 5 :: "+auditorList.get(0).getEmployeeid());
     		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
     	}
     	else
@@ -469,7 +511,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     	applyAuditing(audit,updatedEgBillregister.getCreatedBy());
     	 auditRepository.save(audit);
 		persistenceService.getSession().flush();
-		System.out.println("end");
+		
 	}
 
 	@RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
@@ -596,4 +638,102 @@ public class UpdateExpenseBillController extends BaseBillController {
         return microServiceUtil.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
  	
+    
+    
+    private void refundvalidateLedgerAndSubledger(final EgBillregister egBillregister, final BindingResult resultBinder) {
+        BigDecimal totalDrAmt = BigDecimal.ZERO;
+        BigDecimal totalCrAmt = BigDecimal.ZERO;
+        for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
+            if (details.getDebitamount() != null)
+                totalDrAmt = totalDrAmt.add(details.getDebitamount());
+            if (details.getCreditamount() != null)
+                totalCrAmt = totalCrAmt.add(details.getCreditamount());
+            if (details.getGlcodeid() == null)
+                resultBinder.reject("msg.expense.bill.accdetail.accmissing", new String[] {}, null);
+
+            /*
+             * if (details.getDebitamount() != null && details.getCreditamount()
+             * != null && details.getDebitamount().equals(BigDecimal.ZERO) &&
+             * details.getCreditamount().equals(BigDecimal.ZERO) &&
+             * details.getGlcodeid() != null)
+             * resultBinder.reject("msg.expense.bill.accdetail.amountzero", new
+             * String[] { details.getChartOfAccounts().getGlcode() }, null);
+             */
+           
+            	boolean isDebitCreditAmountEmpty = (details.getDebitamount() == null
+                        || (details.getDebitamount() != null && details.getDebitamount().compareTo(BigDecimal.ZERO) == 0))
+                        && (details.getCreditamount() == null || (details.getCreditamount() != null
+                                && details.getCreditamount().compareTo(BigDecimal.ZERO) == 0));
+                if (isDebitCreditAmountEmpty) {
+                    resultBinder.reject("msg.expense.bill.accdetail.amountzero",
+                            new String[] { details.getChartOfAccounts().getGlcode() }, null);
+                }
+          
+            
+
+            if (details.getDebitamount() != null && details.getCreditamount() != null
+                    && details.getDebitamount().compareTo(BigDecimal.ZERO) == 1
+                    && details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
+                resultBinder.reject("msg.expense.bill.accdetail.amount",
+                        new String[] { details.getChartOfAccounts().getGlcode() }, null);
+        }
+       // if (totalDrAmt.compareTo(totalCrAmt) != 0)
+            //resultBinder.reject("msg.expense.bill.accdetail.drcrmatch", new String[] {}, null);
+        refundvalidateSubledgerDetails(egBillregister, resultBinder);
+    }
+
+    private void refundvalidateSubledgerDetails(final EgBillregister egBillregister, final BindingResult resultBinder) {
+        Boolean check;
+        BigDecimal detailAmt;
+        BigDecimal payeeDetailAmt;
+        for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
+
+            detailAmt = BigDecimal.ZERO;
+            payeeDetailAmt = BigDecimal.ZERO;
+
+            if (details.getDebitamount() != null && details.getDebitamount().compareTo(BigDecimal.ZERO) == 1)
+                detailAmt = details.getDebitamount();
+            else if (details.getCreditamount() != null &&
+                    details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
+                detailAmt = details.getCreditamount();
+
+            for (final EgBillPayeedetails payeeDetails : details.getEgBillPaydetailes()) {
+                if (payeeDetails != null) {
+                    if (payeeDetails.getDebitAmount() != null && payeeDetails.getCreditAmount() != null
+                            && payeeDetails.getDebitAmount().equals(BigDecimal.ZERO)
+                            && payeeDetails.getCreditAmount().equals(BigDecimal.ZERO))
+                        resultBinder.reject("msg.expense.bill.subledger.amountzero",
+                                new String[] { details.getChartOfAccounts().getGlcode() }, null);
+
+                    if (payeeDetails.getDebitAmount() != null && payeeDetails.getCreditAmount() != null
+                            && payeeDetails.getDebitAmount().compareTo(BigDecimal.ZERO) == 1
+                            && payeeDetails.getCreditAmount().compareTo(BigDecimal.ZERO) == 1)
+                        resultBinder.reject("msg.expense.bill.subledger.amount",
+                                new String[] { details.getChartOfAccounts().getGlcode() }, null);
+
+                    if (payeeDetails.getDebitAmount() != null && payeeDetails.getDebitAmount().compareTo(BigDecimal.ZERO) == 1)
+                        payeeDetailAmt = payeeDetailAmt.add(payeeDetails.getDebitAmount());
+                    else if (payeeDetails.getCreditAmount() != null
+                            && payeeDetails.getCreditAmount().compareTo(BigDecimal.ZERO) == 1)
+                        payeeDetailAmt = payeeDetailAmt.add(payeeDetails.getCreditAmount());
+
+                    check = false;
+                    for (final CChartOfAccountDetail coaDetails : details.getChartOfAccounts().getChartOfAccountDetails())
+                        if (payeeDetails.getAccountDetailTypeId() == coaDetails.getDetailTypeId().getId())
+                            check = true;
+                    //if (!check)
+                      //  resultBinder.reject("msg.expense.bill.subledger.mismatch",
+                        //        new String[] { details.getChartOfAccounts().getGlcode() }, null);
+
+                }
+
+            }
+
+           // if (detailAmt.compareTo(payeeDetailAmt) != 0 && !details.getEgBillPaydetailes().isEmpty())
+               // resultBinder.reject("msg.expense.bill.subledger.amtnotmatchinng",
+                        //new String[] { details.getChartOfAccounts().getGlcode() }, null);
+        }
+    }
+    
+    
 }

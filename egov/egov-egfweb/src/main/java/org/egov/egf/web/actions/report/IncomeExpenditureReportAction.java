@@ -131,7 +131,9 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
     InputStream inputStream;
     ReportHelper reportHelper;
     Statement incomeExpenditureStatement = new Statement();
+    @Autowired
     IncomeExpenditureService incomeExpenditureService;
+    @Autowired
     IncomeExpenditureScheduleService incomeExpenditureScheduleService;
     private String majorCode;
     private String minorCode;
@@ -209,8 +211,9 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         addRelatedEntity("fund", Fund.class);
     }
 
-    @Override
-    public void prepare() {
+	
+	  @Override public void prepare() {
+		
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         super.prepare();
@@ -780,24 +783,28 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 	}
 
 public void populateDataSource2(Statement s) {
-	incomeExpenditureStatement =s;
+    		try {
+    			incomeExpenditureStatement= setRelatedEntitesOn2(s);
+    		}catch(Exception ex) {
     	
+    		}
     		
-    		incomeExpenditureStatement= setRelatedEntitesOn2(incomeExpenditureStatement);
-    	        System.out.println(incomeExpenditureStatement.getFund().getId());
-    	        System.out.println(incomeExpenditureStatement.getFinancialYear().getId());
-    	        System.out.println(incomeExpenditureStatement.getDepartment().getCode());
-    	        
-    	        	 System.out.println("Inside populateDataSource2");
     	            incomeExpenditureStatement.setFunds(fundService.findAll());
     	            System.out.println(incomeExpenditureStatement.getFunds().size());
     	            System.out.println(incomeExpenditureStatement.getFunds().get(0).getName());
     	            
-    	            incomeExpenditureService.populateIEStatement(incomeExpenditureStatement);
+    	            try {
+    	            	 incomeExpenditureService.populateIEStatement2(incomeExpenditureStatement);
+    	            	 System.out.println(null==incomeExpenditureService);
+    	            }catch(Exception ex) {
+    	            	System.out.println("Exception");
+    	            	ex.printStackTrace();
+    	            }
+    	               
+    }
     	
        
         
-    }
 
 protected Statement setRelatedEntitesOn2(Statement incomeExpenditureStatement) {
     setTodayDate(new Date());
@@ -811,19 +818,9 @@ protected Statement setRelatedEntitesOn2(Statement incomeExpenditureStatement) {
     	System.out.println(incomeExpenditureStatement.getDepartment().getCode());
     	org.egov.infra.admin.master.entity.Department dep = departmentService.getDepartmentByCode(incomeExpenditureStatement.getDepartment().getCode());
     	
-    	System.out.println("Fetched id"+dep.getId());
-    	System.out.println("Fetched code"+dep.getCode());
-    	System.out.println("Fetched name"+dep.getName());
+    	
         Department dept =new Department(dep.getId(),dep.getName(),dep.getCode());
         
-			/*
-			 * dept.setCode(dep.getCode()); dept.setId(dept.getId());
-			 * dept.setName(dept.getName());
-			 */
-        		
-        		System.out.println("TESTING DEPT namse"+dept.getName());
-        		System.out.println("TESTING DEPT id "+dept.getId());
-        		System.out.println("TESTING DEPT code"+dept.getCode());
         incomeExpenditureStatement.setDepartment(dept);
         heading.append(" in " + incomeExpenditureStatement.getDepartment().getName() + " Department");
     } else
@@ -852,10 +849,44 @@ protected Statement setRelatedEntitesOn2(Statement incomeExpenditureStatement) {
         		(Long.parseLong(incomeExpenditureStatement.getFunctionary().getId().toString()))));
         heading.append(" and " + incomeExpenditureStatement.getFunctionary().getName() + " Functionary");
     }
-    System.out.println(heading);
+   // System.out.println(heading);
     return incomeExpenditureStatement;
 	}
 	
+
+
+	public Statement populateDataSourceForAllSchedules2(Statement s) {
+	
+	
+
+		incomeExpenditureStatement= setRelatedEntitesOn2(s);
+	
+        incomeExpenditureStatement.setFunds(fundService.findAll());
+        System.out.println(incomeExpenditureStatement.getFunds().size());
+        System.out.println(incomeExpenditureStatement.getFunds().get(0).getName());
+        
+        incomeExpenditureStatement= incomeExpenditureScheduleService.populateDataForAllSchedulesForRestData(incomeExpenditureStatement);
+        System.out.println("populateDataSourceForAllSchedules2::::"+ incomeExpenditureStatement.getEntries().size());
+        return s;
+	
+	}
+	
+	
+	
+	
+	public  Statement populateSchedulewiseDetailCodeReport2(Statement s) {
+		try {
+			incomeExpenditureStatement= setRelatedEntitesOn2(s);
+		}catch(Exception ex) {
+			
+		}
+	   
+	        incomeExpenditureStatement.setFunds(incomeExpenditureService.getFunds());
+	        incomeExpenditureStatement =   incomeExpenditureScheduleService.populateDetailcodeRestData(incomeExpenditureStatement);
+	       
+	        return incomeExpenditureStatement;
+	    
+	}
 
 	//Added By Bikash For Income Expenditure EXcel Sheet 1722021
 	private byte[] getIncomeExpenditureExcelSheet(Map<String,String>headerData,Statement incomExpenditureStatement) {

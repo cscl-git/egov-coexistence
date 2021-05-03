@@ -102,6 +102,10 @@ public class TimeSeriesReportService {
         final String aggregationField = getAggregationFiledByType(timeSeriesReportResult);
         final Map<Integer, String> monthValuesMap = DateUtils.getAllMonths();
         Integer month;
+        final List<TimeSeriesReportResult> responseDetailsList = new ArrayList<>();
+        if(StringUtils.isNotBlank(timeSeriesReportResult.getPeriod())) {
+        	
+       
         final SearchResponse timeSeriesReport = findAllLegalcaseDocumentByFilter(
                 timeSeriesReportResult,
                 getFilterQuery(timeSeriesReportResult),
@@ -114,7 +118,7 @@ public class TimeSeriesReportService {
             else if (YEAR.equalsIgnoreCase(timeSeriesReportResult.getPeriod()))
                 aggregationName = YEARLY;
         TimeSeriesReportResult responseDetail;
-        final List<TimeSeriesReportResult> responseDetailsList = new ArrayList<>();
+        
         final Terms terms = timeSeriesReport.getAggregations().get(AGGREGATION_BY_FIELD);
         for (final Bucket bucket : terms.getBuckets()) {
 
@@ -123,7 +127,9 @@ public class TimeSeriesReportService {
 
                 final String[] dateArr = entry.getKeyAsString().split("T");
                 final ValueCount valueCount = entry.getAggregations().get(TOTAL_COUNT);
+                System.out.println("++++++++++++++"+valueCount);
                 if (valueCount.getValue() > 0) {
+                	System.out.println("+++++++"+bucket.getKeyAsString());
                     responseDetail = new TimeSeriesReportResult();
                     responseDetail.setAggregatedBy(bucket.getKeyAsString());
                     responseDetail.setYear(dateArr[0].split("-", 3)[0]);
@@ -135,6 +141,45 @@ public class TimeSeriesReportService {
                 }
             }
 
+        }
+        }else {
+        	final SearchResponse timeSeriesReport = findAllLegalcaseDocumentFilter(
+                    timeSeriesReportResult,
+                    getFilterQuery(timeSeriesReportResult),
+                    aggregationField);
+
+            String aggregationName = StringUtils.EMPTY;
+            
+                    aggregationName = MONTHLY;
+            TimeSeriesReportResult responseDetail;
+            
+            final Terms terms = timeSeriesReport.getAggregations().get(AGGREGATION_BY_FIELD);
+            for (final Bucket bucket : terms.getBuckets()) {
+
+                final Histogram agg = bucket.getAggregations().get(aggregationName);
+                Double count=0.0;
+            	String aggregatedby=null;
+            	responseDetail = new TimeSeriesReportResult();
+                for (final Histogram.Bucket entry : agg.getBuckets()) {
+                	
+                	responseDetail = new TimeSeriesReportResult();
+                    final String[] dateArr = entry.getKeyAsString().split("T");
+                    final ValueCount valueCount = entry.getAggregations().get(TOTAL_COUNT);
+                   // System.out.println("++++++++sssss++++++"+valueCount.getValue());
+                    if (valueCount.getValue() > 0) {
+                    	
+                        count+=(double) valueCount.getValue();
+                        aggregatedby=bucket.getKeyAsString();
+                    }
+                   
+                }
+                
+                responseDetail.setAggregatedBy(bucket.getKeyAsString());
+                responseDetail.setMonth("");
+                responseDetail.setCount(count.longValue());
+                responseDetailsList.add(responseDetail);
+
+            }
         }
 
         return responseDetailsList;
@@ -206,4 +251,20 @@ public class TimeSeriesReportService {
         return AggregationBuilders.terms(aggregationName).field(fieldName);
     }
 
+    public SearchResponse findAllLegalcaseDocumentFilter(final TimeSeriesReportResult timeSeriesReportResult,
+            final BoolQueryBuilder query, final String aggregationField) {
+        DateHistogramInterval interval = null;
+        String aggregationName = StringUtils.EMPTY;
+        
+                interval = DateHistogramInterval.MONTH;
+                aggregationName = MONTHLY;
+          
+        return elasticsearchTemplate.getClient().prepareSearch(LcmsConstants.LEGALCASE_INDEX_NAME)
+                .setQuery(query)
+                .addAggregation(getCountWithGrouping(AGGREGATION_BY_FIELD, aggregationField)
+                        .subAggregation(AggregationBuilders.dateHistogram(aggregationName).field(CASE_DATE)
+                                .interval(interval)
+                                .subAggregation(AggregationBuilders.count(TOTAL_COUNT).field("lcNumber"))))
+                .execute().actionGet();
+    }
 }

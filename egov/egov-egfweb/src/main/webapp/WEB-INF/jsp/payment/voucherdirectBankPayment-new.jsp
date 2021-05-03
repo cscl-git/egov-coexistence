@@ -115,6 +115,7 @@
 <script>
 	path="${pageContext.request.contextPath}";
 	var showMode='<s:property value="showMode"/>';	
+	var fundid='<s:property value="fundId.id"/>';
 		var totaldbamt=0,totalcramt=0;
 		var OneFunctionCenter= <s:property value="isRestrictedtoOneFunctionCenter"/>; 
 		//bootbox.alert(">>.."+OneFunctionCenter);                 
@@ -305,7 +306,7 @@
 
 </head>
 <body
-	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();">
+	onload="onLoadTask_new();loadDropDownCodesExcludingCashAndBank();loadDropDownCodesFunction();populateSchemes('%{fundId.id}');loadBank('%{fundId.id}');">
 	<s:form action="directBankPayment" theme="css_xhtml" name="dbpform"
 		validate="true">
 		<s:push value="model">
@@ -342,7 +343,7 @@
 						<s:date name='voucherDate' var="voucherDateId" format='dd/MM/yyyy' />
 						<td class="bluebox" width="34%">
 							<div name="daterow">
-								<s:textfield id="voucherDate" name="voucherDate"
+								<s:textfield id="voucherDate" name="voucherDate" readOnly="true"
 									value="%{voucherDateId}" data-date-end-date="0d"
 									onkeyup="DateFormat(this,this.value,event,false,'3')"
 									placeholder="DD/MM/YYYY" class="form-control datepicker"
@@ -351,7 +352,7 @@
 							</div>
 						</td>
 					</tr>
-					<%@include file="directBankPayment-form.jsp"%>
+					<%@include file="voucherdirectBankPayment-form.jsp"%>
 
 
 					<div class="subheadsmallnew"></div>
@@ -499,7 +500,7 @@ function onSubmit()
 					 return false;
 					}
 			}
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+		document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		return true;
 		}
 	else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -517,7 +518,7 @@ function onSubmit()
 		}
 		 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 		 if (msg == true) {
-			 document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+			 document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 			 document.dbpform.submit();
 			return true;
 		 } else {
@@ -534,7 +535,7 @@ function onSubmit()
 				 return false;
 				}
 		}
-		document.dbpform.action = '/services/EGF/payment/directBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+		document.dbpform.action = '/services/EGF/payment/voucherdirectBankPayment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
 		document.dbpform.submit();
 	}
 		

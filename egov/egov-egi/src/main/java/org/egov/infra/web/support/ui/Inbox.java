@@ -81,8 +81,6 @@ public class Inbox {
 
     private Inbox(StateAware stateAware, WorkflowTypes workflowTypes, String nextAction) {
         State state = stateAware.getCurrentState();
-        if(state.getType().equalsIgnoreCase("EgBillregister") || state.getType().equalsIgnoreCase("Paymentheader") || state.getType().equalsIgnoreCase("CVoucherHeader") || state.getType().equalsIgnoreCase("CouncilPreamble") || state.getType().equalsIgnoreCase("CouncilMeeting"))
-        {
         this.id = workflowTypes.isGrouped() ? EMPTY : new StringBuilder(5).append(state.getId()).append("#")
                 .append(workflowTypes.getId()).toString();
         this.date = toDefaultDateTimeFormat(state.getCreatedDate());
@@ -95,7 +93,6 @@ public class Inbox {
         this.createdDate = state.getCreatedDate();
         this.draft = state.isNew() && (state.getCreatedBy()==getUserId());
     }
-  }
 
     private Inbox(StateHistory stateHistory, WorkflowTypes workflowTypes) {
         this.id = stateHistory.getState().getId().toString();

@@ -878,5 +878,15 @@
         <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-request-form.jsp"/>
     </definition>
+    
+    <definition name="payRefund-request-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/payment-refund-request.jsp"/>
+    </definition>
+    
+    <definition name="re-pr-approvedvoucher" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/refundPreApprovedVoucher.jsp"/>
+    </definition>
 
 </tiles-definitions>

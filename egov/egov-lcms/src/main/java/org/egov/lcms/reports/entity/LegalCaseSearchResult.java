@@ -88,6 +88,7 @@ public class LegalCaseSearchResult {
 	private String concernedBranch;
     private String statusDesc;
     private Integer judgmentTypeId;
+    private String iscaseImp;
 
     public String getFromDate() {
         return fromDate;
@@ -328,6 +329,14 @@ public class LegalCaseSearchResult {
 
 	public void setJudgmentTypeId(Integer judgmentTypeId) {
 		this.judgmentTypeId = judgmentTypeId;
+	}
+
+	public String getIscaseImp() {
+		return iscaseImp;
+	}
+
+	public void setIscaseImp(String iscaseImp) {
+		this.iscaseImp = iscaseImp;
 	}
 
    

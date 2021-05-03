@@ -66,10 +66,23 @@ public class EstimateApprovalRestTestController {
 				.responseBody(workDnitService.getAllDnitList()).build(), HttpStatus.OK);
 	}
 	
+	/*
+	 * @ResponseBody
+	 * 
+	 * @RequestMapping(value = "getAllWorkAgreement", method = RequestMethod.GET)
+	 * public ResponseEntity<ResponseInfoWrapper> getAllWorkAgreement(){ ModelMap m
+	 * = new ModelMap();
+	 * 
+	 * return new ResponseEntity<>(ResponseInfoWrapper.builder()
+	 * .responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+	 * .responseBody(boQDetailsService.getAllWorkOrderAgreementRest()).build(),
+	 * HttpStatus.OK); }
+	 */
+	
 	@ResponseBody
-	@RequestMapping(value = "getAllWorkAgreement", method = RequestMethod.GET)
+	@RequestMapping(value = "getAllWorkAgreementByMilestone", method = RequestMethod.GET)
 	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
-	public ResponseEntity<ResponseInfoWrapper>  getAllWorkAgreement(){
+	public ResponseEntity<ResponseInfoWrapper>  getAllWorkOrderAgreementRestByMileStone(){
 		ModelMap m = new ModelMap();
 		
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()

@@ -53,11 +53,14 @@ import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.BoqDateUpdate;
 import org.egov.works.boq.entity.BoqNewDetails;
+import org.egov.works.boq.entity.BoqDetailsPop;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.egov.works.boq.service.BoQDetailsService;
 import org.egov.works.boq.service.BoqDateUpdateService;
+import org.egov.works.boq.service.BoqDetailsPopService;
 import org.egov.works.estimatepreparationapproval.autonumber.WorkNoGenerator;
+import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -111,6 +114,10 @@ public class BoQDetailsController extends GenericWorkFlowController{
 
     @Autowired
     BoqDateUpdateService boqDateUpdateService;
+    
+    @Autowired
+    BoqDetailsPopService boqDetailsPopService;
+    
 private static Map<String, String> map; 
     
     // Instantiating the static map 
@@ -133,9 +140,58 @@ private static Map<String, String> map;
 		System.out.println("work  ----newform-");
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
+		model.addAttribute("showTableHeaderFirst","Y");
+		System.out.println("table - view - successfully--");
+		return "boqDetails";
+	}
+
+	@RequestMapping(value="/addRow")
+	public String AddRowTable(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
+			final Model model, HttpServletRequest request)
+	{
+		System.out.println("addRow  ----addRow-");
+List<BoQDetails> boQDetailsList = new ArrayList();
+		BoQDetails aBoQDetails = new BoQDetails();
+		String milestone="";
+		String item_description ="";
+		String ref_dsr="";
+		String unit="";
+		Double rate=null;
+		Double quantity=null;
+		Double amount=null;
+		int count = 0;
+		
+		
+		aBoQDetails.setMilestone(milestone);
+		aBoQDetails.setItem_description(item_description);
+		aBoQDetails.setRef_dsr(ref_dsr);
+		aBoQDetails.setUnit(unit);
+		aBoQDetails.setRate(rate);
+		aBoQDetails.setQuantity(quantity);
+		aBoQDetails.setAmount(amount);
+		aBoQDetails.setSlNo(Long.valueOf(count));
+		aBoQDetails.setSizeIndex(count);
+		boQDetailsList.add(aBoQDetails);
+		count=boQDetailsList.size();
+		System.out.println("count-------"+count);
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setContractors(getAllActiveContractors());
+		workOrderAgreement.setBoQDetailsList(boQDetailsList);
+		model.addAttribute("workOrderAgreement", workOrderAgreement);
+		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+        prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+        model.addAttribute("milestoneList",groupByMilesToneMap);
+        prepareValidActionListByCutOffDate(model);
+       
+		model.addAttribute("showTableHeader","Y");
+		
+		System.out.println("table - view - successfully--");
 		return "boqDetails";
 	}
 
@@ -482,6 +538,8 @@ private static Map<String, String> map;
 
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		List<BoqDetailsPop> arrayboqDetailsPop =new ArrayList();
+		String refNo=null;
 		HashSet<String> milesstoneList=new HashSet<>();
 		int count = 0;
 		String fileName = null;
@@ -522,30 +580,16 @@ private static Map<String, String> map;
 			Workbook workbook = getWorkbook(inputStream, filePath);
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> iterator = firstSheet.iterator();
-			boolean check=false;
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
-				int rowNum = nextRow.getRowNum();
-				
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
-				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
-            
-					//String string=firstSheet.getRow(rowNum).getCell(2).toString();
-				 //check=checkAvailableBoq(string);
-				
-				}else {
-					check=false;
-				}
+				BoqDetailsPop boqDetailsPop =new BoqDetailsPop();
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
 
-
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
-//edited	
-						
-
 
 						if (cell.getColumnIndex() == 0) {
 							aBoQDetails.setMilestone(cell.getStringCellValue());
@@ -553,51 +597,26 @@ private static Map<String, String> map;
 						}
 						
 						else if (cell.getColumnIndex() == 1) {
-							
-							//if(check) {
-							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setItem_description(" ");
-							//}
-							
+							boqDetailsPop.setItem_description(cell.getStringCellValue());
 						} else if (cell.getColumnIndex() == 2) {
-							
-							//if(check) {
-							
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setRef_dsr(" ");
-							//}
+							boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
 						}else if (cell.getColumnIndex() == 3) {
-							
-							//if(check) {
-								
 							aBoQDetails.setUnit(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setUnit(" ");
-						//	}
-							
+							boqDetailsPop.setUnit(cell.getStringCellValue());
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
 						 if (cell.getColumnIndex() == 4) {
-							 
-							 //if(check) {
-								 
 							aBoQDetails.setRate(cell.getNumericCellValue());
-							// }else {
-							//	 aBoQDetails.setRate(0.0); 
-							// }
+							boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
 						} else if (cell.getColumnIndex() == 5) {
-							
-							//if(check) {
-							
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
-							//}else {
-							//	aBoQDetails.setQuantity(0.0);
-						//	}
+							
+							
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 						}
@@ -611,23 +630,36 @@ private static Map<String, String> map;
 						aBoQDetails.setSlNo(Long.valueOf(count));
 						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
+						arrayboqDetailsPop.add(boqDetailsPop);
 						
 					
 
 					}
 				}
-            
 			}
 
 			// workbook.close();
 			inputStream.close();
-//////////
+
 		} else {
 			// response = "Please choose a file.";
 		}
 		 Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 try {
+				List<BoqDetailsPop> boQCheck= boqDetailsPopService.checkRecordsExists(refNo);
+				if(boQCheck.size()>0)
+				{
+					System.out.println("Already Exists");
+					
+				}else {
+					boqDetailsPopService.saveExcelDate(arrayboqDetailsPop);
+					System.out.println("Excel data saved successfully.. ");
+				}
 		 
+			}catch(Exception e) {
+				e.getMessage();
+			}
 		
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
@@ -808,7 +840,7 @@ public boolean checkAvailableBoq(final String ref) {
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 
 		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
-			//System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
+			System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
 		workOrderAgreement.setDocumentDetail(documents);
 

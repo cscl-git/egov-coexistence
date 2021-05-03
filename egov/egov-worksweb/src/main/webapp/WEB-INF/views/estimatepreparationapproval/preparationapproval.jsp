@@ -9,6 +9,8 @@
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ <link rel="stylesheet" href="/resources/demos/style.css">
         
 <style>
 .table thead > tr > th {
@@ -32,6 +34,12 @@
 
 
 </style>
+
+ <script>
+  $( function() {
+    $( "#estimateDate" ).datepicker();
+  } );
+  </script>
 
 <form:form name="estimatepreparationapproval-form" role="form"
 	method="post" action="estimate"
@@ -75,7 +83,7 @@
 									code="lbl.estimate.preparation.estimate.date" /></label>
 					<div class="col-sm-3 add-margin">
 									<form:input id="estimateDate" path="estimateDate"
-									class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
+									class="form-control datepicker"  data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>
@@ -448,5 +456,7 @@
 	</div>
 </form:form>
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 	

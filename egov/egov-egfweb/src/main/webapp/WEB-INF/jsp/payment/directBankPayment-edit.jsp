@@ -281,6 +281,7 @@
 			</s:iterator>
 	
 	}
+   
 	var amountshouldbenumeric='<s:text  name="amount.should.be.numeric"/>';
 	var succesMessage='<s:text name="directbank.transaction.succcess"/>';
 	var totalsnotmatchingamount='<s:text name="totals.not.matching.amount"/>';

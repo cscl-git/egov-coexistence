@@ -76,10 +76,10 @@ $(document).ready(function(){
 	worksDiv();
 	$netPayableAccountCodeId = $('#netPayableId').val();
 	patternvalidation(); 
-	debitGlcode_initialize();
-	creditGlcode_initialize();
+	//debitGlcode_initialize();
+	//creditGlcode_initialize();
 	$('#fund').val($('#fund').val());
-	loadCheckListTable();
+	//loadCheckListTable();
 	if($("#mode").val() == 'edit'){
 		netpayableamount = $("#netPayableAmount").val();
 		billamount = $("#billamount").val();
@@ -93,7 +93,7 @@ $(document).ready(function(){
 		$("#billamount").val(billamount);
 	}
 	else{
-		calculateBillAmount();
+		//calculateBillAmount();
 	}
 	
 	var entityName = new Bloodhound({
@@ -138,12 +138,7 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger[0].payTo').value=data.name;
 			document.getElementById('tempSubLedger[0].detailkeyId').value=data.id;
-			if(document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value==""){
-				document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value=document.getElementById('tempSubLedger[0].detailkeyId').value;
-				document.getElementById('tempSubLedger[0].netPayableDetailKeyName').value=detailKeyName;
-			}
-
-			
+			document.getElementById('tempSubLedger[0].detailTypeId').value=document.getElementById('tempSubLedger[0].subLedgerType').value;
 			
 			
 		/*$("#subLedgerCode").val(data.code);
@@ -155,34 +150,47 @@ $('.subLedgerCodeOT').typeahead({
 
 $('.btn-wf-primary').click(function(){
 	var button = $(this).attr('id');
+	document.getElementById("workFlowAction").value = button;
+	  if (button == 'SaveAsDraft') {
+	      
+		    $('#approvalDepartment').removeAttr('required');
+	        $('#approvalDesignation').removeAttr('required');
+	        $('#approvalPosition').removeAttr('required');
+	        $('#approvalComent').removeAttr('required');
+	  }
+	//return true;
+});
+
+/*$('.btn-wf-primary').click(function(){
+	var button = $(this).attr('id');
 	if (button != null && (button == 'Forward')) {
 		if(!validateWorkFlowApprover(button))
-			return false;
+			return true;
 		if(!$("form").valid())
-			return false;
+			return true;
 		if(validate()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
-			return false;
+			return true;
 	 }
 	else if (button != null && (button == 'Reject')) {
 		if(!validateWorkFlowApprover(button))
-			return false;
+			return true;
 		if(!$("form").valid())
-			return false;
+			return true;
 		if(validate()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
-			return false;
+			return true;
 	 }
 	   else if (button != null && (button == 'SaveAsDraft')) {
 	      
 	       if(!validateWorkFlowApprover(button))
 	           {
 	           
-	            return false;
+	            return true;
 	           }
 	        if(true){
 	             
@@ -194,7 +202,7 @@ $('.btn-wf-primary').click(function(){
 	        }else
 	            {
 	             //alert('button-----2.2------'+button);
-	            return false;
+	            return true;
 	            
 	            }
 	        
@@ -205,26 +213,26 @@ $('.btn-wf-primary').click(function(){
 		$('#approvalPosition').removeAttr('required');
 		$('#approvalComent').removeAttr('required');
 		if(!validateWorkFlowApprover(button))
-			return false;
+			return true;
 		if(!$("form").valid())
-			return false;
+			return true;
 		if(validate()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
-			return false;
+			return true;
 	} else{
 		if(!validateWorkFlowApprover(button))
-			return false;
+			return true;
 		if($("form").valid()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
-			return false;
+			return true;
 	}
-	return false;
+	return true;
 });
-
+*/
 function getCookie(name){
 	let cookies = document.cookie;
 	if(cookies.search(name) != -1){
@@ -441,10 +449,9 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger['+index+'].payTo').value=data.name;
 			document.getElementById('tempSubLedger['+index+'].detailkeyId').value=data.id;
-			if(document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value==""){
-				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value=document.getElementById('tempSubLedger['+index+'].detailkeyId').value;
-				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value=detailKeyName;
-			}
+			document.getElementById('tempSubLedger['+index+'].detailTypeId').value=document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
+			
+				 
 				
 		
 	});
@@ -509,7 +516,7 @@ $('#billSubType').change(function () {
 	
 	worksDiv();
 	$("#selectedCheckList").val("");
-	loadCheckListTable();
+	//loadCheckListTable();
 });
 
 	
@@ -596,7 +603,7 @@ $('#billSubType').change(function () {
 	worksDiv();
 	
 	$("#selectedCheckList").val("");
-	loadCheckListTable();
+	//loadCheckListTable();
 });
 
 function loadCheckListTable(){
@@ -1233,7 +1240,7 @@ function addCustomEventListener(target,type,func){
 function validate(){
 	if(billamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.account.details'));
-		return false;
+		return true;
 	}
 	
 	/*if(debitamount != Number(Number(creditamount) + Number(netpayableamount))){
@@ -1243,13 +1250,13 @@ function validate(){
 	
 	if(debitamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
-		return false;
+		return true;
 	}
 	
 	if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
-		return false;
+		return true;
 	}
 	return true;
 }
@@ -1506,117 +1513,40 @@ function worksDiv(){
 
 function populateBdgetDetails()
 {
-	var budgetInd=document.getElementById('viewBudgetIndicator');
-	var indicator='N';
-	var pId =document.getElementById('paId');
-	if(budgetInd != null && budgetInd != '' && budgetInd.value == 'Y' && pId != null && pId != '')
+	var dept=document.getElementById('department').value;
+	var fund=document.getElementById('fund').value;
+	var func=document.getElementById('egBillregistermis.function').value;
+	var accCode='';
+	var status = false;
+	if(dept == null || dept == '')
 	{
-		indicator='Y';
+		bootbox.alert('Please select department to view budget details');
+		status = true;
 	}
-	if(indicator == 'Y')
+	else if(fund == null || fund == '')
 	{
-		var today = new Date();
-		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
-		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=pv&vhId='+pId.value;
-		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+		bootbox.alert('Please select fund to view budget details');
+		status = true;
 	}
-	else
+	else if(func == null || func == '')
 	{
-		var dept=document.getElementById('department').value;
-		var fund=document.getElementById('fund').value;
-		var func=document.getElementById('egBillregistermis.function').value;
-		var accCode='';
-		var status = false;
-		if(dept == null || dept == '')
-		{
-			bootbox.alert('Please select department to view budget details');
-			status = true;
-		}
-		else if(fund == null || fund == '')
-		{
-			bootbox.alert('Please select fund to view budget details');
-			status = true;
-		}
-		else if(func == null || func == '')
-		{
-			bootbox.alert('Please select fund to view budget details');
-			status = true;
-		}
-		if(status == false)
-		{
-			accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
-			var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
-			if(accCode == null || accCode == '' || amt == null || amt == '')
-			{
-				bootbox.alert('Please select Debit Account Code/Amount to view budget details');
-			}
-			else
-			{
-				var today = new Date();
-				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
-				var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
-				window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
-			}
-		}
+		bootbox.alert('Please select fund to view budget details');
+		status = true;
 	}
-	
-	}
-
-
-function populateVarianceDetails()
-{
-	var budgetInd=document.getElementById('viewBudgetIndicator');
-	var indicator='N';
-	var pId =document.getElementById('paId');
-	if(budgetInd != null && budgetInd != '' && budgetInd.value == 'Y' && pId != null && pId != '')
+	if(status == false)
 	{
-		indicator='Y';
-	}
-	if(indicator == 'Y')
-	{
-		var today = new Date();
-		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
-		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=pv&vhId='+pId.value;
-		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
-	}
-	else
-	{
-		var dept=document.getElementById('department').value;
-		var fund=document.getElementById('fund').value;
-		var func=document.getElementById('egBillregistermis.function').value;
-		var accCode='';
-		var status = false;
-		if(dept == null || dept == '')
+		accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
+		var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
+		if(accCode == null || accCode == '' || amt == null || amt == '')
 		{
-			bootbox.alert('Please select department to view budget details');
-			status = true;
+			bootbox.alert('Please select Debit Account Code/Amount to view budget details');
 		}
-		else if(fund == null || fund == '')
+		else
 		{
-			bootbox.alert('Please select fund to view budget details');
-			status = true;
-		}
-		else if(func == null || func == '')
-		{
-			bootbox.alert('Please select fund to view budget details');
-			status = true;
-		}
-		if(status == false)
-		{
-			accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
-			var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
-			if(accCode == null || accCode == '' || amt == null || amt == '')
-			{
-				bootbox.alert('Please select Debit Account Code/Amount to view budget details');
-			}
-			else
-			{
-				var today = new Date();
-				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
-				var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
-				window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
-			}
+			var today = new Date();
+			var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
+			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 		}
 	}
-	
 	}

@@ -188,6 +188,12 @@ public class SearchLegalCaseService {
             queryStr.append(" and reportStatus.id =:reportStatus ");
         if (legalCaseSearchResultOblj.getJudgmentTypeId() != null)
             queryStr.append(" and jt.judgmentType.id =:judgmentid ");
+        
+        if (legalCaseSearchResultOblj.getJudgmentTypeId() == null  && !StringUtils.isNotBlank(legalCaseSearchResultOblj.getLcNumber()) && !StringUtils.isNotBlank(legalCaseSearchResultOblj.getCaseNumber()))
+			queryStr.append(" and jt.judgmentType.name !='Decided' or jt.judgmentType.name is null ");
+		
+		if(legalCaseSearchResultOblj.getIscaseImp()!=null)
+			queryStr.append("and legalObj.caseImportant='Yes'");
     }
 
     public List<ReportStatus> getReportStatus() {

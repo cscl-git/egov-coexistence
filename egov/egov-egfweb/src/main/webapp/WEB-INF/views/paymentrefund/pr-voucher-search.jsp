@@ -62,17 +62,17 @@
 							</form:select>
 						</div>
 					</div>					
-					<div class="form-group receipt-info" style="display: none;">
-						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.receipt.no" text="Receipt Number"/></label>
-						<div class="col-sm-3 add-margin">
-							<form:input path="receiptNumber" id="receiptNumber" class="form-control text-left" maxlength="50" />
-						</div>
+					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.payee.name" text="Payee Name"/></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="partyName" id="partyName" class="form-control text-left" maxlength="50" />
 						</div>
 					</div>					
 					<div class="form-group receipt-info" style="display: none;">
+					   <label class="col-sm-3 control-label text-right"><spring:message code="lbl.receipt.no" text="Receipt Number"/></label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="receiptNumber" id="receiptNumber" class="form-control text-left" maxlength="50" />
+						</div>
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.service.type" text="Service Type"/></label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="serviceType" id="serviceType" cssClass="form-control" cssErrorClass="form-control error">
@@ -129,3 +129,5 @@
 <script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
 <script src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>"	type="text/javascript"></script>
 <script src="<cdn:url value='/resources/app/js/pr-voucher-search-helper.js?rnd=${app_release_no}'/>"></script>
+
+
