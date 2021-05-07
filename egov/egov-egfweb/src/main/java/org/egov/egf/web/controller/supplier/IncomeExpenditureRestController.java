@@ -5,32 +5,29 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.egov.audit.entity.AuditCheckList;
-import org.egov.audit.entity.AuditChecklistHistory;
-import org.egov.audit.entity.AuditDetails;
-import org.egov.audit.model.AuditDetail;
-import org.egov.audit.model.AuditRestDataPOJO;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.Fund;
 import org.egov.commons.service.CFinancialYearService;
+import org.egov.egf.model.BudgetVarianceEntry;
+import org.egov.egf.model.BudgetVarianceEntryRestData;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.MinorScheduleRestData;
 import org.egov.egf.model.ScheduleReportRestData;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
+import org.egov.egf.web.actions.report.BudgetVarianceReportAction;
 import org.egov.egf.web.actions.report.IncomeExpenditureReportAction;
 import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.model.common.ResponseInfo;
 import org.egov.model.common.ResponseInfoWrapper;
-import org.jsoup.select.Evaluator.IsEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,7 +44,15 @@ public class IncomeExpenditureRestController {
 	 private  DepartmentService departmentService;
 	
     @Autowired
+	BudgetVarianceReportAction budgetVarianceReportAction;
+	
+    @Autowired
   private   CFinancialYearService cFinancialYearService;
+  private   List<String> allowheaderList= new ArrayList<String>(); 
+  private HttpHeaders headers = new HttpHeaders();
+  
+  private final String headername="Content-Security-Policy";
+  private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in";
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureYearly", method = RequestMethod.GET)
@@ -75,11 +80,11 @@ public class IncomeExpenditureRestController {
 			 if(null!=ieEntries && ieEntries.size()>0) {
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody(ieEntries).build(), HttpStatus.OK);
+							.responseBody(ieEntries).build(), headers,HttpStatus.OK);
 			 }else {
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody("no data").build(), HttpStatus.OK);
+							.responseBody("no data").build(),getHeaders(), HttpStatus.OK);
 			 }
 		
 	}
@@ -115,7 +120,7 @@ public class IncomeExpenditureRestController {
 			 }else {
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody("no data").build(), HttpStatus.OK);
+							.responseBody("no data").build(),getHeaders(),  HttpStatus.OK);
 			 }	
 	}
 	
@@ -141,7 +146,7 @@ public class IncomeExpenditureRestController {
 			if(null==cFinancialYear) {
 				return new ResponseEntity<>(ResponseInfoWrapper.builder()
 						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-						.responseBody("Invalid Financial Year").build(), HttpStatus.OK);
+						.responseBody("Invalid Financial Year").build(),getHeaders(),  HttpStatus.OK);
 			}
 			incomeExpenditureStatement= incomeExpenditureReportAction.populateDataSourceForAllSchedules2(incomeExpenditureStatement);
 	
@@ -156,7 +161,7 @@ public class IncomeExpenditureRestController {
 				 if(null==finallist) {
 					 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 								.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-								.responseBody("No Data").build(), HttpStatus.OK);
+								.responseBody("No Data").build(),getHeaders(),  HttpStatus.OK);
 				 }
 				 ModelMap m =new ModelMap();
 				 m.addAttribute("Report Type","Minor Schedules");
@@ -166,11 +171,11 @@ public class IncomeExpenditureRestController {
 				 m.addAttribute("minorschdulelist", finallist);
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody(m).build(), HttpStatus.OK);
+							.responseBody(m).build(),getHeaders(),  HttpStatus.OK);
 			 }else {
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody("No Data").build(), HttpStatus.OK);
+							.responseBody("No Data").build(),getHeaders(),  HttpStatus.OK);
 			 }
 			
 					
@@ -183,6 +188,9 @@ public class IncomeExpenditureRestController {
 	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureSchedules(@RequestParam(name = "fin_id") Long fin,HttpServletRequest req ){
 	
+			
+			
+		
 			Department d = null;
 			CFinancialYear cf = new CFinancialYear();
 			Fund f = new Fund();
@@ -198,7 +206,7 @@ public class IncomeExpenditureRestController {
 			if(null==cFinancialYear) {
 				return new ResponseEntity<>(ResponseInfoWrapper.builder()
 						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-						.responseBody("Invalid Financial Year").build(), HttpStatus.OK);
+						.responseBody("Invalid Financial Year").build(),getHeaders(),  HttpStatus.OK);
 			}
 			incomeExpenditureStatement= incomeExpenditureReportAction.populateSchedulewiseDetailCodeReport2(incomeExpenditureStatement);
 			
@@ -225,7 +233,7 @@ public class IncomeExpenditureRestController {
 				 if(null==finallist) {
 					 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 								.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-								.responseBody("No Data").build(), HttpStatus.OK);
+								.responseBody("No Data").build(),getHeaders(),  HttpStatus.OK);
 				 }
 				 
 				 ModelMap m =new ModelMap();
@@ -236,15 +244,66 @@ public class IncomeExpenditureRestController {
 				 m.addAttribute("Allschedulelist", finallist);
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody(m).build(), HttpStatus.OK);
+							.responseBody(m).build(),getHeaders(),  HttpStatus.OK);
 			 }else {
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody("No Data").build(), HttpStatus.OK);
+							.responseBody("No Data").build(),getHeaders(), HttpStatus.OK);
 			 }
 			
 					
 	}
+	
+	
+	
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "getAllBudgetVarianceReportRest", method = RequestMethod.GET)
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	public ResponseEntity<ResponseInfoWrapper>  getAllBudgetVarianceReportRest(HttpServletRequest req ){
+	
+			Department d = null;
+			CFinancialYear cf = new CFinancialYear();
+			Fund f = new Fund();
+			List<BudgetVarianceEntry> budgetVarianceEntry = new ArrayList<BudgetVarianceEntry>();
+			List<BudgetVarianceEntryRestData>finallist= new ArrayList<BudgetVarianceEntryRestData>();
+			budgetVarianceEntry=null;
+			budgetVarianceEntry = budgetVarianceReportAction.populateRestData();
+			
+			if(null!=budgetVarianceEntry) {
+				
+				budgetVarianceEntry.stream().forEach(bv->{
+					BudgetVarianceEntryRestData o = new BudgetVarianceEntryRestData();
+					o.setAe(bv.getActual());
+					o.setBe(bv.getTotal());
+					o.setAdditionalAppropriation(bv.getAdditionalAppropriation());
+					o.setBudgetCode(bv.getBudgetCode());
+					o.setBudgetHead(bv.getBudgetHead());
+					o.setDepartmentCode(bv.getDepartmentCode());
+					o.setDepartmentName(bv.getDepartmentName());
+					o.setDetailId(bv.getDetailId());
+					o.setEstimate(bv.getEstimate());
+					o.setFunctionCode(bv.getFunctionCode());
+					o.setFundCode(bv.getFundCode());
+					o.setVariance(bv.getVariance());
+					finallist.add(o);
+					
+				});
+				
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody(finallist).build(),getHeaders(), HttpStatus.OK);
+			}
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody("No Data").build(),getHeaders(), HttpStatus.OK);
+			 
+			
+					
+	}
+	
+	
 	
 	
 	private List<MinorScheduleRestData>segregateIncomeExpendStatementlist(List<StatementEntry> smentry){
@@ -262,7 +321,7 @@ public class IncomeExpenditureRestController {
 				m.setGlCode(s.getGlCode());
 				m.setPreviousYearTotal(s.getPreviousYearTotal());
 				m.setScheduleNo(s.getScheduleNo());
-				m.setType("I");
+				m.setType("Income");
 				income.add(m);
 				
 			}
@@ -274,7 +333,7 @@ public class IncomeExpenditureRestController {
 				m.setGlCode(s.getGlCode());
 				m.setPreviousYearTotal(s.getPreviousYearTotal());
 				m.setScheduleNo(s.getScheduleNo());
-				m.setType("E");
+				m.setType("Expense");
 				income.add(m);
 				
 			}
@@ -302,7 +361,7 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 				m.setPreviousYearAmount(s.getPreviousYearAmount());
 				m.setGlCode(s.getGlCode());
 				m.setScheduleNo(s.getScheduleNo());
-				m.setType("I");
+				m.setType("Income");
 				income.add(m);
 				
 			}
@@ -315,7 +374,7 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 				m.setPreviousYearAmount(s.getPreviousYearAmount());
 				m.setGlCode(s.getGlCode());
 				m.setScheduleNo(s.getScheduleNo());
-				m.setType("E");
+				m.setType("Expense");
 				income.add(m);
 				
 			}
@@ -349,4 +408,30 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 		}
 		return res;
 	}
+
+
+
+	public HttpHeaders getHeaders() {
+		
+		return headers = updateHeaders(headers);
+	}
+
+
+
+	public void setHeaders(HttpHeaders headers) {
+		this.headers = headers;
+	}
+	
+	public HttpHeaders updateHeaders(HttpHeaders headers) {
+		allowheaderList.clear();
+		allowheaderList.add("https://egov.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-dev.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-uat.chandigarhsmartcity.in");
+		allowheaderList.add("http://localhost:3010");
+		headers.set(headername, headervalue);
+		headers.setAccessControlAllowHeaders(allowheaderList);
+		return headers;
+		
+	}
+	
 }

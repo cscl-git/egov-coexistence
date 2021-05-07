@@ -31,6 +31,7 @@ import org.egov.infra.utils.StringUtils;
 import org.egov.model.common.ResponseInfo;
 import org.egov.model.common.ResponseInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -55,6 +56,12 @@ public class AgendaRestController {
 	 @Autowired
 	 private CouncilMeetingService councilMeetingService;
 	
+	 private   List<String> allowheaderList= new ArrayList<String>(); 
+	  private HttpHeaders headers = new HttpHeaders();
+	  private final String headername="Content-Security-Policy";
+		private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in";
+		
+	 
 	@RequestMapping("getAllAgenda")
 	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllAgenda( @ModelAttribute final CouncilPreamble councilPreamble){
@@ -126,7 +133,7 @@ public class AgendaRestController {
 		 }
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(agendaRestDataViewsList).build(), HttpStatus.OK);
+				.responseBody(agendaRestDataViewsList).build(),getHeaders(), HttpStatus.OK);
 	}
 	
 	
@@ -197,7 +204,7 @@ public class AgendaRestController {
 		 }
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(meetingRestDataViewList).build(), HttpStatus.OK);
+				.responseBody(meetingRestDataViewList).build(),getHeaders(), HttpStatus.OK);
 	}
 	
 	@RequestMapping(path= {"getAllMom"})
@@ -266,7 +273,7 @@ public class AgendaRestController {
 		 }
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(meetingRestDataViewList).build(), HttpStatus.OK);
+				.responseBody(meetingRestDataViewList).build(),getHeaders(), HttpStatus.OK);
 	}
 	
 	
@@ -300,8 +307,29 @@ public class AgendaRestController {
 		 }
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(meetingRestDataViewList).build(), HttpStatus.OK);
+				.responseBody(meetingRestDataViewList).build(),getHeaders(), HttpStatus.OK);
 	}
 	
+	public HttpHeaders getHeaders() {
 
+		return headers = updateHeaders(headers);
+	}
+
+
+
+	public void setHeaders(HttpHeaders headers) {
+		this.headers = headers;
+	}
+	
+	public HttpHeaders updateHeaders(HttpHeaders headers) {
+		allowheaderList.clear();
+		allowheaderList.add("https://egov.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-dev.chandigarhsmartcity.in ");
+		allowheaderList.add("https://egov-uat.chandigarhsmartcity.in");
+		allowheaderList.add("http://localhost:3010");
+		headers.set(headername, headervalue);
+		headers.setAccessControlAllowHeaders(allowheaderList);
+		return headers;
+		
+	}
 }

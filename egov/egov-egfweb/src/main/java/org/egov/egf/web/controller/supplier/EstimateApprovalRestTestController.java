@@ -1,5 +1,6 @@
 package org.egov.egf.web.controller.supplier;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -12,6 +13,7 @@ import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationAppr
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkDnitService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.ModelMap;
@@ -32,6 +34,12 @@ public class EstimateApprovalRestTestController {
 	WorkDnitService workDnitService;
 	@Autowired
 	BoQDetailsService boQDetailsService;
+	private   List<String> allowheaderList= new ArrayList<String>(); 
+	private HttpHeaders headers = new HttpHeaders();
+	
+	private final String headername="Content-Security-Policy";
+	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in";
+	
 	
 	public static final String SUCCESS = "Success";
 	@GetMapping(value = "/_get")
@@ -53,7 +61,7 @@ public class EstimateApprovalRestTestController {
 		  
 		  return new ResponseEntity<>(ResponseInfoWrapper.builder()
 					.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-					.responseBody(fetchedData).build(), HttpStatus.OK);
+					.responseBody(fetchedData).build(),getHeaders(), HttpStatus.OK);
 	}
 	@ResponseBody
 	@RequestMapping(value = "getAllDnit", method = RequestMethod.GET)
@@ -63,7 +71,7 @@ public class EstimateApprovalRestTestController {
 		m.put("allestimation", workDnitService.getAllDnitList());
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(workDnitService.getAllDnitList()).build(), HttpStatus.OK);
+				.responseBody(workDnitService.getAllDnitList()).build(),getHeaders(), HttpStatus.OK);
 	}
 	
 	/*
@@ -87,7 +95,31 @@ public class EstimateApprovalRestTestController {
 		
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(boQDetailsService.getAllWorkOrderAgreementRestByMileStone()).build(), HttpStatus.OK);
+				.responseBody(boQDetailsService.getAllWorkOrderAgreementRestByMileStone()).build(),getHeaders(), HttpStatus.OK);
 	}
+	public HttpHeaders getHeaders() {
+		
+		return headers = updateHeaders(headers);
+	}
+
+
+
+	public void setHeaders(HttpHeaders headers) {
+		this.headers = headers;
+	}
+	
+	public HttpHeaders updateHeaders(HttpHeaders headers) {
+		
+		allowheaderList.clear();
+		allowheaderList.add("https://egov.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-dev.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-uat.chandigarhsmartcity.in");
+		allowheaderList.add("http://localhost:3010");
+		headers.set(headername, headervalue);
+		headers.setAccessControlAllowHeaders(allowheaderList);
+		return headers;
+		
+	}
+	
 	
 }

@@ -100,6 +100,7 @@
 				<security:filter-chain pattern="/legalcase/**" filters="none" />
 				<security:filter-chain pattern="/agenda/**" filters="none" />
 				<security:filter-chain pattern="/auditrest/**" filters="none" />
+				<security:filter-chain pattern="/incomeexpend/**" filters="none" />
 				<security:filter-chain pattern="/**"  filters="concurrentSessionFilter,securityContextPersistenceFilter,logoutFilter,authenticationProcessingFilter,securityContextHolderAwareRequestFilter,rememberMeAuthenticationFilter,anonymousAuthenticationFilter,exceptionTranslationFilter,filterSecurityInterceptor" />
 			</list> 
 		</constructor-arg>
