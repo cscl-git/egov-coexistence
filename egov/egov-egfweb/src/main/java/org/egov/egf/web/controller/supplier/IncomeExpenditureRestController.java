@@ -427,7 +427,9 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 		allowheaderList.add("https://egov.chandigarhsmartcity.in");
 		allowheaderList.add("https://egov-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://egov-uat.chandigarhsmartcity.in");
-		allowheaderList.add("http://localhost:3010");
+		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
+		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
+		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);
 		return headers;
