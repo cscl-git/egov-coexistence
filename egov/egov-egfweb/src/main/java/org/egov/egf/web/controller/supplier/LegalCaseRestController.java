@@ -29,7 +29,7 @@ public class LegalCaseRestController {
 	private   List<String> allowheaderList= new ArrayList<String>(); 
 	private HttpHeaders headers = new HttpHeaders();
 	private final String headername="Content-Security-Policy";
-	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in";
+	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
 	
 	@ResponseBody
 	@RequestMapping(value = "getLegalCase", method = RequestMethod.GET)
