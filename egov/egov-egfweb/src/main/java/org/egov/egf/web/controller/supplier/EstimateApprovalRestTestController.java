@@ -117,6 +117,7 @@ public class EstimateApprovalRestTestController {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("http://localhost:3010");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);
 		return headers;
