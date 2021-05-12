@@ -45,16 +45,16 @@
            
     </c:if>
    <br> 
-   <c:if test="${mode != 'view' }">
+  <%--  <c:if test="${mode != 'view' }">
         <div>
             <table width="100%">
                         <tbody>
                         <tr>
                             <td valign="top">
-                                <table id="uploadertblX" width="100%"><tbody>
+                                <table id="uploadertbl" width="100%"><tbody>
                                 <tr id="row1">
                                     <td>
-                                        <input type="file" name="fileRoughCost" id="fileX" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-10">
+                                        <input type="file" name="fileRoughCost" id="file1" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-10">
                                     <form:hidden path="objectType" id="objectType" class="checklist_description" value="roughWorkFile"></form:hidden>
                                     
                                     </td>
@@ -62,13 +62,13 @@
                                 </tbody></table>
                             </td>
                         </tr>
-                       <%--  <tr>
+                        <tr>
                             <td align="center">
                                 <button id="attachNewFileBtn" type="button" class="btn btn-primary" onclick="addFileInputFieldUpload()"><spring:message code="lbl.addfile" text="Add File"/></button>
                             </td>
-                        </tr> --%>
+                        </tr>
                         </tbody>
             </table>
         </div>
-       </c:if>
+       </c:if> --%>
 </div>

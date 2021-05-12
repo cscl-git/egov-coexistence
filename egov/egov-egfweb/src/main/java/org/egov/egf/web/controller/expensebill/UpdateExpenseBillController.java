@@ -238,17 +238,6 @@ public class UpdateExpenseBillController extends BaseBillController {
        
 
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
-        
-		/*
-		 * Set<EgBillPayeedetails> egBillPaydetaileslist = new
-		 * HashSet<EgBillPayeedetails>();
-		 * 
-		 * for (final EgBilldetails details : egBillregister.getBillDetails()) {
-		 * egBillPaydetaileslist.add(details.getEgBillPaydetailes());
-		 * egBillPaydetaileslist.addAll(details.getEgBillPaydetailes()); }
-		 */
-        
-        //egBillregister.getBillPayeedetails().addAll(egBillPaydetaileslist);
         prepareBillDetailsForView(egBillregister);
         expenseBillService.validateSubledgeDetails(egBillregister);
         final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService
@@ -380,6 +369,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         }
         
             
+		
         }
         
         if(!egBillregister.getBillPayeedetails().isEmpty())
@@ -393,6 +383,10 @@ public class UpdateExpenseBillController extends BaseBillController {
     	}
         
        
+    	}
+		if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
+        	  populateEgBillregistermisDetails(egBillregister);
     	}
         if (resultBinder.hasErrors()) {
             setDropDownValues(model);

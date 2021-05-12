@@ -275,6 +275,44 @@
 			<form:input id="sanctiondate" path="sanctiondate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
 		</div>
 	</div>
+	<div class="form-group">
+   <c:if test="${not empty egBillregister.egBillregistermis.budget}">
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.budget.amount" text="Budget"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<c:out default="N/A" value="${egBillregister.egBillregistermis.budget }" />	
+		</div>
+		</c:if>
+		  <c:if test="${not empty egBillregister.egBillregistermis.balance}">
+		<label class="col-sm-2 control-label text-right">
+		<spring:message code="lbl.balance"  text="Balance"/>	
+		</label>
+		<div class="col-sm-3 add-margin">
+		<c:out default="N/A" value="${egBillregister.egBillregistermis.balance }" />	
+		</div>
+		</c:if>	
+	</div>
+	
+	
+	<div class="form-group">
+	<c:if test="${not empty egBillregister.egBillregistermis.previousexpenditure}">
+		<label class="col-sm-3 control-label text-right">
+			<spring:message code="lbl.previousexpenditure" text="Previous expenditure (Till Date)"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<c:out default="N/A" value="${egBillregister.egBillregistermis.previousexpenditure }" />
+		</div>
+		</c:if>
+		<c:if test="${not empty egBillregister.egBillregistermis.currentexpenditure}">
+		<label class="col-sm-2 control-label text-right">
+			<spring:message code="lbl.currentexpenditure" text="Current Expenditure"/>
+		</label>
+		<div class="col-sm-3 add-margin">
+			<c:out default="N/A" value="${egBillregister.egBillregistermis.currentexpenditure }" />
+		</div>
+		</c:if>
+	</div>
   </c:otherwise>
 </c:choose>	
 	

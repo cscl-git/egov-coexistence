@@ -72,7 +72,6 @@ import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
-import org.egov.egf.web.actions.report.BudgetVarianceReportAction;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.microservice.FinanceController;
@@ -215,6 +214,13 @@ public class CreateExpenseBillController extends BaseBillController {
         }
 
         populateBillDetails(egBillregister);
+       
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
+        	  populateEgBillregistermisDetails(egBillregister);
+    	}
+     
+        
         validateBillNumber(egBillregister, resultBinder);
         if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
     	{ 
@@ -259,10 +265,13 @@ public class CreateExpenseBillController extends BaseBillController {
             }
             if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
                 approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+            
             EgBillregister savedEgBillregister;
             egBillregister.setDocumentDetail(list);
+            
+            
             try {
-            	BudgetVarianceReportAction obj=new BudgetVarianceReportAction();
+
                 savedEgBillregister = expenseBillService.create(egBillregister, approvalPosition, approvalComment, null, 
                         workFlowAction,approvalDesignation);
             } catch (ValidationException e) {

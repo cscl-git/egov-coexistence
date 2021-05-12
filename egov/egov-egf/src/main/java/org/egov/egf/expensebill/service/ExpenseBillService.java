@@ -247,16 +247,6 @@ public class ExpenseBillService {
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 
         final EgBillregister savedEgBillregister = expenseBillRepository.save(egBillregister);
-        BudgetVarianceReportAction obj=new BudgetVarianceReportAction();
-        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
-        {
-        	System.out.println("id :::::"+savedEgBillregister.getId());
-        	BudgetVarianceEntry row=obj.loadDataVariance(String.valueOf(savedEgBillregister.getId()));
-        	savedEgBillregister.getEgBillregistermis().setBudget(row.getTotal());
-        	savedEgBillregister.getEgBillregistermis().setBalance(row.getVariance());
-        	savedEgBillregister.getEgBillregistermis().setCurrentexpenditure(savedEgBillregister.getBillamount());
-        	
-        }
         
         createCheckList(savedEgBillregister, checkLists);
 

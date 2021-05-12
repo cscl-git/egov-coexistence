@@ -1,44 +1,44 @@
 	
-var data;
-function makeFieldAsAutocomplete(field){
-	console.log('--makeFieldAsAutocomplete--');
-	var tr = $(field).closest('tr');
-	tr.find('div[id^="worklist_"]').empty();
-	$.ajax({
-		 url:'/services/works/popup/getboq/'+$(field).val(),
-		 contentType:"application/json",		
-		 dataType:"json",
-		 success:function(r)
-		 {
-			 data=r;
-			for (var i=0; i<data.length; i++) {
-				 console.log(data[i].id+ '------KK----' + data[i].ref_dsr +'--'+ data[i].item_description + '--'+data[i].unit+'--'+data[i].rate);
-				 tr.find('div[id^="worklist_"]').append("<option value='"+data[i].id+"'   data-description='"+data[i].item_description+"'  data-rate1='"+data[i].rate+"' data-unit='"+data[i].unit+"'        >"+data[i].ref_dsr+"</option>");
-			}
-		 }
-	 })
-	
-}
+//var data;
+//function makeFieldAsAutocomplete(field){
+//	console.log('--makeFieldAsAutocomplete--');
+//	var tr = $(field).closest('tr');
+//	tr.find('div[id^="worklist_"]').empty();
+//	$.ajax({
+//		 url:'/services/works/popup/getboq/'+$(field).val(),
+//		 contentType:"application/json",		
+//		 dataType:"json",
+//		 success:function(r)
+//		 {
+//			 data=r;
+//			for (var i=0; i<data.length; i++) {
+//				 console.log(data[i].id+ '------KK----' + data[i].ref_dsr +'--'+ data[i].item_description + '--'+data[i].unit+'--'+data[i].rate);
+//				 tr.find('div[id^="worklist_"]').append("<option value='"+data[i].id+"'   data-description='"+data[i].item_description+"'  data-rate1='"+data[i].rate+"' data-unit='"+data[i].unit+"'        >"+data[i].ref_dsr+"</option>");
+//			}
+//		 }
+//	 })
+//	
+//}
 
 
 
-$(document).ready(function(){
-    
-    console.log('--------------------start------------------------');
-    $('#mainContainerDiv').find('table[id^="boq"] > tbody').each(function(){
-    	console.log(this);
-    	$(this).on('keyup', 'input[type="text"][id$=".ref_dsr"]', function(){
-    		console.log('keyup');	
-    		makeFieldAsAutocomplete(this);	
-    	});
-    	$(this).on('click', 'div[id^="worklist_"] > option', function(){
-    		console.log('keyup worklist_  option click' );
-    		var row = $(this).closest('tr');
-    		
-    		row.find('input[type="text"][id$="ref_dsr"]').val($(this).text());
-    		row.find('input[type="text"][id$="item_description"]').val($(this).data('description'));
-    		row.find('input[type="number"][id$="rate"]').val($(this).data('rate1'));
-    		row.find('input[type="text"][id$="unit"]').val($(this).data('unit'));
+//$(document).ready(function(){
+//    
+//    console.log('--------------------start------------------------');
+//    $('#mainContainerDiv').find('table[id^="boq"] > tbody').each(function(){
+//    	console.log(this);
+//    	$(this).on('keyup', 'input[type="text"][id$=".ref_dsr"]', function(){
+//    		console.log('keyup');	
+//    		makeFieldAsAutocomplete(this);	
+//    	});
+//    	$(this).on('click', 'div[id^="worklist_"] > option', function(){
+//    		console.log('keyup worklist_  option click' );
+//    		var row = $(this).closest('tr');
+//    		
+//    		row.find('input[type="text"][id$="ref_dsr"]').val($(this).text());
+//    		row.find('input[type="text"][id$="item_description"]').val($(this).data('description'));
+//    		row.find('input[type="number"][id$="rate"]').val($(this).data('rate1'));
+//    		row.find('input[type="text"][id$="unit"]').val($(this).data('unit'));
 //    		row.find('input[type="text"][id$="milestone"]').val('FOR THE WORK OF "STRENGTHENING OF SWD SYSTEM AT PHIRNI ROAD AND VARIOUS LOCATIONS IN VILLAGE BURAIL UT, CHANDIGARH ');
     		
 //    		var rate = parseFloat($("[id*=rate]").val());
@@ -46,16 +46,17 @@ $(document).ready(function(){
 //          var total = parseFloat(rate * quantity);
 //            $("[id*=lblPrice]").val(total);
 //    		row.find('input[type="number"][id$="amount"]').val(total);
-    		var optionDiv = $(this).closest('div[id^="worklist_"]');
-    		optionDiv.css('display','none');
-    		
-    		
-    	});
-    });
-    console.log('--------------------end------------------------');
+//    		var optionDiv = $(this).closest('div[id^="worklist_"]');
+//    		optionDiv.css('display','none');
+//    		
+//    		
+//    	});
+//    });
+//    console.log('--------------------end------------------------');
+//    
+// }); //Ready end
     
    
- }); //Ready end
 
 
 

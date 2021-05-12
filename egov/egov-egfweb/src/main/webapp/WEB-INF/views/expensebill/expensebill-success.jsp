@@ -79,7 +79,7 @@
 	</div>			
 	
 	<div class="buttonbottom">
-	<input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/bill/billView-view.action?billId=${billd}')" class="btn btn-default">
+	<input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/expensebill/view/${billd}')" class="btn btn-default">
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 	</div>

@@ -168,6 +168,7 @@
         <c:if test="${mode == 'readOnly'}">
             <div class="row">
                 <div class="col-sm-12 text-center">
+                <input name="button" type="button" class="buttonsubmit" id="button1" value="Print" onclick="window.print()">&nbsp;
                     <input type="submit" name="closeButton" id="closeButton" value='<spring:message code="lbl.close" text="Close"/>' Class="btn btn-default"
                            onclick="window.close();"/>
                 </div>

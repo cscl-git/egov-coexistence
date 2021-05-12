@@ -244,6 +244,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String estimateDt;
 
 	@Transient
+	private String createdDt;
+	
+	@Transient
 	private String fromDate;
 
 	@Transient
@@ -803,6 +806,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setPendingWith(String pendingWith) {
 		this.pendingWith = pendingWith;
+	}
+
+	public String getCreatedDt() {
+		return createdDt;
+	}
+
+	public void setCreatedDt(String createdDt) {
+		this.createdDt = createdDt;
 	}
 	
 	

@@ -5,6 +5,26 @@
 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ <link rel="stylesheet" href="/resources/demos/style.css">
+<style>
+.dropdown-content option{
+	BACKGROUND-COLOR: LIGHTGRAY;
+    BORDER: 1PX SOLID GRAY;
+    WIDTH: 90PX;
+    padding: 5px;
+}
+.dropdown-content option:hover{
+	background-color: gray;
+	color: white;
+}
+</style>
+
+ <script>
+  $( function() {
+    $( "#estimateDate" ).datepicker();
+ } );  
+  </script>
 
 		<spring:hasBindErrors name="estimatePreparationApproval">
 			<div class="alert alert-danger"
@@ -317,8 +337,18 @@
 			<spring:message code="lbl.work.boq" text="BoQ Details" />
 					</div>
 		<br>
-		<div>
-			
+		<div id="mainContainerDiv">
+			<%-- 	<c:if test="${fileuploadAllowed != 'Y' }">  --%>
+					<a target="_blank" style="float:right;"
+							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
+					<br>
+					<input type="file" name="file" style="color: #000000;"> <br>
+					<br>
+					<div class="buttonbottom" align="center">
+						<input type="submit" id="save" class="btn btn-primary" name="save"
+							value="Upload" /> <br>
+					</div>
+		<%-- 	</c:if>   --%>
 			<div>
 				<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
 					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
@@ -362,11 +392,16 @@
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 													required="required" class="form-control item_description"
 											maxlength="200"  title="${boq.item_description}" ></form:input></td>
-											<td><form:input type="text" style="width:80px;"
+											<td>
+											 <div class="dropdown-content" id="autocomplete">
+											<form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 													required="required" class="form-control ref_dsr"
-											maxlength="200"  title="${boq.ref_dsr}"></form:input></td>
+											maxlength="200"  title="${boq.ref_dsr}"></form:input>
+											<div id="worklist_${boq.sizeIndex}" ></div>
+											</div>
+											</td>
 											<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].unit"
 												id="boQDetailsList[${boq.sizeIndex}].unit"
@@ -417,7 +452,8 @@
 
 
 
-
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 	

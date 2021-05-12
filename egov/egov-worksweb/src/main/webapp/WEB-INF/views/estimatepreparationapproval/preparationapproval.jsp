@@ -84,7 +84,7 @@
 					<div class="col-sm-3 add-margin">
 									<form:input id="estimateDate" path="estimateDate"
 									class="form-control datepicker"  data-date-end-date="0d"
-									placeholder="DD/MM/YYYY" />
+									placeholder="DD/MM/YYYY"  autocomplete="off"/>
 								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -339,6 +339,7 @@
 
 				<br>
 				<div id="mainContainerDiv">
+				
 				<%-- <c:if test="${fileuploadAllowed != 'Y' }"> --%> 
 					<a target="_blank" style="float:right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
@@ -346,19 +347,41 @@
 					<input type="file" name="file" style="color: #000000;"> <br>
 					<br>
 					<div class="buttonbottom" align="center">
+					<input type="hidden" id="id" name="id" value="2">
 						<input type="submit" id="save" class="btn btn-primary" name="save"
 							value="Upload" /> <br>
 					</div>
 			<%-- 	</c:if>  --%>
+		
 					<br>
 				
 				<div>
-			<c:if test="${fileuploadAllowed == 'Y' }">
-			<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
-					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
 				
+			<%-- <c:if test="${showTableHeaderFirst == 'Y' }">	
+					<table class="table table-bordered tableBoq">
+						<thead>
+								<tr>
+							 <th><c:out value="${mapboq.key}"/></th> 
+							</tr>
+							<tr>
+								<th><spring:message code="lbl.item.Milestone" /></th>	
+									<th><spring:message code="lbl.item.description" /></th>
+									<th><spring:message code="lbl.ref.dsr" /></th>
+									<th><spring:message code="lbl.unit" /></th>
+									<th><spring:message code="lbl.rate" /></th>
+									<th><spring:message code="lbl.quantity" /></th>
+									<th><spring:message code="lbl.amount" /></th>
+									<th><spring:message code="lbl.action" /></th>
+								</tr>
+							</thead>
 				
+					</table>
+					<a href ="/services/works//estimatePreparation/addRow">Add Row</a>
+		    </c:if>		
 				
+			<c:if test="${showTableHeader == 'Y' }">
+					<c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
+					 <table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
 						<thead>
 							<tr>
 							<th><c:out value="${mapboq.key}"/></th>
@@ -374,13 +397,92 @@
 								<th><spring:message code="lbl.action" /></th>
 							</tr>
 						</thead>
+							<tbody>
+					 <c:forEach var="boq" items="${mapboq.value}" varStatus="status">
+						
+					 <c:if test="${mapboq.key == boq.milestone }">
+								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
+								<td>
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
+												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:input type="text" style="width:150px;"
+											path="boQDetailsList[${boq.sizeIndex}].milestone"
+											id="boQDetailsList[${boq.sizeIndex}].milestone"
+											required="required"  class="form-control milestone" title="${boq.milestone}"></form:input></td>
+									<td><form:input type="text" style="width:200px;"
+											path="boQDetailsList[${boq.sizeIndex}].item_description"
+											id="boQDetailsList[${boq.sizeIndex}].item_description"
+											required="required" readonly="true" class="form-control item_description"
+											 title="${boq.item_description}"></form:input></td>
+											 
+								
+									<td>
+									 <div class="dropdown-content" id="autocomplete">
+										<form:input type="text" style="width:80px;"
+											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
+											data-inputindex = "${boq.sizeIndex}"
+											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
+										 	required="required" class="form-control ref_dsr"
+											maxlength="200"  title="${boq.ref_dsr}"></form:input>
+											<div id="worklist_${boq.sizeIndex}" ></div>
+										</div>			
+									</td>
 						
 				
-						<tbody>
+										<td><form:input type="text" style="width:80px;"
+											path="boQDetailsList[${boq.sizeIndex}].unit"
+												id="boQDetailsList[${boq.sizeIndex}].unit"
+												required="required"  class="form-control unit"
+												maxlength="200"></form:input></td>
+										<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].rate" step=".01"
+												id="boQDetailsList[${boq.sizeIndex}].rate"
+												required="required"  class="form-control rate"
+												onchange="valueChanged()"></form:input></td>
+										<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].quantity" step=".01"
+											id="boQDetailsList[${boq.sizeIndex}].quantity"
+											required="required"  class="form-control quantity"
+												name="quantity" onchange="valueChanged()"></form:input></td>
+										<td><form:input type="number" style="width:100px;"
+											path="boQDetailsList[${boq.sizeIndex}].amount"
+											id="boQDetailsList[${boq.sizeIndex}].amount"
+											required="required" readonly="true" class="form-control amount"
+											maxlength="200" name="amount" ></form:input></td>
+									 <td class="text-center"><span style=" cursor:pointer;  color: black;" onclick="addcheckListRow(${mapstatus.index});" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
+				 				<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="$(this).closest('tr').remove();"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
+				 		
+				 				 </td>
+			
+									</tr>
+							</c:if>	
+						</c:forEach> 
+					</tbody>
+				</table>
+			</c:forEach> 
+			</c:if>	--%>
 					
 						
+			  <c:if test="${fileuploadAllowed == 'Y' }"> 
+			    <c:forEach var="mapboq" items="${milestoneList}" varStatus="mapstatus">
+					<table id="boq${mapstatus.index}tableBoq" class="table table-bordered tableBoq">
+						<thead>
+							<tr>
+							<th><c:out value="${mapboq.key}"/></th>
+							</tr>
+							<tr>
+								<th><spring:message code="lbl.item.Milestone" /></th>	
+								<th><spring:message code="lbl.item.description" /></th>
+								<th><spring:message code="lbl.ref.dsr" /></th>
+								<th><spring:message code="lbl.unit" /></th>
+								<th><spring:message code="lbl.rate" /></th>
+								<th><spring:message code="lbl.quantity" /></th>
+								<th><spring:message code="lbl.amount" /></th>
+								<th><spring:message code="lbl.action" /></th>
+							</tr>
+						</thead>
+						<tbody>
 						<c:forEach var="boq" items="${mapboq.value}" varStatus="status">
-						
 						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
 								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
 								<td><form:input type="text" style="width:150px;"
@@ -426,20 +528,15 @@
 				 				<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="$(this).closest('tr').remove();"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
 				 		
 				 				 </td>
-			
 								</tr>
 							</c:forEach>
-							
 						</tbody>
 				</table>
-				
-					
-					
 				</c:forEach>
 				</c:if>
 				</div>	
 				</div>	
-				
+			</br>	
 				<div class="panel-title"> Estimate Rate Analysis </div>
 				<div>
 				<jsp:include page="RoughWorkfileupload.jsp" />
