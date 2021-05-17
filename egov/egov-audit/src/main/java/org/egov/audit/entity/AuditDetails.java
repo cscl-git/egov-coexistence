@@ -85,8 +85,13 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	
 	@Override
 	public String getStateDetails() {
-
-		 return getState().getComments().isEmpty() ? auditno : auditno + "-" + getState().getComments();
+		String billNumber="";
+		if(egBillregister != null)
+		{
+			billNumber=egBillregister.getBillnumber();
+		}
+		
+		 return getState().getComments().isEmpty() ? auditno+" ("+billNumber+") " : auditno + "-" + getState().getComments()+" ("+billNumber+") ";
 	}
 
 	@Override

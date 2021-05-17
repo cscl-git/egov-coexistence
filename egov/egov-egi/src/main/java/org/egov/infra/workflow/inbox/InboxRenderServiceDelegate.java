@@ -182,10 +182,11 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 //        owners.add(4L);
 //        owners.add(1L);
         if (!owners.isEmpty()) {
-        	LOG.debug ("Owner");
             List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
             for (String type : types) {
-            	LOG.debug ("type : "+type);
+            	if(isAllowableType(type)) {//added abhishek on13052021
+            		continue;
+            	}
                 Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
                 if (inboxRenderService.isPresent()) {
                 	LOG.debug ("draft : "+draft);
@@ -232,6 +233,19 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     		return true;
     	}else if(WORKFLOW_MODULE_WORKS.equalsIgnoreCase(module)
     			&& WORKFLOW_MODULE_WORKS_TYPES.contains(type)) {
+    		return true;
+    	}
+    	return false;
+    }
+    //added abhishek
+    private boolean isAllowableType(String type) {
+    	if(WORKFLOW_MODULE_AGENDA_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_APNIMANDI_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_AUDIT_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_WORKS_TYPES.contains(type)) {
     		return true;
     	}
     	return false;
