@@ -259,6 +259,7 @@ public class AuditService {
 	           if (workFlowAction.equals("Approve")) {
 	        	   System.out.println("Approve");
 	        	   owenrPos.setId(auditDetails.getLead_auditor());
+	        	   
 	   			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	   	        .withComments(comment)
 	   	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos)
@@ -339,6 +340,8 @@ public class AuditService {
 	    	{
 	    		owenrPos.setId(null);
 	    	}
+	    	auditDetails.setRsa_id(owenrPos.getId());
+	    	auditDetails.setRsa_name(getEmployeeName(owenrPos.getId()));
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
 	        .withStateValue("Pending with Section Officer").withDateInfo(new Date()).withOwner(owenrPos)
@@ -373,6 +376,8 @@ public class AuditService {
 	    	{
 	    		owenrPos.setId(null);
 	    	}
+	    	auditDetails.setLead_auditor(owenrPos.getId());
+	    	auditDetails.setAuditor_name(getEmployeeName(owenrPos.getId()));
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
 	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos)
@@ -437,5 +442,10 @@ public class AuditService {
 	public List<AuditDetails>getAllAudit(){
 		 return auditRepository.findAll();
 	}
+	
+	public String getEmployeeName(Long empId){
+        
+        return microServiceUtil.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

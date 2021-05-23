@@ -53,6 +53,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -74,7 +75,10 @@ import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditEmployee;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.model.PostAuditResult;
+import org.egov.audit.repository.AuditCheckListRepository;
 import org.egov.audit.repository.AuditRepository;
+import org.egov.audit.service.AuditCheckListHistoryService;
+import org.egov.audit.service.AuditCheckListService;
 import org.egov.audit.service.AuditService;
 import org.egov.audit.service.BillTypeCheckListService;
 import org.egov.audit.service.ManageAuditorService;
@@ -143,6 +147,12 @@ public class CreateAuditController extends GenericWorkFlowController {
 	
 	@Autowired
 	 private BillTypeCheckListService billTypeCheckListService;
+	
+	@Autowired
+	private AuditCheckListService auditCheckListService;
+	
+	@Autowired
+	private AuditCheckListHistoryService auditCheckListHistoryService;
 
 	@Autowired
 	private AuditService auditService;
@@ -464,8 +474,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 	        {
 	        	if (request.getParameter("approvalComent") != null)
 		            approvalComment = request.getParameter("approvalComent");
-		        System.out.println("approval comment : "+approvalComment);
-		        System.out.println("auditDetail.getApprovalComent() ::"+auditDetail.getApprovalComent());
 		        if(approvalComment != null &&  !approvalComment.isEmpty())
 		        {
 		        	auditDetail.setApprovalComent(approvalComment);
@@ -1438,6 +1446,23 @@ public class CreateAuditController extends GenericWorkFlowController {
 	return "audit-success"; 
 	 
 	 }
+	 
+	
+	 @RequestMapping(value = "/deleteAuditchecklist/{id}", method = RequestMethod.GET)
+	 @ResponseBody
+	    public String deleteAuditchecklist(@PathVariable final String id) {
+		 String responce=null;
+		 AuditCheckList auditCheckList = auditCheckListService.getById(Long.valueOf(id));
+		 if(auditCheckList != null) {
+			 List<AuditChecklistHistory> auditChecklisthistory=auditCheckList.getCheckList_history();
+			 auditCheckListHistoryService.deleteAuditChecklistHistory(auditChecklisthistory);
+			 auditCheckListService.deleteAuditChecklist(auditCheckList);
+			 responce ="Delete Success";
+		  }else {
+			  responce ="Entity not found";
+		  }
+	     return responce;
+	    }
 	 
 	 
 	 

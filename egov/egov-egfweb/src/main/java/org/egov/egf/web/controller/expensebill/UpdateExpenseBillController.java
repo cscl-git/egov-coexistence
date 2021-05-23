@@ -492,6 +492,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     	audit.setType(PRE);
     	audit.setDepartment(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
     	audit.setLead_auditor(owenrPos.getId());
+    	audit.setAuditor_name(getEmployeeName(owenrPos.getId()));
     	audit.setEgBillregister(updatedEgBillregister);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));
     	audit.setPassUnderobjection(0);

@@ -117,7 +117,14 @@ public class AuditRestDataController {
 	
 		 List<AuditDetails> auditDetailsList= new ArrayList<>();
 		 List<AuditRestDataPOJO> responseData =  new ArrayList<>();
+		 auditDetailsList=null;
        auditDetailsList = (List<AuditDetails> )auditService.getAllAudit();
+       
+       if(null==auditDetailsList) {
+    	   return new ResponseEntity<>(ResponseInfoWrapper.builder()
+   				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+   				.responseBody("No Data").build(),getHeaders(), HttpStatus.OK);
+       }
        
        auditDetailsList.stream().forEach(audit->{
     	   AuditRestDataPOJO  a=  new AuditRestDataPOJO(); 
@@ -132,6 +139,8 @@ public class AuditRestDataController {
     	   a.setAudit_no(audit.getAuditno());
     	   a.setPassUnderobjection(audit.getPassUnderobjection());
     	   a.setBillid((null!=audit.getEgBillregister())?audit.getEgBillregister().getId().toString():null);
+    	   a.setAuditor_name(audit.getAuditor_name());
+    	   a.setRsa_name(audit.getRsa_name());
     	   a.setDepartment( departmentService.getDepartmentById(Long.parseLong(audit.getDepartment())).getName());
     	   if(audit.getCheckList().size()>0) {
     		   audit.getCheckList().stream().forEach(ck->{

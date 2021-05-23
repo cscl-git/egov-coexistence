@@ -48,6 +48,55 @@
  */
 /*Added By Kundan For Solved Date Picker Issue*/
 
+function ConfirmDelete()
+{
+ var txt;
+ var estId=document.getElementById("uploadId");
+ var comments=document.getElementById("comments").value;
+ var file=document.getElementById('file1');
+
+	if(file.files.length >0){
+		
+		if(comments === "" || comments==='undefined'){
+			 
+			 bootbox.alert("Please Fill Boq Comment.");
+			 return false;
+			 
+		 }
+		// debugger;
+		 if(estId != null)
+			 {
+				 var x = confirm("Are you sure you want to upload file again previous file will be deleted. !");
+				 
+				  if (x==true)
+					  {
+					  	txt = "You pressed OK!";
+					  	return true;
+					  }
+				     
+				  else
+					  {
+					  	txt = "You pressed Cancel!";
+					  	return false;
+					  }
+				   
+				 }
+		
+
+		return true;
+
+	}else{
+
+		bootbox.alert("Please Select File.")
+
+		return false;
+
+	}
+ 
+ 
+ 
+}
+
 
 
 function calculateMeasuredAmount(x)
@@ -242,7 +291,30 @@ function addpaymentRow() {
 		  bootbox.alert($.i18n.prop('msg.limit.reached'));
 	}
 }
+var subledgerrowcount=0;
+function addcheckListRow2() { 
+	
+	
+	var rowcount = $("#tblchecklist tbody tr").length;
+	if (rowcount < 30) {
+		if (document.getElementById('tblchecklistRow') != null) {
+			addRowPayment('tblchecklist','tblchecklistRow');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.milestone').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.item_description').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.unit').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.rate').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.quantity').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.amount').val('');
+			
+			++subledgerrowcount;
 
+			addCustomEvent(rowcount,'temppayment[index].addButton','keydown',shortKeyFunForAddButton);
+		}
+	} else {
+		  bootbox.alert($.i18n.prop('msg.limit.reached'));
+	}
+}
 
 
 
@@ -457,17 +529,8 @@ function getRow(obj) {
 
 
 var subledgerrowcount=0;
-var milestone;
 function addcheckListRow(x) { 
 	var dataId = $(x).attr("data-idx");
-//debugger;
-var mainTable = $('#mainContainerDiv');
-var tr = mainTable.find('tbody tr');
-tr.each(function() {
-milestone = $(this).closest('tr').find('input[type="text"][id$="milestone"]').val();
-console.log("milestone--"+milestone);
-});
-
 
 	
   if (dataId==undefined)
@@ -478,16 +541,56 @@ console.log("milestone--"+milestone);
    	dataId++;
    }  
 	
-     
-     
-
 	var rowcount = $('.tableBoq tbody tr').length;
 	if (rowcount < 30) {
 		if (document.getElementById('boq'+x+'tableBoqrow') != null) {
 			addRow('boq'+x+'tableBoq','boq'+x+'tableBoqrow');
-			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('input[type="text"][id$="milestone"]').val(milestone);
-			console.log('milestone-rowcount'+milestone);
-//			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
+			
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.item_description').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.unit').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.rate').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.quantity').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.amount').val('');
+			
+			++subledgerrowcount;
+     
+			addCustomEvent(rowcount,'tempSubLedger[index].addButton','keydown',shortKeyFunForAddButton);
+			
+			
+		}
+	} else {
+		  bootbox.alert($.i18n.prop('msg.limit.reached'));
+	}
+}
+var subledgerrowcount=0;
+function addcheckListRow1(x) { 
+	
+	var xx = document.getElementById("deletefromdb");
+	var y = document.getElementById("deletefromfront");
+     
+
+		
+		var dataId = $(x).attr("data-idx");	
+  if (dataId==undefined)
+  {
+  	dataId=1;
+  }
+   else{
+   	dataId++;
+   }  
+  
+	var rowcount = $('.tableBoq tbody tr').length;
+	
+	if (rowcount < 30) {
+		 xx.style.display = "none";
+		    y.style.display = "block";
+		    
+		if (document.getElementById('boq'+x+'tableBoqrow') != null) {
+			addRow('boq'+x+'tableBoq','boq'+x+'tableBoqrow');
+			
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.item_description').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.unit').val('');
@@ -498,11 +601,16 @@ console.log("milestone--"+milestone);
 			++subledgerrowcount;
 			
 			addCustomEvent(rowcount,'tempSubLedger[index].addButton','keydown',shortKeyFunForAddButton);
+			xx.style.display = "block";
+		    y.style.display = "none";
+			
 		}
 	} else {
+		
 		  bootbox.alert($.i18n.prop('msg.limit.reached'));
 	}
 }
+
 
 function deleteEsRow(obj,x) {
 	var rowcount=$(".tableBoq tbody tr").length;

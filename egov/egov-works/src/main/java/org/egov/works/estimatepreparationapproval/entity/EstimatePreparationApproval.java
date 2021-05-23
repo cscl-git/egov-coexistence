@@ -166,6 +166,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
+	private List<BoqUploadDocument> uploadDocument=new ArrayList<BoqUploadDocument>();
+
 	@ManyToOne
     @JoinColumn(name = "statusid")
     private EgwStatus status;
@@ -247,6 +250,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String createdDt;
 	
 	@Transient
+	private String executeDiv;
+	
+	@Transient
 	private String fromDate;
 
 	@Transient
@@ -260,6 +266,12 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
+
+	@Transient
+	private List<BoqUploadDocument> docUpload;
+	
+	/*@Transient
+	private List<String> UploadId;*/
 
 	@Transient
 	private String department = "";
@@ -301,7 +313,40 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Transient
 	private String workCategry;
 	
+	@Column(name="comments")
+    private String comments;
+	
+	@Transient
+	private Long uploadfileStoreId;
+	@Transient
+	private Long uploadId;
+	
+	
 
+
+	public Long getUploadId() {
+		return uploadId;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
+	public Long getUploadfileStoreId() {
+		return uploadfileStoreId;
+	}
+
+	public void setUploadfileStoreId(Long uploadfileStoreId) {
+		this.uploadfileStoreId = uploadfileStoreId;
+	}
+
+	public void setUploadId(Long uploadId) {
+		this.uploadId = uploadId;
+	}
 
 	public Long getExecutingDivision() {
 		return executingDivision;
@@ -815,6 +860,32 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	public void setCreatedDt(String createdDt) {
 		this.createdDt = createdDt;
 	}
+
+	public String getExecuteDiv() {
+		return executeDiv;
+	}
+
+	public void setExecuteDiv(String executeDiv) {
+		this.executeDiv = executeDiv;
+	}
+
+	public List<BoqUploadDocument> getUploadDocument() {
+		return uploadDocument;
+	}
+
+	public void setUploadDocument(List<BoqUploadDocument> uploadDocument) {
+		this.uploadDocument = uploadDocument;
+	}
+
+	public List<BoqUploadDocument> getDocUpload() {
+		return docUpload;
+	}
+
+	public void setDocUpload(List<BoqUploadDocument> docUpload) {
+		this.docUpload = docUpload;
+	}
+
+	
 	
 	
 

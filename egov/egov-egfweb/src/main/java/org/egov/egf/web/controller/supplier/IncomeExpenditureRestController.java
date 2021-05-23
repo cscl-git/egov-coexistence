@@ -1,6 +1,7 @@
 package org.egov.egf.web.controller.supplier;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,15 +62,34 @@ public class IncomeExpenditureRestController {
 		
 			
 			Department d = new Department();
+			
 			CFinancialYear cf = new CFinancialYear();
 			Fund f = new Fund();
 			cf.setId(fin);
 			d.setCode(o.toString());
 			f.setId(0);
+			
+			CFinancialYear cFinancialYear = null;
+			cFinancialYear = cFinancialYearService.findOne(cf.getId());
+			if(null==cFinancialYear) {
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Financial Year").build(),getHeaders(),  HttpStatus.OK);
+			}
+			
+			org.egov.infra.admin.master.entity.Department dt = departmentService.getDepartmentByCode(d.getCode());
+			
+			
+			if(null==dt) {
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Department ").build(),getHeaders(),  HttpStatus.OK);
+			}
 			final Statement incomeExpenditureStatement=  new  Statement (cf,d,f);
 			incomeExpenditureStatement.setRestData(true);
 			
 			incomeExpenditureReportAction.populateDataSource2(incomeExpenditureStatement);
+			
 			
 			 List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
 			
@@ -78,9 +98,18 @@ public class IncomeExpenditureRestController {
 			 ieEntries=removeEmptyEntries(ieEntries);
 			
 			 if(null!=ieEntries && ieEntries.size()>0) {
+				 
+				 ModelMap m =new ModelMap();
+				 m.addAttribute("Report Type","Income And Expenditure Report");
+				// m.addAttribute("departmentname", dt.getName());
+				 m.addAttribute("departmentname", incomeExpenditureReportAction.getIncomeExpenditureStatement().getDepartment().getName());
+				 m.addAttribute("Year Range",cFinancialYear.getFinYearRange());
+				 m.addAttribute("currentyear",incomeExpenditureReportAction.getCurrentYearToDate());
+				 m.addAttribute("previousyear",incomeExpenditureReportAction.getPreviousYearToDate());
+				 m.addAttribute("incomeExpenditureList", ieEntries);
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-							.responseBody(ieEntries).build(), headers,HttpStatus.OK);
+							.responseBody(m).build(), headers,HttpStatus.OK);
 			 }else {
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
@@ -103,6 +132,15 @@ public class IncomeExpenditureRestController {
 			d.setCode(o.toString());
 			f.setId(0);
 			
+			
+			
+			CFinancialYear cFinancialYear = null;
+			cFinancialYear = cFinancialYearService.findOne(cf.getId());
+			if(null==cFinancialYear) {
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Financial Year").build(),getHeaders(),  HttpStatus.OK);
+			}
 			final Statement incomeExpenditureStatement=  new  Statement (cf,d,f);
 			incomeExpenditureStatement.setRestData(true);
 			incomeExpenditureStatement.setPeriod("Half Yearly");
@@ -114,6 +152,14 @@ public class IncomeExpenditureRestController {
 			 if(null!=ieEntries)
 			 ieEntries= removeEmptyEntries(ieEntries);
 			 if(null!=ieEntries && ieEntries.size()>0) {
+				 
+				 ModelMap m =new ModelMap();
+				 m.addAttribute("Report Type","Income And Expenditure Report");
+				 m.addAttribute("departmentname", incomeExpenditureReportAction.getIncomeExpenditureStatement().getDepartment().getName());
+				 m.addAttribute("Year Range",cFinancialYear.getFinYearRange());
+				 m.addAttribute("currentyear",incomeExpenditureReportAction.getCurrentYearToDate());
+				 m.addAttribute("previousyear",incomeExpenditureReportAction.getPreviousYearToDate());
+				 m.addAttribute("incomeExpenditureList", ieEntries);
 				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
 							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
 							.responseBody(ieEntries).build(), HttpStatus.OK);
@@ -301,6 +347,125 @@ public class IncomeExpenditureRestController {
 			 
 			
 					
+	}
+	
+	
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "getAllIncomeExpentiureByDeptAndDate", method = RequestMethod.GET)
+	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByDate( @RequestParam(name = "org_id") Long o,
+			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
+			HttpServletRequest req ){
+			Department d = new Department();	
+			Fund f = new Fund();
+			d.setCode(o.toString());
+			f.setId(0);	
+			if(null==fromDate|| null==toDate || null==o ) {
+				
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Request, Required Parameters not Passed ").build(),getHeaders(),  HttpStatus.OK);
+			}
+			
+			org.egov.infra.admin.master.entity.Department dt = departmentService.getDepartmentByCode(d.getCode());
+			
+			
+			if(null==dt) {
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Department ").build(),getHeaders(),  HttpStatus.OK);
+			}
+			final Statement incomeExpenditureStatement=  new  Statement ();
+			incomeExpenditureStatement.setRestData(true);
+			
+			incomeExpenditureStatement.setDepartment(d);;
+			incomeExpenditureStatement.setFromDate(fromDate);
+			incomeExpenditureStatement.setToDate(toDate);
+			incomeExpenditureStatement.setPeriod("Date");
+			incomeExpenditureReportAction.populateDataSource2(incomeExpenditureStatement);
+			
+			
+			 List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
+			
+			 ieEntries = incomeExpenditureReportAction.getIncomeExpenditureStatement().getIeEntries();
+			 if(null!=ieEntries)
+			 ieEntries=removeEmptyEntries(ieEntries);
+			
+			 if(null!=ieEntries && ieEntries.size()>0) {
+				 
+				 ModelMap m =new ModelMap();
+				 m.addAttribute("Report Type","Income And Expenditure Report");
+				 m.addAttribute("departmentname", dt.getName());
+				 m.addAttribute("currentyear",incomeExpenditureReportAction.getCurrentYearToDate());
+				 m.addAttribute("previousyear",incomeExpenditureReportAction.getPreviousYearToDate());
+				 m.addAttribute("incomeExpenditureList", ieEntries);
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody(m).build(), getHeaders(),HttpStatus.OK);
+			 }else {
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody("no data").build(),getHeaders(), HttpStatus.OK);
+			 }
+		
+	}
+	
+	
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "getAllIncomeExpentiureByFromToDate", method = RequestMethod.GET)
+	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByFromToDate( 
+			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
+			HttpServletRequest req ){
+		
+		
+			Department d = new Department();
+			Fund f = new Fund();
+			d.setCode(null);
+			f.setId(0);
+			
+			
+			if(null==fromDate|| null==toDate ) {
+				
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Request, Required Parameters not Passed ").build(),getHeaders(),  HttpStatus.OK);
+			}
+			
+			
+			final Statement incomeExpenditureStatement=  new  Statement ();
+			incomeExpenditureStatement.setRestData(true);
+			
+			incomeExpenditureStatement.setDepartment(d);
+			incomeExpenditureStatement.setFromDate(fromDate);
+			incomeExpenditureStatement.setToDate(toDate);
+			incomeExpenditureStatement.setPeriod("Date");
+			incomeExpenditureReportAction.populateDataSource2(incomeExpenditureStatement);
+			 List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
+			
+			 ieEntries = incomeExpenditureReportAction.getIncomeExpenditureStatement().getIeEntries();
+			 if(null!=ieEntries)
+			 ieEntries=removeEmptyEntries(ieEntries);
+			
+			 if(null!=ieEntries && ieEntries.size()>0) {
+				 
+				 ModelMap m =new ModelMap();
+				 m.addAttribute("Report Type","Income And Expenditure Report");
+				// m.addAttribute("departmentname", dt.getName());
+				 m.addAttribute("currentyear",incomeExpenditureReportAction.getCurrentYearToDate());
+				 m.addAttribute("previousyear",incomeExpenditureReportAction.getPreviousYearToDate());
+				 m.addAttribute("incomeExpenditureList", ieEntries);
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody(m).build(), getHeaders(),HttpStatus.OK);
+			 }else {
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody("no data").build(),getHeaders(), HttpStatus.OK);
+			 }
+		
 	}
 	
 	

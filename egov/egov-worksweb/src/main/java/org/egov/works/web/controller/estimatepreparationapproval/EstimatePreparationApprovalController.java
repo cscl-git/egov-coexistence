@@ -276,6 +276,23 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
 				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
+	//for saving uploaded document
+        System.out.println("Id Upload--------"+estimatePreparationApproval.getUploadId());
+		System.out.println("Upload file id -----"+estimatePreparationApproval.getUploadfileStoreId());
+		System.out.println("Id ----"+savedEstimatePreparationApproval.getId());
+		//Long uploadId=estimatePreparationApproval.getUploadId();
+		//String fileStoreId=estimatePreparationApproval.getUploadfileStoreId().toString();
+		Long id=savedEstimatePreparationApproval.getId();
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					estimatePreparationApprovalService.updateDocuments(id,update);
+				}
+			}
+		}
+																							  
 		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
         + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
 
@@ -546,6 +563,17 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
 				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
+			Long id=savedEstimatePreparationApproval.getId();
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					estimatePreparationApprovalService.updateDocuments(id,update);
+				}
+			}
+		}
+        											
 		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
         + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
 
@@ -555,12 +583,12 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@RequestMapping(value = "/estimate", params = "save", method = RequestMethod.POST)
 	public String uploadBoqFileData(
 			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, @RequestParam("file") MultipartFile file, final HttpServletRequest request,final Long id)
+			final Model model, @RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files, final HttpServletRequest request,final Long id)
 			throws Exception {
 		estimatePreparationApproval=workEstimateService.searchEstimateData(id);
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<BoQDetails> boQDetailsList2 = new ArrayList();
-		
+		List<DocumentUpload> docup = new ArrayList<>();
 		List<BoqDetailsPop> arrayboqDetailsPop =new ArrayList();
 		HashSet<String> milesstoneList=new HashSet<>();
 		String refNo=null;
@@ -574,6 +602,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
 		Double estAmt= 0.0;
+		String comments =request.getParameter("comments");											
 		// String documentPath = "D://Upload/";
 
 		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
@@ -609,6 +638,27 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+	   
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkFile");
+						upload.setComments(comments);
+//						upload.setComments(comments);
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
+				
 			Iterator<Row> iterator = firstSheet.iterator();
 			List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
 			while (iterator.hasNext()) {
@@ -662,6 +712,41 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		} else {
 			// response = "Please choose a file.";
 		}
+  int nextcount=1;
+		
+		
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		estimatePreparationApproval.setDocumentDetail(docup);  
+		estimatePreparationApproval.setRoughCostdocumentDetail(docup);
+		DocumentUpload savedocebefore = estimatePreparationApprovalService.savedocebefore(estimatePreparationApproval);		
+		
+  BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		docUpload.add(boqUploadDocument2);
+		
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		
 		
 		  Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
@@ -723,6 +808,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute("uploadDocID",uploadDoc);
+		model.addAttribute("uploadDocument", uploadDocument);
 		model.addAttribute("mode", "view");
 		System.out.println("upload");
 		return "estimatepreparationapproval-form";
@@ -1130,12 +1217,295 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "create-estimate-form";
 	}
 
+@RequestMapping(value = "/edit/saveestimate1", params="save", method = RequestMethod.POST)
+	public String editEstimateData1(
+			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,@RequestParam("file1") MultipartFile[] file1,Model model,
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,@RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files, final HttpServletRequest request) throws Exception {
+
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		List<DocumentUpload> documentsall=new ArrayList<>();
+		Long id = estimatePreparationApproval.getId();
+		System.out.println(":::::ID:::::: "+id);
+		
+		//New File UPload....
+		List<DocumentUpload> docup = new ArrayList<>();
+		String refNo=null;
+		int count = 0;
+		String fileName = null;
+		String extension = null;
+		String filePath = null;
+		File fileToUpload = null;
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
+		String FILE_PATH_SEPERATOR = "\\";
+		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+		Double estAmt= 0.0;
+		String comments =request.getParameter("comments");
+		// String documentPath = "D://Upload/";
+
+		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
+
+		long currentTime = new Date().getTime();
+		if (file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
+			fileName = file.getOriginalFilename().toString().split("\\.")[0];
+			extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			fileName = fileName.replace(" ", "") + "_" + currentTime + extension;
+			filePath = documentPath + fileName;
+			fileToUpload = new File(filePath);
+			byte[] bytes = file.getBytes();
+			Path Path = null;
+			Path = Paths.get(filePath);
+
+			Path doc = Paths.get(documentPath);
+			if (!Files.exists(doc)) {
+				Files.createDirectories(doc);
+			}
+
+			Files.write(Path, bytes);
+		}
+		
+		
+		File xlsFile = new File(fileToUpload.toString());
+		if (xlsFile.exists()) {
+
+			
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+			
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+	   
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkFile");
+						upload.setComments(comments);
+//						upload.setComments(comments);
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
+				
+				Iterator<Row> iterator = firstSheet.iterator();
+				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+				
+			while (iterator.hasNext()) {
+				Row nextRow = iterator.next();
+				Iterator<Cell> cellIterator = nextRow.cellIterator();
+				BoQDetails aBoQDetails = new BoQDetails();
+				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
+				while (cellIterator.hasNext()) {
+					Cell cell = (Cell) cellIterator.next();
+
+					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+
+						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+	   
+						}
+	  
+						else if (cell.getColumnIndex() == 1) {
+	   
+							aBoQDetails.setItem_description(cell.getStringCellValue());
+							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+	   
+						} else if (cell.getColumnIndex() == 2) {
+	   
+							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							//boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
+						}else if (cell.getColumnIndex() == 3) {
+	   
+							aBoQDetails.setUnit(cell.getStringCellValue());
+							//boqDetailsPop.setUnit(cell.getStringCellValue());
+	   
+						} 
+
+					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+
+						 if (cell.getColumnIndex() == 4) {
+		
+							aBoQDetails.setRate(cell.getNumericCellValue());
+							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+	   
+						} else if (cell.getColumnIndex() == 5) {
+	   
+							aBoQDetails.setQuantity(cell.getNumericCellValue());
+	   
+	   
+							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
+							estAmt=estAmt+aBoQDetails.getAmount();
+	   
+						}
+
+					}
+
+
+					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
+							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
+							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
+						count=boQDetailsList.size();
+						aBoQDetails.setSizeIndex(count);
+						boQDetailsList.add(aBoQDetails);
+						//arrayboqDetailsPop.add(boqDetailsPop);
+	 
+
+					}
+				}
+	
+			}
+
+			// workbook.close();
+			inputStream.close();
+			}
+		}	
+
+	} else {
+			// response = "Please choose a file.";
+		}
+		int nextcount=1;
+		
+		
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		estimatePreparationApproval.setDocumentDetail(docup);  
+		estimatePreparationApproval.setRoughCostdocumentDetail(docup);
+		DocumentUpload savedocebefore = estimatePreparationApprovalService.savedocebefore(estimatePreparationApproval);		
+		estimatePreparationApprovalService.updateDocuments(id, savedocebefore.getId());
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getFileStore().getFileName()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
+		
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		docUpload.add(boqUploadDocument2);
+		//End of document Upload
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		//estimateDetails.setDepartments(getDepartmentsFromMs());
+		//estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
+		//estimatePreparationApproval.setDesignations(getDesignationsFromMs());
+		estimateDetails.setDocUpload(docUpload);
+		
+		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
+		if(estAmt >= 10000000){
+			BigDecimal  pct = new BigDecimal(3);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimateDetails.setContingentPercentage(3.0);
+			estimateDetails.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimateDetails.setEstimateAmount(dobestAmtPlusContingentAmt);
+		}
+		else {
+			BigDecimal  pct = new BigDecimal(5);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimateDetails.setContingentPercentage(5.0);
+			estimateDetails.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimateDetails.setEstimateAmount(dobestAmtPlusContingentAmt);
+		}
+		
+		
+		
+		
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+
+		
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
+		estimateDetails.setBoQDetailsList(boQDetailsList);
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setExpHead(estimateDetails.getExpHead_est());
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		
+		/*BoQDetails boq = new BoQDetails();
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList.size());
+				boQDetailsList.add(boq);
+			}*/
+		
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		
+		List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
+		System.out.println("::::::::filesStoreId::::::::::::: "+savedocebefore.getId()+"-----"+savedocebefore.getFileStore().getId()+"------"+savedocebefore.getObjectType()+"------"+savedocebefore.getFileStore().getFileName());
+		DocumentUpload doc1= new DocumentUpload();
+		//Long fileStoreId = savedocebefore.getFileStore().getId();
+		doc1.setId(savedocebefore.getId());
+		doc1.setFileStore(savedocebefore.getFileStore());
+		uploadDoc.add(doc1);
+		 
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		model.addAttribute("uploadDocument", uploadDocument);
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		return "create-estimate-form";
+	}
+	
 	@RequestMapping(value = "/edit/saveestimate1",  method = RequestMethod.POST)
 	public String editEstimateData(
 			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,@RequestParam("file1") MultipartFile[] files,
 			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
 
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
+		Long id=estimatePreparationApproval.getId();
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		BoQDetails boq = new BoQDetails();
+		
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			
+			Long ids =estimatePreparationApproval.getId();
+			System.out.println("ids------"+ids);
+			
+			estimatePreparationApprovalService.deleteBoqUploadData(ids);
+		}			
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {

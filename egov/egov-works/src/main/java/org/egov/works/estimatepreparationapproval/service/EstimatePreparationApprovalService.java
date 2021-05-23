@@ -2,6 +2,7 @@ package org.egov.works.estimatepreparationapproval.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,6 +37,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.jayway.jsonpath.internal.function.json.Append;
 
 @Service
 @Transactional
@@ -72,6 +75,8 @@ public class EstimatePreparationApprovalService {
 
 		List<BoQDetails> list = new ArrayList<BoQDetails>();
 			for (BoQDetails boq : estimatePreparationApproval.getBoQDetailsList()) {
+				System.out.println("++++++++++++ "+boq.getItem_description()+"++++++++");
+				/*if(boq.getMilestone() !=null && boq.getItem_description() !=null && boq.getRef_dsr() !=null && boq.getQuantity() != null && boq.getRate() !=null && boq.getUnit() != null)*/ 
 				boq.setEstimatePreparationApproval(estimatePreparationApproval);
 				list.add(boq);
 			}
@@ -119,6 +124,7 @@ public class EstimatePreparationApprovalService {
 		}
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalRepository
 				.save(estimatePreparationApproval);
+		System.out.println("::::::: "+estimatePreparationApproval.getDocumentDetail()+":::::::: ");
 		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
 				: estimatePreparationApproval.getDocumentDetail();
 		List<DocumentUpload> documentDetails = new ArrayList<>();
@@ -140,6 +146,26 @@ public class EstimatePreparationApprovalService {
 		return savedEstimatePreparationApproval1;
 	}
 	
+	//saving document before 
+	public DocumentUpload savedocebefore(EstimatePreparationApproval estimatePreparationApproval) {
+		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
+				: estimatePreparationApproval.getDocumentDetail();
+		List<DocumentUpload> documentDetails = new ArrayList<>();
+		DocumentUpload documentUpload=new DocumentUpload();
+		
+		documentDetails = getDocumentDetailsbefore(files, estimatePreparationApproval,
+				"Works_Est");
+			
+		
+		
+		if (!documentDetails.isEmpty()) {
+			
+		 documentUpload=	persistDocument1(documentDetails);
+		System.out.println("::::::::::: "+ documentUpload.getId()+":::::::::: " +documentUpload.getObjectType()+":::::::::::: "+documentUpload.getFileStore().getId());
+		System.out.println(":::::::::::Changed:::::::::");
+		}
+	return documentUpload;	
+	}
 	public void createEstimateWorkflowTransition(final EstimatePreparationApproval estimatePreparationApproval,
             final Long approvalPosition, final String approvalComent, final String additionalRule,
             final String workFlowAction,final String approvalDesignation) {
@@ -324,6 +350,50 @@ public class EstimatePreparationApprovalService {
         }
         return documentDetailsList;
     }
+	public List<DocumentUpload> getDocumentDetailsbefore(final List<DocumentUpload> files, final Object object,
+            final String objectType) {
+        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
+
+        Long id;
+        Method method;
+        try {
+            method = object.getClass().getMethod("getId", null);
+            id = (Long) method.invoke(object, null);
+            System.out.println("::::::::::ID:::::::: "+id);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
+        }
+
+        for (DocumentUpload doc : files) {
+            final DocumentUpload documentDetails = new DocumentUpload();
+            //documentDetails.setObjectId(id);
+            String seqquery="select nextVal('seq_egf_documents')";
+        
+          
+           
+            if(doc.getObjectType()!=null) {
+	            if(doc.getObjectType().equals("roughWorkFile")) {
+	            	System.out.println(":::getObjectType():::::+ "+doc.getFileName());
+	            	 documentDetails.setObjectType("roughWorkFile");
+	            	 documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+	                         doc.getContentType(), "roughWorkFile"));
+	            	 documentDetails.setComments(doc.getComments());
+	            }
+            }
+            else {
+            documentDetails.setObjectType(objectType);
+            System.out.println("::::::::+ "+doc.getFileName());
+            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+                    doc.getContentType(), "roughWorkFile"));
+            documentDetails.setComments(doc.getComments());
+            }
+           
+            documentDetailsList.add(documentDetails);
+
+        }
+        return documentDetailsList;
+    }
 	
 	
 	
@@ -334,6 +404,17 @@ public class EstimatePreparationApprovalService {
 		if (documentDetailsList != null && !documentDetailsList.isEmpty())
 			for (final DocumentUpload doc : documentDetailsList)
 				documentUploadRepository.save(doc);
+		
+	}
+	public DocumentUpload persistDocument1(final List<DocumentUpload> documentDetailsList) {
+		DocumentUpload docs= new DocumentUpload();
+		if (documentDetailsList != null && !documentDetailsList.isEmpty()) {
+			for (final DocumentUpload doc : documentDetailsList)
+			{
+				docs=documentUploadRepository.save(doc);
+			}
+		}
+		return docs;
 	}
 	
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
@@ -353,6 +434,23 @@ public class EstimatePreparationApprovalService {
 			ex.printStackTrace();
 		}
 		return a;
+	}
+	public void updateDocuments(Long id,Long uploadId)
+	{
+	
+			documentUploadRepository.updateDoc(id,uploadId);
+	
+	}
+	
+	/*public void deleteBoq(Long id) {
+		final StringBuffer query = new StringBuffer();
+		query.append("delete from txn_BoQDetails where estimate_preparation_id=?");
+		persistenceService.deleteAllBy(query.toString(), id);
+		
+	}*/
+	public void deleteBoqUploadData(Long id) {
+		// TODO Auto-generated method stub
+		documentUploadRepository.deleteData(id);
 	}
 	
 }

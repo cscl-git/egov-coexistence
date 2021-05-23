@@ -217,7 +217,7 @@
 							<th><c:out value="${mapboq.key}"/></th>
 							</tr>
 							<tr>
-								<th><spring:message code="lbl.item.Milestone" /></th>	
+								<%-- <th><spring:message code="lbl.item.Milestone" /></th>	 --%>
 									<th><spring:message code="lbl.item.description" /></th>
 									<th><spring:message code="lbl.ref.dsr" /></th>
 									<th><spring:message code="lbl.unit" /></th>
@@ -236,19 +236,26 @@
 						
 						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
 								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
-										<td>
+								<%-- 		<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
-								<form:input type="text" style="width:200px;"
+								<form:hidden type="text" style="width:200px;"
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"
 											required="required" class="form-control milestone"
-											  readonly="true"  title="${boq.milestone}"></form:input></td>
-									<td><form:input type="text" style="width:400px;"
+											  readonly="true"  title="${boq.milestone}"></form:hidden></td> --%>
+									<td><form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
+												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:hidden
+											path="boQDetailsList[${boq.sizeIndex}].milestone"
+											id="boQDetailsList[${boq.sizeIndex}].milestone"
+											></form:hidden>
+									
+									<form:textarea type="text" style="height: 100px;"
 											path="boQDetailsList[${boq.sizeIndex}].item_description"
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 											required="required" class="form-control item_description"
-											  readonly="true"  title="${boq.item_description}" ></form:input></td>
+											  readonly="true"  title="${boq.item_description}" ></form:textarea></td>
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
@@ -292,7 +299,7 @@
 				<br> <br>
 				<div class="panel-title"> Estimate Rate Analysis </div>
 				<div>
-				<jsp:include page="RoughWorkfileupload.jsp" />
+				<jsp:include page="RoughWorkfileupload2.jsp" />
 				</div>
 		<br> <br>
 				

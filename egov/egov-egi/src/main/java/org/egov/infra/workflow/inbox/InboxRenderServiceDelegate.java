@@ -200,18 +200,23 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     }
     
     private List<T> getAssignedWorkflowItems(boolean draft, String module) {
+    	System.out.println("module :::"+module);
+    	System.out.println("draft :::"+draft);
         List<T> workflowItems = new ArrayList<>();
         List<Long> owners = currentUserPositionIds();
         if (!owners.isEmpty()) {
             List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
             for (String type : types) {
+            	System.out.println("type :::"+type);
             	if(!StringUtils.isEmpty(module)
             			&& !isAllowableType(module, type)) {
+            		System.out.println("continue");
             		continue;
             	}
-            	
+            	System.out.println("continue1");
                 Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
                 if (inboxRenderService.isPresent()) {
+                	System.out.println("present");
                     InboxRenderService<T> renderService = inboxRenderService.get();
                     workflowItems.addAll(draft ? renderService.getDraftWorkflowItems(owners) :
                             renderService.getAssignedWorkflowItems(owners));
@@ -279,6 +284,7 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 
     private Optional<InboxRenderService<T>> getInboxRenderService(String type) {
         InboxRenderService<T> inboxRenderService = null;
+        
         try {
             if (getWorkflowType(type) != null)
                 inboxRenderService = applicationContext.getBean(String.format(INBOX_RENDER_SERVICE_SUFFIX, type), InboxRenderService.class);
@@ -314,11 +320,11 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
        
     	List<Long> positions = new ArrayList<>();
     	Long empId = ApplicationThreadLocals.getUserId();
-    	LOG.debug("emp id : "+empId);
+    	System.out.println("emp id : "+empId);
     	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
     	
     	if(null !=employs && employs.size()>0 ) {
-    		LOG.debug ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
+    		System.out.println ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
 	    	employs.get(0).getAssignments().forEach(assignment->{
 	    		positions.add(assignment.getPosition());
 	    	});

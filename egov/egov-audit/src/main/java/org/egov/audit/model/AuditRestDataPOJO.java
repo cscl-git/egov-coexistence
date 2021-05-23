@@ -18,6 +18,9 @@ public class AuditRestDataPOJO {
 	private Integer passUnderobjection;
 	private String billid;
 	private String department;
+	private String auditor_name;
+	private String rsa_name;
+	
 	
 	public Long getId() {
 		return Id;
@@ -93,5 +96,19 @@ public class AuditRestDataPOJO {
 		this.department = department;
 	}
 	
+	public String getAuditor_name() {
+		return auditor_name;
+	}
 	
+	public void setAuditor_name(String auditor_name) {
+		this.auditor_name = auditor_name;
+	}
+
+	public String getRsa_name() {
+		return rsa_name;
+	}
+
+	public void setRsa_name(String rsa_name) {
+		this.rsa_name = rsa_name;
+	}
 }
