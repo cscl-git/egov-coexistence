@@ -84,6 +84,12 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@Transient
 	private String employeeName;
 	
+	@Transient
+	private String pendingWith;
+	
+	@Transient
+	private String billNumber;
+	
 	@Column(name="auditor_name",nullable = true)
 	private String auditor_name;
 	
@@ -283,6 +289,22 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 		return serialVersionUID;
 	}
 
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
+	}
+
+	public String getBillNumber() {
+		return billNumber;
+	}
+
+	public void setBillNumber(String billNumber) {
+		this.billNumber = billNumber;
+	}
+
 	public String getAuditor_name() {
 		return auditor_name;
 	}
@@ -298,7 +320,6 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	public void setRsa_name(String rsa_name) {
 		this.rsa_name = rsa_name;
 	}
-
 
 	public Long getRsa_id() {
 		return rsa_id;
