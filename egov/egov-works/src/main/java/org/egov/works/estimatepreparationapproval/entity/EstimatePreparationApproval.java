@@ -33,6 +33,7 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqUploadDocument;
 
 
 //Added Bikash Dhal

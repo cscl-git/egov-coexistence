@@ -144,8 +144,8 @@ function addcheckListRow(x) {
 
 	var rowcount = $("#tblchecklist tbody tr").length;
 	if (rowcount < 30) {
-		if (document.getElementById('rec-0') != null) {
-			addRow('tblchecklist','rec-0');
+		if (document.getElementById('tblchecklistRow') != null) {
+			addRow('tblchecklist','tblchecklistRow');
 			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.checklist_description').val('');
 			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.status').val('');
 			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.checklist_date').val('');
@@ -173,71 +173,7 @@ function deleteSubledgerRow(obj) {
     
    // resetDebitCodes();
 }
-// written by Sonu Prajapati
 
-jQuery(document).delegate('.Add', 'click', function(e) {
-    e.preventDefault();    
-    if (rowcount < 30) {
-    var size = jQuery('#tblchecklist >tbody >tr').length;
-    var content = jQuery('#tblchecklist tbody tr');
-    var element = null;    
-    element = content.clone();
-    element.attr('id', 'rec-'+size);
-    element.find('.checklist_description').attr('path', "checkList["+size+"].checklist_description");
-    element.find('.checklist_description').val('');
-    element.find('.status').attr('path', "checkList["+size+"].status");
-    element.find('.status').val('');
-    element.find('.checklist_date').attr('path', "checkList["+size+"].checklist_date");
-    element.find('.checklist_date').val('');
-    element.find('.auditor_comment').attr('path', "checkList["+size+"].auditor_commente");
-    element.find('.auditor_comment').val('');
-    element.find('.user_comments').attr('path', "checkList["+size+"].user_comments");
-    element.find('.user_comments').val('');
-    element.find('.dataDelete').attr('data-id', size);
-    element.find('.dataDelete').attr('data-href', "");
-    element.appendTo('#tbl_posts_body');
-    } else {
-		  bootbox.alert($.i18n.prop('msg.limit.reached'));
-	}
-  });
-
-$('#confirm-delete').on('show.bs.modal', function(e) {
-	var size = jQuery('#tblchecklist >tbody >tr').length;
-	$(this).find('.btn-ok').val($(e.relatedTarget).data('href'));
-	$(this).find('.rowindex').val($(e.relatedTarget).data('id'));
-});
-
-jQuery(document).delegate('.btn-ok', 'click', function(e) {
-    e.preventDefault(); 
-    var rowcount=$("#tblchecklist tbody tr").length;
-    if(rowcount<=1) {
-		bootbox.alert($.i18n.prop('msg.this.row.can.not.be.deleted'));
-		return false;
-	}else{
-    var deleteurl= $(this).attr("value");
-    if(deleteurl != null || deleteurl != ""){
-    $.ajax({
-    	url: deleteurl,     
-    	type: "GET",
-    	contentType:'application/json',
-    	//data: JSON.stringify(jsonData),
-    	success: function (response) {
-    		console.log("success"+response);
-    		 var id = jQuery(this).attr('data-id');
-             jQuery('#rec-' + id).remove();
-    	}, 
-    	error: function (response) {
-    		console.log("failed");
-    	}
-    	});
-      }else{
-    	 var id = jQuery(this).attr('data-id');
-         jQuery('#rec-' + id).remove();
-    }
-	}
-});
-
-//End by Sonu Prajapati
 
 function addCustomEvent(index,target,type,func){
 	target = target.replace('index',index);

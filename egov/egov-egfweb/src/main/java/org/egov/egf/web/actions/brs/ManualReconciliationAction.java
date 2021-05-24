@@ -148,12 +148,32 @@ public class ManualReconciliationAction extends BaseFormAction {
 	public String search()
 	{
 		unReconciledCheques = manualReconcileHelper.getUnReconciledCheques(reconcileBean);
-		
 		Collections.sort(unReconciledCheques, new Comparator<ReconcileBean>() {
 		    public int compare(ReconcileBean m1, ReconcileBean m2) {
 		        return (getDate(m1.getChequeDate())).compareTo(getDate(m2.getChequeDate()));
 		    }
 		});
+		List<ReconcileBean> unReconciledChequesCopy=unReconciledCheques;
+		if(unReconciledChequesCopy != null && !unReconciledChequesCopy.isEmpty())
+		{
+			System.out.println("Size ::"+unReconciledChequesCopy.size());
+			System.out.println("limit :::"+reconcileBean.getLimit());
+			int i=1;
+			int limit=reconcileBean.getLimit();
+			unReconciledCheques.clear();
+			for(ReconcileBean bean:unReconciledChequesCopy)
+			{
+				if(i > limit)
+				{
+					break;
+				}
+				else
+				{
+					unReconciledCheques.add(bean);
+				}
+			}
+			
+		}
 		return "search";
 	}
 

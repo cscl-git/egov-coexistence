@@ -37,9 +37,9 @@
 					</c:if>
 				</tr>
 			</thead>
-			<tbody id="tbl_posts_body">
+			<tbody>
 			<c:forEach items="${auditDetail.checkList}" var="audit" varStatus="status">
-			<tr id="rec-${status.index}">
+			<tr id="tblchecklistRow">
 			<td>
 			<c:if test="${auditDetail.auditStatus != 'Created' && auditDetail.auditStatus != 'Pending with Auditor'}">
 			<form:hidden path="checkList[${status.index}].checklist_description" id="checkList[${status.index}].checklist_description" class="checklist_description"/>
@@ -125,15 +125,15 @@
 			<c:if test="${mode !='view' }">
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 			<td class="text-center">
-			    <!-- <span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span> -->
-				<%--  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> --%>
-				<span style="cursor:pointer;" tabindex="0" class="Add" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
+			    <span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
+				  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> 
+				<!-- <span style="cursor:pointer;" tabindex="0" class="Add" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
 				        <i class="fa fa-plus"></i>
-				</span>
-				<span class="add-padding subledge-delete-row">
+				</span> -->
+				<%-- <span class="add-padding subledge-delete-row">
 				       <a class="fa fa-trash dataDelete" data-id="${status.index}" style="color:black;" href="#" data-href="/services/audit/createAudit/deleteAuditchecklist/${audit.checkListId}"
 				             data-toggle="modal" data-target="#confirm-delete" data-original-title="Delete!"></a>
-				</span>
+				</span> --%>
 				 </td>
 			
 			</c:if>
@@ -151,25 +151,6 @@
 	</div>
 </div>
 
-
-<div class="modal fade" id="confirm-delete" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-       <div class="modal-content">
-        <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-             <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
-        </div>
-        <div class="modal-body">
-        <input type="hidden"  name="rowindex" class="rowindex"/>
-          <p>Do you want to proceed?</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-            <button type="button" class="btn btn-danger btn-ok" value="">Delete</button>
-        </div>
-      </div>
-    </div>
-</div>
 
 
 
