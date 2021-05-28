@@ -419,6 +419,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureByDeptAndDate", method = RequestMethod.GET)
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByDate( @RequestParam(name = "org_id") Long o,
 			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req ){
@@ -488,6 +489,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureByFromToDate", method = RequestMethod.GET)
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByFromToDate( 
 			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req ){
