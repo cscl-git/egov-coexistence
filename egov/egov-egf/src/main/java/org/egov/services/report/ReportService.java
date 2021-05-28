@@ -63,11 +63,17 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.utils.Constants;
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.Query;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cfg.Configuration;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BigDecimalType;
+import org.hibernate.type.DateType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -84,6 +90,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 public abstract class ReportService {
    
  @Autowired
@@ -97,6 +106,8 @@ public abstract class ReportService {
     List<Character> coaType = new ArrayList<Character>();
     @Autowired
     private FinancialYearHibernateDAO financialYearDAO;
+  
+   
   
     final static Logger LOGGER = Logger.getLogger(ReportService.class);
 
@@ -267,6 +278,10 @@ public abstract class ReportService {
             if (glCode.equalsIgnoreCase(balanceSheetQueryObject.getGlCode())
                     && balanceSheetQueryObject.getAmount().compareTo(BigDecimal.ZERO) != 0)
                 resultList.add(balanceSheetQueryObject);
+        
+        
+		  
+		 
         return resultList;
     }
 
@@ -292,7 +307,7 @@ public abstract class ReportService {
             final Date toDate, final Date fromDate, final String coaType, final String subReportType) {
     	String    voucherStatusToExclude = getAppConfigValueFor("EGF",
                 "statusexcludeReport");
-        
+    	System.out.println("voucherStatusToExclude------>>"+voucherStatusToExclude);
         final Query query = persistenceService.getSession()
                 .createSQLQuery(
                         "select c.majorcode as glCode,v.fundid as fundId,c.type as type,sum(debitamount)-sum(creditamount) as amount"
@@ -317,6 +332,52 @@ public abstract class ReportService {
                                 .addScalar("glCode").addScalar("fundId",BigDecimalType.INSTANCE).addScalar("type")
                                 .addScalar("amount",BigDecimalType.INSTANCE).setResultTransformer(
                                         Transformers.aliasToBean(StatementResultObject.class));
+        
+        System.out.println("Executing Query------------>>>"+query.toString());
+        return query.list();
+    }
+    
+    
+    
+
+    List<StatementResultObject> getTransactionAmountForApi(final String filterQuery,
+            final Date toDate, final Date fromDate, final String coaType, final String subReportType) {
+    	String    voucherStatusToExclude = getAppConfigValueFor("EGF",
+                "statusexcludeReport");
+    	System.out.println("voucherStatusToExclude------>>"+voucherStatusToExclude);
+        final Query query = persistenceService.getSession()
+                .createSQLQuery(
+                        "select c.majorcode as glCode,v.fundid as fundId,c.type as type,sum(debitamount)-sum(creditamount) as amount, "
+                        + " mis.departmentcode as departmentcode,v.createdby as createdby,v.createddate as createddate,"
+                        + "v.lastmodifiedby as  lastmodifiedby,v.lastmodifieddate as lastmodifieddate "
+                                + " from generalledger g,chartofaccounts c,voucherheader v ,vouchermis mis where v.id=mis.voucherheaderid and "
+                                + "v.id=g.voucherheaderid and c.type in("
+                                + coaType
+                                + ") and c.id=g.glcodeid and v.status not in("
+                                + voucherStatusToExclude
+                                + ")  AND v.voucherdate <= '"
+                                + getFormattedDate(toDate)
+                                + "' and v.voucherdate >='"
+                                + getFormattedDate(fromDate)
+                                + "' and substr(c.glcode,1,"
+                                + minorCodeLength
+                                + ") in "
+                                + "(select distinct coa2.glcode from chartofaccounts coa2, schedulemapping s where s.id=coa2.scheduleid and "
+                                + "coa2.classification=2 and s.reporttype = '"
+                                + subReportType
+                                + "') "
+                                + filterQuery
+                                + " group by c.majorcode,v.fundid,c.type,mis.departmentcode,v.createdby ,v.createddate ,v.lastmodifiedby ,v.lastmodifieddate order by c.majorcode")
+                                .addScalar("glCode").addScalar("fundId",BigDecimalType.INSTANCE).addScalar("type")
+                                .addScalar("amount",BigDecimalType.INSTANCE).addScalar("departmentcode").addScalar("createdby",BigDecimalType.INSTANCE)
+                                .addScalar("createddate",DateType.INSTANCE).addScalar("lastmodifiedby",BigDecimalType.INSTANCE).addScalar("lastmodifieddate",DateType.INSTANCE).setResultTransformer(
+                                        Transformers.aliasToBean(StatementResultObject.class));
+		/*
+		 * for(StatementResultObject a:(List<StatementResultObject>)query.list()) {
+		 * System.out.println("Department Code"+a.getDepartmentcode()); }
+		 */
+        
+        System.out.println("Executing Query------------>>>"+query.toString());
         return query.list();
     }
 
@@ -469,5 +530,10 @@ public abstract class ReportService {
             balanceSheetEntry.setCurrentYearTotal(currentYearTotal);
         }
     }
+    
+   
+    
+    
+   
 
 }

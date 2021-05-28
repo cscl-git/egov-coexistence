@@ -277,6 +277,45 @@ public abstract class ScheduleService extends PersistenceService {
                                 + " and g.glcodeid=coa.id  "
                                 +
                         "GROUP by g.glcode,coa.name,v.fundid ,coa.type ,coa.majorcode order by g.glcode,coa.name,coa.type");
+        System.out.println("getAllLedgerTransaction------------->"+query.toString());
+        for(Object o : (List<Object[]>) query.list() ) {
+        	System.out.println("Schedule Object----->"+o);
+        }
+        return query.list();
+    }
+
+    
+    
+    	
+    protected List<Object[]> getAllLedgerTransactionApi(final String majorcode, final Date toDate, final Date fromDate,
+            final String fundId,
+            final String filterQuery) {
+        if (LOGGER.isInfoEnabled())
+            LOGGER.info("Getting ledger transactions details where >>>> EndDate=" + toDate + "from Date=" + fromDate);
+        final String voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
+        if (!majorcode.equals("")) {
+        }
+
+        final Query query = getSession()
+                .createSQLQuery(
+                        "select g.glcode,coa.name,sum(g.debitamount)-sum(g.creditamount),v.fundid,coa.type,coa.majorcode,"
+                        + " mis.departmentcode ,v.createddate ,v.createdby ,v.lastmodifiedby ,v.lastmodifieddate  from generalledger g,chartofaccounts coa ,"
+                                +
+                                "voucherheader v,vouchermis mis where v.id=mis.voucherheaderid and g.voucherheaderid=v.id and g.glcodeid=coa.id and v.voucherdate BETWEEN '"
+                                + getFormattedDate(fromDate)
+                                + "' and '"
+                                +
+                                getFormattedDate(toDate)
+                                + "' and v.status not in ("
+                                + voucherStatusToExclude
+                                + ") and v.id=g.voucherheaderid and v.fundid in"
+                                + fundId
+                                + filterQuery
+                                + " and g.glcodeid=coa.id  "
+                                +
+                        "GROUP by g.glcode,coa.name,v.fundid ,coa.type ,coa.majorcode,mis.departmentcode ,v.createddate ,v.createdby ,v.lastmodifiedby ,v.lastmodifieddate  order by g.glcode,coa.name,coa.type");
+        System.out.println("getAllLedgerTransaction------------->"+query.toString());
+        
         return query.list();
     }
 

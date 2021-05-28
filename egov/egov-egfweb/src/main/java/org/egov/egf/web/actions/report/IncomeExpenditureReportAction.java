@@ -804,6 +804,29 @@ public void populateDataSource2(Statement s) {
     }
     	
        
+public void populateDataSourceForApi(Statement s) {
+	try {
+		incomeExpenditureStatement= setRelatedEntitesOn2(s);
+	}catch(Exception ex) {
+		
+	}
+        
+            incomeExpenditureStatement.setFunds(fundService.findAll());
+            System.out.println(incomeExpenditureStatement.getFunds().size());
+            System.out.println(incomeExpenditureStatement.getFunds().get(0).getName());
+            
+            try {
+            	 incomeExpenditureService.populateIEStatementForApi(incomeExpenditureStatement);
+            	 System.out.println(null==incomeExpenditureService);
+            }catch(Exception ex) {
+            	System.out.println("Exception");
+            	ex.printStackTrace();
+            }
+               
+}
+
+
+
         
 
 protected Statement setRelatedEntitesOn2(Statement incomeExpenditureStatement) {
@@ -883,6 +906,21 @@ protected Statement setRelatedEntitesOn2(Statement incomeExpenditureStatement) {
 	   
 	        incomeExpenditureStatement.setFunds(incomeExpenditureService.getFunds());
 	        incomeExpenditureStatement =   incomeExpenditureScheduleService.populateDetailcodeRestData(incomeExpenditureStatement);
+	       
+	        return incomeExpenditureStatement;
+	    
+	}
+
+	
+	public  Statement populateSchedulewiseDetailCodeReportApi(Statement s) {
+		try {
+			incomeExpenditureStatement= setRelatedEntitesOn2(s);
+		}catch(Exception ex) {
+			
+		}
+	   
+	        incomeExpenditureStatement.setFunds(incomeExpenditureService.getFunds());
+	        incomeExpenditureStatement =   incomeExpenditureScheduleService.populateDetailcodeRestDataApi(incomeExpenditureStatement);
 	       
 	        return incomeExpenditureStatement;
 	    

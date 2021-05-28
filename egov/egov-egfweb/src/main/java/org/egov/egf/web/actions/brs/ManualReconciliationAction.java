@@ -49,6 +49,7 @@ package org.egov.egf.web.actions.brs;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -153,7 +154,8 @@ public class ManualReconciliationAction extends BaseFormAction {
 		        return (getDate(m1.getChequeDate())).compareTo(getDate(m2.getChequeDate()));
 		    }
 		});
-		List<ReconcileBean> unReconciledChequesCopy=unReconciledCheques;
+		List<ReconcileBean> unReconciledChequesCopy=new ArrayList<ReconcileBean>();
+		unReconciledChequesCopy.addAll(unReconciledCheques);
 		if(unReconciledChequesCopy != null && !unReconciledChequesCopy.isEmpty())
 		{
 			System.out.println("Size ::"+unReconciledChequesCopy.size());
@@ -170,6 +172,7 @@ public class ManualReconciliationAction extends BaseFormAction {
 				else
 				{
 					unReconciledCheques.add(bean);
+					i++;
 				}
 			}
 			

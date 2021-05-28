@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.Fund;
 import org.egov.commons.service.CFinancialYearService;
+import org.egov.egf.contract.model.AuditDetails;
 import org.egov.egf.model.BudgetVarianceEntry;
 import org.egov.egf.model.BudgetVarianceEntryRestData;
 import org.egov.egf.model.IEStatementEntry;
@@ -270,7 +271,7 @@ public class IncomeExpenditureRestController {
 			 
 			 //System.out.println(ieEntries.size());
 			 
-			 smentry = incomeExpenditureStatement.getEntries(); 
+			// smentry = incomeExpenditureStatement.getEntries(); 
 			 if(null!=ieEntries&&ieEntries.size()>0) {
 				
 				 List<ScheduleReportRestData> finallist = new ArrayList<ScheduleReportRestData>();
@@ -285,6 +286,70 @@ public class IncomeExpenditureRestController {
 				 ModelMap m =new ModelMap();
 				 m.addAttribute("Report Type","All Schedules");
 				 m.addAttribute("Year Range",cFinancialYear.getFinYearRange());
+				 m.addAttribute("currentyear",incomeExpenditureReportAction.getCurrentYearToDate());
+				 m.addAttribute("previousyear",incomeExpenditureReportAction.getPreviousYearToDate());
+				 m.addAttribute("Allschedulelist", finallist);
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody(m).build(),getHeaders(),  HttpStatus.OK);
+			 }else {
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody("No Data").build(),getHeaders(), HttpStatus.OK);
+			 }
+			
+					
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "getAllIncomeExpentiureSchedulesByFromToDate", method = RequestMethod.GET)
+	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureSchedules(@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
+			HttpServletRequest req){
+			
+
+		if(null==fromDate|| null==toDate ) {
+			
+			return new ResponseEntity<>(ResponseInfoWrapper.builder()
+					.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+					.responseBody("Invalid Request, Required Parameters not Passed ").build(),getHeaders(),  HttpStatus.OK);
+		}
+			
+		
+			Department d = null;
+			CFinancialYear cf = new CFinancialYear();
+			Fund f = new Fund();
+			//cf.setId(fin);
+			//d.setCode("0");
+			f.setId(0);
+			
+			Statement incomeExpenditureStatement=  new  Statement (cf,d,f);
+			incomeExpenditureStatement.setRestData(true);
+			
+			incomeExpenditureStatement.setFromDate(fromDate);
+			incomeExpenditureStatement.setToDate(toDate);
+			incomeExpenditureStatement.setPeriod("Date");
+			incomeExpenditureStatement= incomeExpenditureReportAction.populateSchedulewiseDetailCodeReportApi(incomeExpenditureStatement);
+			
+
+			 List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
+	 
+			 ieEntries = null;
+			 ieEntries = incomeExpenditureStatement.getIeEntries();
+			 ieEntries = removeEmptyEntries(ieEntries);
+			 if(null!=ieEntries&&ieEntries.size()>0) {
+				
+				 List<ScheduleReportRestData> finallist = new ArrayList<ScheduleReportRestData>();
+				
+				 finallist= segregateIncomeExpendIElist(ieEntries);
+				 if(null==finallist) {
+					 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+								.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+								.responseBody("No Data").build(),getHeaders(),  HttpStatus.OK);
+				 }
+				 
+				 ModelMap m =new ModelMap();
+				 m.addAttribute("Report Type","All Schedules");
+				
 				 m.addAttribute("currentyear",incomeExpenditureReportAction.getCurrentYearToDate());
 				 m.addAttribute("previousyear",incomeExpenditureReportAction.getPreviousYearToDate());
 				 m.addAttribute("Allschedulelist", finallist);
@@ -357,10 +422,17 @@ public class IncomeExpenditureRestController {
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByDate( @RequestParam(name = "org_id") Long o,
 			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req ){
+		
+		
 			Department d = new Department();	
+			
+			
 			Fund f = new Fund();
+			
 			d.setCode(o.toString());
 			f.setId(0);	
+			
+			
 			if(null==fromDate|| null==toDate || null==o ) {
 				
 				return new ResponseEntity<>(ResponseInfoWrapper.builder()
@@ -442,7 +514,7 @@ public class IncomeExpenditureRestController {
 			incomeExpenditureStatement.setFromDate(fromDate);
 			incomeExpenditureStatement.setToDate(toDate);
 			incomeExpenditureStatement.setPeriod("Date");
-			incomeExpenditureReportAction.populateDataSource2(incomeExpenditureStatement);
+			incomeExpenditureReportAction.populateDataSourceForApi(incomeExpenditureStatement);
 			 List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
 			
 			 ieEntries = incomeExpenditureReportAction.getIncomeExpenditureStatement().getIeEntries();
@@ -517,6 +589,7 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 		List<ScheduleReportRestData> expense=new ArrayList<ScheduleReportRestData>();
 		List<ScheduleReportRestData> finallist=new ArrayList<ScheduleReportRestData>();
 		smentry.stream().forEach(s->{
+			AuditDetails a = new AuditDetails();
 			ScheduleReportRestData m = new ScheduleReportRestData();
 			if(null!=s.getGlCode()&&s.getGlCode().startsWith("1")) {
 				m.setAccountName(s.getAccountName());
@@ -526,6 +599,12 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 				m.setPreviousYearAmount(s.getPreviousYearAmount());
 				m.setGlCode(s.getGlCode());
 				m.setScheduleNo(s.getScheduleNo());
+				m.setDepartment_name(s.getDepartmentcode());
+				a.setCreatedby(s.getAuditDetails().getCreatedby());
+				a.setCreateddate(s.getAuditDetails().getCreateddate());
+				a.setLastmodifiedby(s.getAuditDetails().getLastmodifiedby());
+				a.setLastmodifieddate(s.getAuditDetails().getLastmodifieddate());
+				m.setAuditDetails(a);
 				m.setType("Income");
 				income.add(m);
 				
@@ -539,6 +618,15 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 				m.setPreviousYearAmount(s.getPreviousYearAmount());
 				m.setGlCode(s.getGlCode());
 				m.setScheduleNo(s.getScheduleNo());
+				m.setDepartment_name(s.getDepartmentcode());
+				
+				m.setAuditDetails(m.getAuditDetails());
+			
+				a.setCreatedby(s.getAuditDetails().getCreatedby());
+				a.setCreateddate(s.getAuditDetails().getCreateddate());
+				a.setLastmodifiedby(s.getAuditDetails().getLastmodifiedby());
+				a.setLastmodifieddate(s.getAuditDetails().getLastmodifieddate());
+				m.setAuditDetails(a);
 				m.setType("Expense");
 				income.add(m);
 				
@@ -567,6 +655,10 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 				//System.out.println("Empty");
 			}else {
 				//System.out.println("Added"+i);
+				if(e.getDepartmentcode()!=null) {
+					e.setDepartmentcode(departmentService.getDepartmentByCode(e.getDepartmentcode()).getName());
+					
+				}
 				res.add(e);
 			}
 			i++;		
