@@ -82,6 +82,8 @@ import org.egov.utils.VoucherHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.nio.file.Files;
@@ -107,6 +109,9 @@ public class JournalVoucherAction extends BaseVoucherAction
     private List<DocumentUploads> documentDetail = new ArrayList<>();
     private String target;
     protected String showMode;
+    private String subdivision;
+    
+
     @Autowired
     @Qualifier("voucherService")
     private VoucherService voucherService;
@@ -150,6 +155,7 @@ public class JournalVoucherAction extends BaseVoucherAction
         addDropdownData("approvaldepartmentList", Collections.EMPTY_LIST);
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
+        addDropdownData("subdivisionList", Collections.EMPTY_LIST);
 
     }
 
@@ -168,6 +174,20 @@ public class JournalVoucherAction extends BaseVoucherAction
 
             }
         }
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	SubDivision subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+        
+        
         billDetailslist = new ArrayList<VoucherDetails>();
         subLedgerlist = new ArrayList<VoucherDetails>();
         billDetailslist.add(new VoucherDetails());
@@ -188,6 +208,18 @@ public class JournalVoucherAction extends BaseVoucherAction
     {
         showMode = "view";
         // loadApproverUser("default");
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("JournalVoucherAction | new | End");
         return NEW;
@@ -213,6 +245,9 @@ public class JournalVoucherAction extends BaseVoucherAction
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("VoucherAction | create Method | Start");
         LOGGER.info("Backlog entry :::"+backlogEntry);
+        
+        System.out.println("hello  "+subdivision);
+        
         String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
         //removeEmptyRowsAccoutDetail(billDetailslist);
@@ -239,14 +274,20 @@ public class JournalVoucherAction extends BaseVoucherAction
        // validateFields();
        // if (!validateData(billDetailslist, subLedgerlist))
        //     try {
+        
+        
         if (!workFlowAction.equalsIgnoreCase("Save As Draft")) 
         validateFields();
+        System.out.println(voucherHeader.getVouchermis().getSubdivision());
         if (workFlowAction.equalsIgnoreCase("Save As Draft") || !validateData(billDetailslist, subLedgerlist))
             try {
                 if (!"JVGeneral".equalsIgnoreCase(voucherTypeBean.getVoucherName())) {
                     voucherTypeBean.setTotalAmount(parameters.get("totaldbamount")[0]);
                 }
                 populateWorkflowBean();
+                System.out.println(voucherHeader.getVouchermis().getSubdivision());
+               // System.out.println(voucherHeader.getVouchermis().getFunction().getId());
+                System.out.println(voucherHeader.getVouchermis().getSourcePath());
                 if(uploadedFiles!=null)
                 {
 	                for (int i = 0; i < uploadedFiles.length; i++)
@@ -263,6 +304,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 }
                 }
                 voucherHeader.setBackdateentry(backlogEntry);
+                voucherHeader.setSubdivision(voucherHeader.getVouchermis().getSubdivision());
                 System.out.println("before save");
               //  voucherHeader = journalVoucherActionHelper.createVcouher(billDetailslist, subLedgerlist, voucherHeader,
                //         voucherTypeBean, workflowBean);
@@ -290,6 +332,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 {
                     if (voucherHeader.getVouchermis().getBudgetaryAppnumber() == null)
                     {
+                    	
                         message = "Voucher  "
                                 + voucherHeader.getVoucherNumber()
                                 + " Created Sucessfully";
@@ -298,6 +341,7 @@ public class JournalVoucherAction extends BaseVoucherAction
 
                     else
                     {
+                    	
                         message = "Voucher  "
                                 + voucherHeader.getVoucherNumber()
                                 + " Created Sucessfully"
@@ -315,11 +359,13 @@ public class JournalVoucherAction extends BaseVoucherAction
 					if (voucherHeader.getVouchermis().getBudgetaryAppnumber() == null) {
 						if(voucherHeader.getState().getValue()!=null && voucherHeader.getState().getValue().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
 						{
+							
 							message = "Voucher  " + voucherHeader.getVoucherNumber() + " Save As Draft Sucessfully" ;
 							target = "success";
 						}
 						else
                     {
+							
 						message = "Voucher  " + voucherHeader.getVoucherNumber() + " Created Sucessfully" + "\\n"
 								+ getText("pjv.voucher.approved", new String[] {
 										this.getEmployeeName(voucherHeader.getState().getOwnerPosition()) });
@@ -331,11 +377,13 @@ public class JournalVoucherAction extends BaseVoucherAction
                     {
                     	if(voucherHeader.getState().getValue()!=null && voucherHeader.getState().getValue().equalsIgnoreCase(FinancialConstants.WORKFLOW_STATE_SAVEASDRAFT))
                     	{
+                    		
                     	message = "Voucher  " + voucherHeader.getVoucherNumber() + " Save As Draft Sucessfully" ;
                     	target = "success";
                     	}
                     	else
                     	{
+                    		
                     	                        message = "Voucher  "
                     	                                + voucherHeader.getVoucherNumber()
                     	                                + " Created Sucessfully"
@@ -358,6 +406,7 @@ public class JournalVoucherAction extends BaseVoucherAction
                 if (LOGGER.isDebugEnabled())
                     LOGGER.debug("JournalVoucherAction | create  | Success | message === " + message);
 				getValidActions();
+				
                 return viewform();
             }
 
@@ -648,7 +697,13 @@ public class JournalVoucherAction extends BaseVoucherAction
 		this.backlogEntry = backlogEntry;
 	}
 
+	public String getSubdivision() {
+		return subdivision;
+	}
 	
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 	
 
 }

@@ -206,6 +206,8 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
 
     private Boolean budgetCheckReq = true;
     
+    private String subdivision;
+
     public Boolean isBudgetCheckReq() {
         return budgetCheckReq;
     }
@@ -611,5 +613,13 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
     public void setDepartmentName(String departmentName) {
         this.departmentName = departmentName;
     }
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 
 }

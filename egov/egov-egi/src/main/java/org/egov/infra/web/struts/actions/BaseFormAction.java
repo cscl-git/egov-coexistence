@@ -65,6 +65,7 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.interceptor.ParameterAware;
 import org.apache.struts2.interceptor.RequestAware;
 import org.apache.struts2.interceptor.SessionAware;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -102,6 +103,9 @@ public abstract class BaseFormAction extends ActionSupport
 
     @Autowired
     public MicroserviceUtils microserviceUtils;
+    
+    
+    
     protected transient Map<String, Object> request;
     protected transient Map<String, List> dropdownData = new HashMap<>();
     protected transient Map<String, Class> relations = new HashMap<>();
@@ -134,6 +138,7 @@ public abstract class BaseFormAction extends ActionSupport
     public void prepare() {
         final Map<String, Class> relationships = getRelationships();
         for (final Entry<String, Class> rel : relationships.entrySet())
+        	//
             try {
                 setRelationship(rel.getKey(), rel.getValue());
             } catch (IntrospectionException e) {
@@ -146,7 +151,10 @@ public abstract class BaseFormAction extends ActionSupport
         final String[] ids = parameters.get(relationshipName);
         if (ids != null && ids.length > 0) {
             final String id = ids[0];
-            if (!"department".equals(relationshipName) && !"executingDepartment".equals(relationshipName) && isNotBlank(id) && Long.valueOf(id) > 0) {
+            System.out.println(relationshipName+"    "+class1);
+            System.out.println(id+"    "+id.getClass());
+       
+            if (!"department".equals(relationshipName) && !"subdivision".equals(relationshipName) && !"executingDepartment".equals(relationshipName) && isNotBlank(id) && Long.valueOf(id) > 0) {
                 final PropertyDescriptor propDiscriptor = new PropertyDescriptor("id", class1);
                 if (class1 != null && "Fund".equals(class1.getSimpleName()))
                     setValue(relationshipName, getPersistenceService().load(Integer.valueOf(id), class1));
@@ -160,6 +168,9 @@ public abstract class BaseFormAction extends ActionSupport
             }else if("executingDepartment".equals(relationshipName) && id != null){
                 Department dept = microserviceUtils.getDepartmentByCode(id);
                 setValue(relationshipName, dept.getCode());
+            }
+            else if("subdivision".equals(relationshipName) && id != null){
+               setValue(relationshipName, id);
             }
 
         }

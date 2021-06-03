@@ -133,6 +133,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.GLEngine.Transaxtion;
+import com.exilant.eGov.src.common.SubDivision;
 import com.opensymphony.xwork2.validator.annotations.Validation;
 
 @ParentPackage("egov")
@@ -288,6 +289,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
         this.setPartialPayment("deduction");
         setDefaultPaymentMode(FinancialConstants.MODEOFPAYMENT_PEX);
         System.out.println("3");
+       
     }
 
     @Override
@@ -297,6 +299,7 @@ public class RemitRecoveryAction extends BasePaymentAction {
             LOGGER.debug("RemitRecoveryAction | newform | start");
         reset();
         loadDefalutDates();
+        mandatoryFields.remove("subdivision");
         return NEW;
     }
 
@@ -304,6 +307,19 @@ public class RemitRecoveryAction extends BasePaymentAction {
         commonBean.reset();
         voucherHeader.reset();
         remittanceBean = new RemittanceBean();
+        mandatoryFields.remove("subdivision");
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         if (remit)
             listRemitBean = new ArrayList<RemittanceBean>();
     }

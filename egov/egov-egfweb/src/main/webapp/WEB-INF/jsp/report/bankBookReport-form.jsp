@@ -91,11 +91,12 @@ function getData(){
 
 
 function getMiscData(){
-	var fund,department,functionary,field,scheme,subscheme,data,function1="";
+	var fund,department,functionary,field,scheme,subscheme,data,subdivision,function1="";
 	fund = document.getElementById('fundId').value;
 	//fund1 = document.getElementById('fund').value;
 	scheme=document.getElementById('schemeId').value;
 	department = document.getElementById('vouchermis.departmentid').value;
+	subdivision = document.getElementById('vouchermis.subdivision').value;
 	
 	function1=document.getElementById('vouchermis.function').value;
 	if(fund != undefined)
@@ -103,6 +104,8 @@ function getMiscData(){
 	
 	if(department != undefined)
 		data = data+"&vouchermis.departmentcode="+department;
+	if(subdivision != undefined)
+		data = data+"&vouchermis.subdivision="+subdivision;
 	if(functionary != undefined)
 		data = data+"&vouchermis.functionary.id="+functionary;
 	if(field != undefined)

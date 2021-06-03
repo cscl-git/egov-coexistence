@@ -49,6 +49,7 @@ package org.egov.egf.web.actions.report;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,6 +63,7 @@ import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
 import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
@@ -75,6 +77,7 @@ import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.reports.GeneralLedgerReport;
 import com.exilant.eGov.src.reports.GeneralLedgerReportBean;
 import com.exilant.exility.common.TaskFailedException;
@@ -150,6 +153,20 @@ public class GeneralLedgerReportAction extends BaseFormAction {
 		addDropdownData("fieldList",
 				persistenceService.findAllBy(" from Boundary b where lower(b.boundaryType.name)='ward' "));
 		addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
+		
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
+		
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("Inside  Prepare ........");
 

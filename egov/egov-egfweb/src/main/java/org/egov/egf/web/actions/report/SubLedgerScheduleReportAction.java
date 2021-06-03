@@ -49,6 +49,7 @@
 package org.egov.egf.web.actions.report;
 
 import com.exilant.GLEngine.GeneralLedgerBean;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.transactions.RptSubLedgerSchedule;
 import com.exilant.exility.common.TaskFailedException;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
@@ -61,6 +62,8 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.Fund;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -98,8 +101,12 @@ public class SubLedgerScheduleReportAction extends BaseFormAction {
     protected LinkedList subLedgerScheduleDisplayList = new LinkedList();
     String heading = "";
     String titleName = "";
+   
     @Autowired
 	private EgovMasterDataCaching masterDataCache;
+
+    @Autowired
+	private AppConfigValueService appConfigValuesService;
 
     public SubLedgerScheduleReportAction() {
         super();
@@ -115,6 +122,20 @@ public class SubLedgerScheduleReportAction extends BaseFormAction {
         addDropdownData("fundList",
                 persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
         addDropdownData("departmentList", masterDataCache.get("egi-department"));
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
+        
         if (subLedgerScheduleReport != null && subLedgerScheduleReport.getGlcode() != null
                 && !subLedgerScheduleReport.getGlcode().equalsIgnoreCase(""))
             addDropdownData(
@@ -150,6 +171,7 @@ public class SubLedgerScheduleReportAction extends BaseFormAction {
     @ReadOnly
     @Action(value = "/report/subLedgerScheduleReport-ajaxSearch")
     public String ajaxSearch() throws TaskFailedException {
+    	//System.out.println(subLedgerScheduleReport.getSubdivision());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("SubLedgerScheduleReportAction | Search | start");
         try {

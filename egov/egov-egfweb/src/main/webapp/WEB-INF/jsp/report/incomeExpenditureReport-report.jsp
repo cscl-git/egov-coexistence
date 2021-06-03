@@ -119,7 +119,7 @@ function getData(){
 	if(validateMandatoryFields()){
 		doLoadingMask();
 		//var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.asOndate='+document.getElementById('asOndate').value+'&model.fund.id='+document.getElementById('fund').value;
-		var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value+'&model.fund.id='+document.getElementById('fund').value;
+		var url = '/services/EGF/report/incomeExpenditureReport-ajaxPrintIncomeExpenditureReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.function.id='+document.getElementById('function').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value+'&model.fund.id='+document.getElementById('fund').value+'&model.subdivision.subdivisionName='+document.getElementById('subdivision').value;
 		YAHOO.util.Connect.asyncRequest('POST', url, callback, null);
 		return true;
     }
@@ -266,6 +266,12 @@ th.bluebgheadtd {
 					</td>
 				</tr> --%>
 				<tr>
+				<td class="greybox">&nbsp;</td>
+				  <td class="bluebox"><s:text name="report.subdivision" />:</td>
+					<td class="bluebox"><s:select name="subdivision"
+							id="subdivision" list="dropdownData.subdivisionList" listKey="subdivisionCode"
+							listValue="subdivisionName" headerKey="0" headerValue="%{getText('lbl.choose.options')}"
+							value="model.subdivision.subdivisionName" /></td>
 					<td></td>
 				</tr>
 			</table>

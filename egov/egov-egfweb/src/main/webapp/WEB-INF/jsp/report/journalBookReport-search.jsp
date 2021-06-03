@@ -197,6 +197,17 @@
 						<td class="bluebox">&nbsp;</td>
 						<td class="bluebox">&nbsp;</td>
 					</tr>
+					<tr>
+						
+						<td class="bluebox"><s:text name="journalBook.subdivision" /></td>
+						<td class="bluebox"><s:select name="subdivision" id="subdivision"
+								list="dropdownData.subdivisionList" listKey="subdivisionCode" listValue="subdivisionName"
+								headerKey="" headerValue="----Choose----" /></td>
+								
+						<td class="bluebox"></td>
+						<td class="bluebox"></td>		
+								
+					</tr>
 
 				</table>
 				<br />

@@ -42,4 +42,5 @@ public class VoucherDetailsResponse {
     private String deptName;    
     private String narration;
     private String banNumber;
+    private String subdivision;
 }

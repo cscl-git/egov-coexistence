@@ -97,6 +97,7 @@ import org.hibernate.type.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.reports.TrialBalanceBean;
 
 import net.sf.jasperreports.engine.JRException;
@@ -192,6 +193,18 @@ public class TrialBalanceAction extends BaseFormAction {
 		addDropdownData("fieldList", masterDataCache.get("egi-ward"));
 		addDropdownData("functionList", masterDataCache.get("egi-function"));
 		addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
 
 	}
 
@@ -233,6 +246,7 @@ public class TrialBalanceAction extends BaseFormAction {
 	@Action(value = "/report/trialBalance-search")
 	@ReadOnly
 	public String search() {
+		System.out.println(rb.getSubdivision());
 		if (rb.getReportType().equalsIgnoreCase("daterange")) {
 			String sDate = parameters.get("fromDate")[0];
 			String eDate = parameters.get("toDate")[0];
@@ -307,6 +321,7 @@ public class TrialBalanceAction extends BaseFormAction {
 		String tsFieldIdCond = "";
 		String fundcondition = "";
 		String misSchemeCond ="";
+		String missubDCond="";
 		List<TrialBalanceBean> forAllFunds = new ArrayList<TrialBalanceBean>();
 
 		if (rb.getFundId() != null)
@@ -324,6 +339,11 @@ public class TrialBalanceAction extends BaseFormAction {
 			misDeptCond = " and mis.DEPARTMENTCODE= :departmentCode";
 			tsDeptCond = " and DEPARTMENTCODE= :departmentCode";
 		}
+		if (null != rb.getSubdivision() && !rb.getSubdivision().isEmpty()) {
+			missubDCond = " and mis.subdivision= :subdivision";
+			
+		}
+
 		if(schemeId != null && !schemeId.isEmpty())
 		{
 			misSchemeCond= " and mis.schemeid = :scheme";
@@ -382,7 +402,7 @@ public class TrialBalanceAction extends BaseFormAction {
 				+ tsFieldIdCond
 				+ " AND glcodeid =(SELECT id   FROM chartofaccounts WHERE  glcode=coa.glcode) ) AND coa.id NOT IN(SELECT glcodeid FROM generalledger gl,voucherheader vh "
 				+ voucherMisTable + " WHERE " + " vh.status not in (" + defaultStatusExclude + ") " + misClause
-				+ misDeptCond +misSchemeCond + functionaryCond + functionIdCond + fieldIdCond
+				+ misDeptCond + missubDCond+ misSchemeCond + functionaryCond + functionIdCond + fieldIdCond
 				+ " AND vh.id=gl.voucherheaderid AND vh.fundid=fu.id AND vh.voucherdate<=:toDate AND vh.voucherdate>=(SELECT startingdate FROM financialyear WHERE  startingdate<=:toDate AND   endingdate>=:toDate) "
 				+ fundcondition + ")" + " GROUP BY coa.glcode,coa.name, fu.id"
 				+ " HAVING((SUM((SELECT case when SUM(OPENINGDEBITBALANCE) IS NULL then 0 else SUM(OPENINGDEBITBALANCE) end FROM transactionsummary WHERE"
@@ -403,6 +423,8 @@ public class TrialBalanceAction extends BaseFormAction {
 				SQLQuery.setInteger("fundId", rb.getFundId());
 			if (null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty())
 				SQLQuery.setString("departmentCode", rb.getDepartmentCode());
+			if (null != rb.getSubdivision() && !rb.getSubdivision().isEmpty())
+				SQLQuery.setString("subdivision", rb.getSubdivision());
 			if (null != rb.getFunctionaryId())
 				SQLQuery.setInteger("functionaryId", rb.getFunctionaryId());
 			if (null != rb.getFunctionId())
@@ -559,7 +581,8 @@ public class TrialBalanceAction extends BaseFormAction {
 		String tsdivisionIdCond = "";
 		String misdivisionIdCond = "";
 		String misSchemeCond="";
-		if ((null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) || null != rb.getFunctionaryId()
+		String missubDCond="";
+		if ((null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty()) || null != rb.getFunctionaryId() || null != rb.getDivisionId() || null != rb.getSubdivision()
 				|| null != rb.getDivisionId() || (schemeId != null && !schemeId.isEmpty())) {
 			voucherMisTable = ",vouchermis mis ";
 			misClause = " and mis.voucherheaderid=vh.id ";
@@ -572,6 +595,9 @@ public class TrialBalanceAction extends BaseFormAction {
 		if(schemeId != null && !schemeId.isEmpty())
 		{
 			misSchemeCond=" and mis.schemeid= :scheme ";
+		}
+		if (null != rb.getSubdivision() && !rb.getSubdivision().isEmpty()) {
+			missubDCond = " and mis.subdivision= :subdivision";
 		}
 		if (null != rb.getFunctionaryId()) {
 			functionaryCond = " and mis.FunctionaryId= :functionaryId";
@@ -672,7 +698,7 @@ public class TrialBalanceAction extends BaseFormAction {
 		final String currentDebitCreditStr = "SELECT coa.glcode AS accCode ,coa.name  AS accName, SUM(gl.creditAmount) as creditAmount,sum(gl.debitAmount) as debitAmount"
 				+ " FROM generalledger gl,chartofaccounts coa,financialyear fy,Voucherheader vh " + voucherMisTable
 				+ " WHERE gl.glcodeid=coa.id and vh.id= gl.voucherheaderid AND  vh.fundid=:fundId " + misClause
-				+ misDeptCond + functionaryCond + functionIdCond + misdivisionIdCond + misSchemeCond
+				+ misDeptCond + missubDCond + functionaryCond + functionIdCond + misdivisionIdCond + misSchemeCond
 				+ " AND vh.voucherdate>=:fromDate AND vh.voucherdate<=:toDate "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ") " + " GROUP BY gl.glcodeid,coa.glcode,coa.name ORDER BY coa.glcode ASC";
@@ -683,6 +709,8 @@ public class TrialBalanceAction extends BaseFormAction {
 		currentDebitCreditQry.setInteger("fundId", rb.getFundId());
 		if (null != rb.getDepartmentCode() && !rb.getDepartmentCode().isEmpty())
 			currentDebitCreditQry.setString("departmentCode", rb.getDepartmentCode());
+		if (null != rb.getSubdivision() && !rb.getSubdivision().isEmpty())
+			currentDebitCreditQry.setString("subdivision", rb.getSubdivision());
 		if (null != rb.getFunctionaryId())
 			currentDebitCreditQry.setInteger("functionaryId", rb.getFunctionaryId());
 		if (null != rb.getFunctionId())
@@ -934,6 +962,9 @@ public class TrialBalanceAction extends BaseFormAction {
 		if (rb.getDivisionId() != null)
 			heading.append(" For  "
 					+ (String) persistenceService.find("select name from Boundary where id=?", rb.getDivisionId()));
+		if (rb.getSubdivision() != null && !rb.getSubdivision().isEmpty()) {
+			heading.append(" For  " + rb.getSubdivision());
+		}
 		return heading.toString();
 	}
 

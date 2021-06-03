@@ -52,6 +52,7 @@ package org.egov.egf.web.actions.contra;
 
 import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.GLEngine.Transaxtion;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -69,6 +70,7 @@ import org.egov.commons.Fund;
 import org.egov.commons.Vouchermis;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.web.actions.voucher.BaseVoucherAction;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -261,7 +263,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 		String fSignatory = firstsignatory;
 		String sSignatory = secondsignatory;
 		
-		
+		System.out.println(voucherHeader.getVouchermis().getSubdivision());
 			if(fSignatory!=null) {
 				voucherHeader.setFirstsignatory(fSignatory);
 			}
@@ -592,6 +594,18 @@ public class ContraBTBAction extends BaseVoucherAction {
 			contraBean.setChequeDate(sdf.format(currDate));
 			contraBean.setModeOfCollection(MDC_OTHER);
 			voucherDate = sdf.parse(sdf.format(currDate));
+			 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+						"receipt_sub_divison");
+		        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+		        SubDivision subdivision=null;
+		        for(AppConfigValues value:appConfigValuesList)
+		        {
+		        	subdivision = new SubDivision();
+		        	subdivision.setSubdivisionCode(value.getValue());
+		        	subdivision.setSubdivisionName(value.getValue());
+		        	subdivisionList.add(subdivision);
+		        }
+		        addDropdownData("subdivisionList", subdivisionList);
 		} catch (ParseException e) {
 
 		}

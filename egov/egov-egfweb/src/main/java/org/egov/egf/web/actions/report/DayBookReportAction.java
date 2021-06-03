@@ -48,6 +48,7 @@
 package org.egov.egf.web.actions.report;
 
 import com.exilant.GLEngine.DayBook;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.reports.DayBookReportBean;
 import com.exilant.exility.common.TaskFailedException;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
@@ -62,6 +63,8 @@ import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.SubScheme;
 import org.egov.egf.model.VoucherDetailMiscMapping;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
@@ -98,6 +101,9 @@ public class DayBookReportAction extends BaseFormAction {
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
 
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
+
     /**
      *
      */
@@ -129,6 +135,19 @@ public class DayBookReportAction extends BaseFormAction {
         addDropdownData("fundList",persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
         addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
         
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
+		
         currentDate = formatter.format(todayDate);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside  Prepare ........");
@@ -174,8 +193,9 @@ public class DayBookReportAction extends BaseFormAction {
     
     private String getQuery() {
         final SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
-        String startDate = "", endDate = "", fundId = "";
+        String startDate = "", endDate = "", fundId = "",department="",subdivision="";;
         fundId = dayBookReport.getFundId();
+		 String departfromCond="vouchermis mis,";
         String schemeId=dayBookReport.getSchemeId();
     	System.out.println("scheme id"+dayBookReport.getSchemeId());
     	String naration=dayBookReport.getNarration();
@@ -187,6 +207,12 @@ public class DayBookReportAction extends BaseFormAction {
         } catch (ParseException e) {
 
         }
+		if (dayBookReport.getDepartment() != null && !dayBookReport.getDepartment().equals("")) {
+        	department =dayBookReport.getDepartment();
+        }
+        if (dayBookReport.getSubdivision() != null && !dayBookReport.getSubdivision().equals("")) {
+        	subdivision =dayBookReport.getSubdivision();
+        }
         String query = "SELECT voucherdate as vdate, TO_CHAR(voucherdate, 'dd-Mon-yyyy')  AS  voucherdate, vouchernumber as vouchernumber , gd.glcode AS glcode,ca.name AS particulars ,vh.name ||' - '|| vh.TYPE AS type"
                 + ", CASE WHEN vh.description is null THEN ' ' ELSE vh.description END AS narration, CASE  WHEN status=0 THEN ( 'Approved') ELSE ( case WHEN status=1 THEN 'Reversed' else (case WHEN status=2 THEN 'Reversal' else ' ' END) END ) END as status , debitamount  , "
                 + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId,(select dep.name from eg_department dep where dep.code=vmis.departmentcode) as dept,(select fun.name from function fun where fun.id=vmis.functionid) as func FROM voucherheader vh,vouchermis vmis, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID AND vh.id=vmis.voucherheaderid"
@@ -194,6 +220,10 @@ public class DayBookReportAction extends BaseFormAction {
                 + startDate
                 + "' and voucherdate <= '"
                 + endDate
+				+ "'and mis.departmentcode='"
+                + department
+                + "'and mis.subdivision='"
+                + subdivision
                 + "' and vh.status not in (4,5)  and vh.fundid = " + fundId ;
         
         if(schemeId != null && !schemeId.isEmpty())

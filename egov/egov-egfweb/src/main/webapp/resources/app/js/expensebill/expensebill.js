@@ -1246,11 +1246,11 @@ function validate(){
 		return false;
 	}
 	
-	if(!$netPayableAccountCodeId)
+	/*if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
 		return false;
-	}
+	}*/
 	return true;
 }
 
@@ -1379,10 +1379,14 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Reject') {
-		$('#approvalDepartment').attr('required', 'required');
+		/*$('#approvalDepartment').attr('required', 'required');
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
-		$('#approvalComent').attr('required', 'required');
+		$('#approvalComent').attr('required', 'required');*/
+		 $('#approvalDepartment').removeAttr('required');
+	        $('#approvalDesignation').removeAttr('required');
+	        $('#approvalPosition').removeAttr('required');
+	        $('#approvalComent').removeAttr('required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {
 	        
@@ -1395,10 +1399,14 @@ function validateWorkFlowApprover(name) {
 	          $('#billSubType').removeAttr('required');
 	    }
 	if (button != null && button == 'Cancel') {
+		/*$('#approvalDepartment').removeAttr('required');
+		$('#approvalDesignation').removeAttr('required');
+		$('#approvalPosition').removeAttr('required');
+		$('#approvalComent').attr('required', 'required');*/
 		$('#approvalDepartment').removeAttr('required');
 		$('#approvalDesignation').removeAttr('required');
 		$('#approvalPosition').removeAttr('required');
-		$('#approvalComent').attr('required', 'required');
+	        $('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Forward') {
 		$('#approvalDepartment').attr('required', 'required');

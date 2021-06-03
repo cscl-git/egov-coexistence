@@ -103,6 +103,7 @@ public class GeneralLedgerBean
     private String subLedgerTypeName;
     private String schemeId;
     private String narrationText;
+	private String subdivision;
 
     public String getVoucherName() {
         return voucherName;
@@ -859,6 +860,14 @@ public class GeneralLedgerBean
 
 	public void setNarrationText(String narrationText) {
 		this.narrationText = narrationText;
+	}
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 
 }

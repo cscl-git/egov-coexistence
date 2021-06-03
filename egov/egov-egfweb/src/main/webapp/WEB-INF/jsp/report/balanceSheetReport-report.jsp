@@ -268,6 +268,12 @@ th.bluebgheadtd {
 					<td class="bluebox"></td>
 				</tr> --%>
 				<tr>
+				  <td class="bluebox">&nbsp;</td>
+					<td class="bluebox"><s:text name="report.subdivision" />:</td>
+					<td class="bluebox"><s:select name="subdivision" id="subdivision"
+							list="dropdownData.subdivisionList" listKey="subdivisionCode" listValue="subdivisionName"
+							headerKey="0" headerValue="%{getText('lbl.choose.options')}" value="model.subdivision.subdivisionName" />
+					</td>
 					<td></td>
 				</tr>
 			</table>

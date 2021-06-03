@@ -86,7 +86,7 @@ public class RptSubLedgerSchedule {
     double totalDr, totalCr, totalOpgBal, totalClosingBal;
     List<Object[]> resultset;
     TaskFailedException taskExc;
-    private String glCode, accEntityId, fundId, fyId, deptId;
+    private String glCode, accEntityId, fundId, fyId, deptId,subdiv;
     private CFinancialYear fyObj;
   
     private LinkedList dataList;
@@ -110,6 +110,7 @@ public class RptSubLedgerSchedule {
         glCode = reportBean.getGlcode();
         fundId = reportBean.getFund_id();
         deptId = reportBean.getDeptId();
+        subdiv = reportBean.getSubdivision();
         accEntityId = reportBean.getAccEntityId();
 
         reportBean.setAccEntityId(accEntityId);
@@ -163,6 +164,7 @@ public class RptSubLedgerSchedule {
         String departmentFromCondition = "";
         String departmentWhereCondition = "";
         String departmentConditionTran = "";
+        String subdivisionWhereCondition="";
         dataList = new LinkedList();                
 
         totalCr = 0.0;
@@ -173,6 +175,9 @@ public class RptSubLedgerSchedule {
             departmentConditionTran = " and DEPARTMENTCODE=? ";
             departmentFromCondition = ",vouchermis vmis";
             departmentWhereCondition = "AND vh.id = vmis.voucherheaderid and vmis.departmentcode=? ";
+        }
+        if (subdiv != null && !subdiv.equalsIgnoreCase("")) {
+           subdivisionWhereCondition = "and vmis.subdivision=? ";
         }
         final List<AppConfigValues> listAppConfVal = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "statusexcludeReport");
@@ -192,6 +197,7 @@ public class RptSubLedgerSchedule {
             +" AND gl.glcodeid=(Select ID FROM chartofaccounts WHERE glcode = ?) AND gl.debitamount > 0 AND gl.voucherheaderid = vh .ID"
              +" AND vh.voucherdate >= to_date(?,'dd/mm/yyyy') AND vh.voucherdate <= to_date(?,'dd/mm/yyyy')  AND vh.fundid= ? "
             + departmentWhereCondition
+            + subdivisionWhereCondition
             +"  AND vh.status NOT IN ("
             + defaultStatusExclude
             +") GROUP BY gld.detailkeyid "
@@ -203,6 +209,7 @@ public class RptSubLedgerSchedule {
             +" AND gl.creditamount > 0 AND gl.voucherheaderid = vh .ID AND vh.voucherdate >= to_date(?,'dd/mm/yyyy') AND vh.voucherdate <= "
             +" to_date(?,'dd/mm/yyyy')  AND vh.fundid= ? "
             + departmentWhereCondition
+            + subdivisionWhereCondition
             +" AND vh.status NOT IN ("
             + defaultStatusExclude
             +") GROUP BY gld.detailkeyid  "
@@ -215,6 +222,7 @@ public class RptSubLedgerSchedule {
             +" AND vh.voucherdate >=(Select startingdate FROM financialyear WHERE startingdate <= to_date(?,'dd/mm/yyyy') "
             +" AND endingdate >= to_date(?,'dd/mm/yyyy') ) AND vh.voucherdate <= to_date(?,'dd/mm/yyyy')-1 "
             + departmentWhereCondition
+            + subdivisionWhereCondition
             +" AND vh.fundid = ? AND vh.status NOT  IN ("
             + defaultStatusExclude
             +") GROUP BY gld.detailkeyid  "
@@ -227,6 +235,7 @@ public class RptSubLedgerSchedule {
             +" AND vh.voucherdate >=(Select startingdate FROM financialyear WHERE startingdate <= to_date(?,'dd/mm/yyyy') "
             +" AND endingdate >= to_date(?,'dd/mm/yyyy') ) AND vh.voucherdate <= to_date(?,'dd/mm/yyyy')-1 "
             + departmentWhereCondition
+            + subdivisionWhereCondition
             +" AND vh.fundid = ? AND vh.status NOT  IN ("
             + defaultStatusExclude
             +") GROUP BY gld.detailkeyid "
@@ -249,6 +258,9 @@ public class RptSubLedgerSchedule {
             if (deptId != null && !deptId.equalsIgnoreCase(""))
                 pst.setString(i++,deptId);
   
+            if (subdiv != null && !subdiv.equalsIgnoreCase(""))
+                pst.setString(i++,subdiv);
+  
             pst.setLong(i++, Integer.valueOf(accEntityId));
             pst.setString(i++, glCode);
             pst.setString(i++, startDate);
@@ -257,6 +269,9 @@ public class RptSubLedgerSchedule {
             if (deptId != null && !deptId.equalsIgnoreCase(""))
                 pst.setString(i++,deptId);
  
+            if (subdiv != null && !subdiv.equalsIgnoreCase(""))
+                pst.setString(i++,subdiv);
+ 
             pst.setLong(i++, Integer.valueOf(accEntityId));
             pst.setString(i++, glCode);
             pst.setString(i++, startDate);
@@ -264,6 +279,10 @@ public class RptSubLedgerSchedule {
             pst.setString(i++, startDate);
             if (deptId != null && !deptId.equalsIgnoreCase(""))
                 pst.setString(i++, deptId);
+            
+            if (subdiv != null && !subdiv.equalsIgnoreCase(""))
+                pst.setString(i++,subdiv);
+            
             pst.setLong(i++, Long.parseLong(fundId));
 
             pst.setLong(i++, Integer.valueOf(accEntityId));
@@ -273,6 +292,10 @@ public class RptSubLedgerSchedule {
             pst.setString(i++, startDate);
             if (deptId != null && !deptId.equalsIgnoreCase(""))
                 pst.setString(i++, deptId);
+            
+            if (subdiv != null && !subdiv.equalsIgnoreCase(""))
+                pst.setString(i++,subdiv);
+            
             pst.setLong(i++, Long.parseLong(fundId));
 
             pst.setString(i++, glCode);

@@ -254,9 +254,11 @@ today = dd+'/'+mm+'/'+yyyy;
 								listValue="name" headerKey="" headerValue="%{getText('lbl.choose.options')}"
 								value="divisionId" /></td>
 								
-						
-						<td class="greybox"></td>
-						<td class="greybox"></td>
+						<td class="bluebox"><s:text name="voucher.subdivision" />
+						<td class="bluebox"><s:select name="subdivision"
+								id="divisionId" list="dropdownData.subdivisionList" listKey="subdivisionCode"
+								listValue="subdivisionName" headerKey="" headerValue="%{getText('lbl.choose.options')}"
+								value="subdivision" /></td>	
 					</tr>
 					<tr>
 						<td class="bluebox"></td>

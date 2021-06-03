@@ -116,6 +116,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 @Controller
 @RequestMapping(value = "/expensebill")
 public class UpdateExpenseBillController extends BaseBillController {
@@ -214,6 +216,8 @@ public class UpdateExpenseBillController extends BaseBillController {
         
         if(egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()) {
               model.addAttribute("refundable", egBillregister.getRefundable());
+        }else {
+			model.addAttribute("refundable", null);
         }
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE)) {
             return "redirect:/supplierbill/update/" + billId;
@@ -222,6 +226,20 @@ public class UpdateExpenseBillController extends BaseBillController {
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
         setDropDownValues(model);
+		
+		 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"receipt_sub_divison");
+	        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+	        SubDivision subdivision=null;
+	        for(AppConfigValues value:appConfigValuesList)
+	        {
+	        	subdivision = new SubDivision();
+	        	subdivision.setSubdivisionCode(value.getValue());
+	        	subdivision.setSubdivisionName(value.getValue());
+	        	subdivisionList.add(subdivision);
+	        }
+	        model.addAttribute("subdivision", subdivisionList);
+		
         model.addAttribute(BILL_TYPES, BillType.values());
         model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
         if (egBillregister.getState() != null)
@@ -362,28 +380,26 @@ public class UpdateExpenseBillController extends BaseBillController {
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             populateBillDetails(egBillregister);
             validateBillNumber(egBillregister, resultBinder);
-            if(egBillregister.getRefundable()!= null) {
+            if(egBillregister.getRefundable()!= null && egBillregister.getRefundable().equalsIgnoreCase("Y")
+            		&& egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
             	refundvalidateLedgerAndSubledger(egBillregister, resultBinder);
             }else {
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
-        
-            
-		
         }
         
-        if(!egBillregister.getBillPayeedetails().isEmpty())
+        if(!egBillregister.getBillPayeedetails().isEmpty() && !workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONCANCEL))
     	{
         populateBillDetails(egBillregister);
         validateBillNumber(egBillregister, resultBinder);
-        if(egBillregister.getRefundable()!= null) {
+           if(egBillregister.getRefundable()!= null && egBillregister.getRefundable().equalsIgnoreCase("Y")
+        		&& egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
         	 refundvalidateLedgerAndSubledger(egBillregister, resultBinder);
         }else {
         validateLedgerAndSubledger(egBillregister, resultBinder);
     	}
-        
-       
     	}
+        
 		if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
     	{ 
         	  populateEgBillregistermisDetails(egBillregister);
@@ -412,7 +428,8 @@ public class UpdateExpenseBillController extends BaseBillController {
                 if (null != workFlowAction)
                 {
                 	egBillregister.setDocumentDetail(list);
-                	 if(egBillregister.getRefundable()!= null) {
+                	  if(egBillregister.getRefundable()!= null && egBillregister.getRefundable().equalsIgnoreCase("Y")
+                	    && egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
                 		 updatedEgBillregister = refundBillService.update(egBillregister, approvalPosition, approvalComment, null,
                                  workFlowAction, mode, apporverDesignation);
                 	 }else {
@@ -466,9 +483,20 @@ public class UpdateExpenseBillController extends BaseBillController {
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
             
+	     if(updatedEgBillregister.getRefundable()!= null && updatedEgBillregister.getRefundable().equalsIgnoreCase("Y")
+            	    && updatedEgBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+            	return "redirect:/refund/successRefund?approverDetails=" + approverDetails + "&billNumber="
+                 + updatedEgBillregister.getBillnumber()+"&billId="
+                    + updatedEgBillregister.getId();
+             }else {
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
                     + updatedEgBillregister.getBillnumber()+"&billId="
                     + updatedEgBillregister.getId();
+             }		
+            
+            /*return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
+                    + updatedEgBillregister.getBillnumber()+"&billId="
+                    + updatedEgBillregister.getId();*/
         }
     }
 

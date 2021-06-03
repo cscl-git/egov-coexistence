@@ -105,6 +105,7 @@
 				id="fundsourceId" list="dropdownData.fundsourceList" listKey="id"
 				listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 				value="voucherHeader.vouchermis.fundsource.id" /></td>
+				
 	</s:if>
 </tr>
 <tr>
@@ -122,6 +123,21 @@
 				value="%{voucherHeader.vouchermis.departmentcode}"
 				 /></td>
 	</s:if>
+				 
+		<s:if test="%{shouldShowHeaderField('subdivision')}">
+		<td class="greybox"><s:text name="voucher.subdivision" /> <s:if
+				test="%{isFieldMandatory('subdivision')}">
+				<span class="bluebox"><span class="mandatory1">*</span></span>
+			</s:if></td>
+		<td class="bluebox">
+		  <s:select headerKey="-1" 
+			headerValue="%{getText('lbl.choose.options')}" name="vouchermis.subdivision" id="subdivision" 
+			cssClass="selectwk" list="dropdownData.subdivisionList" 
+			listKey="subdivisionCode" listValue="subdivisionName"  
+			value="%{voucherHeader.vouchermis.subdivision}"/>
+		 </td>  
+	</s:if>
+	
 	<s:if test="%{shouldShowHeaderField('field')}">
 		<td class="greybox"><s:text name="voucher.field" /> <s:if
 				test="%{isFieldMandatory('field')}">

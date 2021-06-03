@@ -186,6 +186,18 @@
 							listValue="name" headerKey="-1" headerValue="----Choose----"
 							value="%{departmentId.id}" /></td>
 				</tr>
+				
+				<tr>
+					<td class="bluebox"></td>
+					<td class="bluebox"><s:text name="voucher.subdivision" />
+					<td class="bluebox"><s:select name="subdivision"
+							id="subdivision" list="dropdownData.subdivisionList" listKey="subdivisionCode"
+							listValue="subdivisionName" headerKey="-1" headerValue="----Choose----"
+							value="%{subdivision}" /></td>
+					<td></td>
+					<td></td>		
+				</tr>
+				
 				<tr>
 					<td class="bluebox"></td>
 					<td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>

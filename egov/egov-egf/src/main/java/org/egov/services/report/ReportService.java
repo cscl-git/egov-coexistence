@@ -169,6 +169,11 @@ public abstract class ReportService {
                 && balanceSheet.getFund().getId() != 0)
             query = query + " and v.fundid="
                     + balanceSheet.getFund().getId().toString();
+        if (balanceSheet.getSubdivision() != null
+                && balanceSheet.getSubdivision().getSubdivisionName() != null
+                && !balanceSheet.getSubdivision().getSubdivisionName().equalsIgnoreCase("0"))
+            query = query + " and mis.subdivision="
+                    + balanceSheet.getSubdivision().getSubdivisionName();
         return query;
     }
 
@@ -221,6 +226,11 @@ public abstract class ReportService {
                 && balanceSheet.getFund().getId() != 0)
             query = query + " and ts.fundid="
                     + balanceSheet.getFund().getId().toString();
+        if (balanceSheet.getSubdivision() != null
+                && balanceSheet.getSubdivision().getSubdivisionName() != null
+                && !balanceSheet.getSubdivision().getSubdivisionName().equalsIgnoreCase("0"))
+            query = query + " and mis.subdivision="
+                    + balanceSheet.getSubdivision().getSubdivisionName();
         return query;
     }
 
@@ -278,10 +288,6 @@ public abstract class ReportService {
             if (glCode.equalsIgnoreCase(balanceSheetQueryObject.getGlCode())
                     && balanceSheetQueryObject.getAmount().compareTo(BigDecimal.ZERO) != 0)
                 resultList.add(balanceSheetQueryObject);
-        
-        
-		  
-		 
         return resultList;
     }
 
@@ -307,7 +313,7 @@ public abstract class ReportService {
             final Date toDate, final Date fromDate, final String coaType, final String subReportType) {
     	String    voucherStatusToExclude = getAppConfigValueFor("EGF",
                 "statusexcludeReport");
-    	System.out.println("voucherStatusToExclude------>>"+voucherStatusToExclude);
+        
         final Query query = persistenceService.getSession()
                 .createSQLQuery(
                         "select c.majorcode as glCode,v.fundid as fundId,c.type as type,sum(debitamount)-sum(creditamount) as amount"
@@ -530,10 +536,5 @@ public abstract class ReportService {
             balanceSheetEntry.setCurrentYearTotal(currentYearTotal);
         }
     }
-    
-   
-    
-    
-   
 
 }

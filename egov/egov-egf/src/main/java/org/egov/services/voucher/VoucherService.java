@@ -451,6 +451,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		final Map<String, Object> voucherMap = new HashMap<>();
 		final CVoucherHeader voucherHeader = (CVoucherHeader) persistenceService.find("from CVoucherHeader where id=?",
 				voucherId);
+		System.out.println("from getVoucherInfo method"+ voucherHeader.getVoucherNumber());
 		voucherMap.put(Constants.VOUCHERHEADER, voucherHeader);
 		final List<CGeneralLedger> glList = voucherHibDAO.getGLInfo(voucherHeader.getId());
 		if (LOGGER.isDebugEnabled())
@@ -547,6 +548,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			existingVH = getUpdatedVNumCGVN(existingVH, voucherHeader, voucherNumType);
 			existingVH.setFundId(voucherHeader.getFundId());
 			existingVH.getVouchermis().setDepartmentcode(voucherHeader.getVouchermis().getDepartmentcode());
+			existingVH.getVouchermis().setSubdivision(voucherHeader.getVouchermis().getSubdivision());
 			existingVH.getVouchermis().setFunction(voucherHeader.getVouchermis().getFunction());
 			existingVH.getVouchermis().setSchemeid(voucherHeader.getVouchermis().getSchemeid());
 			existingVH.getVouchermis().setSubschemeid(voucherHeader.getVouchermis().getSubschemeid());

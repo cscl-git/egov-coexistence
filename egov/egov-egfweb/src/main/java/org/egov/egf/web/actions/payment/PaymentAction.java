@@ -117,6 +117,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.exilant.GLEngine.ChartOfAccounts;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 import com.exilant.exility.common.TaskFailedException;
 import com.opensymphony.xwork2.validator.annotations.Validation;
@@ -239,6 +240,7 @@ public class PaymentAction extends BasePaymentAction {
     private String secondsignatory="-1";
     private String backlogEntry="";
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
+	/* private String subdivision; */
    
     @Autowired
     private FinancialUtils financialUtils;
@@ -319,6 +321,19 @@ public class PaymentAction extends BasePaymentAction {
                 + FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed prepare.");
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
     }
 
     private void loadbankBranch(final Fund fund) {
@@ -372,6 +387,7 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/payment-beforeSearch")
     public String beforeSearch() throws Exception {
+    	mandatoryFields.removeIf( mfield -> mfield.equals("subdivision"));
         return "search";
     }
 
@@ -446,7 +462,8 @@ public class PaymentAction extends BasePaymentAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting search...");
         // Get App config value
-
+        mandatoryFields.removeIf( mfield -> mfield.equals("subdivision"));
+        System.out.println(voucherHeader.getVouchermis().getSubdivision());
         final StringBuffer sql = new StringBuffer();
         if (!"".equals(billNumber))
             sql.append(" and bill.billnumber = '" + billNumber + "' ");
@@ -476,6 +493,9 @@ public class PaymentAction extends BasePaymentAction {
         // the vocuhermis table
         if (voucherHeader.getVouchermis().getFunction() != null)
             sql.append(" and bill.egBillregistermis.function=" + voucherHeader.getVouchermis().getFunction().getId());
+        if (voucherHeader.getVouchermis().getSubdivision() != null
+        		&& !voucherHeader.getVouchermis().getSubdivision().equalsIgnoreCase("-1"))
+            sql.append(" and bill.egBillregistermis.voucherHeader.vouchermis.subdivision='" + voucherHeader.getVouchermis().getSubdivision()+ "'");
 
         EgwStatus egwStatus = null;
         /*
@@ -655,11 +675,24 @@ public class PaymentAction extends BasePaymentAction {
         paymentMode = FinancialConstants.MODEOFCOLLECTION_CHEQUE;
         loadSchemeSubscheme();
         loadFundSource();
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed search.");
         return "searchbills";
     }
 
+    
     private String salaryBills(final StringBuffer sql, final String mainquery, final String mainquery1) {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting salaryBills...");
@@ -926,6 +959,18 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed generatePayment.");
         if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
             addActionMessage(getText("payment.bankbalance.controltype"));
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return "form";
 
     }
@@ -1032,6 +1077,11 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/payment-create")
     public String create() {
+    	
+    	System.out.println(parameters.get("department")[0]);
+    	//System.out.println(parameters.get("subdivision").toString());
+    	System.out.println(billregister.getEgBillregistermis().getSubdivision());
+    	
         try {
             contingentList = prepareBillTypeList(contingentList,selectedContingentRows);
             contractorList = prepareBillTypeList(contractorList,selectedContractorRows);
@@ -1061,6 +1111,11 @@ public class PaymentAction extends BasePaymentAction {
             populateWorkflowBean();
             if (parameters.get("department") != null)
                 billregister.getEgBillregistermis().setDepartmentcode(parameters.get("department")[0]);
+			/*
+			 * if (parameters.get("subdivision") != null)
+			 * billregister.getEgBillregistermis().setSubdivision(parameters.get(
+			 * "subdivision")[0].toString());
+			 */
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
@@ -1123,6 +1178,18 @@ public class PaymentAction extends BasePaymentAction {
             LOGGER.debug("Completed createPayment.");
         populateDepartmentName();
         setMode("view");
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return VIEW;
     }
 
@@ -2624,6 +2691,13 @@ public String getBacklogEntry() {
 public void setBacklogEntry(String backlogEntry) {
 	this.backlogEntry = backlogEntry;
 }
+
+	/*
+	 * public String getSubdivision() { return subdivision; }
+	 * 
+	 * public void setSubdivision(String subdivision) { this.subdivision =
+	 * subdivision; }
+	 */
 
 
 

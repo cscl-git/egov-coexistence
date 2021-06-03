@@ -64,6 +64,8 @@ import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.EntityTypeService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.model.BankAdviceReportInfo;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
@@ -82,6 +84,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import com.exilant.eGov.src.common.SubDivision;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -119,6 +123,8 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
+	@Autowired
+	private AppConfigValueService appConfigValueService;
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(RtgsIssueRegisterReportAction.class);
@@ -162,6 +168,18 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		addDropdownData("accNumList", Collections.EMPTY_LIST);
 		addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
 		finYearDate();
+		List<AppConfigValues> appConfigValuesList =appConfigValueService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
 		mandatoryFields.clear();
 
 	}
@@ -506,6 +524,11 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 			if (null != parameters.get("departmentid") && null != parameters.get("departmentid")[0]
 					&& !parameters.get("departmentid")[0].equalsIgnoreCase("-1"))
 				deptQry = " AND vmis.departmentcode ='" + parameters.get("departmentid")[0] + "'";
+			
+			if (null != parameters.get("subdivision") && null != parameters.get("subdivision")[0]
+					&& !parameters.get("subdivision")[0].equalsIgnoreCase("-1"))
+				deptQry = " AND vmis.subdivision ='" + parameters.get("subdivision")[0] + "'";
+			
 			if (null != parameters.get("rtgsAssignedFromDate") && null != parameters.get("rtgsAssignedFromDate")[0]
 					&& !parameters.get("rtgsAssignedFromDate")[0].isEmpty())
 

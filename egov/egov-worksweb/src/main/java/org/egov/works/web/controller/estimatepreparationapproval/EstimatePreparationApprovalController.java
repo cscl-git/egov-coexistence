@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;												   
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
@@ -150,6 +151,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	public String showNewFormGet(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
+
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
@@ -620,21 +622,24 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			Path Path = null;
 			Path = Paths.get(filePath);
 
+	 /*
 			Path doc = Paths.get(documentPath);
 			if (!Files.exists(doc)) {
 				Files.createDirectories(doc);
 			}
 
 			Files.write(Path, bytes);
+	  */
 		}
+		byte[] bytes = file.getBytes();
+        String completeData = new String(bytes);
+        String[] rows = completeData.split("#");
+        String[] columns = rows[0].split(",");
+		//File xlsFile = new File(fileToUpload.toString());
+		//if (xlsFile.exists()) {
 		
-		
-		File xlsFile = new File(fileToUpload.toString());
-		if (xlsFile.exists()) {
-
-			
-			FileInputStream inputStream = new FileInputStream(new File(filePath));
-			Workbook workbook = getWorkbook(inputStream, filePath);
+			//FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
@@ -645,10 +650,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
 						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
-						
 						{
 							continue;
-	   
 						}
 						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
 						upload.setFileName(files[j].getOriginalFilename());
@@ -659,7 +662,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 //						upload.setComments(comments);
 						//System.out.println("comments--------"+comments);
 						docup.add(upload);
-																																							
 					}
 				
 			Iterator<Row> iterator = firstSheet.iterator();
@@ -670,6 +672,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
+
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
 
@@ -732,13 +735,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			}
 
 			// workbook.close();
-			inputStream.close();
+			//inputStream.close();
 			}
 		}	
 
-		} else {
+		//} else {
 			// response = "Please choose a file.";
-		}
+		//}
   int nextcount=1;
 		
 		
@@ -1228,8 +1231,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
-//		estimateDetails.setDepartments(getDepartmentsFromMs());
-//		estimateDetails.setDesignations(getDesignationsFromMs());
+estimateDetails.setDepartments(getDepartmentsFromMs());
+estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setExpHead(estimateDetails.getExpHead_est());
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());

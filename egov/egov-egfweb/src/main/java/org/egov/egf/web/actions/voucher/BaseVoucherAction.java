@@ -194,7 +194,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			addDropdownData("schemeList", Collections.emptyList());
 		if (headerFields.contains("subscheme"))
 			addDropdownData("subschemeList", Collections.emptyList());
-
+		if (headerFields.contains("subdivision"))
+			addDropdownData("subdivisionList", Collections.emptyList());
 		// addDropdownData("typeList",
 		// persistenceService.findAllBy(" select distinct vh.type from
 		// CVoucherHeader vh where vh.status!=4 order by vh.type"));
@@ -271,6 +272,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 							voucherHeader.getVouchermis().getSchemeid().getId()));
 	}
 
+	
+
 	protected void loadFundSource() {
 		if (headerFields.contains("fundsource") && null != voucherHeader.getVouchermis().getSubschemeid()) {
 			final List<Fundsource> fundSourceList = financingSourceService
@@ -287,6 +290,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
 		headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
 		headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
+		headerdetails.put(VoucherConstant.SUBDIVISION, voucherHeader.getSubdivision());
 
 		if (voucherHeader.getVouchermis().getDepartmentcode() != null)
 			headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());
@@ -332,7 +336,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		checkMandatoryField("fundsource", voucherHeader.getVouchermis().getFundsource(),
 				"voucher.fundsource.mandatory");
 		checkMandatoryField("field", voucherHeader.getVouchermis().getDivisionid(), "voucher.field.mandatory");
-
+		checkMandatoryField("subdivision", voucherHeader.getVouchermis().getSubdivision(), "voucher.subdivision.mandatory");
 	}
 
 	protected void checkMandatoryField(final String fieldName, final Object value, final String errorKey) {
@@ -698,6 +702,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		}
 	}
 
+	
 	public boolean isFieldMandatory(final String field) {
 		return mandatoryFields.contains(field);
 	}

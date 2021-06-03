@@ -444,33 +444,32 @@
      </c:otherwise>
 </c:choose>
 	
-	
 	<c:choose>
      <c:when test="${refundable != null && !refundable.isEmpty()}">
      <c:choose>
-		<c:when test="${headerFields.contains('field')}">
+		<c:when test="${headerFields.contains('subdivision')}">
 			<c:choose>
-				<c:when test="${mandatoryFields.contains('field')}">
-					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.field" />
+				<c:when test="${mandatoryFields.contains('subdivision')}">
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subdivision" />
 						<span class="mandatory"></span>
 					</label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="egBillregistermis.fieldid" disabled="true" data-first-option="false" id="field" class="form-control" required="required">
+						<form:select path="egBillregistermis.subdivision"  disabled="true" data-first-option="false" id="subdivision" class="form-control" required="required">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${fields}" itemValue="id" itemLabel="name" />
+							<form:options items="${subdivision}" itemValue="subdivisionName" itemLabel="subdivisionName" />
 						</form:select>
-						<form:errors path="egBillregistermis.fieldid" cssClass="add-margin error-msg" />
+						<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.functionary" />
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subdivision" />
 					</label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="egBillregistermis.fieldid" disabled="true" data-first-option="false" id="field" class="form-control">
+						<form:select path="egBillregistermis.subdivision" disabled="true" data-first-option="false" id="subdivision" class="form-control" >
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${fields}" itemValue="id" itemLabel="name" />
+							<form:options items="${subdivision}" itemValue="subdivisionName" itemLabel="subdivisionName" />
 						</form:select>
-						<form:errors path="egBillregistermis.fieldid" cssClass="add-margin error-msg" />
+						<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
 					</div>
 				</c:otherwise>
 			</c:choose>
@@ -484,29 +483,30 @@
      </c:when>
      <c:otherwise>
      <c:choose>
-		<c:when test="${headerFields.contains('field')}">
+		<c:when test="${headerFields.contains('subdivision')}">
+		
 			<c:choose>
-				<c:when test="${mandatoryFields.contains('field')}">
-					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.field" />
+				<c:when test="${mandatoryFields.contains('subdivision')}">
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subdivision" />
 						<span class="mandatory"></span>
 					</label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="egBillregistermis.fieldid" data-first-option="false" id="field" class="form-control" required="required">
+						<form:select path="egBillregistermis.subdivision" data-first-option="false" id="subdivision" class="form-control" required="required">
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${fields}" itemValue="id" itemLabel="name" />
+							<form:options items="${subdivision}" itemValue="subdivisionName" itemLabel="subdivisionName" />
 						</form:select>
-						<form:errors path="egBillregistermis.fieldid" cssClass="add-margin error-msg" />
+						<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
 					</div>
 				</c:when>
 				<c:otherwise>
-					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.functionary" />
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subdivision" />
 					</label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="egBillregistermis.fieldid" data-first-option="false" id="field" class="form-control">
+						<form:select path="egBillregistermis.subdivision" data-first-option="false" id="subdivision" class="form-control" >
 							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${fields}" itemValue="id" itemLabel="name" />
+							<form:options items="${subdivision}" itemValue="subdivisionName" itemLabel="subdivisionName" />
 						</form:select>
-						<form:errors path="egBillregistermis.fieldid" cssClass="add-margin error-msg" />
+						<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
 					</div>
 				</c:otherwise>
 			</c:choose>
@@ -520,7 +520,6 @@
      </c:otherwise>
 </c:choose>     
      
-  
 <c:choose>
      <c:when test="${refundable != null && !refundable.isEmpty()}">
       <c:choose>
@@ -552,9 +551,9 @@
 			</c:choose>
 		</c:when>
 		<c:otherwise>
-			<label class="col-sm-2 control-label text-right"></label>
+		<!-- <label class="col-sm-2 control-label text-right"></label>
 			<div class="col-sm-3 add-margin">
-			</div>
+			</div>  -->
 		</c:otherwise>
 	</c:choose>
      </c:when>
@@ -588,15 +587,19 @@
 			</c:choose>
 		</c:when>
 		<c:otherwise>
-			<label class="col-sm-2 control-label text-right"></label>
+			<!-- <label class="col-sm-2 control-label text-right"></label>
 			<div class="col-sm-3 add-margin">
-			</div>
+			</div>  -->
 		</c:otherwise>
 	</c:choose>
      </c:otherwise>
 </c:choose>     
      
+ 
+
 </div>
+
+
 
 <div class="form-group">
 

@@ -122,6 +122,10 @@
 			<s:if test="%{shouldShowHeaderField('department')}">
 				<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="voucher.department"/> :</td>
 				<td width="25%" class="<c:out value='${tdclass}' />"><s:property value="%{getMasterName('department')}" /></td>
+				
+			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="voucher.subdivision"/>:&nbsp;</td>
+			<td width="25%" class="<c:out value='${tdclass}' />"><s:property value="%{voucherHeader.vouchermis.subdivision}" /></td>
+			
 			</s:if>
 			<s:if test="%{shouldShowHeaderField('functionary')}">
 				<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="voucher.functionary"/> :

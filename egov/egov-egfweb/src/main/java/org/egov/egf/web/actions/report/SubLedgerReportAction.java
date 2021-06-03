@@ -50,6 +50,7 @@ package org.egov.egf.web.actions.report;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -64,7 +65,9 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.Fund;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -74,6 +77,7 @@ import org.egov.utils.FinancialConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.reports.GeneralLedgerReport;
 import com.exilant.eGov.src.reports.GeneralLedgerReportBean;
 import com.exilant.exility.common.TaskFailedException;
@@ -98,6 +102,8 @@ public class SubLedgerReportAction extends BaseFormAction {
 	private String drillDownFromSchedule;
 	@Autowired
 	private EgovMasterDataCaching masterDataCache;
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
 
 	public SubLedgerReportAction() {
 		super();
@@ -113,6 +119,20 @@ public class SubLedgerReportAction extends BaseFormAction {
 		addDropdownData("fundList",
 				persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
 		addDropdownData("departmentList", masterDataCache.get("egi-department"));
+		
+		 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+	 				"receipt_sub_divison");
+	         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+	         SubDivision subdivision=null;
+	         for(AppConfigValues value:appConfigValuesList)
+	         {
+	         	subdivision = new SubDivision();
+	         	subdivision.setSubdivisionCode(value.getValue());
+	         	subdivision.setSubdivisionName(value.getValue());
+	         	subdivisionList.add(subdivision);
+	         }
+	         addDropdownData("subdivisionList", subdivisionList);
+		
 		if (subLedgerReport != null && subLedgerReport.getGlCode1() != null
 				&& !subLedgerReport.getGlCode1().equalsIgnoreCase(""))
 			addDropdownData("subLedgerTypeList",
@@ -147,6 +167,7 @@ public class SubLedgerReportAction extends BaseFormAction {
 	@Action(value = "/report/subLedgerReport-search")
 	@ReadOnly
 	public String search() throws TaskFailedException {
+		System.out.println(subLedgerReport.getSubdivisionName());
 		subLedgerReport.setReportType("sl");
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("SubLedgerAction | Search | start");
@@ -183,6 +204,10 @@ public class SubLedgerReportAction extends BaseFormAction {
 				+ fund.getName() + " from " + subLedgerReport.getStartDate() + " to " + subLedgerReport.getEndDate();
 		if (checkNullandEmpty(subLedgerReport.getDepartmentCode()))
 			heading = heading + " under " + depMap.get(subLedgerReport.getDepartmentCode()) + " ";
+		/*
+		 * if (checkNullandEmpty(subLedgerReport.getSubdivisionName())) heading =
+		 * heading + " under " + depMap.get(subLedgerReport.getSubdivisionName()) + " ";
+		 */
 		return heading;
 	}
 

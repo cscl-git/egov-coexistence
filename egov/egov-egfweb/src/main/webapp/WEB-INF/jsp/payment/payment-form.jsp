@@ -147,6 +147,26 @@
 																	<td class="greybox">
 																	<td class="greybox">
 																</s:else>
+																
+																<s:if test="%{shouldShowHeaderField('subdivision')}">
+																	<td class="greybox"><strong><s:text
+																				name="voucher.subdivision" /></strong> <s:if
+																			test="%{isFieldMandatory('subdivision')}">
+																			<span class="bluebox"><span class="mandatory1">*</span></span>
+																		</s:if></td>
+																	<td class="greybox"><s:select name="billregister.egBillregistermis.subdivision"
+																	        headerValue="%{getText('lbl.choose.options')}" headerKey="-1"
+																			id="subdivision" list="dropdownData.subdivisionList"
+																			listKey="subdivisionCode" listValue="subdivisionName" 
+																			value="%{billregister.egBillregistermis.voucherHeader.vouchermis.subdivision}" /></td>
+																	
+																</s:if>
+																<s:else>
+																	<td class="greybox">
+																	<td class="greybox">
+																</s:else>
+																
+																
 																<s:if test="%{shouldShowHeaderField('functionary')}">
 																	<td class="greybox"><strong><s:text
 																				name="voucher.functionary" /></strong> <s:if
@@ -691,6 +711,12 @@
 			if(dom.get('department').value=='-1')
 			{
 				bootbox.alert("<s:text name='msg.please.select.department'/>");
+				undoLoadingMask();
+				return false;
+			}
+			if(dom.get('subdivision').value=='-1')
+			{
+				bootbox.alert("<s:text name='msg.please.select.subdivision'/>");
 				undoLoadingMask();
 				return false;
 			}

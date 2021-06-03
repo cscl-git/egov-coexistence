@@ -283,6 +283,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         addDropdownData("departmentList", Collections.EMPTY_LIST);
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
+        addDropdownData("subdivision", Collections.EMPTY_LIST);
     }
 
     @SkipValidation
@@ -427,6 +428,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             }
             action = "save";
             return "billview";
+            
         }
 
     }

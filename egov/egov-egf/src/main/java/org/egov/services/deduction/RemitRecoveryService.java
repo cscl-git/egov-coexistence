@@ -143,7 +143,7 @@ public class RemitRecoveryService {
             query.append(" from EG_REMITTANCE_GLDTL egr1,eg_remittance_detail egd,eg_remittance  eg,voucherheader vh");
             query.append(
                     " where vh.status!=4 and  eg.PAYMENTVHID=vh.id and egd.remittanceid=eg.id and egr1.id=egd.remittancegldtlid ");
-            query.append(" and egr1.id=egr.id) As col_7_0 , mis.departmentcode as col_8_0,mis.functionid as col_9_0");
+            query.append(" and egr1.id=egr.id) As col_7_0 , mis.departmentcode as col_8_0,mis.functionid as col_9_0,mis.subdivision as col_10_0");
             query.append(
                     "  FROM VOUCHERHEADER vh,  VOUCHERMIS mis,  GENERALLEDGER gl,  GENERALLEDGERDETAIL gld,  EG_REMITTANCE_GLDTL egr,  TDS recovery5_");
             query.append(
@@ -193,7 +193,7 @@ public class RemitRecoveryService {
                 dateQry.append(" and vh.VOUCHERDATE <='" + Constants.DDMMYYYYFORMAT1.format(voucherHeader.getVoucherDate()) + "' ");
             query2.append("SELECT vh.NAME,  vh.VOUCHERNUMBER,  vh.VOUCHERDATE, egr.glamt, egr.ID, ");
             query2.append("(select  case when sum(egd.remittedamt) is null then 0 else sum(egd.remittedamt) end from EG_REMITTANCE_GL egr1,eg_remittance_detail egd,eg_remittance  eg,voucherheader vh where vh.status!=4 and  eg.PAYMENTVHID=vh.id and egd.remittanceid=eg.id and egd.REMITTANCEGLID=egr1.id  and egr1.id=egr.id) As col_7_0 , ");
-            query2.append("mis.departmentcode,mis.functionid , egr.glid ,vh.description ");
+            query2.append("mis.departmentcode,mis.functionid , egr.glid ,vh.description,mis.subdivision ");
             query2.append("FROM VOUCHERHEADER vh,  VOUCHERMIS mis,  GENERALLEDGER gl,  EG_REMITTANCE_GL egr,  TDS recovery5_ ");
             query2.append("WHERE recovery5_.GLCODEID  =gl.GLCODEID AND gl.id=egr.glid and ");
             query2.append("vh.ID =gl.VOUCHERHEADERID AND mis.VOUCHERHEADERID  =vh.ID AND ");
@@ -369,6 +369,11 @@ public class RemitRecoveryService {
                 misQuery.append("and  mis.departmentcode='");
                 misQuery.append(voucherHeader.getVouchermis().getDepartmentcode() + "'");
             }
+            if (null != voucherHeader.getVouchermis().getSubdivision()
+                    && !voucherHeader.getVouchermis().getSubdivision().equalsIgnoreCase("-1")) {
+                misQuery.append("and  mis.subdivision='");
+                misQuery.append(voucherHeader.getVouchermis().getSubdivision() + "'");
+            }
             if (null != voucherHeader.getVouchermis().getFunctionary()
                     && null != voucherHeader.getVouchermis().getFunctionary().getId()
                     && -1 != voucherHeader.getVouchermis().getFunctionary().getId()) {
@@ -435,6 +440,8 @@ public class RemitRecoveryService {
             remitBean.setDepartmentId(element[8].toString());
             if(element[9]!=null)
                 remitBean.setFunctionId(Long.valueOf(element[9].toString()));
+            if(element[10]!=null)
+                remitBean.setSubdivision(element[10].toString());
             final EntityType entity = voucherHibDAO.getEntityInfo(Integer.valueOf(element[5].toString()),
                     Integer.valueOf(element[4].toString()));
             if (entity == null) {
@@ -503,6 +510,10 @@ public class RemitRecoveryService {
                 if(element[9] != null)
                 {
                 	remitBean.setNaration(element[9].toString());
+                }
+                if(element[10] != null)
+                {
+                	remitBean.setSubdivision(element[10].toString());
                 }
             }catch (Exception e) {
 				e.printStackTrace();

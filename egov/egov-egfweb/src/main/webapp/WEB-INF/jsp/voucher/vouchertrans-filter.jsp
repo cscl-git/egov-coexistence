@@ -77,6 +77,7 @@
 				listKey="code" listValue="name" headerKey="-1"
 				headerValue="%{getText('lbl.choose.options')}"
 				value="voucherHeader.vouchermis.departmentcode" /></td>
+		
 	</s:if>
 	<s:else>
 		<td class="greybox"></td>
@@ -144,6 +145,25 @@
 		<td class="greybox"></td>
 		<td class="greybox"></td>
 	</s:else>
+	
+	<s:if test="%{shouldShowHeaderField('subdivision')}">
+		<td class="greybox"><s:text name="voucher.subdivision" /> <s:if
+				test="%{isFieldMandatory('subdivision')}">
+				<span class="mandatory1">*</span>
+			</s:if></td>
+		<td class="bluebox">
+		  <s:select headerKey="-1"
+			headerValue="%{getText('lbl.choose.options')}" name="vouchermis.subdivision" id="vouchermis.subdivision" 
+			cssClass="selectwk" list="dropdownData.subdivisionList" 
+			listKey="subdivisionCode" listValue="subdivisionName"  
+			value="%{voucherHeader.vouchermis.subdivision}"/>
+		 </td>
+		 </s:if>
+     <s:else>
+		<td class="greybox"></td>
+		<td class="greybox"></td>
+	</s:else>	
+	
 	<s:if test="%{shouldShowHeaderField('field')}">
 		<td class="greybox"><s:text name="voucher.field" /> <s:if
 				test="%{isFieldMandatory('field')}">
@@ -243,6 +263,13 @@ function validateMIS(){
 					return false;
 				 }
 			</s:if>
+			<s:if test="%{isFieldMandatory('subdivision')}"> 
+			 if(null!= document.getElementById('vouchermis.subdivision') && document.getElementById('vouchermis.subdivision').value == -1){
+
+				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.subdivision'/>";
+				return false;
+			 }
+		    </s:if>
 			<s:if test="%{isFieldMandatory('scheme')}"> 
 				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value == -1){
 

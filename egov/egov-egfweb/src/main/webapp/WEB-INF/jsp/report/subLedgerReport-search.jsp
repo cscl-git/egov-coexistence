@@ -231,8 +231,12 @@ background: #DEDEDE;
 									id="departmentCode" list="dropdownData.departmentList"
 									listKey="code" listValue="name" headerKey=""
 									headerValue="%{getText('lbl.choose.options')}" /></td>
-							<td class="greybox"></td>
-							<td class="greybox"></td>
+									
+							<td class="greybox"><s:text name="subLedger.subdivision" /></td>
+							<td class="greybox"><s:select name="subdivisionName"
+									id="subdivisionName" list="dropdownData.subdivisionList"
+									listKey="subdivisionCode" listValue="subdivisionName" headerKey=""
+									headerValue="%{getText('lbl.choose.options')}" /></td>
 
 						</tr>
 

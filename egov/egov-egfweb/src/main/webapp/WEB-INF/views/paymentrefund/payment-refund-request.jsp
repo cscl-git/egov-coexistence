@@ -48,12 +48,14 @@
 			 <td width="25%" class="greybox">${voucherDetails.financeSource}</td>
 			</tr>
 			<tr>
+			 <td width="10%" class="greybox"><b>Sub Division :  </b></td>
+			 <td width="25%" class="greybox">${voucherDetails.subdivision}</td>
 			 <td width="10%" class="greybox"><b>Department :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.deptName}</td>
-			 <td width="10%" class="greybox"><b>Narration :</b></td>
-			 <td width="25%" class="greybox">${voucherDetails.narration}</td>
 			</tr>
 			<tr>
+			 <td width="10%" class="greybox"><b>Narration :</b></td>
+			 <td width="25%" class="greybox">${voucherDetails.narration}</td>
 			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.banNumber}</td>
 			</tr>
@@ -67,6 +69,7 @@
 	<input type="hidden" name="egBillregistermis.budgetaryAppnumber" id="egBillregistermis.budgetaryAppnumber" value="${voucherDetails.banNumber}"/>
 	<input type="hidden" name="egBillregistermis.fundsource" id="egBillregistermis.fundsource" value="${fundsource}"/>
 	<input type="hidden" name="egBillregistermis.egBillSubType" id="egBillregistermis.egBillSubType" value="${billsubtype}"/> 
+	<input type="hidden" name="egBillregistermis.subdivision" id="egBillregistermis.subdivision" value="${voucherDetails.subdivision}"/> 
 	
 	
 	<%-- <div class="form-group">

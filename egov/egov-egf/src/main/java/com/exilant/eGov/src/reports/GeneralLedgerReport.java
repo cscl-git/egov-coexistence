@@ -141,6 +141,7 @@ public class GeneralLedgerReport {
         }
         final String fundId = reportBean.getFund_id();
         final String deptCode = reportBean.getDepartmentCode();
+        final String subdivisionName = reportBean.getSubdivisionName();
         final String fundSourceId = reportBean.getFundSource_id();
         reportBean.setFundName(getFundName(fundId));
         reportBean.setAccountCode(getAccountName(glCode1));
@@ -271,7 +272,7 @@ public class GeneralLedgerReport {
                 // opb<startdate
                 startDate = sdf.format(formatter1.parse(startDate));
                 final OpBal opbal = getOpeningBalance(glCode1, fundId, fundSourceId, fyId, accEntityId, accEntityKey,
-                        startDate, functionId, deptCode);
+                        startDate, functionId, deptCode,subdivisionName);
                 final String arr[] = new String[15];
                 openingBalance = opbal.dr - opbal.cr;
                 if (LOGGER.isInfoEnabled())
@@ -360,7 +361,7 @@ public class GeneralLedgerReport {
                         final String arr[] = new String[15];
                         startDate = sdf.format(formatter1.parse(startDate));
                         final OpBal opbal = getOpeningBalance(code, fundId, fundSourceId, fyId, accEntityId,
-                                accEntityKey, startDate, functionId, deptCode);
+                                accEntityKey, startDate, functionId, deptCode,subdivisionName);
                         openingBalance = opbal.dr - opbal.cr;
                         String fundName = "";
                         if (element[13].toString() != null)
@@ -865,8 +866,6 @@ public class GeneralLedgerReport {
             addTableToQuery = ", vouchermis vmis ";
         if (!StringUtils.isEmpty(functionId))
             functionCondition = " and gl.functionid=" + functionId;
-        if (!StringUtils.isEmpty(schemeId))
-        	schemeCondition = " and vmis1.schemeid=" + schemeId;
         if (!accEntityKey.equals(""))
             return "SELECT  gl.glcode as \"code\",(select ca.type from chartofaccounts ca where glcode=gl.glcode) as \"glType\" ,"
             + " vh.id AS \"vhid\",vh.voucherDate AS \"vDate\",TO_CHAR(vh.voucherDate ,'dd-Mon-yyyy') "
@@ -930,7 +929,7 @@ public class GeneralLedgerReport {
 
     private OpBal getOpeningBalance(final String glCode, final String fundId, final String fundSourceId,
             final String fyId, final String accEntityId, final String accEntityKey, final String tillDate,
-            final String functionId, final String deptCode) throws TaskFailedException {
+            final String functionId, final String deptCode,final String subdivisionName) throws TaskFailedException {
         String fundCondition = "";
         String fundSourceCondition = "";
         String accEntityCondition = "";
@@ -938,6 +937,7 @@ public class GeneralLedgerReport {
         String deptCondition = "";
         String deptFromCondition = "";
         String deptWhereCondition = "";
+        String subdivisionWhereCondition="";
 
         double opDebit = 0, opCredit = 0;
 
@@ -948,6 +948,10 @@ public class GeneralLedgerReport {
             deptCondition = "DEPARTMENTCODE = ? AND ";
             deptFromCondition = ", vouchermis mis";
             deptWhereCondition = " mis.voucherheaderid =vh.id   and mis.DepartmentCode = ? and ";
+        }
+        if (subdivisionName != null && !subdivisionName.equalsIgnoreCase("")) {
+        	subdivisionWhereCondition = "mis.subdivision = ? AND ";
+        	
         }
         if (!fundSourceId.equalsIgnoreCase(""))
             fundSourceCondition = "fundSourceId = ? AND ";
@@ -1028,6 +1032,7 @@ public class GeneralLedgerReport {
                     + accEntityCondition
                     + " AND "
                     + deptWhereCondition
+                    + subdivisionWhereCondition
                     + " vh.voucherDate >= to_date(?,'dd/mm/yyyy')  AND vh.voucherDate < to_date(?,'dd/mm/yyyy') AND vh.status not in ("
                     + defaultStatusExclude
                     + ")"
@@ -1037,6 +1042,7 @@ public class GeneralLedgerReport {
                     + " , "
                     + " generalledgerdetail gldet WHERE vh.id = gl.voucherHeaderId AND "
                     + deptWhereCondition
+                    + subdivisionWhereCondition
                     + " "
                     + " gl.glcodeid IN (coa.id) "
                     + fundCondition
@@ -1054,6 +1060,7 @@ public class GeneralLedgerReport {
                     + deptFromCondition
                     + " WHERE vh.id = gl.voucherHeaderId AND "
                     + deptWhereCondition
+                    + subdivisionWhereCondition
                     + " gl.glCode IN (?)"
                     + " "
                     + fundCondition
@@ -1079,10 +1086,14 @@ public class GeneralLedgerReport {
                 }
                 if (deptCode != null && !deptCode.equalsIgnoreCase(""))
                     pstmt.setString(i++,deptCode);
+                if (subdivisionName != null && !subdivisionName.equalsIgnoreCase(""))
+                    pstmt.setString(i++,subdivisionName);
                 pstmt.setString(i++, startDate);
                 pstmt.setString(i++, tillDate);
                 if (deptCode != null && !deptCode.equalsIgnoreCase(""))
                     pstmt.setString(i++, deptCode);
+                if (subdivisionName != null && !subdivisionName.equalsIgnoreCase(""))
+                    pstmt.setString(i++,subdivisionName);
                 if (!fundId.equalsIgnoreCase(""))
                     pstmt.setLong(i++, Long.parseLong(fundId));
                 if (!fundSourceId.equalsIgnoreCase(""))
@@ -1100,6 +1111,8 @@ public class GeneralLedgerReport {
 
                 if (deptCode != null && !deptCode.equalsIgnoreCase(""))
                     pstmt.setString(i++, deptCode);
+                if (subdivisionName != null && !subdivisionName.equalsIgnoreCase(""))
+                    pstmt.setString(i++,subdivisionName);
                 pstmt.setString(i++, glCode);
                 if (!fundId.equalsIgnoreCase(""))
                     pstmt.setLong(i++, Long.parseLong(fundId));

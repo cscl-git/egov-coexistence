@@ -14,12 +14,16 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
@@ -49,6 +53,7 @@ import org.egov.egf.contract.model.RefundLedger;
 import org.egov.egf.contract.model.RefundRequest;
 import org.egov.egf.contract.model.RefundResponse;
 import org.egov.egf.contract.model.VoucherDetailsResponse;
+import org.egov.egf.contract.model.VoucherResponse;
 import org.egov.egf.contract.model.VoucherSearch;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.expensebill.service.RefundBillService;
@@ -56,16 +61,22 @@ import org.egov.egf.expensebill.service.VouchermisService;
 import org.egov.egf.masters.services.OtherPartyService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.expensebill.BaseBillController;
+import org.egov.egf.web.controller.expensebill.CreateExpenseBillController;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
+import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.ChartOfAccounts;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.BillType;
@@ -80,14 +91,18 @@ import org.egov.model.voucher.PreApprovedVoucher;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.PaymentRefundUtils;
+import org.geotools.filter.IsNullImpl;
+import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.python.netty.util.internal.ObjectUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.ObjectUtils;
@@ -96,6 +111,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -430,6 +446,10 @@ public class PaymentRefundController extends BaseBillController {
 		        if (egBillregister.getEgBillregistermis().getFundsource() != null) {
 		        	voucherDetails.setFinanceSource(egBillregister.getEgBillregistermis().getFundsource().getName());
 		        }
+		        if (egBillregister.getEgBillregistermis().getSubdivision() != null) {
+		        	voucherDetails.setSubdivision(egBillregister.getEgBillregistermis().getSubdivision());
+		        	
+		        }
 			}
 			
 			final List<CGeneralLedger> gllist = paymentRefundUtils.getAccountDetails(vhid);
@@ -551,6 +571,10 @@ public class PaymentRefundController extends BaseBillController {
 		        if (egBillregister.getEgBillregistermis().getFundsource() != null) {
 		        	voucherDetails.setFinanceSource(egBillregister.getEgBillregistermis().getFundsource().getName());
 		        	model.addAttribute("fundsource", egBillregister.getEgBillregistermis().getFundsource());
+		        }
+		        if (egBillregister.getEgBillregistermis().getSubdivision() != null) {
+		        	voucherDetails.setSubdivision(egBillregister.getEgBillregistermis().getSubdivision());
+		        	
 		        }
 		        
 		        model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
@@ -894,19 +918,25 @@ public class PaymentRefundController extends BaseBillController {
                         new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
             }
 
-        } else if (FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT.equals(expenseBill.getStatus().getCode()))
+        } else if (FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT.equals(expenseBill.getStatus().getCode())) {
             message = messageSource.getMessage("msg.expense.refund.bill.approved.success",
                     new String[]{expenseBill.getBillnumber()}, null);
-        else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue()))
+        }
+            
+        else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue())) {
             message = messageSource.getMessage("msg.expense.refund.bill.reject",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
-        else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getStatus().getCode()))
+        }
+        else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getStatus().getCode())) {
+        	expenseBill.setState(null);
+            refundBillService .saveEgBillregister_afterStateNull(expenseBill);
             message = messageSource.getMessage("msg.expense.refund.bill.cancel",
                     new String[]{expenseBill.getBillnumber()}, null);
-        else if ("Pending for Cancellation".equals(expenseBill.getStatus().getCode()))
+        }
+        else if ("Pending for Cancellation".equals(expenseBill.getStatus().getCode())) {
         	message = messageSource.getMessage("msg.expense.refund.bill.cancel.success",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
-
+        }
         return message;
     }
     

@@ -197,6 +197,13 @@ background: #DEDEDE;
 								name="functionCode" value="%{functionCode}" autocomplete="off"
 								onfocus='autocompleteFunction(this);'
 								onblur='splitFunction(this);' /></td>
+								
+						<td class="greybox"><s:text name="generalLedger.subdivision" /></td>
+						<td class="greybox"><s:select name="subdivisionName"
+								id="subdivisionName" list="dropdownData.subdivisionList"
+								listKey="subdivisionCode" listValue="subdivisionName" headerKey=""   
+								headerValue="%{getText('lbl.choose.options')}" /></td>		
+								
 						<%-- <td class="greybox"><s:text name="generalLedger.functionary" /></td>
 						<td class="greybox"><s:select name="functionaryId"
 								id="functionaryId" list="dropdownData.functionaryList"

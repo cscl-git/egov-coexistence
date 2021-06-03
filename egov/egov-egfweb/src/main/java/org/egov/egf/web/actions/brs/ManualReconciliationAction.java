@@ -158,10 +158,10 @@ public class ManualReconciliationAction extends BaseFormAction {
 		unReconciledChequesCopy.addAll(unReconciledCheques);
 		if(unReconciledChequesCopy != null && !unReconciledChequesCopy.isEmpty())
 		{
-			System.out.println("Size ::"+unReconciledChequesCopy.size());
-			System.out.println("limit :::"+reconcileBean.getLimit());
 			int i=1;
 			int limit=reconcileBean.getLimit();
+			System.out.println("Size ::"+unReconciledChequesCopy.size());
+			System.out.println("limit :::"+limit);
 			unReconciledCheques.clear();
 			for(ReconcileBean bean:unReconciledChequesCopy)
 			{

@@ -48,6 +48,7 @@
 package org.egov.egf.web.actions.report;
 
 import com.exilant.GLEngine.GeneralLedgerBean;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
 import com.opensymphony.xwork2.validator.annotations.Validations;
@@ -58,7 +59,9 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.commons.CFunction;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -105,6 +108,9 @@ public class JournalBookReportAction extends BaseFormAction {
     private EgovMasterDataCaching masterDataCache;
     @Autowired
     private CityService cityService;
+    @Autowired
+	private AppConfigValueService appConfigValuesService;
+    
     String heading = "";
     String titleName = "";
 
@@ -126,6 +132,19 @@ public class JournalBookReportAction extends BaseFormAction {
         addDropdownData("departmentList", masterDataCache.get("egi-department"));
         addDropdownData("functionList", masterDataCache.get("egi-function"));
         addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
+        
         addDropdownData("voucherNameList", VoucherHelper.VOUCHER_TYPE_NAMES.get(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL));
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside  Prepare ........");
@@ -149,6 +168,7 @@ public class JournalBookReportAction extends BaseFormAction {
     @Action(value = "/report/journalBookReport-ajaxSearch")
     @ReadOnly
     public String ajaxSearch() throws TaskFailedException {
+    	System.out.println(journalBookReport.getSubdivision());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("JournalBookAction | Search | start");
         journalBookReport.setUlbName(ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()));
@@ -232,6 +252,10 @@ public class JournalBookReportAction extends BaseFormAction {
             subQuery = subQuery + " and vh.Name='" + journalBookReport.getVoucher_name() + "' ";
         if (journalBookReport.getDept_name() != null && !journalBookReport.getDept_name().equals(""))
             subQuery = subQuery + " and vmis.departmentcode='" + journalBookReport.getDept_name() + "' ";
+        
+        if (journalBookReport.getSubdivision() != null && !journalBookReport.getSubdivision().equals(""))
+            subQuery = subQuery + " and vmis.subdivision='" + journalBookReport.getSubdivision() + "' ";
+        
         if (journalBookReport.getFunctionId() != null && !journalBookReport.getFunctionId().equals(""))
             subQuery = subQuery + " and vmis.functionid  =" + journalBookReport.getFunctionId() + " ";
         if (journalBookReport.getSchemeId() != null && !journalBookReport.getSchemeId().equals(""))

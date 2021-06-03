@@ -179,13 +179,45 @@
 
 	<%if(count % 2 == 1) {%>
 </tr>
+<tr>
+<td style="width: 5%"></td>
+	<%} %>
+	<s:if test="%{shouldShowHeaderField('subdivision')}">
+		<% count++; %>
+		<td class="greybox"><s:text name="voucher.subdivision" /> <s:if
+				test="%{isFieldMandatory('subdivision')}">
+				<span class="mandatory1">*</span>
+			</s:if><br> <br></td>
+		<td class="bluebox">
+		  <s:select name="vouchermis.subdivision" id="subdivision"
+		  list="dropdownData.subdivisionList" listKey="subdivisionCode" listValue="subdivisionName" 
+			headerKey="-1" headerValue="%{getText('lbl.choose.options')}" 
+			value="%{vouchermis.subdivision}"/>
+		 </td>
+	</s:if>
+
+	<%if(count % 2 == 1) {%>
+</tr>
+<tr>
 <%} else {%>
 <td></td>
 <td></td>
 </tr>
 <%} %>
 
+<%-- <tr>
+<td style="width: 5%"></td>
+	<s:if test="%{shouldShowHeaderField('subdivision')}">
 
+		<td class="bluebox"><s:text name="voucher.subdivision" /></td>
+		<td class="bluebox">
+		  <s:select name="vouchermis.subdivision" id="subdivision"
+		  list="dropdownData.subdivisionList" listKey="subdivisionCode" listValue="subdivisionName" 
+			headerKey="-1" headerValue="%{getText('lbl.choose.options')}" 
+			value="%{vouchermis.subdivision}"/>
+		 </td>
+	</s:if>
+</tr> --%>
 
 
 <script>

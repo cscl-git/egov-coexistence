@@ -103,6 +103,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 import net.sf.jasperreports.engine.JRException;
 
 @ParentPackage("egov")
@@ -173,6 +175,8 @@ public class BankBookReportAction extends BaseFormAction {
 	@Autowired
 	private Environment environment;
 
+	List<AppConfigValues> appConfigValuesList=new ArrayList<AppConfigValues>();
+
 	public void setReportHelper(final ReportHelper reportHelper) {
 		this.reportHelper = reportHelper;
 	}
@@ -233,6 +237,19 @@ public class BankBookReportAction extends BaseFormAction {
 			if (headerFields.contains(Constants.FIELD))
 				addDropdownData("fieldList",
 						persistenceService.findAllBy(" from Boundary b where lower(b.boundaryType.name)='ward' "));
+			if (headerFields.contains("subdivision"))
+				appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+		 				"receipt_sub_divison");
+		         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+		         SubDivision subdivision=null;
+		         for(AppConfigValues value:appConfigValuesList)
+		         {
+		         	subdivision = new SubDivision();
+		         	subdivision.setSubdivisionCode(value.getValue());
+		         	subdivision.setSubdivisionName(value.getValue());
+		         	subdivisionList.add(subdivision);
+		         }
+		         addDropdownData("subdivisionList", subdivisionList);
 			
 		}
 	}
@@ -258,6 +275,9 @@ public class BankBookReportAction extends BaseFormAction {
 	@ReadOnly
 	@Action(value = "/report/bankBookReport-ajaxLoadBankBook")
 	public String ajaxLoadBankBook() {
+		System.out.println( parameters.get("vouchermis.departmentcode")[0]);
+		System.out.println( parameters.get("vouchermis.subdivision")[0]);
+		System.out.println(getVouchermis().getDepartmentcode());
 		if (parameters.containsKey("bankAccount.id") && parameters.get("bankAccount.id")[0] != null) {
 			startDate = parseDate("startDate");
 			endDate = parseDate("endDate");
@@ -695,6 +715,11 @@ public class BankBookReportAction extends BaseFormAction {
 			query.append(" and vmis.DEPARTMENTCODE='").append(getVouchermis().getDepartmentcode() + "'");
 			Department department = microserviceUtils.getDepartmentByCode(getVouchermis().getDepartmentcode());
 			header.append(" in " + department.getName() + " ");
+		}
+		if (getVouchermis() != null && getVouchermis().getSubdivision() != null
+				&& getVouchermis().getSubdivision() != null && !getVouchermis().getSubdivision().equals("-1")) {
+			query.append(" and vmis.subdivision='").append(getVouchermis().getSubdivision() + "'");
+			header.append(" in " + getVouchermis().getSubdivision() + " ");
 		}
 		if (getVouchermis() != null && getVouchermis().getFunctionary() != null
 				&& getVouchermis().getFunctionary().getId() != null && getVouchermis().getFunctionary().getId() != -1)

@@ -80,14 +80,19 @@ public class ReportEngine {
         String firstParam = "";
         final String andParam = " and ";
         final StringBuffer reportEngineQry = new StringBuffer("");
-
+        System.out.println("XXXXXXXXX");
         try {
             if (reBean.getSchemeId() != null || reBean.getSubSchemeId() != null || reBean.getFundsourceId() != null
-                    || reBean.getDivisionId() != null || reBean.getDepartmentId() != null || reBean.getFunctionaryId() != null)
+                    || reBean.getDivisionId() != null || reBean.getDepartmentId() != null || reBean.getSubdivisionName()!= null || reBean.getFunctionaryId() != null)
                 includeVouchermis = true;
             if (reBean.getFunctionId() != null)
                 includeGeneralLedger = true;
 
+            System.out.println("includeVouchermis  ::: "+includeVouchermis);
+            System.out.println("includeGeneralLedger  ::: "+includeGeneralLedger);
+            System.out.println("includeGeneralLedger  ::: "+includeGeneralLedger);
+            System.out.println("reBean.getFunctionaryId()  ::: "+reBean.getFunctionaryId());
+            System.out.println("reBean.getFunctionId()  ::: "+reBean.getFunctionId());
             reportEngineQry.append("select ");
             /**
              * add fields which are to be fetched
@@ -160,6 +165,10 @@ public class ReportEngine {
                 reportEngineQry.append(firstParam + " mis.departmentcode='" + reBean.getDepartmentId()+"'");
                 firstParam = andParam;
             }
+            if (checkNullandEmpty(reBean.getSubdivisionName())) {
+                reportEngineQry.append(firstParam + " mis.subdivision='" + reBean.getSubdivisionName()+"'");
+                firstParam = andParam;
+            }
             if (checkNullandEmpty(reBean.getFunctionaryId())) {
                 reportEngineQry.append(firstParam + " mis.functionaryId=" + reBean.getFunctionaryId());
                 firstParam = andParam;
@@ -220,7 +229,7 @@ public class ReportEngine {
     public ReportEngineBean populateReportEngineBean(final GeneralLedgerReportBean reportBean) {
     
     	System.out.println("reportBean.getFunctionaryId()   ::::::"+reportBean.getFunctionaryId());
-    	System.out.println("reportBean.getSchemeId()   ::::::"+reportBean.getSchemeId());
+    	System.out.println("reportBean.getFunctionCodeId()   ::::::"+reportBean.getFunctionCodeId());
         final ReportEngineBean reBean = new ReportEngineBean();
         reBean.setDepartmentId(reportBean.getDepartmentCode());
         reBean.setDivisionId(reportBean.getFieldId());
@@ -235,7 +244,7 @@ public class ReportEngine {
         reBean.setSubSchemeId(null);
         reBean.setToDate(reportBean.getEndDate());
         reBean.setToVoucherNumber(null);
-        reBean.setSchemeId(reportBean.getSchemeId());
+        reBean.setSubdivisionName(reportBean.getSubdivisionName());
         return reBean;
     }
 

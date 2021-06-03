@@ -181,7 +181,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 	// @LastModifiedDate
 	// private Date lastModifiedDate;
 
-	protected State() {
+	public State() {
 		// Explicit state initialization not allowed
 	}
 
@@ -191,7 +191,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 	}
 
 	// @Override
-	protected void setId(final Long id) {
+	public void setId(final Long id) {
 		this.id = id;
 	}
 
@@ -215,7 +215,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 		return ownerPosition;
 	}
 
-	protected void setOwnerPosition(final Long ownerPosition) {
+	public void setOwnerPosition(final Long ownerPosition) {
 		this.ownerPosition = ownerPosition;
 	}
 
@@ -267,7 +267,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 		return natureOfTask;
 	}
 
-	protected void setNatureOfTask(final String natureOfTask) {
+	public void setNatureOfTask(final String natureOfTask) {
 		this.natureOfTask = natureOfTask;
 	}
 

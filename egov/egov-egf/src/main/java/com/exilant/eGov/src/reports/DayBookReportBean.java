@@ -56,6 +56,24 @@ public class DayBookReportBean
     private String fundId;
     private String schemeId;
     private String narration;
+	private String department;
+    private String subdivision;
+
+    public String getDepartment() {
+		return department;
+	}
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 
     /**
      *
@@ -66,6 +84,8 @@ public class DayBookReportBean
         startDate = "";
         endDate = "";
         totalCount = "";
+        department="";
+        subdivision="";
         fundId = "0";
         schemeId = "0";
         

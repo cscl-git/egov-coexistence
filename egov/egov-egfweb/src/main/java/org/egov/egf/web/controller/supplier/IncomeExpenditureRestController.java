@@ -303,6 +303,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureSchedulesByFromToDate", method = RequestMethod.GET)
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureSchedules(@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req){
 			

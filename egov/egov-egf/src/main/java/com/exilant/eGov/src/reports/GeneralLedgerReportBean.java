@@ -111,6 +111,7 @@ public class GeneralLedgerReportBean
     public String functionCode;
     public String heading;
     private String schemeId;
+	private String subdivisionName;
 
     public GeneralLedgerReportBean(final String str)
     {
@@ -778,6 +779,14 @@ public class GeneralLedgerReportBean
 
 	public void setSchemeId(String schemeId) {
 		this.schemeId = schemeId;
+	}
+	
+	public String getSubdivisionName() {
+		return subdivisionName;
+	}
+
+	public void setSubdivisionName(String subdivisionName) {
+		this.subdivisionName = subdivisionName;
 	}
 
 }

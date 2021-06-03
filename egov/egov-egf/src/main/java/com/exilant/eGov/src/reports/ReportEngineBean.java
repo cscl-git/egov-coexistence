@@ -71,6 +71,15 @@ public class ReportEngineBean {
     private List<String> excludeStatuses;
     private List<String> includeStatuses;
     private int filtersCount = 0;
+    private String subdivisionName;
+
+    public String getSubdivisionName() {
+		return subdivisionName;
+	}
+
+	public void setSubdivisionName(String subdivisionName) {
+		this.subdivisionName = subdivisionName;
+	}
 
     public String getFundId() {
         return fundId;

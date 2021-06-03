@@ -50,11 +50,13 @@ package org.egov.egf.expensebill.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -91,6 +93,7 @@ import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationException;
+import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.models.EgChecklists;
@@ -387,7 +390,7 @@ public class RefundBillService {
 
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
-                && null != egBillregister.getStatus().getCode())
+                && null != egBillregister.getStatus().getCode()) {
             if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
                     && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
             {
@@ -397,28 +400,39 @@ public class RefundBillService {
             }
 			else if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(egBillregister.getStatus().getCode())
                 && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+			{	
             egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                     FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
-            else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT))
+			}
+            else if (workFlowAction.equals(FinancialConstants.BUTTONREJECT)) {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS));
+            }
             else if (FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS.equals(egBillregister.getStatus().getCode())
                     && workFlowAction.equals(FinancialConstants.BUTTONCANCEL))
+            {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS));
+            }
             else if (FinancialConstants.CONTINGENCYBILL_REJECTED_STATUS.equals(egBillregister.getStatus().getCode())
                     && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
+            {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
+            }
             else if ("Pending for Cancellation".equals(egBillregister.getStatus().getCode())
                     && workFlowAction.equals(FinancialConstants.BUTTONFORWARD))
+            {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         "Pending for Cancellation"));
+            }
             else if ("Pending for Cancellation".equals(egBillregister.getStatus().getCode())
                     && workFlowAction.equals(FinancialConstants.BUTTONAPPROVE))
+            {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         "Cancelled"));
-
+            }
+        }
     }
 
     @Transactional(readOnly = true)
@@ -549,6 +563,27 @@ public class RefundBillService {
                         .withStateValue(stateValue).withDateInfo(currentDate.toDate())
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
+                if (egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()
+        				&& egBillregister.getRefundable().equalsIgnoreCase("Y") && egBillregister.getExpendituretype()
+        				.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+        			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                            "Cancelled"));
+        		}else {
+        		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                         "Cancelled"));
+        		}
+                
+                if (egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()
+        				&& egBillregister.getRefundable().equalsIgnoreCase("Y") && egBillregister.getExpendituretype()
+        				.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+        			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                            "Cancelled"));
+        		}else {
+        		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                         "Cancelled"));
+        		}
+        		 egBillregister.setState(null);
+                
             } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
@@ -603,13 +638,35 @@ public class RefundBillService {
             	}
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+					
+					for (StateHistory stat : egBillregister.getStateHistory()) {
+						System.out.println(stat.getId() + "   " + stat.getState().getId());
+					}
+					
+					if(!egBillregister.getStateHistory().isEmpty()) {
+						StateHistory sh = egBillregister.getStateHistory().stream()
+								.collect(Collectors.maxBy(Comparator.comparingLong(StateHistory::getId))).get();
+						if (null == sh.getId()) {
+							final Long created_by = egBillregister.getState().getCreatedBy();
+							egBillregister.getState().setOwnerPosition(created_by);
+							owenrPos.setId(created_by);
+						} else {
+							final Long own_pos = sh.getOwnerPosition();
+							egBillregister.getState().setOwnerPosition(own_pos);
+							owenrPos.setId(own_pos);
+						}
+						System.out.println("User with maximum age: " + sh.getId() + "    " + sh.getOwnerPosition());
+					}else {
+						final Long own_pos = egBillregister.getState().getCreatedBy();
+						egBillregister.getState().setOwnerPosition(own_pos);
+						owenrPos.setId(own_pos);
+					}
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
                     .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                     .withNextAction(wfmatrix.getNextAction())
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
-		        
 		        }
 				else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction))
 				{
@@ -833,4 +890,8 @@ public class RefundBillService {
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+
+	public void saveEgBillregister_afterStateNull(EgBillregister egbillregister) {
+		expenseBillRepository.save(egbillregister);
+	}
 }

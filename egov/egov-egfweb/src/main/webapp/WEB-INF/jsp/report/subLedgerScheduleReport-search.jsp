@@ -199,6 +199,18 @@ background: #DEDEDE;
 								listKey="code" listValue="name" headerKey=""
 								headerValue="%{getText('lbl.choose.options')}" /></td>
 					</tr>
+					
+					<tr>
+						
+						<td class="bluebox"><s:text name="subLedger.subdivision" /></td>
+						<td class="bluebox"><s:select name="subdivision" id="subdivision"
+								value='%{subdivision}' list="dropdownData.subdivisionList"
+								listKey="subdivisionCode" listValue="subdivisionName" headerKey=""
+								headerValue="%{getText('lbl.choose.options')}" /></td>
+								
+					  <td></td>
+					  <td></td>			
+					</tr>
 
 
 				</table>

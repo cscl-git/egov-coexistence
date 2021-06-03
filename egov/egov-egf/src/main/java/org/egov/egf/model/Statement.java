@@ -55,6 +55,8 @@ import org.egov.infra.admin.master.entity.Boundary;
 //import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.microservice.models.Department;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -76,6 +78,7 @@ public class Statement {
     private List<Fund> fundList = new ArrayList<Fund>();
     private List<IEStatementEntry> ieEntries = new ArrayList<IEStatementEntry>();
     private List<StatementEntry> entries = new ArrayList<StatementEntry>();
+	private SubDivision subdivision;
     private boolean restData=false;
     
     
@@ -306,6 +309,13 @@ public class Statement {
 
 	public void setRestData(boolean restData) {
 		this.restData = restData;
+	}
+	public SubDivision getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(SubDivision subdivision) {
+		this.subdivision = subdivision;
 	}
 
 }

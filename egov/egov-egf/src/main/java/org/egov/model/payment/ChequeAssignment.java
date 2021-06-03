@@ -62,6 +62,7 @@ public class ChequeAssignment implements java.io.Serializable {
     private String bankName;
     private String chequeNumber;
     private String departmentName;
+    private String subdivisionName;
     private boolean isSelected;
     private Date chequeDate;
     private Long detailtypeid;
@@ -81,6 +82,7 @@ public class ChequeAssignment implements java.io.Serializable {
     private String drawingOfficerNameTAN;
     private BigDecimal receiptAmount;
     private BigDecimal deductedAmount;
+
 
     public String getSerialNo() {
         return serialNo;
@@ -265,6 +267,14 @@ public class ChequeAssignment implements java.io.Serializable {
     public void setReceiptAmount(final BigDecimal receiptAmount) {
         this.receiptAmount = receiptAmount;
     }
+
+    public String getSubdivisionName() {
+		return subdivisionName;
+	}
+
+	public void setSubdivisionName(String subdivisionName) {
+		this.subdivisionName = subdivisionName;
+	}
 
     public BigDecimal getDeductedAmount() {
         return deductedAmount;

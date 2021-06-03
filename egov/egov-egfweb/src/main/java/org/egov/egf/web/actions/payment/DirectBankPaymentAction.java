@@ -52,6 +52,7 @@ package org.egov.egf.web.actions.payment;
 
 import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.GLEngine.Transaxtion;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 import com.exilant.exility.dataservice.DatabaseConnectionException;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
@@ -203,6 +204,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private String firstsignatory="";
     private String secondsignatory="";
     private String backlogEntry="";
+    private String subdivision;
 
     private EgBillregister egBillregister = new EgBillregister();
     private List<EgBillregister> refundpreApprovedVoucherList;
@@ -289,6 +291,21 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             loadDefalutDates();            
         }
         voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisoinList", subdivisionList);
+        
+        
         // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
             addActionMessage(getText("payment.bankbalance.controltype"));
@@ -422,6 +439,19 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
         addDropdownData("accNumList", Collections.EMPTY_LIST);
+	        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
 	        
         //if (LOGGER.isDebugEnabled()) {
             //LOGGER.debug("egBillregister==" + egBillregister);
@@ -744,6 +774,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
   
    
     @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.subdivison", message = "", key = REQUIRED),
     		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
@@ -794,11 +825,13 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				firstsignatory=arrOfStr1[0];
 				secondsignatory=arrOfStr2[0];
 				backlogEntry=arrOfStr3[0];
+				voucherHeader.setSubdivision(voucherHeader.getVouchermis().getSubdivision());
+				subdivision=voucherHeader.getVouchermis().getSubdivision();
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
                 
-               
+                paymentheader.getVoucherheader().getVouchermis().setSubdivision(subdivision);
                 
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
                     try {
@@ -850,7 +883,18 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 subLedgerlist.add(new VoucherDetails());
             // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         }
-        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return VIEW;
     }
     
@@ -860,6 +904,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     
 
     @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.subdivison", message = "", key = REQUIRED),
     		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
@@ -896,13 +941,26 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                     }
                 voucherHeader.setId(null);
                 populateWorkflowBean();
-                voucherHeader.setBackdateentry(backlogEntry);
+                String[] arrOfStr1 = firstsignatory.split(",");
+				String[] arrOfStr2 = secondsignatory.split(",");
+				String[] arrOfStr3 = backlogEntry.split(",");
                
+				commonBean.setFirstsignatory(arrOfStr1[0]);
+				commonBean.setSecondsignatory(arrOfStr2[0]);
+				commonBean.setBackdateentry(arrOfStr3[0]);
                
+				voucherHeader.setBackdateentry(arrOfStr3[0]);
+				firstsignatory=arrOfStr1[0];
+				secondsignatory=arrOfStr2[0];
+				backlogEntry=arrOfStr3[0];
+                voucherHeader.setSubdivision(voucherHeader.getVouchermis().getSubdivision());
+                subdivision=voucherHeader.getVouchermis().getSubdivision();
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
 
+                paymentheader.getVoucherheader().getVouchermis().setSubdivision(subdivision);
+                
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
                     try {
                         date = sdf.parse(cutOffDate);
@@ -953,6 +1011,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 subLedgerlist.add(new VoucherDetails());
             // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         }
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+        
         return VIEW;
     }
 
@@ -1060,6 +1132,18 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         if (subLedgerlist.size() == 0)
             subLedgerlist.add(new VoucherDetails());
         loadAjaxedDropDowns();
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return NEW;
     }
 
@@ -1217,6 +1301,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             billDetailslist.remove(bankdetail);
         loadAjaxedDropDowns();
         // find it last so that rest of the data loaded
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+        
+        
         if ("view".equalsIgnoreCase(showMode)) {
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("fetching cheque detail ------------------------");
@@ -1274,6 +1372,19 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             if (subLedgerlist.size() == 0)
                 subLedgerlist.add(new VoucherDetails());
             loadAjaxedDropDowns();
+            
+            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+    				"receipt_sub_divison");
+            List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+            SubDivision subdivision=null;
+            for(AppConfigValues value:appConfigValuesList)
+            {
+            	subdivision = new SubDivision();
+            	subdivision.setSubdivisionCode(value.getValue());
+            	subdivision.setSubdivisionName(value.getValue());
+            	subdivisionList.add(subdivision);
+            }
+            addDropdownData("subdivisionList", subdivisionList);
         }
 
         return VIEW;
@@ -1802,5 +1913,13 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
 	public void setBankBranchList(List<Map<String, Object>> bankBranchList) {
 		this.bankBranchList = bankBranchList;
+	}
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 }

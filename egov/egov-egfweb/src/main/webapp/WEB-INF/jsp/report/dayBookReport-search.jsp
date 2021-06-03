@@ -205,6 +205,20 @@
 						<td class="greybox">&nbsp;</td>
 						<td class="greybox">&nbsp;</td>
 					</tr>
+					<tr>
+						<td style="width: 5%"></td>
+						<td class="greybox"><s:text name="dayBook.department" /></td>
+						<td class="greybox"><s:select name="department" id="department"
+								list="dropdownData.departmentList" listKey="code" listValue="name"
+								headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
+						
+                         <td class="greybox"><s:text name="dayBook.subdivision" /></td>
+						<td class="greybox"><s:select name="subdivision"
+								id="subdivision" list="dropdownData.subdivisionList"
+								listKey="subdivisionCode" listValue="subdivisionName" headerKey=""   
+								headerValue="%{getText('lbl.choose.options')}" /></td>   
+                            
+					</tr>
 					
 				</table>
 				<br />

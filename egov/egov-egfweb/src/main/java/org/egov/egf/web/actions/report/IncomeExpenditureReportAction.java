@@ -48,11 +48,19 @@
 package org.egov.egf.web.actions.report;
 
 
-import net.sf.jasperreports.engine.JasperPrint;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import org.apache.poi.hssf.usermodel.HSSFCellStyle;
-import org.apache.poi.hssf.usermodel.HSSFFont;
-import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -73,7 +81,9 @@ import org.egov.commons.service.FundService;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.BoundaryService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.admin.master.service.DepartmentService;
@@ -91,20 +101,10 @@ import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import com.exilant.eGov.src.common.SubDivision;
+
+import net.sf.jasperreports.engine.JasperPrint;
 
 @Component
 @ParentPackage("egov")
@@ -181,6 +181,9 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
      @Autowired
      private  DepartmentService departmentService;
      
+     @Autowired
+     protected AppConfigValueService appConfigValuesService;
+     
     
     public void setIncomeExpenditureService(final IncomeExpenditureService incomeExpenditureService) {
         this.incomeExpenditureService = incomeExpenditureService;
@@ -209,6 +212,7 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
         addRelatedEntity("financialYear", CFinancialYear.class);
         addRelatedEntity("field", Boundary.class);
         addRelatedEntity("fund", Fund.class);
+		addRelatedEntity("subdivision", SubDivision.class);
     }
 
 	
@@ -225,6 +229,18 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
 				  addDropdownData("fieldList", masterDataCache.get("egi-ward"));
 				  addDropdownData("financialYearList", getPersistenceService().findAllBy("from CFinancialYear where isActive=true  order by finYearRange desc " ));
 			  
+				  List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+    				"receipt_sub_divison");
+            List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+            SubDivision subdivision=null;
+            for(AppConfigValues value:appConfigValuesList)
+            {
+            	subdivision = new SubDivision();
+            	subdivision.setSubdivisionCode(value.getValue());
+            	subdivision.setSubdivisionName(value.getValue());
+            	subdivisionList.add(subdivision);
+            }
+            addDropdownData("subdivisionList", subdivisionList);
         }
 			  
 		 
@@ -274,7 +290,16 @@ public class IncomeExpenditureReportAction extends BaseFormAction {
                     incomeExpenditureStatement.getFunctionary().getId()));
             heading.append(" and " + incomeExpenditureStatement.getFunctionary().getName() + " Functionary");
         }
-
+        if (incomeExpenditureStatement.getSubdivision() != null && incomeExpenditureStatement.getSubdivision().getSubdivisionName() != null
+                && !"null".equalsIgnoreCase(incomeExpenditureStatement.getSubdivision().getSubdivisionName())) {
+            SubDivision subd = new SubDivision();
+            subd.setSubdivisionCode(incomeExpenditureStatement.getSubdivision().getSubdivisionName());
+            subd.setSubdivisionName(incomeExpenditureStatement.getSubdivision().getSubdivisionName());
+            incomeExpenditureStatement.setSubdivision(subd);
+            heading.append(" in " + incomeExpenditureStatement.getSubdivision().getSubdivisionName());
+        } else {
+        	incomeExpenditureStatement.setSubdivision(null);
+        }
     }
 
     public void setIncomeExpenditureStatement(final Statement incomeExpenditureStatement) {

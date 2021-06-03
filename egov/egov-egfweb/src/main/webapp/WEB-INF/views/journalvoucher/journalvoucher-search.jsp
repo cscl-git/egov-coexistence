@@ -61,7 +61,21 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="voucherNumber" path="voucherNumber" maxlength="50" />
 				</div>
 				
+				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.subdivision"  text="Sub Division"/>
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:select path="vouchermis.subdivision" id="subdivision" class="form-control">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${subdivisionList}" itemValue="subdivisionCode" itemLabel="subdivisionName" />
+						</form:select>
+				</div>
 				
+				
+				<%-- <label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.billnumber" text="Bill Number"/>
+				</label>
+				<div class="col-sm-3 add-margin">
+					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="billNumber" path="billNumber" maxlength="50" />
+				</div> --%>
 				
     		</div>
     	</div>

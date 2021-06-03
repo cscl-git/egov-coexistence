@@ -120,6 +120,21 @@
 				headerValue="----Choose----"
 				value="voucherHeader.vouchermis.departmentid.id" /></td>
 	</s:if>
+	
+	<s:if test="%{shouldShowHeaderField('subdivision')}">
+		<td class="greybox"><s:text name="voucher.subdivision" /> <s:if
+				test="%{isFieldMandatory('subdivision')}">
+				<span class="mandatory1">*</span>
+			</s:if></td>
+		<td class="bluebox">
+		  <s:select headerKey="-1"
+			headerValue="%{getText('lbl.choose.options')}" name="vouchermis.subdivision" id="subdivision" 
+			cssClass="selectwk" list="dropdownData.subdivisionList" 
+			listKey="subdivisionCode" listValue="subdivisionName"  
+			value="%{voucherHeader.vouchermis.subdivision}"/>
+		 </td>
+		 </s:if>
+	
 	<s:if test="%{shouldShowHeaderField('field')}">
 		<td class="greybox"><s:text name="voucher.field" /> <s:if
 				test="%{isFieldMandatory('field')}">

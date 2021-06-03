@@ -99,7 +99,6 @@
 		: &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
 				value="${expenseBillTotalDebitAmount}" default="0.0"></c:out></span>
 	</div>
-	
 	 <c:choose>
             <c:when test="${refundable != null && !refundable.isEmpty()}">
              <div class="position_alert2" style="display:none;">
@@ -128,6 +127,7 @@
 	<form:hidden path="" name="netPayableAmount" id="netPayableAmount"
 		value="${netPayableAmount}" />
 		<form:hidden path="refundable" id="refundable" value="${egBillregister.refundable}" />
+	<form:hidden path="expendituretype" id="expendituretype" value="${egBillregister.expendituretype}" />
 	<div class="panel-title text-center" style="color: green;">
 		<c:out value="${message}" />
 		<br />
@@ -152,6 +152,7 @@
 			
 			<c:choose>
              <c:when test="${refundable != null && !refundable.isEmpty()}">
+             
              <div class="panel panel-primary" data-collapsed="0" style="display:none;">
 				<jsp:include page="expensebill-debitdetails.jsp" />
 				<jsp:include page="expensebill-creditdetails.jsp" />
@@ -191,6 +192,7 @@
         src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}'/>"></script>
+
 <script
 	src="<cdn:url value='/resources/app/js/expensebill/expensebill.js?rnd=${app_release_no}'/>"></script>
 <script

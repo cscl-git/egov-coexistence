@@ -69,7 +69,9 @@ import org.egov.commons.Fund;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -82,6 +84,8 @@ import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import com.exilant.eGov.src.common.SubDivision;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -132,6 +136,8 @@ public class BalanceSheetReportAction extends BaseFormAction {
  private PersistenceService persistenceService;
  @Autowired
     private EgovMasterDataCaching masterDataCache;
+ @Autowired
+ protected AppConfigValueService appConfigValuesService;
 
     private Date asOnDate;
     
@@ -219,6 +225,7 @@ public class BalanceSheetReportAction extends BaseFormAction {
         addRelatedEntity("functionary", Functionary.class);
         addRelatedEntity("financialYear", CFinancialYear.class);
         addRelatedEntity("field", Boundary.class);
+        addRelatedEntity("subdivision", SubDivision.class);
     }
 
     @Override
@@ -235,6 +242,18 @@ public class BalanceSheetReportAction extends BaseFormAction {
             // addDropdownData("financialYearList",
             // getPersistenceService().findAllBy("from CFinancialYear where isActive=true and isActiveForPosting=true order by finYearRange desc "));
             addDropdownData("financialYearList", persistenceService.findAllBy("from CFinancialYear order by finYearRange desc "));
+            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+    				"receipt_sub_divison");
+            List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+            SubDivision subdivision=null;
+            for(AppConfigValues value:appConfigValuesList)
+            {
+            	subdivision = new SubDivision();
+            	subdivision.setSubdivisionCode(value.getValue());
+            	subdivision.setSubdivisionName(value.getValue());
+            	subdivisionList.add(subdivision);
+            }
+            addDropdownData("subdivisionList", subdivisionList);
         }
     }
 
@@ -271,6 +290,18 @@ public class BalanceSheetReportAction extends BaseFormAction {
                     balanceSheet.getFunctionary().getId()));
             header.append(" in " + balanceSheet.getFunctionary().getName());
         }*/
+        
+        if (balanceSheet.getSubdivision() != null && balanceSheet.getSubdivision().getSubdivisionName() != null
+                && !"null".equalsIgnoreCase(balanceSheet.getSubdivision().getSubdivisionName())) {
+            SubDivision subd = new SubDivision();
+            subd.setSubdivisionCode(balanceSheet.getSubdivision().getSubdivisionName());
+            subd.setSubdivisionName(balanceSheet.getSubdivision().getSubdivisionName());
+            balanceSheet.setSubdivision(subd);
+            header.append(" in " + balanceSheet.getSubdivision().getSubdivisionName());
+        } else {
+        	balanceSheet.setSubdivision(null);
+        }
+        
         if (balanceSheet.getAsOndate() != null)
             header.append(" as on " + DDMMYYYYFORMATS.format(balanceSheet.getAsOndate()));
         header.toString();
