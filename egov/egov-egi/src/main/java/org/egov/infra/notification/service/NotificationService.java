@@ -187,7 +187,6 @@ public class NotificationService {
 		}
 
     public void sendSMS(String mobileNo, String message,String templateId) {
-    	System.out.println("D");
         sendSMS(mobileNo, message, MEDIUM,templateId);
     }
 

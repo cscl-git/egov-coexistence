@@ -1,6 +1,11 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+
+
+<script
+        src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
+
 <div class="panel panel-primary" data-collapsed="0">
 	<div class="panel-heading custom_form_panel_heading">
 		<div class="panel-title">
@@ -51,20 +56,20 @@
 			</td>
 			<td>
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
-				<form:select path="checkList[${status.index}].status" id="checkList[${status.index}].status"  required="required" class="form-control status">
-				<form:option value="">-Select-</form:option>
-				<form:option value="Seen/Checked">Seen/Checked</form:option>
-				<form:option value="Incorrect">Incorrect</form:option>
-				<form:option value="Not Required">Not Required</form:option>
-				</form:select>
+				<select name="checkList[${status.index}].status" id="checkList[${status.index}].status" required="required"  class="form-control status">
+				<option value="">-Select-</option>
+				<option value="Seen/Checked">Seen/Checked</option>
+				<option value="Incorrect">Incorrect</option>
+				<option value="Not Required">Not Required</option>
+				</select>
 			</c:if>
 			<c:if test="${auditDetail.auditStatus == 'Pending with Department' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
-			<form:select path="checkList[${status.index}].status" id="checkList[${status.index}].status" readonly="true"  class="form-control status">
-				<form:option value="">-Select-</form:option>
-				<form:option value="Seen/Checked">Seen/Checked</form:option>
-				<form:option value="Incorrect">Incorrect</form:option>
-				<form:option value="Not Required">Not Required</form:option>
-				</form:select>
+			<select name="checkList[${status.index}].status" id="checkList[${status.index}].status" disabled="disabled"  class="form-control status">
+				<option value="">-Select-</option>
+				<option value="Seen/Checked">Seen/Checked</option>
+				<option value="Incorrect">Incorrect</option>
+				<option value="Not Required">Not Required</option>
+				</select>
 			</c:if>
 			</td>
 			
@@ -125,15 +130,15 @@
 			<c:if test="${mode !='view' }">
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 			<td class="text-center">
-			    <span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
-				  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> 
-				<!-- <span style="cursor:pointer;" tabindex="0" class="Add" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
+			    <!-- <span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span> -->
+				<!--  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> -->
+				<span style="cursor:pointer;" onclick="addcheckListRowNew()" tabindex="0" class="Addrow" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
 				        <i class="fa fa-plus"></i>
-				</span> -->
-				<%-- <span class="add-padding subledge-delete-row">
-				       <a class="fa fa-trash dataDelete" data-id="${status.index}" style="color:black;" href="#" data-href="/services/audit/createAudit/deleteAuditchecklist/${audit.checkListId}"
-				             data-toggle="modal" data-target="#confirm-delete" data-original-title="Delete!"></a>
-				</span> --%>
+				</span>
+				<span class="add-padding subledge-delete-row">
+				       <a class="fa fa-trash dataDelete" data-id="${status.index}" style="color:black;" href="#" data-href="${audit.checkListId},${status.index}"
+				             data-toggle="modal" data-target="#confirm-deleterow" data-original-title="Delete!"></a>
+				</span>
 				 </td>
 			
 			</c:if>
@@ -152,7 +157,63 @@
 </div>
 
 
+<div class="modal fade" id="confirm-deleterow" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+       <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+             <h4 class="modal-title" id="myModalLabel">Confirm Delete</h4>
+        </div>
+        <div class="modal-body">
+        <input type="hidden"  name="rowindex" class="rowindex"/>
+          <p>Do you want to proceed?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+         <a id="deletebtnok" href="" style="display:none">Delete</a>
+            <button type="button" class="btn btn-danger btn-okrow" value="">Delete</button>
+        </div>
+      </div>
+    </div>
+</div>
 
+
+<div style="display:none;">
+    <table id="blank_table">
+    <tr id="rec-0">
+	<td>
+	<form:input path="checkList[0].checklist_description" id="checkList[0].checklist_description" value=""  class="form-control checklist_description" maxlength="200" ></form:input>
+    </td>
+    <td>
+    <select name="checkList[0].status" id="checkList[0].status" required="required" class="form-control status">
+				<option value="">-Select-</option>
+				<option value="Seen/Checked">Seen/Checked</option>
+				<option value="Incorrect">Incorrect</option>
+				<option value="Not Required">Not Required</option>
+				</select>
+    </td>
+    <td>
+    <form:input id="checkList[0].checklist_date" path="checkList[0].checklist_date" class="form-control datepicker checklist_date" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+    </td>
+      <td>
+      <form:input path="checkList[0].auditor_comments" id="checkList[0].auditor_comments"  class="form-control auditor_comments" readonly="false" maxlength="200" ></form:input>
+	</td>
+	<td><a href="#" 0 style="text-decoration: none">&nbsp;
+			<img src="/services/egi/resources/erp2/images/history.png" border="0" /></a>
+	</td>
+   
+	<td class="text-center">
+		<span style="cursor:pointer;" onclick="addcheckListRowNew()" tabindex="0" class="Addrow" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
+				        <i class="fa fa-plus"></i>
+		</span>
+		<span class="add-padding subledge-delete-row">
+		<a class="fa fa-trash dataDelete" data-id="0" style="color:black;" href="#" data-href=""
+				             data-toggle="modal" data-target="#confirm-deleterow" data-original-title="Delete!"></a>
+		</span>
+	</td>
+    </tr>
+   </table>
+ </div>
 
 
 

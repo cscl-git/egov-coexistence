@@ -639,7 +639,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  else
 				  {
-					  firstsignatory="Additional Commissioner";
+					  firstsignatory="Joint Commissioner";
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
@@ -654,7 +654,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  }
 		  else
 		  {
-			  firstsignatory="Additional Commissioner";
+			  firstsignatory="Joint Commissioner";
 			  secondsignatory="Chief Accounts Officer";
 		  }
 		  reportParams.put("primarySignatory",firstsignatory);
@@ -718,7 +718,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  else
 				  {
-					  firstsignatory="Additional Commissioner";
+					  firstsignatory="Joint Commissioner";
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
@@ -734,7 +734,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  }
 		  else
 		  {
-			  firstsignatory="Additional Commissioner";
+			  firstsignatory="Joint Commissioner";
 			  secondsignatory="Chief Accounts Officer";
 		  }
 		  reportParams.put("primarySignatory",firstsignatory);
@@ -799,7 +799,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  else
 				  {
-					  firstsignatory="Additional Commissioner";
+					  firstsignatory="Joint Commissioner";
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
@@ -814,7 +814,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  }
 		  else
 		  {
-			  firstsignatory="Additional Commissioner";
+			  firstsignatory="Joint Commissioner";
 			  secondsignatory="Chief Accounts Officer";
 		  }
 		  reportParams.put("primarySignatory",firstsignatory);
@@ -879,7 +879,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 				  }
 				  else
 				  {
-					  firstsignatory="Additional Commissioner";
+					  firstsignatory="Joint Commissioner";
 				  }
 				  if(element[1] != null && !element[1].toString().isEmpty())
 				  {
@@ -896,7 +896,7 @@ public class BankAdviceReportAction extends BaseFormAction {
 		  }
 		  else
 		  {
-			  firstsignatory="Additional Commissioner";
+			  firstsignatory="Joint Commissioner";
 			  secondsignatory="Chief Accounts Officer";
 		  }
 		  reportParams.put("primarySignatory",firstsignatory);
