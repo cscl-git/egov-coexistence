@@ -21,7 +21,7 @@ public class BoqDateUpdate implements Serializable{
 	@Id
 	@GeneratedValue(generator = SEQ_BOQUPDATE_ID, strategy = GenerationType.SEQUENCE)
 	private long id;
-	private long sl_no;
+	private Long sl_no;
 	private String actualEndDate;
 	private String reason;
 	private Date createdDate;
@@ -30,6 +30,12 @@ public class BoqDateUpdate implements Serializable{
 	
 	
 	
+	public Long getSl_no() {
+		return sl_no;
+	}
+	public void setSl_no(Long sl_no) {
+		this.sl_no = sl_no;
+	}
 	public String getCreatedby() {
 		return createdby;
 	}
@@ -54,12 +60,6 @@ public class BoqDateUpdate implements Serializable{
 	}
 	public void setReason(String reason) {
 		this.reason = reason;
-	}
-	public long getSl_no() {
-		return sl_no;
-	}
-	public void setSl_no(long string) {
-		this.sl_no = string;
 	}
 	public Date getCreatedDate() {
 		return createdDate;

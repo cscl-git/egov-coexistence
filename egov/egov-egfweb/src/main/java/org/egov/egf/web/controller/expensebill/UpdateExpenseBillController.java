@@ -206,6 +206,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE)) {
             return "redirect:/supplierbill/update/" + billId;
         }
+        System.out.println("Update method");
         final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(billId));
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
@@ -215,7 +216,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (egBillregister.getState() != null)
             model.addAttribute("currentState", egBillregister.getState().getValue());
         model.addAttribute("workflowHistory",
-                financialUtils.getHistory(egBillregister.getState(), egBillregister.getStateHistory()));
+                financialUtils.getWorkflowHistory(egBillregister.getState(), egBillregister.getStateHistory()));
         List<String>  validActions =null;
         if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
@@ -243,9 +244,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (department != null)
             egBillregister.getEgBillregistermis().setDepartmentName(department);
         model.addAttribute(EG_BILLREGISTER, egBillregister);
-        /*originalFiles = (List<FileStoreMapper>) persistenceService.getSession().createQuery(
-                "from FileStoreMapper where fileName like '%"+egBillregister.getBillnumber()+"%' order by id desc ").setMaxResults(10).list();
-        model.addAttribute(SUPPORTING_DOCS,originalFiles);*/
+        System.out.println("Update method mid");
         if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
         	model.addAttribute("mode", "cancel");
@@ -253,16 +252,19 @@ public class UpdateExpenseBillController extends BaseBillController {
         	return "expensebill-view";
         	
         }
+        model.addAttribute("paId",egBillregister.getId());
         if (egBillregister.getState() != null
                 && (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(egBillregister.getState().getValue())
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("viewBudget", "Y");
             return "expensebill-update";
         } 
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
             model.addAttribute("validActionList", validActions);
+            model.addAttribute("viewBudget", "Y");
             return "expensebill-update";
         }
         else {
@@ -273,6 +275,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
 
             model.addAttribute("budgetDetails", budgetDetails);
+            model.addAttribute("viewBudget", "Y");
             return EXPENSEBILL_UPDATE_WORKFLOW;
         }
     }
@@ -289,7 +292,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
         
-        
+        System.out.println("Update save method 1");
         if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
         	mode="cancel";
@@ -300,7 +303,6 @@ public class UpdateExpenseBillController extends BaseBillController {
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         if(uploadedFiles!=null)
         for (int i = 0; i < uploadedFiles.length; i++) {
-
             Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
             byte[] fileBytes = Files.readAllBytes(path);
             ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
@@ -347,6 +349,12 @@ public class UpdateExpenseBillController extends BaseBillController {
         if(!egBillregister.getBillPayeedetails().isEmpty())
     	{
         populateBillDetails(egBillregister);
+        
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
+        	  populateEgBillregistermisDetails(egBillregister);
+    	}
+        
         validateBillNumber(egBillregister, resultBinder);
         validateLedgerAndSubledger(egBillregister, resultBinder);
     	}
@@ -371,6 +379,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
         } else {
             try {
+            	System.out.println("Update save method 2 :: "+workFlowAction);
                 if (null != workFlowAction)
                 {
                 	egBillregister.setDocumentDetail(list);
@@ -378,8 +387,10 @@ public class UpdateExpenseBillController extends BaseBillController {
                             workFlowAction, mode, apporverDesignation);
                     if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
                     {
+                    	System.out.println("Update save method 3 :: ");
                     	populateauditWorkFlow(updatedEgBillregister);
                     }
+                    System.out.println("After audit  ");
                 }   
                 
             } catch (final ValidationException e) {
@@ -402,7 +413,7 @@ public class UpdateExpenseBillController extends BaseBillController {
                     return EXPENSEBILL_VIEW;
                 }
             }
-
+            System.out.println("Update save method XXX :: ");
             redirectAttributes.addFlashAttribute(EG_BILLREGISTER, updatedEgBillregister);
 
             // For Get Configured ApprovalPosition from workflow history
@@ -421,21 +432,23 @@ public class UpdateExpenseBillController extends BaseBillController {
             model.addAttribute(BILL_TYPES, BillType.values());
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
                     updatedEgBillregister.getState(), updatedEgBillregister.getId(), approvalPosition, approverName);
-
+            
+            System.out.println("Update save method YYYYY :: ");
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
-                    + updatedEgBillregister.getBillnumber();
+                    + updatedEgBillregister.getBillnumber()+"&billId="
+                    + updatedEgBillregister.getId();
         }
     }
 
     private void populateauditWorkFlow(EgBillregister updatedEgBillregister) {
     	AuditDetails audit=new AuditDetails();
     	final User user = securityUtils.getCurrentUser();
-    	/*List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
-                FinancialConstants.MODULE_NAME_APPCONFIG, FinancialConstants.AUDIT_ + updatedEgBillregister.getEgBillregistermis().getDepartmentcode());*/
     	Position owenrPos = new Position();
     	List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(updatedEgBillregister.getEgBillregistermis().getDepartmentcode()), "Auditor");
+    	System.out.println("Update save method 4 :: ");
     	if(auditorList != null && !auditorList.isEmpty())
     	{
+    		System.out.println("Update save method 5 :: "+auditorList.get(0).getEmployeeid());
     		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
     	}
     	else
@@ -449,6 +462,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     	audit.setType(PRE);
     	audit.setDepartment(updatedEgBillregister.getEgBillregistermis().getDepartmentcode());
     	audit.setLead_auditor(owenrPos.getId());
+    	audit.setAuditor_name(getEmployeeName(owenrPos.getId()));
     	audit.setEgBillregister(updatedEgBillregister);
     	audit.setStatus(egwStatusDAO.getStatusByModuleAndCode(AUDIT2, CREATED));
     	audit.setPassUnderobjection(0);

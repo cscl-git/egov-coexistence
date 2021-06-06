@@ -522,15 +522,30 @@ private static Map<String, String> map;
 			Workbook workbook = getWorkbook(inputStream, filePath);
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> iterator = firstSheet.iterator();
+			boolean check=false;
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
+				int rowNum = nextRow.getRowNum();
+				
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
+				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
+            
+					//String string=firstSheet.getRow(rowNum).getCell(2).toString();
+				 //check=checkAvailableBoq(string);
+				
+				}else {
+					check=false;
+				}
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
 
+
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+//edited	
+						
+
 
 						if (cell.getColumnIndex() == 0) {
 							aBoQDetails.setMilestone(cell.getStringCellValue());
@@ -538,19 +553,51 @@ private static Map<String, String> map;
 						}
 						
 						else if (cell.getColumnIndex() == 1) {
+							
+							//if(check) {
+							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
+							//}else {
+							//	aBoQDetails.setItem_description(" ");
+							//}
+							
 						} else if (cell.getColumnIndex() == 2) {
+							
+							//if(check) {
+							
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							//}else {
+							//	aBoQDetails.setRef_dsr(" ");
+							//}
 						}else if (cell.getColumnIndex() == 3) {
+							
+							//if(check) {
+								
 							aBoQDetails.setUnit(cell.getStringCellValue());
+							//}else {
+							//	aBoQDetails.setUnit(" ");
+						//	}
+							
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
 						 if (cell.getColumnIndex() == 4) {
+							 
+							 //if(check) {
+								 
 							aBoQDetails.setRate(cell.getNumericCellValue());
+							// }else {
+							//	 aBoQDetails.setRate(0.0); 
+							// }
 						} else if (cell.getColumnIndex() == 5) {
+							
+							//if(check) {
+							
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							//}else {
+							//	aBoQDetails.setQuantity(0.0);
+						//	}
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 						}
@@ -569,11 +616,12 @@ private static Map<String, String> map;
 
 					}
 				}
+            
 			}
 
 			// workbook.close();
 			inputStream.close();
-
+//////////
 		} else {
 			// response = "Please choose a file.";
 		}
@@ -594,6 +642,31 @@ private static Map<String, String> map;
 		return "boqDetails";
 
 	}
+
+public boolean checkAvailableBoq(final String ref) {
+	boolean b=false;
+	
+	if(ref!=null && ref !="")
+	{
+	
+	final StringBuffer query = new StringBuffer(500);
+	 List<Object[]> list =null;
+	 query
+        .append(
+                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+	
+			query.append("where bq.ref_dsr = ? ");
+			
+			System.out.println("Query :: "+query.toString());
+			list = persistenceService.findAllBy(query.toString(),ref);
+		
+     if (list.size() != 0) {
+    	 
+    	 b=true; 
+     }
+     }
+	return b;
+}
 
 	public Workbook getWorkbook(FileInputStream inputStream, String excelFilePath) throws IOException {
 		Workbook workbook = null;
@@ -677,12 +750,12 @@ private static Map<String, String> map;
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("mode","view");
-	
+		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
 		return "view-work-agreement";
 	}
 	
@@ -705,8 +778,8 @@ private static Map<String, String> map;
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareValidActionListByCutOffDate(model);
         
@@ -725,7 +798,7 @@ private static Map<String, String> map;
         
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
-	
+		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
 		return "view-work-agreement-closure";
 	}
 	
@@ -766,13 +839,14 @@ private static Map<String, String> map;
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("mode","view");
 		System.out.println("test ending");
+		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
 		return "view-work-agreement-progress";
 	}
 
@@ -877,9 +951,10 @@ private static Map<String, String> map;
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		//model.addAttribute("workflowHistory",getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		model.addAttribute("workflowHistory",getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
+		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
 		org.egov.infra.admin.master.entity.User user =null;
 		
 		BoQDetails boq = new BoQDetails();
@@ -977,7 +1052,12 @@ private static Map<String, String> map;
 		boqDateUpdate.setCreatedDate(date);
 		boqDateUpdateService.saveUpdateDate(boqDateUpdate);
 	}
-	
+//	@RequestMapping("/boq/viewdata")
+//	public String viewModifyDate()
+//	{
+//		System.out.println("kundan view data here ............");
+//		return "view-data";
+//	}
 	/* Ended By Kundan Kumar for save Modify Date on date change */	
 	
 	@RequestMapping(value = "/progress/updateProgress", method = RequestMethod.POST)
@@ -1335,6 +1415,63 @@ private static Map<String, String> map;
 				"Works_Agreement");
 		estDetails.setDocumentDetail(documentDetailsList);
 		return estDetails;
+	}
+	@RequestMapping(value = "/checkref/{id}", method = RequestMethod.GET,produces = "application/json")
+	public @ResponseBody String searchRef(@PathVariable("id") final String ref) {
+		
+		System.out.println("+++++++++++++++"+ref+"++++++++++++++++++++");
+		System.out.println("id :: "+ref);
+		if(ref!=null && ref !="")
+		{
+		List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
+
+		BoqNewDetails estimate=null;
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		
+				query.append("where bq.ref_dsr = ? ");
+				
+				System.out.println("Query :: "+query.toString());
+				list = persistenceService.findAllBy(query.toString(),ref);
+			
+		
+		 
+        
+         if (list.size() != 0) {
+        	 
+        	 for (final Object[] object : list) {
+        		 estimate = new BoqNewDetails();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setItem_description(object[1].toString());
+        		 }
+        		 if(object[2] != null)
+        		 {
+        			 estimate.setRef_dsr(object[2].toString());
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setUnit(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setRate(Double.parseDouble(object[4].toString()));
+        		 }
+        		 
+        		 approvalList.add(estimate);
+        	 }
+        	 
+        	 return "success"; 
+         }
+         
+		}
+		return "fail";
+		
 	}
 	
 	@RequestMapping(value = "/contractorid/{id}", method = RequestMethod.GET,produces = "application/json")

@@ -131,6 +131,8 @@ public class PaymentUtils {
         receipt.getBill().add(bill);
         receipt.setSubdivison(payment.getSubdivison());
         receipt.setGstNo(payment.getGstno());
+        receipt.setServicename(payment.getServicename());
+        receipt.setCollectedbyname(payment.getCollectedbyname());
         receipt.setPaymentStatus(payment.getPaymentStatus().name());
     }
 

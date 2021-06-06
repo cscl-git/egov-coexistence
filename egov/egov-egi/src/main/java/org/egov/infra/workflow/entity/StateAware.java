@@ -107,7 +107,7 @@ public abstract class StateAware extends AbstractAuditable {
         return state;
     }
 
-    private void setState(State state) {
+    public void setState(State state) {
         this.state = state;
     }
 
@@ -268,6 +268,13 @@ public abstract class StateAware extends AbstractAuditable {
         public final Transition withOwner(Long owner) {
             checkTransitionStatus();
             state.setOwnerPosition(owner);
+            return this;
+        }
+        
+        //added by rahul Dev
+        public final Transition withStatusStarted() {
+            checkTransitionStatus();
+            state.setStatus(StateStatus.STARTED);
             return this;
         }
 

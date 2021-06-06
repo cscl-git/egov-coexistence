@@ -12,7 +12,6 @@
     background-color: #acbfd0;
     vertical-align: top;
 }
-
 .table tbody > tr > td {
     color: black;
     vertical-align: top;
@@ -59,6 +58,10 @@
 						<form:input type="text" class="form-control"
 							path="work_agreement_number" readonly="true" />
 					</div>
+					
+					<c:if test="${ProjectModInitiated == 'Project Modification Initiated'}">
+						<a href="#" onclick="openWork('${workOrderAgreement.id}')">Extension History</a>
+					</c:if>
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.start.date" /></label>
@@ -588,7 +591,11 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 <script type="text/javascript">
-
+function openWork(woId)
+{
+	var url = "/services/works/timeExt/viewdata/"+ woId;
+	window.open(url,'','width=900, height=700');
+}
 	
 	function getContractorDetails(obj){
 		var id=obj.value;

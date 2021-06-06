@@ -119,7 +119,7 @@ function validateMandatoryFields(){
 
 function showAllSchedules(){
 	if(validateMandatoryFields()){
- 		window.open('/services/EGF/report/balanceSheetReport-generateScheduleReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.fund.id='+document.getElementById('fund').value+'&model.function.id='+document.getElementById('function').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+ 		window.open('/services/EGF/report/balanceSheetReport-generateScheduleReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.id='+document.getElementById('department').value+'&model.fund.id='+document.getElementById('fund').value+'&model.function.id='+document.getElementById('function').value+'&model.fromDate='+document.getElementById('fromDate').value+'&model.toDate='+document.getElementById('toDate').value,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 
  		//document.balanceSheetReport.action='/services/EGF/report/balanceSheetReport-generateScheduleReport.action?showDropDown=false&model.period='+document.getElementById('period').value+'&model.currency='+document.getElementById('currency').value+'&model.financialYear.id='+document.getElementById('financialYear').value+'&model.department.code='+document.getElementById('department').value+'&model.fund.id='+document.getElementById('fund').value+'&model.function.id='+document.getElementById('function').value+'&model.asOndate='+document.getElementById('asOndate').value,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no';
  		//document.balanceSheetReport.submit();
@@ -143,7 +143,7 @@ function showAllSchedulesDetailed(){
        var toDate=document.getElementById('toDate').value;
 
 
- 	window.open("/services/EGF/report/balanceSheetReport-generateScheduleReportDetailed.action?showDropDown=false&model.period="+period+"&model.currency="+currency+"&model.financialYear.id="+financialYear+"&model.department.code="+department+"&model.fund.id="+fund+"&model.function.id="+functionId+"&model.fromDate="+fromDate+"&model.toDate="+toDate,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+ 	window.open("/services/EGF/report/balanceSheetReport-generateScheduleReportDetailed.action?showDropDown=false&model.period="+period+"&model.currency="+currency+"&model.financialYear.id="+financialYear+"&model.department.id="+department+"&model.fund.id="+fund+"&model.function.id="+functionId+"&model.fromDate="+fromDate+"&model.toDate="+toDate,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 	//document.balanceSheetReport.action="/services/EGF/report/balanceSheetReport-generateScheduleReportDetailed.action?showDropDown=false&model.period="+period+"&model.currency="+currency+"&model.financialYear.id="+financialYear+"&model.department.code="+department+"&model.fund.id="+fund+"&model.function.id="+functionId+"&model.asOndate="+asOndate;
 
 	//document.balanceSheetReport.submit();

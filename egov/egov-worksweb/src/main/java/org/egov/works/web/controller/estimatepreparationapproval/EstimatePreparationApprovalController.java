@@ -37,6 +37,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
@@ -311,17 +312,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         	System.out.println("+++++++++++++Unable to send SMS to for agenda invitation+++++++++");
         }
             
-        
-	    		try {
-					
-	        	boolean emailStatus=sendEmailForAgendaInvitation(msg);
-	        	if(emailStatus) {
-	        		//System.out.println("++++++++++++++++++++++++++email Sent Successfully+++++++++++++++++++");
-	        	}
-				} catch (Exception e) {
-					//LOGGER.error("Error in sending email for agenda invitation",e);
-					e.printStackTrace();
-				}
 	        
        
         return successStatus;
@@ -417,7 +407,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
     }
     public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
-        notificationService.sendSMS(mobileNumber, smsBody);
+        notificationService.sendSMS(mobileNumber, smsBody,null);
     }
     public List<User> getUserListForAgendaInvitation() {
         Set<User> usersListResult = new HashSet<>();
@@ -535,7 +525,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		File fileToUpload = null;
 		String FILE_PATH_PROPERTIES = "D:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
-		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+		//file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
 		Double estAmt= 0.0;
 		// String documentPath = "D://Upload/";
 
@@ -552,26 +542,40 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			Path Path = null;
 			Path = Paths.get(filePath);
 
-			Path doc = Paths.get(documentPath);
-			if (!Files.exists(doc)) {
-				Files.createDirectories(doc);
-			}
-
-			Files.write(Path, bytes);
+			/*
+			 * Path doc = Paths.get(documentPath); if (!Files.exists(doc)) {
+			 * Files.createDirectories(doc); }
+			 * 
+			 * Files.write(Path, bytes);
+			 */
 		}
-		File xlsFile = new File(fileToUpload.toString());
-		if (xlsFile.exists()) {
+		byte[] bytes = file.getBytes();
+        String completeData = new String(bytes);
+        String[] rows = completeData.split("#");
+        String[] columns = rows[0].split(",");
+        
+		//File xlsFile = new File(fileToUpload.toString());
+		//if (xlsFile.exists()) {
 
-			FileInputStream inputStream = new FileInputStream(new File(filePath));
-			Workbook workbook = getWorkbook(inputStream, filePath);
+			//FileInputStream inputStream = new FileInputStream(new File(filePath));
+			//Workbook workbook = getWorkbook(inputStream, filePath);
+        Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			Sheet firstSheet = workbook.getSheetAt(0);
 			Iterator<Row> iterator = firstSheet.iterator();
-			
+			boolean check=false;
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
+				int rowNum = nextRow.getRowNum();
+				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
 
+					//String string=firstSheet.getRow(rowNum).getCell(2).toString();
+				 //check=checkAvailableBoq(string);
+				
+				}else {
+					check=false;
+				}
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
@@ -584,19 +588,44 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 						}
 						
 						else if (cell.getColumnIndex() == 1) {
+							//if(check) {
 							aBoQDetails.setItem_description(cell.getStringCellValue());
+							//}else {
+							//	aBoQDetails.setItem_description("");
+						//	}
+							
 						} else if (cell.getColumnIndex() == 2) {
+							//if(check) {
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							//}else {
+								//aBoQDetails.setRef_dsr("");
+							//}
+							
 						}else if (cell.getColumnIndex() == 3) {
+							//if(check) {
 							aBoQDetails.setUnit(cell.getStringCellValue());
+							//}else {
+								//aBoQDetails.setUnit("");
+							//}
+							
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 
 						 if (cell.getColumnIndex() == 4) {
+							 //if(check) {
 							aBoQDetails.setRate(cell.getNumericCellValue());
+							 //}else {
+								// aBoQDetails.setRate(0.0);
+							 //}
+							
 						} else if (cell.getColumnIndex() == 5) {
+							//if(check) {
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							//}else {
+								//aBoQDetails.setQuantity(0.0);
+							//}
+							
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							
@@ -619,11 +648,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			}
 
 			// workbook.close();
-			inputStream.close();
+			//inputStream.close();
 
-		} else {
+		//} else {
 			// response = "Please choose a file.";
-		}
+		//}
 		
 		  Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
@@ -666,6 +695,30 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		System.out.println("upload");
 		return "estimatepreparationapproval-form";
 
+	}
+	public boolean checkAvailableBoq(final String ref) {
+		boolean b=false;
+		
+		if(ref!=null && ref !="")
+		{
+		
+		final StringBuffer query = new StringBuffer(500);
+		 List<Object[]> list =null;
+		 query
+	        .append(
+	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		
+				query.append("where bq.ref_dsr = ? ");
+				
+				System.out.println("Query :: "+query.toString());
+				list = persistenceService.findAllBy(query.toString(),ref);
+			
+	     if (list.size() != 0) {
+	    	 
+	    	 b=true; 
+	     }
+	     }
+		return b;
 	}
 	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
 		BigDecimal  bg100 = new BigDecimal(100);
@@ -916,8 +969,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 
 		return "view-estimate-form";
 	}
@@ -963,8 +1016,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
 		if (estimateDetails.getState() != null)
             model.addAttribute("currentState", estimateDetails.getState().getValue());
-		//model.addAttribute("workflowHistory",
-			//	getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-estimate-form";
 	}
 

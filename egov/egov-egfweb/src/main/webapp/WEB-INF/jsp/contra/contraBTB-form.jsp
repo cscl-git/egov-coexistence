@@ -184,7 +184,7 @@
 	<td class="bluebox">First Signatory<span class="mandatory1">*</span></td>
 	<td class="bluebox"><s:select name="firstsignatory" headerKey="-1"
 			headerValue="Select First Signatory" value="%{firstsignatory}"
-			list="#{'Additional Commissioner':'Additional Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+			list="#{'Joint Commissioner':'Joint Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
 			id="firstsignatory" /></td>
 	<td class="bluebox" width="15%">Second Signatory<span
 		class="mandatory1">*</span></td>

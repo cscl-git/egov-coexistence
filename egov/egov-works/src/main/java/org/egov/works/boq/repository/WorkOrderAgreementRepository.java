@@ -41,4 +41,6 @@ public interface WorkOrderAgreementRepository extends JpaRepository<WorkOrderAgr
 	
 	@Query(nativeQuery = true)
 	List<WorkOrderAgreementRESTPOJO> getAllWorkOrderAgreement();
+	@Query(nativeQuery = true)
+	List<WorkOrderAgreementRESTPOJO> getAllWorkOrderAgreementByMileStone();
 }

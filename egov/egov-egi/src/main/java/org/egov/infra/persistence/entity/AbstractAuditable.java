@@ -71,6 +71,7 @@ public abstract class AbstractAuditable extends AbstractPersistable<Long> {
 	// @CreatedBy
 	// private User createdBy;
 	private Long createdBy;
+	
 
 	@Temporal(TemporalType.TIMESTAMP)
 	@CreatedDate

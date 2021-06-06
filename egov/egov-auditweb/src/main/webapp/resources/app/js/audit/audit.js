@@ -174,6 +174,7 @@ function deleteSubledgerRow(obj) {
    // resetDebitCodes();
 }
 
+
 function addCustomEvent(index,target,type,func){
 	target = target.replace('index',index);
 	addCustomEventListener(target, type, func);

@@ -182,10 +182,11 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 //        owners.add(4L);
 //        owners.add(1L);
         if (!owners.isEmpty()) {
-        	LOG.debug ("Owner");
             List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
             for (String type : types) {
-            	LOG.debug ("type : "+type);
+            	if(isAllowableType(type)) {//added abhishek on13052021
+            		continue;
+            	}
                 Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
                 if (inboxRenderService.isPresent()) {
                 	LOG.debug ("draft : "+draft);
@@ -199,18 +200,23 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     }
     
     private List<T> getAssignedWorkflowItems(boolean draft, String module) {
+    	System.out.println("module :::"+module);
+    	System.out.println("draft :::"+draft);
         List<T> workflowItems = new ArrayList<>();
         List<Long> owners = currentUserPositionIds();
         if (!owners.isEmpty()) {
             List<String> types = stateService.getAssignedWorkflowTypeNames(owners);
             for (String type : types) {
+            	System.out.println("type :::"+type);
             	if(!StringUtils.isEmpty(module)
             			&& !isAllowableType(module, type)) {
+            		System.out.println("continue");
             		continue;
             	}
-            	
+            	System.out.println("continue1");
                 Optional<InboxRenderService<T>> inboxRenderService = this.getInboxRenderService(type);
                 if (inboxRenderService.isPresent()) {
+                	System.out.println("present");
                     InboxRenderService<T> renderService = inboxRenderService.get();
                     workflowItems.addAll(draft ? renderService.getDraftWorkflowItems(owners) :
                             renderService.getAssignedWorkflowItems(owners));
@@ -232,6 +238,19 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
     		return true;
     	}else if(WORKFLOW_MODULE_WORKS.equalsIgnoreCase(module)
     			&& WORKFLOW_MODULE_WORKS_TYPES.contains(type)) {
+    		return true;
+    	}
+    	return false;
+    }
+    //added abhishek
+    private boolean isAllowableType(String type) {
+    	if(WORKFLOW_MODULE_AGENDA_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_APNIMANDI_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_AUDIT_TYPES.contains(type)) {
+    		return true;
+    	}else if(WORKFLOW_MODULE_WORKS_TYPES.contains(type)) {
     		return true;
     	}
     	return false;
@@ -265,6 +284,7 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
 
     private Optional<InboxRenderService<T>> getInboxRenderService(String type) {
         InboxRenderService<T> inboxRenderService = null;
+        
         try {
             if (getWorkflowType(type) != null)
                 inboxRenderService = applicationContext.getBean(String.format(INBOX_RENDER_SERVICE_SUFFIX, type), InboxRenderService.class);
@@ -300,11 +320,11 @@ public class InboxRenderServiceDelegate<T extends StateAware> {
        
     	List<Long> positions = new ArrayList<>();
     	Long empId = ApplicationThreadLocals.getUserId();
-    	LOG.debug("emp id : "+empId);
+    	System.out.println("emp id : "+empId);
     	List<EmployeeInfo> employs = microserviceUtils.getEmployee(empId, null,null, null);
     	
     	if(null !=employs && employs.size()>0 ) {
-    		LOG.debug ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
+    		System.out.println ("pos no : "+employs.get(0).getAssignments().get(0).getPosition());
 	    	employs.get(0).getAssignments().forEach(assignment->{
 	    		positions.add(assignment.getPosition());
 	    	});

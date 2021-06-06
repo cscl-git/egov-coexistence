@@ -239,9 +239,9 @@
 		<form:errors path="nodalOfficerDepartment" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
-			code="lbl.nodalofficer" />:</label>
+			code="lbl.nodalofficer" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" />
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" required="required"/>
 		<form:errors path="nodalOfficer" cssClass="add-margin error-msg" />
 	</div>	
 </div>
@@ -288,6 +288,16 @@
 			path="estimatePreparedBy" data-pattern="address" />
 		<form:errors path="estimatePreparedBy" cssClass="add-margin error-msg" />
 	</div>
+</div>
+<div class="form-group">
+<label class="col-sm-3 control-label text-right">Is Case Important ?</label>
+<div class="col-sm-3 add-margin">
+
+
+        <input type="radio" name="caseImportant" id="caseyes" class="caseimp" value="Yes" <c:if test="${legalCase.caseImportant=='Yes'}">checked="checked"</c:if>><span>YES</span>
+      
+        <input type="radio" name="caseImportant" id="caseno"  class="caseimp" value="No" <c:if test="${legalCase.caseImportant=='No'}">checked="checked"</c:if>><span>NO</span>
+</div>
 </div>
  <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons" style="display:none;"><spring:message

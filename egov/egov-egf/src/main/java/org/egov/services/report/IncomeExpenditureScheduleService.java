@@ -58,6 +58,7 @@ import org.egov.utils.Constants;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -66,6 +67,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+@Service
 public class IncomeExpenditureScheduleService extends ScheduleService {
  @Autowired
  @Qualifier("persistenceService")
@@ -73,6 +75,7 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
 
     private static final String IE = "IE";
     private static final String I = "I";
+    @Autowired
     private IncomeExpenditureService incomeExpenditureService;
     private static final Logger LOGGER = Logger.getLogger(IncomeExpenditureScheduleService.class);
 
@@ -105,6 +108,8 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
         incomeExpenditureService.removeFundsWithNoData(statement);
         incomeExpenditureService.computeCurrentYearTotals(statement, Constants.LIABILITIES, Constants.ASSETS);
         computeAndAddTotals(statement);
+       
+        System.out.println("populateDataForAllSchedulesOLD ::>>"+statement.getIeEntries().size());
        
     }
 
@@ -543,4 +548,38 @@ public class IncomeExpenditureScheduleService extends ScheduleService {
         this.incomeExpenditureService = incomeExpenditureService;
     }
 
+    
+    public Statement populateDataForAllSchedulesForRestData(final Statement statement) {
+        
+        voucherStatusToExclude = getAppConfigValueFor("EGF", "statusexcludeReport");
+        minorCodeLength = Integer.valueOf(incomeExpenditureService.getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
+        
+        final Date fromDate = incomeExpenditureService.getFromDate(statement);
+        final Date toDate = incomeExpenditureService.getToDate(statement);
+        
+        final List<Fund> fundList = statement.getFunds();
+        populateCurrentYearAmountForAllSchedules(statement, fundList,
+                amountPerFundQueryForAllSchedules(incomeExpenditureService.getFilterQuery(statement), toDate, fromDate, IE));
+        populatePreviousYearTotalsForAllSchedules(statement, incomeExpenditureService.getFilterQuery(statement), toDate, fromDate);
+        incomeExpenditureService.removeFundsWithNoData(statement);
+        incomeExpenditureService.computeCurrentYearTotals(statement, Constants.LIABILITIES, Constants.ASSETS);
+        computeAndAddTotals(statement);
+        System.out.println("Schedule Service"+statement.getIeEntries().size());
+        System.out.println("Schedule Service"+statement.getFunds().size());
+       return statement;
+    }
+    
+    
+public Statement populateDetailcodeRestData(final Statement statement) {
+    	
+        final Date fromDate = incomeExpenditureService.getFromDate(statement);
+        final Date toDate = incomeExpenditureService.getToDate(statement);
+        // List<Fund> fundList = statement.getFunds();
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("preparing list to load all detailcode");
+        populateAmountForAllSchedules(statement, toDate, fromDate, "('I','E')");
+        incomeExpenditureService.removeFundsWithNoDataIE(statement);
+        return statement;
+    }
+	
 }

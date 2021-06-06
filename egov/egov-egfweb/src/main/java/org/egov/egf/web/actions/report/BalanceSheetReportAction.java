@@ -49,6 +49,14 @@ package org.egov.egf.web.actions.report;
 
 
 import net.sf.jasperreports.engine.JasperPrint;
+
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFPrintSetup;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -60,6 +68,7 @@ import org.egov.commons.Functionary;
 import org.egov.commons.Fund;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.egf.model.Statement;
+import org.egov.egf.model.StatementEntry;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
@@ -74,12 +83,17 @@ import org.hibernate.FlushMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 @ParentPackage("egov")
 @Results({
@@ -110,6 +124,8 @@ public class BalanceSheetReportAction extends BaseFormAction {
     FinancialYearDAO financialYearDAO;
     CFinancialYear financialYear=new CFinancialYear();
     
+    private static SimpleDateFormat FORMATDDMMYYYY = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+    private byte[]excelData=null;
    
  @Autowired
  @Qualifier("persistenceService")
@@ -352,17 +368,39 @@ public class BalanceSheetReportAction extends BaseFormAction {
     @Action(value = "/report/balanceSheetReport-generateBalanceSheetXls")
     public String generateBalanceSheetXls() throws Exception {
         populateDataSource();
-        JasperPrint jasper = null;
-        if (!balanceSheet.getPeriod().equalsIgnoreCase("Yearly"))
-            jasper = reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet, getText("report.heading"),
-                    header.toString(),
-                    getCurrentYearToDate(), getPreviousYearToDate(), true);
-        else
-            jasper = reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet, getText("report.heading"),
-                    header.toString(),
-                    getCurrentYearToDate(), getPreviousYearToDate(), true);
-        inputStream = reportHelper.exportXls(inputStream, jasper);
+		/*
+		 * JasperPrint jasper = null; if
+		 * (!balanceSheet.getPeriod().equalsIgnoreCase("Yearly")) jasper =
+		 * reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
+		 * getText("report.heading"), header.toString(), getCurrentYearToDate(),
+		 * getPreviousYearToDate(), true); else jasper =
+		 * reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
+		 * getText("report.heading"), header.toString(), getCurrentYearToDate(),
+		 * getPreviousYearToDate(), true); inputStream =
+		 * reportHelper.exportXls(inputStream, jasper); return BALANCE_SHEET_XLS;
+		 */
+        final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate())
+        + "                                               ";
+        String report_header="Balance Sheet Report  ";
+        Map<String, String> headerData = new HashMap<>();
+        headerData.put("h1", report_header+header.toString());
+        headerData.put("h2", subtitle);
+        headerData.put("h3", "Amount in "+balanceSheet.getCurrency());
+        headerData.put("h4", "Account Code");
+        headerData.put("h5","Head Of Account");
+        headerData.put("h6","Schedule No");
+       
+        headerData.put("h8",getPreviousYearToDate());
+        headerData.put("h9", getCurrentYearToDate());
+        
+      try {
+    	  excelData = getBalanceSheetResultsExcelSheet(headerData,balanceSheet);
+      } catch (Exception e) {
+		e.printStackTrace();
+	}
+       inputStream = new ByteArrayInputStream(excelData);
         return BALANCE_SHEET_XLS;
+        
     }
 
     @ReadOnly
@@ -381,11 +419,28 @@ public class BalanceSheetReportAction extends BaseFormAction {
     @Action(value = "/report/balanceSheetReport-generateScheduleXls")
     public String generateScheduleXls() throws Exception {
         populateDataSourceForAllSchedules();
-        final JasperPrint jasper = reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
-                getText("report.heading"),
-                header.toString(),
-                getCurrentYearToDate(), getPreviousYearToDate(), false);
-        inputStream = reportHelper.exportXls(inputStream, jasper);
+		/*
+		 * final JasperPrint jasper =
+		 * reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
+		 * getText("report.heading"), header.toString(), getCurrentYearToDate(),
+		 * getPreviousYearToDate(), false); inputStream =
+		 * reportHelper.exportXls(inputStream, jasper); return BALANCE_SHEET_XLS;
+		 */
+        final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate())
+        + "                                               ";
+        
+        String report_header="Balance Sheet Report  ";
+        Map<String, String> headerData = new HashMap<>();
+        headerData.put("h1", report_header+header.toString());
+        headerData.put("h2", subtitle);
+        headerData.put("h3", "Amount in "+balanceSheet.getCurrency());
+        headerData.put("h4", "Account Code");
+        headerData.put("h5","Head Of Account");
+        headerData.put("h6","Schedule No");
+       
+        
+       excelData = getBalanceSheetMinorAllScheduleResultsExcelSheet(headerData,balanceSheet);
+       inputStream = new ByteArrayInputStream(excelData);
         return BALANCE_SHEET_XLS;
     }
 
@@ -407,11 +462,29 @@ public class BalanceSheetReportAction extends BaseFormAction {
     @Action(value = "/report/balanceSheetReport-generateDetailedScheduleXls")
     public String generateDetailedScheduleXls() throws Exception {
         populateDataSourceForAllSchedulesDetailed();
-        final JasperPrint jasper = reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
-                getText("report.heading"),
-                header.toString(),
-                getCurrentYearToDate(), getPreviousYearToDate(), false);
-        inputStream = reportHelper.exportXls(inputStream, jasper);
+		/*
+		 * final JasperPrint jasper =
+		 * reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
+		 * getText("report.heading"), header.toString(), getCurrentYearToDate(),
+		 * getPreviousYearToDate(), false); inputStream =
+		 * reportHelper.exportXls(inputStream, jasper); return BALANCE_SHEET_XLS;
+		 */
+        final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate())
+        + "                                               ";
+        
+        String report_header="Balance Sheet Report  ";
+        Map<String, String> headerData = new HashMap<>();
+        headerData.put("h1", report_header+header.toString());
+        headerData.put("h2", subtitle);
+        headerData.put("h3", "Amount in "+balanceSheet.getCurrency());
+        headerData.put("h4", "Account Code");
+        headerData.put("h5","Head Of Account");
+        headerData.put("h6","Schedule No");
+       
+        
+       excelData = getBalanceSheetMinorAllScheduleResultsExcelSheet(headerData,balanceSheet);
+       inputStream = new ByteArrayInputStream(excelData);
+        
         return BALANCE_SHEET_XLS;
     }
 
@@ -430,10 +503,26 @@ public class BalanceSheetReportAction extends BaseFormAction {
     @Action(value = "/report/balanceSheetReport-generateBalanceSheetScheduleXls")
     public String generateBalanceSheetScheduleXls() throws Exception {
         populateDataSourceForSchedule();
-        final JasperPrint jasper = reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
-                getText("report.sub.schedule.heading"), header.toString(),
-                getCurrentYearToDate(), getPreviousYearToDate(), false);
-        inputStream = reportHelper.exportXls(inputStream, jasper);
+		/*
+		 * final JasperPrint jasper =
+		 * reportHelper.generateFinancialStatementReportJasperPrint(balanceSheet,
+		 * getText("report.sub.schedule.heading"), header.toString(),
+		 * getCurrentYearToDate(), getPreviousYearToDate(), false); inputStream =
+		 * reportHelper.exportXls(inputStream, jasper); return BALANCE_SHEET_XLS;
+		 */
+        
+        final String subtitle = "Report Run Date-" + FORMATDDMMYYYY.format(getTodayDate())
+        + "                                               ";
+        
+        String report_header="Balance Sheet Report  ";
+        Map<String, String> headerData = new HashMap<>();
+        headerData.put("h1", report_header+header.toString());
+        headerData.put("h2", subtitle);
+        headerData.put("h3", "Amount in "+balanceSheet.getCurrency());
+        headerData.put("h4", "Account Code");
+        headerData.put("h5","Head Of Account");
+        excelData = getBalanceSheetScheduleResultsExcelSheet(headerData,balanceSheet);
+        inputStream = new ByteArrayInputStream(excelData);
         return BALANCE_SHEET_XLS;
     }
 
@@ -494,4 +583,511 @@ public class BalanceSheetReportAction extends BaseFormAction {
     public void setAsOnDate(Date asOnDate) {
         this.asOnDate = asOnDate;
     }
+    
+    
+  //Added By Bikash For Income Expenditure EXcel Sheet 22022021
+  		private byte[] getBalanceSheetResultsExcelSheet(Map<String,String>headerData,Statement balanceSheet) {
+  			System.out.println("Inside Schedule Action");
+  			byte[]fileContent=null;
+  			try {
+  				HSSFWorkbook wb = new HSSFWorkbook();
+  				Sheet sheet = wb.createSheet("Balance Sheet Report");
+  				//sheet.getPrintSetup().setLandscape(true);
+  				//sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE); 
+  				HSSFCellStyle style = wb.createCellStyle();  
+			/*
+			 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
+			 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
+			 */
+  		      //  style.setFont(font);  
+  				int i =0;
+  				Row row1 = sheet.createRow(i++);	  
+  				Cell c1=  row1.createCell(0);
+  				c1.setCellStyle(style);
+  				c1.setCellValue(headerData.get("h1"));
+  				
+  				Row row2 = sheet.createRow(i++);	  
+  				Cell c2=  row2.createCell(0);
+  				c2.setCellStyle(style);
+  				c2.setCellValue(headerData.get("h2"));
+  				Cell c3=  row2.createCell(3);
+  				c3.setCellStyle(style);
+  				c3.setCellValue(headerData.get("h3"));
+  				
+  				
+  				Row row3 = sheet.createRow(i++);	  
+  				Cell c4=  row3.createCell(0);
+  				c4.setCellStyle(style);
+  				c4.setCellValue(headerData.get("h4"));
+  				
+  				Cell c5=  row3.createCell(1);
+  				c5.setCellStyle(style);
+  				c5.setCellValue(headerData.get("h5"));
+
+  				Cell c11=  row3.createCell(2);
+  				c11.setCellStyle(style);
+  				c11.setCellValue(headerData.get("h6"));
+
+  				
+  				int j =3;
+  				int fund_size=balanceSheet.getFunds().size();
+  				if(fund_size>1) {
+  					
+  					for(Fund f:balanceSheet.getFunds()) {
+  						
+  						//System.out.println("Fund loop "+j);
+  						Cell c6=  row3.createCell(j++);
+  						c6.setCellStyle(style);
+  						c6.setCellValue(f.getName().toString());
+  					}
+  					
+  					//System.out.println("After Fund loop "+j);
+  					Cell c7=  row3.createCell(j);
+  					c7.setCellStyle(style);
+  					c7.setCellValue(getCurrentYearToDate());
+  					//System.out.println("Fund loop 2 "+j);
+  					Cell c8=  row3.createCell(j+1);
+  					c8.setCellStyle(style);
+  					c8.setCellValue(getPreviousYearToDate());
+  					
+  				}else {
+  					Cell c7=  row3.createCell(j++);
+  					c7.setCellStyle(style);
+  					c7.setCellValue(getCurrentYearToDate());
+  					
+  					Cell c8=  row3.createCell(j++);
+  					c8.setCellStyle(style);
+  					c8.setCellValue(getPreviousYearToDate());
+  					
+  				}
+  	
+  				//Row row4 = sheet.createRow(i++);
+  				
+  				for(StatementEntry s : balanceSheet.getEntries()) {
+  					//System.out.println("GLCODE"+s.getGlCode());
+  					
+  					//System.out.println("Account"+s.getAccountName());
+  					String schedule_num="";
+  					String glcode="";
+  					String account_name="";
+  					String fundAmount="";
+  					String currentYearTotal="";
+  					String previousYearTotal="";
+  					
+  					 Row row = sheet.createRow(i++);
+  					 	Cell cell0 = row.createCell(0);
+  						Cell cell1 = row.createCell(1);
+  						Cell cell7=row.createCell(2);
+  						Cell cell4;
+  						Cell cell5;
+  						int x=3;
+  						if(fund_size>1) {
+
+  						 for(Fund f:balanceSheet.getFunds()) {
+  							  
+  							  Cell cell3 = row.createCell(x++); 
+  							  if(null!=s.getFundWiseAmount().get(f.getName()))
+  							  { 
+  								  fundAmount =s.getFundWiseAmount().get(f.getName()).toString();
+  							  }
+  							  		cell3.setCellValue(fundAmount);
+  							 
+  							  
+  							  }
+  						
+  						 cell4=row.createCell(x);
+  							
+  						 cell5=row.createCell(x+1);
+  						}else {
+  							 cell4=row.createCell(x++);
+  							 cell5=row.createCell(x++);
+  						}
+
+  						if(null!=s.getGlCode()) {
+  							glcode =s.getGlCode().toString();
+  						}
+  						
+  						if(null!=s.getAccountName()) {
+  							account_name =s.getAccountName().toString();
+  						}
+  						
+  						if(null!=s.getCurrentYearTotal()) {
+  							currentYearTotal=s.getCurrentYearTotal().toString();
+  						}
+  						if(null!=s.getCurrentYearTotal()) {
+  							previousYearTotal=s.getPreviousYearTotal().toString();
+  						}
+  						if(null!=s.getScheduleNo()) {
+  						schedule_num = s.getScheduleNo().toString();
+  						}
+  						
+  				/*
+  				 * if(currentYearTotal.equals("0")) { currentYearTotal="0.0"; }
+  				 * if(previousYearTotal.equals("0")) { previousYearTotal="0.0"; }
+  				 */
+  						cell0.setCellValue(glcode);
+  						cell1.setCellValue(account_name);
+  						cell4.setCellValue(currentYearTotal);
+  						cell5.setCellValue(previousYearTotal);
+  						cell7.setCellValue(schedule_num);
+  			        } 
+  				int numberOfSheets = wb.getNumberOfSheets();
+				 for (int x = 0; x < numberOfSheets; x++) {
+				        Sheet sheet1 = wb.getSheetAt(x);
+				        int total_row=6;
+				        if (sheet1.getPhysicalNumberOfRows() > 0) {
+				        	
+				        		Row row = sheet1.getRow(total_row);
+					            Iterator<Cell> cellIterator = row.cellIterator();
+					            while (cellIterator.hasNext()) {
+					                Cell cell = cellIterator.next();
+					                int columnIndex = cell.getColumnIndex();
+					               // System.out.println(columnIndex);
+					                sheet1.autoSizeColumn(columnIndex);
+					            }
+				        	
+				            
+				        }
+				    }
+  				ByteArrayOutputStream os = new ByteArrayOutputStream();
+  				wb.write(os);
+  				fileContent = os.toByteArray();
+  				
+  				
+  			}catch(Exception ex) {
+  				ex.printStackTrace();
+  			}
+  			 return fileContent;
+  		}
+    
+  		private byte[] getBalanceSheetScheduleResultsExcelSheet(Map<String,String>headerData,Statement balanceSheet) {
+			System.out.println("Inside Schedule Action");
+			byte[]fileContent=null;
+			try {
+				HSSFWorkbook wb = new HSSFWorkbook();
+				Sheet sheet = wb.createSheet("Balance Sheet Report");
+			/*
+			 * sheet.getPrintSetup().setLandscape(true);
+			 * sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE);
+			 */
+				HSSFCellStyle style = wb.createCellStyle();  
+			/*
+			 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
+			 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
+			 */
+		        //style.setFont(font);  
+				int i =0;
+				Row row1 = sheet.createRow(i++);	  
+				Cell c1=  row1.createCell(0);
+				c1.setCellStyle(style);
+				c1.setCellValue(headerData.get("h1"));
+				
+				Row row2 = sheet.createRow(i++);	  
+				Cell c2=  row2.createCell(0);
+				c2.setCellStyle(style);
+				c2.setCellValue(headerData.get("h2"));
+				Cell c3=  row2.createCell(3);
+				c3.setCellStyle(style);
+				c3.setCellValue(headerData.get("h3"));
+				
+				
+				Row row3 = sheet.createRow(i++);	  
+				Cell c4=  row3.createCell(0);
+				c4.setCellStyle(style);
+				c4.setCellValue(headerData.get("h4"));
+				
+				Cell c5=  row3.createCell(1);
+				c5.setCellStyle(style);
+				c5.setCellValue(headerData.get("h5"));
+				
+				int j =2;
+				int fund_size=balanceSheet.getFunds().size();
+				System.out.println(fund_size);
+				if(fund_size>1) {
+					
+					for(Fund f:balanceSheet.getFunds()) {
+						
+						//System.out.println("Fund loop "+j);
+						Cell c6=  row3.createCell(j++);
+			
+						c6.setCellStyle(style);
+						c6.setCellValue(f.getName().toString());
+					}
+					
+					//System.out.println("After Fund loop "+j);
+					Cell c7=  row3.createCell(j);
+					c7.setCellStyle(style);
+					c7.setCellValue(getCurrentYearToDate());
+					//System.out.println("Fund loop 2 "+j);
+					Cell c8=  row3.createCell(j+1);
+					c8.setCellStyle(style);
+					c8.setCellValue(getPreviousYearToDate());
+					
+				}else {
+					Cell c7=  row3.createCell(j++);
+					c7.setCellStyle(style);
+					c7.setCellValue(getCurrentYearToDate());
+					
+					Cell c8=  row3.createCell(j++);
+					c8.setCellStyle(style);
+					c8.setCellValue(getPreviousYearToDate());
+					
+				}
+	
+				//Row row4 = sheet.createRow(i++);
+				
+				for(StatementEntry s : balanceSheet.getEntries()) {
+					//System.out.println("GLCODE"+s.getGlCode());
+					
+					//System.out.println("Account"+s.getAccountName());
+					String glcode="";
+					String account_name="";
+					String fundAmount="";
+					String currentYearTotal="0.0";
+					String previousYearTotal="0.0";
+					
+					 Row row = sheet.createRow(i++);
+					 	Cell cell0 = row.createCell(0);
+						Cell cell1 = row.createCell(1);
+						Cell cell4;
+						Cell cell5;
+						int x=2;
+						if(fund_size>1) {
+											
+						 for(Fund f:balanceSheet.getFunds()) {
+							  
+							  Cell cell3 = row.createCell(x++); 
+							  if(null!=s.getFundWiseAmount().get(f.getName()))
+							  { 
+								  fundAmount =s.getFundWiseAmount().get(f.getName()).toString();
+							  }
+							  		cell3.setCellValue(fundAmount);
+
+							  }
+						
+						 cell4=row.createCell(x);
+							
+						 cell5=row.createCell(x+1);
+						}else {
+							 cell4=row.createCell(x++);
+							 cell5=row.createCell(x++);
+						}
+						
+						
+						
+						if(null!=s.getGlCode()) {
+							glcode =s.getGlCode().toString();
+						}
+						
+						if(null!=s.getAccountName()) {
+							account_name =s.getAccountName().toString();
+						}
+						
+						if(null!=s.getCurrentYearTotal()) {
+							currentYearTotal=s.getCurrentYearTotal().toString();
+						}
+						if(null!=s.getCurrentYearTotal()) {
+							previousYearTotal=s.getPreviousYearTotal().toString();
+						}
+						
+						System.out.println("currentYearTotal"+currentYearTotal);
+						System.out.println("previousYearTotal"+previousYearTotal);
+						cell0.setCellValue(glcode);
+						cell1.setCellValue(account_name);
+						cell4.setCellValue(currentYearTotal);
+						cell5.setCellValue(previousYearTotal);	
+			        } 
+				int numberOfSheets = wb.getNumberOfSheets();
+				 for (int x = 0; x < numberOfSheets; x++) {
+				        Sheet sheet1 = wb.getSheetAt(x);
+				        int total_row=6;
+				        if (sheet1.getPhysicalNumberOfRows() > 0) {
+				        	
+				        		Row row = sheet1.getRow(total_row);
+					            Iterator<Cell> cellIterator = row.cellIterator();
+					            while (cellIterator.hasNext()) {
+					                Cell cell = cellIterator.next();
+					                int columnIndex = cell.getColumnIndex();
+					               // System.out.println(columnIndex);
+					                sheet1.autoSizeColumn(columnIndex);
+					            }
+				        	
+				            
+				        }
+				    }
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				wb.write(os);
+				fileContent = os.toByteArray();
+				
+				
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			 return fileContent;
+		}
+  		
+  		
+  		private byte[] getBalanceSheetMinorAllScheduleResultsExcelSheet(Map<String,String>headerData,Statement balanceSheet) {
+			System.out.println("Inside ALl Schedule Action");
+			byte[]fileContent=null;
+			try {
+				HSSFWorkbook wb = new HSSFWorkbook();
+				Sheet sheet = wb.createSheet("Balance Sheet Report");
+			/*
+			 * sheet.getPrintSetup().setLandscape(true);
+			 * sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE);
+			 */ 
+				HSSFCellStyle style = wb.createCellStyle();  
+			/*
+			 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
+			 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
+			 * style.setFont(font);
+			 */
+				int i =0;
+				Row row1 = sheet.createRow(i++);	  
+				Cell c1=  row1.createCell(0);
+				c1.setCellStyle(style);
+				c1.setCellValue(headerData.get("h1"));
+				
+				Row row2 = sheet.createRow(i++);	  
+				Cell c2=  row2.createCell(0);
+				c2.setCellStyle(style);
+				c2.setCellValue(headerData.get("h2"));
+				Cell c3=  row2.createCell(3);
+				c3.setCellStyle(style);
+				c3.setCellValue(headerData.get("h3"));
+				
+				
+				Row row3 = sheet.createRow(i++);	  
+				Cell c4=  row3.createCell(0);
+				c4.setCellStyle(style);
+				c4.setCellValue(headerData.get("h4"));
+				
+				Cell c5=  row3.createCell(1);
+				c5.setCellStyle(style);
+				c5.setCellValue(headerData.get("h5"));
+				
+				int j =2;
+				int fund_size=balanceSheet.getFunds().size();
+				System.out.println(fund_size);
+				if(fund_size>1) {
+					
+					for(Fund f:balanceSheet.getFunds()) {
+						Cell c6=  row3.createCell(j++);
+						c6.setCellStyle(style);
+						c6.setCellValue(f.getName().toString());
+					}
+				
+					Cell c7=  row3.createCell(j);
+					c7.setCellStyle(style);
+					c7.setCellValue(getCurrentYearToDate());
+					
+					Cell c8=  row3.createCell(j+1);
+					c8.setCellStyle(style);
+					c8.setCellValue(getPreviousYearToDate());
+					
+				}else {
+					Cell c7=  row3.createCell(j++);
+					c7.setCellStyle(style);
+					c7.setCellValue(getCurrentYearToDate());
+					
+					Cell c8=  row3.createCell(j++);
+					c8.setCellStyle(style);
+					c8.setCellValue(getPreviousYearToDate());
+					
+				}
+	
+				for(StatementEntry s : balanceSheet.getEntries()) {
+					
+					String glcode="";
+					String account_name="";
+					String fundAmount="";
+					String currentYearTotal="";
+					String previousYearTotal="";
+					
+					 Row row = sheet.createRow(i++);
+					 	Cell cell0 = row.createCell(0);
+						Cell cell1 = row.createCell(1);
+						Cell cell4;
+						Cell cell5;
+						int x=2;
+						if(fund_size>1) {
+ 
+						 for(Fund f:balanceSheet.getFunds()) {
+							  
+							  Cell cell3 = row.createCell(x++); 
+							  if(null!=s.getFundWiseAmount().get(f.getName()))
+							  { 
+								  fundAmount = s.getFundWiseAmount().get(f.getName()).toString();
+							  }
+							  		cell3.setCellValue(fundAmount);
+
+							  }
+						
+						 cell4=row.createCell(x);
+							
+						 cell5=row.createCell(x+1);
+						 
+						}else {
+							 cell4=row.createCell(x++);
+							 cell5=row.createCell(x++);
+						}
+						
+						
+						
+						if(null!=s.getGlCode()) {
+							glcode =s.getGlCode().toString();
+						}
+						
+						if(null!=s.getAccountName()) {
+							account_name =s.getAccountName().toString();
+						}
+						
+						if(null!=s.getCurrentYearTotal()) {
+							currentYearTotal=s.getCurrentYearTotal().toString();
+						}
+						if(null!=s.getCurrentYearTotal()) {
+							previousYearTotal=s.getPreviousYearTotal().toString();
+						}
+						
+		/*
+		 * if(currentYearTotal.equals("0")) { currentYearTotal="0.0"; }
+		 * if(previousYearTotal.equals("0")) { previousYearTotal="0.0"; }
+		 */
+						System.out.println("currentYearTotal"+currentYearTotal);
+						System.out.println("previousYearTotal"+previousYearTotal);
+						cell0.setCellValue(glcode);
+						cell1.setCellValue(account_name);
+						cell4.setCellValue(currentYearTotal);
+						cell5.setCellValue(previousYearTotal);	
+			        } 
+				
+				int numberOfSheets = wb.getNumberOfSheets();
+				 for (int x = 0; x < numberOfSheets; x++) {
+				        Sheet sheet1 = wb.getSheetAt(x);
+				        int total_row=6;
+				        if (sheet1.getPhysicalNumberOfRows() > 0) {
+				        	
+				        		Row row = sheet1.getRow(total_row);
+					            Iterator<Cell> cellIterator = row.cellIterator();
+					            while (cellIterator.hasNext()) {
+					                Cell cell = cellIterator.next();
+					                int columnIndex = cell.getColumnIndex();
+					               // System.out.println(columnIndex);
+					                sheet1.autoSizeColumn(columnIndex);
+					            }
+				        	
+				            
+				        }
+				    }
+				ByteArrayOutputStream os = new ByteArrayOutputStream();
+				wb.write(os);
+				fileContent = os.toByteArray();
+				
+				
+			}catch(Exception ex) {
+				ex.printStackTrace();
+			}
+			 return fileContent;
+		}
 }

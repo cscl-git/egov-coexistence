@@ -47,10 +47,6 @@
  *
  */
 
-$(document).ready(function(){
-	
-});
-
 
 function calculateMeasuredAmount(x)
 {
@@ -194,6 +190,34 @@ function calcualtePerctAmountedit(x){
 	}
 	
 }
+
+function completionPerctAmountedit(x){
+	
+	var rowcount = $("#tblchecklist tbody tr").length;
+	
+	var paymentval=0;
+	
+	
+	var dataId = $(x).attr("data-idx");
+
+	
+	  if (dataId==undefined)
+	  {
+	  	dataId=0;
+	  }
+	  var percentage =document.getElementById("paymentDistribution[" + x
+				+ "].completion_percent").value;
+		
+
+		if(percentage <=100)
+		{
+				
+		}
+		else{
+			bootbox.alert("Completion Percentage exceed 100%");
+		}
+	}
+	
 
 
 var subledgerrowcount=0;

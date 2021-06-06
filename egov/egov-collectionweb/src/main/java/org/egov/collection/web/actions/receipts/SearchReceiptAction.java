@@ -54,7 +54,6 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -62,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
@@ -85,6 +83,7 @@ import org.egov.eis.service.AssignmentService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.BifurcationDetail;
 import org.egov.infra.microservice.models.BillDetail;
 import org.egov.infra.microservice.models.BillDetailAdditional;
 import org.egov.infra.microservice.models.BusinessService;
@@ -94,11 +93,7 @@ import org.egov.infra.microservice.models.RemittanceDepositWorkDetail;
 import org.egov.infra.microservice.models.RemittanceResponseDepositWorkDetails;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.utils.Page;
-import org.egov.infra.reporting.engine.ReportFormat;
-import org.egov.infra.reporting.engine.ReportOutput;
-import org.egov.infra.reporting.engine.ReportRequest;
 import org.egov.infra.reporting.engine.ReportService;
-import org.egov.infra.utils.DateUtils;
 import org.egov.infra.web.struts.actions.SearchFormAction;
 import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.search.SearchQuery;
@@ -535,7 +530,6 @@ public class SearchReceiptAction extends SearchFormAction {
                     System.out.println("19");  
                     receiptList.add(receiptHeader);
 
-                    
                 }
             }
 
@@ -551,7 +545,8 @@ public class SearchReceiptAction extends SearchFormAction {
        System.out.println("modeOfPayment  ::::"+modeOfPayment);
        System.out.println("collectedBy  ::::"+collectedBy);
         for (ReceiptHeader receiptHeader2 : receiptListfilterList) {
-        	System.out.println("inside  ::::");
+			
+			
         	 BigDecimal searchamt = new BigDecimal(searchAmount);
         	 System.out.println("inside1  ::::");
         	 BigDecimal  searchamtbig =null;
@@ -563,15 +558,12 @@ public class SearchReceiptAction extends SearchFormAction {
              }
              System.out.println("inside5  ::::");
              searchamt = searchamt.setScale(4, BigDecimal.ROUND_DOWN);
-             System.out.println("inside6  ::::");
+        	
         	
         
         if(searchAmount!=null && !searchAmount.equals("0") && !searchAmount.isEmpty()){
-        	System.out.println("L1");
         	if(collectedBy!=null && !collectedBy.isEmpty()){
-        		System.out.println("L2");
         		if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
-        			System.out.println("L3");
         			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
                     {
         				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -585,7 +577,6 @@ public class SearchReceiptAction extends SearchFormAction {
                     }
         		}
         		else {
-        			System.out.println("L4");
         			if(searchamtbig.equals(searchamt) && (receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
                     {
         				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -601,7 +592,6 @@ public class SearchReceiptAction extends SearchFormAction {
         		}
         	}
         	else if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
-        		System.out.println("L5");
 	        		if(searchamtbig.equals(searchamt) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
 	                {
 	        			if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -614,7 +604,6 @@ public class SearchReceiptAction extends SearchFormAction {
 	               
 	                }
 	    		}else{
-	    			System.out.println("L6");
 	    			if(searchamtbig.equals(searchamt))
 	                {
 	    				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -629,9 +618,7 @@ public class SearchReceiptAction extends SearchFormAction {
 	        	}
         }
         else if(collectedBy!=null && !collectedBy.isEmpty()) {
-        	System.out.println("L7");
 			if(modeOfPayment!=null && !modeOfPayment.isEmpty()) {
-				System.out.println("L8");		
 			        		if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()) && receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
 			                {
 			        			if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -644,7 +631,6 @@ public class SearchReceiptAction extends SearchFormAction {
 			               
 			                }
 			    		}else {
-			    			System.out.println("L9");
 			    			if((receiptHeader2.getCreatedUser().toLowerCase()).contains(collectedBy.toLowerCase()))
 			                {
 			    				if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -660,7 +646,6 @@ public class SearchReceiptAction extends SearchFormAction {
         	
         }
         else if(modeOfPayment!=null && !modeOfPayment.isEmpty()){
-        	System.out.println("L10");
         	if(receiptHeader2.getModOfPayment().equalsIgnoreCase(modeOfPayment))
             {
         		if(receiptHeader2.getTotalDepositAmount()!=null) {
@@ -675,7 +660,6 @@ public class SearchReceiptAction extends SearchFormAction {
         	
             }
         else {
-        	System.out.println("L11");
         	if(receiptHeader2.getTotalDepositAmount()!=null) {
         		totalDepositAmount2=totalDepositAmount2.add(receiptHeader2.getTotalDepositAmount().setScale(2, BigDecimal.ROUND_DOWN));
 			}
@@ -802,7 +786,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     System.out.println("22");
                     receiptHeader.setReceiptdate(new Date(billDetail.getReceiptDate()));
                     System.out.println("33");
-                    receiptHeader.setService(billDetail.getBusinessService());
+                    receiptHeader.setService(microserviceUtils.getBusinessServiceNameByCode(billDetail.getBusinessService()));
                     System.out.println("44");
                     receiptHeader.setReferencenumber("");
                     System.out.println("55");
@@ -816,6 +800,7 @@ public class SearchReceiptAction extends SearchFormAction {
                     {
                     	continue;
                     }
+                    
                     System.out.println("99");
                     receiptHeader.setSubdivison(receipt.getSubdivison());
                     System.out.println("10");
@@ -892,17 +877,16 @@ public class SearchReceiptAction extends SearchFormAction {
         
          System.out.println("searchAmount :::"+searchAmount);
          for (ReceiptHeader receiptHeader2 : receiptListfilterList) {
-        	 System.out.println("inside loop");
+ 			
+ 			
          	 BigDecimal searchamt = new BigDecimal(searchAmount);
-         	System.out.println("inside loop1");
-         	BigDecimal  searchamtbig = null;
+         	BigDecimal  searchamtbig =null;
               if(receiptHeader2.getTotalAmount() != null)
               {
-            	    searchamtbig = receiptHeader2.getTotalAmount().setScale(4, BigDecimal.ROUND_DOWN);
+            	  searchamtbig = receiptHeader2.getTotalAmount().setScale(4, BigDecimal.ROUND_DOWN);
               }
-              System.out.println("inside loop3");  
               searchamt = searchamt.setScale(4, BigDecimal.ROUND_DOWN);
-              System.out.println("inside loop4");  
+         
          if(searchAmount!=null && !searchAmount.equals("0") && !searchAmount.isEmpty()){
          	System.out.println("111111");
          	if(collectedBy!=null && !collectedBy.isEmpty()){

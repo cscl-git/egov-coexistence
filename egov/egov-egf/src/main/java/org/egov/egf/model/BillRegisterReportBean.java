@@ -86,6 +86,8 @@ public class BillRegisterReportBean {
     private String deducPexNo;
     private String departmentCode;
     private String pexNodate;
+    private String chqNo;
+    private String chqDate;
     private List<ChartOfAccounts> chartOfAccounts;
     private List<BillDetail> billDetailList=new ArrayList<BillDetail>();
     private String budgetHead;
@@ -111,6 +113,11 @@ public class BillRegisterReportBean {
     private BigDecimal bankAmount;
     private BigDecimal courtAmount;
     private BigDecimal pensionAmount;
+    private BigDecimal electricityChargesAmount;
+    private BigDecimal adminServiceChargesAmount;
+    private BigDecimal otherChargesAmount;
+    private BigDecimal otherRecovFromEmployeesAmount;
+    
     public String getBillNumber() {
         return billNumber;
     }
@@ -486,6 +493,54 @@ public class BillRegisterReportBean {
 
 	public void setPensionAmount(BigDecimal pensionAmount) {
 		this.pensionAmount = pensionAmount;
+	}
+
+	public String getChqNo() {
+		return chqNo;
+	}
+
+	public void setChqNo(String chqNo) {
+		this.chqNo = chqNo;
+	}
+
+	public String getChqDate() {
+		return chqDate;
+	}
+
+	public void setChqDate(String chqDate) {
+		this.chqDate = chqDate;
+	}
+
+	public BigDecimal getElectricityChargesAmount() {
+		return electricityChargesAmount;
+	}
+
+	public void setElectricityChargesAmount(BigDecimal electricityChargesAmount) {
+		this.electricityChargesAmount = electricityChargesAmount;
+	}
+
+	public BigDecimal getOtherChargesAmount() {
+		return otherChargesAmount;
+	}
+
+	public void setOtherChargesAmount(BigDecimal otherChargesAmount) {
+		this.otherChargesAmount = otherChargesAmount;
+	}
+
+	public BigDecimal getOtherRecovFromEmployeesAmount() {
+		return otherRecovFromEmployeesAmount;
+	}
+
+	public void setOtherRecovFromEmployeesAmount(BigDecimal otherRecovFromEmployeesAmount) {
+		this.otherRecovFromEmployeesAmount = otherRecovFromEmployeesAmount;
+	}
+
+	public BigDecimal getAdminServiceChargesAmount() {
+		return adminServiceChargesAmount;
+	}
+
+	public void setAdminServiceChargesAmount(BigDecimal adminServiceChargesAmount) {
+		this.adminServiceChargesAmount = adminServiceChargesAmount;
 	}
 
 	

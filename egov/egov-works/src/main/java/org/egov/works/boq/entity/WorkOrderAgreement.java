@@ -16,6 +16,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedNativeQueries;
 import javax.persistence.NamedNativeQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
@@ -29,6 +30,7 @@ import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
+
 
 
 @SqlResultSetMapping(name = "AllWorkOrderAgreementresultset",classes = {
@@ -52,9 +54,15 @@ import org.egov.model.masters.Contractor;
 				)
 	})
 
+	@NamedNativeQueries({
+		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address, aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_department,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast (aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
+				resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset"),
 
-	@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address, aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_department,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast (aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
+		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreementByMileStone", query ="select aw.id,aw.agency_work_order,aw.agreement_details,aw.category, aw.contractor_address,aw.contractor_code, aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date, aw.estimated_cost,dep.name as executing_department , aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details, aw.work_end_date, aw.work_intended_date,aw.work_number, aw.work_start_date,aw.work_status, aw.ward_number, aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate, aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments, aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, case lower(aw.milestonestatus) when 'no' then round(sum(tb.measured_amount)/(sum(tb.amount))*100) when 'yes' THEN (select sum(pd.payment_percent)*(sum(pd.completion_percent)/(count(pd.completion_percent)*100.0)) from txn_work_agreement bw, txn_paymentdistribution pd where bw.id=pd.work_id and bw.id =aw.id ) end percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb where aw.statusid =es.id and cast(aw.executing_department as Integer) = dep.id and aw.id=tb.work_id group by aw.id,dep.name ,es.code,lower(aw.milestonestatus)",
 		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
+	})
+
+	
 
 @Entity
 @Table(name = "txn_work_agreement")

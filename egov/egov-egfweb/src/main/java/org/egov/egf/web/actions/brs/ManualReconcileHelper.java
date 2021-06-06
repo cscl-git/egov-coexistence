@@ -309,12 +309,11 @@ public class ManualReconcileHelper {
         		+"   group by ih.id,rec.transactiontype,insType.type,iv.voucherheaderid " );
         
         
-        if(reconBean.getLimit() != null && reconBean.getLimit() != 0){
-            query.append(" limit "+reconBean.getLimit());
-        }else{
-            query.append(" limit "+DEFAULT_LIMIT );
-            reconBean.setLimit(DEFAULT_LIMIT);
-        }
+			/*
+			 * if(reconBean.getLimit() != null && reconBean.getLimit() != 0){
+			 * query.append(" limit "+reconBean.getLimit()); }else{
+			 * query.append(" limit "+DEFAULT_LIMIT ); reconBean.setLimit(DEFAULT_LIMIT); }
+			 */
 		
        // if(LOGGER.isInfoEnabled())    
         LOGGER.info("  query  for getUnReconciledCheques: "+query);

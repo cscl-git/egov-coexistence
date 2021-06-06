@@ -3322,8 +3322,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     }
 
     public Paymentheader createPaymentHeaderForContra(final CVoucherHeader voucherHeader, final Bankaccount ba,final String payModType,final String paidAmt) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createPaymentHeader...");
+            LOGGER.info("Starting createPaymentHeader...");
         final Paymentheader paymentheader = new Paymentheader();
         paymentheader.setType(payModType);
         paymentheader.setVoucherheader(voucherHeader);
@@ -3331,8 +3330,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         paymentheader.setPaymentAmount(BigDecimal.valueOf(Double.valueOf(paidAmt)));
         applyAuditing(paymentheader);
         persist(paymentheader);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed createPaymentHeader.");
+            LOGGER.info("Completed createPaymentHeader.");
         return paymentheader;
     }
     public String getEmployeeName(Long empId){

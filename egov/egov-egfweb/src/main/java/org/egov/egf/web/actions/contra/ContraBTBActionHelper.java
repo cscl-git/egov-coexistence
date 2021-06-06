@@ -139,6 +139,7 @@ public class ContraBTBActionHelper {
 	@Transactional
 	public CVoucherHeader create(ContraBean contraBean, ContraJournalVoucher contraVoucher,
 			CVoucherHeader voucherHeader) throws Exception {
+		LOGGER.info("create starts ::: "+contraBean.getModeOfCollection());
 		try {
 			voucherHeader2 = null;
 			 List<InstrumentHeader> instrumentList = null;
@@ -147,17 +148,28 @@ public class ContraBTBActionHelper {
 			instrumentList = instrumentService
 					.addToInstrument(createInstruments(contraBean, contraVoucher, voucherHeader));
 			}
+			LOGGER.info("fund checking");
 			if (contraBean.getToFundId() != null && !voucherHeader.getFundId().getId().equals(contraBean.getToFundId()))
+			{
+				LOGGER.info("1 ::::contraBean.getToFundId() :::"+contraBean.getToFundId());
+				LOGGER.info("1 ::::voucherHeader.getFundId().getId() :::"+voucherHeader.getFundId().getId());
 				voucherHeader = callCreateVoucherForInterFund(voucherHeader, contraVoucher, contraBean);
+			}
 			else
+			{
+				LOGGER.info("2");
 				voucherHeader = callCreateVoucher(voucherHeader, contraVoucher, contraBean);
+			}	
 			if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 			{
+				LOGGER.info("PEX");
 				final Bankaccount ba = getBankaccount(contraVoucher.getFromBankAccountId().getId());
+				LOGGER.info("PEX 1");
 				contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
 						voucherHeader, contraBean); 
-				
+				LOGGER.info("PEX 2");
 	        	paymentService.createPaymentHeaderForContra( voucherHeader,  ba,contraBean.getModeOfCollection(),contraBean.getAmount().toString());
+	        	LOGGER.info("PEX 3");
 	        	final Miscbilldetail miscBilldetail = new Miscbilldetail();
 	        	miscBilldetail.setBillamount(contraBean.getAmount());
 	        	miscBilldetail.setBillVoucherHeader(voucherHeader);
@@ -170,57 +182,74 @@ public class ContraBTBActionHelper {
 	        		 miscBilldetail.setPaidto(contraVoucher.getToBankAccountId().getBankbranch().getBank().getName());
 	        	 }
 	           miscBilldetail.setPaidby(null);
+	           LOGGER.info("PEX 4");
 	           miscbilldetailService.create(miscBilldetail);
-	           
+	           LOGGER.info("PEX 5");
 	          
 			}else {
+				LOGGER.info("YYYYYYYY");
 			updateInstrument(instrumentList.get(0), voucherHeader);
+			LOGGER.info("AAAAA");
 			contraVoucher = addOrupdateContraJournalVoucher(contraVoucher, instrumentList.get(0), voucherHeader,
 					contraBean);
+			LOGGER.info("BBBBBB");
 			}
+			LOGGER.info("CCCCCCC");
 			ContraJournalVoucher contraVoucher2 = null;
 			if (voucherHeader2 != null) {
+				LOGGER.info("DDDDD");
 				final List<Map<String, Object>> createInstrumentMap = createInstrumentsForReceipt(contraBean,
 						contraVoucher, voucherHeader);
+				LOGGER.info("EEEEE");
 				// set is pay cheque to 0 saying it is a receipt cheque
 				if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 				{
-					
+					LOGGER.info("FFFFF");
 					contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
-							voucherHeader, contraBean);   
+							voucherHeader, contraBean);  
+					LOGGER.info("GGGGGG");
 		        	
 				}else {
+					LOGGER.info("HHHHH");
 				createInstrumentMap.get(0).put("Is pay cheque", "0");
 				final List<InstrumentHeader> instrumentList2 = instrumentService.addToInstrument(createInstrumentMap);
+				LOGGER.info("IIIIII");
 				contraVoucher2 = new ContraJournalVoucher();
 				
 				contraVoucher2 = addOrupdateContraJournalVoucher(contraVoucher2, instrumentList2.get(0), voucherHeader2,
 						contraBean);
+				LOGGER.info("JJJJJ");
 				updateInstrument(instrumentList2.get(0), voucherHeader2);
+				LOGGER.info("KKKKKK");
 				}
 			} else {
 				List<Map<String, Object>> iList = new ArrayList<Map<String, Object>>();
 				if(contraBean.getModeOfCollection().equalsIgnoreCase(MDC_PEX))
 				{
-					
+					LOGGER.info("LLLL");
 					contraVoucher = addOrupdateContraJournalVoucherPEX(contraVoucher,
 							voucherHeader, contraBean);   
 					
-		        	
+					LOGGER.info("MMMM");
 				}else {
+					LOGGER.info("NNNNN");
 				iList = createInstrumentsForReceipt(contraBean, contraVoucher, voucherHeader);
+				LOGGER.info("OOOO");
 				final List<InstrumentHeader> receiptInstrumentList = instrumentService.addToInstrument(iList);
+				LOGGER.info("PPPP");
 				updateInstrument(receiptInstrumentList.get(0), voucherHeader);
+				LOGGER.info("QQQ");
 				contraVoucher = addOrupdateContraJournalVoucher(contraVoucher, receiptInstrumentList.get(0),
 						voucherHeader, contraBean);
+				LOGGER.info("RRRR");
 			}
 			}
 		} catch (final ValidationException e) {
-			throw new ValidationException(Arrays
-					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+			e.printStackTrace();
 		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+			e.printStackTrace();
 		}
+		LOGGER.info("SSSSS");
 		return voucherHeader;
 	}
 		 private Bankaccount getBankaccount(final Long bankAccountId) {
@@ -248,8 +277,7 @@ public class ContraBTBActionHelper {
 						iMap.put("Instrument number",
 								chequeService.nextChequeNumber(cVoucher.getToBankAccountId().getId().toString(), 1,voucherHeader.getVouchermis().getDepartmentcode()));
 					} catch (final ApplicationRuntimeException e) {
-						throw new ValidationException(Arrays.asList(
-								new ValidationError("Exception while getting Cheque Number  ", e.getMessage())));
+						e.printStackTrace();
 					}
 
 					iMap.put("Instrument date", new Date());
@@ -258,8 +286,7 @@ public class ContraBTBActionHelper {
 					try {
 						dt = sdf.parse(cBean.getChequeDate());
 					} catch (final ParseException e) {
-						throw new ValidationException(Arrays.asList(
-								new ValidationError("Exception while formatting ChequeDate ", "TRANSACTION_FAILED")));
+						e.printStackTrace();
 					}
 					iMap.put("Instrument date", dt);
 				}
@@ -272,8 +299,7 @@ public class ContraBTBActionHelper {
                             try {
                                     dt = sdf.parse(cBean.getChequeDate());
                             } catch (final ParseException e) {
-                                    throw new ValidationException(Arrays.asList(
-                                                    new ValidationError("Exception while formatting ChequeDate ", "TRANSACTION_FAILED")));
+                            	e.printStackTrace();
                             }
                             iMap.put("Transaction date", dt);
                             // change this to advice type later
@@ -284,8 +310,7 @@ public class ContraBTBActionHelper {
                         try {
                                 dt = sdf.parse(cBean.getChequeDate());
                         } catch (final ParseException e) {
-                                throw new ValidationException(Arrays.asList(
-                                                new ValidationError("Exception while formatting ChequeDate ", "TRANSACTION_FAILED")));
+                        	e.printStackTrace();
                         }
                         iMap.put("Transaction date", dt);
                         // change this to advice type later
@@ -296,8 +321,7 @@ public class ContraBTBActionHelper {
 				try {
 					dt = sdf.parse(cBean.getChequeDate());
 				} catch (final ParseException e) {
-					throw new ValidationException(Arrays.asList(
-							new ValidationError("Exception while formatting ChequeDate ", "TRANSACTION_FAILED")));
+					e.printStackTrace();
 				}
 				iMap.put("Transaction date", dt);
 				// change this to advice type later
@@ -306,10 +330,9 @@ public class ContraBTBActionHelper {
 			iMap.put("Is pay cheque", "0");
 			iList.add(iMap);
 		} catch (final ValidationException e) {
-			throw new ValidationException(Arrays
-					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+			e.printStackTrace();
 		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+			e.printStackTrace();
 		}
 		return iList;
 	}
@@ -380,6 +403,7 @@ public class ContraBTBActionHelper {
 	@Transactional
 	public CVoucherHeader callCreateVoucherForInterFund(CVoucherHeader voucher,
 			final ContraJournalVoucher contraVoucher, ContraBean contraBean) {
+		LOGGER.info("XXXX");
 		try {
 			final Fund toFund = (Fund) persistenceService.find("from Fund where id=?", contraBean.getToFundId());
 			org.egov.infra.microservice.models.Department toDepartment = new org.egov.infra.microservice.models.Department();
@@ -581,7 +605,6 @@ public class ContraBTBActionHelper {
 			 LOGGER.info("Subledder Details getToBankAccountID==> " + contraVoucher.getToBankAccountId().getId());
 			final Bankaccount ba = getBankaccount(contraVoucher.getToBankAccountId().getId());
 			   OtherParty otherparty = new OtherParty();
-	           otherparty.setCode(ba.getAccountnumber());
 	           otherparty.setName(ba.getAccountnumber());
 	           LOGGER.info("Subledder Details BankAccount Number==> " +  ba.getAccountnumber());
 	           List<OtherParty> othePartyList = otherPartyService.search(otherparty);
@@ -606,16 +629,20 @@ public class ContraBTBActionHelper {
 			voucher = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);
 
 		} catch (final HibernateException e) {
+			e.printStackTrace();
 			LOGGER.error(e.getMessage());
 			throw new ValidationException(
 					Arrays.asList(new ValidationError(EXCEPTION_WHILE_SAVING_DATA, TRANSACTION_FAILED)));
 		} catch (final ApplicationRuntimeException e) {
 			LOGGER.error(e.getMessage());
+			e.printStackTrace();
 			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
 		} catch (final ValidationException e) {
+			e.printStackTrace();
 			throw new ValidationException(Arrays
 					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
 		} catch (final Exception e) {
+			e.printStackTrace();
 			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
 		}
 		if (LOGGER.isDebugEnabled())
@@ -634,10 +661,9 @@ public class ContraBTBActionHelper {
 			iList.add(iMap);
 			instrumentService.updateInstrumentVoucherReference(iList);
 		} catch (final ValidationException e) {
-			throw new ValidationException(Arrays
-					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+			e.printStackTrace();
 		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+			e.printStackTrace();
 		}
 	}
 
@@ -686,10 +712,9 @@ public class ContraBTBActionHelper {
 					LOGGER.info("Contra Journal Voucher created");
 			}
 		} catch (final ValidationException e) {
-			throw new ValidationException(Arrays
-					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+			e.printStackTrace();
 		} catch (final Exception e) {
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+			e.printStackTrace();
 		}
 		return cjv;
 	}
@@ -701,7 +726,7 @@ public class ContraBTBActionHelper {
 			contraVoucher.setFromBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getFromBankAccountId())));
 		if (contraBean != null && contraBean.getToBankAccountId() != null
-				&& !contraBean.getFromBankAccountId().equals("-1"))
+				&& !contraBean.getToBankAccountId().equals("-1"))
 			contraVoucher.setToBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getToBankAccountId())));
 		return contraVoucher;

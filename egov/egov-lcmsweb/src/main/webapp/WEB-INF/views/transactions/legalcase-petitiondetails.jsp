@@ -346,7 +346,7 @@
 		
 	</div>
 	<label class="col-sm-2 control-label text-right" id="persons">
-		Def.Councel Email ID:<span class="mandatory"></span></label>
+		Def.Counsel Email ID:</label>
 	<div class="col-sm-3 add-margin">
 		<form:input path="counselEmailNo" class="form-control text-left patternvalidation"
 			data-pattern="alphanumericwithspecialcharacters" maxlength="64"

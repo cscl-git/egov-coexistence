@@ -47,6 +47,11 @@
  */
 package org.egov.lcms.reports.entity;
 
+import org.egov.lcms.transactions.entity.LegalCase;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.util.Date;
 
 import org.egov.lcms.transactions.entity.LegalCase;
@@ -55,6 +60,7 @@ public class LegalCaseSearchResult {
     private String caseNumber;
     private String lcNumber;
     private Date caseFromDate;
+    @JsonIgnore 
     private LegalCase legalCase;
     private Date caseToDate;
     private String standingCouncil;
@@ -79,7 +85,10 @@ public class LegalCaseSearchResult {
     private String fromDate;
     private String toDate;
     private Boolean legalViewAccess=false;
-    private String judgmentType;
+	private String concernedBranch;
+    private String statusDesc;
+    private Integer judgmentTypeId;
+    private String iscaseImp;
 
     public String getFromDate() {
         return fromDate;
@@ -297,17 +306,38 @@ public class LegalCaseSearchResult {
         this.legalViewAccess = legalViewAccess;
     }
 
-	public String getJudgmentType() {
-		return judgmentType;
+	
+	public String getConcernedBranch() {
+		return concernedBranch;
 	}
 
-	public void setJudgmentType(String judgmentType) {
-		this.judgmentType = judgmentType;
+	public void setConcernedBranch(String concernedBranch) {
+		this.concernedBranch = concernedBranch;
 	}
 
-	
+	public String getStatusDesc() {
+		return statusDesc;
+	}
 
-	
+	public void setStatusDesc(String statusDesc) {
+		this.statusDesc = statusDesc;
+	}
+
+	public Integer getJudgmentTypeId() {
+		return judgmentTypeId;
+	}
+
+	public void setJudgmentTypeId(Integer judgmentTypeId) {
+		this.judgmentTypeId = judgmentTypeId;
+	}
+
+	public String getIscaseImp() {
+		return iscaseImp;
+	}
+
+	public void setIscaseImp(String iscaseImp) {
+		this.iscaseImp = iscaseImp;
+	}
 
    
 }

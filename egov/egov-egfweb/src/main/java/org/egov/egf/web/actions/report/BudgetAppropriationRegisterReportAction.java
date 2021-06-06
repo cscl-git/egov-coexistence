@@ -195,6 +195,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         CFinancialYear financialYear = new CFinancialYear();
         if (parameters.get("asOnDate")[0] != null) {
             strAsOnDate = parameters.get("asOnDate")[0];
+            LOGGER.info("as on date ::::"+strAsOnDate);
             try {
                 dtAsOnDate = Constants.DDMMYYYYFORMAT2.parse(strAsOnDate);
                 financialYear = financialYearDAO.getFinancialYearByDate(dtAsOnDate);
@@ -240,6 +241,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
 
         if (budgetGroup != null) {
             budgetHead = budgetGroup.getName();
+            LOGGER.info("head :::"+budgetHead);
             StringBuilder strQuery = new StringBuilder();
             strQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");

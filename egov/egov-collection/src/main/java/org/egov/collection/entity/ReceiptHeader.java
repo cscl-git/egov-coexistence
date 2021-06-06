@@ -91,6 +91,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Boolean isModifiable;
 
     private String service;
+    private String serviceBusinessName;
     private Character collectiontype;
     private Set<ReceiptDetail> receiptDetails = new LinkedHashSet<>();
     private ReceiptMisc receiptMisc;
@@ -139,6 +140,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Date rrDate;
     private String subdivison;
     private String gstno;
+    private String createdByName;
     public ReceiptHeader() {
     }
 
@@ -963,6 +965,22 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setGstno(String gstno) {
 		this.gstno = gstno;
+	}
+
+	public String getServiceBusinessName() {
+		return serviceBusinessName;
+	}
+
+	public void setServiceBusinessName(String serviceBusinessName) {
+		this.serviceBusinessName = serviceBusinessName;
+	}
+
+	public String getCreatedByName() {
+		return createdByName;
+	}
+
+	public void setCreatedByName(String createdByName) {
+		this.createdByName = createdByName;
 	}
 
 	

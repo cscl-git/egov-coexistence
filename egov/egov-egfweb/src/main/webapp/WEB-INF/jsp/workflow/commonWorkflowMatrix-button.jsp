@@ -52,7 +52,8 @@
 		document.getElementById("workFlowAction").value=name;
 		if(name == 'Save As Draft')
 			{
-				return onSubmit();
+				//return onSubmit();
+			   return  onSubmitDraft();
 			}
 	    var approverPosId = document.getElementById("approverPositionId");
 	    if(approverPosId) {
@@ -66,7 +67,8 @@
 	    document.getElementById("workFlowAction").value=name;
 	    if(name == "Save As Draft")
 	    	{
-	    		return  onSubmit();
+	    		//return  onSubmit();
+	    	 return  onSubmitDraft();
 	    	}
 	    var approverPosId = document.getElementById("approverPositionId");
 	    if(approverPosId && approverPosId.value != -1 && approverPosId.value != "") {

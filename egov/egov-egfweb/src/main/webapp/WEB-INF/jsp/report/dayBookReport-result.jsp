@@ -124,6 +124,14 @@
 			title="PEX DATE" style="width:5%;text-align:right"
 			property="pexDate" />
 			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="CHEQUE NO" style="width:5%;text-align:right"
+			property="chqNo" />
+			
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="CHEQUE DATE" style="width:5%;text-align:right"
+			property="chqDate" />
+			
 			<!--  -->
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Status" style="width:6%;text-align:center" property="status" />

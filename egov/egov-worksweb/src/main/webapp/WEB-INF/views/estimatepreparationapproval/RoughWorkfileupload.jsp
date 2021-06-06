@@ -51,10 +51,10 @@
                         <tbody>
                         <tr>
                             <td valign="top">
-                                <table id="uploadertbl" width="100%"><tbody>
+                                <table id="uploadertblX" width="100%"><tbody>
                                 <tr id="row1">
                                     <td>
-                                        <input type="file" name="fileRoughCost" id="file1" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-10">
+                                        <input type="file" name="fileRoughCost" id="fileX" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-10">
                                     <form:hidden path="objectType" id="objectType" class="checklist_description" value="roughWorkFile"></form:hidden>
                                     
                                     </td>

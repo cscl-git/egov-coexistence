@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -83,10 +84,29 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@Transient
 	private String employeeName;
 	
+	@Transient
+	private String pendingWith;
+	
+	@Transient
+	private String billNumber;
+	
+	@Column(name="auditor_name",nullable = true)
+	private String auditor_name;
+	
+	@Column(name="rsa_name",nullable = true)
+	private String rsa_name;
+	
+	private Long rsa_id;
+	
 	@Override
 	public String getStateDetails() {
-
-		 return getState().getComments().isEmpty() ? auditno : auditno + "-" + getState().getComments();
+		String billNumber="";
+		if(egBillregister != null)
+		{
+			billNumber=egBillregister.getBillnumber();
+		}
+		
+		 return getState().getComments().isEmpty() ? auditno+" ("+billNumber+") " : auditno + "-" + getState().getComments()+" ("+billNumber+") ";
 	}
 
 	@Override
@@ -267,6 +287,46 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
+	}
+
+	public String getBillNumber() {
+		return billNumber;
+	}
+
+	public void setBillNumber(String billNumber) {
+		this.billNumber = billNumber;
+	}
+
+	public String getAuditor_name() {
+		return auditor_name;
+	}
+
+	public void setAuditor_name(String auditor_name) {
+		this.auditor_name = auditor_name;
+	}
+
+	public String getRsa_name() {
+		return rsa_name;
+	}
+
+	public void setRsa_name(String rsa_name) {
+		this.rsa_name = rsa_name;
+	}
+
+	public Long getRsa_id() {
+		return rsa_id;
+	}
+
+	public void setRsa_id(Long rsa_id) {
+		this.rsa_id = rsa_id;
 	}
 
 

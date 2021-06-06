@@ -124,8 +124,17 @@
 			</td>
 			<c:if test="${mode !='view' }">
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
-			<td class="text-center"><span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
-				 <span class="add-padding subledge-delete-row" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>
+			<td class="text-center">
+			    <span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
+				  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> 
+				<!-- <span style="cursor:pointer;" tabindex="0" class="Add" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
+				        <i class="fa fa-plus"></i>
+				</span> -->
+				<%-- <span class="add-padding subledge-delete-row">
+				       <a class="fa fa-trash dataDelete" data-id="${status.index}" style="color:black;" href="#" data-href="/services/audit/createAudit/deleteAuditchecklist/${audit.checkListId}"
+				             data-toggle="modal" data-target="#confirm-delete" data-original-title="Delete!"></a>
+				</span> --%>
+				 </td>
 			
 			</c:if>
 			</c:if>
@@ -141,3 +150,9 @@
 		
 	</div>
 </div>
+
+
+
+
+
+

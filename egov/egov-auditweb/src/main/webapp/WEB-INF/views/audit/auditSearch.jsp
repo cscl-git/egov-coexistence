@@ -90,8 +90,10 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th><spring:message code="lbl.serial" text="SL.No."/></th>
 						<th><spring:message code="lbl.auditType" text="Audit Type"/></th>
 						<th><spring:message code="lbl.auditnumber" text="Audit Number"/></th>
+						<th><spring:message code="lbl.billNumber" text="Bill Number"/></th>
 						<th><spring:message code="lbl.schdauditdate" text="Audit Scheduled Date"/></th>
 						<th><spring:message code="lbl.checklist.status" text="Status"/></th>
+						<th><spring:message code="lbl.pendingWith" text="Pending With"/></th>
 					</tr>
 					</thead>
 `					 <c:if test="${auditDetail.auditSearchList != null &&  !auditDetail.auditSearchList.isEmpty()}">
@@ -109,10 +111,16 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 							${result.auditno }</a>
 							</td>
 							<td>
+							${result.billNumber}
+							</td>
+							<td>
 							${result.schdDate }
 							</td>
 							<td>
 							${result.statusDescription }
+							</td>
+							<td>
+							${result.pendingWith }
 							</td>
 						</tr>
 						</c:forEach>

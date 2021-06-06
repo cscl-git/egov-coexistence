@@ -130,6 +130,15 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
 
     private BigDecimal deductamountwitheld;
 
+    
+    private BigDecimal budget; 
+    
+    private BigDecimal  previousexpenditure; 
+    
+    private BigDecimal currentexpenditure; 
+    
+    private BigDecimal balance; 
+
     private BigDecimal month;
 
     private String departmentcode;
@@ -196,7 +205,7 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
     private Long subSchemeId;
 
     private Boolean budgetCheckReq = true;
-
+    
     public Boolean isBudgetCheckReq() {
         return budgetCheckReq;
     }
@@ -226,6 +235,40 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
     public void setMbRefNo(final String mbRefNo) {
         this.mbRefNo = mbRefNo;
     }
+
+    
+
+    public BigDecimal getBudget() {
+		return budget;
+	}
+
+	public void setBudget(BigDecimal budget) {
+		this.budget = budget;
+	}
+
+	public BigDecimal getPreviousexpenditure() {
+		return previousexpenditure;
+	}
+
+	public void setPreviousexpenditure(BigDecimal previousexpenditure) {
+		this.previousexpenditure = previousexpenditure;
+	}
+
+	public BigDecimal getCurrentexpenditure() {
+		return currentexpenditure;
+	}
+
+	public void setCurrentexpenditure(BigDecimal currentexpenditure) {
+		this.currentexpenditure = currentexpenditure;
+	}
+
+	public BigDecimal getBalance() {
+		return balance;
+	}
+
+	public void setBalance(BigDecimal balance) {
+		this.balance = balance;
+	}
 
     public EgBillregistermis() {
     }

@@ -270,8 +270,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 			}
 		
 		
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Starting Bank to Bank Transfer ...");
+			LOGGER.info("Starting Bank to Bank Transfer ...");
 		try {
 			getHibObjectsFromContraBean();
 			if (egovCommon.isShowChequeNumber())
@@ -287,12 +286,12 @@ public class ContraBTBAction extends BaseVoucherAction {
 				LOGGER.debug("Completed Bank to Bank Transfer .");
 		} catch (final ValidationException e) {
 			LoadAjaxedDropDowns();
-			throw new ValidationException(Arrays
-					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+			e.printStackTrace();
 		} catch (final Exception e) {
 			LoadAjaxedDropDowns();
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+			e.printStackTrace();
 		}
+		LOGGER.info("Ending Bank to Bank Transfer ...");
 		return SUCCESS;
 	}
 
@@ -1317,15 +1316,18 @@ public class ContraBTBAction extends BaseVoucherAction {
 	 * manually
 	 */
 	private void getHibObjectsFromContraBean() {
+		LOGGER.info("getHibObjectsFromContraBean starts");
 		final String bankQry = "from Bankaccount where id=?";
 		if (contraBean != null && contraBean.getFromBankAccountId() != null
 				&& !contraBean.getFromBankAccountId().equals("-1"))
 			contraVoucher.setFromBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getFromBankAccountId())));
 		if (contraBean != null && contraBean.getToBankAccountId() != null
-				&& !contraBean.getFromBankAccountId().equals("-1"))
+				&& !contraBean.getToBankAccountId().equals("-1"))
 			contraVoucher.setToBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getToBankAccountId())));
+		
+		LOGGER.info("getHibObjectsFromContraBean ends");
 	}
 
 	/*

@@ -111,7 +111,7 @@ public class PetitionTypeMaster extends AbstractAuditable {
     }
 
     @Override
-    protected void setId(final Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 

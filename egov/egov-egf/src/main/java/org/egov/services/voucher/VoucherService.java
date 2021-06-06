@@ -124,6 +124,7 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.payment.Paymentheader;
 import org.egov.model.voucher.VoucherDetails;
+import org.egov.model.voucher.VoucherDraftDetails;
 import org.egov.model.voucher.VoucherTypeBean;
 import org.egov.pims.commons.Designation;
 import org.egov.pims.commons.Position;
@@ -144,6 +145,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.exilant.GLEngine.Transaxtion;
 import com.exilant.GLEngine.TransaxtionParameter;
 import com.exilant.eGov.src.common.EGovernCommon;
+import com.exilant.eGov.src.reports.JournalVoucherDraftService;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 
 @Service
@@ -221,6 +223,14 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 
 	  @Autowired
 	    private CommonDocumentUploadRepository documentUploadRepository;
+
+	  // jayanta for save as draft
+      @Autowired
+      @Qualifier("journalVoucherDraftService")
+      private JournalVoucherDraftService journalVoucherDraftService;
+   
+   
+   
 
 	public VoucherService(final Class<CVoucherHeader> voucherHeader) {
 		super(voucherHeader);
@@ -1548,7 +1558,96 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
             return vmisHibernateDao.getRecentVoucherByServiceNameAndReferenceDoc(serviceName, referenceDocument);
         }
 	
-	    //Impplemented By Prasanta
+	
+	 public List<VoucherDetails> getVoucherDraftInfo(final String voucherNumber) {
+
+			
+			
+			final List<VoucherDraftDetails> dl = persistenceService.findAllBy(
+                 " from VoucherDraftDetails where vouchernumber=? order by id asc",voucherNumber);
+			
+			
+			final List<VoucherDetails> billDetailslist = new ArrayList<>();
+			final List<VoucherDetails> subLedgerlist = new ArrayList<>();
+			VoucherDetails voucherDetail;
+			VoucherDetails subLedgerDetail;
+			BigDecimal crAmount;
+			BigDecimal drAmount;
+			try {
+				for (final VoucherDraftDetails voucherDraftDetails : dl) {
+					voucherDetail = new VoucherDetails();
+					
+					voucherDetail.setGlcodeIdDetail(voucherDraftDetails.getGlcodeIdDetail());
+					voucherDetail.setGlcodeDetail(voucherDraftDetails.getGlcodeDetail());
+
+					//voucherDetail.setAccounthead(coaDAO.findById(generalLedger.getGlcodeId().getId(), false).getName());
+					drAmount = voucherDetail.getDebitAmountDetail();//new BigDecimal(voucherDetail.getDebitAmountDetail());
+					crAmount = voucherDetail.getCreditAmountDetail();//new BigDecimal(generalLedger.getCreditAmount());
+					voucherDetail.setDebitAmountDetail(drAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
+					voucherDetail.setCreditAmountDetail(crAmount.setScale(2, BigDecimal.ROUND_HALF_UP));
+					billDetailslist.add(voucherDetail);
+
+					
+				}
+			} catch (final HibernateException e) {
+				LOGGER.error("Exception occured in VoucherSerive |getVoucherInfo " + e);
+			} catch (final Exception e) {
+				LOGGER.error("Exception occured in VoucherSerive |getVoucherInfo " + e);
+			}
+
+			//voucherMap.put(Constants.GLDEATILLIST, billDetailslist);
+			/**
+			 * create empty sub ledger row
+			 */
+		
+			return billDetailslist;
+
+		}
+	 
+	 
+	 public boolean updateVoucherDraft(final List<VoucherDetails> billDetailslist, final CVoucherHeader vh) {
+		    boolean status=false;
+			try {
+					System.out.println("------------------");
+					Query pstmt3 = null;
+					final String delQrr = "delete from voucherdraftdetails where voucherNumber=?";
+					
+					pstmt3 = persistenceService.getSession().createSQLQuery(delQrr);
+					pstmt3.setString(0, vh.getVoucherNumber());
+					pstmt3.executeUpdate();
+				
+				
+				for (final VoucherDetails accountDetails : billDetailslist) 
+					{
+						VoucherDraftDetails voucherDraftDetails =new VoucherDraftDetails();
+						
+						
+						voucherDraftDetails.setVoucherNumber(vh.getVoucherNumber());
+						//voucherDraftDetails.setAccounthead(voucherDraftDetails);
+						voucherDraftDetails.setDebitAmountDetail(accountDetails.getDebitAmountDetail());
+						voucherDraftDetails.setCreditAmountDetail(accountDetails.getCreditAmountDetail());
+					//	voucherDraftDetails.setIsSubledger(isSubledger);
+						if(accountDetails.getGlcodeIdDetail()==null)
+							voucherDraftDetails.setGlcodeDetail("");
+						else
+							voucherDraftDetails.setGlcodeDetail(accountDetails.getGlcodeIdDetail().toString());
+						
+						journalVoucherDraftService.delete(voucherDraftDetails);
+						journalVoucherDraftService.create(voucherDraftDetails);
+						status=true;
+					
+				}
+			} catch (final Exception e) {
+				e.printStackTrace();
+				LOGGER.error("Exception occured while posting data into voucher detail and transaction");
+				throw new ApplicationRuntimeException(
+						"Exception occured while posting data into voucher detail and transaction" + e.getMessage());
+			}
+
+			return status;
+
+		}
+	 //Impplemented By Prasanta
 	 public Vouchermis getVouchermisByReceiptNumber(String recieptNumber) {
 		 System.out.println("Inside Service>>"+recieptNumber);
 		 Vouchermis vmis = new Vouchermis();
@@ -1561,11 +1660,11 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		 return vmis;
 	 }
 	 
-	 public void updateSourcePathForGJV(CVoucherHeader voucherHeader)
-     {
-         voucherHeader.getVouchermis().setSourcePath(
-                 "/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id=" + voucherHeader.getId());
-         update(voucherHeader);
-     }
+	    public void updateSourcePathForGJV(CVoucherHeader voucherHeader)
+	    {
+	    	voucherHeader.getVouchermis().setSourcePath(
+					"/services/EGF/voucher/journalVoucherModify-beforeModify.action?voucherHeader.id=" + voucherHeader.getId());
+			update(voucherHeader);
+	    }
 
 }

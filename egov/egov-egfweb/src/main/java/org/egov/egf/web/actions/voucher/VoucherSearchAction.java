@@ -295,6 +295,7 @@ public class VoucherSearchAction extends BaseFormAction {
 		List<CVoucherHeader> list = new ArrayList<CVoucherHeader>();
 		List<CVoucherHeader> filterlist =new ArrayList<CVoucherHeader>();
 		List<Query> qryObj;
+		
 		// for view voucher implementing paginated result
 		if (null == showMode || showMode.equals("")) {
 			System.out.println("before query search");
@@ -929,6 +930,7 @@ public class VoucherSearchAction extends BaseFormAction {
 			e.printStackTrace();
 		}
     }
+	
 	
 
 }

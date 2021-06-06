@@ -30,7 +30,7 @@
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="ref_dsr"
-							required="required" />
+							required="required" onchange="checkref(this);" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit">Unit<span
 						class="mandatory"></span>:
@@ -62,6 +62,40 @@
 
 
 </form:form>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+
+<script type="text/javascript">
+	
+	
+	function checkref(obj){
+		var id=obj.value;
+		$.ajax({
+			type : "GET",
+			data: 'html',
+			url : "/services/works/boq/checkref/"+id,
+			success : function(result) {
+				console.log("success : "+result);
+				if(result=="success"){
+					bootbox.alert("This Ref DSR/NS already exist.Please try other");
+				}
+				
+				/* $(result).each(function(i, obj) 
+			    {
+					var contractor_email=obj.email;
+					var contractor_phone=obj.mobileNumber;
+					var contractor_address=obj.correspondenceAddress;
+					var contractor_code=obj.code;
+					
+					($('#contractor_email').val(contractor_email));
+					($('#contractor_phone').val(contractor_phone));
+					($('#contractor_address').val(contractor_address));
+					($('#contractor_code').val(contractor_code));
+				    
+				}); */
+			}
+		});
+	}
+</script>
 
 
 

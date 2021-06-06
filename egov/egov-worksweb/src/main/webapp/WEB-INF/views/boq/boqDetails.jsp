@@ -353,9 +353,9 @@
 
 
 <div class="panel panel-primary" onchange="milestoneshow">
-<label class="col-sm-3 control-label text-left-audit">Milestones ?</label></br>
+<label class="col-sm-3 control-label text-left-audit">Is progress Milestone based ?</label></br>
 
-        <input type="radio" name="milestonestatus" id="mileYes" class="milestatus" value="Yes"><span>YES</span>
+        <input type="radio" name="milestonestatus" id="mileYes" class ="milestatus" value="Yes"><span>YES</span>
         <input type="radio" name="milestonestatus" id="mileNo"  class="milestatus" value="No"><span>NO</span>
 
 </div>
@@ -431,10 +431,10 @@
 					<a target="_blank" style="float:right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br>
-					<input type="file" name="file" style="color: #000000;"> <br>
+					<input type="file" name="file" id="file" style="color: #000000;"> <br>
 					<br>
 					<div class="buttonbottom" align="center">
-						<input type="submit" id="save" class="btn btn-primary" name="save"
+						<input type="submit" id="save" class="btn btn-primary" name="save" onclick="return filecheck();"
 							value="Upload" /> <br>
 					</div>
 					</c:if>
@@ -473,6 +473,11 @@
 								<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].dnitCreation"
+												id="boQDetailsList[${boq.sizeIndex}].dnitCreation" />
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].estimatePreparationApproval"
+												id="boQDetailsList[${boq.sizeIndex}].estimatePreparationApproval" />
+												
 								<form:input type="text" style="width:150px;"
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"

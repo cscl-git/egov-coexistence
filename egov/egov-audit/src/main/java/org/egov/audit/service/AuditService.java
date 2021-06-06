@@ -82,6 +82,9 @@ public class AuditService {
 	 private ManageAuditorService manageAuditorService;
 
 	@Autowired
+	protected MicroserviceUtils microserviceUtils;
+
+	@Autowired
 	public AuditService(final ScriptService scriptExecutionService) {
 		this.scriptExecutionService = scriptExecutionService;
 	}
@@ -172,7 +175,7 @@ public class AuditService {
             bill.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(comment)
                     .withStateValue("Rejected").withDateInfo(currentDate.toDate())
-                    .withOwner(owenrPos)
+                    .withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                     .withNextAction("")
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
                     .withCreatedBy(user.getId())
@@ -261,7 +264,7 @@ public class AuditService {
 	        	   owenrPos.setId(auditDetails.getLead_auditor());
 	   			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	   	        .withComments(comment)
-	   	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos)
+	   	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	   	        .withNextAction(actionName)
 	   	        .withNatureOfTask(natureOfTask)
 	   	        .withCreatedBy(user.getId())
@@ -302,7 +305,7 @@ public class AuditService {
 					
 	                auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
 	                        .withComments(comment)
-	                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos)
+	                        .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	                        .withNextAction(actionName)
 	        	   	        .withNatureOfTask(natureOfTask)
 	        	   	        .withCreatedBy(user.getId())
@@ -316,7 +319,7 @@ public class AuditService {
 			owenrPos.setId(auditDetails.getCreatedBy());
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
-	        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos)
+	        .withStateValue("NEW").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	        .withNextAction(actionName)
 	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
@@ -339,9 +342,11 @@ public class AuditService {
 	    	{
 	    		owenrPos.setId(null);
 	    	}
+	    	auditDetails.setRsa_id(owenrPos.getId());
+	    	auditDetails.setRsa_name(getEmployeeName(owenrPos.getId()));
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
-	        .withStateValue("Pending with Section Officer").withDateInfo(new Date()).withOwner(owenrPos)
+	        .withStateValue("Pending with Section Officer").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	        .withNextAction(actionName)
 	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
@@ -373,9 +378,11 @@ public class AuditService {
 	    	{
 	    		owenrPos.setId(null);
 	    	}
+	    	auditDetails.setLead_auditor(owenrPos.getId());
+	    	auditDetails.setAuditor_name(getEmployeeName(owenrPos.getId()));
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
-	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos)
+	        .withStateValue("Pending with Auditor").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	        .withNextAction(actionName)
 	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
@@ -396,7 +403,7 @@ public class AuditService {
 	    	}
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
-	        .withStateValue("Pending with Examiner").withDateInfo(new Date()).withOwner(owenrPos)
+	        .withStateValue("Pending with Examiner").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	        .withNextAction(actionName)
 	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
@@ -433,5 +440,14 @@ public class AuditService {
     	List<Designation> desgnList = microServiceUtil.getDesignation(desgnCode);
     	return desgnList.get(0);
     }
+	
+	public List<AuditDetails>getAllAudit(){
+		 return auditRepository.findAll();
+	}
+	
+	public String getEmployeeName(Long empId){
+        
+        return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
+     }
 
 }

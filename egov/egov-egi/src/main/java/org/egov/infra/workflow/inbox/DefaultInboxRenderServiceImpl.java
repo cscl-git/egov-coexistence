@@ -99,7 +99,7 @@ public class DefaultInboxRenderServiceImpl<T extends StateAware> implements Inbo
 
     @Override
     public List<T> getAssignedWorkflowItems(List<Long> owners) {
-      
+      System.out.println("XXXXX");
 //    	List<T> list = this.stateAwarePersistenceService.getSession().createCriteria(this.stateAwareType)
 //                .setFetchMode("state", JOIN).createAlias("state", "state")
 //                .setFlushMode(MANUAL).setReadOnly(true).setCacheable(true)

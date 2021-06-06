@@ -75,7 +75,7 @@ public class SMSNotificationListener {
         try {
             MapMessage emailMessage = (MapMessage) message;
             smsService.sendSMS(emailMessage.getString(MOBILE), emailMessage.getString(MESSAGE),
-                    NotificationPriority.valueOf(emailMessage.getString(PRIORITY)));
+                    NotificationPriority.valueOf(emailMessage.getString(PRIORITY)),emailMessage.getString("template"));
         } catch (JMSException e) {
             throw JmsUtils.convertJmsAccessException(e);
         }
@@ -85,7 +85,7 @@ public class SMSNotificationListener {
     public void sendQuickSMS(Message message) {
         try {
             MapMessage emailMessage = (MapMessage) message;
-            smsService.sendSMS(emailMessage.getString(MOBILE), emailMessage.getString(MESSAGE), HIGH);
+            smsService.sendSMS(emailMessage.getString(MOBILE), emailMessage.getString(MESSAGE), HIGH,emailMessage.getString("template"));
         } catch (JMSException e) {
             throw JmsUtils.convertJmsAccessException(e);
         }

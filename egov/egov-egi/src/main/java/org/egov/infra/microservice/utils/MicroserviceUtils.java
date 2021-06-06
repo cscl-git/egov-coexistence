@@ -1164,15 +1164,12 @@ public class MicroserviceUtils {
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
         case "VERSION2":
-        	System.out.println("DDDDD");
             PaymentSearchCriteria paySearchCriteria=new PaymentSearchCriteria();
-            System.out.println("EEEE");
             rSearchcriteria.toPayemntSerachCriteriaContract(paySearchCriteria);
-            System.out.println("FFFF");
             List<Payment> payments = this.getPayments(paySearchCriteria);
-            System.out.println("GGGG");
+            System.out.println("Response conversion starts");
             paymentUtils.getReceiptsFromPayments(payments, receipts);
-            System.out.println("HHHH");
+            System.out.println("Response conversion ends");
             break;
 
         default:
@@ -1451,7 +1448,9 @@ public class MicroserviceUtils {
     }
 
     public void setExpire(String key) {
-        redisTemplate.expire(key, 90, TimeUnit.MINUTES);
+    	LOGGER.info("Set Expire : " + key);
+        redisTemplate.expire(key, 30, TimeUnit.MINUTES);
+        LOGGER.info("Set Expire in : 30 Mins" + key);
     }
 
     public Object readFromRedis(String sessionId, String key) {
@@ -1800,15 +1799,18 @@ public class MicroserviceUtils {
             {
             	LOGGER.info("ids ; "+url.toString());
             	response = restTemplate.postForObject(url.toString(), reqSearchWrapper, PaymentResponse.class);
+            	LOGGER.info("ids end; "+url.toString());
             }
             else if(searchCriteria.getReceiptNumbers() != null && !searchCriteria.getReceiptNumbers().isEmpty()) {
             	LOGGER.info("reqReceiptWrapper.getIds().size()    :::"+reqReceiptWrapper.getIds().size());
             	response = restTemplate.postForObject(url.toString(), reqReceiptWrapper, PaymentResponse.class);
+            	LOGGER.info("reqReceiptWrapper.getIds().size() ends  :::"+reqReceiptWrapper.getIds().size());
             }
             else
             {
             	LOGGER.info("non ids : "+url.toString());
             response = restTemplate.postForObject(url.toString(), reqWrapper, PaymentResponse.class);
+            LOGGER.info("non ids end : "+url.toString());
             }
             
             return response.getPayments();

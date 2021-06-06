@@ -5,7 +5,13 @@
 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
-
+ <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ <link rel="stylesheet" href="/resources/demos/style.css">
+<script>
+  $( function() {
+    $( "#estimateDate" ).datepicker();
+  } );
+  </script>
 		<spring:hasBindErrors name="estimatePreparationApproval">
 			<div class="alert alert-danger"
 				style="margin-top: 20px; margin-bottom: 10px;">
@@ -419,5 +425,7 @@
 
 
 	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 	

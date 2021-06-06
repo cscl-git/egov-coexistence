@@ -186,7 +186,7 @@ public class CreateExpenseBillController extends BaseBillController {
                          final BindingResult resultBinder, final HttpServletRequest request, @RequestParam final String workFlowAction)
             throws IOException {
         LOGGER.info("ExpenseBill is creating with user ::"+ApplicationThreadLocals.getUserId());
-      //User createdBy = new User();
+      ///User createdBy = new User();
      // createdBy.setId(ApplicationThreadLocals.getUserId());
       egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
       ExpenseBillNumberGenerator v = beanResolver.getAutoNumberServiceFor(ExpenseBillNumberGenerator.class);
@@ -214,6 +214,13 @@ public class CreateExpenseBillController extends BaseBillController {
         }
 
         populateBillDetails(egBillregister);
+       
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+    	{ 
+        	  populateEgBillregistermisDetails(egBillregister);
+    	}
+     
+        
         validateBillNumber(egBillregister, resultBinder);
         if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
     	{ 
@@ -261,6 +268,8 @@ public class CreateExpenseBillController extends BaseBillController {
             
             EgBillregister savedEgBillregister;
             egBillregister.setDocumentDetail(list);
+            
+            
             try {
 
                 savedEgBillregister = expenseBillService.create(egBillregister, approvalPosition, approvalComment, null, 
@@ -294,7 +303,8 @@ public class CreateExpenseBillController extends BaseBillController {
 //              
 
             return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
-                    + savedEgBillregister.getBillnumber();
+                    + savedEgBillregister.getBillnumber()+"&billId="
+                            + savedEgBillregister.getId();
 //            return "redirect:/expensebill/success?approverDetails=" + approverDetails + "&billNumber="
 //            + 77777;
 
@@ -302,7 +312,7 @@ public class CreateExpenseBillController extends BaseBillController {
     }
 
     @RequestMapping(value = "/success", method = RequestMethod.GET)
-    public String showSuccessPage(@RequestParam("billNumber") final String billNumber, final Model model,
+    public String showSuccessPage(@RequestParam("billNumber") final String billNumber, @RequestParam("billId") final String billId, final Model model,
                                   final HttpServletRequest request) {
         final String[] keyNameArray = request.getParameter("approverDetails").split(",");
         Long id = 0L;
@@ -325,6 +335,7 @@ public class CreateExpenseBillController extends BaseBillController {
 //        approverName= keyNameArray[0];
         if (id != null)
             model.addAttribute("approverName", approverName);
+        model.addAttribute("billd", billId);
 //        model.addAttribute("currentUserDesgn", currentUserDesgn);
 //        model.addAttribute("nextDesign", nextDesign);
 

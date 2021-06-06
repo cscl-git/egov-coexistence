@@ -1189,6 +1189,7 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
     public ReceiptResponse populateAndPersistReceipts(final ReceiptHeader receiptHeader,
             final List<InstrumentHeader> receiptInstrList) {
         String consumerCode = getConsumerCode(receiptHeader);
+        System.out.println("Consumer Code :::"+consumerCode);
         DemandResponse demandResponse = generateDemand(consumerCode, receiptHeader);
         List billList = generateBill(consumerCode, receiptHeader.getService());
         return generateReceipt(receiptHeader, billList);
@@ -1690,13 +1691,17 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
                 .totalAmountPaid(receiptHeader.getTotalAmount())
                 .paidBy(receiptHeader.getPaidBy())
                 .gstno(receiptHeader.getGstno())
+                .servicename(receiptHeader.getServiceBusinessName())
+                .collectedbyname(receiptHeader.getCreatedByName())
                 .subdivison(receiptHeader.getSubdivison())
                 .narration(receiptHeader.getReferenceDesc())
                 .payerAddress(receiptHeader.getPayeeAddress())
                 .paymentStatus(PaymentStatusEnum.NEW)
                 .build();
         this.prepareInstrumentsDetails(payment,receiptHeader);
+        System.out.println("START PAYMENT");
         PaymentResponse response = microserviceUtils.generatePayments(payment);
+        System.out.println("END PAYMENT");
         return response.getPayments();
     }
     

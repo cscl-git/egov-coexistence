@@ -168,9 +168,9 @@
 							<s:text name="chq.assignment.rtgs.refno"/><span class="mandatory1">*</span>
 							<s:textfield id="rtgsRefNoMap['%{#count}']" name="rtgsRefNoMap['%{#count}']" value=""/>       
 						</td>         -->
-						<td class="greybox"><s:text name="chq.assignment.pex.date" /><span
-							class="mandatory1">*</span> <s:date name="pexdateMap[%{#count}]"
-								var="pexdateMap[%{#count}]" format="dd/MM/yyyy" /> <s:textfield
+						<td class="greybox"><s:text name="chq.assignment.pex.date" /><span	class="mandatory1">*</span>
+						 <s:date name="pexdateMap[%{#count}]" var="pexdateMap[%{#count}]" format="dd/MM/yyyy" /> 
+						 <s:textfield
 								id="pexdateMapId" name="pexdateMap[%{#count}]"
 								value="%{pexdateMap[%{#count}]}" data-date-end-date="0d"
 								onkeyup="DateFormat(this,this.value,event,false,'3')"
@@ -183,6 +183,7 @@
 			<div class="subheadsmallnew" id="noRecordsDiv"
 				style="visibility: hidden">No Records Found</div>
 			<br />
+			
 			<div>
 			Total Amount (Rs) : <input type="text" name="caltotalamount" readonly="readonly" id="caltotalamount">
 			</div>
@@ -197,7 +198,7 @@
 
 				<s:submit id="assignChequeBtn" method="updatePex"
 					value="Assign PEX Number" cssClass="buttonsubmit"
-					onclick="return validate();" />
+					onclick="return validatepexdate();" />
 				<input type="button" value="Close"
 					onclick="javascript:window.close()" class="button" />
 			</div>
@@ -206,17 +207,20 @@
 	</s:form>
 	<script>
 	var sum=0;
+	var pexAccountArray = [];
 			function update(obj)
 			{
 				//alert(obj)		
  				var id ="";
  				var index = "";
 				
+				var accountId;
 				if(obj.checked){
 					
 					 id = obj.id;
 					 index  = parseInt(id.replace("isSelected",""));					
-					
+					 accountId = document.getElementsByName("pexList["+index+"].bankAccountId")[0].value;
+					pexAccountArray.push(accountId);
 					sum = sum + parseInt(document.getElementsByName("pexList["+index+"].paidAmount")[0].value);
 					document.getElementById("caltotalamount").value = sum;
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)+1;
@@ -224,6 +228,8 @@
 				else{
 					 id = obj.id;
 					 index  = parseInt(id.replace("isSelected",""));
+					 accountId = document.getElementsByName("pexList["+index+"].bankAccountId")[0].value;
+					pexAccountArray.pop(accountId);
 					sum = sum - parseInt(document.getElementsByName("pexList["+index+"].paidAmount")[0].value);
 					document.getElementById("caltotalamount").value = sum;
 					document.getElementById('selectedRows').value=parseInt(document.getElementById('selectedRows').value)-1;
@@ -262,6 +268,32 @@
 								 
 				return true;                   
 			}
+			
+			function validatepexdate(){
+				
+				
+				var accountId = null;
+				
+				if(pexAccountArray.length==0){
+					bootbox.alert('Please select the payment voucher');
+					return false;
+				}
+				if(pexAccountArray.length>0){	
+				
+				for(var i=0; i<pexAccountArray.length;i++){  //pexdateMap
+				  if(document.getElementsByName("pexdateMap["+pexAccountArray[i]+"]")[0].value =='' || document.getElementsByName("pexdateMap["+pexAccountArray[i]+"]")[0].value==null){
+						  bootbox.alert('Please select PEX Date ');
+					return false;
+				  }
+				}
+				}
+				
+				document.chequeAssignment.action='/services/EGF/payment/chequeAssignment-updatePex.action';
+	    		document.chequeAssignment.submit();
+				return true;
+				}		
+				
+			
 		function validateForPexMode(){
 				var noOfSelectedRows=document.getElementById('selectedRows').value;
 				//bootbox.alert("sizseled"+noOfSelectedRows);      

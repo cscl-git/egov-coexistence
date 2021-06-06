@@ -401,5 +401,14 @@ private BoqNewDetailsRepository boqNewDetailsRepository;
 		}
 		return w;
 	}
+	public List<WorkOrderAgreementRESTPOJO>getAllWorkOrderAgreementRestByMileStone(){
+		List<WorkOrderAgreementRESTPOJO> w=null;
+		try {
+			w=workOrderAgreementRepository.getAllWorkOrderAgreementByMileStone();
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		return w;
+	}
 
 }

@@ -94,7 +94,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th>TDS/I. Tax</th>
 						<th>TDS ON IGST</th><th>TDS ON CGST/UTGST</th><th>Labour Cess</th>
 						<th>Collection charges</th><th>Water charges</th><th>Quality Cess</th>
-						<th>Penalty/Fine</th><th>Security/Amt withheld</th><th>GPF</th><th>NPS/CPF</th><th>GSLIC/GIS</th><th>House Building Advance</th><th>Licence Fees</th><th>LIC</th><th>Bank Loan</th><th>Court Attachment</th><th>Pension Fund</th><th>Any other deduction</th>
+						<th>Penalty/Fine</th><th>Security/Amt withheld</th><th>GPF</th><th>NPS/CPF</th><th>GSLIC/GIS</th><th>House Building Advance</th><th>Licence Fees</th><th>LIC</th><th>Bank Loan</th><th>Court Attachment</th><th>Pension Fund</th><th>Electricity charges</th><th>Admin/Service Charges</th><th>Other Charges</th><th>Other Recoveries From Employees</th><th>Any other deduction</th>
 						<th>Net Amount</th>
 						<th>Paid Amount</th>
 						<th>Journal Voucher number </th>
@@ -103,6 +103,8 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th>BPV Date</th>
 						<th>PEX NUMBER</th>
 						<th>PEX DATE </th>
+						<th>CHEQUE NUMBER</th>
+						<th>CHEQUE DATE </th>
 						<th>Bank Account Number</th>
 						<th>Status</th>
 					</tr>
@@ -184,6 +186,18 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 								${ result.pensionAmount}
 						    </td>
 						    <td>
+								${ result.electricityChargesAmount}
+						    </td>
+						    <td>
+								${ result.adminServiceChargesAmount}
+						    </td>
+						    <td>
+								${ result.otherChargesAmount}
+						    </td>
+						    <td>
+								${ result.otherRecovFromEmployeesAmount}
+						    </td>
+						    <td>
 								${ result.deductionAmount}
 						    </td>
 						    <td>
@@ -209,6 +223,12 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						    </td>
 						    <td>
 								${ result.pexNodate}
+						    </td>
+						    <td>
+								${ result.chqNo}
+						    </td>
+						    <td>
+								${ result.chqDate}
 						    </td>
 						     <td>
 								${ result.bankaccount}

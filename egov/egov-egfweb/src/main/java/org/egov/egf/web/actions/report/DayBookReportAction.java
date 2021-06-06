@@ -286,22 +286,23 @@ public class DayBookReportAction extends BaseFormAction {
                 	{
                 		bean.setPexno(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getVoucherNumber());
                 		bean.setPexDate(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getApprovalComent());
+                		bean.setChqNo(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getFirstsignatory());
+                		bean.setChqDate(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getSecondsignatory());
                 	}
                 }
                 if(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())) != null)
                 {
                 	bean.setPexno(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getVoucherNumber());
                 	bean.setPexDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getApprovalComent());
+                	bean.setChqNo(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getFirstsignatory());
+                	bean.setChqDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getSecondsignatory());
                 }
-                
             }
-
             if (narration != null && !narration.equalsIgnoreCase("") && narration.equalsIgnoreCase(bean.getNarration())) {
                 bean.setNarration("");
             } else {
                 narration = bean.getNarration();
             }
-
         }
 
     }
@@ -311,7 +312,7 @@ public class DayBookReportAction extends BaseFormAction {
        	final StringBuffer query5 = new StringBuffer(500);
       	List<Object[]> list= null;
       	query5
-          .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+          .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
       	LOGGER.info("Query 5 :: "+query5.toString());
       	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
        	list = queryInstru.list();
@@ -338,6 +339,14 @@ public class DayBookReportAction extends BaseFormAction {
       			if(object[4] != null)
       			{
       				pexDetail.setCgvn(object[4].toString());
+      			}
+      			if(object[5] != null)
+      			{
+      				pexDetail.setFirstsignatory(object[5].toString());
+      			}
+      			if(object[6] != null)
+      			{
+      				pexDetail.setSecondsignatory(object[6].toString());
       			}
       			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
       		}

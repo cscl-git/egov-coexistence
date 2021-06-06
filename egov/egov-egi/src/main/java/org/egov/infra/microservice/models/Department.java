@@ -23,7 +23,13 @@ public class Department {
     public Department() {
     }
 
-    public Long getId() {
+    public Department(Long id2, String name2, String code2) {
+    	this.id = id2;
+        this.name = name2;
+        this.code = code2;
+	}
+
+	public Long getId() {
         return id;
     }
 

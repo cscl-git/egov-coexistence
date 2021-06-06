@@ -47,6 +47,16 @@
  */
 package org.egov.council.service;
 
+import static org.egov.council.utils.constants.CouncilConstants.MODULE_FULLNAME;
+import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
+import static org.egov.council.utils.constants.CouncilConstants.SENDEMAILFORCOUNCIL;
+import static org.egov.council.utils.constants.CouncilConstants.SENDSMSFORCOUNCIL;
+
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.egov.council.entity.CommitteeMembers;
@@ -61,16 +71,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-
-import static org.egov.council.utils.constants.CouncilConstants.MODULE_FULLNAME;
-import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
-import static org.egov.council.utils.constants.CouncilConstants.SENDEMAILFORCOUNCIL;
-import static org.egov.council.utils.constants.CouncilConstants.SENDSMSFORCOUNCIL;
 
 @Service
 public class CouncilSmsAndEmailService {
@@ -113,7 +113,7 @@ public class CouncilSmsAndEmailService {
 	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
 	                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
 	                if (mobileNo != null) {
-	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage);
+	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,null);
 	                }
 	            }
         	}catch(Exception e) {
@@ -123,7 +123,7 @@ public class CouncilSmsAndEmailService {
 	            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
 	            for (User user : listOfUsers) {
 	                if (user.getMobileNumber() != null) {
-	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage);
+	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage,null);
 	                }
 	            }
             }catch(Exception e) {
@@ -134,16 +134,20 @@ public class CouncilSmsAndEmailService {
     }
     
     public void sendSmsNotice(CouncilMeeting councilMeeting, String customMessage) {
+    	LOGGER.info("A");
         String mobileNo;
         Boolean smsEnabled = isSmsEnabled();
-
+        final List<AppConfigValues> appList = appConfigValuesService
+                .getConfigValuesByModuleAndKey("EGF",
+                        "AGENDA_NOTICE_TEMPLATE_ID");
+        final String templateId = appList.get(0).getValue();
         if (smsEnabled) {
         	try {
 	            for (CommitteeMembers committeeMembers : committeeMemberService
 	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
 	                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
 	                if (mobileNo != null) {
-	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage);
+	                    buildSmsForMeeting(mobileNo, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,templateId);
 	                }
 	            }
         	}catch(Exception e) {
@@ -153,7 +157,7 @@ public class CouncilSmsAndEmailService {
 	            List<User> listOfUsers = councilMeetingService.getUserListForNotice(councilMeeting);
 	            for (User user : listOfUsers) {
 	                if (user.getMobileNumber() != null) {
-	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage);
+	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage,templateId);
 	                }
 	            }
             }catch(Exception e) {
@@ -252,15 +256,17 @@ public class CouncilSmsAndEmailService {
      */
 
     public void buildSmsForMeeting(final String mobileNumber, final String name, final CouncilMeeting councilMeeting,
-            final String customMessage) {
+            final String customMessage,String templateId) {
         String smsMsg;
+        final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
             smsMsg = smsBodyByCodeAndArgsWithType("msg.resolution.sms", name, councilMeeting, customMessage);
         } else {
-            smsMsg = smsBodyByCodeAndArgsWithType("msg.meeting.sms", name, councilMeeting, customMessage);
+            //smsMsg = smsBodyByCodeAndArgsWithType("msg.meeting.sms", name, councilMeeting, customMessage);
+        	smsMsg="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Agenda sent to your mail. Chandigarh Smart City Ltd.";
         }
         if (mobileNumber != null && smsMsg != null)
-            sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
+            sendSMSOnSewerageForMeeting(mobileNumber, smsMsg,templateId);
     }
     
     public void buildEmailForMeeting(final String email, final String name, final CouncilMeeting councilMeeting,
@@ -276,8 +282,10 @@ public class CouncilSmsAndEmailService {
             body = emailBodyByCodeAndArgsWithType("email.resolution.body", name, councilMeeting, customMessage);
             subject = emailSubjectforEmailByCodeAndArgs("email.resolution.subject", name, councilMeeting);
         } else {
-            body = emailBodyByCodeAndArgsWithType("email.meeting.body", name, councilMeeting, customMessage);
-            subject = emailSubjectforEmailByCodeAndArgs("email.meeting.subject", name, councilMeeting);
+            //body = emailBodyByCodeAndArgsWithType("email.meeting.body", name, councilMeeting, customMessage);
+        	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
+        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
@@ -295,22 +303,22 @@ public class CouncilSmsAndEmailService {
 
     public void buildSmsForMeetingCouncilRoles(final String userName, final String mobileNumber,
             final CouncilMeeting councilMeeting,
-            final String customMessage) {
+            final String customMessage,String templateId) {
         String smsMsg;
+        final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
         if (MOM_FINALISED.equals(councilMeeting.getStatus().getCode())) {
             smsMsg = smsBodyByCodeAndArgsWithType("msg.council.roles.resolution.sms", userName, councilMeeting,
                     customMessage);
         } else {
-            smsMsg = smsBodyByCodeAndArgsWithType("msg.council.roles.meeting.sms", userName, councilMeeting,
-                    customMessage);
+        	smsMsg="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Agenda sent to your mail. Chandigarh Smart City Ltd.";
         }
         if (mobileNumber != null && smsMsg != null)
-            sendSMSOnSewerageForMeeting(mobileNumber, smsMsg);
+            sendSMSOnSewerageForMeeting(mobileNumber, smsMsg,templateId);
     }
     
     public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
             final String customMessage) {
-    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage,null);            
     }
 
     public void buildEmailForMeetingForCouncilRoles(final String userName, final String email,
@@ -329,9 +337,9 @@ public class CouncilSmsAndEmailService {
             body = emailBodyByCodeAndArgsWithType("email.council.roles.resolution.body", userName, councilMeeting,
                     customMessage);
         } else {
-            subject = emailSubjectforEmailByCodeAndArgs("email.council.roles.meeting.subject", userName, councilMeeting);
-            body = emailBodyByCodeAndArgsWithType("email.council.roles.meeting.body", userName, councilMeeting,
-                    customMessage);
+        	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
+        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
@@ -358,11 +366,17 @@ public class CouncilSmsAndEmailService {
     public String emailBodyByCodeAndArgsWithType(final String code, final String name, final CouncilMeeting councilMeeting,
             final String customMessage) {
         final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
-        return councilMessageSource.getMessage(code,
+        /*return councilMessageSource.getMessage(code,
                 new String[] { name,
                         sf.format(councilMeeting.getMeetingDate()),
                         String.valueOf(councilMeeting.getMeetingTime()),
                         String.valueOf(councilMeeting.getMeetingLocation()), customMessage != null ? customMessage : " " },
+                LocaleContextHolder.getLocale());*/
+        return councilMessageSource.getMessage(code,
+                new String[] { councilMeeting.getCommitteeType().getName(),councilMeeting.getMeetingNumber(),councilMeeting.getCommitteeType().getName(),
+                        sf.format(councilMeeting.getMeetingDate()),
+                        String.valueOf(councilMeeting.getMeetingTime()),
+                        String.valueOf(councilMeeting.getMeetingLocation()) },
                 LocaleContextHolder.getLocale());
     }
 
@@ -418,8 +432,9 @@ public class CouncilSmsAndEmailService {
                 LocaleContextHolder.getLocale());
     }
 
-    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
-        notificationService.sendSMS(mobileNumber, smsBody);
+    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
+    	LOGGER.info("C");
+        notificationService.sendSMS(mobileNumber, smsBody,templateId);
     }
 
     /*public void sendEmailOnSewerageForMeetingWithAttachment(final String email, final String emailBody,

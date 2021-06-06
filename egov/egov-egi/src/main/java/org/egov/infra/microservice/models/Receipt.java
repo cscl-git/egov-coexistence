@@ -30,6 +30,10 @@ public class Receipt {
     private String paymentStatus;
     
     private String gstNo;
+    
+    private String servicename;
+    
+    private String collectedbyname;
 
     @NotNull
     @Size(min = 1, max = 1)
@@ -139,5 +143,21 @@ public class Receipt {
 
 	public void setPaymentStatus(String paymentStatus) {
 		this.paymentStatus = paymentStatus;
+	}
+
+	public String getServicename() {
+		return servicename;
+	}
+
+	public void setServicename(String servicename) {
+		this.servicename = servicename;
+	}
+
+	public String getCollectedbyname() {
+		return collectedbyname;
+	}
+
+	public void setCollectedbyname(String collectedbyname) {
+		this.collectedbyname = collectedbyname;
 	}
 }

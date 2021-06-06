@@ -72,6 +72,7 @@ import org.egov.commons.SubScheme;
 import org.egov.egf.model.VoucherDetailMain;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
+import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infstr.services.PersistenceService;
@@ -85,6 +86,12 @@ import org.hibernate.SQLQuery;
 import org.python.icu.math.BigDecimal;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author manoranjan
@@ -285,7 +292,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
                     billMap.put("sourcepath", object[7].toString());
                 else
                     billMap.put("sourcepath",
-                            "/services/EGF/bill/billView-view.action?billId=" + object[8].toString());
+                            "/services/EGF/expensebill/view/" + object[8].toString());
                 // If bill is created from create bill screen
                 if (object[11] != null)
                 {

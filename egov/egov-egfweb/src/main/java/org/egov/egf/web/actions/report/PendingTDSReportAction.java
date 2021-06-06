@@ -575,7 +575,6 @@ public class PendingTDSReportAction extends BaseFormAction {
             {
         		if(row.getVoucherNumber() != null && !row.getVoucherNumber().isEmpty())
         		{
-        			//dept = departmentService.getDepartmentById(Long.parseLong(row.getDepartmentId()));
         			if(voucherDetailMainMapping.get(row.getVoucherNumber()) != null)
         			{
         				row.setDeptName(voucherDetailMainMapping.get(row.getVoucherNumber()).getDepartment());
@@ -599,8 +598,8 @@ public class PendingTDSReportAction extends BaseFormAction {
             		{
             			 if(supplierMap.get(row.getPartyName()) != null)
             			 {
-            				 row.setGstNo(supplierMap.get(row.getPartyName()).getTinNumber());
-            				 row.setPanNo(supplierMap.get(row.getPartyName()).getPanNumber());
+            				 row.setGstNo(supplierMap.get(row.getPartyName().trim()).getTinNumber());
+            				 row.setPanNo(supplierMap.get(row.getPartyName().trim()).getPanNumber());
             			 }
             			
             		}
@@ -608,8 +607,8 @@ public class PendingTDSReportAction extends BaseFormAction {
             		{
             			if(contractorMap.get(row.getPartyName()) != null)
             			{
-            				row.setGstNo(contractorMap.get(row.getPartyName()).getTinNumber());
-           				 	row.setPanNo(contractorMap.get(row.getPartyName()).getPanNumber());
+            				row.setGstNo(contractorMap.get(row.getPartyName().trim()).getTinNumber());
+           				 	row.setPanNo(contractorMap.get(row.getPartyName().trim()).getPanNumber());
             			}
             			
             		}

@@ -80,7 +80,8 @@ public class MSCommController {
     	try {
     		LOGGER.info("logout method of clear token ");
             String access_token = request.getRequestInfo().getAuthToken();
-            LOGGER.info("*********** access_token : logout::: "+ access_token);   
+            LOGGER.info("*********** access_token : logout::: "+ access_token); 
+            LOGGER.info("*********** redisRepository : logout::: "+ redisRepository);
         	if(redisRepository!=null){
         		String sessionId = (String)microserviceUtils.readFromRedis(access_token, access_token);
         		if(sessionId != null) {

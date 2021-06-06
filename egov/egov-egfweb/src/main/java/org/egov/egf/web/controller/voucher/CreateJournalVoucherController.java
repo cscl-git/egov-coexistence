@@ -477,7 +477,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    	final StringBuffer query5 = new StringBuffer(500);
   	 list= null;
   	query5
-      .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+      .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
   	LOGGER.info("Query 5 :: "+query5.toString());
   	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
    	list = queryInstru.list();
@@ -504,6 +504,14 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   			if(object[4] != null)
   			{
   				pexDetail.setCgvn(object[4].toString());
+  			}
+  			if(object[5] != null)
+  			{
+  				pexDetail.setFirstsignatory(object[5].toString());
+  			}
+  			if(object[6] != null)
+  			{
+  				pexDetail.setSecondsignatory(object[6].toString());
   			}
   			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
   		}
@@ -569,6 +577,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    					{
    						resultset.setPexNodate(voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
    					}
+   					//cheque
+   					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory().isEmpty())
+   					{
+   						resultset.setChqNo(voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory());
+   					}
+   					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory().isEmpty())
+   					{
+   						resultset.setChqDate(voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory());
+   					}
+   					//
    					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn().isEmpty())
    					{
    						resultset.setBankaccount(voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn());
@@ -611,6 +629,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					{
 						resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
 					}
+					//checque
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory().isEmpty())
+					{
+						resultset.setChqNo(voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory());
+					}
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory().isEmpty())
+					{
+						resultset.setChqDate(voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory());
+					}
+					//
 					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(result.getId()).getCgvn().isEmpty())
 					{
 						resultset.setBankaccount(voucherDetailIntrumentMapping.get(result.getId()).getCgvn());
@@ -646,6 +674,10 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         BigDecimal bankAmount=new BigDecimal("0");
         BigDecimal courtAmount=new BigDecimal("0");
         BigDecimal pensionAmount=new BigDecimal("0");
+        BigDecimal electricityChargesAmount=new BigDecimal("0");
+        BigDecimal adminServiceChargesAmount=new BigDecimal("0");
+        BigDecimal otherChargesAmount=new BigDecimal("0");
+        BigDecimal otherRecovFromEmployeesAmount=new BigDecimal("0");
     	BigDecimal anyTax=new BigDecimal("0");
     	BigDecimal net=new BigDecimal("0");
     	BigDecimal decTax=new BigDecimal("0");
@@ -673,11 +705,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         			{
         				laborTax=laborTax.add(row.getCreditAmount());
         			}
-        			else if(row.getGlCode().equalsIgnoreCase("1408055"))
+        			else if(row.getGlCode().equalsIgnoreCase("1408055") || row.getGlCode().equalsIgnoreCase("1408052"))
         			{
         				colTax=colTax.add(row.getCreditAmount());
         			}
-        			else if(row.getGlCode().equalsIgnoreCase("1405014"))
+        			else if(row.getGlCode().equalsIgnoreCase("1405014") || row.getGlCode().equalsIgnoreCase("1408053"))
         			{
         				waterTax=waterTax.add(row.getCreditAmount());
         			}
@@ -729,6 +761,22 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         			{
         				pensionAmount=pensionAmount.add(row.getCreditAmount());
         			}
+        			else if(row.getGlCode().equalsIgnoreCase("1405053"))
+        			{
+        				electricityChargesAmount=electricityChargesAmount.add(row.getCreditAmount());
+        			}
+        			else if(row.getGlCode().equalsIgnoreCase("1407001"))
+        			{
+        				adminServiceChargesAmount=adminServiceChargesAmount.add(row.getCreditAmount());
+        			}
+        			else if(row.getGlCode().equalsIgnoreCase("1408001"))
+        			{
+        				otherChargesAmount=otherChargesAmount.add(row.getCreditAmount());
+        			}
+        			else if(row.getGlCode().equalsIgnoreCase("1408059"))
+        			{
+        				otherRecovFromEmployeesAmount=otherRecovFromEmployeesAmount.add(row.getCreditAmount());
+        			}
         			else
         			{
         				taxNonMatching.add(row.getGlCode());
@@ -758,6 +806,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         	resultset.setBankAmount(bankAmount);
         	resultset.setCourtAmount(courtAmount);
         	resultset.setPensionAmount(pensionAmount);
+        	
+        	resultset.setElectricityChargesAmount(electricityChargesAmount);
+        	resultset.setAdminServiceChargesAmount(adminServiceChargesAmount);
+        	resultset.setOtherChargesAmount(otherChargesAmount);
+        	resultset.setOtherRecovFromEmployeesAmount(otherRecovFromEmployeesAmount);
         	int i=0;
         	for(String rowTds:taxNonMatching) {
         		if(tds.contains(rowTds))
@@ -767,8 +820,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         		i++;
         	}
         	resultset.setDeductionAmount(anyTax);
-        	
-        	decTax=decTax.add(tdsTax).add(igstTax).add(cgstTax).add(laborTax).add(colTax).add(waterTax).add(qualCessTax).add(fineTax).add(secTax).add(gpfAmount).add(npsAmount).add(gslicAmount).add(hbaAmount).add(licenseAmount).add(licAmount).add(bankAmount).add(courtAmount).add(pensionAmount).add(anyTax);
+        	decTax=decTax.add(tdsTax).add(igstTax).add(cgstTax).add(laborTax).add(colTax).add(waterTax).add(qualCessTax).add(fineTax).add(secTax).add(gpfAmount).add(npsAmount).add(gslicAmount).add(hbaAmount).add(licenseAmount).add(licAmount).add(bankAmount).add(courtAmount).add(pensionAmount).add(electricityChargesAmount).add(adminServiceChargesAmount).add(otherChargesAmount).add(otherRecovFromEmployeesAmount).add(anyTax);
         	net=resultset.getGrossAmount().subtract(decTax);
         	resultset.setNetAmount(net);
     	}
@@ -974,7 +1026,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   	final StringBuffer query5 = new StringBuffer(500);
  	 list= null;
  	query5
-     .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber from voucher_detail_instrument vdi   ");
+     .append("select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
  	LOGGER.info("Query 5 :: "+query5.toString());
  	queryInstru=this.persistenceService.getSession().createSQLQuery(query5.toString());
   	list = queryInstru.list();
@@ -1001,6 +1053,14 @@ public class CreateJournalVoucherController extends BaseVoucherController {
  			if(object[4] != null)
  			{
  				pexDetail.setCgvn(object[4].toString());
+ 			}
+ 			if(object[5] != null)
+ 			{
+ 				pexDetail.setFirstsignatory(object[5].toString());
+ 			}
+ 			if(object[6] != null)
+ 			{
+ 				pexDetail.setSecondsignatory(object[6].toString());
  			}
  			voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
  		}
@@ -1066,6 +1126,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   					{
   						resultset.setPexNodate(voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
   					}
+  					//cheque
+  					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory().isEmpty())
+  					{
+  						resultset.setChqNo(voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory());
+  					}
+  					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory().isEmpty())
+  					{
+  						resultset.setChqDate(voucherDetailIntrumentMapping.get(row.getBpvId()).getSecondsignatory());
+  					}
+  					//
   					if(voucherDetailIntrumentMapping.get(row.getBpvId()) != null && voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn().isEmpty())
   					{
   						resultset.setBankaccount(voucherDetailIntrumentMapping.get(row.getBpvId()).getCgvn());
@@ -1108,6 +1178,16 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					{
 						resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
 					}
+					//cheque
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory().isEmpty())
+					{
+						resultset.setChqNo(voucherDetailIntrumentMapping.get(result.getId()).getFirstsignatory());
+					}
+					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory() != null && !voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory().isEmpty())
+					{
+						resultset.setChqDate(voucherDetailIntrumentMapping.get(result.getId()).getSecondsignatory());
+					}
+					//
 					if(voucherDetailIntrumentMapping.get(result.getId()) != null && voucherDetailIntrumentMapping.get(result.getId()).getCgvn() != null && !voucherDetailIntrumentMapping.get(result.getId()).getCgvn().isEmpty())
 					{
 						resultset.setBankaccount(voucherDetailIntrumentMapping.get(result.getId()).getCgvn());
@@ -1118,7 +1198,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   		
   	}
    	
-   	String[] COLUMNS = {"S.no.", "Party Name", "DIVISION", "BUDGET HEAD","Scheme" ,"Gross Amount", "TDS/I", "TDS ON IGST", "TDS ON CGST/UTGST", "Labour Cess", "Collection charges", "Water charges", "Quality Cess", "Penalty/Fine", "Security/Amt withheld","GPF","NPS/CPF","GSLIC/GIS","House Building Advance","Licence Fees","LIC","Bank Loan","Court Attachment","Pension Fund","Any other deduction", "Net Amount", "Paid Amount", "Journal Voucher number","Jounal Voucher Date", "Payment voucher number","BPV Date", "PEX NUMBER", "PEX DATE","Bank Account Number", "Status"};
+   	String[] COLUMNS = {"S.no.", "Party Name", "DIVISION", "BUDGET HEAD","Scheme" ,"Gross Amount", "TDS/I", "TDS ON IGST", "TDS ON CGST/UTGST", "Labour Cess", "Collection charges", "Water charges", "Quality Cess", "Penalty/Fine", "Security/Amt withheld","GPF","NPS/CPF","GSLIC/GIS","House Building Advance","Licence Fees","LIC","Bank Loan","Court Attachment","Pension Fund","Electricity charges","Admin/Service Charges","Other Charges","Other Recoveries From Employees","Any other deduction", "Net Amount", "Paid Amount", "Journal Voucher number","Jounal Voucher Date", "Payment voucher number","BPV Date", "PEX NUMBER", "PEX DATE", "CHEQUE NUMBER", "CHEQUE DATE","Bank Account Number", "Status"};
 	
 	ByteArrayInputStream in = resultToExcel(billRegReportList, COLUMNS);
 	
@@ -1887,38 +1967,57 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					row.createCell(23).setCellValue(detail.getPensionAmount().doubleValue());
 				}
 				
+				if(detail.getElectricityChargesAmount() !=null) {
+					row.createCell(24).setCellValue(detail.getElectricityChargesAmount().doubleValue());
+				}
+				if(detail.getAdminServiceChargesAmount() !=null) {
+					row.createCell(25).setCellValue(detail.getAdminServiceChargesAmount().doubleValue());
+				}
+				if(detail.getOtherChargesAmount() !=null) {
+					row.createCell(26).setCellValue(detail.getOtherChargesAmount().doubleValue());
+				}
+				if(detail.getOtherRecovFromEmployeesAmount() !=null) {
+					row.createCell(27).setCellValue(detail.getOtherRecovFromEmployeesAmount().doubleValue());
+				}
+				
 				if(detail.getDeductionAmount() != null) {
-					row.createCell(24).setCellValue(detail.getDeductionAmount().doubleValue());
+					row.createCell(28).setCellValue(detail.getDeductionAmount().doubleValue());
 				}
 				if(detail.getNetAmount() != null) {
-					row.createCell(25).setCellValue(detail.getNetAmount().doubleValue());
+					row.createCell(29).setCellValue(detail.getNetAmount().doubleValue());
 				}
 				if(detail.getPaidAmount() !=null) {
-					row.createCell(26).setCellValue(detail.getPaidAmount().doubleValue());
+					row.createCell(30).setCellValue(detail.getPaidAmount().doubleValue());
 				}
 				if(detail.getVoucherNumber() != null) {
-					row.createCell(27).setCellValue(detail.getVoucherNumber());
+					row.createCell(31).setCellValue(detail.getVoucherNumber());
 				}
 				if(detail.getVoucherDate() != null) {
-					row.createCell(28).setCellValue(detail.getVoucherDate());
+					row.createCell(32).setCellValue(detail.getVoucherDate());
 				}
 				if(detail.getPaymentVoucherNumber() != null) {
-					row.createCell(29).setCellValue(detail.getPaymentVoucherNumber());
+					row.createCell(33).setCellValue(detail.getPaymentVoucherNumber());
 				}
 				if(detail.getBpvDate() != null) {
-					row.createCell(30).setCellValue(detail.getBpvDate());
+					row.createCell(34).setCellValue(detail.getBpvDate());
 				}
 				if(detail.getPexNo() != null) {
-					row.createCell(31).setCellValue(detail.getPexNo());
+					row.createCell(35).setCellValue(detail.getPexNo());
 				}
 				if(detail.getPexNodate() != null) {
-					row.createCell(32).setCellValue(detail.getPexNodate());
+					row.createCell(36).setCellValue(detail.getPexNodate());
+				}
+				if(detail.getChqNo() != null) {
+					row.createCell(37).setCellValue(detail.getChqNo());
+				}
+				if(detail.getChqDate() != null) {
+					row.createCell(38).setCellValue(detail.getChqDate());
 				}
 				if(detail.getBankaccount() != null) {
-					row.createCell(33).setCellValue(detail.getBankaccount());
+					row.createCell(39).setCellValue(detail.getBankaccount());
 				}
 				if(detail.getStatus() != null) {
-					row.createCell(34).setCellValue(detail.getStatus());
+					row.createCell(40).setCellValue(detail.getStatus());
 				}
 			}
 	 

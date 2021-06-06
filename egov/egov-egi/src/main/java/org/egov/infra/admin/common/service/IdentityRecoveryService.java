@@ -107,7 +107,7 @@ public class IdentityRecoveryService {
             IdentityRecovery identityRecovery = generate(user.get(), new DateTime().plusMinutes(5).toDate(), byOTP);
             if (byOTP) {
                 String message = "Your OTP for recovering password is " + identityRecovery.getToken();
-                notificationService.sendSMS(user.get().getMobileNumber(), message, HIGH);
+                notificationService.sendSMS(user.get().getMobileNumber(), message, HIGH,null);
                 notificationService.sendEmail(user.get().getEmailId(), "Password Reset", message);
             } else {
                 notificationService.sendEmail(identityRecovery.getUser(), "Password Recovery",

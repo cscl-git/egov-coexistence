@@ -1506,40 +1506,58 @@ function worksDiv(){
 
 function populateBdgetDetails()
 {
-	var dept=document.getElementById('department').value;
-	var fund=document.getElementById('fund').value;
-	var func=document.getElementById('egBillregistermis.function').value;
-	var accCode='';
-	var status = false;
-	if(dept == null || dept == '')
+	var budgetInd=document.getElementById('viewBudgetIndicator');
+	var indicator='N';
+	var pId =document.getElementById('paId');
+	if(budgetInd != null && budgetInd != '' && budgetInd.value == 'Y' && pId != null && pId != '')
 	{
-		bootbox.alert('Please select department to view budget details');
-		status = true;
+		indicator='Y';
 	}
-	else if(fund == null || fund == '')
+	if(indicator == 'Y')
 	{
-		bootbox.alert('Please select fund to view budget details');
-		status = true;
+		var today = new Date();
+		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=pv&vhId='+pId.value;
+		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 	}
-	else if(func == null || func == '')
+	else
 	{
-		bootbox.alert('Please select fund to view budget details');
-		status = true;
-	}
-	if(status == false)
-	{
-		accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
-		var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
-		if(accCode == null || accCode == '' || amt == null || amt == '')
+		var dept=document.getElementById('department').value;
+		var fund=document.getElementById('fund').value;
+		var func=document.getElementById('egBillregistermis.function').value;
+		var accCode='';
+		var status = false;
+		if(dept == null || dept == '')
 		{
-			bootbox.alert('Please select Debit Account Code/Amount to view budget details');
+			bootbox.alert('Please select department to view budget details');
+			status = true;
 		}
-		else
+		else if(fund == null || fund == '')
 		{
-			var today = new Date();
-			var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
-			var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
-			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+			bootbox.alert('Please select fund to view budget details');
+			status = true;
+		}
+		else if(func == null || func == '')
+		{
+			bootbox.alert('Please select fund to view budget details');
+			status = true;
+		}
+		if(status == false)
+		{
+			accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
+			var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
+			if(accCode == null || accCode == '' || amt == null || amt == '')
+			{
+				bootbox.alert('Please select Debit Account Code/Amount to view budget details');
+			}
+			else
+			{
+				var today = new Date();
+				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+				var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
+				window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+			}
 		}
 	}
+	
 	}

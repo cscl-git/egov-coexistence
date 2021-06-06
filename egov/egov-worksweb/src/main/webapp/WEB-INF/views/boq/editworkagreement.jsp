@@ -40,6 +40,7 @@
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 <%-- <form:input type="hidden" class="form-control" path="estId"  /> --%>
 
+	
 <form:form name="workOrderAgreementForm" role="form" method="post"
 	action="work1" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
@@ -76,6 +77,10 @@
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="work_agreement_number"  />
 					</div>
+					
+					<c:if test="${ProjectModInitiated == 'Project Modification Initiated'}">
+						<a href="#" onclick="openWork('${workOrderAgreement.id}')">Extension History</a>
+					</c:if>
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.start.date" /></label>
@@ -369,6 +374,8 @@
 		<br>
 		<br>
 		<br>
+		
+		<c:if test="${workOrderAgreement.milestonestatus == 'Yes' }">
 <div class="panel panel-primary" data-collapsed="0"
 			style="scrollable: true;">
 			<div class="panel-heading">
@@ -423,6 +430,7 @@
 			
 			
 </div>
+</c:if>
 		<!-- ========================code end=========== -->
 
 		<!-- ===========boq here below======== -->
@@ -551,7 +559,6 @@
 		</div>
 
 	</div>
-
 </form:form>
 	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
@@ -583,6 +590,12 @@
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
 
 <script type="text/javascript">
+function openWork(woId)
+{
+	var url = "/services/works/timeExt/viewdata/"+ woId;
+	window.open(url,'','width=900, height=700');
+}
+
 	
 function pop() {
 /* 	alert("ok"); */

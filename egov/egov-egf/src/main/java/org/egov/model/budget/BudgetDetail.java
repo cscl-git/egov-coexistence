@@ -386,6 +386,7 @@ public class BudgetDetail extends StateAware {
                     total = total.subtract(entry.getDeductionAmount());            
             }
         }
+		System.out.println("debug :::: budgetReAppropriations  :: ::" + total);
         return total;
     }
     

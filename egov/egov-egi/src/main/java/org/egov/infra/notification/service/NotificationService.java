@@ -186,22 +186,25 @@ public class NotificationService {
 			
 		}
 
-    public void sendSMS(String mobileNo, String message) {
-        sendSMS(mobileNo, message, MEDIUM);
+    public void sendSMS(String mobileNo, String message,String templateId) {
+    	System.out.println("D");
+        sendSMS(mobileNo, message, MEDIUM,templateId);
     }
 
     public void sendSMS(User user, String templateName, Object... messageValues) {
         sendSMS(user.getMobileNumber(), messageTemplateService.realizeMessage(
-                messageTemplateService.getByTemplateName(templateName), messageValues), MEDIUM);
+                messageTemplateService.getByTemplateName(templateName), messageValues), MEDIUM,null);
     }
 
-    public void sendSMS(String mobileNo, String message, NotificationPriority priority) {
+    public void sendSMS(String mobileNo, String message, NotificationPriority priority,String templateId) {
+    	System.out.println("f");
         if (smsEnabled && isNoneBlank(mobileNo, message))
             jmsTemplate.send(HIGH.equals(priority) ? flashQueue : smsQueue, session -> {
                 MapMessage mapMessage = session.createMapMessage();
                 mapMessage.setString(MOBILE, mobileNo);
                 mapMessage.setString(MESSAGE, message);
                 mapMessage.setString(PRIORITY, priority.name());
+                mapMessage.setString("template",templateId);
                 return mapMessage;
             });
     }

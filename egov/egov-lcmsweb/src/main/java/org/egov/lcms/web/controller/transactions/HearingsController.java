@@ -162,15 +162,9 @@ public class HearingsController {
     public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Hearings hearings, final String lcNumber) {
     	final LegalCase legalCase =legalCaseService.findByLcNumber(lcNumber);
           boolean successStatus=false;
-    final String msg="Dear Member,\r\n" + 
-    			"This is to inform you that hearing for Court Type-" +legalCase.getCourtMaster().getName()+" has been scheduled on Date-"+legalCase.getNextDate() +"\r\n" + 
-    			"Thanks & Regards\r\n" + 
-    			"Legal Branch";
-            	
-            
         try {
         	//System.out.println("+++++++++++"+msg+"+++++++++++++++++");
-        	Boolean status=sendSmsForAgendaInvitation(msg,legalCase);
+        	Boolean status=sendSmsForAgendaInvitation(legalCase);
         	if(status) {
         		successStatus=true;
         	}
@@ -246,18 +240,24 @@ public class HearingsController {
 
     
     //-----------------------------------------------SMS----------------------------------------------------------------
-    public Boolean sendSmsForAgendaInvitation(String customMessage,LegalCase legalCase) {
+    public Boolean sendSmsForAgendaInvitation(LegalCase legalCase) {
         Boolean smsEnabled = true;
          Boolean smsStatus=false;
+         String customMessage="";
+         final List<AppConfigValues> appList = appConfigValuesService
+                 .getConfigValuesByModuleAndKey("EGF",
+                         "LEGAL_HEARING_TEMPLATE_ID");
+         final String templateId = appList.get(0).getValue();
         if (smsEnabled) {
             try {
 	            List<User> listOfUsers = getUserListForAgendaInvitation();
 	            for (User user : listOfUsers) {
 	                if (user.getMobileNumber() != null) {
-	                	
-	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage);
+	                	customMessage="Dear "+user.getName()+" , This is to inform you that hearing has been schedule for court type "+legalCase.getCourtMaster().getName()+" on "+legalCase.getNextDate()+" . Regards, Legal department. Chandigarh Smart City Ltd.";
+	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage,templateId);
 	                	if(legalCase.getCounselPhoneNo()!=null && legalCase.getCounselPhoneNo()!="0") {
-	                		buildSmsForAgendaInvitation(legalCase.getOppPartyAdvocate(), legalCase.getCounselPhoneNo(), customMessage);
+	                		customMessage="Dear "+legalCase.getOppPartyAdvocate()+" , This is to inform you that hearing has been schedule for court type "+legalCase.getCourtMaster().getName()+" on "+legalCase.getNextDate()+" . Regards, Legal department. Chandigarh Smart City Ltd.";
+	                		buildSmsForAgendaInvitation(legalCase.getOppPartyAdvocate(), legalCase.getCounselPhoneNo(), customMessage,templateId);
 	                	}
 	                }
 	                smsStatus=true;
@@ -279,11 +279,11 @@ public class HearingsController {
     }
     
     public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
-            final String customMessage) {
-    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage);            
+            final String customMessage,String templateId) {
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage,templateId);            
     }
-    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody) {
-        notificationService.sendSMS(mobileNumber, smsBody);
+    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
+        notificationService.sendSMS(mobileNumber, smsBody,templateId);
     }
     public List<User> getUserListForAgendaInvitation() {
         Set<User> usersListResult = new HashSet<>();

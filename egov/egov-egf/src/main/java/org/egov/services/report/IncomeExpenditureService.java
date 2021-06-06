@@ -51,14 +51,19 @@ import org.egov.commons.Fund;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementResultObject;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.utils.Constants;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
+
+import javaxt.utils.Array;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -68,8 +73,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
+import java.util.Set;
+@Service
 public class IncomeExpenditureService extends ReportService {
  @Autowired
  @Qualifier("persistenceService")
@@ -77,6 +86,9 @@ public class IncomeExpenditureService extends ReportService {
  
  @Autowired
  public MicroserviceUtils microserviceUtils;
+
+ @Autowired
+ AppConfigValueService appConfigValuesService;
 
     private static final String I = "I";
     private static final String E = "E";
@@ -93,6 +105,9 @@ public class IncomeExpenditureService extends ReportService {
     public void setFunctionwiseIEService(final FunctionwiseIEService functionwiseIEService) {
         this.functionwiseIEService = functionwiseIEService;
     }
+
+    @PersistenceContext
+   	protected EntityManager entityManager;
 
     @Override
     protected void addRowsToStatement(final Statement balanceSheet, final Statement assets, final Statement liabilities) {
@@ -119,18 +134,27 @@ public class IncomeExpenditureService extends ReportService {
     }
 
     public void populateIEStatement(Statement ie) {
+    	
+    	try {
         minorCodeLength = Integer.valueOf(getAppConfigValueFor(Constants.EGF, "coa_minorcode_length"));
+    	}catch(Exception ex) {
+    		System.out.println("Exception here");
+    		ex.printStackTrace();
+    	}
+    		
+    		//	System.out.println(minorCodeLength);
+    		 System.out.println("Minir Code"+minorCodeLength);
         coaType.add('I');
         coaType.add('E');
       
         Date  fromDate = getFromDate(ie);
         Date  toDate = getToDate(ie);
         final String filterQuery = getFilterQuery(ie);
+    	        System.out.println("populateIEStatement");
         populateCurrentYearAmountPerFund(ie, filterQuery, toDate, fromDate, IE);
         // populateSchedule(ie,IE);
         ie = addBudgetDetails(ie);
         removeFundsWithNoDataIE(ie);
-        
     }
 
     private Statement addBudgetDetails(final Statement ie) {
@@ -182,14 +206,29 @@ public class IncomeExpenditureService extends ReportService {
         final BigDecimal divisor = statement.getDivisor();
         final Statement expenditure = new Statement();
         final Statement income = new Statement();
-        final List<StatementResultObject> allGlCodes = getAllGlCodesFor(scheduleReportType);  // has all the IE schedule codes
+        List<StatementResultObject> allGlCodes =new ArrayList<StatementResultObject>();
+        
+        	 allGlCodes = getAllGlCodesFor(scheduleReportType);
+        
+          // has all the IE schedule codes
 
         // get all the net amount total fundwise for each major code
 
-        final List<StatementResultObject> results = getTransactionAmount(filterQuery, toDate, fromDate, "'I','E'", IE);
+        //final List<StatementResultObject> results = getTransactionAmount(filterQuery, toDate, fromDate, "'I','E'", IE);
 
-        final List<StatementResultObject> PreYearResults = getTransactionAmount(filterQuery, getPreviousYearFor(toDate),
+      // final List<StatementResultObject> PreYearResults = getTransactionAmount(filterQuery, getPreviousYearFor(toDate),
+                //getPreviousYearFor(fromDate), "'I','E'", scheduleReportType);
+        List<StatementResultObject> results = new ArrayList<StatementResultObject>();
+        List<StatementResultObject> PreYearResults =new ArrayList<StatementResultObject>();
+        
+       
+            results = getTransactionAmount(filterQuery, toDate, fromDate, "'I','E'", IE);
+
+              PreYearResults = getTransactionAmount(filterQuery, getPreviousYearFor(toDate),
                 getPreviousYearFor(fromDate), "'I','E'", scheduleReportType);
+
+         
+        
 
         for (final StatementResultObject queryObject : allGlCodes) {
 
@@ -485,11 +524,24 @@ public class IncomeExpenditureService extends ReportService {
         queryStr.append(" order by 1");
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("query is " + queryStr.toString());
-        final SQLQuery budgteQuery = persistenceService.getSession().createSQLQuery(queryStr.toString());
+        SQLQuery budgteQuery =null;
+        Session session=null;
+        if(incomeExpenditureStatement.isRestData()) {
+        	session =  entityManager.unwrap(Session.class);
+        	 budgteQuery = session.createSQLQuery(queryStr.toString());
         budgteQuery.addScalar("glCode").addScalar("amount")
         .setResultTransformer(Transformers.aliasToBean(StatementResultObject.class));
         budgteQuery.setLong("finYearId", incomeExpenditureStatement.getFinancialYear().getId())
         .setString("isBeRe", "RE");
+        }else {
+        	 budgteQuery = persistenceService.getSession().createSQLQuery(queryStr.toString());
+             budgteQuery.addScalar("glCode").addScalar("amount")
+             .setResultTransformer(Transformers.aliasToBean(StatementResultObject.class));
+             budgteQuery.setLong("finYearId", incomeExpenditureStatement.getFinancialYear().getId())
+             .setString("isBeRe", "RE");
+        }
+        
+         
         final List<StatementResultObject> list = budgteQuery.list();
         return list;
 
@@ -518,14 +570,55 @@ public class IncomeExpenditureService extends ReportService {
         queryStr.append(" order by 1 asc");
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("query is " + queryStr.toString());
-        final SQLQuery budgteReappQuery = persistenceService.getSession().createSQLQuery(queryStr.toString());
+        
+        SQLQuery budgteReappQuery =null;
+        Session session=null;
+        if(incomeExpenditureStatement.isRestData()) {
+        	session =  entityManager.unwrap(Session.class);
+        	budgteReappQuery = session.createSQLQuery(queryStr.toString());
+            budgteReappQuery.addScalar("glCode").addScalar("amount")
+            .setResultTransformer(Transformers.aliasToBean(StatementResultObject.class));
+            budgteReappQuery.setLong("finYearId", incomeExpenditureStatement.getFinancialYear().getId())
+            .setString("isBeRe", "RE");
+        }else {
+        	
+        	budgteReappQuery = persistenceService.getSession().createSQLQuery(queryStr.toString());
         budgteReappQuery.addScalar("glCode").addScalar("amount")
         .setResultTransformer(Transformers.aliasToBean(StatementResultObject.class));
         budgteReappQuery.setLong("finYearId", incomeExpenditureStatement.getFinancialYear().getId())
         .setString("isBeRe", "RE");
+        }
+       
         final List<StatementResultObject> list = budgteReappQuery.list();
         return list;
     }
 
     
+public void populateIEStatement2(Statement ie) {
+    	System.out.println("Inside populateIEStatement2 try");
+    	
+    	
+    	try {
+    		Date  fromDate = getFromDate(ie);
+	        Date  toDate = getToDate(ie);
+    		
+    		minorCodeLength =   Integer.valueOf(appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF, "coa_minorcode_length").get(0).getValue());
+    		
+    		 
+    	        coaType.add('I');
+    	        coaType.add('E');
+    	      
+    	        
+    	        final String filterQuery = getFilterQuery(ie);
+    	        System.out.println("populateIEStatement");
+    	        populateCurrentYearAmountPerFund(ie, filterQuery, toDate, fromDate, IE);
+    	        // populateSchedule(ie,IE);
+    	        ie = addBudgetDetails(ie);
+    	        removeFundsWithNoDataIE(ie);     
+    }catch(Exception ex) {
+		System.out.println("Exception here");
+		ex.printStackTrace();
+	}
+    	
+	}
 }

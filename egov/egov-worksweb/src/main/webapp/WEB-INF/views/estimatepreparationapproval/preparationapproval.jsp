@@ -9,7 +9,8 @@
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
-        
+         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+ <link rel="stylesheet" href="/resources/demos/style.css">
 <style>
 .table thead > tr > th {
     color: black;
@@ -17,7 +18,11 @@
     vertical-align: top;
 }
 </style>
-
+ <script>
+  $( function() {
+    $( "#estimateDate" ).datepicker();
+  } );
+  </script>
 <form:form name="estimatepreparationapproval-form" role="form"
 	method="post" action="estimate"
 	modelAttribute="estimatePreparationApproval"
@@ -320,10 +325,10 @@
 					<a target="_blank" style="float:right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br>
-					<input type="file" name="file" style="color: #000000;"> <br>
+					<input type="file" name="file" id="file" style="color: #000000;"> <br>
 					<br>
 					<div class="buttonbottom" align="center">
-						<input type="submit" id="save" class="btn btn-primary" name="save"
+						<input type="submit" id="save" class="btn btn-primary" name="save" onclick="return filecheck();"
 							value="Upload" /> <br>
 					</div>
 					</c:if>
@@ -427,6 +432,8 @@
 				</div>
 	</div>
 </form:form>
-	<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+		<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 	
