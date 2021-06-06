@@ -103,6 +103,7 @@ import org.egov.utils.VoucherHelper;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 
 public class BaseVoucherAction extends GenericWorkFlowAction {
@@ -195,7 +196,19 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		if (headerFields.contains("subscheme"))
 			addDropdownData("subschemeList", Collections.emptyList());
 		if (headerFields.contains("subdivision"))
-			addDropdownData("subdivisionList", Collections.emptyList());
+		{
+			List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"receipt_sub_divison");
+	        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+	        for(AppConfigValues value:appConfigValuesList)
+	        {
+	        	SubDivision subdivision = new SubDivision();
+	        	subdivision.setSubdivisionCode(value.getValue());
+	        	subdivision.setSubdivisionName(value.getValue());
+	        	subdivisionList.add(subdivision);
+	        }
+	        addDropdownData("subdivisionList", subdivisionList);
+		}
 		// addDropdownData("typeList",
 		// persistenceService.findAllBy(" select distinct vh.type from
 		// CVoucherHeader vh where vh.status!=4 order by vh.type"));

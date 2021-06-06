@@ -240,7 +240,7 @@ public class PaymentAction extends BasePaymentAction {
     private String secondsignatory="-1";
     private String backlogEntry="";
  	List<HashMap<String, Object>> workflowHistory =new ArrayList<HashMap<String, Object>>(); 
-	/* private String subdivision; */
+	 private String subdivision; 
    
     @Autowired
     private FinancialUtils financialUtils;
@@ -1111,11 +1111,11 @@ public class PaymentAction extends BasePaymentAction {
             populateWorkflowBean();
             if (parameters.get("department") != null)
                 billregister.getEgBillregistermis().setDepartmentcode(parameters.get("department")[0]);
-			/*
-			 * if (parameters.get("subdivision") != null)
-			 * billregister.getEgBillregistermis().setSubdivision(parameters.get(
-			 * "subdivision")[0].toString());
-			 */
+                
+                
+            if (subdivision != null)
+	       billregister.getEgBillregistermis().setSubdivision(subdivision);
+			
             if (parameters.get("function") != null)
                 billregister.getEgBillregistermis()
                         .setFunction(functionService.findOne(Long.valueOf(parameters.get("function")[0].toString())));
@@ -2692,12 +2692,12 @@ public void setBacklogEntry(String backlogEntry) {
 	this.backlogEntry = backlogEntry;
 }
 
-	/*
-	 * public String getSubdivision() { return subdivision; }
-	 * 
-	 * public void setSubdivision(String subdivision) { this.subdivision =
-	 * subdivision; }
-	 */
+	
+	  public String getSubdivision() { return subdivision; }
+	  
+	  public void setSubdivision(String subdivision) { this.subdivision =
+	  subdivision; }
+	 
 
 
 

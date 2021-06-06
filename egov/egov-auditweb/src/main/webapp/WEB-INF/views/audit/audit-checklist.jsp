@@ -2,7 +2,6 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 
-
 <script
         src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 
@@ -42,9 +41,9 @@
 					</c:if>
 				</tr>
 			</thead>
-			<tbody>
+			<tbody id="tbl_add_body">
 			<c:forEach items="${auditDetail.checkList}" var="audit" varStatus="status">
-			<tr id="tblchecklistRow">
+			<tr id="rec-${status.index}">
 			<td>
 			<c:if test="${auditDetail.auditStatus != 'Created' && auditDetail.auditStatus != 'Pending with Auditor'}">
 			<form:hidden path="checkList[${status.index}].checklist_description" id="checkList[${status.index}].checklist_description" class="checklist_description"/>
@@ -131,7 +130,7 @@
 			<c:if test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor'}">
 			<td class="text-center">
 			    <!-- <span style="cursor:pointer;" onclick="addcheckListRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span> -->
-				<!--  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> -->
+				<%--  <span class="add-padding subledge-delete-row" data-id="${status.index}" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> --%>
 				<span style="cursor:pointer;" onclick="addcheckListRowNew()" tabindex="0" class="Addrow" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true">
 				        <i class="fa fa-plus"></i>
 				</span>
@@ -170,7 +169,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
-         <a id="deletebtnok" href="" style="display:none">Delete</a>
+         <a id="deletebtnok" herf="" style="display:none">Delete</a>
             <button type="button" class="btn btn-danger btn-okrow" value="">Delete</button>
         </div>
       </div>
@@ -185,7 +184,7 @@
 	<form:input path="checkList[0].checklist_description" id="checkList[0].checklist_description" value=""  class="form-control checklist_description" maxlength="200" ></form:input>
     </td>
     <td>
-    <select name="checkList[0].status" id="checkList[0].status" required="required" class="form-control status">
+    <select name="checkList[0].status" id="checkList[0].status"  class="form-control status">
 				<option value="">-Select-</option>
 				<option value="Seen/Checked">Seen/Checked</option>
 				<option value="Incorrect">Incorrect</option>
@@ -214,6 +213,5 @@
     </tr>
    </table>
  </div>
-
 
 

@@ -1628,3 +1628,33 @@ function populateVarianceDetails()
 	}
 	
 	}
+
+function validateSubLedger(Curraction) {
+
+	if (Curraction.value == 'Forward') {
+		
+		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
+		var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
+		var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
+		var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
+		
+
+		if (subLedgerGlCode == null || subLedgerGlCode == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		}else if (subLedgerType == null || subLedgerType == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} else if (subLedgerName == null || subLedgerName == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} else if (subLedgerAmount == null || subLedgerAmount == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} 	
+
+	}else{
+		return true;
+	}
+
+}

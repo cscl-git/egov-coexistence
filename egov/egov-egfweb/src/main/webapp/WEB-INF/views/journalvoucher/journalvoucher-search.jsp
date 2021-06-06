@@ -102,6 +102,7 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th><spring:message code="lbl.serial" text="SL.No."/></th>
 						<th>Party Name</th>
 						<th>Division</th>
+						<th>Sub Division</th>
 						<th>Budget Head</th>
 						<th>Scheme</th>
 						<th>Gross Amount</th>
@@ -135,6 +136,9 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						    </td>
 						    <td>
 								${ result.departmentCode}
+						    </td>
+						    <td>
+								${ result.subdivision}
 						    </td>
 						    <td>
 								${ result.budgetHead}

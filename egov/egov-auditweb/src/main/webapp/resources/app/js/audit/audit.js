@@ -219,7 +219,7 @@ jQuery(document).delegate('.btn-okrow', 'click', function(e) {
 		bootbox.alert($.i18n.prop('msg.this.row.can.not.be.deleted'));
 		return false;
 	}else{
-   if(deleteurl[0] != '0' || deleteurl[0] != 0 || deleteurl[0] != 'null'){
+   if(deleteurl[0] !== "0"){
     $.ajax({
     	url: "/services/audit/createAudit/deleteAuditchecklist/"+deleteurl[0],     
     	type: "GET",

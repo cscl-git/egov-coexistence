@@ -84,6 +84,7 @@ import org.egov.egf.model.VoucherDetailMiscMapping;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.voucher.service.JournalVoucherService;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.BillDetail;
@@ -111,6 +112,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.exilant.eGov.src.common.SubDivision;
 
 /**
  * @author venki
@@ -273,7 +276,17 @@ public class CreateJournalVoucherController extends BaseVoucherController {
         model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
         prepareWorkflow(model, voucherHeader, new WorkflowContainer());
        
-        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	SubDivision subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        model.addAttribute("subdivisionList", subdivisionList);
         voucherHeader.setVoucherDate(new Date());
         return JOURNALVOUCHER_SEARCH;
     }
@@ -295,7 +308,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     	
     	List<Object[]> list= null;
     	query1
-        .append("select vdm.voucherid ,vdm.vouchernumber ,vdm.status,vdm.head,vdm.department,vdm.voucherdate,vdm.scheme from voucher_detail_main vdm where vdm.fund ="+voucherHeader.getFundId().getId())
+        .append("select vdm.voucherid ,vdm.vouchernumber ,vdm.status,vdm.head,vdm.department,vdm.voucherdate,vdm.scheme,vdm.subdivision from voucher_detail_main vdm where vdm.fund ="+voucherHeader.getFundId().getId())
         		.append(getDateQuery(voucherHeader.getBillFrom(), voucherHeader.getBillTo()))
         		.append(getMisQuery(voucherHeader));
     	LOGGER.info("Query 1 :: "+query1.toString());
@@ -321,6 +334,10 @@ public class CreateJournalVoucherController extends BaseVoucherController {
     			if(object[6] != null)
     			{
     				voucherDetailMain.setScheme(object[6].toString());
+    			}
+    			if(object[7] != null)
+    			{
+    				voucherDetailMain.setSubdivision(object[7].toString());
     			}
     			voucherDetailMainMapping.put(voucherDetailMain.getId(), voucherDetailMain);
     		}
@@ -558,6 +575,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    					resultset.setPartyName(voucherDetailPartyMapping.get(key).getVoucherNumber());
    				}
    				resultset.setDepartmentCode(result.getDepartment());
+   				resultset.setSubdivision(result.getSubdivision());
    				resultset.setBudgetHead(result.getHead());
    				resultset.setVoucherNumber(result.getVoucherNumber());
    				resultset.setVoucherDate(result.getVoucherDate());
@@ -613,6 +631,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					resultset.setPaidAmount(new BigDecimal(voucherMiscBillMapping.get(result.getId()).getVoucherNumber()));
 				}
 				resultset.setDepartmentCode(result.getDepartment());
+				resultset.setSubdivision(result.getSubdivision());
 				resultset.setBudgetHead(result.getHead());
 				resultset.setVoucherNumber(result.getVoucherNumber());
 				resultset.setVoucherDate(result.getVoucherDate());
@@ -844,7 +863,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    	
    	List<Object[]> list= null;
    	query1
-       .append("select vdm.voucherid ,vdm.vouchernumber ,vdm.status,vdm.head,vdm.department,vdm.voucherdate,vdm.scheme from voucher_detail_main vdm where vdm.fund ="+voucherHeader.getFundId().getId())
+       .append("select vdm.voucherid ,vdm.vouchernumber ,vdm.status,vdm.head,vdm.department,vdm.voucherdate,vdm.scheme,vdm.subdivision from voucher_detail_main vdm where vdm.fund ="+voucherHeader.getFundId().getId())
        		.append(getDateQuery(voucherHeader.getBillFrom(), voucherHeader.getBillTo()))
        		.append(getMisQuery(voucherHeader));
    	LOGGER.info("Query 1 :: "+query1.toString());
@@ -870,6 +889,10 @@ public class CreateJournalVoucherController extends BaseVoucherController {
    			if(object[6] != null)
    			{
    				voucherDetailMain.setScheme(object[6].toString());
+   			}
+   			if(object[7] != null)
+   			{
+   				voucherDetailMain.setSubdivision(object[7].toString());
    			}
    			voucherDetailMainMapping.put(voucherDetailMain.getId(), voucherDetailMain);
    		}
@@ -1107,6 +1130,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
   					resultset.setPartyName(voucherDetailPartyMapping.get(key).getVoucherNumber());
   				}
   				resultset.setDepartmentCode(result.getDepartment());
+  				resultset.setSubdivision(result.getSubdivision());
   				resultset.setBudgetHead(result.getHead());
   				resultset.setVoucherNumber(result.getVoucherNumber());
   				resultset.setVoucherDate(result.getVoucherDate());
@@ -1162,6 +1186,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 					resultset.setPaidAmount(new BigDecimal(voucherMiscBillMapping.get(result.getId()).getVoucherNumber()));
 				}
 				resultset.setDepartmentCode(result.getDepartment());
+				resultset.setSubdivision(result.getSubdivision());
 				resultset.setBudgetHead(result.getHead());
 				resultset.setVoucherNumber(result.getVoucherNumber());
 				resultset.setVoucherDate(result.getVoucherDate());
@@ -1870,6 +1895,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 				misQuery.append(" and vdm.vouchernumber='");
 				misQuery.append(voucherHeader.getVoucherNumber()+"'");
 			}
+			if (null != voucherHeader.getSubdivision() && !voucherHeader.getSubdivision().isEmpty() && !voucherHeader.getSubdivision().equalsIgnoreCase("-1")) {
+				misQuery.append(" and vdm.subdivision='");
+				misQuery.append(voucherHeader.getVouchermis().getSubdivision()+"'");
+			}
+			
 		}
 		return misQuery.toString();
 

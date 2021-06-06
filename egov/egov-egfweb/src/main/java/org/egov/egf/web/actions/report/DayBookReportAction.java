@@ -149,16 +149,14 @@ public class DayBookReportAction extends BaseFormAction {
          addDropdownData("subdivisionList", subdivisionList);
 		
         currentDate = formatter.format(todayDate);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Inside  Prepare ........");
+            LOGGER.info("Inside  Prepare ........");
 
     }
 
     @SkipValidation
     @Action(value = "/report/dayBookReport-newForm")
     public String newForm() {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("..Inside NewForm method..");
+            LOGGER.info("..Inside NewForm method..");
         return FinancialConstants.STRUTS_RESULT_PAGE_SEARCH;
     }
 
@@ -170,8 +168,7 @@ public class DayBookReportAction extends BaseFormAction {
     @ReadOnly
     @Action(value = "/report/dayBookReport-ajaxSearch")
     public String ajaxSearch() throws TaskFailedException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("dayBookAction | Search | start");
+            LOGGER.info("dayBookAction | Search | start");
         prepareResultList();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("dayBookAction | list | End");
@@ -201,17 +198,23 @@ public class DayBookReportAction extends BaseFormAction {
     	String naration=dayBookReport.getNarration();
     	System.out.println("naration ::: "+dayBookReport.getNarration());
     	String oderBy=" ORDER BY vdate,vouchernumber";
+    	
+    	 String departwhereCond="";
+        String subdiwhereCond="";
+    	
         try {
             startDate = sdf.format(formatter.parse(dayBookReport.getStartDate()));
-            endDate = sdf.format(formatter.parse(dayBookReport.getEndDate()));
+             endDate = sdf.format(formatter.parse(dayBookReport.getEndDate()))+"'";
         } catch (ParseException e) {
 
         }
 		if (dayBookReport.getDepartment() != null && !dayBookReport.getDepartment().equals("")) {
-        	department =dayBookReport.getDepartment();
+        	departwhereCond=" and vmis.departmentcode=";
+        	department ="'"+dayBookReport.getDepartment()+"'";
         }
         if (dayBookReport.getSubdivision() != null && !dayBookReport.getSubdivision().equals("")) {
-        	subdivision =dayBookReport.getSubdivision();
+        	subdiwhereCond=" and vmis.subdivision=";
+        	subdivision ="'"+dayBookReport.getSubdivision()+"'";
         }
         String query = "SELECT voucherdate as vdate, TO_CHAR(voucherdate, 'dd-Mon-yyyy')  AS  voucherdate, vouchernumber as vouchernumber , gd.glcode AS glcode,ca.name AS particulars ,vh.name ||' - '|| vh.TYPE AS type"
                 + ", CASE WHEN vh.description is null THEN ' ' ELSE vh.description END AS narration, CASE  WHEN status=0 THEN ( 'Approved') ELSE ( case WHEN status=1 THEN 'Reversed' else (case WHEN status=2 THEN 'Reversal' else ' ' END) END ) END as status , debitamount  , "
@@ -220,11 +223,13 @@ public class DayBookReportAction extends BaseFormAction {
                 + startDate
                 + "' and voucherdate <= '"
                 + endDate
-				+ "'and mis.departmentcode='"
+                +departwhereCond
                 + department
-                + "'and mis.subdivision='"
+                +subdiwhereCond
                 + subdivision
-                + "' and vh.status not in (4,5)  and vh.fundid = " + fundId ;
+                + " and vh.status not in (4,5)  and vh.fundid = "
+                + fundId 
+                + oderBy;
         
         if(schemeId != null && !schemeId.isEmpty())
         {

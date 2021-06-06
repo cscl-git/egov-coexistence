@@ -177,6 +177,7 @@ public class RptSubLedgerSchedule {
             departmentWhereCondition = "AND vh.id = vmis.voucherheaderid and vmis.departmentcode=? ";
         }
         if (subdiv != null && !subdiv.equalsIgnoreCase("")) {
+           departmentFromCondition = ",vouchermis vmis";
            subdivisionWhereCondition = "and vmis.subdivision=? ";
         }
         final List<AppConfigValues> listAppConfVal = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",

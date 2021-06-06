@@ -950,6 +950,7 @@ public class GeneralLedgerReport {
             deptWhereCondition = " mis.voucherheaderid =vh.id   and mis.DepartmentCode = ? and ";
         }
         if (subdivisionName != null && !subdivisionName.equalsIgnoreCase("")) {
+                deptFromCondition = ", vouchermis mis";
         	subdivisionWhereCondition = "mis.subdivision = ? AND ";
         	
         }

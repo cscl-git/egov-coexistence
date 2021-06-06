@@ -12,6 +12,7 @@ public class VoucherDetailMain {
 	private String fund;
 	private String scheme;
 	private String description;
+	private String subdivision;
 	public Long getId() {
 		return id;
 	}
@@ -65,5 +66,11 @@ public class VoucherDetailMain {
 	}
 	public void setDescription(String description) {
 		this.description = description;
+	}
+	public String getSubdivision() {
+		return subdivision;
+	}
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 }
