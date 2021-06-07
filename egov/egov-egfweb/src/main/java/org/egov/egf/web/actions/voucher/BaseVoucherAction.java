@@ -134,6 +134,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 	private CreateVoucher createVoucher;
 	Map<String, List<String>> voucherNames = VoucherHelper.VOUCHER_TYPE_NAMES;
 
+	List<AppConfigValues> appConfigValuesList=new ArrayList<AppConfigValues>();
+
 	@Autowired
 	protected EgovMasterDataCaching masterDataCache;
 	@Autowired
@@ -196,19 +198,18 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		if (headerFields.contains("subscheme"))
 			addDropdownData("subschemeList", Collections.emptyList());
 		if (headerFields.contains("subdivision"))
-		{
-			List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 					"receipt_sub_divison");
 	        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+	        SubDivision subdivision=null;
 	        for(AppConfigValues value:appConfigValuesList)
 	        {
-	        	SubDivision subdivision = new SubDivision();
+	        	subdivision = new SubDivision();
 	        	subdivision.setSubdivisionCode(value.getValue());
 	        	subdivision.setSubdivisionName(value.getValue());
 	        	subdivisionList.add(subdivision);
 	        }
 	        addDropdownData("subdivisionList", subdivisionList);
-		}
 		// addDropdownData("typeList",
 		// persistenceService.findAllBy(" select distinct vh.type from
 		// CVoucherHeader vh where vh.status!=4 order by vh.type"));

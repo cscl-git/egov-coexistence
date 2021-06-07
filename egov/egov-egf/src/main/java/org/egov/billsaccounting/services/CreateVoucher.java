@@ -477,8 +477,8 @@ public class CreateVoucher {
 			if (billMis.getDepartmentcode() != null) {
 				headerDetails.put(VoucherConstant.DEPARTMENTCODE, billMis.getDepartmentcode());
 			}
-			if (billMis.getVoucherHeader().getVouchermis().getSubdivision() != null) {
-				headerDetails.put(VoucherConstant.SUBDIVISION, billMis.getVoucherHeader().getVouchermis().getSubdivision());
+			if (billMis.getSubdivision() != null) {
+				headerDetails.put(VoucherConstant.SUBDIVISION, billMis.getSubdivision());
 			}
 			if (billMis.getFund() != null)
 				headerDetails.put(VoucherConstant.FUNDCODE, billMis.getFund().getCode());
@@ -1565,7 +1565,7 @@ public class CreateVoucher {
 		checkMandatoryField("fundsource", headerdetails.get(VoucherConstant.FUNDSOURCECODE), headerdetails,
 				headerMandateFields);
 		checkMandatoryField("field", headerdetails.get(VoucherConstant.DIVISIONID), headerdetails, headerMandateFields);
-		checkMandatoryField("subdivision", headerdetails.get(VoucherConstant.SUBDIVISION), headerdetails, headerMandateFields);
+		//checkMandatoryField("subdivision", headerdetails.get(VoucherConstant.SUBDIVISION), headerdetails, headerMandateFields);
 
 	}
 
