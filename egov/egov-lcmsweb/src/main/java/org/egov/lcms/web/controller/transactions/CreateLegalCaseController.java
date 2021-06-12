@@ -51,7 +51,9 @@ package org.egov.lcms.web.controller.transactions;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.lcms.autonumber.LegalCaseNumberGenerator;
+import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
+import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.masters.service.ConcernedBranchMasterService;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.LegalCaseService;
@@ -92,9 +94,19 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
     @Autowired
     private LegalCaseNumberGenerator legalCaseNumberGenerator;
 
+    @Autowired
+	AdvocateMasterService advocateMasterService;
+
     @RequestMapping(value = "/create", method = RequestMethod.POST)
     public String newForm(@ModelAttribute final LegalCase legalcase, final Model model,
             final HttpServletRequest request) {
+//    	model.addAttribute(LcmsConstants.DefCLIST,advocateMasterService.findAll());
+    	List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
+    	for(AdvocateMaster as:dropdownValue) {
+    		System.out.println("::::"+as.getName());
+    		
+    	}
+    	model.addAttribute("defendingDropdown",dropdownValue);
     	model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
         model.addAttribute(LcmsConstants.LEGALCASE, legalcase);
         model.addAttribute(LcmsConstants.MODE, "create");
@@ -125,6 +137,7 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
             model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, false);
             model.addAttribute("bipartisanRespondentDetailsList", legalCase.getBipartisanRespondentDetailsList());
             model.addAttribute("bipartisanPetitionerDetailsList", legalCase.getBipartisanPetitionerDetailsList());
+            model.addAttribute("biDefendingCounsilDetailsList", legalCase.getBiDefendingCounsilDetailsList());
             return "legalCase-newForm";
         }
         //legalCase.setLcNumber(legalCaseNumberGenerator.generateLegalCaseNumber());

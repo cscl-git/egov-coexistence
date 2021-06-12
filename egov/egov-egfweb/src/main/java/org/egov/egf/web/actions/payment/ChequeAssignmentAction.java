@@ -1830,8 +1830,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                 sql.append(" and  iv.voucherHeaderId.vouchermis.departmentcode='" + department + "'");
             if (voucherHeader.getVoucherNumber() != null && !voucherHeader.getVoucherNumber().isEmpty())
                 sql.append(" and  iv.voucherHeaderId.voucherNumber='" + voucherHeader.getVoucherNumber() + "'");
-            final String mainquery = "select ih from  InstrumentVoucher iv,InstrumentHeader ih ,InstrumentType it where iv.instrumentHeaderId.id =ih.id and ih.transactionNumber is not null and ih.instrumentType=it.id and it.type = 'pex' and   iv.voucherHeaderId.status=0  and iv.voucherHeaderId.type='"
-                    + FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT + "'  " + sql + " "
+            final String mainquery = "select ih from  InstrumentVoucher iv,InstrumentHeader ih ,InstrumentType it where iv.instrumentHeaderId.id =ih.id and ih.transactionNumber is not null and ih.instrumentType=it.id and it.type = 'pex' and   iv.voucherHeaderId.status=0  and iv.voucherHeaderId.type IN ('Payment','Contra') " + sql + " "
 
                     + " and ih.statusId.id in (?)  order by iv.voucherHeaderId.voucherDate";
             final EgwStatus created = instrumentService.getStatusId(FinancialConstants.INSTRUMENT_CREATED_STATUS);

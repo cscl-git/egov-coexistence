@@ -67,4 +67,8 @@ public interface AdvocateMasterRepository extends JpaRepository<AdvocateMaster, 
     List<AdvocateMaster> findByIsActiveTrueOrderByNameAsc();
 
     public List<AdvocateMaster> findByNameLike(String name);
+    
+    
+    @Query(" from AdvocateMaster b where b.name like %:name% ")
+	List<AdvocateMaster> getRecordsByRef(@Param("name")String name);
 }

@@ -310,7 +310,7 @@ public class CreateVoucher {
 	 */
 
 	public long createVoucherFromBill(final int billId, String voucherStatus, final String voucherNumber,
-			final Date voucherDate) throws ApplicationRuntimeException, SQLException, TaskFailedException {
+			final Date voucherDate, final String backDateEntry, final String narration) throws ApplicationRuntimeException, SQLException, TaskFailedException {
 		CVoucherHeader vh = null;
 		try {
 			if (voucherStatus == null) {
@@ -410,7 +410,9 @@ public class CreateVoucher {
 			final Set<EgBilldetails> billDetailslist = egBillregister.getEgBilldetailes();
 			detailMap = new HashMap<String, Object>();
 			new HashMap<String, Object>();
-
+			if (backDateEntry != null && backDateEntry != "" && backDateEntry != "-1") {
+				headerDetails.put("backdateentry", backDateEntry);
+			}			
 			headerDetails.put(VoucherConstant.VOUCHERNAME, name);
 			headerDetails.put(VoucherConstant.VOUCHERTYPE, voucherType);
 			headerDetails.put("vouchersubtype", voucherSubType);
@@ -470,8 +472,13 @@ public class CreateVoucher {
 			headerDetails.put(VoucherConstant.VOUCHERDATE, vdt);
 			if (egBillregister.getId() != null)
 				headerDetails.put("billid", egBillregister.getId());
-			if (egBillregister.getNarration() != null)
+			/*if (egBillregister.getNarration() != null)
+				headerDetails.put(VoucherConstant.NARRATION, egBillregister.getNarration());*/
+			if (narration != null) {
+				headerDetails.put(VoucherConstant.NARRATION, narration);
+			} else {
 				headerDetails.put(VoucherConstant.NARRATION, egBillregister.getNarration());
+			}
 			if (billMis.getSourcePath() != null)
 				headerDetails.put(VoucherConstant.SOURCEPATH, billMis.getSourcePath());
 			if (billMis.getDepartmentcode() != null) {
@@ -2851,6 +2858,8 @@ public class CreateVoucher {
 	}
 	
 	// jayanta for save as draft
+	
+	
 		@Transactional
 		public CVoucherHeader createPreApprovedVoucher(final HashMap<String, Object> headerdetails,
 				final List<HashMap<String, Object>> accountcodedetails,

@@ -113,7 +113,7 @@ public class LegalCaseDocumentService {
                     .withPreviousCaseNumber(legalCase.getAppealNum() == null ? "" : legalCase.getAppealNum())
                     .withOfficerIncharge(legalCase.getOfficerIncharge() == null ? "" : legalCase.getOfficerIncharge().getName())
                     .withConcernedBranch(((legalCase.getConcernedBranch() == null) || (legalCase.getConcernedBranch() !=null && legalCase.getConcernedBranch().getConcernedBranch() == null)) ? "" : legalCase.getConcernedBranch().getConcernedBranch())
-                    .withAdvocateName(legalCase.getOppPartyAdvocate() == null ? "" : legalCase.getOppPartyAdvocate())
+                    .withAdvocateName(legalCase.getDefendingCounsilNames())
                     .withConcernedDepartment(legalCase.getNodalOfficerDepartment() == null ? "":legalCase.getNodalOfficerDepartment())
                     .withSubStatus(legalCase.getReportStatus() ==null ? "" : legalCase.getReportStatus().getName())
                     .withPwrDueDate((legalCase.getPwrList() != null && !legalCase.getPwrList().isEmpty())?legalCase.getPwrList().get(0).getPwrDueDate():null)
@@ -148,7 +148,7 @@ public class LegalCaseDocumentService {
         legalCaseDocument.setOfficerIncharge(legalCase.getOfficerIncharge() == null ? "" : legalCase.getOfficerIncharge().getName());
         legalCaseDocument.setConcernedBranch(((legalCase.getConcernedBranch() == null) || (legalCase.getConcernedBranch() !=null && legalCase.getConcernedBranch().getConcernedBranch() == null)) ? "" : legalCase.getConcernedBranch().getConcernedBranch());
         legalCaseDocument.setConcernedDepartment(legalCase.getNodalOfficerDepartment() == null ? "" : legalCase.getNodalOfficerDepartment());
-        legalCaseDocument.setAdvocateName(legalCase.getOppPartyAdvocate() == null ? "" : legalCase.getOppPartyAdvocate());
+        legalCaseDocument.setAdvocateName(legalCase.getDefendingCounsilNames());
         legalCaseDocument.setPetitionerNames(legalCase.getPetitionersNames());
         legalCaseDocument.setRespondantNames(legalCase.getRespondantNames());
         legalCaseDocument.setPreviousCaseNumber(legalCase.getAppealNum() == null ? "" : legalCase.getAppealNum());

@@ -67,6 +67,7 @@ public class WorkflowBean {
     private String workFlowAction;
     private Long approverPositionId;
     private String currentState;
+    private String narration;
 
     public String getActionName() {
         return actionName;
@@ -163,5 +164,13 @@ public class WorkflowBean {
     public void setCurrentState(String currentState) {
         this.currentState = currentState;
     }
+
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
     
 }

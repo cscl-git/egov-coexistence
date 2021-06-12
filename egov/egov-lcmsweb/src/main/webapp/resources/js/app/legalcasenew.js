@@ -478,8 +478,340 @@ $('#reappealOfCase').click(function() {
 });
 
 
+/*function showToggle() {
+	debugger;
+		  var x = document.getElementById("myDIV");
+		  if (x.style.display === "none") {
+		    x.style.display = "block";
+		  } else {
+		    x.style.display = "none";
+		  }
+		}*/
+
+function showToggle(){
+	  document.getElementById('myDIV').style.display = 'block';
+	}
+
+function hideToggle(){
+	debugger;
+	  document.getElementById('myDIV').style.display ='none';
+	}
+
+
+
+function importantGuide()
+{
+	bootbox.alert('Guide line !!');
+}
+
+
+
+
+// added by kundan here
+
+function addDefendingCounsilRow()
+{   
+	
+	var index=document.getElementById('defendingCounsilDetails').rows.length-1;
+	var tableObj=document.getElementById('defendingCounsilDetails');
+	var tbody=tableObj.tBodies[0];
+	var lastRow = tableObj.rows.length;
+	var rowObj = tableObj.rows[1].cloneNode(true);
+	console.log($(rowObj).html());
+	debugger;
+	
+	nextIdx=(lastRow-1);
+	var currentROwIndex=nextIdx-1;
+	jQuery(rowObj).find("input, select").each(
+			function() {
+			
+			jQuery(this).attr({
+						'id' : function(_, id) {
+							return id.replace('[0]', '['
+									+ nextIdx + ']');
+						},
+						'name' : function(_, name) {
+							return name.replace('[0]', '['
+									+ nextIdx + ']');
+							
+						}
+			});  
+   });
+
+
+   tbody.appendChild(rowObj);
+   $('#defendingCounsilDetails tbody tr:last').find('input[type=text]').val('');
+   $('#defendingCounsilDetails tbody tr:last').find('option').attr("selected",null);
+   $('#defendingCounsilDetails tbody tr:last').find('input[type=checkbox]').prop('checked', false);
+//   $(':checkbox').prop('checked', false).removeAttr('checked');
+//   var mainTable = $('#mainContainerDiv');
+//   var tr = mainTable.find('tbody tr');
+//   tr.find('div[id^="worklist_"]').empty();
+//   $('#defendingCounsilDetails tbody tr:last').find('div[id^="worklist_"]').css('display','block');
+   generateSno(".defendingCounsilDetails");
+		
+}
+
+$(document).on('click',"#counsil_delete_row",function (){
+	var table = document.getElementById('defendingCounsilDetails');
+    var rowCount = table.rows.length;
+    var counts = rowCount - 1;
+    var j = 2;
+    var i;
+    if(counts==1)
+	{
+		bootbox.alert("This Row cannot be deleted");
+		return false;
+	}else{	
+
+		$(this).closest('tr').remove();		
+		
+		jQuery("#defendingCounsilDetails tr:eq(1) td span[alt='AddF']").show();
+		//starting index for table fields
+		var idx=0;
+		
+		//regenerate index existing inputs in table row
+		jQuery("#defendingCounsilDetails tr:not(:first)").each(function() {
+			jQuery(this).find("input, select").each(function() {
+			   jQuery(this).attr({
+			      'id': function(_, id) {  
+			    	  return id.replace(/\[.\]/g, '['+ idx +']'); 
+			       },
+			      'name': function(_, name) {
+			    	  return name.replace(/\[.\]/g, '['+ idx +']'); 
+			      },
+			   });
+			   
+			  
+			   
+		    });
+			idx++;
+		});
+		
+		generateSno(".defendingCounsilDetails");
+		
+		return true;
+	}
+});
+//var email;
+//var mobile;
+//function fillvalue(name,id){
+//	debugger;
+//	var columnid=id;
+//	alert("::: "+columnid);
+//	var ids=name;
+//	var vale = document.getElementById(ids).value;
+//	console.log("name--"+name);
+//	console.log("name--"+vale);
+//	
+//	$.ajax({
+//		 url:'/services/lcms/popup/getboq/'+vale,
+//		 contentType:"application/json",		
+//		 dataType:"json",
+//		 success:function(r)
+//		 {
+//			 debugger;
+//			 data=r;
+//			 console.log("data-name"+data.mobileNumber);
+//			 console.log("data-emial"+data.email);
+//			for (var i=0; i<data.length; i++) {
+//					
+//					console.log(data[i].id+ '------KK----' + data[i].name +'--'+ data[i].mobileNumber + '--'+data[i].email);
+////					 tr.find('div[id^="worklist_"]').append("<option value='"+data[i].id+"'   data-name='"+data[i].name+"' data-email='"+data[i].email+"'  data-mobile='"+data[i].mobileNumber+"'   >" + data[i].name+"</option>");
+//					 var mainTable = $('#mainContainerDiv');
+//					 var tr = mainTable.find('tbody tr');
+////					  var row = $(this).closest('tbody');
+//					 tr.find('input[type="text"][id$="counselEmail"]').val(data[i].email);
+//					 tr.find('input[type="text"][id$="counselphoneNo"]').val(data[i].mobileNumber);
+//						
+//			
+//			}
+//		 }
+//	
+//	 })
+//}
+
+$(document).ready(function(){
+$('#mainContainerDiv').find('table[id^="defendingCounsilDetails"] > tbody').each(function(){
+
+$(this).on('change', 'select', function() {   
+	debugger;
+	var name=this.value;
+	console.log("vale"+name);
+	var row = $(this).closest('tr');
+	$.ajax({
+		 url:'/services/lcms/popup/getboq/'+name,
+		 contentType:"application/json",
+		 dataType:"json",
+		 success:function(r)
+		 {
+			 debugger;
+			 data=r;
+			for (var i=0; i<data.length; i++) {
+					
+					console.log(data[i].id+ '------KK----' + data[i].name +'--'+ data[i].mobileNumber + '--'+data[i].email);
+					row.find('input[type="text"][id$="counselEmail"]').val(data[i].email);
+					row.find('input[type="text"][id$="counselphoneNo"]').val(data[i].mobileNumber);
+						
+			}
+		 }
+	
+	 })
+    
+  });
+
+});
+
+});
 
 
 
 
 
+
+
+var data;
+var oppPartyAdvocate;
+function makeFieldAsAutocomplete(field){
+	console.log('--makeFieldAsAutocomplete--');
+	
+	var mainTable = $('#mainContainerDiv');
+	var tr = mainTable.find('tbody tr');
+	tr.each(function() {
+		oppPartyAdvocate = $(this).closest('tr').find('[id$="oppPartyAdvocate"]').val();
+	console.log("Name--"+oppPartyAdvocate);
+	});
+	var tr = $(field).closest('tr');
+	tr.find('div[id^="worklist_"]').empty();
+	$.ajax({
+		 url:'/services/lcms/popup/getboq/'+$(field).val(),
+		 contentType:"application/json",		
+		 dataType:"json",
+		 success:function(r)
+		 {
+			 debugger;
+			 data=r;
+			for (var i=0; i<data.length; i++) {
+				if(data[i].name!=oppPartyAdvocate)
+					{
+					
+					console.log(data[i].id+ '------KK----' + data[i].name +'--'+ data[i].mobileNumber + '--'+data[i].email);
+					 tr.find('div[id^="worklist_"]').append("<option value='"+data[i].id+"'   data-name='"+data[i].name+"' data-email='"+data[i].email+"'  data-mobile='"+data[i].mobileNumber+"'   >" + data[i].name+"</option>");
+					 
+					}
+				 
+			
+			}
+		 }
+	 })
+	
+	
+}
+
+
+
+$(document).ready(function(){
+    
+    console.log('--------------------start------------------------');
+    $('#mainContainerDiv').find('table[id^="defendingCounsilDetails"] > tbody').each(function(){
+    	console.log(this);
+    	$(this).on('keyup', 'input[type="text"][id$=".oppPartyAdvocate"]', function(){
+    		console.log('keyup');	
+    		makeFieldAsAutocomplete(this);	
+    		var inputVal1 = $(this).val();
+    		console.log("inputVal1--"+inputVal1);
+    	});
+    	$(this).on('click', 'div[id^="worklist_"] > option', function(){
+    		console.log('keyup worklist_  option click' );
+    		var row = $(this).closest('tr');
+    		row.find('input[type="text"][id$="oppPartyAdvocate"]').val($(this).text());
+    		row.find('input[type="text"][id$="counselEmail"]').val($(this).data('email'));
+    		row.find('input[type="text"][id$="counselphoneNo"]').val($(this).data('mobile'));
+    		var optionDiv = $(this).closest('div[id^="worklist_"]');
+    		optionDiv.css('display','none');
+    	});
+    });
+    console.log('--------------------end------------------------');
+    
+   
+ }); //Ready end
+
+
+
+$(document).on('click', 'input[type="checkbox"]', function() {      
+  if ($(':checkbox').is(':checked')){
+	  	var row = $(this).closest('tr');
+		row.find('input[type="text"][id$="oppPartyAdvocate"]').prop('checked', true).attr('checked', 'checked');
+		$('input[type="checkbox"]').not(this).prop('checked', false); 
+  	}
+  else {
+    $(':checkbox').prop('checked', false).removeAttr('checked');
+}     
+});
+
+
+$("#buttonid").on("click",function(){
+    if (($("input[name*='defCounsilPrimary']:checked").length)<=0) {
+        bootbox.alert("You must check at least one checkbox");
+        return false;
+    }
+    
+});
+
+//$("#buttonSubmit").on("click",function(){
+//    if (($("input[name*='defCounsilPrimary']:checked").length)<=0) {
+//        bootbox.alert("You must check at least one checkbox");
+//        return false;
+//    }
+//    
+//});
+
+//$("#petitionTypeMaster").blur(function(){
+//	$(':checkbox').prop('checked', false).removeAttr('checked');
+//	});
+
+$('#mainContainerDiv').find('table[id^="defendingCounsilDetails"] > tbody').each(function(){
+	console.log(this);
+	$(this).on('blur', 'input[type="text"][id$=".oppPartyAdvocate"]', function(){
+		var row = $(this).closest('tr');
+		row.find('input[type="text"][id$="oppPartyAdvocate"]').val("");
+		var optionDiv = $(this).closest('tr').find('div[id^="worklist_"]');
+		optionDiv.css('display','block');
+	});
+});
+
+
+//$('#mainContainerDiv').find('table[id^="defendingCounsilDetails"] > tbody').each(function(){
+//$(this).on('click', 'input[type="checkbox"]', function() { 
+//	debugger;
+//	var row = $(this).closest('tr');
+//    if(this.checked)
+//    	
+//    //	 var citylat 
+//        row.find('input[type="text"][id$="defCounsilPrimary"]').val("YES");
+////        $("#primaryCounsin").val("YES");
+//    
+//   else
+//
+//        row.find('input[type="text"][id$="defCounsilPrimary"]').val("");
+//});
+//});
+
+
+
+
+
+$(window).on('load', function () {
+	$('#mainContainerDiv').find('table[id^="defendingCounsilDetails"] > tbody').each(function(){
+	debugger;
+	var bla = $('#defCounsilPrimary').val();
+	console.log('checkbox checked--'+bla)
+	if(bla=='YES')
+		{
+		$( '#input[type="checkbox"][id$="defCounsilPrimary"]' ).prop( "checked", true );
+		}else
+			{
+			$( '#input[type="checkbox"][id$="defCounsilPrimary"]'  ).prop( "checked", false );
+			}
+	});
+});

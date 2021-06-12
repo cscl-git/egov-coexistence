@@ -71,6 +71,7 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.services.payment.MiscbilldetailService;
@@ -122,10 +123,15 @@ public class PreApprovedActionHelper {
     @Transactional
     public CVoucherHeader createVoucherFromBill(CVoucherHeader voucherHeader, WorkflowBean workflowBean, Long billId,
             String voucherNumber, Date voucherDate) throws ApplicationRuntimeException, SQLException, TaskFailedException {
+    	EgBillregister expenseBill = null;
         try {
+        	String backDateEntry = voucherHeader.getBackdateentry();
+        	String  narration = voucherHeader.getNarration();
             Long voucherHeaderId = createVoucher.createVoucherFromBill(billId.intValue(), null,
-                    voucherNumber, voucherDate);
+                    voucherNumber, voucherDate,backDateEntry,narration);
             voucherHeader = voucherService.findById(voucherHeaderId, false);
+            
+			
             voucherHeader = sendForApproval(voucherHeader, workflowBean);
         }catch (final ValidationException e) {
             if (e.getErrors().get(0).getMessage() != null && !e.getErrors().get(0).getMessage().equals(StringUtils.EMPTY))
@@ -146,6 +152,7 @@ public class PreApprovedActionHelper {
     public CVoucherHeader sendForApproval(CVoucherHeader voucherHeader, WorkflowBean workflowBean)
     {
     	EgBillregister expenseBill = null;
+    	//EgBillregistermis egBillregistermis =null;
         try {
 
             if (FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())
@@ -171,6 +178,8 @@ public class PreApprovedActionHelper {
             		voucherHeader.setVoucherDate(currentDate);
             	}
             }
+            
+            voucherHeader.setNarration(workflowBean.getNarration());
             voucherService.persist(voucherHeader);
             if(workflowBean.getWorkFlowAction().equals("Approve"))
             {
@@ -183,8 +192,13 @@ public class PreApprovedActionHelper {
             		for(Miscbilldetail row : miscBillList)
             		{
             			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
+            			 expenseBill.getEgBillregistermis().setNarration(workflowBean.getNarration());
+            			 
             			 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Voucher Approved"));
+            			
                 		 expenseBillService.create(expenseBill);
+                		 
+                		 
                 		 persistenceService.getSession().flush();
             		}
             	}

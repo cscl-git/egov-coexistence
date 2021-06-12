@@ -181,9 +181,10 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private Long assigntoIdboundary;
 
-    @Length(max = 128)
-    @Column(name = "oppPartyAdvocate")
-    @Audited
+//    @Length(max = 128)
+//    @Column(name = "oppPartyAdvocate")
+//    @Audited
+    @Transient
     private String oppPartyAdvocate;
 
     @Length(max = 256)
@@ -332,12 +333,38 @@ public class LegalCase extends AbstractAuditable {
     @OrderBy("id asc")
     private List<BipartisanDetails> bipartisanPetitionerDetailsList = new ArrayList<>(0);
 
+    
+    @Transient
+    @Audited
+    @OrderBy("id asc")
+    private List<BidefendingCounsilDetails> biDefendingCounsilDetailsList = new ArrayList<>(0);
+    
+
+    @Audited
+    @OrderBy("id asc")
+    @OneToMany(mappedBy = "legalCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<BidefendingCounsilDetails> bidefendingCounsilDetails = new ArrayList<>(0);
+
+
+	public List<BidefendingCounsilDetails> getBiDefendingCounsilDetailsList() {
+		
+		return biDefendingCounsilDetailsList;
+	}
+
+	public void setBiDefendingCounsilDetailsList(List<BidefendingCounsilDetails> biDefendingCounsilDetailsList) {
+		this.biDefendingCounsilDetailsList = biDefendingCounsilDetailsList;
+	}
+
     @Transient
     private List<Judgment> judgmentsBeanList = new ArrayList<>(0);
     
     @Transient
     private String fileNumber;
 
+	@Transient
+    private String counselphoneNo;//Added by kundan kumar
+    @Transient
+    private String counselEmail;
     public List<ValidationError> validate() {
         final List<ValidationError> errors = new ArrayList<>();
         if (getIsFiledByCorporation() && getStampNumber().length() == 0)
@@ -471,6 +498,31 @@ public class LegalCase extends AbstractAuditable {
         bipartisanPetitionerDetailsList = new ArrayList<>(tempset);
         return bipartisanPetitionerDetailsList;
 
+    }
+    public List<BidefendingCounsilDetails> getDefendingCounsil() {
+    
+    final List<BidefendingCounsilDetails> tempList = new ArrayList<>();
+    for (final BidefendingCounsilDetails temp : bidefendingCounsilDetails)
+        if (!temp.getIsRepondent())
+            tempList.add(temp);
+    final Set<BidefendingCounsilDetails> tempset = new HashSet<>(tempList);
+    
+    biDefendingCounsilDetailsList = new ArrayList<>(tempset);
+    
+    return biDefendingCounsilDetailsList;
+    }
+    
+    public String getDefendingCounsilNames() {
+        final StringBuilder tempStr = new StringBuilder();
+        for (final BidefendingCounsilDetails temp : bidefendingCounsilDetails)
+        	if(temp.getDefCounsilPrimary().equals("YES"))
+        	{
+            if (!temp.getIsRepondent())
+                if (tempStr.length() == 0)
+                    tempStr.append(temp.getOppPartyAdvocate());
+                else
+                    tempStr.append(LcmsConstants.APPENDSEPERATE).append(temp.getOppPartyAdvocate());
+        	}return tempStr.toString();
     }
 
     public List<BipartisanDetails> getRespondents() {
@@ -655,6 +707,14 @@ public class LegalCase extends AbstractAuditable {
         this.bipartisanDetails.add(bipartisanDetails);
     }
 
+    public List<BidefendingCounsilDetails> getBidefendingCounsilDetails() {
+		return bidefendingCounsilDetails;
+	}
+
+	public void setBidefendingCounsilDetails(List<BidefendingCounsilDetails> bidefendingCounsilDetails) {
+		this.bidefendingCounsilDetails = bidefendingCounsilDetails;
+	}
+
     public void removeBipartisanDetails(final BipartisanDetails bipartisanDetails) {
         this.bipartisanDetails.remove(bipartisanDetails);
     }
@@ -700,17 +760,15 @@ public class LegalCase extends AbstractAuditable {
     }
 
     /*
-	 * public List<PaperBook> getPaperBookSet() { return paperBookSet; } public void
-	 * setPaperBookSet(final List<PaperBook> paperBookSet) { this.paperBookSet =
-	 * paperBookSet; } public List<ProcessRegister> getProcessRegisterSet() { return
-	 * processRegisterSet; } public void setProcessRegisterSet(final
-	 * List<ProcessRegister> processRegisterSet) { this.processRegisterSet =
-	 * processRegisterSet; }
+     * public List<PaperBook> getPaperBookSet() { return paperBookSet; } public void setPaperBookSet(final List<PaperBook>
+     * paperBookSet) { this.paperBookSet = paperBookSet; } public List<ProcessRegister> getProcessRegisterSet() { return
+     * processRegisterSet; } public void setProcessRegisterSet(final List<ProcessRegister> processRegisterSet) {
+     * this.processRegisterSet = processRegisterSet; }
      */
 
     /*
-	 * public Long getDocumentNum() { return documentNum; } public void
-	 * setDocumentNum(final Long documentNum) { this.documentNum = documentNum; }
+     * public Long getDocumentNum() { return documentNum; } public void setDocumentNum(final Long documentNum) { this.documentNum
+     * = documentNum; }
      */
 
     public List<BipartisanDetails> getBipartisanDetails() {
@@ -738,9 +796,8 @@ public class LegalCase extends AbstractAuditable {
     }
 
     /*
-	 * public Date getPetFirstAppDate() { return petFirstAppDate; } public void
-	 * setPetFirstAppDate(final Date petFirstAppDate) { this.petFirstAppDate =
-	 * petFirstAppDate; }
+     * public Date getPetFirstAppDate() { return petFirstAppDate; } public void setPetFirstAppDate(final Date petFirstAppDate) {
+     * this.petFirstAppDate = petFirstAppDate; }
      */
 
     public String getStampNumber() {
@@ -1089,5 +1146,21 @@ public class LegalCase extends AbstractAuditable {
 
 	public void setCaseImportant(String caseImportant) {
 		this.caseImportant = caseImportant;
+	}
+
+	public String getCounselphoneNo() {
+		return counselphoneNo;
+	}
+
+	public void setCounselphoneNo(String counselphoneNo) {
+		this.counselphoneNo = counselphoneNo;
+	}
+
+	public String getCounselEmail() {
+		return counselEmail;
+	}
+
+	public void setCounselEmail(String counselEmail) {
+		this.counselEmail = counselEmail;
 	}
 }

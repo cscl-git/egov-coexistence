@@ -313,5 +313,10 @@ public class AdvocateMasterService extends PersistenceService<AdvocateMaster, Lo
         return null;
 
     }
+    
+    public List<AdvocateMaster> getRecords(String name)
+	{
+		return advocateMasterRepository.getRecordsByRef(name);
+	}
 
 }

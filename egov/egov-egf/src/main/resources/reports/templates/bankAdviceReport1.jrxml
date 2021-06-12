@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="612" pageHeight="1008" columnWidth="512" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
 	<property name="ireport.zoom" value="1.0263162364614133"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="344"/>
+	<property name="ireport.y" value="584"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -466,7 +466,7 @@
 				</jr:table>
 			</componentElement>
 			<textField>
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="1" y="87" width="493" height="26" isPrintWhenDetailOverflows="true" uuid="69482f61-eefb-429e-b26a-9afa59bf6646"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="1" y="87" width="493" height="34" isPrintWhenDetailOverflows="true" uuid="69482f61-eefb-429e-b26a-9afa59bf6646"/>
 				<textElement textAlignment="Right">
 					<font fontName="Verdana" size="11" isBold="true"/>
 				</textElement>

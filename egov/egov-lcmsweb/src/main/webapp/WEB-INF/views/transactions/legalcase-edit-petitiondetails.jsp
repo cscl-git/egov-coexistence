@@ -52,6 +52,21 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn"%>
+
+<style>
+.dropdown-content option{
+	BACKGROUND-COLOR: LIGHTGRAY;
+    BORDER: 1PX SOLID GRAY;
+    WIDTH: 138PX;
+    padding: 5px;
+}
+.dropdown-content option:hover{
+	background-color: gray;
+	color: white;
+}
+
+</style>
+
 <div class="panel-heading">
 	<div class="panel-title">
 		<spring:message code="lbl.bipartisanDetails.details" />
@@ -214,6 +229,116 @@
 		</c:forEach>
 	</tbody>
 </table>
+
+
+
+
+
+<div  id="mainContainerDiv" >
+
+<div class="panel-heading">
+	<div class="panel-title">
+		<spring:message code="lbl.defending.counsel" />
+	</div>
+</div>
+<table class="table table-striped table-bordered" id="defendingCounsilDetails">
+	<thead>
+		<tr>
+			<%-- <th class="text-center"><spring:message code="lbl.slno" /> --%>
+			<th class="text-center"><spring:message code="lbl.defCouncilCheck" /> 
+			<th class="text-center"><spring:message code="lbl.standingcounselname" /><span
+				class="mandatory"></span></th>
+			<th class="text-center"><spring:message code="lbl.defCounselEmial" /></th>
+			<th class="text-center"><spring:message code="lbl.defCounselPhone" /></th>
+			
+			<th class="text-center"><spring:message
+					code="lbl.add/Def_Counsel" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		
+		<c:forEach var="biDefendingCounsilDetailsList"
+			items="${legalCase.getDefendingCounsil()}" varStatus="status">
+			<tr>
+				
+				              
+
+				<td class="text-right">
+				
+				  <%-- <input id="biDefendingCounsilDetailsList[${status.index}].id"
+				                 name="biDefendingCounsilDetailsList[${status.index}].id"
+				                  value="${biDefendingCounsilDetailsList.id}"type="hidden" /> --%>
+				
+				                <input 
+				                id="biDefendingCounsilDetailsList[${status.index}].defCounsilPrimary"
+				                 name="biDefendingCounsilDetailsList[${status.index}].defCounsilPrimary"
+				                  value="YES" ${'YES'==biDefendingCounsilDetailsList.defCounsilPrimary? "checked" : ""} type="checkbox" />
+				</td>
+				<td>
+						 <div class="dropdown-content" id="autocomplete">
+									<select class="form-control table-input text-left patternvalidation"
+										required="required" id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"    >
+										<option value="">
+											<spring:message code="lbls.select" />
+										</option>
+											<c:forEach items="${defendingDropdown}" var="category">
+							                   
+							                    <option value="${category.name}"  ${category.name ==biDefendingCounsilDetailsList.oppPartyAdvocate? "selected" : ""}>${category.name}</option>
+										       
+										  <%--   ${category.name ==biDefendingCounsilDetailsList.oppPartyAdvocate? "selected" : ""} --%>
+										</c:forEach> 
+									</select>
+								</div>
+							</td>
+				<%-- <td>
+				<div class="dropdown-content" id="autocomplete">
+				<input type="text"
+					class="form-control table-input text-left"
+					id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+					name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+					value="${biDefendingCounsilDetailsList.oppPartyAdvocate}" autocomplete="off"/>
+					<div id="worklist_${status.index}" ></div>
+					</div>
+					</td> --%>
+
+
+				<td class="text-right"><input type="text"
+					class="form-control table-input text-left"
+					id="biDefendingCounsilDetailsList[${status.index}].counselEmail"
+					name="biDefendingCounsilDetailsList[${status.index}].counselEmail"
+					value="${biDefendingCounsilDetailsList.counselEmail}" readonly="readonly"/></td>
+
+				<td class="text-right"><input type="text"
+					id="biDefendingCounsilDetailsList[${status.index}].counselphoneNo"
+					name="biDefendingCounsilDetailsList[${status.index}].counselphoneNo"
+					class="form-control table-input text-left patternvalidation"
+					onkeyup="decimalvalue(this);"
+					value="${biDefendingCounsilDetailsList.counselphoneNo}" maxlength="10" readonly="readonly"/></td>
+				<%-- <input type="hidden" id="activeid"
+					name="biDefendingCounsilDetailsList[${status.index}].id"
+					id="biDefendingCounsilDetailsList[${status.index}].id"
+					value="${bipartisanRespondentDetailsList.id}" /> --%>
+					<input id="biDefendingCounsilDetailsList[${status.index}].id"
+				                 name="biDefendingCounsilDetailsList[${status.index}].id"
+				                  value="${biDefendingCounsilDetailsList.id}"type="hidden" />
+				<input type="hidden"
+					id="biDefendingCounsilDetailsList[${status.index}].isRepondent"
+					name="biDefendingCounsilDetailsList[${status.index}].isRepondent"
+					class="form-control table-input text-right"
+					style="text-align: center" value="${true}" />
+				<td class="text-center"><a href="javascript:void(0);"
+							class="btn-sm btn-default" onclick="addDefendingCounsilRow();"><i
+								class="fa fa-plus"></i></a> <a href="javascript:void(0);"
+							class="btn-sm btn-default" id="counsil_delete_row"><i
+								class="fa fa-trash"></i></a></td>
+			</tr>
+		</c:forEach>
+		
+	</tbody>
+</table>
+</div>
+
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.representedby" />:</label>
@@ -224,7 +349,7 @@
 		<form:errors path="representedby" cssClass="add-margin error-msg" />
 	</div>
 
-	<label class="col-sm-2 control-label text-right" id="persons">
+	<%-- <label class="col-sm-2 control-label text-right" id="persons">
 		<spring:message code="lbl.standingcounselname" />:
 	</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
@@ -232,20 +357,20 @@
 			data-pattern="string" maxlength="50" id="oppPartyAdvocate"
 			path="oppPartyAdvocate" />
 		<form:errors path="oppPartyAdvocate" cssClass="add-margin error-msg" />
-	</div>
+	</div> --%>
 
 </div>
 
 
 <!-- Added By Kundan -->
-<div class="form-group">
+<%-- <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.defCounselPhone" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
 		<form:input class="form-control patternvalidation"
 			data-pattern="number" maxlength="10" id="counselphoneNo"
-			path="counselPhoneNo" required="required" placeholder="Mobile No." />
-		<form:errors path="counselPhoneNo" cssClass="add-margin error-msg" />
+			path="counselphoneNo" required="required" placeholder="Mobile No." />
+		<form:errors path="counselphoneNo" cssClass="add-margin error-msg" />
 	</div>
 
 	<label class="col-sm-2 control-label text-right" id="persons">
@@ -254,11 +379,11 @@
 	<div class="col-sm-3 add-margin" id="personsdiv">
 		<form:input class="form-control patternvalidation"
 			data-pattern="alphanumericwithspecialcharacters" maxlength="50" id="counselEmail"
-			path="counselEmailNo" placeholder="abc@xyz.com"/>
-		<form:errors path="counselEmailNo" cssClass="add-margin error-msg" />
+			path="counselEmail" placeholder="abc@xyz.com"/>
+		<form:errors path="counselEmail" cssClass="add-margin error-msg" />
 	</div>
 
-</div>
+</div> --%>
 
 <!-- Ended By Kundan -->
 

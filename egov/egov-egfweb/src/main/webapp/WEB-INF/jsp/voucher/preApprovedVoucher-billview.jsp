@@ -139,12 +139,16 @@ else{
 function onSubmit()
 {
 	var voucherdate =document.getElementById('voucherDate').value ;
-	if(voucherdate!=null && voucherdate!=""){
+	var backdateentry =document.getElementById('backdateentry').value ;
+	if((voucherdate!=null && voucherdate!="")&&(backdateentry!="-1")){
 		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
 		return true;
-	}else{
+	}else if(voucherdate==null || voucherdate==""){
 		bootbox.alert("<s:text name='msg.please.select.voucher.date'/> ");
 		return false;
+	}else if(backdateentry=="-1"){
+			bootbox.alert("<s:text name='please select voucher backdateentry'/> ");
+			return false;
 		}
 }
 
