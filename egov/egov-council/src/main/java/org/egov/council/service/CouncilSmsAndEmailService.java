@@ -221,7 +221,7 @@ public class CouncilSmsAndEmailService {
 	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
 	                emailId = committeeMembers.getCouncilMember().getEmailId();
 	                if (emailId != null) {
-	                    buildEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
+	                    buildRandomEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
 	                            attachment, fileType, fileName);
 	                }
 	            }

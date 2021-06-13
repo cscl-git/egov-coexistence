@@ -367,15 +367,17 @@ public class CouncilMeetingController {
     				String fileType = isBlank(councilMeeting.getFilestoreid().getContentType()) ? Files.probeContentType(file)
                             : councilMeeting.getFilestoreid().getContentType();
             		String fileName = councilMeeting.getFilestoreid().getFileName();
-            		councilSmsAndEmailService.sendEmail(councilMeeting, null, data,fileType, fileName);
+            		councilSmsAndEmailService.sendRandomEmail(councilMeeting, null, data,fileType, fileName);
     			} catch (IOException e) {
+    				e.printStackTrace();
     				LOGGER.error("Error in sending email",e);
     			}
             }else {
-            	councilSmsAndEmailService.sendEmail(councilMeeting, null,councilReportService.generatePDFForAgendaDetails(councilMeeting));
+            	councilSmsAndEmailService.sendRandomEmail(councilMeeting, null,councilReportService.generatePDFForAgendaDetails(councilMeeting));
             }
         }catch(Exception e) {
-        	LOGGER.error("Unable to send EMAIL of meeting number "+councilMeeting.getMeetingNumber());
+        	e.printStackTrace();
+        	LOGGER.error("Unable to send EMAIL of meeting number ");
         }
         
         redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilNotice.success", null, null));
