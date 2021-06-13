@@ -82,6 +82,7 @@ import org.egov.egf.model.BudgetVarianceEntry;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.reporting.engine.ReportFormat;
@@ -108,9 +109,12 @@ import org.hibernate.FlushMode;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
 import net.sf.jasperreports.engine.JRException;
 
+
+@Component
 @Results(value = {
         @Result(name = "results", location = "budgetVarianceReport-results.jsp"),
         @Result(name = "form", location = "budgetVarianceReport-form.jsp"),
@@ -138,6 +142,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     private PersistenceService persistenceService;
     @Autowired
     AppConfigValueService appConfigValuesService;
+    @Autowired
     private ReportService reportService;
     private final List<String> accountTypeList = new ArrayList<String>();
     private String accountType = "";
@@ -145,9 +150,12 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     @Autowired
     private BudgetDetailConfig budgetDetailConfig;
     protected List<String> gridFields = new ArrayList<String>();
+    @Autowired
     protected BudgetDetailService budgetDetailService;
+    @Autowired
     private FinancialYearHibernateDAO financialYearDAO;
     private String type = "Budget";
+    @Autowired
     private BudgetService budgetService;
     String budgetType = Constants.BE;
     private final Map<String, String> queryParamMap = new HashMap<String, String>();
@@ -157,6 +165,9 @@ public class BudgetVarianceReportAction extends BaseFormAction {
     @Autowired
     @Qualifier("masterDataCache")
     private EgovMasterDataCaching masterDataCache;
+    
+    @Autowired
+	 private  DepartmentService departmentService;
     
     private String dept;
     private String funds;
@@ -544,6 +555,9 @@ public class BudgetVarianceReportAction extends BaseFormAction {
                 "budget.isActiveBudget=true and budget.status.code='Approved' and budget.financialYear.id="
                 + financialYear.getId()
                 + getMiscQuery() + " order by budget.name,budgetGroup.name");
+        System.out.println("Populate data Query");
+        System.out.println("from BudgetDetail where budget.isbere=" + budgetType +"and budget.isActiveBudget=true and budget.status.code='Approved' "
+        		+ "and budget.financialYear.id="+ financialYear.getId()+" "+ getMiscQuery() + "order by budget.name,budgetGroup.name");
         System.out.println("2");
         if (budgetVarianceEntries == null)
             budgetVarianceEntries = new ArrayList<BudgetVarianceEntry>();
@@ -578,6 +592,65 @@ public class BudgetVarianceReportAction extends BaseFormAction {
             budgetVarianceEntries.add(budgetVarianceEntry);
         }
         populateActualData(financialYear);
+    }
+
+    
+    
+    
+    
+    public List<BudgetVarianceEntry> populateRestData() {
+    	System.out.println("1");
+		/*
+		 * final CFinancialYear financialYear =
+		 * financialYearDAO.getFinancialYearByDate(asOnDate); final boolean
+		 * hasApprovedReForYear =
+		 * budgetService.hasApprovedReForYear(financialYear.getId()); if
+		 * (hasApprovedReForYear) { type = "Revised"; budgetType = Constants.RE; }
+		 */
+        final List<BudgetDetail> result = persistenceService.findAllBy("from BudgetDetail where budget.isbere='" + budgetType
+                + "' and " +
+                "budget.isActiveBudget=true and budget.status.code='Approved' "+ getMiscQuery() + " order by budget.name,budgetGroup.name");
+       // System.out.println("Populate data Query");
+       // System.out.println("from BudgetDetail where budget.isbere=" + budgetType +"and budget.isActiveBudget=true and budget.status.code='Approved' "
+        //		+ ""+" "+ getMiscQuery() + "order by budget.name,budgetGroup.name");
+        System.out.println("2");
+        if (budgetVarianceEntries == null)
+            budgetVarianceEntries = new ArrayList<BudgetVarianceEntry>();
+        for (final BudgetDetail budgetDetail : result) {
+            final BudgetVarianceEntry budgetVarianceEntry = new BudgetVarianceEntry();
+            budgetVarianceEntry.setBudgetHead(budgetDetail.getBudgetGroup().getName());
+            if (budgetDetail.getExecutingDepartment() != null) {
+                budgetVarianceEntry.setDepartmentCode(budgetDetail.getExecutingDepartment());
+                
+                budgetVarianceEntry.setDepartmentName(departmentService.getDepartmentByCode(budgetDetail.getExecutingDepartment()).getName());
+            }
+            if (budgetDetail.getFund() != null)
+                budgetVarianceEntry.setFundCode(budgetDetail.getFund().getName());
+            if (budgetDetail.getFunction() != null)
+                budgetVarianceEntry.setFunctionCode(budgetDetail.getFunction().getName());
+            budgetVarianceEntry.setDetailId(budgetDetail.getId());
+            budgetVarianceEntry.setBudgetCode(budgetDetail.getBudget().getName());
+            if ("RE".equalsIgnoreCase(budgetType) && !getConsiderReAppropriationAsSeperate()) {
+                budgetVarianceEntry.setAdditionalAppropriation(BigDecimal.ZERO);
+                final BigDecimal estimateAmount = (budgetDetail.getApprovedAmount() == null ? BigDecimal.ZERO : budgetDetail
+                        .getApprovedAmount()).add(budgetDetail.getApprovedReAppropriationsTotal() == null ? BigDecimal.ZERO
+                        : budgetDetail.getApprovedReAppropriationsTotal());
+                budgetVarianceEntry.setEstimate(estimateAmount);
+            } else {
+                budgetVarianceEntry.setEstimate(budgetDetail.getApprovedAmount() == null ? BigDecimal.ZERO : budgetDetail
+                        .getApprovedAmount());
+                budgetVarianceEntry
+                        .setAdditionalAppropriation(budgetDetail.getApprovedReAppropriationsTotal() == null ? BigDecimal.ZERO
+                                : budgetDetail.getApprovedReAppropriationsTotal());
+            }
+            budgetVarianceEntry.setTotal(budgetVarianceEntry.getEstimate().add(budgetVarianceEntry.getAdditionalAppropriation()));
+            
+            budgetVarianceEntries.add(budgetVarianceEntry);
+        }
+       
+        populateActualDataRest();
+        
+        return budgetVarianceEntries;
     }
 
     private String getMiscQuery() {
@@ -649,7 +722,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 
     private void populateActualData(final CFinancialYear financialYear) {
         final String fromDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getStartingDate());
-        System.out.println("4");
+        //System.out.println("4");
         if (budgetVarianceEntries != null && budgetVarianceEntries.size() != 0) {
         	System.out.println("5");
             setQueryParams();
@@ -665,28 +738,26 @@ public class BudgetVarianceReportAction extends BaseFormAction {
         }
     }
 
-    /*private void extractData(final List<Object[]> result) {
-        final Map<String, String> budgetDetailIdsAndAmount = new HashMap<String, String>();
-        if (result == null)
-            return;
-        for (final Object[] row : result)
-            if (row[0] != null && row[1] != null)
-                budgetDetailIdsAndAmount.put(row[0].toString(), row[1].toString());
-        for (final BudgetVarianceEntry row : budgetVarianceEntries) {
-            final BigDecimal actual = row.getActual();
-            if (budgetDetailIdsAndAmount.get(row.getDetailId().toString()) != null) {
-                if (actual == null || BigDecimal.ZERO.compareTo(actual) == 0)
-                    row.setActual(new BigDecimal(budgetDetailIdsAndAmount.get(row.getDetailId().toString())));
-                else
-                    row.setActual(
-                            row.getActual().add(new BigDecimal(budgetDetailIdsAndAmount.get(row.getDetailId().toString()))));
-            } else if (actual == null)
-                row.setActual(BigDecimal.ZERO);
-            row.setVariance(row.getEstimate().add(
-                    row.getAdditionalAppropriation().subtract(row.getActual() == null ? BigDecimal.ZERO : row.getActual())));
-        }
-    }*/
     
+    
+    private void populateActualDataRest() {
+       // final String fromDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getStartingDate());
+        System.out.println("4");
+        if (budgetVarianceEntries != null && budgetVarianceEntries.size() != 0) {
+        	System.out.println("5");
+            setQueryParams();
+           // System.out.println("calling budgetDetailService.fetchActualsForFYWithParams");
+            final List<Object[]> resultForVoucher = budgetDetailService.fetchActualsForFYWithParamsRest( formMiscQuery("vmis", "gl", "vh"));
+          //  System.out.println("calling "+resultForVoucher.get(0)[0]);
+            extractData(resultForVoucher);
+           // System.out.println("budgetDetailService.fetchActualsForBillWithVouchersParams");
+            final List<Object[]> resultForBill = budgetDetailService.fetchActualsForBillWithVouchersParamsRest( formMiscQuery("bmis", "bdetail", "bmis"));
+            extractData(resultForBill);
+        } else {
+            addActionError("no data found");
+        }
+    }
+
     private void extractData(final List<Object[]> result) {
         final Map<String, String> budgetDetailIdsAndAmount = new HashMap<String, String>();
         
@@ -927,7 +998,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 	public void setVhId(String vhId) {
 		this.vhId = vhId;
 	}
-	
+    	
 	
 
 }

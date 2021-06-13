@@ -176,8 +176,11 @@
 		<tr>
 			<td width="10%" class="<c:out value='${tdclass}' />"><s:text name="voucher.narration"/> :
 				&nbsp;</td>
-			<td colspan="3" class="<c:out value='${tdclass}' />"><s:property
-					value="%{getMasterName('narration')}" /></td>
+			<td colspan="3" class="<c:out value='${tdclass}' />">
+			
+			 <textarea name="narration" cols="150" rows="3" id="narration" onblur="checkLength(this)"> <s:property value="%{getMasterName('narration')}" /></textarea>
+			</td>
+			
 			<c:choose>
 				<c:when test="${tdclass == 'bluebox'}">
 					<c:set var="tdclass" value="greybox" scope="request" />
@@ -204,5 +207,16 @@
 			</c:choose>
 
 		</tr>
+
+		<tr>
+			<td style="width: 10%" class="<c:out value='${tdclass}' />">Back Dated Entry<span class="mandatory1">*</span>:	&nbsp;</td>
+			
+			<td class="greybox" colspan="3">
+			<s:select name="backdateentry" headerKey="-1" headerValue="Select"
+					value="%{getMasterName('backdateentry')}" list="#{'Y':'Yes' ,'N':'No'}"
+					id="backdateentry" />
+			</td>
+		</tr>
+
 	</table>
 </div>

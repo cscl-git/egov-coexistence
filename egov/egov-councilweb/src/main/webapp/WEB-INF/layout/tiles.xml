@@ -293,6 +293,11 @@
         <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilNotice-new.jsp"/>
     </definition>
     
+    <definition name="councilRandomNotice-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.councilmeeting.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilRandomNotice-new.jsp"/>
+    </definition>
+    
     <definition name="councilmeeting-result" extends="base_layout">
         <put-attribute name="page-title" value="title.councilmeeting.success" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/councilMeeting/councilmeeting-result.jsp"/>

@@ -2,7 +2,7 @@
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="612" pageHeight="1008" columnWidth="512" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
 	<property name="ireport.zoom" value="1.1289478601075547"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="763"/>
+	<property name="ireport.y" value="48"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -87,6 +87,8 @@
 	<parameter name="headerImagePath" class="java.lang.String"/>
 	<parameter name="footerImagePath" class="java.lang.String"/>
 	<parameter name="backgroundImgPath" class="java.lang.String"/>
+	<parameter name="pexNo" class="java.lang.String"/>
+	<parameter name="deptCode" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[select 1 from dual]]>
 	</queryString>
@@ -100,9 +102,9 @@
 		</band>
 	</background>
 	<title>
-		<band height="246">
+		<band height="261">
 			<staticText>
-				<reportElement x="1" y="59" width="198" height="31" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
+				<reportElement x="1" y="73" width="198" height="31" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
@@ -111,42 +113,42 @@
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="20" y="90" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
+				<reportElement x="20" y="104" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="20" y="107" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
+				<reportElement x="20" y="121" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="128" width="263" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
+				<reportElement x="0" y="142" width="263" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{chequeNumber}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="334" y="118" width="63" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
+				<reportElement x="334" y="132" width="63" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Dated : ]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="40" y="182" width="467" height="64" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
+				<reportElement x="40" y="196" width="467" height="64" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
 				<textElement textAlignment="Justified" verticalAlignment="Top">
 					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="397" y="118" width="110" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
+				<reportElement x="397" y="132" width="110" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
 				<box leftPadding="2"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
@@ -154,14 +156,14 @@
 				<textFieldExpression><![CDATA[$P{chequeDate}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="164" width="470" height="15" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
+				<reportElement x="0" y="178" width="470" height="15" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
-				<textFieldExpression><![CDATA["SUB:   Transfer of Funds"]]></textFieldExpression>
+				<textFieldExpression><![CDATA["SUB:   Issuance of Demand Draft from A/c No."+$P{accountNumber}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="-2" y="144" width="42" height="18" uuid="b948cd40-2d89-48bf-847c-c752efa3301e"/>
+				<reportElement x="-2" y="158" width="42" height="18" uuid="b948cd40-2d89-48bf-847c-c752efa3301e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
@@ -171,6 +173,13 @@
 				<reportElement x="0" y="-20" width="512" height="70" uuid="62111010-ab4a-4ec7-84c1-5cc976000d8e"/>
 				<imageExpression><![CDATA[$P{headerImagePath}]]></imageExpression>
 			</image>
+			<staticText>
+				<reportElement x="0" y="50" width="512" height="23" uuid="6eed8537-3f92-401f-adc2-e8e3c3d47c7b"/>
+				<textElement textAlignment="Center">
+					<font fontName="Verdana" size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[(Accounts Branch)]]></text>
+			</staticText>
 		</band>
 	</title>
 	<pageHeader>
@@ -199,161 +208,212 @@
 		</band>
 	</pageFooter>
 	<lastPageFooter>
-		<band height="284">
+		<band height="292">
 			<staticText>
-				<reportElement positionType="Float" x="8" y="70" width="139" height="36" uuid="f8ee65f5-8611-4006-bd30-c46298dd83a5"/>
+				<reportElement positionType="Float" x="8" y="26" width="139" height="36" uuid="f8ee65f5-8611-4006-bd30-c46298dd83a5"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
 					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Municipal Corporation, Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="310" y="70" width="131" height="36" uuid="13a71011-c6e3-4d07-8b12-890a685381fe"/>
+				<reportElement positionType="Float" x="310" y="26" width="131" height="36" uuid="13a71011-c6e3-4d07-8b12-890a685381fe"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" markup="styled">
 					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
 				<text><![CDATA[Municipal Corporation, Chandigarh]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="488" y="239" width="12" height="20" uuid="b2da2db7-6240-44f2-aee9-f422b53090ac"/>
+				<reportElement x="488" y="259" width="12" height="20" uuid="b2da2db7-6240-44f2-aee9-f422b53090ac"/>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"/"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report" isBlankWhenNull="true">
-				<reportElement x="501" y="239" width="7" height="20" uuid="dc3cd0eb-5cb4-4a93-b99d-40ac876f67ab"/>
+				<reportElement x="501" y="259" width="7" height="20" uuid="dc3cd0eb-5cb4-4a93-b99d-40ac876f67ab"/>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="2" y="230" width="483" height="39" uuid="48920241-a39e-4e21-8289-197adc2e4725"/>
+				<reportElement x="2" y="250" width="483" height="39" uuid="48920241-a39e-4e21-8289-197adc2e4725"/>
 				<imageExpression><![CDATA[$P{footerImagePath}]]></imageExpression>
 			</image>
 			<textField>
-				<reportElement x="8" y="44" width="255" height="26" uuid="201a98d9-d080-4a74-bf03-1fc7648ddbee"/>
+				<reportElement x="8" y="0" width="255" height="26" uuid="201a98d9-d080-4a74-bf03-1fc7648ddbee"/>
 				<textElement verticalAlignment="Bottom">
 					<font fontName="Verdana"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{secondarySignatory}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="310" y="44" width="192" height="24" uuid="1e3ffc3c-1ac7-4654-abb9-ec451184cb4c"/>
+				<reportElement x="310" y="0" width="192" height="24" uuid="1e3ffc3c-1ac7-4654-abb9-ec451184cb4c"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Verdana"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{primarySignatory}]]></textFieldExpression>
 			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="9" y="68" width="100" height="15" uuid="ade15d5f-457d-4688-b404-4771c84677a8"/>
+				<textElement>
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<text><![CDATA[Endst No : ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="9" y="84" width="500" height="20" uuid="9108f115-18e0-4dc4-875d-c324238dfad8"/>
+				<textElement>
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<text><![CDATA[Copy of the above is forwarded to the followiing for information & necessary action.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="344" y="189" width="157" height="59" uuid="c3550982-5a56-4ab1-b3cd-888a8b5f8168"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Chief Accounts Officer,
+Municipal Corporation,
+Chandigarh]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="9" y="161" width="502" height="28" uuid="b2a222ae-bec2-4059-bde7-2df8e9462d86"/>
+				<textElement>
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<text><![CDATA[Copies of the bill deduction vouchers are attached herewith for depositing the statutory liabilities with the respective authorities.]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="397" y="69" width="91" height="15" uuid="d66f05e8-7f8e-4dd0-8a37-ce561371141f"/>
+				<textElement>
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<text><![CDATA[Dated :]]></text>
+			</staticText>
 		</band>
 	</lastPageFooter>
 	<summary>
-		<band height="148">
+		<band height="171">
 			<rectangle>
-				<reportElement x="0" y="0" width="495" height="141" uuid="37cc37f0-45e7-4333-bda1-15fa5ca9f79a"/>
+				<reportElement x="0" y="23" width="495" height="141" uuid="37cc37f0-45e7-4333-bda1-15fa5ca9f79a"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="0" y="0" width="495" height="44" uuid="d5327a22-d020-4c21-a058-c6b7cf5d2fd3"/>
+				<reportElement x="0" y="23" width="495" height="44" uuid="d5327a22-d020-4c21-a058-c6b7cf5d2fd3"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="0" y="88" width="495" height="28" uuid="25d3369d-4560-4992-a89c-ebda5380aa28"/>
+				<reportElement x="0" y="111" width="495" height="28" uuid="25d3369d-4560-4992-a89c-ebda5380aa28"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="0" y="116" width="495" height="32" uuid="ff3c3373-916f-4191-9718-10466627a4e0"/>
+				<reportElement x="0" y="139" width="495" height="32" uuid="ff3c3373-916f-4191-9718-10466627a4e0"/>
 			</rectangle>
 			<line>
-				<reportElement x="26" y="0" width="1" height="148" uuid="f4cce99b-9080-4233-ae6f-e82f1bddad88"/>
+				<reportElement x="26" y="23" width="1" height="148" uuid="f4cce99b-9080-4233-ae6f-e82f1bddad88"/>
 			</line>
 			<staticText>
-				<reportElement x="1" y="0" width="24" height="44" uuid="f5654c8f-0ba3-4e61-a427-22f622e81a3f"/>
+				<reportElement x="1" y="23" width="24" height="44" uuid="f5654c8f-0ba3-4e61-a427-22f622e81a3f"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Sl No]]></text>
 			</staticText>
 			<line>
-				<reportElement x="110" y="0" width="1" height="44" uuid="6b915026-68dd-4bf5-96f8-e224d52b0dd3"/>
+				<reportElement x="110" y="23" width="1" height="44" uuid="6b915026-68dd-4bf5-96f8-e224d52b0dd3"/>
 			</line>
 			<staticText>
-				<reportElement x="27" y="0" width="83" height="44" uuid="c5bda651-c237-478a-bd8d-03ae696d6fe4"/>
+				<reportElement x="27" y="23" width="83" height="44" uuid="c5bda651-c237-478a-bd8d-03ae696d6fe4"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Party Name]]></text>
 			</staticText>
 			<line>
-				<reportElement x="204" y="0" width="1" height="44" uuid="24221b04-fa00-47a6-8694-a10fd90c77ff"/>
+				<reportElement x="204" y="23" width="1" height="44" uuid="24221b04-fa00-47a6-8694-a10fd90c77ff"/>
 			</line>
 			<staticText>
-				<reportElement x="111" y="0" width="93" height="44" uuid="97d13846-bb99-47a1-995c-35e73c94e86a"/>
+				<reportElement x="111" y="23" width="93" height="44" uuid="97d13846-bb99-47a1-995c-35e73c94e86a"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Party Account No]]></text>
 			</staticText>
 			<line>
-				<reportElement x="299" y="0" width="1" height="44" uuid="f41c79e3-45da-48e9-9b26-35d032e3e157"/>
+				<reportElement x="299" y="23" width="1" height="44" uuid="f41c79e3-45da-48e9-9b26-35d032e3e157"/>
 			</line>
 			<line>
-				<reportElement x="380" y="0" width="1" height="116" uuid="614c407a-ca74-460d-8e4b-bb825dfd99e3"/>
+				<reportElement x="380" y="23" width="1" height="116" uuid="614c407a-ca74-460d-8e4b-bb825dfd99e3"/>
 			</line>
 			<staticText>
-				<reportElement x="205" y="0" width="94" height="44" uuid="eafd1d83-48af-41e2-9979-dffd1e6b6a50"/>
+				<reportElement x="205" y="23" width="94" height="44" uuid="eafd1d83-48af-41e2-9979-dffd1e6b6a50"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Party Bank Name]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="300" y="0" width="80" height="44" uuid="9a52f000-2af6-46a1-b2d8-10d9f03b4446"/>
+				<reportElement x="300" y="23" width="80" height="44" uuid="9a52f000-2af6-46a1-b2d8-10d9f03b4446"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Party Bank IFSC Code]]></text>
 			</staticText>
 			<staticText>
-				<reportElement x="381" y="0" width="114" height="44" uuid="a0f58a11-4582-40bb-a52a-0abce1d861ed"/>
+				<reportElement x="381" y="23" width="114" height="44" uuid="a0f58a11-4582-40bb-a52a-0abce1d861ed"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Party Amount]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="27" y="44" width="353" height="44" uuid="dd3abe42-f670-42f3-8c6e-564a14fd704f"/>
+				<reportElement x="27" y="67" width="353" height="44" uuid="dd3abe42-f670-42f3-8c6e-564a14fd704f"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{mainParameter}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="1" y="44" width="24" height="44" uuid="ab203d73-b2e7-49f7-b72a-60869934989d"/>
+				<reportElement x="1" y="67" width="24" height="44" uuid="ab203d73-b2e7-49f7-b72a-60869934989d"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[1]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="381" y="44" width="115" height="44" uuid="69bd2a9d-496b-414e-aa0e-cb364c7c0019"/>
+				<reportElement x="381" y="67" width="115" height="44" uuid="69bd2a9d-496b-414e-aa0e-cb364c7c0019"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement x="281" y="88" width="100" height="28" uuid="1dcf4d4a-29ee-4686-9d79-021c5fdb80f2"/>
+				<reportElement x="281" y="111" width="100" height="28" uuid="1dcf4d4a-29ee-4686-9d79-021c5fdb80f2"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[Total]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="381" y="88" width="114" height="28" uuid="4c08d5ce-0715-48ff-be04-e8e214ab58c7"/>
+				<reportElement x="381" y="111" width="114" height="28" uuid="4c08d5ce-0715-48ff-be04-e8e214ab58c7"/>
 				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement stretchType="RelativeToTallestObject" x="27" y="116" width="468" height="32" isPrintWhenDetailOverflows="true" uuid="1cf6286f-1e61-4833-ab60-b85bec112a2a"/>
+				<reportElement stretchType="RelativeToTallestObject" x="27" y="139" width="468" height="32" isPrintWhenDetailOverflows="true" uuid="1cf6286f-1e61-4833-ab60-b85bec112a2a"/>
 				<textElement textAlignment="Right">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalAmountInWords}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="5" y="2" width="100" height="20" uuid="13c60bd2-762c-4b8b-a72a-800074b77945"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{pexNo}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="393" y="2" width="100" height="20" uuid="8592174b-d84e-43a6-af32-68897abbd91b"/>
+				<textElement textAlignment="Right">
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{deptCode}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

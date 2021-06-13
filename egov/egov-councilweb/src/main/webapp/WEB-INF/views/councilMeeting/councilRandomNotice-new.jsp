@@ -49,28 +49,65 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
-
-<c:if test="${random != 'Y' }">
-<div class="alert alert-success" role="alert">
-	<strong>${message}</strong>
-</div><%@ include file="councilnotice-view.jsp"%>
-</c:if>
-<c:if test="${random == 'Y' }">
-<div id="main">
-<div class="row">
-	<div class="col-md-12">
-		<div class="panel panel-primary" data-collapsed="0">
-			<div class="panel-heading">
-				<div class="panel-title text-center">
-					<c:out value="${message }" /><br />
-					
-				</div>
-			</div>
+<%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
+<form:form role="form" action="/services/council/councilmeeting/randomNotice" modelAttribute="councilNotice" 
+	id="councilMeetingform" cssClass="form-horizontal form-groups-bordered"
+	enctype="multipart/form-data">
+	<div class="panel panel-primary" data-collapsed="0">
+	<div class="panel-heading">
+		<div class="panel-title">
+			Create Random Notice
 		</div>
-	</div>			
-	<div class="text-center"><input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/></div>		
-</div>					
-</div>
+	</div>
+	
+	<div class="panel-body">
+	<div class="form-group">
+			<label class="col-sm-5 control-label text-right"><spring:message
+						code="lbl.meeting.document" /><span class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				
+						<form:input path="attachments" type="file" id="attachments"
+							name="attachments" required="true" data-id="1"
+							class="filechange inline btn upload-file" />
+						<small class="error-msg"><spring:message
+								code="lbl.mesg.document" /></small>
+						<form:errors path="attachments" cssClass="error-msg" />
+					
+			</div>
+	</div>
+	</div>
+	</div>
+	
+	
+	<div class="form-group">
+		<div class="text-center">
+			<button type='submit' class='btn btn-primary' id="buttonSubmit">
+				<spring:message code='lbl.create' />
+			</button>
+			<a href='javascript:void(0)' class='btn btn-default'
+				onclick='self.close()'><spring:message code='lbl.close' /></a>
+		</div>
+	</div>
+</form:form>
 
-</c:if>
+<script
+	src="<cdn:url value='/resources/app/js/councilNoticeHelper.js?rnd=${app_release_no}'/>"></script>
+<script
+	src="<cdn:url value='/resources/app/js/documentsupload.js?rnd=${app_release_no}'/>"></script>
+<script
+	src="<cdn:url value='/resources/app/js/showMoreorLessContent.js?rnd=${app_release_no}'/>"></script>
 
+<script>
+	 $('#buttonSubmit').click(function(e) {
+		   var action = '/services/council/councilmeeting/randomNotice' ;
+ 			$('#councilMeetingform').attr('method', 'post');
+ 			$('#councilMeetingform').attr('action', action); 
+		
+	});	 
+</script>
+
+<style>
+	.morecontent span {
+	    display: none;
+	}
+</style>

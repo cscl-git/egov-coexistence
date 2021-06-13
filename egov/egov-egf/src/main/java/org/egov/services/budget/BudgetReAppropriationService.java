@@ -79,8 +79,10 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class BudgetReAppropriationService extends PersistenceService<BudgetReAppropriation, Long> {
 
@@ -368,7 +370,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         misc.setReAppropriationDate(appropriationMisc.getReAppropriationDate());
         misc.setRemarks(appropriationMisc.getRemarks());
         misc.setSequenceNumber(getSequenceNumber(detail));
-        misc.setStatus(egwStatusDAO.getStatusByModuleAndCode("REAPPROPRIATIONMISC", "Approved"));
+        misc.setStatus(egwStatusDAO.getStatusByModuleAndCode("REAPPROPRIATIONMISC", "Created"));
         budgetReAppropriationMiscService.applyAuditing(misc);
         budgetReAppropriationMiscService.persist(misc);
         /*
@@ -474,7 +476,28 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         planningBudgetUsage = budgetDetailsDAO.getPlanningBudgetUsage(budgetDetail);
         budgetAvailable = planningBudgetApproved.subtract(planningBudgetUsage);
         budgetDetail.setBudgetAvailable(budgetAvailable);*/
+        
+        
         List<BudgetDetail> detailList = budgetDetailService.getBudgetDetailsForReAppCao();
+       
+       if(detailList != null && !detailList.isEmpty())
+       {
+    	   for(BudgetReAppropriation row:detailList.get(0).getBudgetReAppropriations())
+           {
+        	   if(row.getStatus().getCode().equalsIgnoreCase("New"))
+        	   {
+        		   EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved");
+        		   row.setStatus(status);
+        		   
+        		   applyAuditing(row);
+        	        persist(row);
+        		   
+        	   }
+           }
+       }
+       
+       //budgetReAppropriations.iterator().next()
+        
         for(BudgetDetail bd:detailList)
         {
         	EgwStatus status =  egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
@@ -745,6 +768,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
             final String asOnDate) {
         final BudgetReAppropriation appropriation = new BudgetReAppropriation();
         EgwStatus status = egwStatusDAO.getStatusByModuleAndCode("BUDGETDETAIL", "Approved");
+        System.out.println("info :::: financial year ID :: ::"+financialYear.getId());
         reAppView.getBudgetDetail().setStatus(status);
         final List<BudgetDetail> searchBy = budgetDetailService.searchByCriteriaWithTypeAndFY(financialYear.getId(), beRe,
                 reAppView.getBudgetDetail());
@@ -764,7 +788,7 @@ public class BudgetReAppropriationService extends PersistenceService<BudgetReApp
         else
             appropriation.setDeductionAmount(reAppView.getDeltaAmount());
 
-        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "Approved"));
+        appropriation.setStatus(egwStatusDAO.getStatusByModuleAndCode("BudgetReAppropriation", "New"));
         validateDeductionAmount(appropriation);
         /*
          * appropriation.start().withOwner(position); budgetReAppropriationWorkflowService.transition(actionName, appropriation,

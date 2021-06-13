@@ -188,6 +188,10 @@ public class CouncilSmsAndEmailService {
     	sendEmail(councilMeeting, customMessage, attachment, null, null);
     }
     
+    public void sendRandomEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment) {
+    	sendRandomEmail(councilMeeting, customMessage, attachment, null, null);
+    }
+    
     public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment, String fileType, String fileName) {
     	String emailId;
         Boolean emailEnabled = isEmailEnabled();
@@ -204,16 +208,27 @@ public class CouncilSmsAndEmailService {
 	        }catch(Exception e) {
 	        	LOGGER.error("Unable to send EMAIL to council members of meeting number "+councilMeeting.getMeetingNumber());
 	        }
-			/*
-			 * try { List<User> listOfUsers =
-			 * councilMeetingService.getUserListForMeeting(councilMeeting); for (User user :
-			 * listOfUsers) { if (user.getEmailId() != null) {
-			 * buildEmailForMeetingForCouncilRoles(user.getUserName(), user.getEmailId(),
-			 * councilMeeting, customMessage, attachment, fileType, fileName); } }
-			 * }catch(Exception e) {
-			 * LOGGER.error("Unable to send EMAIL to meeting creators of meeting number "
-			 * +councilMeeting.getMeetingNumber()); }
-			 */
+			
+        }
+    }
+    
+    public void sendRandomEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment, String fileType, String fileName) {
+    	String emailId;
+        Boolean emailEnabled = isEmailEnabled();
+        if (emailEnabled) {
+        	try {
+	            for (CommitteeMembers committeeMembers : committeeMemberService
+	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
+	                emailId = committeeMembers.getCouncilMember().getEmailId();
+	                if (emailId != null) {
+	                    buildRandomEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
+	                            attachment, fileType, fileName);
+	                }
+	            }
+	        }catch(Exception e) {
+	        	LOGGER.error("Unable to send EMAIL to council members of meeting number "+councilMeeting.getMeetingNumber());
+	        }
+			
         }
     }
     
@@ -303,6 +318,16 @@ public class CouncilSmsAndEmailService {
         	}
         	
         }
+        if (email != null && body != null)
+            sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
+    }
+    
+    public void buildRandomEmailForMeeting(final String email, final String name, final CouncilMeeting councilMeeting,
+            final String customMessage, final byte[] attachment, String fileType, String fileName) {
+        String body;
+        String subject;
+        body="Dear "+councilMeeting.getCommitteeType().getName()+" Member, Please find the attachment for the notice";
+        subject = councilMeeting.getCommitteeType().getName()+" Member, Please find the attachment for the notice";
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }

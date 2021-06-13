@@ -1580,7 +1580,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                         + ",egf_budget b where bd.budget=b.id and vmis.VOUCHERHEADERID=vh.id and gl.VOUCHERHEADERID=vh.id and bd.budgetgroup=bg.id and "
                         + "(bg.ACCOUNTTYPE='REVENUE_EXPENDITURE' or bg.ACCOUNTTYPE='CAPITAL_EXPENDITURE') and vh.status not in ("
                         + voucherstatusExclude
-                        + ") and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
+                        + ") and (select ews.value from eg_wf_states ews where id=vh.state_id) <> 'Rejected' and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
                         + "vh.voucherDate>= to_date('" + fromDate + "','dd/MM/yyyy') and vh.voucherDate <= to_date("
                         + toVoucherDate + ",'dd/MM/yyyy') " + miscQuery
                         + " and (gl.glcode =bg.mincode or gl.glcode=bg.majorcode ) group by bd.id" + " union "
@@ -1589,12 +1589,52 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                         + ",egf_budget b where bd.budget=b.id and vmis.VOUCHERHEADERID=vh.id and gl.VOUCHERHEADERID=vh.id and bd.budgetgroup=bg.id and "
                         + "(bg.ACCOUNTTYPE='REVENUE_RECEIPTS' or bg.ACCOUNTTYPE='CAPITAL_RECEIPTS') and vh.status not in ("
                         + voucherstatusExclude
-                        + ") and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
+                        + ") and (select ews.value from eg_wf_states ews where id=vh.state_id) <> 'Rejected' and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
                         + "vh.voucherDate>= to_date('" + fromDate + "','dd/MM/yyyy') and vh.voucherDate <= to_date("
                         + toVoucherDate + ",'dd/MM/yyyy') " + miscQuery
                         + " and (gl.glcode = bg.mincode  or gl.glcode=bg.majorcode ) group by bd.id");
+        System.out.println("QUERY FORM fetchActualsForFYWithParams "+query.toString());
+        
         final List<Object[]> result = getSession().createSQLQuery(query.toString()).list();
+        System.out.println("Size fetchActualsForFYWithParams"+result.size());
+        return result;
+    }
+    
+    
+    
+    public List<Object[]> fetchActualsForFYWithParamsRest(final StringBuffer miscQuery) {
+        final List<AppConfigValues> list = appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF,
+                "exclude_status_forbudget_actual");
+        if (list.isEmpty())
+            throw new ValidationException("", "exclude_status_forbudget_actual is not defined in AppConfig");
+        final StringBuffer budgetGroupQuery = new StringBuffer();
+        budgetGroupQuery
+                .append(" (select bg1.id as id,bg1.accounttype as accounttype ,c1.glcode as mincode, c2.glcode as maxcode,c3.glcode as majorcode "
+                        + "from egf_budgetgroup bg1 left outer join chartofaccounts c1 on c1.id=bg1.mincode left outer join chartofaccounts c2 on "
+                        + "c2.id=bg1.maxcode left outer join chartofaccounts  c3 on c3.id=bg1.majorcode )  bg ");
+        final String voucherstatusExclude = list.get(0).getValue();
+        StringBuffer query = new StringBuffer();
+        query = query
+                .append("select bd.id as id,(SUM(gl.debitAmount)-SUM(gl.creditAmount)) as amount from egf_budgetdetail bd,generalledger gl,voucherheader vh,"
+                        + "vouchermis vmis," + budgetGroupQuery
+                        + ",egf_budget b where bd.budget=b.id and vmis.VOUCHERHEADERID=vh.id and gl.VOUCHERHEADERID=vh.id and bd.budgetgroup=bg.id and "
+                        + "(bg.ACCOUNTTYPE='REVENUE_EXPENDITURE' or bg.ACCOUNTTYPE='CAPITAL_EXPENDITURE') and vh.status not in ("
+                        + voucherstatusExclude
+                        + ") and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null)  "
+                        + " " + miscQuery
+                        + " and (gl.glcode =bg.mincode or gl.glcode=bg.majorcode ) group by bd.id" + " union "
+                        + "select bd.id as id,(SUM(gl.creditAmount)-SUM(gl.debitAmount)) as amount from egf_budgetdetail bd,generalledger gl,voucherheader vh,"
+                        + "vouchermis vmis," + budgetGroupQuery
+                        + ",egf_budget b where bd.budget=b.id and vmis.VOUCHERHEADERID=vh.id and gl.VOUCHERHEADERID=vh.id and bd.budgetgroup=bg.id and "
+                        + "(bg.ACCOUNTTYPE='REVENUE_RECEIPTS' or bg.ACCOUNTTYPE='CAPITAL_RECEIPTS') and vh.status not in ("
+                        + voucherstatusExclude
+                        + ") and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null)  "
+                        + " " + miscQuery
+                        + " and (gl.glcode = bg.mincode  or gl.glcode=bg.majorcode ) group by bd.id");
+        System.out.println("QUERY FORM fetchActualsForFYWithParams "+query.toString());
 
+        final List<Object[]> result = getSession().createSQLQuery(query.toString()).list();
+        System.out.println("Size fetchActualsForFYWithParams"+result.size());
         return result;
     }
 
@@ -1635,9 +1675,14 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 + "and bg.maxcode) or bdetail.glcodeid=bg.majorcode) group by bd.id" + " ) group by bud ");
         if (LOGGER.isDebugEnabled())
             LOGGER.debug(" Main Query :" + query);
+        System.out.println("QUERY FORM fetchActualsForBillWithParams "+query.toString());
         final List<Object[]> result = getSession().createSQLQuery(query.toString()).list();
+        System.out.println("QUERY FORM fetchActualsForFYWithParams "+result.size());
         return result;
     }
+
+    
+    
 
     /*
      * Similar to fetchActualsForBillWithParams() except that this will only consider bills for which vouchers are present and the
@@ -1679,6 +1724,47 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                         + " and (bg.ACCOUNTTYPE='REVENUE_RECEIPTS' or bg.ACCOUNTTYPE='CAPITAL_RECEIPTS') and br.statusid not in (select id as idd from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL'))  and "
                         + " (bmis.voucherheaderid is NULL or vh.status=4)  and  br.billdate>= to_date('" + fromDate
                         + "','dd/MM/yyyy') and br.billdate <= to_date(" + toVoucherDate + ",'dd/MM/yyyy') " + miscQuery
+                        + " and ((bdetail.glcodeid between bg.mincode and bg.maxcode ) or bdetail.glcodeid=bg.majorcode  ) group by bd.id");
+
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug(" Main Query :" + query);
+        final List<Object[]> result = getSession().createSQLQuery(query.toString()).list();
+        return result;
+    }
+    
+    
+    
+    public List<Object[]> fetchActualsForBillWithVouchersParamsRest(final StringBuffer miscQuery) {
+        StringBuffer query = new StringBuffer();
+        query = query
+                .append("select bd.id as bud,SUM(case when bdetail.debitAmount is null then 0  else bdetail.debitAmount  end)   -SUM(case when bdetail.creditAmount is null then 0 else bdetail.creditAmount end)   as amt from egf_budgetdetail bd,eg_billdetails bdetail, eg_billregistermis bmis, eg_billregister br,"
+                        + "egf_budgetgroup bg,voucherheader vh, vouchermis vmis where bmis.billid=br.id and bdetail.billid=br.id and bd.budgetgroup=bg.id and "
+                        + "(bg.ACCOUNTTYPE='REVENUE_EXPENDITURE' or bg.ACCOUNTTYPE='CAPITAL_EXPENDITURE') and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL'))  and "
+                        + "bmis.voucherheaderid =vh.id and vh.status!=4 " + miscQuery
+                        + " and (bmis.budgetCheckReq is null or bmis.budgetCheckReq=true) and vh.id = vmis.voucherheaderid and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) "
+                        + " and ((bdetail.glcodeid between bg.mincode  and bg.maxcode ) or bdetail.glcodeid=bg.majorcode ) group by bd.id"
+                        + " UNION "
+                        + "select bd.id as bud,SUM(case when bdetail.creditAmount is null then 0 else bdetail.creditAmount end)-SUM(case when bdetail.debitAmount is null then 0  else bdetail.debitAmount  end) as amt from egf_budgetdetail bd,eg_billdetails bdetail, eg_billregistermis bmis, eg_billregister br,"
+                        + "egf_budgetgroup bg,voucherheader vh, vouchermis vmis where bmis.billid=br.id and bdetail.billid=br.id and bd.budgetgroup=bg.id and "
+                        + " (bmis.budgetCheckReq is null or bmis.budgetCheckReq=true) and vh.id = vmis.voucherheaderid and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) "
+                        + " and (bg.ACCOUNTTYPE='REVENUE_RECEIPTS' or bg.ACCOUNTTYPE='CAPITAL_RECEIPTS') and br.statusid not in (select id as idd from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL'))  and "
+                        + " bmis.voucherheaderid =vh.id and vh.status!=4  " + miscQuery
+                        + " and ((bdetail.glcodeid between bg.mincode and bg.maxcode ) or bdetail.glcodeid=bg.majorcode  ) group by bd.id"
+                        + " UNION "
+                        + " select bd.id as bud,SUM(case when bdetail.debitAmount is null then 0  else bdetail.debitAmount  end)   -SUM(case when bdetail.creditAmount is null then 0 else bdetail.creditAmount end)   as amt "
+                        + " from egf_budgetdetail bd,eg_billdetails bdetail, eg_billregister br,egf_budgetgroup bg, eg_billregistermis bmis left outer join voucherheader vh on vh.id=bmis.voucherheaderid "
+                        + " where bmis.billid=br.id and bdetail.billid=br.id and bd.budgetgroup=bg.id and "
+                        + "(bg.ACCOUNTTYPE='REVENUE_EXPENDITURE' or bg.ACCOUNTTYPE='CAPITAL_EXPENDITURE') and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL'))  and "
+                        + "(bmis.voucherheaderid is NULL or vh.status=4) " + miscQuery
+                        + " and (bmis.budgetCheckReq is null or bmis.budgetCheckReq=true) and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) "
+                        + " and ((bdetail.glcodeid between bg.mincode  and bg.maxcode ) or bdetail.glcodeid=bg.majorcode ) group by bd.id"
+                        + " UNION "
+                        + "select bd.id as bud,SUM(case when bdetail.creditAmount is null then 0 else bdetail.creditAmount end)-SUM(case when bdetail.debitAmount is null then 0  else bdetail.debitAmount  end) as amt"
+                        + " from egf_budgetdetail bd,eg_billdetails bdetail, egf_budgetgroup bg, eg_billregister br,eg_billregistermis bmis  left outer join voucherheader vh on vh.id=bmis.voucherheaderid "
+                        + " where bmis.billid=br.id and bdetail.billid=br.id and bd.budgetgroup=bg.id and "
+                        + " (bmis.budgetCheckReq is null or bmis.budgetCheckReq=true) and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) "
+                        + " and (bg.ACCOUNTTYPE='REVENUE_RECEIPTS' or bg.ACCOUNTTYPE='CAPITAL_RECEIPTS') and br.statusid not in (select id as idd from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL'))  and "
+                        + " (bmis.voucherheaderid is NULL or vh.status=4)  " + miscQuery
                         + " and ((bdetail.glcodeid between bg.mincode and bg.maxcode ) or bdetail.glcodeid=bg.majorcode  ) group by bd.id");
 
         if (LOGGER.isDebugEnabled())

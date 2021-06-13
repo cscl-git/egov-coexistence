@@ -330,6 +330,59 @@ public class CouncilMeetingController {
         redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilNotice.success", null, null));
         return REDIRECT_COUNCILNOTICE_RESULT + councilMeeting.getId();
     }
+    @RequestMapping(value = "/newRandomNotice", method = RequestMethod.POST)
+    public String newRandomFormNotice(@ModelAttribute final CouncilMeeting councilMeeting, final Model model) {
+    	
+        model.addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
+        model.addAttribute(COUNCIL_NOTICE, councilMeeting);
+            return "councilRandomNotice-new";
+    }
+    
+    @RequestMapping(value = "/randomNotice", method = RequestMethod.POST)
+    public String randomNotice(@Valid @ModelAttribute final CouncilMeeting councilMeeting, final BindingResult errors,
+    					@RequestParam final MultipartFile attachments,
+                         final Model model, final RedirectAttributes redirectAttrs, final HttpServletRequest request) {
+
+       
+        if (attachments != null && attachments.getSize() > 0) {
+            try {
+            	councilMeeting.setFilestoreid(fileStoreService.store(
+                        attachments.getInputStream(),
+                        attachments.getOriginalFilename(),
+                        attachments.getContentType(),
+                        CouncilConstants.MODULE_NAME));
+            } catch (IOException e) {
+                LOGGER.error("Error in loading documents" + e.getMessage(), e);
+            }
+        }
+        CommitteeType committeeType = committeeTypeService.findByName("General House");
+        councilMeeting.setCommitteeType(committeeType);
+        
+        try {
+        	//Sent mail with of uploaded Meeting document
+            if(null != councilMeeting.getFilestoreid()) {
+            	Path file = fileStoreService.fetchAsPath(councilMeeting.getFilestoreid().getFileStoreId(), CouncilConstants.MODULE_NAME);
+        		try {
+    				byte[] data = Files.readAllBytes(file);
+    				String fileType = isBlank(councilMeeting.getFilestoreid().getContentType()) ? Files.probeContentType(file)
+                            : councilMeeting.getFilestoreid().getContentType();
+            		String fileName = councilMeeting.getFilestoreid().getFileName();
+            		councilSmsAndEmailService.sendRandomEmail(councilMeeting, null, data,fileType, fileName);
+    			} catch (IOException e) {
+    				e.printStackTrace();
+    				LOGGER.error("Error in sending email",e);
+    			}
+            }else {
+            	councilSmsAndEmailService.sendRandomEmail(councilMeeting, null,councilReportService.generatePDFForAgendaDetails(councilMeeting));
+            }
+        }catch(Exception e) {
+        	e.printStackTrace();
+        	LOGGER.error("Unable to send EMAIL of meeting number ");
+        }
+        
+        redirectAttrs.addFlashAttribute(MESSAGE, messageSource.getMessage("msg.councilNotice.success", null, null));
+        return "redirect:/councilmeeting/resultrandomNotice";
+    }
     
     
     @RequestMapping(value = "/create", method = RequestMethod.POST)
@@ -500,6 +553,13 @@ public class CouncilMeetingController {
         if(councilMeeting.getCommitteeType()!=null) {
         model.addAttribute("commiteemembelist", councilMeeting.getCommitteeType().getCommiteemembers());
         }
+        return COUNCILNOTICE_RESULT;
+    }
+    @RequestMapping(value = "/resultrandomNotice", method = RequestMethod.GET)
+    public String resultRandomNotice( Model model) {
+    	String message="Random Notice Created Successfully.";
+        model.addAttribute("message", message);
+        model.addAttribute("random", "Y");
         return COUNCILNOTICE_RESULT;
     }
 

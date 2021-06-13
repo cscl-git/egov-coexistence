@@ -93,6 +93,15 @@ public class RemittanceBean implements Predicate {
     private String panNumber;
     private String gstNo;
     private String deptName;
+	private String subdivision;
+
+    public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 
     public Long getFunctionId() {
         return functionId;

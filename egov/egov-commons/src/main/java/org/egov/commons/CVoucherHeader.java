@@ -168,6 +168,19 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 		this.subdivision = subdivision;
 	}
 
+	@Transient
+    private String narration;
+    
+ 
+    
+    public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
+
     private String firstsignatory;
     private String secondsignatory;
     private String postauditprocessing;

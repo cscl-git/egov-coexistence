@@ -545,7 +545,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 							+ "  and lower(ph.type)=lower('pex') " + instrumentHeaderQry.toString()
 							+ " AND IV.VOUCHERHEADERID IS NOT NULL AND iv.voucherheaderid = vh.id AND ih.instrumentnumber IS NULL "
 							+ " AND ih.id = iv.instrumentheaderid "
-							+ " AND vh.type = 'Payment' and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id,ih.transactionnumber,"
+							+ " AND vh.type IN ('Payment','Contra') and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id,ih.transactionnumber,"
 							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");
 		} catch (ParseException e) {
 			e.printStackTrace();

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="612" pageHeight="1008" columnWidth="512" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
-	<property name="ireport.zoom" value="1.652892561983471"/>
+	<property name="ireport.zoom" value="1.128947860107555"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="302"/>
+	<property name="ireport.y" value="943"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -294,10 +294,10 @@ Chandigarh]]></text>
 				<reportElement x="0" y="88" width="495" height="28" uuid="25d3369d-4560-4992-a89c-ebda5380aa28"/>
 			</rectangle>
 			<rectangle>
-				<reportElement x="0" y="116" width="495" height="25" uuid="ff3c3373-916f-4191-9718-10466627a4e0"/>
+				<reportElement x="0" y="116" width="495" height="32" uuid="ff3c3373-916f-4191-9718-10466627a4e0"/>
 			</rectangle>
 			<line>
-				<reportElement x="26" y="0" width="1" height="141" uuid="f4cce99b-9080-4233-ae6f-e82f1bddad88"/>
+				<reportElement x="26" y="0" width="1" height="148" uuid="f4cce99b-9080-4233-ae6f-e82f1bddad88"/>
 			</line>
 			<staticText>
 				<reportElement x="1" y="0" width="24" height="44" uuid="f5654c8f-0ba3-4e61-a427-22f622e81a3f"/>
@@ -389,7 +389,7 @@ Chandigarh]]></text>
 				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="27" y="116" width="468" height="24" uuid="1cf6286f-1e61-4833-ab60-b85bec112a2a"/>
+				<reportElement stretchType="RelativeToTallestObject" x="27" y="116" width="468" height="32" isPrintWhenDetailOverflows="true" uuid="1cf6286f-1e61-4833-ab60-b85bec112a2a"/>
 				<textElement textAlignment="Right">
 					<font fontName="Verdana" size="12"/>
 				</textElement>

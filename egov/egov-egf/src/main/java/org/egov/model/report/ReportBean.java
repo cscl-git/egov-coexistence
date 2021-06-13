@@ -62,6 +62,15 @@ public class ReportBean {
 
     private String reportType;
     private String exportType;
+    private String subdivision;
+
+    public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 
     public String getExportType() {
         return exportType;

@@ -195,7 +195,6 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         CFinancialYear financialYear = new CFinancialYear();
         if (parameters.get("asOnDate")[0] != null) {
             strAsOnDate = parameters.get("asOnDate")[0];
-            LOGGER.info("as on date ::::"+strAsOnDate);
             try {
                 dtAsOnDate = Constants.DDMMYYYYFORMAT2.parse(strAsOnDate);
                 financialYear = financialYearDAO.getFinancialYearByDate(dtAsOnDate);
@@ -241,12 +240,11 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
 
         if (budgetGroup != null) {
             budgetHead = budgetGroup.getName();
-            LOGGER.info("head :::"+budgetHead);
             StringBuilder strQuery = new StringBuilder();
             strQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
             strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and  gl.glcodeid =:glCodeId");
-            strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
+            strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and (vh.state_id is not null and (select st.status from eg_wf_states st where st.id=vh.state_id)!=1) and vh.status != 4 and vh.voucherdate  >=:strStDate");
             strQuery.append(" and vh.voucherdate <=:strAODate");
             strQuery.append(getFunctionQuery("gl.functionid"));
             strQuery.append(getDepartmentQuery("vmis.departmentcode"));
@@ -462,35 +460,44 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
     private BigDecimal getBudgetBEorREAmt(final String type) {
         BigDecimal approvedAmount = new BigDecimal(0.0);
         try {
+        	
+        	 //System.out.println("ApprovedAmount (1) :: :: :: "+budgedDetailList.get(0).getApprovedReAppropriationsTotal());
             CFinancialYear financialYr = new CFinancialYear();
             financialYr = financialYearDAO.getFinancialYearByDate(dtAsOnDate);
             final CFinancialYear financialYear = financialYearDAO.getFinancialYearById(Long.valueOf(financialYr.getId()));
 
             List<BudgetDetail> budgedDetailList = new ArrayList<BudgetDetail>();
             String query = " from BudgetDetail bd where bd.budget.isbere=? and bd.budgetGroup=? and bd.budget.financialYear=? ";
-            if (department.getCode() != null && "-1".equals(department.getCode()))
-                query = query + " and bd.executingDepartment=" + department.getCode();
+            if (department.getCode() != null && !("-1".equals(department.getCode())))
+                query = query + " and bd.executingDepartment='" + department.getCode() +"'";
             if (function.getId() != null && function.getId() != -1)
                 query = query + " and bd.function.id=" + function.getId();
             if (fund.getId() != null && fund.getId() != -1)
                 query = query + " and bd.fund.id=" + fund.getId();
+            //query = query + " and bd.status.description='Approved'";
+            //query = query + " and bd.budgetReAppropriations.status.description='Approved'";
             budgedDetailList = persistenceService.findAllBy(query, type, budgetGroup, financialYear);
+            
+            //System.out.println("ApprovedAmount (1) :: :: :: "+budgedDetailList.get(0).getApprovedReAppropriationsTotal());
+            System.out.println(type);
             if (budgedDetailList != null && budgedDetailList.size() > 0)
                 for (final BudgetDetail bdetail : budgedDetailList) {
                     approvedAmount = approvedAmount.add(bdetail.getApprovedAmount());
-                    if ("RE".equalsIgnoreCase(type) && !getConsiderReAppropriationAsSeperate()) {
+                    if (("RE".equalsIgnoreCase(type)) && !getConsiderReAppropriationAsSeperate()) {
                         approvedAmount = approvedAmount.add(bdetail.getApprovedReAppropriationsTotal());
+                        System.out.println("ApprovedAmount (RE)(2) :: :: :: "+approvedAmount);
                         continue;
-                    } else if ("BE".equalsIgnoreCase(type))
-                        addtionalAppropriationForBe = addtionalAppropriationForBe.add(bdetail
-                                .getApprovedReAppropriationsTotal());
-                    else {
+                    } else if ("BE".equalsIgnoreCase(type) ) {
+                        addtionalAppropriationForBe = addtionalAppropriationForBe.add(bdetail.getApprovedReAppropriationsTotal());
+                    }else {
                         shouldShowREAppropriations = true;
                         addtionalAppropriationForRe = addtionalAppropriationForRe.add(bdetail
                                 .getApprovedReAppropriationsTotal());
+                        System.out.println("ApprovedAmount (BE)(3) :: :: :: "+approvedAmount);
                     }
                 }
-        } catch (final ValidationException e) {
+        } catch (final Exception e) {
+        	e.printStackTrace();
             if (LOGGER.isInfoEnabled())
                 LOGGER.info("ValidationException while fetching BudgetBEorREAmt :" + e.getMessage());
             return new BigDecimal(0.0);
