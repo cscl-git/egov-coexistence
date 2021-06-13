@@ -134,7 +134,7 @@
 							name="voucherHeader.voucherDate" format="dd/MM/yyyy" /></td>
 				</tr>
 			</table>
-			<jsp:include page="voucherViewHeader.jsp" />
+			<jsp:include page="voucherViewHeaderView.jsp" />
 			<table align="center" id="sourceIcon">
 			<s:if test="%{getMasterName('narration')=='ECHALLAN Receipt'}">  				
  			</s:if>

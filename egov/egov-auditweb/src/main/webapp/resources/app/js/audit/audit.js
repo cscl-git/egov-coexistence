@@ -175,6 +175,79 @@ function deleteSubledgerRow(obj) {
 }
 
 
+// written by Sonu Prajapati
+
+function addcheckListRowNew() {
+    
+    var size = $('#tblchecklist >tbody >tr').length;
+    if (size < 30) {
+    var content = $('#blank_table tr');
+    var element = null;   
+    
+    element = content.clone(true,true);
+    element.attr('id', 'rec-'+size);
+    element.find('.checklist_description').attr('path', "checkList["+size+"].checklist_description");
+    element.find('.checklist_description').val('');
+    element.find('.status').attr('path', "checkList["+size+"].status");
+    element.find('.status').val('');
+    element.find('.checklist_date').attr('path', "checkList["+size+"].checklist_date");
+    //element.find('.checklist_date').attr('class', "form-control datepicker checklist_date");
+    element.find('.auditor_comment').attr('path', "checkList["+size+"].auditor_commente");
+    element.find('.auditor_comment').val('');
+    element.find('.user_comments').attr('path', "checkList["+size+"].user_comments");
+    element.find('.user_comments').val('');
+    element.find('.dataDelete').attr('data-id', size);
+    element.find('.dataDelete').attr('data-href', '0,'+size);
+    element.appendTo('#tbl_add_body');
+    } else {
+		  bootbox.alert($.i18n.prop('msg.limit.reached'));
+	}
+  }
+
+$('#confirm-deleterow').on('show.bs.modal', function(e) {
+	$(this).find('#deletebtnok').attr('href', $(e.relatedTarget).data('href'));
+	
+
+});
+
+jQuery(document).delegate('.btn-okrow', 'click', function(e) {
+    e.preventDefault(); 
+    var hrefdata=$('#deletebtnok').attr('href');
+    var deleteurl=hrefdata.split(",");
+    var rowcount=$('#tblchecklist >tbody >tr').length;
+    if(rowcount<=1) {
+		bootbox.alert($.i18n.prop('msg.this.row.can.not.be.deleted'));
+		return false;
+	}else{
+   if(deleteurl[0] !== "0"){
+    $.ajax({
+    	url: "/services/audit/createAudit/deleteAuditchecklist/"+deleteurl[0],     
+    	type: "GET",
+    	contentType:'application/json',
+    	//data: JSON.stringify(jsonData),
+    	success: function (response) {
+    		console.log("success"+response);
+    		 //var id = jQuery(this).attr('data-id');
+             jQuery('#rec-' + deleteurl[1]).remove();
+             $('#confirm-deleterow').modal('hide');
+    	}, 
+    	error: function (response) {
+    		console.log("failed");
+    	}
+    	});
+      }else{
+    	 //var id = jQuery(this).attr('data-id');
+         jQuery('#rec-' + deleteurl[1]).remove();
+         $('#confirm-deleterow').modal('hide');
+    }
+	}
+});
+
+//End by Sonu Prajapati
+
+
+
+
 function addCustomEvent(index,target,type,func){
 	target = target.replace('index',index);
 	addCustomEventListener(target, type, func);

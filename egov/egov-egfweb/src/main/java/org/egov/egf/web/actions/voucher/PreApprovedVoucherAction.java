@@ -283,6 +283,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         addDropdownData("departmentList", Collections.EMPTY_LIST);
         addDropdownData("designationList", Collections.EMPTY_LIST);
         addDropdownData("userList", Collections.EMPTY_LIST);
+        addDropdownData("subdivision", Collections.EMPTY_LIST);
     }
 
     @SkipValidation
@@ -427,6 +428,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             }
             action = "save";
             return "billview";
+            
         }
 
     }
@@ -1158,6 +1160,11 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
                                 .getBillnumber();
             else if ("budgetaryAppnumber".equals(name))
                 val = voucherHeader.getVouchermis().getBudgetaryAppnumber();
+            else if (name.equals("subdivision") && voucherHeader.getVouchermis().getSubdivision() != null
+                    && !voucherHeader.getVouchermis().getSubdivision().equals("-1"))
+            	val = voucherHeader.getVouchermis().getSubdivision();
+           
+            
         } else if (name.equals("fund") && egBillregister.getEgBillregistermis().getFund() != null)
             val = egBillregister.getEgBillregistermis().getFund().getName();
         else if (name.equals("fundsource") && egBillregister.getEgBillregistermis().getFundsource() != null)
@@ -1180,6 +1187,9 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
             val = egBillregister.getBillnumber();
         else if ("budgetaryAppnumber".equals(name))
             val = egBillregister.getEgBillregistermis().getBudgetaryAppnumber();
+        else if (name.equals("subdivision") && egBillregister.getEgBillregistermis().getSubdivision() != null) 
+        	 val = egBillregister.getEgBillregistermis().getSubdivision();
+        
         return val;
     }
 

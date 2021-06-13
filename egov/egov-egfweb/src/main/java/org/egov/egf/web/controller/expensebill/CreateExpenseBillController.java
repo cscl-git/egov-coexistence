@@ -72,10 +72,12 @@ import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
 import org.egov.egf.budget.model.BudgetControlType;
 import org.egov.egf.budget.service.BudgetControlTypeService;
+import org.egov.egf.expensebill.repository.ExpenseBillRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.egf.web.controller.microservice.FinanceController;
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.service.FileStoreService;
@@ -98,6 +100,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.exilant.eGov.src.common.SubDivision;
 
 /**
  * @author venki
@@ -166,6 +169,21 @@ public class CreateExpenseBillController extends BaseBillController {
     	   }
     	}
         setDropDownValues(model);
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        model.addAttribute("subdivision", subdivisionList);
+		
+        
         model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
         prepareWorkflow(model, egBillregister, new WorkflowContainer());
        model.addAttribute("validActionList", validActions);
@@ -459,5 +477,6 @@ public class CreateExpenseBillController extends BaseBillController {
     	}
 		return empName;
 	}
+    
 
 }

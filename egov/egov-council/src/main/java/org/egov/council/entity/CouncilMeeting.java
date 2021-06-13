@@ -121,6 +121,9 @@ public class CouncilMeeting extends StateAware{
     @Transient
     private Date toDate;
 
+    @Transient
+    private String meetingpostone;
+
     @OrderBy("id")
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL)
     private List<MeetingMOM> meetingMOMs = new ArrayList<>();
@@ -358,4 +361,12 @@ public class CouncilMeeting extends StateAware{
     public void setAttachments(MultipartFile attachments) {
         this.attachments = attachments;
     }
+
+	public String getMeetingpostone() {
+		return meetingpostone;
+	}
+
+	public void setMeetingpostone(String meetingpostone) {
+		this.meetingpostone = meetingpostone;
+	}
 }

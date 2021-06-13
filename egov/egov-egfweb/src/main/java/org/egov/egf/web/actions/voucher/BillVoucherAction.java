@@ -151,6 +151,10 @@ public class BillVoucherAction extends BaseVoucherAction {
                     && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
                 query.append(" and br.egBillregistermis.departmentcode='")
                         .append(voucherHeader.getVouchermis().getDepartmentcode() + "'");
+            if (null != voucherHeader.getVouchermis().getSubdivision()
+                    && !voucherHeader.getVouchermis().getSubdivision().equals("-1"))
+                query.append(" and br.egBillregistermis.subdivision='")
+                        .append(voucherHeader.getVouchermis().getSubdivision() + "'");
             if (null != voucherTypeBean.getVoucherDateFrom()
                     && StringUtils.isNotEmpty(voucherTypeBean.getVoucherDateFrom()))
                 query.append(" and br.billdate>='")

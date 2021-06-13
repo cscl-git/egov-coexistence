@@ -106,7 +106,7 @@ import org.springframework.validation.BindingResult;
 
 @Controller
 public abstract class BaseBillController extends BaseVoucherController {
-private static final Logger LOGGER = Logger.getLogger(BaseBillController.class);
+	private static final Logger LOGGER = Logger.getLogger(BaseBillController.class);
 
     @Autowired
     private EgBillSubTypeService egBillSubTypeService;
@@ -126,30 +126,30 @@ private static final Logger LOGGER = Logger.getLogger(BaseBillController.class);
     private PersistenceService persistenceService;
 
     protected boolean isBillDateDefaultValue;
-   
+    
     @Autowired
     protected BudgetDetailService budgetDetailService;
-   
+    
     @Autowired
-private FunctionDAO functionDAO;
+	private FunctionDAO functionDAO;
 
     @Autowired
     private FinancialYearHibernateDAO financialYearDAO;
-   
+    
     @Autowired
     private BudgetService budgetService;
-   
+    
     protected List<String> headerFields = new ArrayList<String>();
     private BudgetDetail budgetDetail = new BudgetDetail();
     protected List<String> gridFields = new ArrayList<String>();    
     private final Map<String, String> queryParamMap = new HashMap<String, String>();
     protected List<String> mandatoryFields = new ArrayList<String>();
-   
-   
-   
+    
+    
+    
     @Autowired
     public MicroserviceUtils microserviceUtils;
-   
+    
     private List<BudgetVarianceEntry> budgetVarianceEntries = new ArrayList<BudgetVarianceEntry>();
 
     public BaseBillController(final AppConfigValueService appConfigValuesService) {
@@ -196,7 +196,7 @@ private FunctionDAO functionDAO;
              * resultBinder.reject("msg.expense.bill.accdetail.amountzero", new
              * String[] { details.getChartOfAccounts().getGlcode() }, null);
              */
-           
+            
             boolean isDebitCreditAmountEmpty = (details.getDebitamount() == null
                     || (details.getDebitamount() != null && details.getDebitamount().compareTo(BigDecimal.ZERO) == 0))
                     && (details.getCreditamount() == null || (details.getCreditamount() != null
@@ -281,7 +281,7 @@ private FunctionDAO functionDAO;
             egBillregister.getEgBilldetailes().addAll(egBillregister.getCreditDetails());
             egBillregister.getEgBilldetailes().addAll(egBillregister.getNetPayableDetails());
         }
-
+        
         for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
             if (details.getGlcodeid() != null) {
                 if (egBillregister.getEgBillregistermis().getFunction() != null){

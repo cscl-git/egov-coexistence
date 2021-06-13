@@ -102,6 +102,8 @@ import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 @ParentPackage("egov")
 @Results({ @Result(name = VoucherSearchAction.SEARCH, location = "voucherSearch-search.jsp"),
 		@Result(name = com.opensymphony.xwork2.Action.SUCCESS, type = "redirect", location = "voucherSearch.action") })
@@ -146,6 +148,8 @@ public class VoucherSearchAction extends BaseFormAction {
 	private Department deptImpl = new Department();
 	private Map<Long,String> paymentVoucherMap=new HashMap<Long,String>();
 
+	private String subdivision;
+
 	@Override
 	public Object getModel() {
 		return voucherHeader;
@@ -186,6 +190,8 @@ public class VoucherSearchAction extends BaseFormAction {
 			addDropdownData("schemeList", Collections.EMPTY_LIST);
 		if (headerFields.contains("subscheme"))
 			addDropdownData("subschemeList", Collections.EMPTY_LIST);
+		if (headerFields.contains("subdivision"))
+			addDropdownData("subdivisionList", Collections.EMPTY_LIST);
 
 		if (null != parameters.get("showMode")) {
 			showMode = parameters.get("showMode")[0];
@@ -252,8 +258,23 @@ public class VoucherSearchAction extends BaseFormAction {
 		if (showMode != null && showMode.equalsIgnoreCase("nonBillPayment")) {
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("nonBillPayment");
-		} else if (voucherHeader.getType() != null && !voucherHeader.getType().equals("-1"))
+		} else if (voucherHeader.getType() != null && !voucherHeader.getType().equals("-1")) {
 			getVoucherNameMap(voucherHeader.getType());
+		}
+		
+	
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
 
 		return SEARCH;
 
@@ -272,12 +293,16 @@ public class VoucherSearchAction extends BaseFormAction {
 	@ValidationErrorPage(value = SEARCH)
 	@Action(value = "/voucher/voucherSearch-search")
 	public String search() throws ApplicationException, ParseException {
+		
 		LOGGER.info("amount :::"+amount);
 		LOGGER.info("partyName  :::"+partyName);
+		subdivision=voucherHeader.getVouchermis().getSubdivision();
+		System.out.println("hello from voucherSearch-search  "+subdivision);
 		boolean ismodifyJv = false;
 		voucherList = new ArrayList<Map<String, Object>>();
 		Map<String, Object> voucherMap = null;
 		voucherHeader.getVouchermis().setDepartmentcode(deptImpl.getCode());
+		//voucherHeader.getVouchermis().setSubdivision(subdivision);
 		if (null != parameters.get("showMode"))
 			showMode = parameters.get("showMode")[0];
 		if (voucherHeader.getModuleId() != null && voucherHeader.getModuleId() == -1)
@@ -295,7 +320,6 @@ public class VoucherSearchAction extends BaseFormAction {
 		List<CVoucherHeader> list = new ArrayList<CVoucherHeader>();
 		List<CVoucherHeader> filterlist =new ArrayList<CVoucherHeader>();
 		List<Query> qryObj;
-		
 		// for view voucher implementing paginated result
 		if (null == showMode || showMode.equals("")) {
 			System.out.println("before query search");
@@ -317,6 +341,34 @@ public class VoucherSearchAction extends BaseFormAction {
 			list = voucherSearchUtil.searchNonBillVouchers(voucherHeader, fromDate, toDate, showMode);
 		else
 			list = voucherSearchUtil.search(voucherHeader, fromDate, toDate, showMode);
+		
+		
+		
+		  if(list.size()==0 || list.isEmpty()) {
+		    voucherHeader.getVouchermis().setSubdivision(null);
+		    if (null == showMode || showMode.equals("")) { 
+		    	System.out.println("before query search"); 
+		    	qryObj =voucherSearchUtil.voucherSearchQuery(voucherHeader, fromDate, toDate,showMode);
+		    	final Query qry = qryObj.get(0); 
+		    	final Long count = (Long)persistenceService.find(qryObj.get(1).getQueryString());
+		    	//final Page resPage= new Page(qry, page, pageSize);
+		    	//pagedResults = new EgovPaginatedList(resPage, count.intValue()); 
+		    	try {
+		          System.out.println("before executing"); 
+		          list = qry.list();
+		          System.out.println("after executing"); 
+		          }catch (Exception e) {
+		         e.printStackTrace(); 
+		         }
+		    	System.out.println("quey executed");
+		    	} 
+		    else if(showMode.equalsIgnoreCase("nonbillPayment")) 
+		    	list =voucherSearchUtil.searchNonBillVouchers(voucherHeader, fromDate, toDate,showMode);
+		    else list = voucherSearchUtil.search(voucherHeader, fromDate,toDate, showMode);
+		    }
+		 
+		
+		
 		if (null == showMode || showMode.equals("")) {
 			paymentVoucherMap.clear();
 			
@@ -413,6 +465,13 @@ public class VoucherSearchAction extends BaseFormAction {
 					org.egov.infra.microservice.models.Department depList = microserviceUtils
 							.getDepartmentByCode(voucherheader.getVouchermis().getDepartmentcode());
 					voucherMap.put("deptName", depList.getName());
+					if (voucherheader.getVouchermis().getSubdivision() != null) {
+						voucherMap.put("subdivision", voucherheader.getVouchermis().getSubdivision());
+					}else {
+						voucherMap.put("subdivision", "-");
+					}
+					
+					
 				}
 				voucherMap.put("voucherdate", voucherheader.getVoucherDate());
 				voucherMap.put("fundname", voucherheader.getFundId().getName());
@@ -450,7 +509,7 @@ public class VoucherSearchAction extends BaseFormAction {
 			Page page = new Page<Map<String, Object>>(1, voucherList.size(), voucherList);
 			pagedResults = new EgovPaginatedList(page, voucherList.size());
 			pagedResults.setList(voucherList);
-			System.out.println("size ::: "+pagedResults.getList().size());
+			System.out.println(pagedResults.getList().size());
 		} else
 		{
 			paymentVoucherMap.clear();
@@ -485,6 +544,11 @@ public class VoucherSearchAction extends BaseFormAction {
 						org.egov.infra.microservice.models.Department depList = microserviceUtils
 								.getDepartmentByCode(voucherheader.getVouchermis().getDepartmentcode());
 						voucherMap.put("deptName", depList.getName());
+						if (voucherheader.getVouchermis().getSubdivision() != null) {
+							voucherMap.put("subdivision", voucherheader.getVouchermis().getSubdivision());
+						}else {
+							voucherMap.put("subdivision", "-");
+						}
 					}
 					voucherMap.put("voucherdate", voucherheader.getVoucherDate());
 					voucherMap.put("fundname", voucherheader.getFundId().getName());
@@ -523,8 +587,23 @@ public class VoucherSearchAction extends BaseFormAction {
 					voucherList.add(voucherMap);
 				}
 			}
+			System.out.println(pagedResults.getList().size());
 	}
 		System.out.println("END");
+
+		
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
 		return SEARCH;
 	}
 
@@ -699,6 +778,8 @@ public class VoucherSearchAction extends BaseFormAction {
 					"voucher.fundsource.mandatory");
 			checkMandatoryField("vouchermis.divisionId", "field", voucherHeader.getVouchermis().getDivisionid(),
 					"voucher.field.mandatory");
+			checkMandatoryField("vouchermis.subdivision", "subdivision", voucherHeader.getVouchermis().getSubdivision(),
+					"voucher.subdivision.mandatory");
 		}
 	}
 
@@ -930,6 +1011,14 @@ public class VoucherSearchAction extends BaseFormAction {
 			e.printStackTrace();
 		}
     }
+
+		public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 	
 	
 

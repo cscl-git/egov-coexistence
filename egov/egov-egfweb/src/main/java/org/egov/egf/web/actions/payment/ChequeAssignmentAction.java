@@ -134,6 +134,8 @@ import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 import net.sf.jasperreports.engine.JRException;
 
 @ParentPackage("egov")
@@ -207,6 +209,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private String bank_branch;
     private String bank_account;
     private String department;
+    private String subdivision;
     public Map<String, String> modeOfPaymentMap;
     private Date chequeDt;
     private boolean chequeNoGenerationAuto;
@@ -415,8 +418,21 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         // overriding department Mandatory Condition only for cheque assignment search
         mandatoryFields.remove("department");
         mandatoryFields.remove("function");
+        mandatoryFields.remove("subdivision");
         deptNonMandatory = true;
         functionNonMandatory = true;
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return "search";
     }
 
@@ -576,6 +592,18 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         // typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS+","+FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeSearchForRemittance.");
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return "remittancePexSearch";
     }
 
@@ -689,6 +717,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
             LOGGER.debug("Starting beforeSearchForRemittance...");
         headerFields.remove("scheme");
         headerFields.remove("subscheme");
+        mandatoryFields.remove("subdivision");
         paymentMode = FinancialConstants.MODEOFPAYMENT_CASH;
         modeOfPaymentMap = new LinkedHashMap<String, String>();
         modeOfPaymentMap.put(FinancialConstants.MODEOFPAYMENT_CASH, getText("cash.consolidated.cheque"));
@@ -699,6 +728,18 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         // typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS+","+FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeSearchForRemittance.");
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return "before_remittance_search";
     }
 
@@ -855,6 +896,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     public String search() throws ApplicationException, ParseException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting search...");
+        System.out.println(voucherHeader.getVouchermis().getSubdivision());
+        System.out.println(voucherHeader.getVouchermis().getDepartmentcode());
         chequeSlNoMap = loadChequeSerialNo(bankaccount);
         chequeAssignmentList = paymentService.getPaymentVoucherNotInInstrument(parameters, voucherHeader);
         if (!paymentMode.equals(FinancialConstants.MODEOFPAYMENT_CHEQUE)) {
@@ -2991,6 +3034,18 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     public String beforePexSearch() {
         paymentMode = FinancialConstants.MODEOFPAYMENT_PEX;
         //rtgsContractorAssignment = true;
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return "pexSearch";
     }
     
@@ -2998,6 +3053,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-searchPEX")
     public String searchPEX() throws ApplicationException, ParseException {
+    	
+        voucherHeader.getVouchermis().setSubdivision(subdivision);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchRTGS...");
         List<ChequeAssignment> pexChequeAssignmentList;
@@ -3369,5 +3426,13 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed loadReasonsForSurrendaring.");
     }
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
 
 }

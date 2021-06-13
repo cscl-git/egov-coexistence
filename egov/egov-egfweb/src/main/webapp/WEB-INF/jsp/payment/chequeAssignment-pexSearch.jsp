@@ -49,6 +49,8 @@
 
 <%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
+
+<%@ page language="java"%>
 <html>
 <head>
 <link rel="stylesheet" type="text/css"
@@ -101,6 +103,9 @@
 					<td class="bluebox"><s:select name="billType" id="billType"
 							list="billTypeMap" headerKey="-1" headerValue="----Choose----"
 							value="%{billType}" /></td>
+					
+					
+							
 				</tr>
 				<tr>
 					<td class="greybox"><s:text name="voucher.fund" /></td>
@@ -136,7 +141,16 @@
 							headerKey="-1" headerValue="----Choose----"
 							value="%{bankaccount}" /></td>
 				</tr>
+                 <tr>
+                 <td class="greybox"><s:text
+							name="voucher.subdivision" /></td>
+					<td class="greybox"><s:select name="subdivision"
+							id="vouchermis.subdivision" list="dropdownData.subdivisionList"
+							listKey="subdivisionCode" listValue="subdivisionName" headerKey="-1"
+							headerValue="----Choose----"
+							value="voucherHeader.vouchermis.subdivision" /></td>
 
+                 </tr>
 
 				<!-- <tr> 	<td class="bluebox">
 				<s:text name="chq.assignment.re-assignsurrendercheque"/>

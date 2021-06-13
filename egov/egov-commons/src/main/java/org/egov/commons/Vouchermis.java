@@ -117,6 +117,9 @@ public class Vouchermis implements java.io.Serializable {
     @Column(name="servicename")
     private String serviceName;
 
+    @Column(name="subdivision")
+    private String subdivision;
+
     public Vouchermis() {
     }
 
@@ -280,5 +283,13 @@ public class Vouchermis implements java.io.Serializable {
 
 	public void setRecieptNumber(String recieptNumber) {
 		this.recieptNumber = recieptNumber;
+	}
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 }

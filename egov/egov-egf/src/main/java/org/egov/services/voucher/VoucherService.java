@@ -547,6 +547,7 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 			existingVH = getUpdatedVNumCGVN(existingVH, voucherHeader, voucherNumType);
 			existingVH.setFundId(voucherHeader.getFundId());
 			existingVH.getVouchermis().setDepartmentcode(voucherHeader.getVouchermis().getDepartmentcode());
+			existingVH.getVouchermis().setSubdivision(voucherHeader.getVouchermis().getSubdivision());
 			existingVH.getVouchermis().setFunction(voucherHeader.getVouchermis().getFunction());
 			existingVH.getVouchermis().setSchemeid(voucherHeader.getVouchermis().getSchemeid());
 			existingVH.getVouchermis().setSubschemeid(voucherHeader.getVouchermis().getSubschemeid());

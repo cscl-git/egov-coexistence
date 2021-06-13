@@ -80,6 +80,9 @@ public interface VoucherConstant {
     public static final String BUDGETARYAPPNUMBER = "budgetaryAppnumber";
     public static final String FUNCTIONARYCODE = "functionarycode";
     public static final String SOURCEPATH = "sourcepath";
+    
+    public static final String SUBDIVISION = "subdivision";
+    
     public static final String REFERENCEDOC = "referencedocument";
     public static final String SERVICE_NAME = "serviceName";
 

@@ -103,6 +103,7 @@ import org.egov.utils.VoucherHelper;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.transactions.VoucherTypeForULB;
 
 public class BaseVoucherAction extends GenericWorkFlowAction {
@@ -132,6 +133,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 	@Autowired
 	private CreateVoucher createVoucher;
 	Map<String, List<String>> voucherNames = VoucherHelper.VOUCHER_TYPE_NAMES;
+
+	List<AppConfigValues> appConfigValuesList=new ArrayList<AppConfigValues>();
 
 	@Autowired
 	protected EgovMasterDataCaching masterDataCache;
@@ -194,7 +197,19 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			addDropdownData("schemeList", Collections.emptyList());
 		if (headerFields.contains("subscheme"))
 			addDropdownData("subschemeList", Collections.emptyList());
-
+		if (headerFields.contains("subdivision"))
+			appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"receipt_sub_divison");
+	        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+	        SubDivision subdivision=null;
+	        for(AppConfigValues value:appConfigValuesList)
+	        {
+	        	subdivision = new SubDivision();
+	        	subdivision.setSubdivisionCode(value.getValue());
+	        	subdivision.setSubdivisionName(value.getValue());
+	        	subdivisionList.add(subdivision);
+	        }
+	        addDropdownData("subdivisionList", subdivisionList);
 		// addDropdownData("typeList",
 		// persistenceService.findAllBy(" select distinct vh.type from
 		// CVoucherHeader vh where vh.status!=4 order by vh.type"));
@@ -227,6 +242,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 	}
 
 	public void populateWorkflowBean() {
+		
 		workflowBean.setApproverPositionId(approverPositionId);
 		workflowBean.setApproverComments(approverComments);
 		workflowBean.setWorkFlowAction(workFlowAction);
@@ -270,6 +286,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 							voucherHeader.getVouchermis().getSchemeid().getId()));
 	}
 
+	
+
 	protected void loadFundSource() {
 		if (headerFields.contains("fundsource") && null != voucherHeader.getVouchermis().getSubschemeid()) {
 			final List<Fundsource> fundSourceList = financingSourceService
@@ -286,6 +304,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		headerdetails.put(VoucherConstant.VOUCHERNUMBER, voucherHeader.getVoucherNumber());
 		headerdetails.put(VoucherConstant.VOUCHERDATE, voucherHeader.getVoucherDate());
 		headerdetails.put(VoucherConstant.DESCRIPTION, voucherHeader.getDescription());
+		headerdetails.put(VoucherConstant.SUBDIVISION, voucherHeader.getSubdivision());
 
 		if (voucherHeader.getVouchermis().getDepartmentcode() != null)
 			headerdetails.put(VoucherConstant.DEPARTMENTCODE, voucherHeader.getVouchermis().getDepartmentcode());
@@ -331,7 +350,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		checkMandatoryField("fundsource", voucherHeader.getVouchermis().getFundsource(),
 				"voucher.fundsource.mandatory");
 		checkMandatoryField("field", voucherHeader.getVouchermis().getDivisionid(), "voucher.field.mandatory");
-
+		//checkMandatoryField("subdivision", voucherHeader.getVouchermis().getSubdivision(), "voucher.subdivision.mandatory");
 	}
 
 	protected void checkMandatoryField(final String fieldName, final Object value, final String errorKey) {
@@ -519,6 +538,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 																			// details
 																			// about
 		// the account code those are detail codes.
+		
 		final List<String> repeatedglCodes = VoucherHelper.getRepeatedGlcodes(billDetailslist);
 		for (final VoucherDetails voucherDetails : billDetailslist) {
 			final CChartOfAccountDetail chartOfAccountDetail = (CChartOfAccountDetail) getPersistenceService().find(
@@ -691,6 +711,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		}
 	}
 
+	
 	public boolean isFieldMandatory(final String field) {
 		return mandatoryFields.contains(field);
 	}

@@ -50,84 +50,49 @@
 <%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <tr>
-	<td style="width: 5%"></td>
+	<td class="greybox"></td>
 	<s:if test="%{shouldShowHeaderField('fund')}">
 		<td class="greybox"><s:text name="voucher.fund" /> <s:if
 				test="%{isFieldMandatory('fund')}">
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
-		<td class="greybox"><s:select name="fundId" id="fundId"
+		<td class="greybox"><s:select name="fundId" id="fundId" disabled="true"
 				list="dropdownData.fundList" listKey="id" listValue="name"
-				headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+				headerKey="" headerValue="%{getText('lbl.choose.options')}"
 				onChange="populateSchemes(this);loadBank(this);"
 				value="%{fundId.id}" /></td>
 	</s:if>
-	<s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>
-	<s:if test="%{shouldShowHeaderField('department')}">
-		<td class="greybox" id="deptLabel"><s:text
-				name="voucher.department" /> <s:if
-				test="%{isFieldMandatory('department')}">
-				<span class="bluebox"><span class="mandatory1">*</span></span>
-			</s:if></td>
-		<td class="greybox"><s:select name="vouchermis.departmentcode"
-				id="vouchermis.departmentid" list="dropdownData.departmentList"
-				listKey="code" listValue="name" headerKey="-1"
-				headerValue="%{getText('lbl.choose.options')}"
-				value="voucherHeader.vouchermis.departmentcode" /></td>
-		
-	</s:if>
-	<s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>
-</tr>
-<s:if test="%{shouldShowHeaderField('scheme') || shouldShowHeaderField('subscheme')}">
-	<tr>
-		<td style="width: 5%"></td>
-		<s:if test="%{shouldShowHeaderField('scheme')}">
-			<egov:ajaxdropdown id="scheme" fields="['Text','Value']"
-				dropdownId="schemeid" url="voucher/common-ajaxLoadSchemes.action" />
-	
-			<td class="greybox"><s:text name="voucher.scheme" /> <s:if
-					test="%{isFieldMandatory('scheme')}">
-					<span class="mandatory1">*</span>
-				</s:if></td>
-			<td class="greybox"><s:select list="dropdownData.schemeList"
-					name="vouchermis.schemeid" id="schemeid" listKey="id"
-					listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
-					onChange="populatesubSchemes(this)"
-					value="voucherHeader.vouchermis.schemeid.id" /></td>
-		</s:if>
-		<s:else>
-			<td class="greybox"></td>
-			<td class="greybox"></td>
-		</s:else>
-		<s:if test="%{shouldShowHeaderField('subscheme')}">
-			<egov:ajaxdropdown id="subscheme" fields="['Text','Value']"
-				dropdownId="subschemeid"
-				url="voucher/common-ajaxLoadSubSchemes.action" />
-			<td class="bluebox"><s:text name="voucher.subscheme" /> <s:if
-					test="%{isFieldMandatory('subscheme')}">
-					<span class="mandatory1">*</span>
-				</s:if></td>
-			<td class="bluebox"><s:select name="vouchermis.subschemeid"
-					id="subschemeid" list="dropdownData.subschemeList" listKey="id"
-					listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
-					value="voucherHeader.vouchermis.subschemeid.id"
-					onChange="populateFundSource(this)" /></td>
-		</s:if>
-		<s:else>
-			<td class="greybox"></td>
-			<td class="greybox"></td>
-		</s:else>
-	</tr>
-</s:if>
-<tr>
-	<td style="width: 5%"></td>
+	<s:if test="%{shouldShowHeaderField('scheme')}">
+		<egov:ajaxdropdown id="scheme" fields="['Text','Value']"
+			dropdownId="schemeid" url="voucher/common-ajaxLoadSchemes.action" />
 
+		<td class="greybox"><s:text name="voucher.scheme" /> <s:if
+				test="%{isFieldMandatory('scheme')}">
+				<span class="mandatory1">*</span>
+			</s:if></td>
+		<td class="greybox"><s:select list="dropdownData.schemeList" disabled="true"
+				name="vouchermis.schemeid" id="schemeid" listKey="id"
+				listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+				onChange="populatesubSchemes(this)"
+				value="voucherHeader.vouchermis.schemeid.id" /></td>
+	</s:if>
+</tr>
+<tr>
+	<td class="bluebox"></td>
+	<s:if test="%{shouldShowHeaderField('subscheme')}">
+		<egov:ajaxdropdown id="subscheme" fields="['Text','Value']"
+			dropdownId="subschemeid"
+			url="voucher/common-ajaxLoadSubSchemes.action" />
+		<td class="bluebox"><s:text name="voucher.subscheme" /> <s:if
+				test="%{isFieldMandatory('subscheme')}">
+				<span class="mandatory1">*</span>
+			</s:if></td>
+		<td class="bluebox"><s:select name="vouchermis.subschemeid" disabled="true"
+				id="subschemeid" list="dropdownData.subschemeList" listKey="id"
+				listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
+				value="voucherHeader.vouchermis.subschemeid.id"
+				onChange="populateFundSource(this)" /></td>
+	</s:if>
 	<s:if test="%{shouldShowHeaderField('fundsource')}">
 		<egov:ajaxdropdown id="fundsource" fields="['Text','Value']"
 			dropdownId="fundsourceId"
@@ -136,91 +101,87 @@
 				test="%{isFieldMandatory('fundsource')}">
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
-		<td class="bluebox"><s:select name="vouchermis.fundsource"
+		<td class="bluebox"><s:select name="vouchermis.fundsource" disabled="true"
 				id="fundsourceId" list="dropdownData.fundsourceList" listKey="id"
 				listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 				value="voucherHeader.vouchermis.fundsource.id" /></td>
+				
 	</s:if>
-	<s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>
-	
-	<s:if test="%{shouldShowHeaderField('subdivision')}">
+</tr>
+<tr>
+	<td class="greybox"></td>
+
+	<s:if test="%{shouldShowHeaderField('department')}">
+		<td class="greybox"><s:text name="voucher.department" /> <s:if
+				test="%{isFieldMandatory('department')}">
+				<span class="bluebox"><span class="mandatory1">*</span></span>
+			</s:if></td>
+		<td class="greybox"><s:select name="vouchermis.departmentcode" disabled="true"
+				id="vouchermis.departmentid" list="dropdownData.departmentList"
+				listKey="code" listValue="name" headerKey=""
+				headerValue="%{getText('lbl.choose.options')}"
+				value="%{voucherHeader.vouchermis.departmentcode}"
+				 /></td>
+	</s:if>
+				 
+		<s:if test="%{shouldShowHeaderField('subdivision')}">
 		<td class="greybox"><s:text name="voucher.subdivision" /> <s:if
 				test="%{isFieldMandatory('subdivision')}">
-				<span class="mandatory1">*</span>
+				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
 		<td class="bluebox">
-		  <s:select headerKey="-1"
-			headerValue="%{getText('lbl.choose.options')}" name="vouchermis.subdivision" id="vouchermis.subdivision" 
+		  <s:select headerKey="-1" 
+			headerValue="%{getText('lbl.choose.options')}" name="vouchermis.subdivision" id="subdivision" 
 			cssClass="selectwk" list="dropdownData.subdivisionList" 
 			listKey="subdivisionCode" listValue="subdivisionName"  
 			value="%{voucherHeader.vouchermis.subdivision}"/>
-		 </td>
-		 </s:if>
-     <s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>	
+		 </td>  
+	</s:if>
 	
 	<s:if test="%{shouldShowHeaderField('field')}">
 		<td class="greybox"><s:text name="voucher.field" /> <s:if
 				test="%{isFieldMandatory('field')}">
 				<span class="mandatory1">*</span>
 			</s:if></td>
-		<td class="greybox"><s:select name="vouchermis.divisionid"
+		<td class="greybox"><s:select name="vouchermis.divisionid" disabled="true"
 				id="vouchermis.divisionid" list="dropdownData.fieldList"
 				listKey="id" listValue="name" headerKey="-1"
 				headerValue="%{getText('lbl.choose.options')}"
 				value="voucherHeader.vouchermis.divisionid.id" /></td>
 	</s:if>
-	<s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>
 </tr>
 <tr>
-	<td style="width: 5%"></td>
-	<s:if test="%{shouldShowHeaderField('function')}">
-		<td id="functionnametext" class="bluebox"><s:text
-				name="voucher.function" /> 
-				<span class="bluebox"><span class="mandatory1">*</span></span>
-			</td>
-		<td class="bluebox"><s:select name="vouchermis.function"
-				id="vouchermis.function" list="dropdownData.functionList"
-				listKey="id" listValue="name" headerKey="-1"
-				headerValue="%{getText('lbl.choose.options')}" value="%{vouchermis.function.id}" /></td>
-	</s:if>
-
-	<s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>
+	<td class="bluebox"></td>
 	<s:if test="%{shouldShowHeaderField('functionary')}">
 		<td class="bluebox"><s:text name="voucher.functionary" /> <s:if
 				test="%{isFieldMandatory('functionary')}">
 				<span class="bluebox"><span class="mandatory1">*</span></span>
 			</s:if></td>
-		<td class="bluebox"><s:select name="vouchermis.functionary"
+		<td class="bluebox"><s:select name="vouchermis.functionary" disabled="true"
 				id="vouchermis.functionary" list="dropdownData.functionaryList"
 				listKey="id" listValue="name" headerKey="-1"
 				headerValue="%{getText('lbl.choose.options')}"
-				value="voucherHeader.vouchermis.functionary.id" /></td>
+				value="voucherHeader.vouchermis.functionary.id" style="width:180px" /></td>
 	</s:if>
-	<s:else>
-		<td class="greybox"></td>
-		<td class="greybox"></td>
-	</s:else>
-	<input type="hidden" name="voucherHeader.allowNegetive" id="voucherHeader.allowNegetive" />
+	<s:if test="%{shouldShowHeaderField('function')}">
+		<td class="bluebox"><s:text name="voucher.function" /> 
+				<span class="bluebox"><span class="mandatory1">*</span></span>
+			</td>
+		<td class="bluebox"><s:select name="vouchermis.function" disabled="true"
+				id="vouchermis.function" list="dropdownData.functionList"
+				listKey="id" listValue="name" headerKey="" 
+				headerValue="%{getText('lbl.choose.options')}" value="%{vouchermis.function.id}" /></td>
+	</s:if>
 
 </tr>
-<script type="text/javascript">
+
+
+<script>
 function populateSchemes(fund){
 	if(null != document.getElementById("schemeid")){
 		populateschemeid({fundId:fund.options[fund.selectedIndex].value});
 		populatesubschemeid({schemeId:-1});
-	//	populatefundsourceId({subSchemeId:-1});	
+		//populatefundsourceId({subSchemeId:-1});	
 	}
 		
 }
@@ -233,12 +194,15 @@ function populateFundSource(subSchemeId){
 	
 	populatefundsourceId({subSchemeId:subSchemeId.options[subSchemeId.selectedIndex].value});	
 }
+function populateApproverDept(dept){
+//	populateApprverDeptId({departmentId:departmentId.options[departmentId.selectedIndex].value});
+}
 function validateMIS(){
 	// Javascript validation of the MIS Manadate attributes.
 			<s:if test="%{isFieldMandatory('vouchernumber')}"> 
 				 if(null != document.getElementById('voucherNumber') && document.getElementById('voucherNumber').value.trim().length == 0 ){
 
-					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.number'/> ";
+					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.enter.voucher.number'/>";
 					return false;
 				 }
 			 </s:if>
@@ -250,56 +214,49 @@ function validateMIS(){
 				 }
 			 </s:if>
 		 <s:if test="%{isFieldMandatory('fund')}"> 
-				 if(null != document.getElementById('fundId') && document.getElementById('fundId').value == -1){
+				 if(null != document.getElementById('fundId') && document.getElementById('fundId').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fund'/>";
 					return false;
 				 }
 			 </s:if>
 			<s:if test="%{isFieldMandatory('department')}"> 
-				 if(null!= document.getElementById('vouchermis.departmentid') && document.getElementById('vouchermis.departmentid').value == -1){
+				 if(null!= document.getElementById('vouchermis.departmentid') && document.getElementById('vouchermis.departmentid').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.department'/>";
 					return false;
 				 }
 			</s:if>
-			<s:if test="%{isFieldMandatory('subdivision')}"> 
-			 if(null!= document.getElementById('vouchermis.subdivision') && document.getElementById('vouchermis.subdivision').value == -1){
-
-				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.subdivision'/>";
-				return false;
-			 }
-		    </s:if>
 			<s:if test="%{isFieldMandatory('scheme')}"> 
-				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value == -1){
+				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.scheme'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('subscheme')}"> 
-				 if(null!= document.getElementById('subschemeid') && document.getElementById('subschemeid').value == -1){
+				 if(null!= document.getElementById('subschemeid') && document.getElementById('subschemeid').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.sub.scheme'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('functionary')}"> 
-				 if(null!=document.getElementById('vouchermis.functionary') &&  document.getElementById('vouchermis.functionary').value == -1){
+				 if(null!=document.getElementById('vouchermis.functionary') &&  document.getElementById('vouchermis.functionary').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.functionary'/>";
 					return false;
 				 }
 			</s:if>
 			<s:if test="%{isFieldMandatory('fundsource')}"> 
-				 if(null !=document.getElementById('fundsourceId') &&  document.getElementById('fundsourceId').value == -1){
+				 if(null !=document.getElementById('fundsourceId') &&  document.getElementById('fundsourceId').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.fundsource'/>";
 					return false;
 				}
 			</s:if>
 			<s:if test="%{isFieldMandatory('field')}"> 
-				 if(null!= document.getElementById('vouchermis.divisionid') && document.getElementById('vouchermis.divisionid').value == -1){
+				 if(null!= document.getElementById('vouchermis.divisionid') && document.getElementById('vouchermis.divisionid').value ==""){
 
 					document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.field'/>";
 					return false;
@@ -313,4 +270,25 @@ function validateMIS(){
 			</s:if>
 			return  true;
 }
+
+	/* 
+		if(null != document.getElementById('departmentid') &&  null != document.getElementById('approverUserId')){
+			if(dept.options[dept.selectedIndex].value != ""){
+				document.getElementById('departmentid').value = dept.options[dept.selectedIndex].value;
+			}else{
+				document.getElementById('departmentid').value = -1;
+			} */
+		
+			
+/* if(null != document.getElementById('departmentid')){
+		<s:if test="%{isFieldMandatory('department')}"> 
+				document.getElementById('departmentid').disabled="true";
+				populateUser();
+		</s:if>
+		<s:else>
+			populateDesg();
+		</s:else>
+	} */
+
+			
 	</script>

@@ -156,8 +156,18 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     private Date billFrom;
     @Transient
     private Date billTo;
+    @Transient
+    private String subdivision;
     
     
+    public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
+
     private String firstsignatory;
     private String secondsignatory;
     private String postauditprocessing;

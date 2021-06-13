@@ -222,6 +222,8 @@ public class VoucherSearchUtil {
 			sql = sql + " and vh.vouchermis.functionary=" + voucherHeader.getVouchermis().getFunctionary().getId();
 		if (voucherHeader.getVouchermis().getDivisionid() != null)
 			sql = sql + " and vh.vouchermis.divisionid=" + voucherHeader.getVouchermis().getDivisionid().getId();
+		if (voucherHeader.getVouchermis().getSubdivision() != null && !voucherHeader.getVouchermis().getSubdivision().equalsIgnoreCase("-1"))
+			sql = sql + " and vh.vouchermis.subdivision='" + voucherHeader.getVouchermis().getSubdivision()+"'";
 		final String sql1 = sql
 				+ " and  (vh.id  in (select voucherHeader.id from EgBillregistermis) and vh.id not in (select billVoucherHeader.id from Miscbilldetail where billVoucherHeader is not null and  payVoucherHeader  in (select id from CVoucherHeader where status not in (4,1) and type='Payment')) )";
 		final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("finance",
@@ -282,6 +284,9 @@ public class VoucherSearchUtil {
 			sql = sql + " and vh.vouchermis.recieptNumber like '%" + voucherHeader.getVouchermis().getRecieptNumber() + "%'";
 		if (voucherHeader.getVouchermis().getServiceName()!=null && !"".equals(voucherHeader.getVouchermis().getServiceName()))
 			sql = sql + " and vh.vouchermis.serviceName like '%" + voucherHeader.getVouchermis().getServiceName() + "%'";
+		if (voucherHeader.getVouchermis().getSubdivision()!=null && !"".equals(voucherHeader.getVouchermis().getSubdivision())
+				&& !voucherHeader.getVouchermis().getSubdivision().equalsIgnoreCase("-1"))
+			sql = sql + " and vh.vouchermis.subdivision='" + voucherHeader.getVouchermis().getSubdivision()+"'";
 
 		return sql;
 	}

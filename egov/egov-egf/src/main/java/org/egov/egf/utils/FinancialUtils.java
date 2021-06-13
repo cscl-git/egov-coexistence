@@ -451,4 +451,9 @@ public class FinancialUtils {
         return documentDetailsList;
     }
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW, readOnly = true)
+	public EgwStatus getEgwStatusByCode(String code) {
+		return egwStatusHibernateDAO.getEgwStatusByCode(code);
+	}
+
 }

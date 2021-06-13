@@ -138,6 +138,8 @@ public abstract class BaseVoucherController extends GenericWorkFlowController {
             model.addAttribute("schemes", Collections.emptyList());
         if (headerFields.contains("subscheme"))
             model.addAttribute("subschemes", Collections.emptyList());
+        if (headerFields.contains("subdivision"))
+            model.addAttribute("subdivision", Collections.emptyList());
 
         model.addAttribute("headerFields", headerFields);
         model.addAttribute("mandatoryFields", mandatoryFields);

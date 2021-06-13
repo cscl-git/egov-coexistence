@@ -48,7 +48,8 @@
 
 
 <%@ include file="/includes/taglibs.jsp"%>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+<%@taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ page language="java"%>
 <html>
 <head>
@@ -132,8 +133,12 @@
 						<tr>
 							<td class="bluebox"><s:text name="bill.Number" /></td>
 							<td class="bluebox"><s:textfield name="billNumber" id="billNumber" maxlength="50" value="%{billNumber}" /></td>
-							<td class="bluebox"></td>
-							<td class="bluebox"></td>
+							<td class="bluebox"><s:text name="voucher.subdivision" /></td>
+							<td class="bluebox">
+							<s:select name="vouchermis.subdivision" id="subdivision" list="dropdownData.subdivisionList"
+							 listKey="subdivisionCode" listValue="subdivisionName" headerKey="-1" headerValue="----Choose----" 
+							 value="voucherHeader.vouchermis.subdivision" />
+							</td>
 						</tr>
 
 					</table>
@@ -165,6 +170,7 @@
 						<th class="bluebgheadtd"><s:text name="lbl.passed.amount"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.expenditure.type"/></th>
 						<th class="bluebgheadtd"><s:text name="lbl.department"/></th>
+						<th class="bluebgheadtd"><s:text name="lbl.subdivision"/></th>
 					</tr>
 					<s:iterator var="p" value="preApprovedVoucherList" status="s">
 						<tr class="setborder">
@@ -176,6 +182,7 @@
 							<td class="bluebox setborder" style="text-align: right"><s:text name="format.number"> <s:param value="%{passedamount}" /> </s:text></td>
 							<td class="bluebox setborder" style="text-align: center"><s:property value="%{expendituretype}" /></td>
 							<td class="bluebox setborder" style="text-align: center"><s:property value="%{egBillregistermis.departmentName}" /></td>
+							<td class="bluebox setborder" style="text-align: center"><s:property value="%{egBillregistermis.subdivision}" /></td>
 						</tr>
 					</s:iterator>
 				</table>

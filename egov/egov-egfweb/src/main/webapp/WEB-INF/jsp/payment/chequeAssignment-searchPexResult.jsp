@@ -84,6 +84,10 @@
 
 					<th class="bluebgheadtdnew"><s:text
 							name="chq.assignment.department.name" /></th>
+							
+					<th class="bluebgheadtdnew"><s:text
+							name="chq.assignment.subdivision.name" /></th>		
+							
 					<th class="bluebgheadtdnew"><s:text
 							name="chq.assignment.payment.voucherno" /></th>
 					<th class="bluebgheadtdnew"><s:text
@@ -130,6 +134,12 @@
 									id="departmentName" name="pexList[%{#counter}].departmentName"
 									value="%{departmentName}" /> <s:property
 									value="%{departmentName}" /></td>
+									
+							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
+									id="subdivisionName" name="pexList[%{#counter}].subdivisionName"
+									value="%{subdivisionName}" /> <s:property
+									value="%{subdivisionName}" /></td>				
+									
 							<td style="text-align: center" class="blueborderfortdnew"><s:hidden
 									id="voucherNumber" name="pexList[%{#counter}].voucherNumber"
 									value="%{voucherNumber}" /><a href="javascript:void(0);"

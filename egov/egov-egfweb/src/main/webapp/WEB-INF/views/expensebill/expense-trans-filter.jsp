@@ -233,7 +233,41 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
-	
+	 <c:choose>
+		<c:when test="${headerFields.contains('subdivision')}">
+		
+			<c:choose>
+				<c:when test="${mandatoryFields.contains('subdivision')}">
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subdivision" />
+						<span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.subdivision" data-first-option="false" id="subdivision" class="form-control" required="required">
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${subdivision}" itemValue="subdivisionName" itemLabel="subdivisionName" />
+						</form:select>
+						<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
+					</div>
+				</c:when>
+				<c:otherwise>
+					<label class="col-sm-2 control-label text-right"><spring:message code="lbl.subdivision" />
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="egBillregistermis.subdivision" data-first-option="false" id="subdivision" class="form-control" >
+							<form:option value=""><spring:message code="lbl.select" /></form:option>
+							<form:options items="${subdivision}" itemValue="subdivisionName" itemLabel="subdivisionName" />
+						</form:select>
+						<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
+					</div>
+				</c:otherwise>
+			</c:choose>
+		</c:when>
+		<c:otherwise>
+			<label class="col-sm-2 control-label text-right"></label>
+			<div class="col-sm-3 add-margin">
+			</div>
+		</c:otherwise>
+	</c:choose>
 	<c:choose>
 		<c:when test="${headerFields.contains('field')}">
 			<c:choose>

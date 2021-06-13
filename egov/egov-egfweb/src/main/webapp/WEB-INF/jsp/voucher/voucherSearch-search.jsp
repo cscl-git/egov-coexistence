@@ -202,6 +202,12 @@
 								style="text-align:center;">
 								<s:property value="%{#attr.currentRowObject.deptName}" />
 							</display:column>
+							
+							<display:column title="Sub Division"
+								style="text-align:center;">
+								<s:property value="%{#attr.currentRowObject.subdivision}" />
+							</display:column> 
+							
 							<display:column title="Total Amount" style="text-align:right;">
 								<s:property value="%{#attr.currentRowObject.amount}" />
 							</display:column>

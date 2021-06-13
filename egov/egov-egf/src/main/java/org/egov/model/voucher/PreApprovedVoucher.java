@@ -72,6 +72,8 @@ public class PreApprovedVoucher {
     private BigDecimal creditAmount = BigDecimal.ZERO;
     private BigDecimal amount = BigDecimal.ZERO;
     private Date voucherDate;
+    private Long glcodeID;
+    private String gl_code;
 
     public Long getFunctionIdDetail() {
         return functionIdDetail;
@@ -200,5 +202,21 @@ public class PreApprovedVoucher {
     public void setVoucherDate(final Date voucherDate) {
         this.voucherDate = voucherDate;
     }
+
+	public Long getGlcodeID() {
+		return glcodeID;
+	}
+
+	public void setGlcodeID(Long glcodeID) {
+		this.glcodeID = glcodeID;
+	}
+
+	public String getGl_code() {
+		return gl_code;
+	}
+
+	public void setGl_code(String gl_code) {
+		this.gl_code = gl_code;
+	}
 
 }

@@ -147,6 +147,26 @@
 																	<td class="greybox">
 																	<td class="greybox">
 																</s:else>
+																
+																<s:if test="%{shouldShowHeaderField('subdivision')}">
+																	<td class="greybox"><strong><s:text
+																				name="voucher.subdivision" /></strong> <s:if
+																			test="%{isFieldMandatory('subdivision')}">
+																			<span class="bluebox"><span class="mandatory1">*</span></span>
+																		</s:if></td>
+																	<td class="greybox"><s:select name="subdivision"
+																	        headerValue="%{getText('lbl.choose.options')}" headerKey="-1"
+																			id="subdivision" list="dropdownData.subdivisionList"
+																			listKey="subdivisionCode" listValue="subdivisionName" 
+																			value="%{billregister.egBillregistermis.voucherHeader.vouchermis.subdivision}" /></td>
+																	
+																</s:if>
+																<s:else>
+																	<td class="greybox">
+																	<td class="greybox">
+																</s:else>
+																
+																
 																<s:if test="%{shouldShowHeaderField('functionary')}">
 																	<td class="greybox"><strong><s:text
 																				name="voucher.functionary" /></strong> <s:if
@@ -694,6 +714,12 @@
 				undoLoadingMask();
 				return false;
 			}
+			if(dom.get('subdivision').value=='-1')
+			{
+				bootbox.alert("<s:text name='msg.please.select.subdivision'/>");
+				undoLoadingMask();
+				return false;
+			}
 			if(dom.get('function').value=='-1')
 			{
 				bootbox.alert("<s:text name='msg.please.select.function'/>");
@@ -735,6 +761,17 @@
 			{
 				secondsignatory=dom.get('secondsignatory').value;
 			}
+			var subdivision=''
+				if(dom.get('subdivision') == null || dom.get('subdivision').value == '-1')
+				{
+					bootbox.alert("Please select subdivision");
+					undoLoadingMask();
+					return false;
+				}
+				else
+				{
+					subdivision=dom.get('subdivision').value;
+				}
 			var backlogEntry='';
 			if(dom.get('backlogEntry') == null || dom.get('backlogEntry').value == '-1')
 			{
@@ -793,7 +830,7 @@
 			if(jQuery("#bankBalanceCheck").val()==noBalanceCheck)
 			{
 				billIdsToPaymentAmountsap('billList','billIdsToPaymentAmountsMapId');
-			 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+			 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry+'&subdivision='+subdivision;
 			 document.forms[0].submit();
 			}
 			else if(!balanceCheck() && jQuery("#bankBalanceCheck").val()==balanceCheckMandatory){
@@ -805,7 +842,7 @@
 					 var msg = confirm("<s:text name='msg.insuff.bank.bal.do.you.want.to.process'/>");
 					 if (msg == true) {
 						 billIdsToPaymentAmountsMap('billList','billIdsToPaymentAmountsMapId');
-						 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+						 document.forms[0].action='${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry+'&subdivision='+subdivision;
 						 document.forms[0].submit();
 					 } else {
 						 undoLoadingMask();
@@ -815,7 +852,7 @@
 			else
 			{
 				billIdsToPaymentAmountsMap('billList','billIdsToPaymentAmountsMapId');
-				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry;
+				document.forms[0].action = '${pageContext.request.contextPath}/payment/payment-create.action?secondsignatory='+secondsignatory+'&firstsignatory='+firstsignatory+'&backlogEntry='+backlogEntry+'&subdivision='+subdivision;
 				document.forms[0].submit();
 			}
 		}  

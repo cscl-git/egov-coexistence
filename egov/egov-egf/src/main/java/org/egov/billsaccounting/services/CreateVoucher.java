@@ -477,6 +477,9 @@ public class CreateVoucher {
 			if (billMis.getDepartmentcode() != null) {
 				headerDetails.put(VoucherConstant.DEPARTMENTCODE, billMis.getDepartmentcode());
 			}
+			if (billMis.getSubdivision() != null) {
+				headerDetails.put(VoucherConstant.SUBDIVISION, billMis.getSubdivision());
+			}
 			if (billMis.getFund() != null)
 				headerDetails.put(VoucherConstant.FUNDCODE, billMis.getFund().getCode());
 			if (billMis.getScheme() != null)
@@ -1560,6 +1563,7 @@ public class CreateVoucher {
 		checkMandatoryField("fundsource", headerdetails.get(VoucherConstant.FUNDSOURCECODE), headerdetails,
 				headerMandateFields);
 		checkMandatoryField("field", headerdetails.get(VoucherConstant.DIVISIONID), headerdetails, headerMandateFields);
+		//checkMandatoryField("subdivision", headerdetails.get(VoucherConstant.SUBDIVISION), headerdetails, headerMandateFields);
 
 	}
 
@@ -1921,6 +1925,10 @@ public class CreateVoucher {
 		if(headerdetails.containsKey(VoucherConstant.BUDGETARYAPPNUMBER) && null != headerdetails.get(VoucherConstant.BUDGETARYAPPNUMBER)){
 		    final String budgetAppNo = headerdetails.get(VoucherConstant.BUDGETARYAPPNUMBER).toString();
 		    vouchermis.setBudgetaryAppnumber(budgetAppNo);
+		}
+		if(headerdetails.containsKey(VoucherConstant.SUBDIVISION) && null != headerdetails.get(VoucherConstant.SUBDIVISION)){
+		    final String subdivision = headerdetails.get(VoucherConstant.SUBDIVISION).toString();
+		    vouchermis.setSubdivision(subdivision);
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("END | createVouchermis");
@@ -2738,6 +2746,8 @@ public class CreateVoucher {
 					voucherHeader.getVouchermis().getFunctionary().getCode());
 		if (voucherHeader.getVouchermis().getFunction() != null)
 			headerdetails.put(VoucherConstant.FUNCTIONCODE, voucherHeader.getVouchermis().getFunction().getCode());
+		if (voucherHeader.getVouchermis().getSubdivision() != null)
+			headerdetails.put(VoucherConstant.SUBDIVISION, voucherHeader.getVouchermis().getSubdivision());
 		return headerdetails;
 	}
 

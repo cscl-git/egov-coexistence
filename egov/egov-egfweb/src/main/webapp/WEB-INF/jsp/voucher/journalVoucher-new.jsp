@@ -437,6 +437,13 @@
 					return false;
 				 }
 			</s:if>
+			<s:if test="%{isFieldMandatory('subdivision')}"> 
+			 if(null!= document.getElementById('vouchermis.subdivision') && document.getElementById('vouchermis.subdivision').value == -1){
+
+				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.subdivision'/>";
+				return false;
+			 }
+		    </s:if>
 			<s:if test="%{isFieldMandatory('scheme')}"> 
 				 if(null!=document.getElementById('schemeid') &&  document.getElementById('schemeid').value == -1){
 

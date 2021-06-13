@@ -95,6 +95,7 @@ public class BillRegisterReportBean {
     private String voucherDate;
     private String bpvDate;
     private String bankaccount;
+    private String subdivision;
     private BigDecimal taxAmount;
     private BigDecimal igstAmount;
     private BigDecimal cgstAmount;
@@ -541,6 +542,14 @@ public class BillRegisterReportBean {
 
 	public void setAdminServiceChargesAmount(BigDecimal adminServiceChargesAmount) {
 		this.adminServiceChargesAmount = adminServiceChargesAmount;
+	}
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 
 	

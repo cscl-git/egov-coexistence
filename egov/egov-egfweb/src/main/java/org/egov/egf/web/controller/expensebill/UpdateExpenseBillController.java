@@ -112,6 +112,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 @Controller
 @RequestMapping(value = "/expensebill")
 public class UpdateExpenseBillController extends BaseBillController {
@@ -211,6 +213,20 @@ public class UpdateExpenseBillController extends BaseBillController {
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
         setDropDownValues(model);
+		
+		 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"receipt_sub_divison");
+	        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+	        SubDivision subdivision=null;
+	        for(AppConfigValues value:appConfigValuesList)
+	        {
+	        	subdivision = new SubDivision();
+	        	subdivision.setSubdivisionCode(value.getValue());
+	        	subdivision.setSubdivisionName(value.getValue());
+	        	subdivisionList.add(subdivision);
+	        }
+	        model.addAttribute("subdivision", subdivisionList);
+		
         model.addAttribute(BILL_TYPES, BillType.values());
         model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
         if (egBillregister.getState() != null)
@@ -258,11 +274,13 @@ public class UpdateExpenseBillController extends BaseBillController {
                         || financialUtils.isBillEditable(egBillregister.getState()))) {
             model.addAttribute("mode", "edit");
             model.addAttribute("viewBudget", "Y");
+			model.addAttribute("egBillregister", egBillregister);
             return "expensebill-update";
         } 
         else if (egBillregister.getState() != null
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
+            model.addAttribute("egBillregister", egBillregister);
             model.addAttribute("validActionList", validActions);
             model.addAttribute("viewBudget", "Y");
             return "expensebill-update";
@@ -276,6 +294,7 @@ public class UpdateExpenseBillController extends BaseBillController {
 
             model.addAttribute("budgetDetails", budgetDetails);
             model.addAttribute("viewBudget", "Y");
+			model.addAttribute("egBillregister", egBillregister);
             return EXPENSEBILL_UPDATE_WORKFLOW;
         }
     }
@@ -286,13 +305,15 @@ public class UpdateExpenseBillController extends BaseBillController {
             final HttpServletRequest request, @RequestParam final String workFlowAction)
             throws ApplicationException, IOException {
 
+    	System.out.println("In update controller");
+    	
         String mode = "";
         EgBillregister updatedEgBillregister = null;
 
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
         
-        System.out.println("Update save method 1");
+        
         if(egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
         	mode="cancel";
@@ -303,6 +324,7 @@ public class UpdateExpenseBillController extends BaseBillController {
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         if(uploadedFiles!=null)
         for (int i = 0; i < uploadedFiles.length; i++) {
+
             Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
             byte[] fileBytes = Files.readAllBytes(path);
             ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);

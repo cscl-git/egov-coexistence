@@ -137,7 +137,7 @@
 		<div class="form-group">
 			<label class="col-sm-3 control-label text-right"><spring:message
 						code="lbl.meeting.document" /><span class="mandatory"></span></label>
-			<div class="col-sm-8 add-margin">
+			<div class="col-sm-3 add-margin">
 				<c:choose>
 					<c:when test="${councilMeeting.filestoreid != null}">
 	
@@ -167,6 +167,17 @@
 					</c:otherwise>
 				</c:choose>
 			</div>
+			
+				<label class="col-sm-2 control-label text-right">Is Meeting Postponed
+					?</label> 
+					<div class="col-sm-3 add-margin">
+					<input type="radio" name="meetingpostone" id="postYes"
+					class="poststatus" value="Yes"><span>YES</span> <input
+					type="radio" name="meetingpostone" id="postNo" class="poststatus"
+					value="No" checked="checked"><span>NO</span>
+					</div>
+					
+			
 		</div>
 	</div>
 </div>

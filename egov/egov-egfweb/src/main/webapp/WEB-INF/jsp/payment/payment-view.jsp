@@ -179,6 +179,21 @@ function openBudgetDtls()
 																			headerValue="%{getText('lbl.choose.options')}"
 																			value="%{paymentheader.voucherheader.vouchermis.departmentcode}" /></td>
 																</s:if>
+																
+																<s:if test="%{shouldShowHeaderField('subdivision')}">
+																	<td class="greybox"><strong><s:text
+																				name="voucher.subdivision" /></strong> <s:if
+																			test="%{isFieldMandatory('subdivision')}">
+																			<span class="bluebox"><span class="mandatory1">*</span></span>
+																		</s:if></td>
+																	<td class="greybox"><s:select name="paymentheader.voucherheader.vouchermis.subdivision"
+																	        headerValue="%{getText('lbl.choose.options')}" headerKey="-1"
+																			id="subdivision" list="dropdownData.subdivisionList"
+																			listKey="subdivisionCode" listValue="subdivisionName" 
+																			value="%{paymentheader.voucherheader.vouchermis.subdivision}" /></td>
+																	
+																</s:if>
+																
 																<s:if test="%{shouldShowHeaderField('functionary')}">
 																	<td class="greybox"><strong><s:text
 																				name="voucher.functionary" /></strong></td>

@@ -66,6 +66,7 @@ public class VoucherDetails {
     private String functionDetail;
     private Long glcodeIdDetail;
     private String glcodeDetail;
+    private String glcodeNameDetail;
     private String accounthead;
     private BigDecimal debitAmountDetail = BigDecimal.ZERO;
     private BigDecimal creditAmountDetail = BigDecimal.ZERO;
@@ -224,5 +225,13 @@ public class VoucherDetails {
     public String getDetailNameEscSpecChar() {
         return StringUtils.escapeJavaScript(detailName);
     }
+
+	public String getGlcodeNameDetail() {
+		return glcodeNameDetail;
+	}
+
+	public void setGlcodeNameDetail(String glcodeNameDetail) {
+		this.glcodeNameDetail = glcodeNameDetail;
+	}
 
 }

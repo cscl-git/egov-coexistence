@@ -141,6 +141,7 @@ public class CouncilSmsAndEmailService {
                 .getConfigValuesByModuleAndKey("EGF",
                         "AGENDA_NOTICE_TEMPLATE_ID");
         final String templateId = appList.get(0).getValue();
+        System.out.println("sms ::: "+councilMeeting.getCommitteeType());
         if (smsEnabled) {
         	try {
 	            for (CommitteeMembers committeeMembers : committeeMemberService
@@ -153,16 +154,15 @@ public class CouncilSmsAndEmailService {
         	}catch(Exception e) {
             	LOGGER.error("Unable to send SMS to council members of meeting number "+councilMeeting.getMeetingNumber());
             }
-            try {
-	            List<User> listOfUsers = councilMeetingService.getUserListForNotice(councilMeeting);
-	            for (User user : listOfUsers) {
-	                if (user.getMobileNumber() != null) {
-	                    buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(), councilMeeting, customMessage,templateId);
-	                }
-	            }
-            }catch(Exception e) {
-            	LOGGER.error("Unable to send SMS to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
-            }
+			/*
+			 * try { List<User> listOfUsers =
+			 * councilMeetingService.getUserListForNotice(councilMeeting); for (User user :
+			 * listOfUsers) { if (user.getMobileNumber() != null) {
+			 * buildSmsForMeetingCouncilRoles(user.getUserName(), user.getMobileNumber(),
+			 * councilMeeting, customMessage,templateId); } } }catch(Exception e) {
+			 * LOGGER.error("Unable to send SMS to meeting creators of meeting number "
+			 * +councilMeeting.getMeetingNumber()); }
+			 */
             buildCouncilSmsDetails(customMessage, councilMeeting);
         }
     }
@@ -204,17 +204,16 @@ public class CouncilSmsAndEmailService {
 	        }catch(Exception e) {
 	        	LOGGER.error("Unable to send EMAIL to council members of meeting number "+councilMeeting.getMeetingNumber());
 	        }
-        	try {
-	            List<User> listOfUsers = councilMeetingService.getUserListForMeeting(councilMeeting);
-	            for (User user : listOfUsers) {
-	                if (user.getEmailId() != null) {
-	                    buildEmailForMeetingForCouncilRoles(user.getUserName(), user.getEmailId(), councilMeeting, customMessage,
-	                            attachment, fileType, fileName);
-	                }
-	            }
-	        }catch(Exception e) {
-	        	LOGGER.error("Unable to send EMAIL to meeting creators of meeting number "+councilMeeting.getMeetingNumber());
-	        }
+			/*
+			 * try { List<User> listOfUsers =
+			 * councilMeetingService.getUserListForMeeting(councilMeeting); for (User user :
+			 * listOfUsers) { if (user.getEmailId() != null) {
+			 * buildEmailForMeetingForCouncilRoles(user.getUserName(), user.getEmailId(),
+			 * councilMeeting, customMessage, attachment, fileType, fileName); } }
+			 * }catch(Exception e) {
+			 * LOGGER.error("Unable to send EMAIL to meeting creators of meeting number "
+			 * +councilMeeting.getMeetingNumber()); }
+			 */
         }
     }
     
@@ -263,7 +262,15 @@ public class CouncilSmsAndEmailService {
             smsMsg = smsBodyByCodeAndArgsWithType("msg.resolution.sms", name, councilMeeting, customMessage);
         } else {
             //smsMsg = smsBodyByCodeAndArgsWithType("msg.meeting.sms", name, councilMeeting, customMessage);
-        	smsMsg="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Agenda sent to your mail. Chandigarh Smart City Ltd.";
+        	
+        	if(councilMeeting.getMeetingpostone() != null && !councilMeeting.getMeetingpostone().isEmpty() && councilMeeting.getMeetingpostone().equalsIgnoreCase("YES"))
+        	{
+        		smsMsg="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting postponed on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Agenda sent to your mail. Chandigarh Smart City Ltd.";
+        	}
+        	else
+        	{
+        		smsMsg="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Agenda sent to your mail. Chandigarh Smart City Ltd.";
+        	}
         }
         if (mobileNumber != null && smsMsg != null)
             sendSMSOnSewerageForMeeting(mobileNumber, smsMsg,templateId);
@@ -284,8 +291,17 @@ public class CouncilSmsAndEmailService {
         } else {
             //body = emailBodyByCodeAndArgsWithType("email.meeting.body", name, councilMeeting, customMessage);
         	final SimpleDateFormat sf = new SimpleDateFormat(DATE_FORMAT);
-        	body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
-            subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
+        	if(councilMeeting.getMeetingpostone() != null && !councilMeeting.getMeetingpostone().isEmpty() && councilMeeting.getMeetingpostone().equalsIgnoreCase("YES"))
+        	{
+        		body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting postposned on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+                subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting postponed on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
+        	}
+        	else
+        	{
+        		body="Dear "+councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) +". Please find the agenda of the meeting attached with this email";
+                subject = councilMeeting.getCommitteeType().getName()+" Members, "+councilMeeting.getMeetingNumber()+ " " +councilMeeting.getCommitteeType().getName() +" Meeting scheduled on "+ sf.format(councilMeeting.getMeetingDate()) +" at "+String.valueOf(councilMeeting.getMeetingTime())+" at "+ String.valueOf(councilMeeting.getMeetingLocation()) ;
+        	}
+        	
         }
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);

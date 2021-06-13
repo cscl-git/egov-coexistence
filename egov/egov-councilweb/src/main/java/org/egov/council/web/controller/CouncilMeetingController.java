@@ -188,6 +188,8 @@ public class CouncilMeetingController {
     private CouncilMeetingTypeService councilMeetingTypeService;
     @Autowired
     protected EgovMasterDataCaching masterDataCache;
+    @Autowired
+    private CouncilCommitteeMemberService councilCommitteeMemberService;
 
     @ModelAttribute("committeeType")
     public List<CommitteeType> getCommitteTypeList() {
@@ -239,6 +241,7 @@ public class CouncilMeetingController {
 	/* to create new Notice without approval */
     @RequestMapping(value = "/newNotice", method = RequestMethod.POST)
     public String newFormNotice(@ModelAttribute final CouncilMeeting councilMeeting, final Model model) {
+    	
         model.addAttribute("autoMeetingNoGenEnabled", isAutoMeetingNoGenEnabled()); 
         model.addAttribute(COUNCIL_NOTICE, councilMeeting);
             return COUNCILNOTICE_NEW;
@@ -269,7 +272,9 @@ public class CouncilMeetingController {
 //            model.addAttribute(COUNCIL_MEETING, councilMeeting);
 //            return COUNCILNOTICE_NEW;
 //        }
-        
+		  
+		  System.out.println("::::postone status:"+councilMeeting.getMeetingpostone()+"::::");
+                
         if (attachments != null && attachments.getSize() > 0) {
             try {
             	councilMeeting.setFilestoreid(fileStoreService.store(
@@ -338,7 +343,7 @@ public class CouncilMeetingController {
 //            model.addAttribute(COUNCIL_MEETING, councilMeeting);
 //            return COUNCILMEETING_NEW;
 //        }
-        
+		System.out.println("::::: "+councilMeeting.getCommitteeType().getName()+":::::"+councilMeeting.getCommitteeType().getCode());        
         if (attachments != null && attachments.getSize() > 0) {
             try {
             	councilMeeting.setFilestoreid(fileStoreService.store(
@@ -492,7 +497,9 @@ public class CouncilMeetingController {
         CouncilMeeting councilMeeting = councilMeetingService.findOne(id);
         updateDepartment(councilMeeting);
         model.addAttribute(COUNCIL_MEETING, councilMeeting);
+        if(councilMeeting.getCommitteeType()!=null) {
         model.addAttribute("commiteemembelist", councilMeeting.getCommitteeType().getCommiteemembers());
+        }
         return COUNCILNOTICE_RESULT;
     }
 
