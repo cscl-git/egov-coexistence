@@ -212,12 +212,9 @@
 			<td style="width: 10%" class="<c:out value='${tdclass}' />">Back Dated Entry<span class="mandatory1">*</span>:	&nbsp;</td>
 			
 			<td class="greybox" colspan="3">
-			<select name="backdateentry"	id="backdateentry">
-					<option value="-1">Select</option>
-					<option value="Y">Yes</option>
-					<option value="N">No</option>
-			</select>
-			
+			<s:select name="backdateentry" headerKey="-1" headerValue="Select"
+					value="%{getMasterName('backdateentry')}" list="#{'Y':'Yes' ,'N':'No'}"
+					id="backdateentry" />
 			</td>
 		</tr>
 
