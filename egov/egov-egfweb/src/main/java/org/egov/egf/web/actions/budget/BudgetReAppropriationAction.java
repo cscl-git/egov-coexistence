@@ -383,11 +383,14 @@ public class BudgetReAppropriationAction extends BaseFormAction {
         newBudgetReAppropriationList = new ArrayList<BudgetReAppropriationView>();
     }
 
+    @SuppressWarnings("deprecation")
     private BudgetReAppropriationMisc save(final Integer userId) {
         boolean reAppropriationCreated = false;
         boolean reAppForNewBudgetCreated = false;
         BudgetReAppropriationMisc misc = null;
         if (financialYear != null && financialYear.getId() != 0)
+        	 System.out.println("info :::: financial Id (1) ::"+financialYear.getId());
+        	
             financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id=?", financialYear.getId());
         try {
             String executingDepartment = budgetDetail.getExecutingDepartment();
@@ -400,6 +403,9 @@ public class BudgetReAppropriationAction extends BaseFormAction {
             misc = budgetReAppropriationService.createBudgetReAppropriationMisc(parameters.get(ACTIONNAME)[0] + "|" + userId,
                     beRe, financialYear, appropriationMisc, null);
             System.out.println("11");
+            //financialYear.setId((long) 14);
+            System.out.println("info :::: financial Id (2)::"+financialYear.getId());
+            
             removeEmptyReAppropriation(budgetReAppropriationList);
             reAppropriationCreated = budgetReAppropriationService.createReAppropriation(parameters.get(ACTIONNAME)[0] + "|"
                     + userId,

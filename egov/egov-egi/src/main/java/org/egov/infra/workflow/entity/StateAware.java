@@ -270,6 +270,13 @@ public abstract class StateAware extends AbstractAuditable {
             state.setOwnerPosition(owner);
             return this;
         }
+        
+        //added by rahul Dev
+        public final Transition withStatusStarted() {
+            checkTransitionStatus();
+            state.setStatus(StateStatus.STARTED);
+            return this;
+        }
 
         public final Transition withOwner(Object owner) {
             checkTransitionStatus();

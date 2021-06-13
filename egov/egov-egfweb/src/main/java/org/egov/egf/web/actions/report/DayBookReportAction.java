@@ -309,11 +309,11 @@ public class DayBookReportAction extends BaseFormAction {
                 bean.setDivision(bean.getDept());
                 bean.setBudgethead(bean.getFunc());
                 //view
-                if(voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId())) != null)
+                if(voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId())) != null && !voucherNumber.contains("CSL"))
                 {
                 	bean.setPartyname(voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId())).getVoucherNumber());
                 }
-                if(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())) != null && !voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).isEmpty())
+                if(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())) != null && !voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).isEmpty() && !voucherNumber.contains("CSL"))
                 {
                 	bean.setBpvno(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getVoucherNumber());
                 	bean.setBpvDate(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getPartyBillNumber());
@@ -325,12 +325,33 @@ public class DayBookReportAction extends BaseFormAction {
                 		bean.setChqDate(voucherDetailIntrumentMapping.get(voucherDetailBpvMapping.get(voucherDetailMiscMapping.get(Long.parseLong(bean.getVhId())).get(0).getBpvId()).getId()).getSecondsignatory());
                 	}
                 }
-                if(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())) != null)
+                if(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())) != null  && !voucherNumber.contains("CSL"))
                 {
                 	bean.setPexno(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getVoucherNumber());
                 	bean.setPexDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getApprovalComent());
                 	bean.setChqNo(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getFirstsignatory());
                 	bean.setChqDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getSecondsignatory());
+                }
+                
+                if(voucherNumber.contains("CSL"))
+                {
+                	bean.setBpvno(null);
+                	bean.setBpvDate(null);
+                	if(voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId())) != null)
+                	{
+                		bean.setPartyname((voucherDetailPartyMapping.get(Long.parseLong(bean.getVhId()))).getVoucherNumber());
+                	}
+                	else
+                	{
+                		bean.setPartyname(null);
+                	}
+                	if(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())) != null)
+                	{
+                		bean.setPexno(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getVoucherNumber());
+                    	bean.setPexDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getApprovalComent());
+                    	bean.setChqNo(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getFirstsignatory());
+                    	bean.setChqDate(voucherDetailIntrumentMapping.get(Long.parseLong(bean.getVhId())).getSecondsignatory());
+                	}
                 }
                 
             }

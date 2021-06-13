@@ -124,9 +124,6 @@ public class JournalVoucherActionHelper {
 			CVoucherHeader voucherHeader, VoucherTypeBean voucherTypeBean, WorkflowBean workflowBean) {
 		// TODO Auto-generated method stub
         try {
-        	LOGGER.info("Name ::: "+voucherTypeBean.getVoucherName());
-        	LOGGER.info("Type ::: "+voucherTypeBean.getVoucherType());
-        	LOGGER.info("Sub -Type ::: "+voucherTypeBean.getVoucherSubType());
             voucherHeader.setName(voucherTypeBean.getVoucherName());
             if("Receipt Journal".equalsIgnoreCase(voucherTypeBean.getVoucherName()))
             {
@@ -369,6 +366,16 @@ public class JournalVoucherActionHelper {
                 		
                 		
                 }
+                if(workflowBean.getWorkFlowAction().equalsIgnoreCase("Forward")) {
+                voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
+                        .withComments(workflowBean.getApproverComments())
+                        .withStatusStarted()
+                        //.withStateValue(wfmatrix.getNextState()).withDateInfo(currentDate.toDate())
+                        .withStateValue(ststeValue)
+                        .withDateInfo(currentDate.toDate())
+                        .withOwner(owner).withOwnerName((owner != null && owner > 0L) ? getEmployeeName(owner):"")
+                        .withNextAction(wfmatrix.getNextAction());
+                }else {
                 
                 voucherHeader.transition().progressWithStateCopy().withSenderName(user.getName())
                         .withComments(workflowBean.getApproverComments())
@@ -377,6 +384,7 @@ public class JournalVoucherActionHelper {
                         .withOwner(owner).withOwnerName((owner != null && owner > 0L) ? getEmployeeName(owner):"")
                         .withNextAction(wfmatrix.getNextAction());
             }
+        }
         }
         return voucherHeader;
     }

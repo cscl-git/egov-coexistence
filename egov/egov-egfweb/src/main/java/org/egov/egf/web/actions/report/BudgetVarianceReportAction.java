@@ -574,6 +574,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
                 budgetVarianceEntry.setFunctionCode(budgetDetail.getFunction().getName());
             budgetVarianceEntry.setDetailId(budgetDetail.getId());
             budgetVarianceEntry.setBudgetCode(budgetDetail.getBudget().getName());
+            
             if ("RE".equalsIgnoreCase(budgetType) && !getConsiderReAppropriationAsSeperate()) {
                 budgetVarianceEntry.setAdditionalAppropriation(BigDecimal.ZERO);
                 final BigDecimal estimateAmount = (budgetDetail.getApprovedAmount() == null ? BigDecimal.ZERO : budgetDetail
@@ -588,11 +589,8 @@ public class BudgetVarianceReportAction extends BaseFormAction {
                                 : budgetDetail.getApprovedReAppropriationsTotal());
             }
             budgetVarianceEntry.setTotal(budgetVarianceEntry.getEstimate().add(budgetVarianceEntry.getAdditionalAppropriation()));
-            
             budgetVarianceEntries.add(budgetVarianceEntry);
         }
-        
-       
         populateActualData(financialYear);
     }
 
@@ -724,16 +722,14 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 
     private void populateActualData(final CFinancialYear financialYear) {
         final String fromDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getStartingDate());
-        System.out.println("4");
+        //System.out.println("4");
         if (budgetVarianceEntries != null && budgetVarianceEntries.size() != 0) {
         	System.out.println("5");
             setQueryParams();
-            System.out.println("calling budgetDetailService.fetchActualsForFYWithParams");
             final List<Object[]> resultForVoucher = budgetDetailService.fetchActualsForFYWithParams(fromDate, "'"
                     + Constants.DDMMYYYYFORMAT2.format(asOnDate) + "'", formMiscQuery("vmis", "gl", "vh"));
-            System.out.println("calling "+resultForVoucher.get(0)[0]);
             extractData(resultForVoucher);
-            System.out.println("budgetDetailService.fetchActualsForBillWithVouchersParams");
+            //system.out.println("");
             final List<Object[]> resultForBill = budgetDetailService.fetchActualsForBillWithVouchersParams(fromDate, "'"
                     + Constants.DDMMYYYYFORMAT2.format(asOnDate) + "'", formMiscQuery("bmis", "bdetail", "bmis"));
             extractData(resultForBill);
@@ -764,15 +760,24 @@ public class BudgetVarianceReportAction extends BaseFormAction {
 
     private void extractData(final List<Object[]> result) {
         final Map<String, String> budgetDetailIdsAndAmount = new HashMap<String, String>();
+        
         if (result == null)
             return;
         for (final Object[] row : result)
-            if (row[0] != null && row[1] != null)
+            if (row[0] != null && row[1] != null) {
+            	if(budgetDetailIdsAndAmount.containsKey(row[0].toString())) {
+            		System.out.println(":::::::::1::::"+new BigDecimal(budgetDetailIdsAndAmount.get(row[0].toString())));
+            		System.out.println(":::::::::2:::"+new BigDecimal(row[1].toString()));
+            		
+            		budgetDetailIdsAndAmount.put(row[0].toString(), (new BigDecimal(budgetDetailIdsAndAmount.get(row[0].toString())).add(new BigDecimal(row[1].toString()))).toString());
+            	}else {
                 budgetDetailIdsAndAmount.put(row[0].toString(), row[1].toString());
+            	}
+            }
         
-        System.out.println("Extract ::"+budgetDetailIdsAndAmount);
         for (final BudgetVarianceEntry row : budgetVarianceEntries) {
             final BigDecimal actual = row.getActual();
+            
             if (budgetDetailIdsAndAmount.get(row.getDetailId().toString()) != null) {
                 if (actual == null || BigDecimal.ZERO.compareTo(actual) == 0)
                     row.setActual(new BigDecimal(budgetDetailIdsAndAmount.get(row.getDetailId().toString())));
@@ -783,6 +788,7 @@ public class BudgetVarianceReportAction extends BaseFormAction {
                 row.setActual(BigDecimal.ZERO);
             row.setVariance(row.getEstimate().add(
                     row.getAdditionalAppropriation().subtract(row.getActual() == null ? BigDecimal.ZERO : row.getActual())));
+        
         }
     }
 

@@ -1580,7 +1580,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                         + ",egf_budget b where bd.budget=b.id and vmis.VOUCHERHEADERID=vh.id and gl.VOUCHERHEADERID=vh.id and bd.budgetgroup=bg.id and "
                         + "(bg.ACCOUNTTYPE='REVENUE_EXPENDITURE' or bg.ACCOUNTTYPE='CAPITAL_EXPENDITURE') and vh.status not in ("
                         + voucherstatusExclude
-                        + ") and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
+                        + ") and (select ews.value from eg_wf_states ews where id=vh.state_id) <> 'Rejected' and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
                         + "vh.voucherDate>= to_date('" + fromDate + "','dd/MM/yyyy') and vh.voucherDate <= to_date("
                         + toVoucherDate + ",'dd/MM/yyyy') " + miscQuery
                         + " and (gl.glcode =bg.mincode or gl.glcode=bg.majorcode ) group by bd.id" + " union "
@@ -1589,7 +1589,7 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                         + ",egf_budget b where bd.budget=b.id and vmis.VOUCHERHEADERID=vh.id and gl.VOUCHERHEADERID=vh.id and bd.budgetgroup=bg.id and "
                         + "(bg.ACCOUNTTYPE='REVENUE_RECEIPTS' or bg.ACCOUNTTYPE='CAPITAL_RECEIPTS') and vh.status not in ("
                         + voucherstatusExclude
-                        + ") and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
+                        + ") and (select ews.value from eg_wf_states ews where id=vh.state_id) <> 'Rejected' and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and "
                         + "vh.voucherDate>= to_date('" + fromDate + "','dd/MM/yyyy') and vh.voucherDate <= to_date("
                         + toVoucherDate + ",'dd/MM/yyyy') " + miscQuery
                         + " and (gl.glcode = bg.mincode  or gl.glcode=bg.majorcode ) group by bd.id");

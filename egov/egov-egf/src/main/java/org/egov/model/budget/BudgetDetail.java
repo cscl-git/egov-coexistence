@@ -158,8 +158,7 @@ public class BudgetDetail extends StateAware {
     private String materializedPath;
 
     @OneToMany(mappedBy = "budgetDetail", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<BudgetReAppropriation> budgetReAppropriations = new HashSet<>(
-            0);
+    private Set<BudgetReAppropriation> budgetReAppropriations = new HashSet<>(0);
 
     @Column(name = "document_number")
     private Long documentNumber;
@@ -372,24 +371,20 @@ public class BudgetDetail extends StateAware {
 
     public BigDecimal getApprovedReAppropriationsTotal() {
         BigDecimal total = BigDecimal.ZERO;
-        budgetReAppropriations = budgetReAppropriations == null
-                ? new HashSet<>()
-                : budgetReAppropriations;
+		budgetReAppropriations = budgetReAppropriations == null ? new HashSet<>() : budgetReAppropriations;
         for (final BudgetReAppropriation entry : budgetReAppropriations){
-            if (!entry.getStatus().getDescription()
-                    .equalsIgnoreCase("Cancelled")){
-                if ((entry.getAdditionAmount() != null)
-                        && BigDecimal.ZERO
-                        .compareTo(entry.getAdditionAmount()) != 0)
+			if (entry.getStatus().getDescription().equalsIgnoreCase("Approved")) {
+				if ((entry.getAdditionAmount() != null) && BigDecimal.ZERO.compareTo(entry.getAdditionAmount()) != 0)
                     total = total.add(entry.getAdditionAmount());
                 else
                     total = total.subtract(entry.getDeductionAmount());            
             }
         }
+		System.out.println("debug :::: budgetReAppropriations  :: ::" + total);
         return total;
     }
     
-    public BigDecimal getApprovedReAppropriationsTotalReapp() {
+    /**public BigDecimal getApprovedReAppropriationsTotalReapp() {
         BigDecimal total = BigDecimal.ZERO;
         BudgetReAppropriation entry=null;
         budgetReAppropriations = budgetReAppropriations == null
@@ -412,10 +407,26 @@ public class BudgetDetail extends StateAware {
                     total = total.subtract(entry.getDeductionAmount());
             }
         return total;
+    }**/
+    
+    public BigDecimal getApprovedReAppropriationsTotalReapp() {
+    	  BigDecimal total = BigDecimal.ZERO;
+          budgetReAppropriations = budgetReAppropriations == null
+                  ? new HashSet<>()
+                  : budgetReAppropriations;
+          for (final BudgetReAppropriation entry : budgetReAppropriations)
+              if (!entry.getStatus().getDescription()
+                      .equalsIgnoreCase("Cancelled"))
+                  if ((entry.getAdditionAmount() != null)
+                          && BigDecimal.ZERO
+                          .compareTo(entry.getAdditionAmount()) != 0)
+                      total = total.add(entry.getAdditionAmount());
+                  else
+                      total = total.subtract(entry.getDeductionAmount());
+          return total;
     }
 
-    public BigDecimal getApprovedReAppropriationsTotalAsOnDate(
-            final Date asOnDate) {
+    public BigDecimal getApprovedReAppropriationsTotalAsOnDate(final Date asOnDate) {
         BigDecimal total = BigDecimal.ZERO;
         budgetReAppropriations = budgetReAppropriations == null
                 ? new HashSet<>()
