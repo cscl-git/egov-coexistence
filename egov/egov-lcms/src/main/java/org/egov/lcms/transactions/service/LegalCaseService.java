@@ -61,6 +61,7 @@ import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
 import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.service.es.LegalCaseDocumentService;
+import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
 import org.egov.lcms.transactions.entity.BipartisanDetails;
 import org.egov.lcms.transactions.entity.CounterAffidavit;
 import org.egov.lcms.transactions.entity.Judgment;
@@ -73,6 +74,7 @@ import org.egov.lcms.transactions.entity.LegalCaseUploadDocuments;
 import org.egov.lcms.transactions.entity.Pwr;
 import org.egov.lcms.transactions.entity.PwrDocuments;
 import org.egov.lcms.transactions.entity.ReportStatus;
+import org.egov.lcms.transactions.repository.BidefendingCounsilDetailsRepository;
 import org.egov.lcms.transactions.repository.LegalCaseRepository;
 import org.egov.lcms.transactions.repository.LegalCaseUploadDocumentsRepository;
 import org.egov.lcms.transactions.repository.PwrDocumentsRepository;
@@ -114,6 +116,10 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
     @Autowired
     private LegalCaseDocumentService legalCaseDocumentService;
 
+    
+    @Autowired 
+    BidefendingCounsilDetailsRepository bidefendingCounsilDetailsRepository;
+    
     public LegalCaseService() {
         super(LegalCase.class);
     }
@@ -129,6 +135,13 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
     public LegalCase findByLcNumber(final String lcnumber) {
         return legalCaseRepository.findByLcNumber(lcnumber);
     }
+
+	/*
+	 * public LegalCase findByLcNumberAndId(final String lcnumber,final Long id) {
+	 * return legalCaseRepository.findByLcNumberAndId(lcnumber,id); }
+	 */
+    
+    
 
     public LegalCase getLegalCaseByCaseNumber(final String caseNumber) {
         return legalCaseRepository.findByCaseNumber(caseNumber);
@@ -151,6 +164,7 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
         applyAuditing(legalcase);
         final LegalCase savedlegalcase = legalCaseRepository.save(legalcase);
         //legalCaseSmsService.sendSmsToOfficerInchargeForLegalCase(legalcase);
+        
         persistLegalCaseIndex(savedlegalcase, null, null, null, null);
         final List<LegalCaseUploadDocuments> documentDetails = getLegalcaseUploadDocumentDetails(savedlegalcase, files);
         if (!documentDetails.isEmpty()) {
@@ -164,6 +178,7 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
     public LegalCase update(final LegalCase legalcase, final MultipartFile[] files) throws IOException, ParseException {
         updateCounterAffidavitAndPwr(legalcase, legalcase.getPwrList());
         applyAuditing(legalcase);
+        
         final LegalCase savedCaAndPwr = legalCaseRepository.save(legalcase);
         persistLegalCaseIndex(legalcase, null, null, null, null);
         //legalCaseSmsService.sendSmsToOfficerInchargeForCounterAffidavit(legalcase.getCounterAffidavits());
@@ -215,12 +230,14 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
 
         if (legalcase != null) {
             if (legalcase.getBipartisanPetitionerDetailsList() != null
-                    || legalcase.getBipartisanRespondentDetailsList() != null) {
+                    || legalcase.getBipartisanRespondentDetailsList() != null || legalcase.getBiDefendingCounsilDetailsList() != null  ) {
                 legalcase.getBipartisanDetails().clear();
+                legalcase.getBidefendingCounsilDetails().clear();
                 legalCaseRepository.flush();
             }
             for (final BipartisanDetails petitioner : legalcase.getBipartisanPetitionerDetailsList()) {
                 if (petitioner.getName() != null && !petitioner.getName().trim().isEmpty()) {
+                	System.out.println("(petitioner.getName()------------"+petitioner.getName());
                     petitioner.setSerialNumber(petitioner.getSerialNumber() != null ? petitioner.getSerialNumber()
                             : serialNumberPetitioner);
                     petitioner.setIsRepondent(Boolean.FALSE);
@@ -243,6 +260,7 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
             for (final BipartisanDetails respondent : legalcase.getBipartisanRespondentDetailsList()) {
                 if (respondent.getName() != null && !respondent.getName().trim().isEmpty()) {
 
+                	System.out.println("respondent.getName() ---------"+respondent.getName() );
                     respondent.setSerialNumber(respondent.getSerialNumber() != null ? respondent.getSerialNumber()
                             : serialNumberRespondent);
                     respondent.setLegalCase(legalcase);
@@ -256,6 +274,41 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
                     respondent.setLastModifiedBy(ApplicationThreadLocals.getUserId());
                     respondent.setLastModifiedDate(currentDate);
                     legalcase.getBipartisanDetails().add(respondent);
+                }
+                serialNumberRespondent++;
+            }
+            for (final BidefendingCounsilDetails respondent : legalcase.getBiDefendingCounsilDetailsList()) {
+                if (respondent.getOppPartyAdvocate() != null && !respondent.getOppPartyAdvocate().trim().isEmpty()) {
+
+                	System.out.println("respondent.getOppPartyAdvocate() ---"+respondent.getOppPartyAdvocate() );
+                    respondent.setSerialNumber(respondent.getSerialNumber() != null ? respondent.getSerialNumber()
+                            : serialNumberRespondent);
+                    respondent.setLegalCase(legalcase);
+//                    if (respondent.getIsRespondentGovernment() == null)
+//                        respondent.setIsRespondentGovernment(Boolean.FALSE);
+                    respondent.setIsRepondent(Boolean.FALSE);
+                    if (respondent.isNew()) {
+                    	respondent.setCreatedBy(ApplicationThreadLocals.getUserId());
+                    	respondent.setCreatedDate(currentDate);
+            		}
+                    respondent.setLastModifiedBy(ApplicationThreadLocals.getUserId());
+                    respondent.setLastModifiedDate(currentDate);
+                    System.out.println("respondent.getDefCounsilPrimary()-----"+respondent.getDefCounsilPrimary());
+                 if( respondent.getDefCounsilPrimary()!=null)
+                 {
+                	 System.out.println("respondent.getOppPartyAdvocate() ---"+respondent.getOppPartyAdvocate() );
+                    if(respondent.getDefCounsilPrimary().equals("YES") || respondent.getDefCounsilPrimary().equals("NO") )
+                    {
+                    	 System.out.println("respondent.getDefCounsilPrimary()-----"+respondent.getDefCounsilPrimary());
+                    	 respondent.setDefCounsilPrimary("YES");
+                    }
+                 } else
+                 {
+                	 respondent.setDefCounsilPrimary("NO");
+                }
+                   
+                    legalcase.getBidefendingCounsilDetails().add(respondent);
+                    
                 }
                 serialNumberRespondent++;
             }
@@ -416,5 +469,10 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
                 judgmentImpl, closeCase);
 
     }
+
+	public void updateDefenidngCounsil(Long id,String novalue,String yesValue) {
+		
+		bidefendingCounsilDetailsRepository.updateDefending(id,novalue,yesValue);
+	}
 
 }

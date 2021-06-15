@@ -60,10 +60,13 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
+import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.masters.service.ConcernedBranchMasterService;
 import org.egov.lcms.masters.service.CourtMasterService;
 import org.egov.lcms.masters.service.PetitionTypeMasterService;
+import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.entity.LegalCaseUploadDocuments;
 import org.egov.lcms.transactions.service.LegalCaseService;
@@ -98,6 +101,14 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
     @Autowired
     private ConcernedBranchMasterService concernedBranchMasterService;
 
+    @Autowired
+    AdvocateMasterService advocateMasterService;
+
+//    @ModelAttribute
+//    private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
+//        return legalCaseService.findByLcNumber(lcNumber);
+//    }
+    
     @ModelAttribute
     private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
         return legalCaseService.findByLcNumber(lcNumber);
@@ -118,6 +129,7 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
         final LegalCase newlegalCase = getLegalCaseDocuments(legalCase);
         model.addAttribute(LcmsConstants.LEGALCASE, newlegalCase);
         setDropDownValues(model);
+        setDropDefending(model);
         final String[] casenumberyear = legalCase.getCaseNumber().split("/");
         legalCase.setCaseNumber(casenumberyear[0]);
         if (casenumberyear.length > 1)
@@ -128,9 +140,21 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
         model.addAttribute(LcmsConstants.MODE, "edit");
         model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, legalCase.getIsReappealOfCase());
         model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
+        List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
+        System.out.println("legalCase.getDefendingCounsilNames==("+legalCase.getDefendingCounsilNames());
+    	for(AdvocateMaster as:dropdownValue) {
+    		System.out.println("::::"+as.getName());
+    		
+    	}
+    	model.addAttribute("defendingDropdown",dropdownValue);
         return "legalcase-edit";
     }
 
+    private void setDropDefending(final Model model) {
+        model.addAttribute("defendingList", advocateMasterService.findAll());
+//        model.addAttribute("petitiontypeList", petitiontypeMasterService.getPetitiontypeList());
+    }
+    
     @RequestMapping(value = "/edit/", method = RequestMethod.POST)
     public String update(@ModelAttribute final LegalCase legalCase, @RequestParam("lcNumber") final String lcNumber,
             final BindingResult errors, final Model model,
@@ -175,6 +199,34 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
             }
         }
         legalCase.setLcNumber(legalCase.getFileNumber());
+        String checkedValue=request.getParameter("defCounsilPrimary");
+        String ids=request.getParameter("id");
+        long id=Long.parseLong(ids);
+        System.out.println("id-------"+id);
+//        for (final BidefendingCounsilDetails respondent : legalCase.getBiDefendingCounsilDetailsList()) {
+//        	if(respondent.getDefCounsilPrimary()!=null)
+//        	{
+//        	System.out.println("respondent.getDefCounsilPrimary()"+respondent.getDefCounsilPrimary());
+//        if(respondent.getDefCounsilPrimary().equals("NO") || respondent.getDefCounsilPrimary().equals("YES"))
+//        {
+//        	if(respondent.getDefCounsilPrimary().equals("NO"))
+//        	{
+//        		String novalue="NO";
+//            	String yesValue="YES";
+//            	legalCaseService.updateDefenidngCounsil(id,novalue,yesValue);
+//            	System.out.println("respondent.getDefCounsilPrimary()----------"+respondent.getDefCounsilPrimary());
+//                legalCaseService.persist(legalCase, attachedDocuments);
+//        	}else {
+//        		legalCaseService.persist(legalCase, attachedDocuments);
+//        	}
+//        	
+//            
+//        }
+//        else {
+//        	legalCaseService.persist(legalCase, attachedDocuments);
+//        }
+//        	}
+//        }
         legalCaseService.persist(legalCase, attachedDocuments);
         setDropDownValues(model);
         final LegalCase newlegalCase = getLegalCaseDocuments(legalCase);
