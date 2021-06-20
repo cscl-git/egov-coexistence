@@ -95,6 +95,7 @@ function submitForm() {
 	var lcNumber = $("#lcNumber").val();
 	
 
+
 	$('.report-section').removeClass('display-hide');
 	$('#report-footer').show();
 	var isCancelled = jQuery('#isStatusExcluded').is(":checked");
@@ -173,7 +174,7 @@ function submitForm() {
 								if (full.casestatus == 'LCCREATED'
 										|| full.casestatus == 'HEARING' || full.casestatus == 'INTERIM_STAY' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Judgment</option><option value="2">Add/Edit Defending Counsel</option><option value="10">Edit para wise remarks/Counter filing date</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="7">Interim Order</option><option value="8">Close Case</option></select>');
-									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Create Judgement</option><option value="2">Add/Edit Defending Counsel</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="8">Close Case</option></select>');
+									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Create Judgement</option><option value="2">Add/Edit Defending Counsel</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="15">Update Payment</option><option value="8">Close Case</option></select>');
 								} else if (full.casestatus == 'JUDGMENT' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option><option value="11">Judgment Implementation</option></select>');
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option></select>');
@@ -182,6 +183,9 @@ function submitForm() {
 								} else if (full.casestatus == 'JUDGEMENT_IMPL' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="12">Edit Judgment Implementation</option><option value="8">Close Case</option></select>');
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="8">Close Case</option></select>');
+								}else if (full.casestatus == 'UPDATE_PAYMENT' && !full.legalViewAccess) {
+									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="12">Edit Judgment Implementation</option><option value="8">Close Case</option></select>');
+									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="15">Update Payment</option></select>');
 								}
 							}
 						} ],
@@ -298,6 +302,12 @@ $("#legalCaseResults").on('change', 'tbody tr td .dropchange', function() {
 	}
 	if (this.value == 12) {
 		var url = '/services/lcms/judgmentimpl/new/?lcNumber=' + lcNumber;
+		$('#searchlegalcaseForm1').attr('method', 'get');
+		$('#searchlegalcaseForm1').attr('action', url);
+//		window.location = url;
+		window.open(url,"","height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");//Added By Kundan For new Pop Window
+	}if (this.value == 15) {
+		var url = '/services/lcms/legalcasedisposal/updatePayment/new/?lcNumber=' + lcNumber;
 		$('#searchlegalcaseForm1').attr('method', 'get');
 		$('#searchlegalcaseForm1').attr('action', url);
 //		window.location = url;

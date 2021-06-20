@@ -1,5 +1,7 @@
 package org.egov.lcms.transactions.repository;
 
+import java.util.List;
+
 import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -20,5 +22,9 @@ public interface BidefendingCounsilDetailsRepository extends JpaRepository<Bidef
     @Transactional
 	@Query("update BidefendingCounsilDetails b set b.defCounsilPrimary=:novalue where b.id=:id ")
 	public void updateRecords(@Param("novalue")String yesValue,@Param("id")Long id);
+
+	public List<BidefendingCounsilDetails> findById(Long id);
+
+	//List<BidefendingCounsilDetails>findByLegalcase(Long id);
 
 }

@@ -1337,7 +1337,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 			contraVoucher.setFromBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getFromBankAccountId())));
 		if (contraBean != null && contraBean.getToBankAccountId() != null
-				&& !contraBean.getFromBankAccountId().equals("-1"))
+				&& !contraBean.getToBankAccountId().equals("-1"))
 			contraVoucher.setToBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getToBankAccountId())));
 	}

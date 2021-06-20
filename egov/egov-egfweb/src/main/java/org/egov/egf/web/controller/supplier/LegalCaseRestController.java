@@ -65,6 +65,7 @@ public class LegalCaseRestController {
 			lg.setCourtId(Integer.parseInt(l.getLegalCase().getCourtMaster().getId().toString()));
 			lg.setCourtType(Integer.parseInt(l.getLegalCase().getCourtMaster().getCourtType().getId().toString()));
 			lg.setLegalCase(l.getLegalCase());
+			lg.setHearingDate(l.getHearingDate());
 			legal.add(lg);
 			
 			

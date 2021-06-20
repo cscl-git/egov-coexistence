@@ -201,8 +201,8 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
         legalCase.setLcNumber(legalCase.getFileNumber());
         String checkedValue=request.getParameter("defCounsilPrimary");
         String ids=request.getParameter("id");
-        long id=Long.parseLong(ids);
-        System.out.println("id-------"+id);
+        //long id=Long.parseLong(ids);
+        //System.out.println("id-------"+id);
 //        for (final BidefendingCounsilDetails respondent : legalCase.getBiDefendingCounsilDetailsList()) {
 //        	if(respondent.getDefCounsilPrimary()!=null)
 //        	{

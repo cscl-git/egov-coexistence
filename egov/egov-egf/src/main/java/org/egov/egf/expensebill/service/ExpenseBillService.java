@@ -609,31 +609,7 @@ public class ExpenseBillService {
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
 					
-					for (StateHistory stat : egBillregister.getStateHistory()) {
-						System.out.println(stat.getId() + "   " + stat.getState().getId());
-					}
-					
-					if(!egBillregister.getStateHistory().isEmpty()) {
-						StateHistory sh = egBillregister.getStateHistory().stream()
-								.collect(Collectors.maxBy(Comparator.comparingLong(StateHistory::getId))).get();
-						if (null == sh.getId()) {
-							final Long created_by = egBillregister.getState().getCreatedBy();
-							egBillregister.getState().setOwnerPosition(created_by);
-							owenrPos.setId(created_by);
-						} else {
-							final Long own_pos = sh.getOwnerPosition();
-							egBillregister.getState().setOwnerPosition(own_pos);
-							owenrPos.setId(own_pos);
-						}
-						System.out.println("User with maximum age: " + sh.getId() + "    " + sh.getOwnerPosition());
-					}else {
-						final Long own_pos = egBillregister.getState().getCreatedBy();
-						egBillregister.getState().setOwnerPosition(own_pos);
-						owenrPos.setId(own_pos);
-					}
-					
-					
-					
+					owenrPos.setId(egBillregister.getCreatedBy());
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)

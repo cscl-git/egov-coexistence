@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="612" pageHeight="1008" columnWidth="512" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
-	<property name="ireport.zoom" value="1.0263162364614133"/>
+	<property name="ireport.zoom" value="1.366026910730141"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="584"/>
+	<property name="ireport.y" value="542"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -466,14 +466,14 @@
 				</jr:table>
 			</componentElement>
 			<textField>
-				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="1" y="87" width="493" height="34" isPrintWhenDetailOverflows="true" uuid="69482f61-eefb-429e-b26a-9afa59bf6646"/>
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="1" y="87" width="493" height="50" uuid="69482f61-eefb-429e-b26a-9afa59bf6646"/>
 				<textElement textAlignment="Right">
 					<font fontName="Verdana" size="11" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{totalAmountInWords}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="0" y="161" width="148" height="33" uuid="b689bd27-2faf-4a98-bb7a-45654a2c1553"/>
+				<reportElement positionType="Float" x="0" y="168" width="148" height="33" uuid="b689bd27-2faf-4a98-bb7a-45654a2c1553"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
 					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
@@ -481,7 +481,7 @@
 Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="318" y="161" width="136" height="34" uuid="59048ccb-c11f-4630-ac69-afaf1f0e467d"/>
+				<reportElement positionType="Float" x="318" y="168" width="136" height="34" uuid="59048ccb-c11f-4630-ac69-afaf1f0e467d"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
 					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
@@ -489,14 +489,14 @@ Chandigarh]]></text>
 Chandigarh]]></text>
 			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="0" y="129" width="267" height="32" uuid="504cfe65-2000-40ec-9d07-2dffba38cffa"/>
+				<reportElement positionType="Float" x="0" y="136" width="267" height="32" uuid="504cfe65-2000-40ec-9d07-2dffba38cffa"/>
 				<textElement verticalAlignment="Bottom">
 					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{secondarySignatory}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement positionType="Float" x="318" y="129" width="190" height="32" uuid="0049162e-c792-4988-ac32-550fd618cada"/>
+				<reportElement positionType="Float" x="318" y="136" width="190" height="32" uuid="0049162e-c792-4988-ac32-550fd618cada"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
 					<font fontName="Verdana" size="11"/>
 				</textElement>

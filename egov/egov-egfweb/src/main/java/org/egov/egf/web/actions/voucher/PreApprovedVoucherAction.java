@@ -253,6 +253,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     private boolean showVoucherDate;
     private String mode = "";
     protected Long voucherId;
+    protected String billdate;
     private EgBillregister billRegister;
     @Autowired
     private EgovMasterDataCaching masterDataCache;
@@ -376,6 +377,12 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
         }
         egBillregister = (EgBillregister) getPersistenceService().find(" from EgBillregister where id=?",
                 Long.valueOf(parameters.get(BILLID)[0]));
+        System.out.println(":before:Billdate:: "+egBillregister.getBilldate());
+        
+        String bill = formatter.format(egBillregister.getBilldate());
+        System.out.println("::After format:: "+bill);
+       setBilldate(bill);
+        
         if (egBillregister.getEgBillregistermis().getVoucherHeader() != null && egBillregister.getEgBillregistermis()
                 .getVoucherHeader().getStatus() != FinancialConstants.CANCELLEDVOUCHERSTATUS)
             voucherHeader = egBillregister.getEgBillregistermis().getVoucherHeader();
@@ -1904,6 +1911,14 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
 	protected String getMessage(final String key) {
         return getText(key);
     }
+
+	public String getBilldate() {
+		return billdate;
+	}
+
+	public void setBilldate(String billdate) {
+		this.billdate = billdate;
+	}
     
 
 }

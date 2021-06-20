@@ -81,6 +81,8 @@ import org.egov.lcms.autonumber.AdvocateUserNameGenerator;
 import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.CourtMaster;
 import org.egov.lcms.masters.repository.AdvocateMasterRepository;
+import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
+import org.egov.lcms.transactions.repository.BidefendingCounsilDetailsRepository;
 import org.egov.lcms.utils.constants.LcmsConstants;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,6 +118,9 @@ public class AdvocateMasterService extends PersistenceService<AdvocateMaster, Lo
     
     @Autowired
     private AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+    BidefendingCounsilDetailsRepository bidefendingCounsilDetailsRepository;
     
     public AdvocateMasterService() {
         super(AdvocateMaster.class);
@@ -317,6 +322,11 @@ public class AdvocateMasterService extends PersistenceService<AdvocateMaster, Lo
     public List<AdvocateMaster> getRecords(String name)
 	{
 		return advocateMasterRepository.getRecordsByRef(name);
+	}
+
+	public List<BidefendingCounsilDetails> getRecordsUpdatePayment(Long id) {
+		// TODO Auto-generated method stub
+		return bidefendingCounsilDetailsRepository.findById(id);
 	}
 
 }

@@ -368,8 +368,12 @@ public class CreateExpenseBillController extends BaseBillController {
 
     private String getMessageByStatus(final EgBillregister expenseBill, final String approverName, final String nextDesign) {
         String message = "";
-
-        if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode()) || FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(expenseBill.getStatus().getCode())) {
+        
+        if(expenseBill.getState().getValue().equalsIgnoreCase("Rejected"))
+        {
+        	message="Expense bill "+expenseBill.getBillnumber() +" has been rejected and sent back to Initiator";
+        }
+        else if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode()) || FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(expenseBill.getStatus().getCode())) {
             if (org.apache.commons.lang.StringUtils
                     .isNotBlank(expenseBill.getEgBillregistermis().getBudgetaryAppnumber())
                     && !BudgetControlType.BudgetCheckOption.NONE.toString()

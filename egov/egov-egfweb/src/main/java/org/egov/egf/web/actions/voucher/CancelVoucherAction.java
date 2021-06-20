@@ -101,6 +101,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.exilant.GLEngine.ChartOfAccounts;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 
 @ParentPackage("egov")
@@ -121,6 +122,8 @@ public class CancelVoucherAction extends BaseFormAction {
 	private static final String DD_MMM_YYYY = "dd-MMM-yyyy";
 	@Autowired
 	private CancelBillAndVoucher cancelBillAndVoucher;
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
 	private final List<String> headerFields = new ArrayList<String>();
 	private final List<String> mandatoryFields = new ArrayList<String>();
 	private CVoucherHeader voucherHeader = new CVoucherHeader();
@@ -173,9 +176,11 @@ public class CancelVoucherAction extends BaseFormAction {
 
 	@Override
 	public void prepare() {
-
+		System.out.println("2");
 		loggedInUser = ApplicationThreadLocals.getUserId().intValue();
+		System.out.println("3");
 		super.prepare();
+		System.out.println("4");
 		getHeaderFields();
 		loadDropDowns();
 	}
@@ -183,9 +188,13 @@ public class CancelVoucherAction extends BaseFormAction {
 	@SkipValidation
 	@Action(value = "/voucher/cancelVoucher-beforeSearch")
 	public String beforeSearch() {
+		System.out.println("1");
 		voucherHeader.reset();
+		System.out.println("CC");
 		setFromDate(null);
+		System.out.println("DD");
 		setToDate(null);
+		System.out.println("END");
 		return SEARCH;
 	}
 
@@ -580,7 +589,7 @@ public class CancelVoucherAction extends BaseFormAction {
 	}
 
 	private void loadDropDowns() {
-
+		System.out.println("Y1");
 		if (headerFields.contains("department")) {
 			List<org.egov.infra.microservice.models.Department> departments = masterDataCache.get("egi-department");
 			addDropdownData("departmentList", departments);
@@ -608,6 +617,19 @@ public class CancelVoucherAction extends BaseFormAction {
 		addDropdownData("typeList", VoucherHelper.VOUCHER_TYPES);
 		voucherNames = voucherHelpers.getVoucherNamesAndTypes();
 		nameMap = new LinkedHashMap<String, String>();
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+		System.out.println("Y2");
 	}
 
 	@Override
@@ -644,6 +666,7 @@ public class CancelVoucherAction extends BaseFormAction {
 	}
 
 	protected void getHeaderFields() {
+		System.out.println("X1");
 		final List<AppConfigValues> appConfigList = appConfigValueService.getConfigValuesByModuleAndKey("EGF",
 				"DEFAULT_SEARCH_MISATTRRIBUTES");
 
@@ -655,6 +678,7 @@ public class CancelVoucherAction extends BaseFormAction {
 			if (mandate.equalsIgnoreCase("M"))
 				mandatoryFields.add(header);
 		}
+		System.out.println("X2");
 
 	}
 

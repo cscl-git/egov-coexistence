@@ -142,6 +142,7 @@ public abstract class BaseFormAction extends ActionSupport
             try {
                 setRelationship(rel.getKey(), rel.getValue());
             } catch (IntrospectionException e) {
+            	e.printStackTrace();
                 throw new ApplicationRuntimeException(String.format("Could not set relationship for key %s of class %s",
                         rel.getKey(), rel.getValue().getSimpleName()), e);
             }
