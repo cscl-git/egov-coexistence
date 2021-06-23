@@ -101,6 +101,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.env.Environment;
 
+import com.exilant.eGov.src.common.SubDivision;
 import com.opensymphony.xwork2.validator.annotations.Validation;
 
 @Results(value = {
@@ -226,6 +227,21 @@ public class VoucherStatusReportAction extends BaseFormAction {
 		// persistenceService.findAllBy(" select distinct vh.type from
 		// CVoucherHeader vh order by vh.type")); //where
 		// vh.status!=4
+		if (headerFields.contains("subdivision")) {
+		List<AppConfigValues> appConfigValuesList =appConfigValueService.getConfigValuesByModuleAndKey("EGF",
+ 				"receipt_sub_divison");
+         List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+         SubDivision subdivision=null;
+         for(AppConfigValues value:appConfigValuesList)
+         {
+         	subdivision = new SubDivision();
+         	subdivision.setSubdivisionCode(value.getValue());
+         	subdivision.setSubdivisionName(value.getValue());
+         	subdivisionList.add(subdivision);
+         }
+         addDropdownData("subdivisionList", subdivisionList);
+		}
+		
 		addDropdownData("typeList", VoucherHelper.VOUCHER_TYPES);
 		addDropdownData("modeOfPaymentList",
 				persistenceService.findAllBy(" select DISTINCT upper(type) from Paymentheader "));
@@ -376,6 +392,9 @@ public class VoucherStatusReportAction extends BaseFormAction {
 
 		if (deptImpl.getCode() != null && !deptImpl.getCode().equals("-1"))
 			sql = sql + " and vh.vouchermis.departmentcode='" + deptImpl.getCode() + "'";
+		
+		if (voucherHeader.getVouchermis().getSubdivision() != null && !voucherHeader.getVouchermis().getSubdivision().equals("-1"))
+			sql = sql + " and vh.vouchermis.subdivision='" + voucherHeader.getVouchermis().getSubdivision() + "'";
 
 		if (voucherHeader.getVouchermis().getSchemeid() != null)
 			sql = sql + " and vh.vouchermis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId();

@@ -1,3 +1,4 @@
+
 <%--
   ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
   ~    accountability and the service delivery of the government  organizations.
@@ -105,6 +106,24 @@ function openSource(){
 	window.open(url,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 }
 
+function billdatecheck(){
+	
+	var billdate=document.getElementById('billdate').value;
+	var voucherDate=document.getElementById('voucherDate').value;
+	
+	
+	var billsplit = billdate.split("/");
+	   var bdate = new Date(billsplit[1] + "/" + billsplit[0] + "/" + billsplit[2]);
+	var vouchersplit = voucherDate.split("/");
+	   var vdate = new Date(vouchersplit[1] + "/" + vouchersplit[0] + "/" + vouchersplit[2]);
+	  if(vdate.setHours(0,0,0,0) > bdate.setHours(0,0,0,0)){
+		   bootbox.alert("Bill date is greater than voucher date");
+	   }else if(vdate.setHours(0,0,0,0) < bdate.setHours(0,0,0,0)){
+		   bootbox.alert("Bill date is lesser than voucher date");
+	   }
+	   
+}
+
 function openBudgetVoucher()
 {
 	var url = '<s:property value='%{getSourcePath()}' />';
@@ -141,8 +160,23 @@ function onSubmit()
 	var voucherdate =document.getElementById('voucherDate').value ;
 	var backdateentry =document.getElementById('backdateentry').value ;
 	if((voucherdate!=null && voucherdate!="")&&(backdateentry!="-1")){
+		var billdate=document.getElementById('billdate').value;
+		var voucherDate=document.getElementById('voucherDate').value;
+		var billsplit = billdate.split("/");
+		   var bdate = new Date(billsplit[1] + "/" + billsplit[0] + "/" + billsplit[2]);
+		var vouchersplit = voucherDate.split("/");
+		   var vdate = new Date(vouchersplit[1] + "/" + vouchersplit[0] + "/" + vouchersplit[2]);
+		   if(vdate.setHours(0,0,0,0) >= bdate.setHours(0,0,0,0)){
 		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
 		return true;
+		   }else {
+			   bootbox.alert("Voucher date can not be before Bill Date.Please check voucher date.");
+			   return false;
+		   }
+		   
+		
+		/* document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
+		return true; */
 	}else if(voucherdate==null || voucherdate==""){
 		bootbox.alert("<s:text name='msg.please.select.voucher.date'/> ");
 		return false;
@@ -198,6 +232,8 @@ function onSubmit()
 				<s:hidden id="billid" name="billid" value="%{egBillregister.id}" />
 				<s:hidden id="vhid" name="vhid" value="%{voucherHeader.id}" />
 				<s:hidden id="id" name="id" value="%{voucherHeader.id}" />
+				<s:hidden id="billdate" name="" value="%{billdate}" />
+				
 
 				<table align="center">
 					<tr class="bluebox">
@@ -317,6 +353,9 @@ function onSubmit()
 		<s:if test="%{hasErrors()}">
 			<script>
 document.getElementById('id').value='';
+
+
+
 	</script>
 		</s:if>
 		<s:token />

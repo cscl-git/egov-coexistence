@@ -610,7 +610,8 @@ public class ContraBTBActionHelper {
 	           List<OtherParty> othePartyList = otherPartyService.search(otherparty);
 	           otherparty = (OtherParty)othePartyList.get(0);
 	        Accountdetailtype  accountdetailtype =  accountdetailtypeService.findByName(otherparty.getClass().getSimpleName());
-	        List<Accountdetailkey>  accountdetailkeyList =accountdetailkeyService.findByDetailName(accountdetailtype.getId(),otherparty.getName());
+	        LOGGER.info("(otherparty.getId()).intValue() :::"+(otherparty.getId()).intValue());
+	        List<Accountdetailkey>  accountdetailkeyList =accountdetailkeyService.findByDetailContra(accountdetailtype.getId(),(otherparty.getId()).intValue());
             
 	        LOGGER.info("Subledder Details DETAILKEYID==> " +  accountdetailkeyList.get(0).getDetailkey());
 	        detailMap.put(VoucherConstant.FUNCTIONCODE, "");            
@@ -624,6 +625,9 @@ public class ContraBTBActionHelper {
             LOGGER.info("Subledger Details size==> " + subledgerDetails.size());
             for (final HashMap<String, Object> subdetailDetailMap : subledgerDetails) {
             	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.DETAILTYPEID).toString());
+            	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.DEBITAMOUNT).toString());
+            	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.DETAILKEYID).toString());
+            	LOGGER.info("Subledger Details DETAILTYPEID==> " +	subdetailDetailMap.get(VoucherConstant.GLCODE).toString());
             }
             
 			voucher = createVoucher.createVoucher(headerDetails, accountdetails, subledgerDetails);

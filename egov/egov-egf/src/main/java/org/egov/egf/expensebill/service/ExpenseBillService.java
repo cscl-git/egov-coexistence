@@ -50,11 +50,13 @@ package org.egov.egf.expensebill.service;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -126,6 +128,7 @@ public class ExpenseBillService {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExpenseBillService.class);
     private final ExpenseBillRepository expenseBillRepository;
+    
     private final ScriptService scriptExecutionService;
     @Autowired
     protected AppConfigValueService appConfigValuesService;
@@ -245,7 +248,7 @@ public class ExpenseBillService {
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 
         final EgBillregister savedEgBillregister = expenseBillRepository.save(egBillregister);
-
+        
         createCheckList(savedEgBillregister, checkLists);
 
         if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE)) {
@@ -540,6 +543,9 @@ public class ExpenseBillService {
                         .withStateValue(stateValue).withDateInfo(currentDate.toDate())
                         .withNextAction("")
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+			
+			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                         "Cancelled"));
             } else if (FinancialConstants.BUTTONVERIFY.equalsIgnoreCase(workFlowAction)) {
                 wfmatrix = egBillregisterRegisterWorkflowService.getWfMatrix(egBillregister.getStateType(), null,
                         null, additionalRule, egBillregister.getCurrentState().getValue(), null);
@@ -594,6 +600,8 @@ public class ExpenseBillService {
             	}
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
+					
+					owenrPos.setId(egBillregister.getCreatedBy());
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
@@ -824,4 +832,8 @@ public class ExpenseBillService {
         
         return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
      }
+
+	public void saveEgBillregister_afterStateNull(EgBillregister egbillregister) {
+		expenseBillRepository.save(egbillregister);
+	}
 }

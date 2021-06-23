@@ -253,7 +253,7 @@ public class VoucherSearchUtil {
 				&& !voucherHeader.getName().equalsIgnoreCase("-1"))
 			sql = sql + " and vh.name='" + voucherHeader.getName() + "'";
 		if (voucherHeader.getVoucherNumber() != null && !voucherHeader.getVoucherNumber().equals(""))
-			sql = sql + " and vh.voucherNumber like '%" + voucherHeader.getVoucherNumber() + "%'";
+			sql = sql + " and lower(vh.voucherNumber) like lower('%" + voucherHeader.getVoucherNumber() + "%')";
 		if (fromDate != null)
 			sql = sql + " and vh.voucherDate>='" + Constants.DDMMYYYYFORMAT1.format(fromDate) + "'";
 		if (toDate != null)

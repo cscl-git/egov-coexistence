@@ -368,7 +368,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             validateLedgerAndSubledger(egBillregister, resultBinder);
         }
         
-        if(!egBillregister.getBillPayeedetails().isEmpty())
+        if(!egBillregister.getBillPayeedetails().isEmpty() && !workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONCANCEL))
     	{
         populateBillDetails(egBillregister);
         

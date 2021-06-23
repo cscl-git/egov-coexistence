@@ -101,6 +101,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
 import com.exilant.GLEngine.ChartOfAccounts;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 
 @ParentPackage("egov")
@@ -121,6 +122,8 @@ public class CancelVoucherAction extends BaseFormAction {
 	private static final String DD_MMM_YYYY = "dd-MMM-yyyy";
 	@Autowired
 	private CancelBillAndVoucher cancelBillAndVoucher;
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
 	private final List<String> headerFields = new ArrayList<String>();
 	private final List<String> mandatoryFields = new ArrayList<String>();
 	private CVoucherHeader voucherHeader = new CVoucherHeader();
@@ -608,6 +611,19 @@ public class CancelVoucherAction extends BaseFormAction {
 		addDropdownData("typeList", VoucherHelper.VOUCHER_TYPES);
 		voucherNames = voucherHelpers.getVoucherNamesAndTypes();
 		nameMap = new LinkedHashMap<String, String>();
+		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+		System.out.println("Y2");
 	}
 
 	@Override

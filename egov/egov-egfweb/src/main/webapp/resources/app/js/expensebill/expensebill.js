@@ -1379,10 +1379,14 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Reject') {
-		$('#approvalDepartment').attr('required', 'required');
+		/*$('#approvalDepartment').attr('required', 'required');
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
-		$('#approvalComent').attr('required', 'required');
+		$('#approvalComent').attr('required', 'required');*/
+		 $('#approvalDepartment').removeAttr('required');
+	        $('#approvalDesignation').removeAttr('required');
+	        $('#approvalPosition').removeAttr('required');
+	        
 	}
 	 if (button != null && button == 'SaveAsDraft') {
 	        

@@ -225,8 +225,8 @@ public class VoucherHelper {
 				misQuery.append(egBillRegister.getEgBillregistermis().getFieldid().getId());
 			}
 			if (null != egBillRegister.getBillnumber() && !egBillRegister.getBillnumber().equalsIgnoreCase("")) {
-				misQuery.append(" and br.billnumber=");
-				misQuery.append("'" + egBillRegister.getBillnumber() + "'");
+				misQuery.append(" and lower(br.billnumber) like");
+				misQuery.append(" lower('%"+ egBillRegister.getBillnumber() + "%')");
 			}
 		}
 		return misQuery.toString();

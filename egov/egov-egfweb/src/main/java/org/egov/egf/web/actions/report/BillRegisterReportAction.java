@@ -104,6 +104,8 @@ import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import com.exilant.eGov.src.common.SubDivision;
+
 /**
  * @author manoranjan
  *
@@ -150,11 +152,14 @@ public class BillRegisterReportAction extends SearchFormAction {
     private List<String> chequeStatusCheckList = new ArrayList<String>();
     StringBuffer getRemiitPaymentVoucherQry = new StringBuffer("");
     List<Integer> cancelledChequeStatus = new ArrayList<Integer>();
+    List<AppConfigValues> appConfigValuesList=new ArrayList<AppConfigValues>();
 
     private static boolean errorState = false;
 
     @Autowired
     private EgovMasterDataCaching masterDataCache;
+    @Autowired
+	private AppConfigValueService appConfigValuesService;
     
     private Department deptImpl = new Department();
     
@@ -206,6 +211,7 @@ public class BillRegisterReportAction extends SearchFormAction {
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         isCompleteBillRegisterReport = false;
         loadDropdownData();
+        mandatoryFields.remove("subdivision");
         toDate = fromDate = null;
         voucherHeader.reset();
         exptype = billType = null;
@@ -220,6 +226,7 @@ public class BillRegisterReportAction extends SearchFormAction {
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         isCompleteBillRegisterReport = true;
         loadDropdownData();
+        mandatoryFields.remove("subdivision");
         toDate = fromDate = null;
         voucherHeader.reset();
         exptype = billType = null;
@@ -852,6 +859,10 @@ public class BillRegisterReportAction extends SearchFormAction {
             whereQuery.append(" and mis.fundid=" + voucherHeader.getFundId().getId());
         if (null != voucherHeader.getVouchermis().getDepartmentcode() && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
             whereQuery.append(" and mis.departmentcode='" + voucherHeader.getVouchermis().getDepartmentcode()+"'");
+        
+        if (null != voucherHeader.getVouchermis().getSubdivision() && !voucherHeader.getVouchermis().getSubdivision().equals("-1"))
+            whereQuery.append(" and mis.subdivision='" + voucherHeader.getVouchermis().getSubdivision()+"'");
+        
         if (null != voucherHeader.getVouchermis().getSchemeid())
             whereQuery.append(" and mis.schemeid=" + voucherHeader.getVouchermis().getSchemeid().getId());
         if (null != voucherHeader.getVouchermis().getSubschemeid())
@@ -977,7 +988,19 @@ public class BillRegisterReportAction extends SearchFormAction {
                 "billTypeList",
                 persistenceService
                 .findAllBy(" select distinct bill.billtype from EgBillregister bill where  bill.billtype is not null order by bill.billtype"));
-
+        if (headerFields.contains("subdivision"))
+        	  appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+       				"receipt_sub_divison");
+               List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+               SubDivision subdivision=null;
+               for(AppConfigValues value:appConfigValuesList)
+               {
+               	subdivision = new SubDivision();
+               	subdivision.setSubdivisionCode(value.getValue());
+               	subdivision.setSubdivisionName(value.getValue());
+               	subdivisionList.add(subdivision);
+               }
+               addDropdownData("subdivisionList", subdivisionList);
     }
 
     protected void getHeaderFields()

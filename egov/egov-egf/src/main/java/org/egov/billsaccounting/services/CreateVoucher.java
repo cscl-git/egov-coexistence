@@ -2067,6 +2067,7 @@ public class CreateVoucher {
 
 			if (null != subdetailDetailMap.get(VoucherConstant.DETAILKEYID)) {
 				detailKeyId = subdetailDetailMap.get(VoucherConstant.DETAILKEYID).toString();
+				LOGGER.info("Voucher DTLTP::::"+detailKeyId);
 				final Session session = persistenceService.getSession();
 				final Query qry = session.createQuery(
 						"from Accountdetailkey adk where adk.accountdetailtype.id=:detailtypeid and adk.detailkey=:detailkey");
@@ -2074,9 +2075,16 @@ public class CreateVoucher {
 				qry.setInteger("detailkey", Integer.valueOf(detailKeyId));
 				qry.setCacheable(true);
 				if (null == qry.list() || qry.list().size() == 0)
+				{
+					LOGGER.info("ERROR1");
 					throw new ApplicationRuntimeException("Subledger data is not valid for account code " + glcode);
+				}
 			} else
+			{
+				LOGGER.info("ERROR2");
 				throw new ApplicationRuntimeException("detailkeyid is missing");
+			}
+				
 
 			if (null != subdetailDetailMap.get(VoucherConstant.DEBITAMOUNT)
 					&& new BigDecimal(subdetailDetailMap.get(VoucherConstant.DEBITAMOUNT).toString())
