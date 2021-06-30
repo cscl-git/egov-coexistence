@@ -66,6 +66,7 @@ import org.apache.commons.lang.StringUtils;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.CVoucherHeader;
 import org.egov.commons.service.CFinancialYearService;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.CheckListService;
@@ -206,7 +207,7 @@ public class RefundBillService {
 
     @Transactional
     public EgBillregister create(final EgBillregister egBillregister, final Long approvalPosition, final String approvalComent
-            , final String additionalRule, final String workFlowAction,final String approvalDesignation) {
+            , final String additionalRule, final String workFlowAction,final String approvalDesignation, final String vhid) {
         if (StringUtils.isBlank(egBillregister.getBilltype()))
             egBillregister.setBilltype(FinancialConstants.BILLTYPE_FINAL_BILL);
         egBillregister.setPassedamount(egBillregister.getBillamount());
@@ -235,8 +236,22 @@ public class RefundBillService {
         if (isBillNumberGenerationAuto())
             egBillregister.setBillnumber(getNextBillNumber(egBillregister));
 
-        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+        List<AppConfigValues> RefundGLCodeList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","RefundGLCode");
+        
+        List<String> glCodeList = new ArrayList<String>();
+        for(AppConfigValues v : RefundGLCodeList) {
+        	glCodeList.add(v.getValue());
+        }
+        
+        String glCode = null;
+        if(egBillregister.getBillDetails().get(0).getGlcodeid()!=null) {
+        	 glCode =   egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode();
+        }
+
+        System.out.println("glcode :::"+glCode+"-------"+glCodeList.toString());
+        if(!(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)) && glCodeList.contains(glCode))
     	{ 
+        	System.out.println("X");
         try {
             checkBudgetAndGenerateBANumber(egBillregister);
         } catch (final ValidationException e) {
@@ -244,7 +259,7 @@ public class RefundBillService {
         }
     	}
       
-
+        String VOUCHERQUERY = " from CVoucherHeader where id=?";
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 
         final EgBillregister savedEgBillregister = expenseBillRepository.save(egBillregister);
@@ -260,6 +275,11 @@ public class RefundBillService {
                     FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
             createExpenseBillRegisterWorkflowTransition(savedEgBillregister, approvalPosition, approvalComent, additionalRule,
                     workFlowAction,approvalDesignation);
+            
+            CVoucherHeader  voucherHeader = (CVoucherHeader) persistenceService.find(VOUCHERQUERY, Long.valueOf(vhid));
+            voucherHeader.setRefundable("Y");
+            voucherService.persist(voucherHeader);
+           
         }
         List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
         final List<DocumentUpload> documentDetails;
@@ -624,8 +644,17 @@ public class RefundBillService {
                 		stateValue = wfmatrix.getNextState();
                 		if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
                 		{
+							if (egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()
+									&& egBillregister.getRefundable().equalsIgnoreCase("Y")
+									&& egBillregister.getExpendituretype()
+											.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+                				egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                                        FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                			}else {
                 			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                                     FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		
+                			}
                 		}
                 		
                 	}

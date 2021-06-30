@@ -79,7 +79,18 @@
 	</div>			
 	
 	<div class="buttonbottom">
+	
+	<c:choose>
+    <c:when test="${type=='refund'}">
+        <input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/refund/view/${billd}')" class="btn btn-default">
+        <br />
+    </c:when>    
+    <c:otherwise>
 	<input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/expensebill/view/${billd}')" class="btn btn-default">
+        <br />
+    </c:otherwise>
+</c:choose>
+	
 	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 	<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 	</div>

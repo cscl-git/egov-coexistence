@@ -1386,9 +1386,9 @@ function validateWorkFlowApprover(name) {
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Reject') {
-		$('#approvalDepartment').removeAttr('required');
-        $('#approvalDesignation').removeAttr('required');
-        $('#approvalPosition').removeAttr('required');
+		$('#approvalDepartment').attr('required', 'required');
+		$('#approvalDesignation').attr('required', 'required');
+		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').attr('required', 'required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {
@@ -1549,4 +1549,19 @@ function populateBdgetDetails()
 			window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
 		}
 	}
+	}
+
+function changeGlCode(totalrow){
+	$('#glcodeid').empty();
+	for(var i=0;i<totalrow;++i){
+	  
+	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
+
+		var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
+		var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
+		  var k ='<option value="'+glId_+'">'+glcode_+'</option>';
+		  $('#glcodeid').append(k);  
+	}	
+		 
+}
 	}

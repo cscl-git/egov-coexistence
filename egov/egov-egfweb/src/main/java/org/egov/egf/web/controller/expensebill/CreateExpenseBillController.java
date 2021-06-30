@@ -360,7 +360,7 @@ public class CreateExpenseBillController extends BaseBillController {
         final EgBillregister expenseBill = expenseBillService.getByBillnumber(billNumber);
 
         final String message = getMessageByStatus(expenseBill, approverName, nextDesign);
-
+        model.addAttribute("type", "expensebill");
         model.addAttribute("message", message);
 
         return "expensebill-success";

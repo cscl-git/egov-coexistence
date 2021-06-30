@@ -19,6 +19,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -40,6 +41,8 @@ import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.service.AccountdetailtypeService;
 import org.egov.commons.service.ChartOfAccountDetailService;
+import org.egov.commons.service.ChartOfAccountsService;
+import org.egov.commons.service.CheckListService;
 import org.egov.commons.service.EntityTypeService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.autonumber.ExpenseBillNumberGenerator;
@@ -55,6 +58,7 @@ import org.egov.egf.contract.model.RefundResponse;
 import org.egov.egf.contract.model.VoucherDetailsResponse;
 import org.egov.egf.contract.model.VoucherResponse;
 import org.egov.egf.contract.model.VoucherSearch;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.expensebill.service.RefundBillService;
 import org.egov.egf.expensebill.service.VouchermisService;
@@ -69,6 +73,7 @@ import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.ChartOfAccounts;
+import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -77,6 +82,7 @@ import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.infstr.models.EgChecklists;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.model.bills.BillType;
@@ -127,12 +133,15 @@ public class PaymentRefundController extends BaseBillController {
 	 private static final String ACCDETAILTYPEQUERY = " from Accountdetailtype where id=?";
 	private static final String STATE_TYPE = "stateType";
 	private static final String BILL_TYPES = "billTypes";
+	private static final String EG_BILLREGISTER = "egBillregister";
 	
 	private static final String NET_PAYABLE_ID = "netPayableId";
 	private static final String DESIGNATION = "designation";
     private static final String APPROVAL_POSITION = "approvalPosition";
 
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
+    private static final String EXPENSEBILL_VIEW = "expensebill-view";
+    private static final String NET_PAYABLE_AMOUNT = "netPayableAmount";
 
     private static final int BUFFER_SIZE = 4096;
 	
@@ -144,6 +153,26 @@ public class PaymentRefundController extends BaseBillController {
 	
 	private final String RE_PR_APPROVEDVOUCHER="re-pr-approvedvoucher";
 	
+	
+	
+	@Autowired
+	private DocumentUploadRepository documentUploadRepository;
+	
+	@Autowired
+	private CheckListService checkListService;
+	
+	@Autowired
+	private MicroserviceUtils microServiceUtil;
+	
+	
+	@Qualifier("chartOfAccountsService")
+	@Autowired
+	private ChartOfAccountsService chartOfAccountsService;
+	 
+	 private void prepareCheckList(final EgBillregister egBillregister) {
+	        final List<EgChecklists> checkLists = checkListService.getByObjectId(egBillregister.getId());
+	        egBillregister.getCheckLists().addAll(checkLists);
+	    }
 	
 	    private String cutOffDate;
 	    protected DateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
@@ -270,7 +299,7 @@ public class PaymentRefundController extends BaseBillController {
 		if(!StringUtils.isEmpty(voucherSearch.getServiceType())) {
 			voucherHeader.getVouchermis().setServiceName(voucherSearch.getServiceType());
 		}
-		
+		System.out.println("test");
 		List<CVoucherHeader> list = null;
 		try {
 			list = voucherSearchUtil.search(voucherHeader, fromDate, toDate, "");
@@ -331,6 +360,7 @@ public class PaymentRefundController extends BaseBillController {
 					voucherMap.put("source", sourceMap.get(voucherheader.getModuleId()));
 
 				voucherMap.put("amount", amt.setScale(2, BigDecimal.ROUND_HALF_EVEN).toString());
+				System.out.println(paymentRefundUtils.getVoucherStatus(voucherheader.getStatus()));
 				voucherMap.put("status", paymentRefundUtils.getVoucherStatus(voucherheader.getStatus()));
 				if(!(voucherheader.getName().equals("Remittance Payment") || voucherheader.getName().equals("Bill Payment") || voucherheader.getName().equals("Direct Bank Payment")) && voucherheader.getStatus()!=4 && voucherheader.getStatus()!=0 && voucherheader.getState() != null) {
 					//voucherMap.put("pendingWith", paymentRefundUtils.getEmployeeName(voucherheader.getState().getOwnerPosition()));
@@ -363,7 +393,11 @@ public class PaymentRefundController extends BaseBillController {
 				if(!voucherMap.containsKey("payeeName")) {
 					voucherMap.put("payeeName", "-");
 				}
+				
+				//voucherList.add(voucherMap);
+				if(paymentRefundUtils.getVoucherStatus(voucherheader.getStatus())=="Approved"){
 				voucherList.add(voucherMap);
+				}
 			}
 			
 			JSONArray jsonArr=new JSONArray();
@@ -515,7 +549,7 @@ public class PaymentRefundController extends BaseBillController {
 	public String paymentRequestForm(@RequestParam(name = "vhid") final String vhid, final Model model) {
 		
 		 List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
-		 EgBillregister egBillregister;
+		 EgBillregister egBillregister = new EgBillregister();
 		 
 		VoucherDetailsResponse voucherDetails = new VoucherDetailsResponse();
 		final List<Map<String, Object>> tempList = new ArrayList<Map<String, Object>>();
@@ -548,7 +582,24 @@ public class PaymentRefundController extends BaseBillController {
 			voucherDetails.setModuleId(voucherHeader.getModuleId());
 			voucherDetails.setVouchermis(voucherHeader.getVouchermis());
 			
+			if(paymentRefundUtils.getEgBillregister(voucherHeader)!=null) {
 			 egBillregister = paymentRefundUtils.getEgBillregister(voucherHeader);
+			}else {
+				
+				if(voucherDetails.getVouchermis().getDepartmentcode()!=null) {
+				 org.egov.infra.microservice.models.Department depList = microserviceUtils.getDepartmentByCode(voucherDetails.getVouchermis().getDepartmentcode());
+				 voucherDetails.setDeptName(depList != null ? depList.getName() : "");
+				model.addAttribute("departcode",voucherDetails.getVouchermis().getDepartmentcode());
+				}
+			}
+			
+			
+			if(null != egBillregister && null != egBillregister.getEgBillregistermis()) {
+				
+			}else {
+				voucherDetails.setFundName(voucherDetails.getFund().getName());
+				model.addAttribute("fundid", voucherDetails.getFund().getId());
+			}
 			
 			if(null != egBillregister && null != egBillregister.getEgBillregistermis()) {
 				if (egBillregister.getEgBillregistermis().getFund() != null) {
@@ -637,8 +688,8 @@ public class PaymentRefundController extends BaseBillController {
 		
 			//System.out.println("hello sonu state type is:   "+egBillregister.getClass().getSimpleName());
 			
-			  //model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
-			  //prepareWorkflow(model, egBillregister, new WorkflowContainer());
+			  model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
+			  prepareWorkflow(model, egBillregister, new WorkflowContainer());
 			  model.addAttribute("validActionList", validActions);
 			  model.addAttribute(BILL_TYPES, BillType.values());
 			  prepareValidActionListByCutOffDate(model);
@@ -659,8 +710,12 @@ public class PaymentRefundController extends BaseBillController {
 	}
 	
     private void populateDropDownValues(final Model model) {
+    	
+    	List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"RefundBillType");
+    	
         model.addAttribute("billNumberGenerationAuto", refundBillService.isBillNumberGenerationAuto());
-        model.addAttribute("billSubTypes", getBillSubTypes());
+        model.addAttribute("billSubTypes", appConfigValuesList);
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
     }
@@ -714,7 +769,9 @@ public class PaymentRefundController extends BaseBillController {
 			 
 			 totalCrAmt=totalCrAmt.add(checknull(egbilldetail.getDebitamount()));
 			 }
-		 BigDecimal bg1 = egBillregister.getBillDetails().get(0).getFunctionid();
+		 //BigDecimal bg1 = egBillregister.getBillDetails().get(0).getFunctionid();
+		 
+		 Long bg1 = egBillregister.getEgBillregistermis().getFunction().getId();
 		 
 		 List<EgBilldetails> egbilldetailCusList=new ArrayList<EgBilldetails>();
            for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) { 
@@ -831,7 +888,9 @@ public class PaymentRefundController extends BaseBillController {
                       try {
                     	  System.out.println("From egbillregister Save method calling");
                            savedEgBillregister = refundBillService.create(egBillregister, approvalPosition, approvalComment, null, 
-                           workFlowAction,approvalDesignation);
+                           workFlowAction,approvalDesignation,vhid);
+                           
+                           
                          } catch (ValidationException e) {
                         	 System.out.println("From Exception saving time");
                         	 e.printStackTrace();
@@ -850,7 +909,8 @@ public class PaymentRefundController extends BaseBillController {
                                      savedEgBillregister.getState(), savedEgBillregister.getId(), approvalPosition,approverName);
                      		              
                         return "redirect:/refund/successRefund?approverDetails=" + approverDetails + "&billNumber="
-                        		                    + savedEgBillregister.getBillnumber();
+                        		                    + savedEgBillregister.getBillnumber()+"&billId="
+                        		                            + savedEgBillregister.getId();
                        }
                  
             }
@@ -858,7 +918,7 @@ public class PaymentRefundController extends BaseBillController {
     
     @RequestMapping(value = "/successRefund", method = RequestMethod.GET)
     public String showSuccessPage(@RequestParam("billNumber") final String billNumber, final Model model,
-                                  final HttpServletRequest request) {
+                                  final HttpServletRequest request, @RequestParam("billId") final String billId) {
         final String[] keyNameArray = request.getParameter("approverDetails").split(",");
         Long id = 0L;
         String approverName = "";
@@ -882,7 +942,8 @@ public class PaymentRefundController extends BaseBillController {
             model.addAttribute("approverName", approverName);
 //        model.addAttribute("currentUserDesgn", currentUserDesgn);
 //        model.addAttribute("nextDesign", nextDesign);
-
+        model.addAttribute("billd", billId);
+        model.addAttribute("type", "refund");
         final EgBillregister expenseBill = refundBillService.getByBillnumber(billNumber);
 
         final String message = getMessageByStatus(expenseBill, approverName, nextDesign);
@@ -1232,4 +1293,58 @@ public class PaymentRefundController extends BaseBillController {
 	    	model.addAttribute("detailTypeList", detailtypeIdList);
 	    	//dropdownData.put("detailTypeList", detailtypeIdList);
     }
+	    
+	    
+		@RequestMapping(value = "/view/{billId}", method = RequestMethod.GET)
+	    public String view(final Model model, @PathVariable String billId,
+	            final HttpServletRequest request) throws ApplicationException {
+	        if (billId.contains("showMode")) {
+	            String[] billIds = billId.split("\\&");
+	            billId = billIds[0];
+	        }
+	        final EgBillregister egBillregister = expenseBillService.getById(Long.parseLong(billId));
+	        final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(billId));
+	        egBillregister.setDocumentDetail(documents);
+	        String departmentCode = this.getDepartmentName(egBillregister.getEgBillregistermis().getDepartmentcode());
+	        egBillregister.getEgBillregistermis().setDepartmentName(departmentCode);
+	        setDropDownValues(model);
+	        egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
+	        model.addAttribute("mode", "readOnly");
+	        model.addAttribute("type", "refundbill");
+	        model.addAttribute(BILL_TYPES, BillType.values());
+	        prepareBillDetailsForView(egBillregister);
+	        prepareCheckList(egBillregister);
+	        
+	        final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService.getNetPayableCodesByAccountDetailType(0);
+	        
+	        for (final EgBilldetails details : egBillregister.getBillDetails())
+	            if (expensePayableAccountList != null && !expensePayableAccountList.isEmpty()
+	                    && expensePayableAccountList.contains(details.getChartOfAccounts()))
+	                model.addAttribute(NET_PAYABLE_AMOUNT, details.getCreditamount());
+	        model.addAttribute(EG_BILLREGISTER, egBillregister);
+	        return EXPENSEBILL_VIEW;
+	    }
+		
+		  private String getDepartmentName(String departmentCode) {
+
+		        List<Department> deptlist = this.masterDataCache.get("egi-department");
+		        String departmentName = null;
+
+		        if (null != deptlist && !deptlist.isEmpty()) {
+
+		            List<Department> dept = deptlist.stream()
+		                    .filter(department -> departmentCode.equalsIgnoreCase(department.getCode()))
+		                    .collect(Collectors.toList());
+		            if (null != dept && dept.size() > 0)
+		                departmentName = dept.get(0).getName();
+		        }
+
+		        if (null == departmentName) {
+		            Department dept = this.microServiceUtil.getDepartmentByCode(departmentCode);
+		            if (null != dept)
+		                departmentName = dept.getName();
+		        }
+
+		        return departmentName;
+		    }
 }

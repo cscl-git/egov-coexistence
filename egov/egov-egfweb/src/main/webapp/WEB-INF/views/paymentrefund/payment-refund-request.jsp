@@ -28,7 +28,7 @@
 		   <table border="0" width="100%" cellspacing="0">
 			<tr>
 			 <td width="10%" class="greybox"><b>Voucher Number :  </b></td>
-			 <td width="25%" class="greybox">${voucherDetails.name}</td>
+			 <td width="25%" class="greybox">${voucherDetails.voucherNumber}</td>
 			 <td width="10%" class="greybox"><b>Date :</b></td>
 			 <td width="25%" class="greybox">
 				<fmt:formatDate pattern="dd/MM/yyyy" value="${voucherDetails.voucherDate}" var="voucherDate" />
@@ -59,6 +59,33 @@
 			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.banNumber}</td>
 			</tr>
+			
+			<tr>
+			 <td width="10%" class="greybox"><b>Function :</b><span class="mandatory"></span></td>
+			 <td width="25%" class="greybox">
+			 <select name="egBillregistermis.function"
+									id="egBillregistermis.function" required="required"
+									class="form-control">
+										<option value="">-Select-</option>
+										<c:forEach items="${cFunctions}" var="function"
+											varStatus="loop">
+											<option value="${function.id}">${function.name}</option>
+										</c:forEach>
+										<%-- <options items="${cFunctions}" itemValue="id" itemLabel="name" /> --%>
+								</select>
+								</td>
+			 <td width="10%" class="greybox"><b>Bill Type :  </b><span class="mandatory"></span></td>
+			 <td width="25%" class="greybox">
+			 <select name="egBillregistermis.egBillSubType" data-first-option="false" id="billSubType" class="form-control" required="required">
+				<option value=""><spring:message code="lbl.select" text="Select"/></option>
+				<c:forEach items="${billSubTypes}" var="subType"
+											varStatus="loop">
+											<option value="${subType.id}">${subType.value}</option>
+										</c:forEach>
+				<%-- <options items="${billSubTypes}" itemValue="id" itemLabel="name" /> --%>
+			</select>
+			 </td>
+			</tr>
 		</table>
 	 </div>
 	</div>
@@ -68,7 +95,7 @@
 	<input type="hidden" name="egBillregistermis.narration" id="egBillregistermis.narration" value="${voucherDetails.narration}"/>
 	<input type="hidden" name="egBillregistermis.budgetaryAppnumber" id="egBillregistermis.budgetaryAppnumber" value="${voucherDetails.banNumber}"/>
 	<input type="hidden" name="egBillregistermis.fundsource" id="egBillregistermis.fundsource" value="${fundsource}"/>
-	<input type="hidden" name="egBillregistermis.egBillSubType" id="egBillregistermis.egBillSubType" value="${billsubtype}"/> 
+	<%-- <input type="hidden" name="egBillregistermis.egBillSubType" id="egBillregistermis.egBillSubType" value="${billsubtype}"/>  --%>
 	<input type="hidden" name="egBillregistermis.subdivision" id="egBillregistermis.subdivision" value="${voucherDetails.subdivision}"/> 
 	
 	
@@ -106,7 +133,7 @@
 		<table class="table table-bordered" id="tblaccountdetails">
 			<thead>
 				<tr>
-				    <th><spring:message code="lbl.function.name" text="Function Name"/></th>
+				    <%-- <th><spring:message code="lbl.function.name" text="Function Name"/></th> --%>
 					<th><spring:message code="lbl.account.code" text="Account Code"/></th>
 					<th><spring:message code="lbl.account.head" text="Account Head"/></th>
 					<th><spring:message code="lbl.debit.amount" text="Debit Amount"/></th>
@@ -117,11 +144,14 @@
 				</tr>
 			</thead>
 			<tbody>
+			
 			 <c:choose>
 			  <c:when test="${!accountDetails.isEmpty()}">
 				<c:forEach items="${accountDetails}" var="accountDetail" varStatus="status">
 				 <tr>
-				    <td><input type="hidden" name="billDetails[${status.index}].functionid" value="${accountDetail.functionid}">${accountDetail.function}</td>
+				   <%--  <td><input type="hidden" name="billDetails[${status.index}].functionid" value="${accountDetail.functionid}">${accountDetail.function}</td> --%>
+				    <input type="hidden" id="billDetails[${status.index}].glcodeid" readonly value="${accountDetail.glcodeid}">
+				    <input type="hidden" id="billDetails[${status.index}].glcode" readonly value="${accountDetail.glcode}"> 
 				       
 				    <td><input type="hidden" name="billDetails[${status.index}].glcodeid" value="${accountDetail.glcodeid}">${accountDetail.glcode}</td>
 					<td><input type="hidden" name="billDetails[${status.index}].chartOfAccounts.name" value="${accountDetail.chartOfAccounts.name}">${accountDetail.accounthead}</td>
@@ -130,7 +160,7 @@
 					<%--<input type="hidden" name="billDetails[${status.index}].detailTypeId" id="billDetails[${status.index}].detailTypeId" value="${accountDetail.glcodeid}" class="form-control table-input hidden-input accountDetailsDetailTypeId"/>
 					<input type="hidden" name="billDetails[${status.index}].detailKeyId" id="billDetails[${status.index}].detailKeyId" class="form-control table-input hidden-input accountDetailsDetailKeyId"/>
 						 --%>		
-					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
 					       class="form-control"/></td>
 					<%-- <td><input type="text" name="billDetails[${status.index}].creditamount" id="billDetails[${status.index}].creditamount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" 
 					       class="form-control"/></td> --%> 
@@ -181,12 +211,10 @@
 				  <input type="hidden" name="billPayeedetails[0].debitAmount" value="0" id="subLedgerDebitAmount_0" class ="subledgerdebitamount"/>
 				   -->
 				  
-				  
-				  
-				  <select data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
+				  <select id="glcodeid" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
 				  <option value=""><spring:message code="lbl.select" text="Select"/>
-				  <c:forEach var="subLedger" items="${subLedgerlist}">
-				    <option value="${subLedger.glcode.id}">${subLedger.glcode.glcode}</option>
+				  <c:forEach var="subLedger"  items="${accountDetails}">
+				    <option value="${subLedger.glcodeid}">${subLedger.glcode}</option>
                     </c:forEach>
 				  </select>
 				  </td>

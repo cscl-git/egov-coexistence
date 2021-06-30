@@ -10,6 +10,7 @@ import org.egov.commons.CFinancialYear;
 import org.egov.commons.Fund;
 import org.egov.commons.service.CFinancialYearService;
 import org.egov.egf.contract.model.AuditDetails;
+import org.egov.egf.model.BudgetAppDisplay;
 import org.egov.egf.model.BudgetVarianceEntry;
 import org.egov.egf.model.BudgetVarianceEntryRestData;
 import org.egov.egf.model.IEStatementEntry;
@@ -17,6 +18,7 @@ import org.egov.egf.model.MinorScheduleRestData;
 import org.egov.egf.model.ScheduleReportRestData;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementEntry;
+import org.egov.egf.web.actions.report.BudgetAppropriationRegisterReportAction;
 import org.egov.egf.web.actions.report.BudgetVarianceReportAction;
 import org.egov.egf.web.actions.report.IncomeExpenditureReportAction;
 import org.egov.infra.admin.master.service.DepartmentService;
@@ -47,6 +49,9 @@ public class IncomeExpenditureRestController {
 	
     @Autowired
 	BudgetVarianceReportAction budgetVarianceReportAction;
+	
+    @Autowired
+    BudgetAppropriationRegisterReportAction budgetAppropriationRegisterReportAction;
 	
     @Autowired
   private   CFinancialYearService cFinancialYearService;
@@ -583,6 +588,47 @@ public class IncomeExpenditureRestController {
 		finallist.addAll(expense);
 		return finallist;
 	}
+	
+	
+	
+	
+	@ResponseBody
+	@RequestMapping(value = "getAllBudgetWatchReportRestData", method = RequestMethod.GET)
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	public ResponseEntity<ResponseInfoWrapper>  getAllBudgetWatchReportRest(ModelMap m ,HttpServletRequest req ){
+		
+			boolean datafound = false;
+			Department d = null;
+			CFinancialYear cf = new CFinancialYear();
+			Fund f = new Fund();
+			List<BudgetAppDisplay> budgetApprRegNewList = new ArrayList<>();
+			budgetApprRegNewList=null;
+			budgetAppropriationRegisterReportAction.generateRestReport();
+			budgetApprRegNewList = budgetAppropriationRegisterReportAction.getUpdatedBdgtAppropriationRegisterList();
+			
+			if(null!=budgetApprRegNewList) {
+				
+				datafound =true;
+				m.addAttribute("data_requested", "Budget Watch Report ");
+				m.addAttribute("message", "Successfully fetched Data ");
+				m.addAttribute("data_found",datafound );
+				m.addAttribute("budgetwatachtreportlist",budgetApprRegNewList );
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody(m).build(),getHeaders(), HttpStatus.OK);
+			}
+			
+			m.addAttribute("data_requested", "Budget Watch Report ");
+			m.addAttribute("message", "Failed fetching Data ");
+			m.addAttribute("data_found",datafound );
+				 return new ResponseEntity<>(ResponseInfoWrapper.builder()
+							.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+							.responseBody(m).build(),getHeaders(), HttpStatus.OK);
+			 
+			
+					
+	}
+	
 	
 	
 	
