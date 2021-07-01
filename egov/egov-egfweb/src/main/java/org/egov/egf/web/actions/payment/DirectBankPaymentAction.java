@@ -79,6 +79,7 @@ import org.egov.commons.Vouchermis;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -152,6 +153,11 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
+    
+    @Autowired
+    private ExpenseBillService expenseBillService;
+    
+    
     @Autowired
     private CreateVoucher createVoucher;
     private PaymentService paymentService;
@@ -500,7 +506,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         } else {
             try {
                 // loading the bill detail info.
-                getMasterDataForBill();
+                getMasterDataForBill(egBillregister.getId());
             } catch (final Exception e) {
             	 System.out.println("In Exception of Sonu Action java class");
                 final List<ValidationError> errors = new ArrayList<ValidationError>();
@@ -670,7 +676,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
        // billDetails.put("subLedgerlist", payeeList);
     }
 
-    public void getMasterDataForBill() throws ApplicationException {
+    public void getMasterDataForBill(Long billId) throws ApplicationException {
         //billDetails = new HashMap<String, Object>();
         CChartOfAccounts coa = null;
         VoucherDetails temp = null;
@@ -679,10 +685,15 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         final List<VoucherDetails> payeeList = new ArrayList<VoucherDetails>();
         VoucherDetails subledger = null;
 
-        final List<EgBilldetails> egBillDetails = persistenceService
-                .findAllBy("from EgBilldetails where  egBillregister.id=? ", egBillregister.getId());
+       /* final List<EgBilldetails> egBillDetails = persistenceService
+                .findAllBy("from EgBilldetails where  egBillregister.id=? ", egBillregister.getId());*/
 
-        for (final EgBilldetails billdetails : egBillDetails) {
+        final EgBillregister egBillregister = expenseBillService.getById(billId);
+        
+        
+        
+
+        for (final EgBilldetails billdetails : egBillregister.getEgBilldetailes()) {
             temp = new VoucherDetails();
             if (billdetails.getFunctionid() != null)
                 //temp.put(Constants.FUNCTION, ((CFunction) getPersistenceService().find("from CFunction where id=?",
@@ -707,6 +718,9 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
             for (final EgBillPayeedetails payeeDetails : billdetails.getEgBillPaydetailes()) {
                 payeeMap = new HashMap<>();
+                
+                System.out.println("result :::::::::::::::"+chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId( payeeDetails.getEgBilldetailsId().getGlcodeid().longValue(),payeeDetails.getAccountDetailTypeId().intValue()) != null);
+                
                 subledger = new VoucherDetails();
                 if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(
                         payeeDetails.getEgBilldetailsId().getGlcodeid().longValue(),

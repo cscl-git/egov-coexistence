@@ -80,7 +80,7 @@
 				<option value=""><spring:message code="lbl.select" text="Select"/></option>
 				<c:forEach items="${billSubTypes}" var="subType"
 											varStatus="loop">
-											<option value="${subType.id}">${subType.value}</option>
+											<option value="${subType.id}">${subType.name}</option>
 										</c:forEach>
 				<%-- <options items="${billSubTypes}" itemValue="id" itemLabel="name" /> --%>
 			</select>

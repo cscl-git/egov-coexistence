@@ -141,12 +141,12 @@ public class AuditService {
 				bill=savedAuditDetails.getEgBillregister();
 				if(bill.getRefundable() != null && bill.getRefundable().equalsIgnoreCase("Y"))
 				{
-					bill.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+					bill.setStatus(financialUtils.getStatusByModuleAndCode("REFUNDBILL",
 		                    FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
 				}
 				else
 				{
-					bill.setStatus(financialUtils.getStatusByModuleAndCode("REFUNDBILL",
+					bill.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
 		                    FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
 				}
 				

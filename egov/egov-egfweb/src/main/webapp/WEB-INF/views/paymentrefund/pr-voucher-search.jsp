@@ -42,7 +42,7 @@
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.todate" text="To Date"/> <span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="toDate" cssClass="form-control datepicker" title="Please enter a valid date" pattern="\d{1,2}/\d{1,2}/\d{4}"
-										data-date-end-date="-1d" id="toDate" data-inputmask="'mask': 'd/m/y'" required="required" />
+										data-date-end-date="0d" id="toDate" data-inputmask="'mask': 'd/m/y'" required="required" />
 							<form:errors path="toDate" cssClass="add-margin error-msg" />
 						</div>
 					</div>

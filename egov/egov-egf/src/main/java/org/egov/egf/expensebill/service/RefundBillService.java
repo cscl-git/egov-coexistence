@@ -243,7 +243,7 @@ public class RefundBillService {
         	glCodeList.add(v.getValue());
         }
         
-        String glCode = null;
+        String glCode = "";
         if(egBillregister.getBillDetails().get(0).getGlcodeid()!=null) {
         	 glCode =   egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode();
         }

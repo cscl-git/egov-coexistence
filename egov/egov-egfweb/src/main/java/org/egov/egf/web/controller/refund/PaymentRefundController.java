@@ -713,9 +713,22 @@ public class PaymentRefundController extends BaseBillController {
     	
     	List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 				"RefundBillType");
+    	List<String> billNames=new ArrayList<String>();
+    	for(AppConfigValues row:appConfigValuesList)
+    	{
+    		billNames.add(row.getValue());
+    	}
+    	List<EgBillSubType> billSubtypes=new ArrayList<EgBillSubType>();
+    	for(EgBillSubType row:egBillSubTypeService.getByExpenditureType(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT))
+    	{
+    		if(billNames.contains(row.getName()))
+    		{
+    			billSubtypes.add(row);
+    		}
+    	}
     	
         model.addAttribute("billNumberGenerationAuto", refundBillService.isBillNumberGenerationAuto());
-        model.addAttribute("billSubTypes", appConfigValuesList);
+        model.addAttribute("billSubTypes", billSubtypes);
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
     }

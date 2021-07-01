@@ -108,7 +108,7 @@
 			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
 			</div>
 </div>
-<c:if test="${type!=null && type="refundbill"}">
+<c:if test="${type!=null && type=='refundbill'}">
 <div class="row add-border">
 	<c:choose>
 		<c:when test="${headerFields.contains('scheme')}">

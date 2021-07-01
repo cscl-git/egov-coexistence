@@ -64,8 +64,7 @@ function ConfirmDelete()
 			 
 		 }
 		// debugger;
-		 if(estId != null)
-			 {
+		 
 				 var x = confirm("Are you sure you want to upload file again previous file will be deleted. !");
 				 
 				  if (x==true)
@@ -80,7 +79,7 @@ function ConfirmDelete()
 					  	return false;
 					  }
 				   
-				 }
+				 
 		
 
 		return true;
@@ -96,6 +95,8 @@ function ConfirmDelete()
  
  
 }
+
+
 
 
 
@@ -815,4 +816,59 @@ function caluclateestamt(){
 		contengencyPercentage(estimateAmt);
 
 }
+$(document).ready(function()
+		{	
+			console.log("workswing................");
+			$('#worksWing').change(function(){
+				//alert($('#worksWing').val());
+				$.ajax({
+					url: "/services/works/estimatePreparation/ajaxexecutivedivision",     
+					type: "GET",
+					data: {
+						id : $('#worksWing').val()
+						
+					},
+					dataType: "json",
+					success: function (response) {
+						console.log("success"+response);
+						$('#department').empty();
+						$('#department').append($("<option value=''>Select from below</option>"));
+						$.each(response, function(index, value) {
+							$('#department').append($('<option>').text(value.name).attr('value', value.code));
+						});
+						
+					}, 
+					error: function (response) {
+						//bootbox.alert('json fail');
+						console.log("failed");
+					}
+				});
+			});
+			$('#department').change(function(){
+				//alert($('#department').val());
+				$.ajax({
+					url: "/services/works/estimatePreparation/ajaxsubdivision",     
+					type: "GET",
+					data: {
+						id : $('#department').val()
+						
+					},
+					dataType: "json",
+					success: function (response) {
+						console.log("success"+response);
+						$('#subdivision').empty();
+						$('#subdivision').append($("<option value=''>Select from below</option>"));
+						$.each(response, function(index, value) {
+							$('#subdivision').append($('<option>').text(value.subdivision).attr('value', value.id));
+						});
+						
+					}, 
+					error: function (response) {
+						//bootbox.alert('json fail');
+						console.log("failed");
+					}
+		});
+	});
+	
 
+});

@@ -96,6 +96,9 @@ public class DocumentUpload implements Serializable {
     @Column(name="comments")
     private String comments;
 
+    @Column(name="username")
+    private String username;
+
     private transient ByteArrayInputStream inputStream;
 
     private transient String fileName;
@@ -176,6 +179,14 @@ public class DocumentUpload implements Serializable {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
     
 }

@@ -56,7 +56,7 @@ public class OtherPartyService implements EntityTypeService {
 
         setAuditDetails(otherParty);
         otherParty = otherpartyRepository.save(otherParty);
-        //saveAccountDetailKey(otherParty);
+        saveAccountDetailKey(otherParty);
         return otherParty;
     }
 

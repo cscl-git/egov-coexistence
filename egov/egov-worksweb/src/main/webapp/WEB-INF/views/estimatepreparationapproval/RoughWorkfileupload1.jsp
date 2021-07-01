@@ -44,6 +44,7 @@ $('#save').click(function() {
 								<th>File</th>
 								<th>Boq Upload Remarks</th>
 								<th>Version</th>
+								<th>File Owner</th>
 								
 								
 							</tr>
@@ -61,6 +62,7 @@ $('#save').click(function() {
 						</td>
 						<td><p style="color: #000000;">${documentDetials.comments }</p></td>
 						<td><span style="color: #643d19;"> ${loop.index + 1}</span></td>
+						<td><p style="color: #000000;">${documentDetials.username }</p></td>
 						
 						</tr>
 						</c:if>

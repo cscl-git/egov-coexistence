@@ -164,11 +164,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "meetDate")
 	private Date meetDate;
 	
+	@Column(name="subdivision")
+	private Long subdivision;
+	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
-	private List<BoqUploadDocument> uploadDocument=new ArrayList<BoqUploadDocument>();
+	/*@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
+	private List<BoqUploadDocument> uploadDocument=new ArrayList<BoqUploadDocument>();*/
 
 	@ManyToOne
     @JoinColumn(name = "statusid")
@@ -282,6 +285,15 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	
 	@Transient
 	private List<Designation> designations = new ArrayList<Designation>();
+	
+	@Transient
+	private List<Workswing> workswings = new ArrayList<Workswing>();
+	
+	@Transient
+	private List<Subdivisionworks> subdivisions = new ArrayList<Subdivisionworks>();
+	
+	@Transient
+	private List<org.egov.infra.admin.master.entity.Department> newdepartments = new ArrayList<org.egov.infra.admin.master.entity.Department>();
 	
 	@Transient
 	private String statusDescription;
@@ -870,13 +882,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 		this.executeDiv = executeDiv;
 	}
 
-	public List<BoqUploadDocument> getUploadDocument() {
-		return uploadDocument;
-	}
 
-	public void setUploadDocument(List<BoqUploadDocument> uploadDocument) {
-		this.uploadDocument = uploadDocument;
-	}
 
 	public List<BoqUploadDocument> getDocUpload() {
 		return docUpload;
@@ -885,6 +891,38 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	public void setDocUpload(List<BoqUploadDocument> docUpload) {
 		this.docUpload = docUpload;
 	}
+
+	public Long getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(Long subdivision) {
+		this.subdivision = subdivision;
+	}
+
+	public List<Workswing> getWorkswings() {
+		return workswings;
+	}
+	
+	public void setWorkswings(List<Workswing> workswings) {
+		this.workswings = workswings;
+	}
+	
+	public List<Subdivisionworks> getSubdivisions() {
+		return subdivisions;
+	}
+	
+	public void setSubdivisions(List<Subdivisionworks> subdivisions) {
+		this.subdivisions = subdivisions;
+	}
+
+	public List<org.egov.infra.admin.master.entity.Department> getNewdepartments() {
+		return newdepartments;
+	}
+
+	public void setNewdepartments(List<org.egov.infra.admin.master.entity.Department> newdepartments) {
+		this.newdepartments = newdepartments;
+}
 
 	
 	

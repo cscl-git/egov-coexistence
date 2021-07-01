@@ -31,9 +31,11 @@
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
-					<form:option value="Building & Roads">Building & Roads</form:option>
+					<form:options items="${estimatePreparationApproval.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+					<%-- <form:option value="Building & Roads">Building & Roads</form:option>
 					<form:option value="Public Health">Public Health</form:option>
-					<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option>
+					<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
 				</form:select>
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -45,8 +47,24 @@
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
-					<form:options items="${estimatePreparationApproval.departments}"
+					<form:options items="${estimatePreparationApproval.newdepartments}"
 						itemValue="code" itemLabel="name" />
+					<%-- <form:options items="${estimatePreparationApproval.departments}"
+						itemValue="code" itemLabel="name" /> --%>
+				</form:select>
+			</div>
+			<label class="col-sm-3 control-label text-left-audit1">Sub-Division<span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control"
+							cssErrorClass="form-control-works error" readonly="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${estimatePreparationApproval.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
+							
 				</form:select>
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -175,21 +193,21 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.name.work" /><span
 				class="mandatory"></span></label>
-			<div class="col-sm-9 block-colm">
+			<div class="col-sm-3 block-colm">
 				<form:textarea class="form-control" path="workName" maxlength="2000" readonly="true" style="height: 100px;"
 					 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.necessity" /><span
 				class="mandatory"></span></label>
-			<div class="col-sm-9 block-colm">
+			<div class="col-sm-3 block-colm">
 					<form:textarea class="form-control" path="necessity" maxlength="2000" readonly ="true" style="height: 100px;"
 					 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.scope.work" /><span
 				class="mandatory"></span></label>
-			<div class="col-sm-9 block-colm">
+			<div class="col-sm-3 block-colm">
 					 <form:textarea class="form-control" path="workScope" maxlength="2000" readonly="true" style="height: 100px;"
 					 />
 			</div>
@@ -349,5 +367,4 @@
 			document.getElementById("table").deleteRow(i);
 		}
 	</script>
-
 

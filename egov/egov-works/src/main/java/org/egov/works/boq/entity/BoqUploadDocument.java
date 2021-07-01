@@ -35,6 +35,9 @@ public class BoqUploadDocument implements Serializable {
     
     @Column(name="comments")
     private String comments;
+    
+    @Column(name="username")
+    private String username;
 
 	public Long getId() {
 		return id;
@@ -74,5 +77,13 @@ public class BoqUploadDocument implements Serializable {
 
 	public void setComments(String comments) {
 		this.comments = comments;
+	}
+
+	public String getUsername() {
+		return username;
+	}
+
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

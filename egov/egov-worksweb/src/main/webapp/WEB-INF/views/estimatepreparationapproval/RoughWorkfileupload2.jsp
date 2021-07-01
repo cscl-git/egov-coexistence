@@ -25,6 +25,7 @@
 								<th>File</th>
 								<th>Boq Upload Remarks</th>
 								<th>Version</th>
+								<th>File Owner</th>
 								
 							</tr>
 						</thead>
@@ -38,6 +39,7 @@
 						</td>
 						<td><span style="color: #643d19;"> ${documentDetials.comments }</span></td>
 						<td><span style="color: #643d19;"> ${loop.index + 1}</span></td>
+						<td><p style="color: #643d19;">${documentDetials.username }</p></td>
 						
 						</tr>
         </c:forEach>
