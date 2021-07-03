@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface SudivisionRepository extends JpaRepository<Subdivisionworks, Long>{
 
 	List<Subdivisionworks> findByDivisionid(final Long id);
+	List<Subdivisionworks> findByid(final Long id);
 }

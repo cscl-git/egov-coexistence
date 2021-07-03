@@ -240,8 +240,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
+		String deptShortCode=populateShortCode(deptCode,estimatePreparationApproval.getWorksWing(),estimatePreparationApproval.getSubdivision());
 	    String estimateNumber = v.getEstimateNumber(deptShortCode);
 		estimatePreparationApproval.setEstimateNumber(estimateNumber);
 		String aaNumber=v.getAANumber(deptShortCode);
@@ -309,6 +310,210 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		
 	}
 	
+	private String populateShortCode(String deptCode, String worksWing, Long subdivision2) {
+		
+		String deptPart=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"works_div_"+deptCode).get(0).getValue();
+		String worksWingPart="";
+		if(worksWing.equalsIgnoreCase("1"))
+		{
+			worksWingPart="BR";
+		}
+		else if(worksWing.equalsIgnoreCase("2"))
+		{
+			worksWingPart="PH";
+		}
+		else
+		{
+			worksWingPart="HE";
+		}
+		String subPart="";
+		if(subdivision2 ==1)
+		{
+			subPart="S11";
+		}
+		else if(subdivision2 ==2)
+		{
+			subPart="S21";
+		}
+		else if(subdivision2 ==3)
+		{
+			subPart="S221";
+		}
+		else if(subdivision2 ==4)
+		{
+			subPart="S31";
+		}
+		else if(subdivision2 ==5)
+		{
+			subPart="S41";
+		}
+		else if(subdivision2 ==6)
+		{
+			subPart="S71";
+		}
+		else if(subdivision2 ==7)
+		{
+			subPart="S81";
+		}
+		else if(subdivision2 ==8)
+		{
+			subPart="S91";
+		}
+		else if(subdivision2 ==9)
+		{
+			subPart="S141";
+		}
+		else if(subdivision2 ==10)
+		{
+			subPart="S151";
+		}
+		else if(subdivision2 ==11)
+		{
+			subPart="S201";
+		}
+		else if(subdivision2 ==12)
+		{
+			subPart="S11";
+		}
+		else if(subdivision2 ==13)
+		{
+			subPart="S101";
+		}
+		else if(subdivision2 ==14)
+		{
+			subPart="S111";
+		}
+		else if(subdivision2 ==15)
+		{
+			subPart="S161";
+		}
+		else if(subdivision2 ==16)
+		{
+			subPart="S171";
+		}
+		else if(subdivision2 ==17)
+		{
+			subPart="S211";
+		}
+		else if(subdivision2 ==18)
+		{
+			subPart="S121";
+		}
+		else if(subdivision2 ==19)
+		{
+			subPart="S131";
+		}
+		else if(subdivision2 ==20)
+		{
+			subPart="S181";
+		}
+		else if(subdivision2 ==21)
+		{
+			subPart="S61";
+		}
+		else if(subdivision2 ==22)
+		{
+			subPart="S11";
+		}
+		else if(subdivision2 ==23)
+		{
+			subPart="S31";
+		}
+		else if(subdivision2 ==24)
+		{
+			subPart="S61";
+		}
+		else if(subdivision2 ==25)
+		{
+			subPart="S51";
+		}
+		else if(subdivision2 ==26)
+		{
+			subPart="S141";
+		}
+		else if(subdivision2 ==27)
+		{
+			subPart="S21";
+		}
+		else if(subdivision2 ==28)
+		{
+			subPart="S41";
+		}
+		else if(subdivision2 ==29)
+		{
+			subPart="S51";
+		}
+		else if(subdivision2 ==30)
+		{
+			subPart="S191";
+		}
+		else if(subdivision2 ==31)
+		{
+			subPart="S11";
+		}
+		else if(subdivision2 ==32)
+		{
+			subPart="S21";
+		}
+		else if(subdivision2 ==33)
+		{
+			subPart="S31";
+		}
+		else if(subdivision2 ==34)
+		{
+			subPart="S91";
+		}
+		else if(subdivision2 ==35)
+		{
+			subPart="S101";
+		}
+		else if(subdivision2 ==36)
+		{
+			subPart="S121";
+		}
+		else if(subdivision2 ==37)
+		{
+			subPart="S131";
+		}
+		else if(subdivision2 ==38)
+		{
+			subPart="S51";
+		}
+		else if(subdivision2 ==39)
+		{
+			subPart="S61";
+		}
+		else if(subdivision2 ==40)
+		{
+			subPart="S71";
+		}
+		else if(subdivision2 ==41)
+		{
+			subPart="S81";
+		}
+		else if(subdivision2 ==42)
+		{
+			subPart="S151";
+		}
+		else if(subdivision2 ==43)
+		{
+			subPart="S11";
+		}
+		else if(subdivision2 ==44)
+		{
+			subPart="S31";
+		}
+		else if(subdivision2 ==45)
+		{
+			subPart="S341";
+		}
+		
+		return worksWingPart+deptPart+subPart;
+	}
+
+
+
 	@RequestMapping(value = "/success", method = RequestMethod.GET)
     public String showSuccessPage(@RequestParam("approverDetails") final String approverDetails,@RequestParam("workflowaction") final String workflowaction, final Model model,
                                   final HttpServletRequest request,@RequestParam("estId") final String estId) {
@@ -550,8 +755,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = estimatePreparationApproval.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
+		String deptShortCode=populateShortCode(deptCode,estimatePreparationApproval.getWorksWing(),estimatePreparationApproval.getSubdivision());
 	    String estimateNumber = v.getEstimateNumber(deptShortCode);
 		estimatePreparationApproval.setEstimateNumber(estimateNumber);
 		String aaNumber=v.getAANumber(deptShortCode);
@@ -638,7 +844,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		File fileToUpload = null;
 		int erow=1;
 		List<Integer> rowerror=new ArrayList<>();
-		Boolean error=false;
+		Boolean error=true;
 		String msg="";
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
@@ -678,6 +884,14 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		
 			//FileInputStream inputStream = new FileInputStream(new File(filePath));
 			Workbook workbook = WorkbookFactory.create(file.getInputStream());
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
@@ -761,7 +975,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 							}else {
 							rowerror.add(erow);	
 							error=true;
-							msg="Please Check the uploaded Document,Error in Document.";
+							msg="Please Check the uploaded Document,Error in Document Rate and Quantity must be number";
 							}
 						}
 
@@ -820,7 +1034,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		DocumentUpload savedocebefore = estimatePreparationApprovalService.savedocebefore(estimatePreparationApproval);		
 		
 		
-		//System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getFileStore().getFileName()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
+		System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getFileStore().getFileName()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
 		
   BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
 		//adding
@@ -1248,12 +1462,18 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
-		estimateDetails.setDepartment(dept);
+		//estimateDetails.setDepartment(dept);
 
-		estimateDetails.setDepartments(getDepartmentsFromMs());
+		//estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		estimateDetails.setDepartment(dept);
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
 		
 		
 		BoQDetails boq = new BoQDetails();
@@ -1292,16 +1512,19 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
 
-		
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
-
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
 
-estimateDetails.setDepartments(getDepartmentsFromMs());
-estimateDetails.setDesignations(getDesignationsFromMs());
+		
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setExpHead(estimateDetails.getExpHead_est());
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
@@ -1350,7 +1573,7 @@ estimateDetails.setDesignations(getDesignationsFromMs());
 		String extension = null;
 		String filePath = null;
 		File fileToUpload = null;
-		Boolean error=false;
+		Boolean error=true;
 		String msg="";
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
@@ -1387,6 +1610,14 @@ estimateDetails.setDesignations(getDesignationsFromMs());
 			
 			FileInputStream inputStream = new FileInputStream(new File(filePath));
 			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
@@ -1468,7 +1699,7 @@ estimateDetails.setDesignations(getDesignationsFromMs());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-								msg="Please Check the upload Document,Error in Document.";
+								msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
 							}
 						}
 
@@ -1796,7 +2027,7 @@ estimateDetails.setDesignations(getDesignationsFromMs());
 		String extension = null;
 		String filePath = null;
 		File fileToUpload = null;
-		Boolean error=false;
+		Boolean error=true;
 		String msg="";
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
@@ -1833,6 +2064,14 @@ estimateDetails.setDesignations(getDesignationsFromMs());
 			
 			FileInputStream inputStream = new FileInputStream(new File(filePath));
 			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
@@ -1914,7 +2153,7 @@ estimateDetails.setDesignations(getDesignationsFromMs());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-								msg="Please Check the upload Document,Error in Document.";
+								msg="Please Check the upload Document,Error in Document Rate and Quantity must be Number.";
 							}
 						}
 
