@@ -47,8 +47,13 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
+import org.egov.infra.aadhaar.webservice.contract.AadhaarInfo;
+import org.egov.lcms.masters.entity.AdvocateMaster;
+import org.egov.lcms.masters.service.AdvocateMasterService;
+import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.entity.LegalCaseDisposal;
+import org.egov.lcms.transactions.entity.PaymentUpadte;
 import org.egov.lcms.transactions.service.LegalCaseDisposalService;
 import org.egov.lcms.transactions.service.LegalCaseService;
 import org.egov.lcms.utils.constants.LcmsConstants;
@@ -62,9 +67,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.fasterxml.jackson.annotation.JsonCreator.Mode;
+import com.mchange.v2.cfg.PropertiesConfigSource.Parse;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 
 @Controller
 @RequestMapping(value = "/legalcasedisposal")
@@ -78,7 +88,12 @@ public class LegalCaseDisposalController {
 
     @Autowired
     private LegalCaseService legalCaseService;
-
+	
+	@Autowired
+    PaymentUpdateService paymentUpdateService;
+    
+    @Autowired
+	AdvocateMasterService advocateMasterService;
     @ModelAttribute
     private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
         return legalCaseService.findByLcNumber(lcNumber);
@@ -109,6 +124,48 @@ public class LegalCaseDisposalController {
         model.addAttribute("message", "Case is closed successfully.");
         model.addAttribute(LcmsConstants.MODE, "create");
         return "legalcaseDisposal-success";
+    }
+    
+    @RequestMapping(value="/updatePayment/new")
+    public String updatePayment(@ModelAttribute("updatePayment")PaymentUpadte paymentUpadte, final BindingResult errors,
+            @RequestParam("lcNumber") final String lcNumber,final RedirectAttributes redirectAttrs, final Model model,
+            final HttpServletRequest request) throws ParseException
+    {
+    	System.out.println(":::+"+lcNumber);
+    	final LegalCase legalCase = getLegalCase(lcNumber);
+    	List<PaymentUpadte> listPaymentUpadte = paymentUpdateService.getRecordsByLegalcase(legalCase.getId());
+    	for(PaymentUpadte s1:listPaymentUpadte)
+    	{
+    		System.out.println("name---defending----"+s1.getNameOfDefendingCounsil());
+    	}
+    	
+    	model.addAttribute("listPaymentUpadte",listPaymentUpadte);
+    	
+    	model.addAttribute("legalCase",legalCase);
+    	
+    	return "updatePayment-new";
+    }
+    @RequestMapping(value="/updatePayment/new" ,params = "save", method = RequestMethod.POST)
+    public String savePaymentRecords(@ModelAttribute("updatePayment")PaymentUpadte paymentUpadte,Model model)
+    {
+    	
+		String namecounsil = paymentUpadte.getNameOfDefendingCounsil();
+		List<BidefendingCounsilDetails> updatePayment = advocateMasterService.getRecordsUpdatePayment(Long.valueOf(namecounsil));
+		    	for(BidefendingCounsilDetails name:updatePayment) {
+		    		paymentUpadte.setNameOfDefendingCounsil(name.getOppPartyAdvocate());
+		    	}
+		PaymentUpadte savepay = paymentUpdateService.savePayment(paymentUpadte);
+    	
+    	
+    	List<PaymentUpadte> listPaymentUpadte = paymentUpdateService.getRecordsByLegalcase(paymentUpadte.getLegalcaseid());
+    	for(PaymentUpadte s1:listPaymentUpadte)
+    	{
+    		System.out.println("name---defending----"+s1.getNameOfDefendingCounsil());
+    	}
+    	
+    	model.addAttribute("listPaymentUpadte",listPaymentUpadte);
+    	model.addAttribute("updatePayment",savepay);
+    	return "updatePayment-new"; 
     }
 
 }

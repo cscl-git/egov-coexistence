@@ -89,6 +89,7 @@ public class LegalCaseSearchResult {
     private String statusDesc;
     private Integer judgmentTypeId;
     private String iscaseImp;
+    private Date hearingDate;
 
     public String getFromDate() {
         return fromDate;
@@ -339,5 +340,15 @@ public class LegalCaseSearchResult {
 		this.iscaseImp = iscaseImp;
 	}
 
+	public Date getHearingDate() {
+		return hearingDate;
+	}
+
+	public void setHearingDate(Date hearingDate) {
+		this.hearingDate = hearingDate;
+	}
+
+	
+	
    
 }

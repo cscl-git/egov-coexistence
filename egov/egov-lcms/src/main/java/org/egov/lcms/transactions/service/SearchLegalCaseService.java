@@ -356,10 +356,12 @@ public class SearchLegalCaseService {
         final StringBuilder queryStr = new StringBuilder();
         queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,");
         queryStr.append(" egwStatus.code  as  caseStatus ,");
-        queryStr.append(" cb.concernedBranch  as  concernedBranch");
+        queryStr.append(" cb.concernedBranch  as  concernedBranch, ");
+        queryStr.append(" hr.hearingDate as  hearingDate");
         queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
         queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
         queryStr.append(" LEFT JOIN   legalObj.judgment jt");
+        queryStr.append(" LEFT JOIN   Hearings hr on legalObj.id=hr.legalCase.id ");
         queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
         queryStr.append(
                 " legalObj.caseTypeMaster.id=casetypemaster.id and legalObj.petitionTypeMaster.id=petmaster.id and ");
@@ -368,6 +370,7 @@ public class SearchLegalCaseService {
             queryStr.append("  and legalObj.reportStatus.id = reportStatus.id ");
 
         getAppendQuery(legalCaseSearchResultObj, queryStr);
+        System.out.println("Query Execute\n------------>>>>>>>"+queryStr.toString());
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
         queryResult = setParametersToQuery(legalCaseSearchResultObj, queryResult);
         final List<LegalCaseSearchResult> legalcaseSearchList = queryResult.list();

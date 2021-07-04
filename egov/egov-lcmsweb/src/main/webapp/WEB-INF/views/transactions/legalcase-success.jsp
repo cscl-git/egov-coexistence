@@ -396,6 +396,68 @@
 					</c:forEach>
 				</tbody>
 			</table>
+			
+			
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="lbl.defending.counsel" />
+				</div>
+			</div>
+			<table class="table table-striped table-bordered"
+				id="respondantDetails">
+				<thead>
+					<tr>
+						<th class="text-center"><spring:message code="lbl.slno" /> 
+						<th class="text-center"><spring:message code="lbl.standingcounselname" /><span
+							class="mandatory"></span></th>
+						<th class="text-center"><spring:message
+								code="lbl.defCounselEmial" /></th>
+						<th class="text-center"><spring:message
+								code="lbl.defCounselPhone" /></th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach var="biDefendingCounsilDetailsBeanList"
+						items="${legalCase.getDefendingCounsil()}" varStatus="status">
+						<tr>
+							<td><input type="text" id="table_name${status.index}"
+								class="form-control" readonly="readonly"
+								style="text-align: center" value="${status.index+1}" /></td>
+							
+
+							<td><form:input type="hidden"
+									id="biDefendingCounsilDetailsBeanList${status.index}].oppPartyAdvocate"
+									path="biDefendingCounsilDetailsBeanList[${status.index}].oppPartyAdvocate" /> 
+									<input
+								type="text" id="table_oppPartyAdvocate${status.index}" class="form-control"
+								readonly="readonly" style="text-align: center"
+								value="${biDefendingCounsilDetailsBeanList.oppPartyAdvocate}" /></td>
+
+								
+								
+							<td><form:input type="hidden"
+									id="biDefendingCounsilDetailsBeanList[${status.index}].counselEmail"
+									path="biDefendingCounsilDetailsBeanList[${status.index}].counselEmail" /> 
+									<input
+								type="text" id="table_counselEmail${status.index}"
+								class="form-control" readonly="readonly"
+								style="text-align: center"
+								value="${biDefendingCounsilDetailsBeanList.counselEmail}" /></td>
+							<td><form:input type="hidden"
+									id="biDefendingCounsilDetailsBeanList[${status.index}].counselphoneNo"
+									path="biDefendingCounsilDetailsBeanList[${status.index}].counselphoneNo" />
+								<input type="text" id="table_counselphoneNo${status.index}"
+								class="form-control" readonly="readonly"
+								style="text-align: center"
+								value="${biDefendingCounsilDetailsBeanList.counselphoneNo}" /></td>
+							
+
+							
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+			
 			<div class="row">
 				<div class="col-md-12">
 					<div class="panel panel-primary" data-collapsed="0">
@@ -407,30 +469,30 @@
 								<div class="col-md-3 col-xs-6 add-margin view-content">
 									<c:out value="${legalCase.representedby}" />
 								</div>
-								<div class="col-md-2 col-xs-6 add-margin">
+								<%-- <div class="col-md-2 col-xs-6 add-margin">
 									<spring:message code="lbl.standingcounselname" />
 									:
 								</div>
 								<div class="col-md-3 col-xs-6 add-margin view-content">
 									<c:out value="${legalCase.oppPartyAdvocate}" />
-								</div>
+								</div> --%>
 							</div>
 							
 						<!-- Added By Kundan -->	
 							<div class="row add-border">
-								<div class="col-md-2 col-xs-6 add-margin">
+								<%-- <div class="col-md-2 col-xs-6 add-margin">
 									<spring:message code="lbl.defCounselPhone" />
 								</div>
 								<div class="col-md-3 col-xs-6 add-margin view-content">
-									<c:out value="${legalCase.counselPhoneNo}" />
-								</div>
-								<div class="col-md-2 col-xs-6 add-margin">
+									<c:out value="${legalCase.counselphoneNo}" />
+								</div> --%>
+								<%-- <div class="col-md-2 col-xs-6 add-margin">
 									<spring:message code="lbl.defCounselEmial" />
 									:
 								</div>
 								<div class="col-md-3 col-xs-6 add-margin view-content">
-									<c:out value="${legalCase.counselEmailNo}" />
-								</div>
+									<c:out value="${legalCase.counselEmail}" />
+								</div> --%>
 							</div>
 						<!-- Ended By Kundan -->		
 							

@@ -57,6 +57,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
@@ -105,6 +106,58 @@ public class AdvocateMaster extends AbstractAuditable implements EntityType {
     @Length(max = 256)
     @Audited
     private String address;
+
+    @Transient
+    private String defCounsilPrimary;
+    @Transient
+    private String counselEmail;
+    @Transient
+    private String oppPartyAdvocate;
+    @Transient
+    private String counselphoneNo;
+    @Transient
+    private boolean isRepondent;
+    
+    
+    public String getCounselEmail() {
+		return counselEmail;
+	}
+
+	public String getOppPartyAdvocate() {
+		return oppPartyAdvocate;
+	}
+
+	public String getCounselphoneNo() {
+		return counselphoneNo;
+	}
+
+	public boolean isRepondent() {
+		return isRepondent;
+	}
+
+	public void setCounselEmail(String counselEmail) {
+		this.counselEmail = counselEmail;
+	}
+
+	public void setOppPartyAdvocate(String oppPartyAdvocate) {
+		this.oppPartyAdvocate = oppPartyAdvocate;
+	}
+
+	public void setCounselphoneNo(String counselphoneNo) {
+		this.counselphoneNo = counselphoneNo;
+	}
+
+	public void setRepondent(boolean isRepondent) {
+		this.isRepondent = isRepondent;
+	}
+
+	public String getDefCounsilPrimary() {
+		return defCounsilPrimary;
+	}
+
+	public void setDefCounsilPrimary(String defCounsilPrimary) {
+		this.defCounsilPrimary = defCounsilPrimary;
+	}
 
     @Audited
     @Length(max = 20)
@@ -157,6 +210,9 @@ public class AdvocateMaster extends AbstractAuditable implements EntityType {
     @Audited
     private String bankAccount;
 
+    
+   
+    
     @Length(max = 20)
     @Audited
     private String ifscCode;

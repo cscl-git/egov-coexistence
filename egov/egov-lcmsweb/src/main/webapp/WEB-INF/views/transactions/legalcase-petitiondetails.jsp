@@ -49,6 +49,19 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<style>
+.dropdown-content option{
+	BACKGROUND-COLOR: LIGHTGRAY;
+    BORDER: 1PX SOLID GRAY;
+    WIDTH: 138PX;
+    padding: 5px;
+}
+.dropdown-content option:hover{
+	background-color: gray;
+	color: white;
+}
+
+</style>
 <div class="panel-heading">
 	<div class="panel-title">
 		<spring:message code="lbl.bipartisanDetails.details" />
@@ -315,6 +328,194 @@
 		</c:choose>
 	</tbody>
 </table>
+
+
+
+<div  id="mainContainerDiv" >
+
+<div class="panel-heading">
+	<div class="panel-title">
+		<spring:message code="lbl.defending.counsel" />
+	</div>
+</div>
+<table class="table table-striped table-bordered" id="defendingCounsilDetails">
+	<thead>
+		<tr>
+			<th class="text-center"><spring:message code="lbl.slno" /> 
+			<th class="text-center"><spring:message code="lbl.defCouncilCheck" />
+			<th class="text-center"><spring:message code="lbl.standingcounselname" /><span
+				class="mandatory"></span></th>
+			<th class="text-center"><spring:message code="lbl.defCounselEmial" /></th>
+			<th class="text-center"><spring:message code="lbl.defCounselPhone" /></th>
+			
+			<th class="text-center"><spring:message
+					code="lbl.add/Def_Counsel" /></th>
+		</tr>
+	</thead>
+	<tbody>
+		<c:choose>
+			<c:when test="${not empty biDefendingCounsilDetailsList}">
+				<c:forEach var="biDefendingCounsilDetailsList"
+					items="${biDefendingCounsilDetailsList}" varStatus="status">
+					<tr>
+						<td><span class="defendingCounsilDetails spansno">1</span></td>
+
+						<td>
+				                <input 
+				                id="biDefendingCounsilDetailsList[${status.index}].defCounsilPrimary"
+				                 name="biDefendingCounsilDetailsList[${status.index}].defCounsilPrimary"
+				                  value="${biDefendingCounsilDetailsList.defCounsilPrimary}" type="checkbox" />
+				                 <!--   <input type="hidden"class="form-control table-input text-left" id="primaryCounsin" name="primaryCounsin" value="YES"/> -->
+				     	</td>
+
+
+						<td>
+						 <div class="dropdown-content" id="autocomplete">
+						<%-- <input type="text"
+							class="form-control table-input text-left"
+							id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							value="${biDefendingCounsilDetailsList.oppPartyAdvocate}" autocomplete="off"/>
+							
+							<div id="worklist_" ></div> --%>
+									<select class="form-control table-input text-left patternvalidation" 
+										required="required" id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate" value="${biDefendingCounsilDetailsList.oppPartyAdvocate}">
+										<option value="">
+											<spring:message code="lbls.select" />
+										</option>
+										<c:forEach items="${defendingDropdown}" var="category">
+										        <option value="${category.name}" >${category.name}</option>
+										    
+										<%-- <options items="${}" itemValue="id"
+											id="oppPartyAdvocate" itemLabel="name" /> --%>
+										</c:forEach>
+									</select>
+								</div>
+							</td>
+
+						<td class="text-right"><input type="text"
+							id="biDefendingCounsilDetailsList[${status.index}].counselEmail"
+							name="biDefendingCounsilDetailsList[${status.index}].counselEmail"
+							class="form-control table-input text-left patternvalidation"
+							value="${biDefendingCounsilDetailsList.counselEmail}" readonly="readonly"/></td>
+
+						<td><input type="text"
+							class="form-control table-input text-right"
+							id="biDefendingCounsilDetailsList[${status.index}].counselphoneNo"
+							name="biDefendingCounsilDetailsList[${status.index}].counselphoneNo"
+							value="${biDefendingCounsilDetailsList.counselphoneNo}" readonly="readonly"/></td>
+						
+					
+						<%-- <input type="hidden" id="activeid"
+							name="biDefendingCounsilDetailsList[${status.index}].id"
+							id="biDefendingCounsilDetailsList[${status.index}].id"
+							value="${biDefendingCounsilDetailsList.id}" /> --%>
+						<input type="hidden"
+							id="biDefendingCounsilDetailsList[${status.index}].isRepondent"
+							name="biDefendingCounsilDetailsList[${status.index}].isRepondent"
+							class="form-control table-input text-right"
+							style="text-align: center" value="${true}" />
+						<td class="text-center"><a href="javascript:void(0);"
+							class="btn-sm btn-default" onclick="addDefendingCounsilRow();"><i
+								class="fa fa-plus"></i></a> <a href="javascript:void(0);"
+							class="btn-sm btn-default" id="counsil_delete_row"><i
+								class="fa fa-trash"></i></a></td>
+					</tr>
+				</c:forEach>
+			</c:when>
+			<c:otherwise>
+				<tr class="">
+					<td><span class="defendingCounsilDetails spansno">1</span> <form:hidden
+							path="biDefendingCounsilDetailsList[0].id"
+							name="biDefendingCounsilDetailsList[0].id"
+							value="${biDefendingCounsilDetailsList[0].id}"
+							class="form-control table-input hidden-input" /></td>
+						<td>
+				                <input 
+				                id="biDefendingCounsilDetailsList[0].defCounsilPrimary"
+				                 name="biDefendingCounsilDetailsList[0].defCounsilPrimary"
+				                  value="YES" type="checkbox" />
+				     			<!-- <input type="hidden" class="form-control table-input text-left"id="primaryCounsin" name="primaryCounsin" value="YES"> -->
+				     	</td>
+							
+						
+						<td>
+						 <div class="dropdown-content" id="autocomplete">
+						<%-- <input type="text"
+							class="form-control table-input text-left"
+							id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							value="${biDefendingCounsilDetailsList.oppPartyAdvocate}" autocomplete="off"/>
+							
+							<div id="worklist_" ></div> --%>
+									<select class="form-control table-input text-left patternvalidation"
+										required="required" id="biDefendingCounsilDetailsList[0].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[0].oppPartyAdvocate">
+										<option value="">
+											<spring:message code="lbls.select" />
+										</option>
+											<c:forEach items="${defendingDropdown}" var="category">
+										        <option value="${category.name}" >${category.name}</option>
+										    
+										<%-- <options items="${}" itemValue="id"
+											id="oppPartyAdvocate" itemLabel="name" /> --%>
+										</c:forEach> 
+									</select>
+								</div>
+							</td>	
+					<%-- <td class="text-right">
+					<div class="dropdown-content" id="autocomplete">
+					<input type="text" autocomplete="off"
+						class="form-control table-input text-left"
+						data-pattern="alphanumerichyphenbackslash"
+						name="biDefendingCounsilDetailsList[0].oppPartyAdvocate"
+						id="biDefendingCounsilDetailsList[0].oppPartyAdvocate" maxlength="50"
+						required="required">
+						<div id="worklist_${status.index}" ></div>
+						
+						</div>
+						</td> --%>
+					<td class="text-right"><input type="text"
+						class="form-control table-input"
+						name="biDefendingCounsilDetailsList[0].counselEmail"
+						id="biDefendingCounsilDetailsList[0].counselEmail" 
+						data-pattern="alphanumericwithspecialcharacters" 
+						maxlength="50" placeholder="abc@xyz.com" readonly="readonly" />
+						
+						</td>
+					<td class="text-right"><input type="text"
+						class="form-control table-input text-left patternvalidation"
+						name="biDefendingCounsilDetailsList[0].counselphoneNo"
+						id="biDefendingCounsilDetailsList[0].counselphoneNo"
+						onkeyup="decimalvalue(this);" maxlength="10" readonly="readonly"/></td>
+					<input type="hidden"
+						id="biDefendingCounsilDetailsList[0].isRepondent"
+						name="biDefendingCounsilDetailsList[0].isRepondent"
+						class="form-control table-input text-right"
+						style="text-align: center" value="${true}" />
+
+					<td class="text-center"><a href="javascript:void(0);"
+						class="btn-sm btn-default" onclick="addDefendingCounsilRow();"><span
+							style="cursor: pointer;"><i class="fa fa-plus"></i></span></a> <a
+						href="javascript:void(0);" class="btn-sm btn-default"
+						id="counsil_delete_row"><span style="cursor: pointer;"><i
+								class="fa fa-trash"></i></span></a></td>
+				</tr>
+			</c:otherwise>
+		</c:choose>
+	</tbody>
+</table>
+</div>
+
+
+
+
+
+
+
+
+
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.representedby" />:</label>
@@ -325,37 +526,6 @@
 		<form:errors path="representedby" cssClass="add-margin error-msg" />
 	</div>
 
-	<label class="col-sm-2 control-label text-right" id="persons">
-		<spring:message code="lbl.standingcounselname" />:<span class="mandatory"></span>
-	</label>
-	<div class="col-sm-3 add-margin" id="personsdiv">
-		<form:input class="form-control patternvalidation"
-			data-pattern="string" maxlength="50" id="oppPartyAdvocate"
-			path="oppPartyAdvocate" required="required" />
-		<form:errors path="oppPartyAdvocate" cssClass="add-margin error-msg" />
-	</div>
-
-</div>
-<div class="form-group">
-	<label class="col-sm-3 control-label text-right" id="persons">Def.Counsel
-		Phone No:<span class="mandatory"></span></label>
-	<div class="col-sm-3 add-margin" id="personsdiv">
-		<form:input class="form-control patternvalidation"
-			data-pattern="number" maxlength="10" id="counselPhoneNo" path="counselPhoneNo"
-			required="required" placeholder="Mobile No."/>
-		
-	</div>
-	<label class="col-sm-2 control-label text-right" id="persons">
-		Def.Counsel Email ID:</label>
-	<div class="col-sm-3 add-margin">
-		<form:input path="counselEmailNo" class="form-control text-left patternvalidation"
-			data-pattern="alphanumericwithspecialcharacters" maxlength="64"
-			placeholder="abc@xyz.com" />
-		
-	</div>
-
-</div>
-<div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.remarks" />:</label>
 	<div class="col-sm-3 add-margin">
@@ -363,6 +533,70 @@
 			name="remarks" maxlength="256" />
 		<form:errors path="remarks" cssClass="add-margin error-msg" />
 	</div>
+
+	
 </div>
+
+
+
+<!-- Added By Kundan -->
+<%-- 
+	<label class="col-sm-2 control-label text-right" id="persons">
+		<spring:message
+			code="lbl.standingcounselname" /><span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin" id="personsdiv">
+		<form:input class="form-control patternvalidation"
+			data-pattern="string" maxlength="50" id="oppPartyAdvocate"
+			path="oppPartyAdvocate" required="required" />
+		<form:errors path="oppPartyAdvocate" cssClass="add-margin error-msg" />
+	</div>
+
+
+
+
+
+
+
+
+
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
+			code="lbl.defCounselPhone" /><span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin" id="personsdiv">
+		<form:input class="form-control patternvalidation"
+			data-pattern="number" maxlength="10" id="counselphoneNo"
+			path="counselphoneNo" required="required" placeholder="Mobile No." />
+		<form:errors path="counselphoneNo" cssClass="add-margin error-msg" />
+	</div>
+		
+	<label class="col-sm-2 control-label text-right" id="persons">
+		<spring:message
+			code="lbl.defCounselEmial" />:</label>
+	<div class="col-sm-3 add-margin" id="personsdiv">
+		<form:input class="form-control patternvalidation"
+			data-pattern="alphanumericwithspecialcharacters" maxlength="50" id="counselEmail"
+			path="counselEmail" placeholder="abc@xyz.com"/>
+		<form:errors path="counselEmail" cssClass="add-margin error-msg" />
+	</div>
+		
+</div> --%>
+
+<!-- Ended By Kundan -->
+
+
+
+
+
+
+<%-- <div class="form-group">
+	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
+			code="lbl.remarks" />:</label>
+	<div class="col-sm-3 add-margin">
+		<form:textarea class="form-control" path="remarks" id="remarks"
+			name="remarks" maxlength="256" />
+		<form:errors path="remarks" cssClass="add-margin error-msg" />
+	</div>
+</div> --%>
 <div id="legalCaseUploadDocuments"></div>
 <input type="hidden" id="mode"  name="mode" value="${mode}" />
+
