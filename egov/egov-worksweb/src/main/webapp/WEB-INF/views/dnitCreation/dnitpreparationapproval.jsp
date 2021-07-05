@@ -60,7 +60,7 @@
 									code="lbl.estimate.preparation.dnit.date" /></label>
 					<div class="col-sm-3 add-margin">
 									<form:input id="estimateDate" path="estimateDate"
-									class="form-control-works datepicker" data-date-end-date="0d"
+									class="form-control datepicker" data-provide="datepicker"  data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>

@@ -8,7 +8,7 @@
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 
 	<form:form name="search-estimate-form" role="form" method="post"
-		action="estimateApprovalSearchView" modelAttribute="workEstimateDetails"
+		action="workEstimateSearch1" modelAttribute="workEstimateDetails"
 	id="workEstimateDetails" class="form-horizontal form-groups-bordered"
 	style="margin-top:-20px;">
 
@@ -28,7 +28,7 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.exp.head" /></label>
 			<div class="col-sm-3 add-margin">
-							<form:select path="expHead_est"  id="expHead_est"
+							<form:select path="expHead_est"  id="wardCheck"
 								cssClass="form-control" cssErrorClass="form-control error">
 								<form:option value="">
 									<spring:message code="lbl.select" />
@@ -41,11 +41,11 @@
 						</div>			
 
 					
-					<%--  <label class="col-sm-3 control-label text-left-audit1"><spring:message
+					 <label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.Category" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="workCategory"  id="workCategory"/>
-					</div>  --%>
+						<form:input type="text" class="form-control" path="estimateNumber" />
+					</div> 
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.works.wing" /></label>
 					<div class="col-sm-3 add-margin">
@@ -60,12 +60,12 @@
 								</form:select>
 					</div>
 					
-					<%-- <label class="col-sm-3 control-label text-left-audit1"><spring:message
+					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.Division" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="workLocation" />
-							</div> --%>
-					
+							</div>
+							
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.work.estimate.from.date" /></label>
 					<div class="col-sm-3 add-margin">
@@ -73,7 +73,10 @@
 							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
+
+
 					
+							
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.work.estimate.to.date" /></label>
 					<div class="col-sm-3 add-margin">
@@ -81,9 +84,8 @@
 							data-date-end-date="0d" placeholder="DD/MM/YYYY" />
 					</div>
 					
-					
-					
-							<label class="col-sm-3 control-label text-left-audit1"><spring:message
+							
+					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.executing.division" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="department" id="department" 
@@ -94,35 +96,14 @@
 							<form:options items="${workEstimateDetails.departments}"
 								itemValue="code" itemLabel="name" />
 								</form:select>
-							</div>	
-							
-					
-
-
-					
-							
-					
-					
-							
-					<%-- <label class="col-sm-3 control-label text-left-audit1"><spring:message
-							code="lbl.estimate.preparation.executing.division" /></label>
-					<div class="col-sm-3 add-margin">
-						<form:select path="department" id="department" 
-							class="form-control">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-							<form:options items="${workEstimateDetails.departments}"
-								itemValue="code" itemLabel="name" />
-								</form:select>
-							</div>	 --%>	
+							</div>		
 							</div>
 						</div>
 					</div>
 
 		<div class="buttonbottom" align="center">
-			<input type="submit" id="estimateApprovalSearchView" class="btn btn-primary"
-						name="estimateApprovalSearchView" code="lbl.search.work.estimate"
+			<input type="submit" id="workEstimateSearch1" class="btn btn-primary"
+						name="workEstimateSearch1" code="lbl.search.work.estimate"
 						value="Search" />
 				</div>
 
@@ -137,8 +118,8 @@
 								<th><spring:message
 										code="lbl.estimate.preparation.name.work" /></th>
 								
-								<%-- <th><spring:message
-										code="lbl.estimate.preparation.Category" /></th> --%>
+								<th><spring:message
+										code="lbl.estimate.preparation.Category" /></th>
 								<th><spring:message
 										code="lbl.estimate.preparation.Division" /></th>
 								<th><spring:message
@@ -166,16 +147,14 @@
 												id="estimateList[${status.index}].workName" />
 											${result.workName }</td>
 										
-										<%-- <td><form:hidden
+										<td><form:hidden
 												path="estimateList[${status.index}].workCategry"
 												id="estimateList[${status.index}].workCategry" />
-											${result.workCategry }</td>--%>
-											
-										<td> 
-										<form:hidden
-												path="estimateList[${status.index}].executeDiv"
-												id="estimateList[${status.index}].executeDiv" />
-											${result.executeDiv }</td>
+											<a href="#" onclick="openEstimate('${result.id}')">${result.workCategry }</a></td>
+										<td><form:hidden
+												path="estimateList[${status.index}].executingDivision"
+												id="estimateList[${status.index}].executingDivision" />
+											${result.executingDivision }</td>
 										<td><form:hidden
 												path="estimateList[${status.index}].worksWing"
 												id="estimateList[${status.index}].worksWing" />

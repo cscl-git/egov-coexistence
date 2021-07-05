@@ -6,6 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
+<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 <style>
 .table thead > tr > th {
     color: black;
@@ -86,21 +87,21 @@
 							code="lbl.start.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="work_start_date" path="work_start_date"
-							class="form-control datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.intended.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="work_intended_date" path="work_intended_date"
-							class="form-control datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualstart.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="actual_start_date" path="actual_start_date"
-							class="form-control datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 							
 					</div>
@@ -108,7 +109,7 @@
 							code="lbl.actualend.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="actual_end_date" path="actual_end_date" onblur="pop()"
-							class="form-control datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<div style="text-align:center;"> 

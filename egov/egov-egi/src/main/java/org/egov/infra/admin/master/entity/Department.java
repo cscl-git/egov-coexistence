@@ -55,6 +55,7 @@ import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -86,6 +87,8 @@ public class Department extends AbstractAuditable {
     @SafeHtml
     private String code;
 
+    @Column(name="workswingid")
+    private Long workswingid;
     @Override
     public Long getId() {
         return id;
@@ -148,5 +151,13 @@ public class Department extends AbstractAuditable {
             return false;
         return true;
     }
+
+	public Long getWorkswingid() {
+		return workswingid;
+}
+
+	public void setWorkswingid(Long workswingid) {
+		this.workswingid = workswingid;
+	}
 
 }

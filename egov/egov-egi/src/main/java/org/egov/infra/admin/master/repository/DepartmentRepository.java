@@ -74,4 +74,6 @@ public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
     @QueryHints({ @QueryHint(name = HINT_CACHEABLE, value = "true") })
     Department findByCode(String code);
+    
+    List<Department> findByWorkswingid(Long id);
 }

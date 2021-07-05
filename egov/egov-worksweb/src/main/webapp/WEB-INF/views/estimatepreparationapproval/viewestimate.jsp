@@ -31,9 +31,11 @@
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
-					<form:option value="Building & Roads">Building & Roads</form:option>
+					<form:options items="${estimatePreparationApproval.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+					<%-- <form:option value="Building & Roads">Building & Roads</form:option>
 					<form:option value="Public Health">Public Health</form:option>
-					<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option>
+					<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
 				</form:select>
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -45,8 +47,24 @@
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
-					<form:options items="${estimatePreparationApproval.departments}"
+					<form:options items="${estimatePreparationApproval.newdepartments}"
 						itemValue="code" itemLabel="name" />
+					<%-- <form:options items="${estimatePreparationApproval.departments}"
+						itemValue="code" itemLabel="name" /> --%>
+				</form:select>
+			</div>
+			<label class="col-sm-3 control-label text-left-audit1">Sub-Division<span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control"
+							cssErrorClass="form-control-works error" readonly="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${estimatePreparationApproval.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
+							
 				</form:select>
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -175,21 +193,21 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.name.work" /><span
 				class="mandatory"></span></label>
-			<div class="col-sm-9 block-colm">
+			<div class="col-sm-3 block-colm">
 				<form:textarea class="form-control" path="workName" maxlength="2000" readonly="true" style="height: 100px;"
 					 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.necessity" /><span
 				class="mandatory"></span></label>
-			<div class="col-sm-9 block-colm">
+			<div class="col-sm-3 block-colm">
 					<form:textarea class="form-control" path="necessity" maxlength="2000" readonly ="true" style="height: 100px;"
 					 />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.scope.work" /><span
 				class="mandatory"></span></label>
-			<div class="col-sm-9 block-colm">
+			<div class="col-sm-3 block-colm">
 					 <form:textarea class="form-control" path="workScope" maxlength="2000" readonly="true" style="height: 100px;"
 					 />
 			</div>
@@ -217,7 +235,7 @@
 							<th><c:out value="${mapboq.key}"/></th>
 							</tr>
 							<tr>
-								<th><spring:message code="lbl.item.Milestone" /></th>	
+								<%-- <th><spring:message code="lbl.item.Milestone" /></th>	 --%>
 									<th><spring:message code="lbl.item.description" /></th>
 									<th><spring:message code="lbl.ref.dsr" /></th>
 									<th><spring:message code="lbl.unit" /></th>
@@ -236,19 +254,26 @@
 						
 						<%-- <c:if test="${mapboq.key == boq.milestone }"> --%>
 								<tr id="boq${mapstatus.index}tableBoqrow" class="boq${status.index}repeat-address">
-										<td>
+								<%-- 		<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
-								<form:input type="text" style="width:200px;"
+								<form:hidden type="text" style="width:200px;"
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"
 											required="required" class="form-control milestone"
-											  readonly="true"  title="${boq.milestone}"></form:input></td>
-									<td><form:input type="text" style="width:400px;"
+											  readonly="true"  title="${boq.milestone}"></form:hidden></td> --%>
+									<td><form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
+												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:hidden
+											path="boQDetailsList[${boq.sizeIndex}].milestone"
+											id="boQDetailsList[${boq.sizeIndex}].milestone"
+											></form:hidden>
+									
+									<form:textarea type="text" style="height: 100px;"
 											path="boQDetailsList[${boq.sizeIndex}].item_description"
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 											required="required" class="form-control item_description"
-											  readonly="true"  title="${boq.item_description}" ></form:input></td>
+											  readonly="true"  title="${boq.item_description}" ></form:textarea></td>
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
@@ -292,7 +317,7 @@
 				<br> <br>
 				<div class="panel-title"> Estimate Rate Analysis </div>
 				<div>
-				<jsp:include page="RoughWorkfileupload.jsp" />
+				<jsp:include page="RoughWorkfileupload2.jsp" />
 				</div>
 		<br> <br>
 				
@@ -342,5 +367,4 @@
 			document.getElementById("table").deleteRow(i);
 		}
 	</script>
-
 

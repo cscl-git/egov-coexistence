@@ -483,15 +483,14 @@
     </definition>
     
 
-	<definition name="view-data" extends="base_layout">
+<definition name="view-data" extends="base_layout">
         <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/viewdata.jsp"/>
     </definition>
-    
-    <definition name="search-estimate-form1" extends="base_layout">
+ <definition name="search-estimate-form1" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate1.jsp"/>
-    </definition>
+    </definition>    
     
 </tiles-definitions>
 

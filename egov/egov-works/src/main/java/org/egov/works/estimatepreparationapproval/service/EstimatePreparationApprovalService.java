@@ -13,7 +13,9 @@ import javax.servlet.http.HttpServletRequest;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.service.DesignationService;
+import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
@@ -28,8 +30,13 @@ import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApprovalRESTPOJO;
+import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
+import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
+import org.egov.works.estimatepreparationapproval.repository.SudivisionRepository;
+import org.egov.works.estimatepreparationapproval.repository.WorkswingRepository;
 import org.joda.time.DateTime;
+import org.python.antlr.PythonParser.return_stmt_return;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +71,12 @@ public class EstimatePreparationApprovalService {
     private MicroserviceUtils microServiceUtil;
 	@Autowired
     private DesignationService designationService;
+	@Autowired
+	private WorkswingRepository workswingrepository;
+	@Autowired
+	private SudivisionRepository sudivisionrepo;
+	@Autowired
+	private DepartmentRepository departmentrepository;
 
 	@Transactional
 	public EstimatePreparationApproval saveEstimatePreparationData(HttpServletRequest request,
@@ -72,6 +85,8 @@ public class EstimatePreparationApprovalService {
 
 		List<BoQDetails> list = new ArrayList<BoQDetails>();
 			for (BoQDetails boq : estimatePreparationApproval.getBoQDetailsList()) {
+				System.out.println("++++++++++++ "+boq.getItem_description()+"++++++++");
+				/*if(boq.getMilestone() !=null && boq.getItem_description() !=null && boq.getRef_dsr() !=null && boq.getQuantity() != null && boq.getRate() !=null && boq.getUnit() != null)*/ 
 				boq.setEstimatePreparationApproval(estimatePreparationApproval);
 				list.add(boq);
 			}
@@ -119,6 +134,7 @@ public class EstimatePreparationApprovalService {
 		}
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalRepository
 				.save(estimatePreparationApproval);
+		System.out.println("::::::: "+estimatePreparationApproval.getDocumentDetail()+":::::::: ");
 		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
 				: estimatePreparationApproval.getDocumentDetail();
 		List<DocumentUpload> documentDetails = new ArrayList<>();
@@ -140,6 +156,26 @@ public class EstimatePreparationApprovalService {
 		return savedEstimatePreparationApproval1;
 	}
 	
+	//saving document before 
+	public DocumentUpload savedocebefore(EstimatePreparationApproval estimatePreparationApproval) {
+		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
+				: estimatePreparationApproval.getDocumentDetail();
+		List<DocumentUpload> documentDetails = new ArrayList<>();
+		DocumentUpload documentUpload=new DocumentUpload();
+		
+		documentDetails = getDocumentDetailsbefore(files, estimatePreparationApproval,
+				"Works_Est");
+			
+		
+		
+		if (!documentDetails.isEmpty()) {
+			
+		 documentUpload=	persistDocument1(documentDetails);
+		System.out.println("::::::::::: "+ documentUpload.getId()+":::::::::: " +documentUpload.getObjectType()+":::::::::::: "+documentUpload.getFileStore().getId());
+		System.out.println(":::::::::::Changed:::::::::");
+		}
+	return documentUpload;	
+	}
 	public void createEstimateWorkflowTransition(final EstimatePreparationApproval estimatePreparationApproval,
             final Long approvalPosition, final String approvalComent, final String additionalRule,
             final String workFlowAction,final String approvalDesignation) {
@@ -241,6 +277,16 @@ public class EstimatePreparationApprovalService {
         }
         
 	}
+	public String getUserName() {
+		final User user = securityUtils.getCurrentUser();
+		String name = user.getName();
+	return name;
+	}
+	public Long getUserId() {
+		final User user = securityUtils.getCurrentUser();
+		Long id = user.getId();
+	return id;
+	}
 	
 	@Transactional
 	public EstimatePreparationApproval editEstimatePreparationData(HttpServletRequest request,
@@ -324,6 +370,52 @@ public class EstimatePreparationApprovalService {
         }
         return documentDetailsList;
     }
+	public List<DocumentUpload> getDocumentDetailsbefore(final List<DocumentUpload> files, final Object object,
+            final String objectType) {
+        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
+
+        Long id;
+        Method method;
+        try {
+            method = object.getClass().getMethod("getId", null);
+            id = (Long) method.invoke(object, null);
+            System.out.println("::::::::::ID:::::::: "+id);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
+        }
+
+        for (DocumentUpload doc : files) {
+            final DocumentUpload documentDetails = new DocumentUpload();
+            //documentDetails.setObjectId(id);
+            String seqquery="select nextVal('seq_egf_documents')";
+        
+          
+           
+            if(doc.getObjectType()!=null) {
+	            if(doc.getObjectType().equals("roughWorkFile")) {
+	            	System.out.println(":::getObjectType():::::+ "+doc.getFileName());
+	            	 documentDetails.setObjectType("roughWorkFile");
+	            	 documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+	                         doc.getContentType(), "roughWorkFile"));
+	            	 documentDetails.setComments(doc.getComments());
+	            	 documentDetails.setUsername(doc.getUsername());
+	            }
+            }
+            else {
+            documentDetails.setObjectType(objectType);
+            System.out.println("::::::::+ "+doc.getFileName());
+            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+                    doc.getContentType(), "roughWorkFile"));
+            documentDetails.setComments(doc.getComments());
+            documentDetails.setUsername(doc.getUsername());
+            }
+           
+            documentDetailsList.add(documentDetails);
+
+        }
+        return documentDetailsList;
+    }
 	
 	
 	
@@ -334,6 +426,17 @@ public class EstimatePreparationApprovalService {
 		if (documentDetailsList != null && !documentDetailsList.isEmpty())
 			for (final DocumentUpload doc : documentDetailsList)
 				documentUploadRepository.save(doc);
+		
+	}
+	public DocumentUpload persistDocument1(final List<DocumentUpload> documentDetailsList) {
+		DocumentUpload docs= new DocumentUpload();
+		if (documentDetailsList != null && !documentDetailsList.isEmpty()) {
+			for (final DocumentUpload doc : documentDetailsList)
+			{
+				docs=documentUploadRepository.save(doc);
+			}
+		}
+		return docs;
 	}
 	
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
@@ -344,6 +447,12 @@ public class EstimatePreparationApprovalService {
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
 	
+	public void updateDocuments(Long id,Long uploadId)
+	{
+	
+			documentUploadRepository.updateDoc(id,uploadId);
+	
+	}
 	public List<EstimatePreparationApprovalRESTPOJO>getAllEstimationPreparationNative(){
 		System.out.println("HERE");
 		List<EstimatePreparationApprovalRESTPOJO> a=null;
@@ -353,6 +462,24 @@ public class EstimatePreparationApprovalService {
 			ex.printStackTrace();
 		}
 		return a;
+	}
+		
+	public void deleteBoqUploadData(Long id) {
+		// TODO Auto-generated method stub
+		documentUploadRepository.deleteData(id);
+	}
+	
+	public List<Workswing> getworskwing() {
+		List<Workswing> workwing = workswingrepository.findAll();
+	return workwing;
+}
+	public List<Subdivisionworks> getsubdivision(Long id) {
+		List<Subdivisionworks> subdivision = sudivisionrepo.findByDivisionid(id);
+	return subdivision;
+	}
+	public List<Department> getdepartment(Long id) {
+		List<Department> departments = departmentrepository.findByWorkswingid(id);
+	return departments;
 	}
 	
 }

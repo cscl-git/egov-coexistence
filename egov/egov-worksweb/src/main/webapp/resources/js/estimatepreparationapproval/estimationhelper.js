@@ -46,6 +46,58 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
+/*Added By Kundan For Solved Date Picker Issue*/
+
+function ConfirmDelete()
+{
+ var txt;
+ var estId=document.getElementById("uploadId");
+ var comments=document.getElementById("comments").value;
+ var file=document.getElementById('file1');
+
+	if(file.files.length >0){
+		
+		if(comments === "" || comments==='undefined'){
+			 
+			 bootbox.alert("Please Fill Boq Comment.");
+			 return false;
+			 
+		 }
+		// debugger;
+		 
+				 var x = confirm("Are you sure you want to upload file again previous file will be deleted. !");
+				 
+				  if (x==true)
+					  {
+					  	txt = "You pressed OK!";
+					  	return true;
+					  }
+				     
+				  else
+					  {
+					  	txt = "You pressed Cancel!";
+					  	return false;
+					  }
+				   
+				 
+		
+
+		return true;
+
+	}else{
+
+		bootbox.alert("Please Select File.")
+
+		return false;
+
+	}
+ 
+ 
+ 
+}
+
+
+
 
 
 function calculateMeasuredAmount(x)
@@ -240,7 +292,30 @@ function addpaymentRow() {
 		  bootbox.alert($.i18n.prop('msg.limit.reached'));
 	}
 }
+var subledgerrowcount=0;
+function addcheckListRow2() { 
+	
+	
+	var rowcount = $("#tblchecklist tbody tr").length;
+	if (rowcount < 30) {
+		if (document.getElementById('tblchecklistRow') != null) {
+			addRowPayment('tblchecklist','tblchecklistRow');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.milestone').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.item_description').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.unit').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.rate').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.quantity').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.amount').val('');
+			
+			++subledgerrowcount;
 
+			addCustomEvent(rowcount,'temppayment[index].addButton','keydown',shortKeyFunForAddButton);
+		}
+	} else {
+		  bootbox.alert($.i18n.prop('msg.limit.reached'));
+	}
+}
 
 
 
@@ -467,13 +542,55 @@ function addcheckListRow(x) {
    	dataId++;
    }  
 	
-     
-     
-
 	var rowcount = $('.tableBoq tbody tr').length;
 	if (rowcount < 30) {
 		if (document.getElementById('boq'+x+'tableBoqrow') != null) {
 			addRow('boq'+x+'tableBoq','boq'+x+'tableBoqrow');
+			
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.item_description').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.unit').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.rate').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.quantity').val('');
+			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.amount').val('');
+			
+			++subledgerrowcount;
+     
+			addCustomEvent(rowcount,'tempSubLedger[index].addButton','keydown',shortKeyFunForAddButton);
+			
+			
+		}
+	} else {
+		  bootbox.alert($.i18n.prop('msg.limit.reached'));
+	}
+}
+var subledgerrowcount=0;
+function addcheckListRow1(x) { 
+	
+	var xx = document.getElementById("deletefromdb");
+	var y = document.getElementById("deletefromfront");
+     
+
+		
+		var dataId = $(x).attr("data-idx");	
+  if (dataId==undefined)
+  {
+  	dataId=1;
+  }
+   else{
+   	dataId++;
+   }  
+  
+	var rowcount = $('.tableBoq tbody tr').length;
+	
+	if (rowcount < 30) {
+		 xx.style.display = "none";
+		    y.style.display = "block";
+		    
+		if (document.getElementById('boq'+x+'tableBoqrow') != null) {
+			addRow('boq'+x+'tableBoq','boq'+x+'tableBoqrow');
+			
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.milestone').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.item_description').val('');
 			$('#boq'+x+'tableBoq tbody tr:eq('+rowcount+')').find('.ref_dsr').val('');
@@ -485,11 +602,16 @@ function addcheckListRow(x) {
 			++subledgerrowcount;
 			
 			addCustomEvent(rowcount,'tempSubLedger[index].addButton','keydown',shortKeyFunForAddButton);
+			xx.style.display = "block";
+		    y.style.display = "none";
+			
 		}
 	} else {
+		
 		  bootbox.alert($.i18n.prop('msg.limit.reached'));
 	}
 }
+
 
 function deleteEsRow(obj,x) {
 	var rowcount=$(".tableBoq tbody tr").length;
@@ -694,4 +816,59 @@ function caluclateestamt(){
 		contengencyPercentage(estimateAmt);
 
 }
+$(document).ready(function()
+		{	
+			console.log("workswing................");
+			$('#worksWing').change(function(){
+				//alert($('#worksWing').val());
+				$.ajax({
+					url: "/services/works/estimatePreparation/ajaxexecutivedivision",     
+					type: "GET",
+					data: {
+						id : $('#worksWing').val()
+						
+					},
+					dataType: "json",
+					success: function (response) {
+						console.log("success"+response);
+						$('#department').empty();
+						$('#department').append($("<option value=''>Select from below</option>"));
+						$.each(response, function(index, value) {
+							$('#department').append($('<option>').text(value.name).attr('value', value.code));
+						});
+						
+					}, 
+					error: function (response) {
+						//bootbox.alert('json fail');
+						console.log("failed");
+					}
+				});
+			});
+			$('#department').change(function(){
+				//alert($('#department').val());
+				$.ajax({
+					url: "/services/works/estimatePreparation/ajaxsubdivision",     
+					type: "GET",
+					data: {
+						id : $('#department').val()
+						
+					},
+					dataType: "json",
+					success: function (response) {
+						console.log("success"+response);
+						$('#subdivision').empty();
+						$('#subdivision').append($("<option value=''>Select from below</option>"));
+						$.each(response, function(index, value) {
+							$('#subdivision').append($('<option>').text(value.subdivision).attr('value', value.id));
+						});
+						
+					}, 
+					error: function (response) {
+						//bootbox.alert('json fail');
+						console.log("failed");
+					}
+		});
+	});
+	
 
+});

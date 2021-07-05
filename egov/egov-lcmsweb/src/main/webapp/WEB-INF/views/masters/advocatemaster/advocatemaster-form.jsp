@@ -133,11 +133,11 @@
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label text-right"><spring:message
-							code="lbl.pannumber" />:<span class="mandatory"></span> </label>
+							code="lbl.pannumber" />: </label>
 					<div class="col-sm-3 add-margin">
 						<form:input path="panNumber"
 							class="form-control text-left patternvalidation" id="panNumber"
-							data-pattern="alphanumeric" maxlength="10" required="required" />
+							data-pattern="alphanumeric" maxlength="10" />
 						<form:errors path="panNumber" cssClass="error-msg" />
 					</div>
 					<label class="col-sm-2 control-label text-right"><spring:message
@@ -176,12 +176,12 @@
 				</div>
 				<div class="form-group">
 					<label class="col-sm-2 control-label text-right"><spring:message
-							code="lbl.monthlyrenumeration" />:<span class="mandatory"></span>
+							code="lbl.monthlyrenumeration" />:</span>
 					</label>
 					<div class="col-sm-3 add-margin">
 						<form:input path="monthlyRenumeration" maxlength="10"
 							id="monthlyRenumeration" class="form-control patternvalidation"
-							data-pattern="decimalvalues" required="required"
+							data-pattern="decimalvalues" 
 							pattern="\d{0,6}(\.\d{1,2})?"
 							title="It will allow upto 7 digits and 2 decimal points"
 							data-first-option="false&true" />

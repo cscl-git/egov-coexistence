@@ -1,7 +1,5 @@
 package org.egov.works.web.controller.searchestimate;
 
-import java.io.ByteArrayInputStream;
-import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -14,7 +12,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.egov.egf.masters.services.ContractorService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
-import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
@@ -23,18 +20,13 @@ import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.service.BoQDetailsService;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatesearch.service.SearchEstimateService;
-import org.egov.works.utils.ExcelGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/searchEstimate")
@@ -58,281 +50,16 @@ public class SearchEstimateController {
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 	 
-//	@RequestMapping(value = "/estimateApprovalSearch", method = RequestMethod.POST)
-//	public String showNewFormGet(
-//			@ModelAttribute("estimateSearchDetails") final EstimatePreparationApproval estimatePreparationApproval,
-//			final Model model, HttpServletRequest request) {
-//
-//		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
-//
-//		return "estimate-detail-search-form";
-//	}
-
 	@RequestMapping(value = "/estimateApprovalSearch", method = RequestMethod.POST)
-	public String showEstimateNewFormGet1(
-			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
+	public String showNewFormGet(
+			@ModelAttribute("estimateSearchDetails") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
 
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
-		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
 
-		return "search-estimate-form1";
-	}
-	
-	
-
-	@RequestMapping(value = "/estimateApprovalSearchView", params = "estimateApprovalSearchView", method = RequestMethod.POST)
-	public String searchWorkEstimateData1(
-			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
-			final Model model, final HttpServletRequest request,StateHistory stateHistory) throws Exception {
-		List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
-
-		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
-		long department = Long.parseLong(estimatePreparationApproval.getDepartment());
-		estimatePreparationApproval.setExecutingDivision(department);
-		}
-		EstimatePreparationApproval estimate=null;
-		
-			final StringBuffer query = new StringBuffer(500);
-			 List<Object[]> list =null;
-			 query
-		        .append(
-		                "select es.id,es.workName,dept.name,es.worksWing,es.expHead_est,es.estimateAmount,es.estimateDate,es.createdDate  from EstimatePreparationApproval es join Department dept on es.executingDivision=dept.id where es.id=es.id");
-			
-			 if(estimatePreparationApproval.getFromDt()!=null || estimatePreparationApproval.getToDt() !=null)
-			       {
-				 SimpleDateFormat DateFor = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-				 if(estimatePreparationApproval.getFromDt()!=null) {
-					String stringDate= DateFor.format(estimatePreparationApproval.getFromDt());
-					System.out.println("stringDate--"+stringDate);
-					query.append(" and es.estimateDate>='").append((stringDate))
-					.append("'");
-				 }
-				 if(estimatePreparationApproval.getToDt() !=null) {
-					String stringDate1= DateFor.format(estimatePreparationApproval.getToDt());
-					System.out.println("stringDate1--"+stringDate1);
-					query.append(" and es.estimateDate<='").append((stringDate1))
-					.append("'");
-				 }
-			    }
-			 if(estimatePreparationApproval.getDepartment() != null || estimatePreparationApproval.getWorkName()!=null || 
-						estimatePreparationApproval.getWorksWing()!=null || estimatePreparationApproval.getExpHead_est()!=null ) 
-			 {
-				 query.append(getMisQuery1(estimatePreparationApproval));
-			 }
-				 System.out.println("Query else:: "+query.toString());
-	         list = persistenceService.findAllBy(query.toString());
-			 
-	         if (list.size() != 0) {
-	        	 
-	        	 for (final Object[] object : list) {
-	        		 estimate = new EstimatePreparationApproval();
-	        		 estimate.setId(Long.parseLong(object[0].toString()));
-	        		 if(object[1] != null)
-	        		 {
-	        			 estimate.setWorkName(object[1].toString());
-	        		 }
-	        		 if(object[2] != null)
-	        		 {
-	        			 estimate.setExecuteDiv(object[2].toString());
-	        		 }
-	        		 if(object[3] != null)
-	        		 {
-	        			 estimate.setWorksWing(object[3].toString());
-	        		 }
-	        		 if(object[4] != null)
-	        		 {
-	        			 estimate.setExpHead_est(object[4].toString());
-	        		 }
-	        		 if(object[5] != null)
-	        		 {
-	        			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
-	        		 }
-	        		 if(object[6] != null)
-	        		 {
-	        			 String estimateDate=object[6].toString();
-	        			 estimate.setEstimateDt(estimateDate.substring(0,10));
-	        		 }
-	        		 if(object[7] != null)
-	        		 {
-	        			 String createDate=object[7].toString();
-	        			 estimate.setCreatedDt(createDate.substring(0,10));
-	        		 }
-	        		 
-	        		 
-//	        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
-//	        		 {
-////	        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
-//	        		 }
-	        		 approvalList.add(estimate);
-	        	 }
-	        	 
-	         }
-		
-		
-        estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
-        System.out.println("estimatePreparationApproval---"+estimatePreparationApproval.getDepartments());
-		estimatePreparationApproval.setEstimateList(approvalList);
-
-		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
-
-		return "search-estimate-form1";
-
+		return "estimate-detail-search-form";
 	}
 
-	@RequestMapping(value = "/estimateApprovalSearchView",params="workEstimateSearchResult" ,method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<InputStreamResource> excelEstimateResult(@ModelAttribute("workEstimateDetails")
-	          final EstimatePreparationApproval estimatePreparationApproval,
-	             final Model model, final HttpServletRequest request) throws Exception {
-		
-             List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
-
-         // Convert input string into a date
-         if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
-         long department = Long.parseLong(estimatePreparationApproval.getDepartment());
-         estimatePreparationApproval.setExecutingDivision(department);
-         }
-         EstimatePreparationApproval estimate=null;
-         final StringBuffer query = new StringBuffer(500);
-		 List<Object[]> list =null;
-		 query
-	        .append(
-	                "select es.id,es.workName,dept.name,es.worksWing,es.expHead_est,es.estimateAmount,es.estimateDate,es.createdDate  from EstimatePreparationApproval es join Department dept on es.executingDivision=dept.id where es.id=es.id");
-		
-		 if(estimatePreparationApproval.getFromDt()!=null || estimatePreparationApproval.getToDt() !=null)
-		       {
-			 SimpleDateFormat DateFor = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-			 if(estimatePreparationApproval.getFromDt()!=null) {
-				String stringDate= DateFor.format(estimatePreparationApproval.getFromDt());
-				System.out.println("stringDate--"+stringDate);
-				query.append(" and es.createdDate>='").append((stringDate))
-				.append("'");
-			 }
-			 if(estimatePreparationApproval.getToDt() !=null) {
-				String stringDate1= DateFor.format(estimatePreparationApproval.getToDt());
-				System.out.println("stringDate1--"+stringDate1);
-				query.append(" and es.createdDate<='").append((stringDate1))
-				.append("'");
-			 }
-		    }
-		 if(estimatePreparationApproval.getDepartment() != null || estimatePreparationApproval.getWorkName()!=null || 
-					estimatePreparationApproval.getWorksWing()!=null || estimatePreparationApproval.getExpHead_est()!=null ) 
-		 {
-			 query.append(getMisQuery1(estimatePreparationApproval));
-		 }
-			 System.out.println("Query else:: "+query.toString());
-         list = persistenceService.findAllBy(query.toString());
-		 
-         if (list.size() != 0) {
-        	 
-        	 for (final Object[] object : list) {
-        		 estimate = new EstimatePreparationApproval();
-        		 estimate.setId(Long.parseLong(object[0].toString()));
-        		 if(object[1] != null)
-        		 {
-        			 estimate.setWorkName(object[1].toString());
-        			 System.out.println("object[1].toString()"+object[1].toString());
-        		 }
-        		 if(object[2] != null)
-        		 {
-        			 estimate.setExecuteDiv(object[2].toString());
-        			 System.out.println("object[2].toString()"+object[2].toString());
-        		 }
-        		 if(object[3] != null)
-        		 {
-        			 estimate.setWorksWing(object[3].toString());
-        			 System.out.println("object[3].toString()"+object[3].toString());
-        		 }
-        		 if(object[4] != null)
-        		 {
-        			 estimate.setExpHead_est(object[4].toString());
-        			 System.out.println("object[4].toString()"+object[4].toString());
-        		 }
-        		 if(object[5] != null)
-        		 {
-        			 estimate.setEstimateAmount(Double.parseDouble(object[5].toString()));
-        			 System.out.println("object[5].toString()"+object[5].toString());
-        		 }
-        		 if(object[6] != null)
-        		 {
-        			 String estimateDate=object[6].toString();
-        			 estimate.setEstimateDt(estimateDate.substring(0,10));
-        			 System.out.println("object[6].toString()"+object[6].toString());
-        			 
-        		 }
-        		 if(object[7] != null)
-        		 {
-        			 String createDate=object[7].toString();
-        			 estimate.setCreatedDt(createDate.substring(0,10));
-        			 System.out.println("object[7].toString()"+object[7].toString());
-        		 }
-        		 
-        		 
-//        		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
-//        		 {
-////        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
-//        		 }
-        		 approvalList.add(estimate);
-        	 }
-        
-	 
-    }
-      estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
-      estimatePreparationApproval.setEstimateList(approvalList);
-		
-		String[] COLUMNS = {"Name Of Work", "Division", "Work Wing", "Expenditure Type", "Estimate Cost", "Date of Estimate creation","Date of Estimate approval"};
-		
-		ByteArrayInputStream in = ExcelGenerator.estimateResultToExcel1(approvalList, COLUMNS);
-		
-		HttpHeaders headers = new HttpHeaders();
-        headers.add("Content-Disposition", "attachment; filename=EstimateResult.xlsx");
-		return ResponseEntity
-                .ok()
-                .headers(headers)
-                .body(new InputStreamResource(in));
-		
-	    }
-	
-	public String getMisQuery1( EstimatePreparationApproval estimate) {
-
-		final StringBuffer misQuery = new StringBuffer(300);
-		if (null != estimate) {
-			
-			if(estimate.getExecutingDivision() != null)
-			{
-				misQuery.append(" and es.executingDivision ='")
-				.append(estimate.getExecutingDivision()).append("'");
-			}
-			
-			if ( estimate.getWorkName() != null && !estimate.getWorkName().isEmpty())
-			{
-				misQuery.append(" and UPPER(es.workName) like UPPER('%")
-						.append(estimate.getWorkName()).append("%')");
-			}
-			
-			if(estimate.getWorksWing() != null)
-			{
-				misQuery.append(" and es.worksWing='")
-				.append(estimate.getWorksWing()).append("'");
-			}
-			
-			if(estimate.getExpHead_est() != null)
-			{
-				misQuery.append(" and es.expHead_est='")
-				.append(estimate.getExpHead_est()).append("'");
-			}
-//			if(estimate.getEstimateAmount() != null)
-//			{
-//				misQuery.append(" and es.estimateAmount=")
-//				.append(estimate.getEstimateAmount());
-//			}
-		}
-		return misQuery.toString();
-
-	}
-
-	
-	
 	@RequestMapping(value = "/workOrderSearch", method = RequestMethod.POST)
 	public String progressUpdate(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {

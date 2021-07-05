@@ -80,8 +80,8 @@ import org.hibernate.validator.constraints.SafeHtml;
 
 @Entity
 @Table(name = "eglc_advocate_master")
-@Unique(id = "id", tableName = "eglc_advocate_master", columnName = { "name", "mobilenumber", "pannumber" }, fields = {
-        "name", "mobileNumber", "panNumber" }, enableDfltMsg = true)
+@Unique(id = "id", tableName = "eglc_advocate_master", columnName = { "name", "mobilenumber" }, fields = {
+        "name", "mobileNumber" }, enableDfltMsg = true)
 @SequenceGenerator(name = AdvocateMaster.SEQ_ADVOCATE_MASTER, sequenceName = AdvocateMaster.SEQ_ADVOCATE_MASTER, allocationSize = 1)
 @AuditOverrides({ @AuditOverride(forClass = AbstractAuditable.class, name = "lastModifiedBy"),
         @AuditOverride(forClass = AbstractAuditable.class, name = "lastModifiedDate") })
@@ -179,7 +179,7 @@ public class AdvocateMaster extends AbstractAuditable implements EntityType {
     @SafeHtml
     private String email;
 
-    @NotNull
+    
     @Audited
     private double monthlyRenumeration;
 
@@ -190,7 +190,7 @@ public class AdvocateMaster extends AbstractAuditable implements EntityType {
     @Audited
     private String firmName;
 
-    @NotNull
+    
     @Length(max = 10)
     @Audited
     private String panNumber;

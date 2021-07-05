@@ -33,6 +33,7 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqUploadDocument;
 
 
 //Added Bikash Dhal
@@ -163,8 +164,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "meetDate")
 	private Date meetDate;
 	
+	@Column(name="subdivision")
+	private Long subdivision;
+	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
+
+	/*@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
+	private List<BoqUploadDocument> uploadDocument=new ArrayList<BoqUploadDocument>();*/
 
 	@ManyToOne
     @JoinColumn(name = "statusid")
@@ -265,6 +272,12 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private List<BoQDetails> boQDetailsList;
 
 	@Transient
+	private List<BoqUploadDocument> docUpload;
+	
+	/*@Transient
+	private List<String> UploadId;*/
+
+	@Transient
 	private String department = "";
 
 	@Transient
@@ -272,6 +285,15 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	
 	@Transient
 	private List<Designation> designations = new ArrayList<Designation>();
+	
+	@Transient
+	private List<Workswing> workswings = new ArrayList<Workswing>();
+	
+	@Transient
+	private List<Subdivisionworks> subdivisions = new ArrayList<Subdivisionworks>();
+	
+	@Transient
+	private List<org.egov.infra.admin.master.entity.Department> newdepartments = new ArrayList<org.egov.infra.admin.master.entity.Department>();
 	
 	@Transient
 	private String statusDescription;
@@ -304,7 +326,40 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Transient
 	private String workCategry;
 	
+	@Column(name="comments")
+    private String comments;
+	
+	@Transient
+	private Long uploadfileStoreId;
+	@Transient
+	private Long uploadId;
+	
+	
 
+
+	public Long getUploadId() {
+		return uploadId;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
+	public Long getUploadfileStoreId() {
+		return uploadfileStoreId;
+	}
+
+	public void setUploadfileStoreId(Long uploadfileStoreId) {
+		this.uploadfileStoreId = uploadfileStoreId;
+	}
+
+	public void setUploadId(Long uploadId) {
+		this.uploadId = uploadId;
+	}
 
 	public Long getExecutingDivision() {
 		return executingDivision;
@@ -826,6 +881,50 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	public void setExecuteDiv(String executeDiv) {
 		this.executeDiv = executeDiv;
 	}
+
+
+
+	public List<BoqUploadDocument> getDocUpload() {
+		return docUpload;
+	}
+
+	public void setDocUpload(List<BoqUploadDocument> docUpload) {
+		this.docUpload = docUpload;
+	}
+
+	public Long getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(Long subdivision) {
+		this.subdivision = subdivision;
+	}
+
+	public List<Workswing> getWorkswings() {
+		return workswings;
+	}
+	
+	public void setWorkswings(List<Workswing> workswings) {
+		this.workswings = workswings;
+	}
+	
+	public List<Subdivisionworks> getSubdivisions() {
+		return subdivisions;
+	}
+	
+	public void setSubdivisions(List<Subdivisionworks> subdivisions) {
+		this.subdivisions = subdivisions;
+	}
+
+	public List<org.egov.infra.admin.master.entity.Department> getNewdepartments() {
+		return newdepartments;
+	}
+
+	public void setNewdepartments(List<org.egov.infra.admin.master.entity.Department> newdepartments) {
+		this.newdepartments = newdepartments;
+}
+
+	
 	
 	
 
