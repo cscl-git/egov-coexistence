@@ -24,6 +24,11 @@
 			<div class="subheadnew">Voucher View</div>
 			</div>
 		 </div>
+		 <div>
+	<c:if test="${glcodedetailIdmsg !=null && glcodedetailIdmsg !=''}">
+	  <p style="color:red;">  ${glcodedetailIdmsg} <p>
+	 </c:if>
+	</div>
 		 <div class="panel-body">
 		   <table border="0" width="100%" cellspacing="0">
 			<tr>
@@ -49,7 +54,27 @@
 			</tr>
 			<tr>
 			 <td width="10%" class="greybox"><b>Sub Division :  </b></td>
+			 <c:if test="${voucherDetails.subdivision !=null && voucherDetails.subdivision !=''}">
 			 <td width="25%" class="greybox">${voucherDetails.subdivision}</td>
+			 </c:if>
+			 <c:if test="${voucherDetails.subdivision ==null || voucherDetails.subdivision ==''}">
+			    <td width="25%" class="greybox">
+			     <td width="10%" class="greybox"><b>Sub division</b></td>
+			 <td width="25%" class="greybox">
+			 <select name="egBillregistermis.function"
+									id="egBillregistermis.subdivision" required="required"
+									class="form-control">
+										<option value="">-Select-</option>
+										<c:forEach items="${subdivisionList}" var="subdivision"
+											varStatus="loop">
+											<option value="${subdivision.subdivisionCode}">${subdivision.subdivisionName}</option>
+										</c:forEach>
+										<%-- <options items="${subdivision}" itemValue="id" itemLabel="name" /> --%>
+								</select>
+								</td>
+			    
+			    </td>
+			 </c:if>
 			 <td width="10%" class="greybox"><b>Department :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.deptName}</td>
 			</tr>
@@ -96,8 +121,10 @@
 	<input type="hidden" name="egBillregistermis.budgetaryAppnumber" id="egBillregistermis.budgetaryAppnumber" value="${voucherDetails.banNumber}"/>
 	<input type="hidden" name="egBillregistermis.fundsource" id="egBillregistermis.fundsource" value="${fundsource}"/>
 	<%-- <input type="hidden" name="egBillregistermis.egBillSubType" id="egBillregistermis.egBillSubType" value="${billsubtype}"/>  --%>
+	 <td width="10%" class="greybox"><b>Sub Division :  </b></td>
+	<c:if test="${voucherDetails.subdivision !=null && voucherDetails.subdivision !=''}">
 	<input type="hidden" name="egBillregistermis.subdivision" id="egBillregistermis.subdivision" value="${voucherDetails.subdivision}"/> 
-	
+	</c:if>
 	
 	<%-- <div class="form-group">
 		<label class="col-sm-3 control-label text-right"><spring:message code="lbl.billsubtype" text="Bill Subtype"/>
@@ -160,7 +187,7 @@
 					<%--<input type="hidden" name="billDetails[${status.index}].detailTypeId" id="billDetails[${status.index}].detailTypeId" value="${accountDetail.glcodeid}" class="form-control table-input hidden-input accountDetailsDetailTypeId"/>
 					<input type="hidden" name="billDetails[${status.index}].detailKeyId" id="billDetails[${status.index}].detailKeyId" class="form-control table-input hidden-input accountDetailsDetailKeyId"/>
 						 --%>		
-					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}','${accountDetail.creditamount}','${status.index}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
 					       class="form-control"/></td>
 					<%-- <td><input type="text" name="billDetails[${status.index}].creditamount" id="billDetails[${status.index}].creditamount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" 
 					       class="form-control"/></td> --%> 
@@ -188,6 +215,7 @@
 			<spring:message code="lbl.subledgerdetails" text="Sub-ledger Details"/>
 		</div>
 	</div>
+	
 	<div style="padding: 0 15px;">
 		<table class="table table-bordered" id="tblSubledgerAdd">
 			<thead>
@@ -616,6 +644,8 @@
 	    //});
 
 	});
+	
+	
 	
 </script>
 

@@ -268,6 +268,12 @@ function validateMIS(){
 					return false;
 				 }            
 			</s:if>
+			<s:if test="%{isFieldMandatory('subdivision')}">                     
+			 if(null!= document.getElementById('subdivision') && document.getElementById('subdivision').value == -1){
+				document.getElementById('lblError').innerHTML = "<s:text name='msg.please.select.subdivision'/>";                                   
+				return false;
+			 }            
+		</s:if>
 			return  true;
 }
 

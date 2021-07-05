@@ -123,6 +123,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import com.exilant.eGov.src.common.SubDivision;
 
 @Controller
 @RequestMapping("/refund")
@@ -546,8 +549,14 @@ public class PaymentRefundController extends BaseBillController {
 	}
 	
 	@RequestMapping(value = "/_paymentRequestForm", method = {RequestMethod.GET, RequestMethod.POST})
-	public String paymentRequestForm(@RequestParam(name = "vhid") final String vhid, final Model model) {
+	public String paymentRequestForm(@RequestParam(name = "vhid") final String vhid, final Model model,@ModelAttribute("message") String message) {
 		
+		if(message!=null) {
+			model.addAttribute("glcodedetailIdmsg", message);
+		}else {
+			message="";
+		}
+		model.addAttribute("glCodeDetailIdList","");
 		 List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
 		 EgBillregister egBillregister = new EgBillregister();
 		 
@@ -726,11 +735,24 @@ public class PaymentRefundController extends BaseBillController {
     			billSubtypes.add(row);
     		}
     	}
+		appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        //addDropdownData("subdivisionList", subdivisionList);
     	
         model.addAttribute("billNumberGenerationAuto", refundBillService.isBillNumberGenerationAuto());
         model.addAttribute("billSubTypes", billSubtypes);
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
+		model.addAttribute("subdivisionList", subdivisionList);
     }
     
     public List<EgBillSubType> getBillSubTypesRef() {
@@ -761,7 +783,7 @@ public class PaymentRefundController extends BaseBillController {
     
     @RequestMapping(value = "/refundCreate", method = RequestMethod.POST)
     public String createRefund(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,
-         final BindingResult resultBinder, final HttpServletRequest request, @RequestParam final String workFlowAction)
+         final BindingResult resultBinder, final HttpServletRequest request, @RequestParam final String workFlowAction,RedirectAttributes redirectAttributes)
          throws IOException {
             LOGGER.info("RefundBill is creating with user ::"+ApplicationThreadLocals.getUserId());
          //User createdBy = new User();
@@ -846,6 +868,7 @@ public class PaymentRefundController extends BaseBillController {
         
         egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
         populateBillDetails(egBillregister);
+        
         validateBillNumber(egBillregister, resultBinder);
         
 		
@@ -853,7 +876,9 @@ public class PaymentRefundController extends BaseBillController {
 			  refundvalidateLedgerAndSubledger(egBillregister, resultBinder);
 		  }
 		 
-                        		   
+		  validateSubledgeDetails(egBillregister);  
+		  System.out.println("------------------------------"+egBillregister.getBillPayeeDetailsNotLink().isEmpty());	  
+	if(egBillregister.getBillPayeeDetailsNotLink().isEmpty()) {
 
         if (resultBinder.hasErrors()) {
         	System.out.println("from ResultBinder Error");
@@ -925,6 +950,17 @@ public class PaymentRefundController extends BaseBillController {
                         		                    + savedEgBillregister.getBillnumber()+"&billId="
                         		                            + savedEgBillregister.getId();
                        }
+                 
+	}else {
+		StringBuilder message = new StringBuilder();
+		for(int i=0;i<egBillregister.getBillPayeeDetailsNotLink().size();i++) {
+			
+			message.append("account detial key "+egBillregister.getBillPayeeDetailsNotLink().get(i).getAccountDetailTypeId()+" not mapped with  glcodeid "+egBillregister.getBillPayeeDetailsNotLink().get(i).getEgBilldetailsId().getGlcodeid()+"\n");
+			
+		}
+		redirectAttributes.addFlashAttribute("message",message);
+		return "redirect:/refund/_paymentRequestForm?vhid=" + vhid;
+	}
                  
             }
     
@@ -1359,5 +1395,25 @@ public class PaymentRefundController extends BaseBillController {
 		        }
 
 		        return departmentName;
+		    }
+		  
+		    public void validateSubledgeDetails(EgBillregister egBillregister) {
+		        final List<EgBillPayeedetails> payeeDetails = new ArrayList<>();
+		        final List<EgBillPayeedetails> payeeDetailsNotMatched = new ArrayList<>();
+		        for (final EgBillPayeedetails payeeDetail : egBillregister.getBillPayeedetails()) {
+		            CChartOfAccountDetail coaDetail = chartOfAccountDetailService
+		                    .getByGlcodeIdAndDetailTypeId(payeeDetail.getEgBilldetailsId().getGlcodeid().longValue(),
+		                            payeeDetail.getAccountDetailTypeId().intValue());
+		            if (coaDetail != null) {
+		                payeeDetails.add(payeeDetail);
+		        }else {
+		        	payeeDetailsNotMatched.add(payeeDetail);
+		        }
+		        }
+		        egBillregister.getBillPayeedetails().clear();
+		        egBillregister.setBillPayeedetails(payeeDetails);
+		        
+		        egBillregister.getBillPayeeDetailsNotLink().clear();
+		        egBillregister.setBillPayeeDetailsNotLink(payeeDetailsNotMatched);
 		    }
 }

@@ -122,6 +122,8 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
     @Transient
     private List<EgBillPayeedetails> billPayeedetails = new ArrayList<>();
     @Transient
+    private List<EgBillPayeedetails> billPayeeDetailsNotLink = new ArrayList<>();
+	@Transient
     private List<EgChecklists> checkLists = new ArrayList<>();
     @Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
@@ -517,5 +519,14 @@ public class EgBillregister extends StateAware implements java.io.Serializable {
 
 	public void setIsCitizenRefund(String isCitizenRefund) {
 		this.isCitizenRefund = isCitizenRefund;
+	}
+	
+	
+    public List<EgBillPayeedetails> getBillPayeeDetailsNotLink() {
+		return billPayeeDetailsNotLink;
+	}
+
+	public void setBillPayeeDetailsNotLink(List<EgBillPayeedetails> billPayeeDetailsNotLink) {
+		this.billPayeeDetailsNotLink = billPayeeDetailsNotLink;
 	}
 }

@@ -1551,17 +1551,45 @@ function populateBdgetDetails()
 	}
 	}
 
-function changeGlCode(totalrow){
+function changeGlCode(totalrow,cramt,k){
 	$('#glcodeid').empty();
 	for(var i=0;i<totalrow;++i){
 	  
 	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
 
+      var j = document.getElementById('billDetails['+i+'].debitamount').value;
+		if((parseFloat(j) > parseFloat(cramt)) && parseFloat(k) == i){
+			document.getElementById('billDetails['+i+'].debitamount'),value='';
+			bootbox.alert('Please fill valid debit amount');	
+			
+			continue;
+		}
 		var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
 		var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
 		  var k ='<option value="'+glId_+'">'+glcode_+'</option>';
 		  $('#glcodeid').append(k);  
 	}	
-		 
+	}	 
 }
-	}
+
+/*function glCodeandIdvalidate(){
+		 
+	 event.preventDefault();		 
+	// var rowCount = $("#tblSubledgerAdd > tbody").children().length-1;
+	 var n = document.getElementById("glcode");
+	 var formdata={};
+	 var glArray=[];
+	 var glcodeid;
+	 var subLedgerType;
+	 
+	 for(var i=0;i<n.length;i++){
+		 //tempSubLedger[0].subLedgerType
+	if ($('#tempSubLedger['+i+'].subLedgerType').val() != null && $('#tempSubLedger['+i+'].subLedgerType').val() != '') {
+		   subLedgerType = $('#tempSubLedger['+i+'].subLedgerType').val();		
+		}
+			glArray.push({'glcodeid':glcodeid[i]},{'subLedgerType':subLedgerType});
+}
+	 
+	 //formdata =	{glArray}; 
+	return false;
+}*/

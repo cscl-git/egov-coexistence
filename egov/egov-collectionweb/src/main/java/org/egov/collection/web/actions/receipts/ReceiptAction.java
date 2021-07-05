@@ -858,6 +858,11 @@ public class ReceiptAction extends BaseFormAction {
         LOGGER.info("Call back for apportioning is completed");
         // billing system
         receiptResponse = receiptHeaderService.populateAndPersistReceipts(receiptHeader, receiptInstrList);
+        System.out.println("Printing of data starts #####");
+        System.out.println("payments_id :::::"+receiptResponse.getReceipts().get(0).getPaymentId());
+        System.out.println("payments_id :::::"+receiptResponse.getReceipts().get(0).getPaymentId());
+        
+        System.out.println("Printing of data ends #####");
 
         message = "Receipt created with receipt number: "
                 + receiptResponse.getReceipts().get(0).getBill().get(0).getBillDetails().get(0).getReceiptNumber();

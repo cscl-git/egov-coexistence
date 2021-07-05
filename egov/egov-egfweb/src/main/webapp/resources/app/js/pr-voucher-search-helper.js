@@ -112,9 +112,21 @@ function callAjaxSearch() {
 				"data" : "voucherdate",
 				"className" : "text-left",
 				"render" : function(data, type, full, meta) {
-					var date = new Date(full.voucherdate);	
-					var dateString = date.toLocaleDateString();
-					return dateString;
+					var fromdate = new Date(full.voucherdate);	
+					//var dateString = date.toLocaleDateString();
+					var dd = fromdate.getDate();
+            var mm = fromdate.getMonth()+1; //January is 0!
+            var yyyy = fromdate.getFullYear();
+            if(dd < 10)
+            {
+	            dd = '0'+ dd;
+            }
+            if(mm < 10)
+            {
+	            mm = '0' + mm;
+            }
+            var fromdate1 = dd+'/'+mm+'/'+yyyy;
+					return fromdate1;
 				}
 			},
 			{

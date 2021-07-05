@@ -182,7 +182,7 @@
  <tr>
 	<td class="bluebox"></td>
 	<td class="bluebox"><s:text name="voucher.narration" /><span class="mandatory1">*</span></td>
-	<td class="bluebox" colspan="3"><s:textarea name="description" value="%{commonBean.narrtion}" readOnly="true"
+	<td class="bluebox" colspan="3"><s:textarea name="description" value="%{commonBean.narrtion}" 
 			id="description" style="width:95%" /></td>
 </tr>
 </s:else>
@@ -274,5 +274,4 @@
 		</div>
 	</div>
 </div> 
-
 
