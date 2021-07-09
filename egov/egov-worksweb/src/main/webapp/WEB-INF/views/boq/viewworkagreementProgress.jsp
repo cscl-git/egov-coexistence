@@ -12,6 +12,7 @@
     background-color: #acbfd0;
     vertical-align: top;
 }
+
 .table tbody > tr > td {
     color: black;
     vertical-align: top;
@@ -92,9 +93,22 @@
 							data-date-end-date="0d" placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.works.wing" /></label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="worksWing" id="worksWing" cssClass="form-control"
+					cssErrorClass="form-control error" readonly="true" disabled="true">
+					<form:option value="">
+						<spring:message code="lbl.select" />
+					</form:option>
+					<form:options items="${workOrderAgreement.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+					
+				</form:select>
+			</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="department" id="department" readonly="true"
+						<form:select path="department" id="department" readonly="true" disabled="true"
 							class="form-control" required="required">
 							<form:option value="">
 								<spring:message code="lbl.select" />
@@ -103,6 +117,19 @@
 								itemValue="code" itemLabel="name" />
 						</form:select>
 					</div>
+					<label class="col-sm-3 control-label text-left-audit">Sub-Division</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control"
+							cssErrorClass="form-control error" readonly="true" disabled="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${workOrderAgreement.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
+							
+						</form:select>
+						</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.amount.wrk" /></label>
@@ -364,7 +391,7 @@
 				<th>Milestone Details</th>
 				<th>Payment Percentage(%)</th>
 				<th>Amount</th>
-									<th>Completion Percentage</th>
+									<th>Completion Percentage(%)</th>
 				<th>Completed?</th>
 
 				<th><spring:message code="lbl.action" text="Action"/></th> 					

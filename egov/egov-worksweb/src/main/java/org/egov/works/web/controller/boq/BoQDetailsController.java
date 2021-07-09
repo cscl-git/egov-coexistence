@@ -53,14 +53,15 @@ import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.BoqDateUpdate;
 import org.egov.works.boq.entity.BoqNewDetails;
-import org.egov.works.boq.entity.BoqDetailsPop;
+import org.egov.works.boq.entity.BoqUploadDocument;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.egov.works.boq.service.BoQDetailsService;
 import org.egov.works.boq.service.BoqDateUpdateService;
 import org.egov.works.boq.service.BoqDetailsPopService;
 import org.egov.works.estimatepreparationapproval.autonumber.WorkNoGenerator;
-import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.Workswing;
+import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -79,6 +80,9 @@ public class BoQDetailsController extends GenericWorkFlowController{
 
 	@Autowired
 	BoQDetailsService boQDetailsService;
+
+	@Autowired
+	EstimatePreparationApprovalService estimatePreparationApprovalService;
 
 	@Autowired
 	public MicroserviceUtils microserviceUtils;
@@ -137,61 +141,13 @@ private static Map<String, String> map;
 	@RequestMapping(value = "/newform", method = RequestMethod.POST)
 	public String showNewFormGet(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
-		System.out.println("work  ----newform-");
+		List<Workswing> worskwing = estimatePreparationApprovalService.getworskwing();
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
-		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
-		model.addAttribute("showTableHeaderFirst","Y");
-		System.out.println("table - view - successfully--");
-		return "boqDetails";
-	}
-
-	@RequestMapping(value="/addRow")
-	public String AddRowTable(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
-			final Model model, HttpServletRequest request)
-	{
-		System.out.println("addRow  ----addRow-");
-List<BoQDetails> boQDetailsList = new ArrayList();
-		BoQDetails aBoQDetails = new BoQDetails();
-		String milestone="";
-		String item_description ="";
-		String ref_dsr="";
-		String unit="";
-		Double rate=null;
-		Double quantity=null;
-		Double amount=null;
-		int count = 0;
-		
-		
-		aBoQDetails.setMilestone(milestone);
-		aBoQDetails.setItem_description(item_description);
-		aBoQDetails.setRef_dsr(ref_dsr);
-		aBoQDetails.setUnit(unit);
-		aBoQDetails.setRate(rate);
-		aBoQDetails.setQuantity(quantity);
-		aBoQDetails.setAmount(amount);
-		aBoQDetails.setSlNo(Long.valueOf(count));
-		aBoQDetails.setSizeIndex(count);
-		boQDetailsList.add(aBoQDetails);
-		count=boQDetailsList.size();
-		System.out.println("count-------"+count);
-		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		workOrderAgreement.setDepartments(getDepartmentsFromMs());
-		workOrderAgreement.setContractors(getAllActiveContractors());
-		workOrderAgreement.setBoQDetailsList(boQDetailsList);
-		model.addAttribute("workOrderAgreement", workOrderAgreement);
-		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
-        prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
-        model.addAttribute("milestoneList",groupByMilesToneMap);
-        prepareValidActionListByCutOffDate(model);
-       
-		model.addAttribute("showTableHeader","Y");
-		
-		System.out.println("table - view - successfully--");
 		return "boqDetails";
 	}
 
@@ -351,14 +307,11 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 	@RequestMapping(value = "/work", params = "Forward/Reassign", method = RequestMethod.POST)
 	public String saveBoQDetailsData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
-		
-		System.out.println("work  ----Forward/Reassign-");
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
 		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
-		System.out.println("work  ----Forward/Reassign-2");
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -372,12 +325,10 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
 			}
-		System.out.println("work  ----Forward/Reassign-3");
 		workOrderAgreement.setDocumentDetail(list);
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
 		deptCode = workOrderAgreement.getDepartment();
-		System.out.println("work  ----Forward/Reassign-4");
 		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 				"works_div_"+deptCode).get(0).getValue();
 		String estimateNumber ="";
@@ -386,7 +337,7 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 			estimateNumber = v.getWorkNumber(deptShortCode);
 		    workOrderAgreement.setWork_agreement_number(estimateNumber);
 		}
-		System.out.println("work  ----Forward/Reassign-5");
+	     
 		//start of workflow
 				Long approvalPosition = 0l;
 		        String approvalComment = "";
@@ -400,11 +351,35 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 		        
 		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
 		            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
-		WorkOrderAgreement savedWorkOrderAgreement =
-				boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
-		System.out.println("work  ----Forward/Reassign-6");
+		        try {
+		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+		Long id=savedWorkOrderAgreement.getId();
+		if(workOrderAgreement.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					boQDetailsService.updateDocuments(id,update);
+				}
+			}
+		}
 		return "redirect:/boq/success?approverDetails=" + approvalPosition + "&estId="
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
+	 }catch (Exception e) {
+			e.printStackTrace();
+		}
+		        workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+		        workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		        workOrderAgreement.setDepartment(workOrderAgreement.getDepartment());
+		        workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+		        workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+		        workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment())));
+     workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setContractors(getAllActiveContractors());
+		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+     prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+     prepareValidActionListByCutOffDate(model);
+		return "boqDetails";
 
 	}
 	
@@ -412,13 +387,11 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 	@RequestMapping(value = "/work", params = "Save As Draft", method = RequestMethod.POST)
 	public String saveBoQDetailsDataDraft(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
 			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
-	System.out.println("work  -----Save As Draft--1");
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
 		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
-		System.out.println("work  -----Save As Draft-2-");
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -432,7 +405,6 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
 			}
-		System.out.println("work  -----Save As Draft--3");
 		workOrderAgreement.setDocumentDetail(list);
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
@@ -449,7 +421,6 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 				Long approvalPosition = 0l;
 		        String approvalComment = "";
 		        String approvalDesignation = "";
-		        System.out.println("work  -----Save As Draft-4-");
 		        if (request.getParameter("approvalComent") != null)
 		            approvalComment = request.getParameter("approvalComent");
 		        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
@@ -459,10 +430,35 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 		        
 		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
 		            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+		        try {
 		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
-		System.out.println("work  -----Save As Draft-5-");
+		Long id=savedWorkOrderAgreement.getId();
+		if(workOrderAgreement.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					boQDetailsService.updateDocuments(id,update);
+				}
+			}
+		}
 		return "redirect:/boq/success?approverDetails=" + approvalPosition + "&estId="
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
+		        }catch (Exception e) {
+					e.printStackTrace();
+				}
+		        workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+		        workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		        workOrderAgreement.setDepartment(workOrderAgreement.getDepartment());
+		        workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+		        workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+		        workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment())));
+		        workOrderAgreement.setDepartments(getDepartmentsFromMs());
+				workOrderAgreement.setContractors(getAllActiveContractors());
+				model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
+		        prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+		        prepareValidActionListByCutOffDate(model);
+				return "boqDetails";
 
 	}
 	
@@ -533,24 +529,58 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 
 	@RequestMapping(value = "/work", params = "save", method = RequestMethod.POST)
 	public String saveBoqFileData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
-			final Model model, @RequestParam("file") MultipartFile file, final HttpServletRequest request)
+			final Model model, @RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files, final HttpServletRequest request)
 			throws Exception {
 
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<BoQDetails> boQDetailsList2 = new ArrayList();
-		List<BoqDetailsPop> arrayboqDetailsPop =new ArrayList();
-		String refNo=null;
 		HashSet<String> milesstoneList=new HashSet<>();
 		int count = 0;
+		String comments =request.getParameter("comments");
+		String userName = boQDetailsService.getUserName();
+		Boolean error=true;
+		String msg="";
 		String fileName = null;
 		String extension = null;
 		String filePath = null;
 		File fileToUpload = null;
-		String FILE_PATH_PROPERTIES = "D:\\Upload\\";
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
 		Double estAmt= 0.0;
+		// for testing only
+		List<DocumentUpload> docup = new ArrayList<>();
+		/*for (int i = 0; i < workOrderAgreement.getBoQDetailsList().size(); i++) {
+			BoQDetails aBoQDetails1 = new BoQDetails();
+			List<BoQDetails> boqq = workOrderAgreement.getBoQDetailsList();
+			
+			
+			if(boqq.get(i).getMilestone() != null && boqq.get(i).getItem_description() !=null && boqq.get(i).getRef_dsr() !=null && boqq.get(i).getRate() !=null && boqq.get(i).getAmount() !=null && boqq.get(i).getQuantity() !=null && boqq.get(i).getUnit() !=null ) {
+			
+				aBoQDetails1.setMilestone(boqq.get(i).getMilestone());
 
+				aBoQDetails1.setItem_description(boqq.get(i).getItem_description());
+				
+				aBoQDetails1.setRef_dsr(boqq.get(i).getRef_dsr());
+				
+				aBoQDetails1.setUnit(boqq.get(i).getUnit());
+				
+				aBoQDetails1.setRate(boqq.get(i).getRate());
+				
+				aBoQDetails1.setQuantity(boqq.get(i).getQuantity());
+				aBoQDetails1.setAmount(aBoQDetails1.getRate() * aBoQDetails1.getQuantity());
+				estAmt=estAmt+aBoQDetails1.getAmount();
+				count=boQDetailsList.size();
+				
+				aBoQDetails1.setSlNo(Long.valueOf(count));
+				
+				aBoQDetails1.setSizeIndex(count);
+				
+				
+				boQDetailsList.add(aBoQDetails1);
+			}
+		}
+*/
 		// String documentPath = "D://Upload/";
 
 		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
@@ -578,14 +608,45 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 
 			FileInputStream inputStream = new FileInputStream(new File(filePath));
 			Workbook workbook = getWorkbook(inputStream, filePath);
-			Sheet firstSheet = workbook.getSheetAt(0);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkAgreementFile");
+						upload.setComments(comments);
+						upload.setUsername(userName);;
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
 			Iterator<Row> iterator = firstSheet.iterator();
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
-				BoqDetailsPop boqDetailsPop =new BoqDetailsPop();
-
+				//int rowNum = nextRow.getRowNum();
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
 
@@ -597,28 +658,43 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 						}
 						
 						else if (cell.getColumnIndex() == 1) {
+							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-							boqDetailsPop.setItem_description(cell.getStringCellValue());
+							
+							
 						} else if (cell.getColumnIndex() == 2) {
+							
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-							boqDetailsPop.setRef_dsr(cell.getStringCellValue());
-							refNo =cell.getStringCellValue();
+							
+							
 						}else if (cell.getColumnIndex() == 3) {
+							
 							aBoQDetails.setUnit(cell.getStringCellValue());
-							boqDetailsPop.setUnit(cell.getStringCellValue());
+							
+							
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
-
+						if(cell.getColumnIndex() == 2) {
+							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
+							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
+						}
 						 if (cell.getColumnIndex() == 4) {
+
 							aBoQDetails.setRate(cell.getNumericCellValue());
-							boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+							
+							
 						} else if (cell.getColumnIndex() == 5) {
+							
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
 							
-							
+								if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
+								}else {
+									error=true;
+									msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
+									}
 						}
 
 					}
@@ -630,36 +706,79 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 						aBoQDetails.setSlNo(Long.valueOf(count));
 						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
-						arrayboqDetailsPop.add(boqDetailsPop);
 						
 					
 
 					}
 				}
+            
 			}
 
 			// workbook.close();
 			inputStream.close();
+			}else {
+				
+			}
+			}
 
 		} else {
 			// response = "Please choose a file.";
 		}
+		int nextcount=1;
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		
+		if(workOrderAgreement.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					boqUploadDocument.setUsername(boq.getUsername());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		
+		workOrderAgreement.setDocumentDetail(docup);
+		if(!error) {
+		DocumentUpload savedocebefore = boQDetailsService.savedocebefore(workOrderAgreement);
+		System.out.println("::::username"+savedocebefore.getUsername()+":::::: "+savedocebefore.getObjectType()+" :::   "+savedocebefore.getFileStore().getId());
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		boqUploadDocument2.setUsername(savedocebefore.getUsername());
+		docUpload.add(boqUploadDocument2);
 		 Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		 try {
-				List<BoqDetailsPop> boQCheck= boqDetailsPopService.checkRecordsExists(refNo);
-				if(boQCheck.size()>0)
-				{
-					System.out.println("Already Exists");
+		workOrderAgreement.setWork_amount(String.valueOf(estAmt));
+		 model.addAttribute("milestoneList",groupByMilesToneMap);
+		 model.addAttribute("fileuploadAllowed","Y");
+		}else {
 					
-				}else {
-					boqDetailsPopService.saveExcelDate(arrayboqDetailsPop);
-					System.out.println("Excel data saved successfully.. ");
+				model.addAttribute("error", "Y");
+				model.addAttribute("message", msg);
 				}
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+	  model.addAttribute("uploadDocument", uploadDocument);
 		 
-			}catch(Exception e) {
-				e.getMessage();
-			}
+		/*Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));*/
+	  workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+	  workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+	  workOrderAgreement.setDepartment(workOrderAgreement.getDepartment());
+	  workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+	  workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+	  workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment()))); 
 		
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
@@ -668,19 +787,21 @@ List<BoQDetails> boQDetailsList = new ArrayList();
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
-        model.addAttribute("milestoneList",groupByMilesToneMap);
+        //model.addAttribute("milestoneList",groupByMilesToneMap);
         prepareValidActionListByCutOffDate(model);
-        model.addAttribute("fileuploadAllowed","Y");
+       // model.addAttribute("fileuploadAllowed","Y");
 		return "boqDetails";
 
 	}
 
-public boolean checkAvailableBoq(final String ref) {
-	boolean b=false;
+public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 	
+	List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
 	if(ref!=null && ref !="")
 	{
 	
+		BoqNewDetails estimate=null;
+		
 	final StringBuffer query = new StringBuffer(500);
 	 List<Object[]> list =null;
 	 query
@@ -692,12 +813,38 @@ public boolean checkAvailableBoq(final String ref) {
 			System.out.println("Query :: "+query.toString());
 			list = persistenceService.findAllBy(query.toString(),ref);
 		
+		
+		 
+        
      if (list.size() != 0) {
     	 
-    	 b=true; 
+        	 for (final Object[] object : list) {
+        		 estimate = new BoqNewDetails();
+        		 estimate.setId(Long.parseLong(object[0].toString()));
+        		 if(object[1] != null)
+        		 {
+        			 estimate.setItem_description(object[1].toString());
      }
+        		 if(object[2] != null)
+        		 {
+        			 estimate.setRef_dsr(object[2].toString());
+        		 }
+        		 if(object[3] != null)
+        		 {
+        			 estimate.setUnit(object[3].toString());
+        		 }
+        		 if(object[4] != null)
+        		 {
+        			 estimate.setRate(Double.parseDouble(object[4].toString()));
+        		 }
+        		 
+        		 approvalList.add(estimate);
+    	 
+    	  
+     }}
+        	 return approvalList; 
      }
-	return b;
+	return approvalList;
 }
 
 	public Workbook getWorkbook(FileInputStream inputStream, String excelFilePath) throws IOException {
@@ -737,9 +884,9 @@ public boolean checkAvailableBoq(final String ref) {
 	@RequestMapping(value = "/updateBoq/updateBoq",method = RequestMethod.POST)
 	public String updateBoq(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, Model model,HttpServletRequest request) {
 		
-		System.out.println(boqNewDetails.getId()+"+++++++++++++++++++++++++++++++==");
+		/*System.out.println(boqNewDetails.getId()+"+++++++++++++++++++++++++++++++==");
 		System.out.println(boqNewDetails.getItem_description()+"++++++++++++++");
-		System.out.println(boqNewDetails.getRef_dsr()+"++++++++++++++++++");
+		System.out.println(boqNewDetails.getRef_dsr()+"++++++++++++++++++");*/
 		
 		
 	boQDetailsService.updateBoqData(boqNewDetails);
@@ -763,6 +910,12 @@ public boolean checkAvailableBoq(final String ref) {
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+		workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getExecuting_department())));
+		
+		workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
 		
 		BoQDetails boq = new BoQDetails();
         for (int i = 0; i < workOrderAgreement.getNewBoQDetailsList().size(); i++) {
@@ -787,7 +940,7 @@ public boolean checkAvailableBoq(final String ref) {
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("mode","view");
-		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
+	
 		return "view-work-agreement";
 	}
 	
@@ -805,6 +958,13 @@ public boolean checkAvailableBoq(final String ref) {
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+		workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getExecuting_department())));
+		
+		workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+		
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
@@ -830,7 +990,7 @@ public boolean checkAvailableBoq(final String ref) {
         
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
-		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
+	
 		return "view-work-agreement-closure";
 	}
 	
@@ -840,7 +1000,7 @@ public boolean checkAvailableBoq(final String ref) {
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 
 		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
-			System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
+			//System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
 		workOrderAgreement.setDocumentDetail(documents);
 
@@ -849,6 +1009,13 @@ public boolean checkAvailableBoq(final String ref) {
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+		workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getExecuting_department())));
+		
+		workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+		
 		
 		BoQDetails boq = new BoQDetails();
         for (int i = 0; i < workOrderAgreement.getNewBoQDetailsList().size(); i++) {
@@ -878,14 +1045,13 @@ public boolean checkAvailableBoq(final String ref) {
 		model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("mode","view");
 		System.out.println("test ending");
-		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
 		return "view-work-agreement-progress";
 	}
 
 	@RequestMapping(value = "/search", method = RequestMethod.POST)
 	public String showEstimateNewFormGet(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
-
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
@@ -899,6 +1065,7 @@ public boolean checkAvailableBoq(final String ref) {
 			final HttpServletRequest request) throws Exception {
 		List<WorkOrderAgreement> workList = new ArrayList<WorkOrderAgreement>();
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		WorkOrderAgreement agreement=null;
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
@@ -976,17 +1143,26 @@ public boolean checkAvailableBoq(final String ref) {
 		
 		workOrderAgreement.setBoQDetailsList(workOrderAgreement.getNewBoQDetailsList());
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
+		String dept = workOrderAgreement.getExecuting_department();
+		System.out.println("::::::Department::: "+dept);
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
+		workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
+		System.out.println("::::::::asdads  "+workOrderAgreement.getWorksWing());
+		workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
+		System.out.println(":::::  state::::"+workOrderAgreement.getState().getValue());
 		if (workOrderAgreement.getState() != null)
             model.addAttribute("currentState", workOrderAgreement.getState().getValue());
-		model.addAttribute("workflowHistory",getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
+		model.addAttribute("workflowHistory",
+				getHistory(workOrderAgreement.getState(), workOrderAgreement.getStateHistory()));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
-		model.addAttribute("ProjectModInitiated","Project Modification Initiated");//Added by Kundan 
 		org.egov.infra.admin.master.entity.User user =null;
 		
 		BoQDetails boq = new BoQDetails();
@@ -1021,6 +1197,288 @@ public boolean checkAvailableBoq(final String ref) {
 		}
 		return result;
 	}
+	@RequestMapping(value = "/edit/work1", params="save", method = RequestMethod.POST)
+	public String editsaveBoqFileData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
+			final Model model, @RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files, final HttpServletRequest request)
+			throws Exception {
+		
+		Long id = workOrderAgreement.getId();
+		System.out.println("::::::ID::: "+id);
+		WorkOrderAgreement workOrderAgreement1 = boQDetailsService.viewWorkData(id);
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
+		HashSet<String> milesstoneList=new HashSet<>();
+		int count = 0;
+		String comments =request.getParameter("comments");
+		String userName = boQDetailsService.getUserName();
+		Boolean error=true;
+		String msg="";
+		String result="";
+		String fileName = null;
+		String extension = null;
+		String filePath = null;
+		File fileToUpload = null;
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
+		String FILE_PATH_SEPERATOR = "\\";
+		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+		Double estAmt= 0.0;
+		// for testing only
+		List<DocumentUpload> docup = new ArrayList<>();
+		
+
+		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
+
+		long currentTime = new Date().getTime();
+		if (file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
+			fileName = file.getOriginalFilename().toString().split("\\.")[0];
+			extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			fileName = fileName.replace(" ", "") + "_" + currentTime + extension;
+			filePath = documentPath + fileName;
+			fileToUpload = new File(filePath);
+			byte[] bytes = file.getBytes();
+			Path Path = null;
+			Path = Paths.get(filePath);
+
+			Path doc = Paths.get(documentPath);
+			if (!Files.exists(doc)) {
+				Files.createDirectories(doc);
+			}
+
+			Files.write(Path, bytes);
+		}
+		File xlsFile = new File(fileToUpload.toString());
+		if (xlsFile.exists()) {
+
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkAgreementFile");
+						upload.setComments(comments);
+						upload.setUsername(userName);;
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
+			Iterator<Row> iterator = firstSheet.iterator();
+		while (iterator.hasNext()) {
+				Row nextRow = iterator.next();
+				Iterator<Cell> cellIterator = nextRow.cellIterator();
+				BoQDetails aBoQDetails = new BoQDetails();
+				//int rowNum = nextRow.getRowNum();
+				while (cellIterator.hasNext()) {
+					Cell cell = (Cell) cellIterator.next();
+
+					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+
+						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+							
+						}
+						
+						else if (cell.getColumnIndex() == 1) {
+							
+								aBoQDetails.setItem_description(cell.getStringCellValue());
+							
+							
+						} else if (cell.getColumnIndex() == 2) {
+							
+								aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							
+							
+						}else if (cell.getColumnIndex() == 3) {
+							
+								aBoQDetails.setUnit(cell.getStringCellValue());
+							
+							
+						} 
+
+					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+						if(cell.getColumnIndex() == 2) {
+							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
+							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
+						}
+						 if (cell.getColumnIndex() == 4) {
+							 
+								 aBoQDetails.setRate(cell.getNumericCellValue());
+							
+							
+						} else if (cell.getColumnIndex() == 5) {
+							
+								aBoQDetails.setQuantity(cell.getNumericCellValue());
+							
+								if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
+							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
+							estAmt=estAmt+aBoQDetails.getAmount();
+								}else {
+									error=true;
+									msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
+									}
+						}
+
+					}
+
+					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
+							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
+							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
+						count=boQDetailsList.size();
+						aBoQDetails.setSlNo(Long.valueOf(count));
+						aBoQDetails.setSizeIndex(count);
+						boQDetailsList.add(aBoQDetails);
+						
+					
+
+					}
+				}
+            
+			}
+
+			// workbook.close();
+			inputStream.close();
+			}else {
+				
+			}
+			}
+
+		} else {
+			// response = "Please choose a file.";
+		}
+		int nextcount=1;
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		
+		if(workOrderAgreement.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					boqUploadDocument.setUsername(boq.getUsername());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		
+		workOrderAgreement.setDocumentDetail(docup);
+		if(!error) {
+		DocumentUpload savedocebefore = boQDetailsService.savedocebefore(workOrderAgreement);
+		boQDetailsService.updateDocuments(id, savedocebefore.getId());
+		System.out.println("::::username :: "+savedocebefore.getUsername()+":::::: "+savedocebefore.getObjectType()+" :::   "+savedocebefore.getFileStore().getId());
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		boqUploadDocument2.setUsername(savedocebefore.getUsername());
+		docUpload.add(boqUploadDocument2);
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		workOrderAgreement1.setWork_amount(String.valueOf(estAmt));
+		 model.addAttribute("milestoneList",groupByMilesToneMap);
+		 model.addAttribute("fileuploadAllowed","Y");
+		}else {
+			  
+				model.addAttribute("error", "Y");
+				model.addAttribute("message", msg);
+		  }
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+	  model.addAttribute("uploadDocument", uploadDocument);
+		
+	  if(error) {
+			
+		  BoQDetails boq = new BoQDetails();
+	        for (int i = 0; i < workOrderAgreement1.getNewBoQDetailsList().size(); i++) {
+	        		boq = workOrderAgreement1.getNewBoQDetailsList().get(i);
+					boq.setSizeIndex(responseList.size());
+					responseList.add(boq);
+					
+				}
+	        Map<String, List<BoQDetails>> groupByMilesToneMap = 
+	        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+	        model.addAttribute("milestoneList",groupByMilesToneMap);
+			}
+	  final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement1.getId());
+		workOrderAgreement1.setDocumentDetail(documents);
+	  workOrderAgreement1.setWorksWing(workOrderAgreement1.getWorksWing());
+	  workOrderAgreement1.setWorkswings(estimatePreparationApprovalService.getworskwing());
+	  workOrderAgreement1.setDepartment(workOrderAgreement1.getDepartment());
+	  workOrderAgreement1.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement1.getWorksWing())));
+	  workOrderAgreement1.setSubdivision(workOrderAgreement.getSubdivision());
+	  workOrderAgreement1.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement1.getDepartment()))); 
+		
+	  workOrderAgreement1.setDepartments(getDepartmentsFromMs());
+	  workOrderAgreement1.setContractors(getAllActiveContractors());
+	  workOrderAgreement1.setBoQDetailsList(boQDetailsList);
+	  workOrderAgreement1.setWork_amount(String.valueOf(estAmt));
+		 model.addAttribute("fileuploadAllowed","Y");
+		model.addAttribute("workOrderAgreement", workOrderAgreement1);
+		model.addAttribute(STATE_TYPE, workOrderAgreement1.getClass().getSimpleName());
+    prepareWorkflow(model, workOrderAgreement1, new WorkflowContainer());
+        //model.addAttribute("milestoneList",groupByMilesToneMap);
+        //prepareValidActionListByCutOffDate(model);
+       /* if (workOrderAgreement1.getState() != null)
+            model.addAttribute("currentState", workOrderAgreement1.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(workOrderAgreement1.getState(), workOrderAgreement1.getStateHistory()));*/
+	
+		
+        
+		//System.out.println("::::::::state:::: "+workOrderAgreement1.getState().getValue());
+		prepareValidActionListByCutOffDate(model);
+        org.egov.infra.admin.master.entity.User user =null;
+        if((workOrderAgreement1.getProject_closure_comments() == null || workOrderAgreement1.getProject_closure_comments().isEmpty()) && workOrderAgreement1.getStatus().getDescription().equals("Approved"))
+		{
+			  user = securityUtils.getCurrentUser();
+			  String desig=getEmployeeDesig(user.getId());
+			  if(desig.equals("243"))
+			  {
+				  model.addAttribute("currentState", "Pending With SDO");  
+			  }
+			result="modify-work-agreement";
+		}
+		else if((workOrderAgreement1.getProject_closure_comments() == null || workOrderAgreement1.getProject_closure_comments().isEmpty()) && !workOrderAgreement1.getStatus().getDescription().equals("Approved"))
+		{
+			result="edit-work-agreement";
+		}
+		else if(workOrderAgreement1.getProject_closure_comments() != null && !workOrderAgreement1.getProject_closure_comments().isEmpty())
+		{
+			result="view-work-agreement-closure";
+		}
+		return result;
+
+	}
 	
 	@RequestMapping(value = "/edit/work1", method = RequestMethod.POST)
 	public String saveEditData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
@@ -1047,6 +1505,13 @@ public boolean checkAvailableBoq(final String ref) {
 				upload.setContentType(files[i].getContentType());
 				list.add(upload);
 			}
+if(workOrderAgreement.getDocUpload()!=null) {
+			
+			Long ids =workOrderAgreement.getId();
+			System.out.println("ids------"+ids);
+			
+			boQDetailsService.deleteBoqUploadData(ids);
+		}
 		workOrderAgreement.setDocumentDetail(list);
 		//start of workflow
 		Long approvalPosition = 0l;
@@ -1062,8 +1527,7 @@ public boolean checkAvailableBoq(final String ref) {
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
-		long id =savedWorkOrderAgreement.getId();//Added by kundan for ID
-		saveModifyDateDate(id,request);//Added by kundan 
+
 		return "redirect:/boq/success?approverDetails=" + approvalPosition + "&estId="
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
 
@@ -1192,6 +1656,7 @@ public boolean checkAvailableBoq(final String ref) {
 	@RequestMapping(value = "/closuresearch", method = RequestMethod.POST)
 	public String closuresearch(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		return "search-closure-work-agreement-form";
 	}
@@ -1199,6 +1664,7 @@ public boolean checkAvailableBoq(final String ref) {
 	@RequestMapping(value = "/closuresearchPage", method = RequestMethod.POST)
 	public String closuresearchPage(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		return "search-closure-work-agreement-page-form";
 	}
@@ -1207,6 +1673,7 @@ public boolean checkAvailableBoq(final String ref) {
 	public String progressUpdate(@ModelAttribute("workOrderAgreement") WorkOrderAgreement workOrderAgreement,
 			final Model model, HttpServletRequest request) {
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		return "search-progress-work-agreement-page-form";
 	}
 	
@@ -1216,6 +1683,7 @@ public boolean checkAvailableBoq(final String ref) {
 			final HttpServletRequest request) throws Exception {
 		List<WorkOrderAgreement> workList = new ArrayList<WorkOrderAgreement>();
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		WorkOrderAgreement agreement=null;
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
@@ -1279,6 +1747,7 @@ public boolean checkAvailableBoq(final String ref) {
 			final HttpServletRequest request) throws Exception {
 		List<WorkOrderAgreement> workList = new ArrayList<WorkOrderAgreement>();
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		WorkOrderAgreement agreement=null;
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
@@ -1340,6 +1809,7 @@ public boolean checkAvailableBoq(final String ref) {
 			final HttpServletRequest request) throws Exception {
 		List<WorkOrderAgreement> workList = new ArrayList<WorkOrderAgreement>();
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		WorkOrderAgreement agreement=null;
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
@@ -1505,6 +1975,25 @@ public boolean checkAvailableBoq(final String ref) {
 		return "fail";
 		
 	}
+	@RequestMapping(value = "/deleteBoq", method = RequestMethod.POST,produces = "application/json")
+	public @ResponseBody String deleteBoq(@RequestParam("id") final String id,@RequestParam("slno") final String slno ) {
+		
+if (id !=null && id != "" && slno!= null && slno!="" ) {
+	
+	Long id1=Long.parseLong(id);
+	Long slno1=Long.parseLong(slno);
+	System.out.println("+++++ID+==++++++"+id+"+++++++slno==++++++"+slno+"+++++++++++++++++++");
+			
+			final StringBuffer query = new StringBuffer(500);
+			query.append("update BoQDetails bq set bq.workOrderAgreement.id=null where bq.slNo=? and bq.workOrderAgreement.id=? ");
+			persistenceService.deleteAllBy(query.toString(),slno1, id1);
+		return "success";
+}
+		
+		return "fail";
+		
+	}
+	
 	
 	@RequestMapping(value = "/contractorid/{id}", method = RequestMethod.GET,produces = "application/json")
 	public @ResponseBody Contractor getById(@PathVariable("id") final Long id) {
@@ -1572,6 +2061,16 @@ public boolean checkAvailableBoq(final String ref) {
 				misQuery.append(" and wo.work_agreement_number='")
 				.append(agreement.getWork_agreement_number_search()).append("'");
 			}
+			if(agreement.getWorksWing() != null && !agreement.getWorksWing().isEmpty())
+			{
+				misQuery.append(" and wo.worksWing='")
+				.append(agreement.getWorksWing()).append("'");
+			}
+			if(agreement.getSubdivision() != null )
+			{
+				misQuery.append(" and wo.subdivision='")
+				.append(agreement.getSubdivision()).append("'");
+			}
 			
 		}
 		return misQuery.toString();
@@ -1593,4 +2092,6 @@ public boolean checkAvailableBoq(final String ref) {
 		return pendingWith;
 	}
 
+	
+	
 }

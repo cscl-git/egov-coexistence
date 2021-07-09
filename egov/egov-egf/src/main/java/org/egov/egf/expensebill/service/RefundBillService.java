@@ -248,10 +248,8 @@ public class RefundBillService {
         	 glCode =   egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode();
         }
 
-        System.out.println("glcode :::"+glCode+"-------"+glCodeList.toString());
-        if(!(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)) && glCodeList.contains(glCode))
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT) && glCodeList.contains(glCode))
     	{ 
-        	System.out.println("X");
         try {
             checkBudgetAndGenerateBANumber(egBillregister);
         } catch (final ValidationException e) {
@@ -260,6 +258,9 @@ public class RefundBillService {
     	}
       
         String VOUCHERQUERY = " from CVoucherHeader where id=?";
+        CVoucherHeader  voucherHeader1 = (CVoucherHeader) persistenceService.find(VOUCHERQUERY, Long.valueOf(vhid));
+        egBillregister.getEgBillregistermis().setPaymentvoucherheaderid(voucherHeader1.getId());
+        
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 
         final EgBillregister savedEgBillregister = expenseBillRepository.save(egBillregister);
@@ -295,7 +296,7 @@ public class RefundBillService {
         if (savedEgBillregister.getEgBillregistermis().getSourcePath() == null
                 || StringUtils.isBlank(savedEgBillregister.getEgBillregistermis().getSourcePath()))
             savedEgBillregister.getEgBillregistermis().setSourcePath(
-                    "/services/EGF/expensebill/view/" + savedEgBillregister.getId().toString());
+                    "/services/EGF/refund/view/" + savedEgBillregister.getId().toString());
 
 
         EgBillregister egbillReg = expenseBillRepository.save(savedEgBillregister);

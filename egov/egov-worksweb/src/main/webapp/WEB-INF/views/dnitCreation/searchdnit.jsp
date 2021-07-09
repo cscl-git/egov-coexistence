@@ -6,6 +6,8 @@
 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+        <script
+	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 
 	<form:form name="search-estimate-form" role="form" method="post"
 		action="workDnitSearch" modelAttribute="workdnitDetails"
@@ -39,7 +41,21 @@
 							<form:option value="Approved">Approved</form:option>
 						</form:select>
 					</div>			
-
+<label class="col-sm-3 control-label text-left-audit"><spring:message
+									code="lbl.estimate.preparation.works.wing" /></label>
+					<div class="col-sm-3 add-margin">
+								<form:select path="worksWing" id="worksWing"
+									cssClass="form-control" cssErrorClass="form-control error">
+									<form:option value="">
+										<spring:message code="lbl.select" />
+									</form:option>
+									<form:options items="${workdnitDetails.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+									<%-- <form:option value="Building & Roads">Building & Roads</form:option>
+									<form:option value="Public Health">Public Health</form:option>
+									<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
+								</form:select>
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.preparation.executing.division" /><span
 						class="mandatory"></span></label>
@@ -53,24 +69,25 @@
 								itemValue="code" itemLabel="name" />
 								</form:select>
 							</div>
+							<label class="col-sm-3 control-label text-left-audit">Sub-Division</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control"
+							cssErrorClass="form-control-works error" >
+									<form:option value="">
+										<spring:message code="lbl.select" />
+									</form:option>
+							<form:options items="${workdnitDetails.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
+							
+								</form:select>
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.preparation.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="estimateNumber" />
 					</div>
-					<label class="col-sm-3 control-label text-left-audit"><spring:message
-									code="lbl.estimate.preparation.works.wing" /></label>
-					<div class="col-sm-3 add-margin">
-								<form:select path="worksWing" id="worksWing"
-									cssClass="form-control" cssErrorClass="form-control error">
-									<form:option value="">
-										<spring:message code="lbl.select" />
-									</form:option>
-									<form:option value="Building & Roads">Building & Roads</form:option>
-									<form:option value="Public Health">Public Health</form:option>
-									<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option>
-								</form:select>
-					</div>
+					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.work.dnit.from.date" /></label>
 					<div class="col-sm-3 add-margin">
@@ -243,6 +260,11 @@
 						name="workDnitSearch" code="lbl.search.work.estimate"
 						value="Search" />
 				</div>
+				<!-- <div class="buttonbottom" align="center">
+			<input type="submit" id="workEditDnit" class="btn btn-primary"
+						name="workEditDnit" code="lbl.search.work.estimate"
+						value="Edit DNIT Search" />
+				</div> -->
 
 		<br> <br> <br>
 		<div class="tab-pane fade in active" id="resultheader">

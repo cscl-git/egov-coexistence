@@ -62,13 +62,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.AccountPayeeDetail;
 import org.egov.collection.entity.Challan;
 import org.egov.collection.entity.CollectionIndex;
+import org.egov.collection.entity.MisReceiptDetail;
 import org.egov.collection.entity.ReceiptDetail;
 import org.egov.collection.entity.ReceiptHeader;
 import org.egov.collection.entity.ReceiptMisc;
@@ -101,7 +101,6 @@ import org.egov.infra.microservice.contract.RequestInfoWrapper;
 import org.egov.infra.microservice.models.Bank;
 import org.egov.infra.microservice.models.Bill;
 import org.egov.infra.microservice.models.BillDetailAdditional;
-import org.egov.infra.microservice.models.BillResponse;
 import org.egov.infra.microservice.models.BillV2;
 import org.egov.infra.microservice.models.BusinessDetails;
 import org.egov.infra.microservice.models.CollectionType;
@@ -116,7 +115,6 @@ import org.egov.infra.microservice.models.PaymentDetail;
 import org.egov.infra.microservice.models.PaymentModeEnum;
 import org.egov.infra.microservice.models.PaymentResponse;
 import org.egov.infra.microservice.models.PaymentStatusEnum;
-import org.egov.infra.microservice.utils.PaymentUtils;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.microservice.models.ReceiptRequest;
 import org.egov.infra.microservice.models.ReceiptResponse;
@@ -124,6 +122,7 @@ import org.egov.infra.microservice.models.RequestInfo;
 import org.egov.infra.microservice.models.TaxPeriod;
 import org.egov.infra.microservice.utils.ApplicationConfigManager;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.microservice.utils.PaymentUtils;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.reporting.engine.ReportRequest;
 import org.egov.infra.security.utils.SecurityUtils;
@@ -1764,5 +1763,33 @@ public class ReceiptHeaderService extends PersistenceService<ReceiptHeader, Long
             payModeEnum = PaymentModeEnum.CASH;
         }
         return payModeEnum;
+    }
+    
+    @Transactional
+    public boolean populateMisReceiptsDetails(ReceiptResponse receiptResponse) {
+        boolean status= true;
+        MisReceiptDetail details=new MisReceiptDetail();
+        try
+        {
+        	details.setPayments_id(receiptResponse.getReceipts().get(0).getPaymentId());
+        	details.setTotal_amt_paid(receiptResponse.getReceipts().get(0).getInstrument().getAmount());
+        	details.setReceipt_number(receiptResponse.getReceipts().get(0).getReceiptNumber());
+        	details.setReceipt_date(receiptResponse.getReceipts().get(0).getReceiptDate());
+        	details.setPaid_by(receiptResponse.getReceipts().get(0).getBill().get(0).getPaidBy());
+        	details.setPayer_address(receiptResponse.getReceipts().get(0).getBill().get(0).getPayerAddress());
+        	details.setNarration(receiptResponse.getReceipts().get(0).getBill().get(0).getNarration());
+        	details.setPayment_status(receiptResponse.getReceipts().get(0).getPaymentStatus());
+        	details.setBank_name(receiptResponse.getReceipts().get(0).getInstrument().getBank().getName());
+        	details.setSubdivison(receiptResponse.getReceipts().get(0).getSubdivison());
+        	details.setServicename(receiptResponse.getReceipts().get(0).getServicename());
+        	details.setCollectedbyname(receiptResponse.getReceipts().get(0).getCollectedbyname());
+        	details.setGstno(receiptResponse.getReceipts().get(0).getGstNo());
+        	details.setPayment_mode(receiptResponse.getReceipts().get(0).getInstrument().getInstrumentType().getName());
+        	persistenceService.persist(details);
+        }catch (Exception e) {
+        	status=false;
+			e.printStackTrace();
+		}
+        return status;
     }
 }

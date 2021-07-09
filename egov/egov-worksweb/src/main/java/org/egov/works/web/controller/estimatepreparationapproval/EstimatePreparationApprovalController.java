@@ -330,183 +330,183 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String subPart="";
 		if(subdivision2 ==1)
 		{
-			subPart="S11";
+			subPart="S1";
 		}
 		else if(subdivision2 ==2)
 		{
-			subPart="S21";
+			subPart="S2";
 		}
 		else if(subdivision2 ==3)
 		{
-			subPart="S221";
+			subPart="S22";
 		}
 		else if(subdivision2 ==4)
 		{
-			subPart="S31";
+			subPart="S3";
 		}
 		else if(subdivision2 ==5)
 		{
-			subPart="S41";
+			subPart="S4";
 		}
 		else if(subdivision2 ==6)
 		{
-			subPart="S71";
+			subPart="S7";
 		}
 		else if(subdivision2 ==7)
 		{
-			subPart="S81";
+			subPart="S8";
 		}
 		else if(subdivision2 ==8)
 		{
-			subPart="S91";
+			subPart="S9";
 		}
 		else if(subdivision2 ==9)
 		{
-			subPart="S141";
+			subPart="S14";
 		}
 		else if(subdivision2 ==10)
 		{
-			subPart="S151";
+			subPart="S15";
 		}
 		else if(subdivision2 ==11)
 		{
-			subPart="S201";
+			subPart="S20";
 		}
 		else if(subdivision2 ==12)
 		{
-			subPart="S11";
+			subPart="S1";
 		}
 		else if(subdivision2 ==13)
 		{
-			subPart="S101";
+			subPart="S10";
 		}
 		else if(subdivision2 ==14)
 		{
-			subPart="S111";
+			subPart="S11";
 		}
 		else if(subdivision2 ==15)
 		{
-			subPart="S161";
+			subPart="S16";
 		}
 		else if(subdivision2 ==16)
 		{
-			subPart="S171";
+			subPart="S17";
 		}
 		else if(subdivision2 ==17)
 		{
-			subPart="S211";
+			subPart="S21";
 		}
 		else if(subdivision2 ==18)
 		{
-			subPart="S121";
+			subPart="S12";
 		}
 		else if(subdivision2 ==19)
 		{
-			subPart="S131";
+			subPart="S13";
 		}
 		else if(subdivision2 ==20)
 		{
-			subPart="S181";
+			subPart="S18";
 		}
 		else if(subdivision2 ==21)
 		{
-			subPart="S61";
+			subPart="S6";
 		}
 		else if(subdivision2 ==22)
 		{
-			subPart="S11";
+			subPart="S1";
 		}
 		else if(subdivision2 ==23)
 		{
-			subPart="S31";
+			subPart="S3";
 		}
 		else if(subdivision2 ==24)
 		{
-			subPart="S61";
+			subPart="S6";
 		}
 		else if(subdivision2 ==25)
 		{
-			subPart="S51";
+			subPart="S5";
 		}
 		else if(subdivision2 ==26)
 		{
-			subPart="S141";
+			subPart="S14";
 		}
 		else if(subdivision2 ==27)
 		{
-			subPart="S21";
+			subPart="S2";
 		}
 		else if(subdivision2 ==28)
 		{
-			subPart="S41";
+			subPart="S4";
 		}
 		else if(subdivision2 ==29)
 		{
-			subPart="S51";
+			subPart="S5";
 		}
 		else if(subdivision2 ==30)
 		{
-			subPart="S191";
+			subPart="S19";
 		}
 		else if(subdivision2 ==31)
 		{
-			subPart="S11";
+			subPart="S1";
 		}
 		else if(subdivision2 ==32)
 		{
-			subPart="S21";
+			subPart="S2";
 		}
 		else if(subdivision2 ==33)
 		{
-			subPart="S31";
+			subPart="S3";
 		}
 		else if(subdivision2 ==34)
 		{
-			subPart="S91";
+			subPart="S9";
 		}
 		else if(subdivision2 ==35)
 		{
-			subPart="S101";
+			subPart="S10";
 		}
 		else if(subdivision2 ==36)
 		{
-			subPart="S121";
+			subPart="S12";
 		}
 		else if(subdivision2 ==37)
 		{
-			subPart="S131";
+			subPart="S13";
 		}
 		else if(subdivision2 ==38)
 		{
-			subPart="S51";
+			subPart="S5";
 		}
 		else if(subdivision2 ==39)
 		{
-			subPart="S61";
+			subPart="S6";
 		}
 		else if(subdivision2 ==40)
 		{
-			subPart="S71";
+			subPart="S7";
 		}
 		else if(subdivision2 ==41)
 		{
-			subPart="S81";
+			subPart="S8";
 		}
 		else if(subdivision2 ==42)
 		{
-			subPart="S151";
+			subPart="S15";
 		}
 		else if(subdivision2 ==43)
 		{
-			subPart="S11";
+			subPart="S1";
 		}
 		else if(subdivision2 ==44)
 		{
-			subPart="S31";
+			subPart="S3";
 		}
 		else if(subdivision2 ==45)
 		{
-			subPart="S341";
+			subPart="S34";
 		}
 		
 		return worksWingPart+deptPart+subPart;
@@ -831,7 +831,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String userName = estimatePreparationApprovalService.getUserName();
 		Long userId = estimatePreparationApprovalService.getUserId();
 		System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
-		
+		 List<String> uom=new ArrayList<String>();
+		 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"works_uom");
+		 for(AppConfigValues row :appConfigValuesList)
+		 {
+			 uom.add(row.getValue());
+		 }
 		//List<BoqDetailsPop> arrayboqDetailsPop =new ArrayList();
 		HashSet<String> milesstoneList=new HashSet<>();
 		String refNo=null;
@@ -889,7 +895,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 		error=false;
 			}else{
-				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
 				}
 			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -897,7 +903,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
-				error=false;
+				//error=false;
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -928,7 +934,12 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
+if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
+						//System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
 
+					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
@@ -951,6 +962,15 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 							aBoQDetails.setUnit(cell.getStringCellValue());
 							//boqDetailsPop.setUnit(cell.getStringCellValue());
 	   
+						}else if (cell.getColumnIndex() == 5) {
+							if (aBoQDetails.getRate() != null)  {
+								
+								if(aBoQDetails.getQuantity()==null ) {
+									error=true;
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								}
+								
+							}
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
@@ -962,27 +982,47 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		
 							aBoQDetails.setRate(cell.getNumericCellValue());
 							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+	   						Double d = cell.getNumericCellValue();
 	   
+							String[] splitter = d.toString().split("\\.");
+							
+							if(splitter[1].length()>2) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							}
 						} else if (cell.getColumnIndex() == 5) {
 	   
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
+	   Double d = cell.getNumericCellValue();
+							String[] splitter = d.toString().split("\\.");
 	   
+							//System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa: "+aBoQDetails.getQuantity());
+							if(splitter[1].length()>2) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							}
+							System.out.println("::unit:: "+uom.contains(aBoQDetails.getUnit()));
+							if(!uom.contains(aBoQDetails.getUnit())) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.";	
+							}
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 								
+	
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							
 							}else {
 							rowerror.add(erow);	
 							error=true;
-							msg="Please Check the uploaded Document,Error in Document Rate and Quantity must be number";
+							msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
 							}
 						}
 
 					}
 
 
-					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
+					if (aBoQDetails.getMilestone()!=null && aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
 							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
 							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
 						count=boQDetailsList.size();
@@ -1551,7 +1591,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-estimate-form";
 	}
-
 @RequestMapping(value = "/edit/saveestimate1", params="save", method = RequestMethod.POST)
 	public String editEstimateData1(
 			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,@RequestParam("file1") MultipartFile[] file1,Model model,
@@ -1564,7 +1603,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String userName = estimatePreparationApprovalService.getUserName();
 		Long userId = estimatePreparationApprovalService.getUserId();
 		System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
-		
+		List<String> uom=new ArrayList<String>();
+		 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"works_uom");
+		 for(AppConfigValues row :appConfigValuesList)
+		 {
+			 uom.add(row.getValue());
+		 }
 		//New File UPload....
 		List<DocumentUpload> docup = new ArrayList<>();
 		String refNo=null;
@@ -1615,7 +1660,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 		error=false;
 			}else{
-				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
 				}
 			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -1655,7 +1700,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
-
+if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
+						System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
+					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
@@ -1678,6 +1727,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 							aBoQDetails.setUnit(cell.getStringCellValue());
 							//boqDetailsPop.setUnit(cell.getStringCellValue());
 	   
+						}else if (cell.getColumnIndex() == 5) {
+							if (aBoQDetails.getRate() != null)  {
+								if(aBoQDetails.getQuantity()==null) {
+									error=true;
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								}
+							}
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
@@ -1688,18 +1744,37 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 						 if (cell.getColumnIndex() == 4) {
 		
 							aBoQDetails.setRate(cell.getNumericCellValue());
+Double d = cell.getNumericCellValue();
+							
+							String[] splitter = d.toString().split("\\.");
+							
+							if(splitter[1].length()>2) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							}
 							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
 	   
 						} else if (cell.getColumnIndex() == 5) {
 	   
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
+	   Double d = cell.getNumericCellValue();
+							
+							String[] splitter = d.toString().split("\\.");
 	   
+							if(splitter[1].length()>2) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							}
+							if(!uom.contains(aBoQDetails.getUnit())) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.";	
+							}
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-								msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
 							}
 						}
 
@@ -1737,7 +1812,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		List<BoqUploadDocument> docUpload=new ArrayList<>();
 		if(estimatePreparationApproval.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
-				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				//System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
 				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
 				if(boq.getObjectId()!=null) {
 					boqUploadDocument.setId(Long.valueOf(nextcount));
@@ -2019,6 +2094,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String userName = estimatePreparationApprovalService.getUserName();
 		Long userId = estimatePreparationApprovalService.getUserId();
 		System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
+		List<String> uom=new ArrayList<String>();
+		 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"works_uom");
+		 for(AppConfigValues row :appConfigValuesList)
+		 {
+			 uom.add(row.getValue());
+		 }
 		//New File UPload....
 		List<DocumentUpload> docup = new ArrayList<>();
 		String refNo=null;
@@ -2069,7 +2151,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 		error=false;
 			}else{
-				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
 				}
 			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -2109,7 +2191,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
-
+					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
+						System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet. ";
+					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
@@ -2132,6 +2218,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 							aBoQDetails.setUnit(cell.getStringCellValue());
 							//boqDetailsPop.setUnit(cell.getStringCellValue());
 	   
+						}else if (cell.getColumnIndex() == 5) {
+							if (aBoQDetails.getRate() != null)  {
+								if(aBoQDetails.getQuantity()==null) {
+									error=true;
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								}
+							}
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
@@ -2143,17 +2236,35 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		
 							aBoQDetails.setRate(cell.getNumericCellValue());
 							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+							Double d = cell.getNumericCellValue();
+							
+							String[] splitter = d.toString().split("\\.");
 	   
+							if(splitter[1].length()>2) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							}
 						} else if (cell.getColumnIndex() == 5) {
 	   
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							Double d = cell.getNumericCellValue();
+							
+							String[] splitter = d.toString().split("\\.");
 	   
+							if(splitter[1].length()>2) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							}
+							if(!uom.contains(aBoQDetails.getUnit())) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.";	
+							}
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-								msg="Please Check the upload Document,Error in Document Rate and Quantity must be Number.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
 							}
 						}
 
@@ -2324,6 +2435,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-estimate-form";
 	}
+	
 	
 	
 	public String getEmployeeName(Long empId){

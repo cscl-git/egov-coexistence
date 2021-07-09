@@ -1253,11 +1253,6 @@ function validate(){
 		return true;
 	}
 	
-	if(!$netPayableAccountCodeId)
-	{
-		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
-		return true;
-	}
 	return true;
 }
 
@@ -1551,16 +1546,16 @@ function populateBdgetDetails()
 	}
 	}
 
-function changeGlCode(totalrow,cramt,k){
+function changeGlCode(totalrow,cramt,l,preamt){
 	$('#glcodeid').empty();
 	for(var i=0;i<totalrow;++i){
 	  
 	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
 
       var j = document.getElementById('billDetails['+i+'].debitamount').value;
-		if((parseFloat(j) > parseFloat(cramt)) && parseFloat(k) == i){
-			document.getElementById('billDetails['+i+'].debitamount'),value='';
-			bootbox.alert('Please fill valid debit amount');	
+		if(((parseFloat(j) > parseFloat(cramt)-preamt)) && parseInt(l) == i ){
+			document.getElementById('billDetails['+i+'].debitamount').value='';
+			bootbox.alert('Please fill valid debit amount for '+document.getElementById('billDetails['+i+'].glcode').value+' code.');	
 			
 			continue;
 		}
@@ -1569,9 +1564,9 @@ function changeGlCode(totalrow,cramt,k){
 		  var k ='<option value="'+glId_+'">'+glcode_+'</option>';
 		  $('#glcodeid').append(k);  
 	}	
+		 
 	}	 
 }
-
 /*function glCodeandIdvalidate(){
 		 
 	 event.preventDefault();		 

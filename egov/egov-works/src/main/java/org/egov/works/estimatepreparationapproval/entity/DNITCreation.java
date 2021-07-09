@@ -33,7 +33,7 @@ import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
-
+import org.egov.works.boq.entity.BoqUploadDocument;
 
 @SqlResultSetMapping(name = "AllDNITCreationresultset",classes = {
 @ConstructorResult(
@@ -51,13 +51,13 @@ import org.egov.works.boq.entity.BoQDetails;
 		@ColumnResult (name="createdby",type=String.class),@ColumnResult (name="createddate",type=String.class),@ColumnResult (name="lastmodifiedby",type=String.class),
 		@ColumnResult (name="lastmodifieddate",type=String.class),@ColumnResult (name="aanumber",type=String.class),@ColumnResult (name="aadate",type=String.class),
 		@ColumnResult (name="contingent_percentage",type=String.class),@ColumnResult (name="contingent_amount",type=String.class),
-		@ColumnResult (name="consultant_fee",type=String.class),@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="status",type=String.class) }
+		@ColumnResult (name="consultant_fee",type=String.class),@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="status",type=String.class),@ColumnResult (name="subdivision",type=String.class) }
 				)
 })
 
 
 
-@NamedNativeQuery(name="DNITCreation.getAllDNITCreation", query = "select tep.id, tep.agency_work_order ,tep.date , tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,es.code as status from txn_dnit_creation tep, eg_department dep,egw_status es where tep.statusid =es.id and tep.executing_division = dep.id",
+@NamedNativeQuery(name="DNITCreation.getAllDNITCreation", query = "select tep.id, tep.agency_work_order ,tep.date , tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,es.code as status,sub.subdivision from txn_dnit_creation tep, eg_department dep,egw_status es,eg_subdivision sub where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id",
 		resultClass = DNITCreationRESTPOJO.class,resultSetMapping = "AllDNITCreationresultset")
 
 
@@ -168,6 +168,9 @@ public class DNITCreation extends StateAware implements Serializable {
 	@Column(name = "unforseen_charges")
 	private BigDecimal unforseenCharges;
 	
+	@Column(name="subdivision")
+	private Long subdivision;
+	
 	@Transient
 	private EstimatePreparationApproval estimatePreparationApproval;
 	@Transient
@@ -179,11 +182,22 @@ public class DNITCreation extends StateAware implements Serializable {
 	@Transient
 	private String pendingWith;
 
-	@Column(name = "corriandumm_status")
-	private String corriandumm_status;
+	@Transient
+	private String comments;
 	
 	@Transient
+	private Long uploadfileStoreId;
+	@Transient
+	private Long uploadId;
+	
+	@Transient
+	private List<BoqUploadDocument> docUpload;
+	
+	@Column(name = "expenditure_head_est")
 	private String expHead_est;
+
+	@Column(name = "corriandumm_status")
+	private String corriandumm_status;
 
 	public Double getContingentPercentage() {
 		return contingentPercentage;
@@ -255,6 +269,14 @@ public class DNITCreation extends StateAware implements Serializable {
 	
 	@Transient
 	private List<Designation> designations = new ArrayList<Designation>();
+	@Transient
+	private List<Workswing> workswings = new ArrayList<Workswing>();
+	
+	@Transient
+	private List<Subdivisionworks> subdivisions = new ArrayList<Subdivisionworks>();
+	
+	@Transient
+	private List<org.egov.infra.admin.master.entity.Department> newdepartments = new ArrayList<org.egov.infra.admin.master.entity.Department>();
 	
 	@Transient
 	private String statusDescription;
@@ -755,6 +777,13 @@ public class DNITCreation extends StateAware implements Serializable {
 		this.pendingWith = pendingWith;
 	}
 
+	public String getExpHead_est() {
+		return expHead_est;
+	}
+
+	public void setExpHead_est(String expHead_est) {
+		this.expHead_est = expHead_est;
+	}
 
 	public String getCorriandumm_status() {
 		return corriandumm_status;
@@ -764,12 +793,68 @@ public class DNITCreation extends StateAware implements Serializable {
 		this.corriandumm_status = corriandumm_status;
 	}
 
-	public String getExpHead_est() {
-		return expHead_est;
+	public String getComments() {
+		return comments;
 	}
 
-	public void setExpHead_est(String expHead_est) {
-		this.expHead_est = expHead_est;
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
+	public List<BoqUploadDocument> getDocUpload() {
+		return docUpload;
+	}
+
+	public void setDocUpload(List<BoqUploadDocument> docUpload) {
+		this.docUpload = docUpload;
+	}
+
+	public Long getUploadfileStoreId() {
+		return uploadfileStoreId;
+	}
+
+	public void setUploadfileStoreId(Long uploadfileStoreId) {
+		this.uploadfileStoreId = uploadfileStoreId;
+	}
+
+	public Long getUploadId() {
+		return uploadId;
+	}
+
+	public void setUploadId(Long uploadId) {
+		this.uploadId = uploadId;
+	}
+
+	public List<Workswing> getWorkswings() {
+		return workswings;
+	}
+
+	public void setWorkswings(List<Workswing> workswings) {
+		this.workswings = workswings;
+	}
+
+	public List<Subdivisionworks> getSubdivisions() {
+		return subdivisions;
+	}
+
+	public void setSubdivisions(List<Subdivisionworks> subdivisions) {
+		this.subdivisions = subdivisions;
+	}
+
+	public List<org.egov.infra.admin.master.entity.Department> getNewdepartments() {
+		return newdepartments;
+	}
+
+	public void setNewdepartments(List<org.egov.infra.admin.master.entity.Department> newdepartments) {
+		this.newdepartments = newdepartments;
+	}
+
+	public Long getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(Long subdivision) {
+		this.subdivision = subdivision;
 	}
 	
 	

@@ -45,7 +45,7 @@
 	
 
 			<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 670px;">
+		<div class="form-group" style="padding: 50px 20px 800px;">
 
 					<input type="hidden" name="estimatePreparationApproval"
 				value="${estimatePreparationApproval.id}" /> <label
@@ -57,9 +57,11 @@
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-									<form:option value="Building & Roads">Building & Roads</form:option>
+									<form:options items="${dnitCreation.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+									<%-- <form:option value="Building & Roads">Building & Roads</form:option>
 									<form:option value="Public Health">Public Health</form:option>
-									<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option>
+									<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
 								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -71,8 +73,24 @@
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-					<form:options items="${estimatePreparationApproval.departments}"
+									<form:options items="${dnitCreation.newdepartments}"
 										itemValue="code" itemLabel="name" />
+					<%-- <form:options items="${estimatePreparationApproval.departments}"
+										itemValue="code" itemLabel="name" /> --%>
+								</form:select>
+							</div>
+							<label class="col-sm-3 control-label text-left-audit1">Sub-Division<span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control-works"
+							cssErrorClass="form-control-works error" required="required">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${dnitCreation.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
+							
 								</form:select>
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -289,25 +307,25 @@
 				<!-- New field end here -->			
 							
 							
-			<label class="col-sm-3 control-label text-left-audit1"></label>
+			<!-- <label class="col-sm-3 control-label text-left-audit1"></label>
 			<div class="col-sm-3 add-margin">
 				<input type="text" class="form-control-works" style="visibility:hidden"
 									 />
-							</div>				
+							</div> -->				
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.name.work" /></label>
-					<div class="col-sm-9 block-colm">
+					<div class="col-sm-3 block-colm">
 				<form:textarea class="form-control-works" path="workName" maxlength="2000" style="height: 100px;"
 					 />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.necessity" /></label>
-					<div class="col-sm-9 block-colm">
+					<div class="col-sm-3 block-colm">
 					<form:textarea class="form-control-works" path="necessity" maxlength="2000" style="height: 100px;"/>
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.scope.work" /></label>
-					<div class="col-sm-9 block-colm">
+					<div class="col-sm-3 block-colm">
 					 <form:textarea class="form-control-works" path="workScope" maxlength="2000" style="height: 100px;"
 					 />
 					</div>
@@ -357,6 +375,10 @@
 								<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].workOrderAgreement"
+												id="boQDetailsList[${boq.sizeIndex}].workOrderAgreement" />
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].estimatePreparationApproval"
+												id="boQDetailsList[${boq.sizeIndex}].estimatePreparationApproval" />
 								<form:input type="text" style="width:150px;"
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"

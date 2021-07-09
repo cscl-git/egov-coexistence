@@ -291,16 +291,7 @@
 									</select>
 								</div>
 							</td>
-				<%-- <td>
-				<div class="dropdown-content" id="autocomplete">
-				<input type="text"
-					class="form-control table-input text-left"
-					id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
-					name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
-					value="${biDefendingCounsilDetailsList.oppPartyAdvocate}" autocomplete="off"/>
-					<div id="worklist_${status.index}" ></div>
-					</div>
-					</td> --%>
+				
 
 
 				<td class="text-right"><input type="text"
@@ -334,6 +325,68 @@
 								class="fa fa-trash"></i></a></td>
 			</tr>
 		</c:forEach>
+		<c:if test="${empty legalCase.getDefendingCounsil()}">
+		<tr class="">
+					<%-- <td><span class="defendingCounsilDetails spansno">1</span> <form:hidden
+							path="biDefendingCounsilDetailsList[0].id"
+							name="biDefendingCounsilDetailsList[0].id"
+							value="${biDefendingCounsilDetailsList[0].id}"
+							class="form-control table-input hidden-input" /></td>--%>
+						<td> 
+				                <input 
+				                id="biDefendingCounsilDetailsList[0].defCounsilPrimary"
+				                 name="biDefendingCounsilDetailsList[0].defCounsilPrimary"
+				                  value="YES" type="checkbox" />
+				     			<!-- <input type="hidden" class="form-control table-input text-left"id="primaryCounsin" name="primaryCounsin" value="YES"> -->
+				     	</td>
+							
+						
+						<td>
+						 <div class="dropdown-content" id="autocomplete">
+						
+									<select class="form-control table-input text-left patternvalidation"
+										required="required" id="biDefendingCounsilDetailsList[0].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[0].oppPartyAdvocate">
+										<option value="">
+											<spring:message code="lbls.select" />
+										</option>
+											<c:forEach items="${defendingDropdown}" var="category">
+										        <option value="${category.name}" >${category.name}</option>
+										    
+										<%-- <options items="${}" itemValue="id"
+											id="oppPartyAdvocate" itemLabel="name" /> --%>
+										</c:forEach> 
+									</select>
+								</div>
+							</td>	
+					
+					<td class="text-right"><input type="text"
+						class="form-control table-input"
+						name="biDefendingCounsilDetailsList[0].counselEmail"
+						id="biDefendingCounsilDetailsList[0].counselEmail" 
+						data-pattern="alphanumericwithspecialcharacters" 
+						maxlength="50" placeholder="abc@xyz.com" readonly="readonly" />
+						
+						</td>
+					<td class="text-right"><input type="text"
+						class="form-control table-input text-left patternvalidation"
+						name="biDefendingCounsilDetailsList[0].counselphoneNo"
+						id="biDefendingCounsilDetailsList[0].counselphoneNo"
+						onkeyup="decimalvalue(this);" maxlength="10" readonly="readonly"/></td>
+					<input type="hidden"
+						id="biDefendingCounsilDetailsList[0].isRepondent"
+						name="biDefendingCounsilDetailsList[0].isRepondent"
+						class="form-control table-input text-right"
+						style="text-align: center" value="${true}" />
+
+					<td class="text-center"><a href="javascript:void(0);"
+						class="btn-sm btn-default" onclick="addDefendingCounsilRow();"><span
+							style="cursor: pointer;"><i class="fa fa-plus"></i></span></a> <a
+						href="javascript:void(0);" class="btn-sm btn-default"
+						id="counsil_delete_row"><span style="cursor: pointer;"><i
+								class="fa fa-trash"></i></span></a></td>
+				</tr>
+		</c:if>
 		
 	</tbody>
 </table>

@@ -22,13 +22,13 @@ import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.workflow.entity.State;
 import org.egov.infra.workflow.entity.StateHistory;
-import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.service.BoQDetailsService;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -47,6 +47,9 @@ public class WorkEstimateController extends GenericWorkFlowController{
 	
 	@Autowired
 	public MicroserviceUtils microserviceUtils;
+
+	@Autowired
+	EstimatePreparationApprovalService estimatePreparationApprovalService;
 
 	@Autowired
 	BoQDetailsService boQDetailsService;
@@ -132,7 +135,8 @@ public class WorkEstimateController extends GenericWorkFlowController{
 				estimatePreparationApproval);
 		approvalList.addAll(workEstimateDetails);
 		estimatePreparationApproval.setEstimateList(approvalList);
-
+		//added as department not showing
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
 
 		return "search-work-estimate-form-new";
@@ -312,17 +316,15 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		for (int i = 0; i < estimatePreparationApproval.getNewBoQDetailsList().size(); i++) {
 			if (estimatePreparationApproval.getNewBoQDetailsList().get(i).isCheckboxChecked()) {
 				boq = estimatePreparationApproval.getNewBoQDetailsList().get(i);
+				
 				boq.setSizeIndex(responseList.size());
 				responseList.add(boq);
 				amount += estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount();
 			}
 		}
 		DNITCreation saveBoqDetails = workEstimateService.searchDnitBoqData(request, id);
-		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",saveBoqDetails.getId());
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
-		workOrderAgreement.setDocuments(documents);
 		workOrderAgreement.setBoQDetailsList(responseList);
-		workOrderAgreement.setDnitId(saveBoqDetails.getId());
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
 		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
 		workOrderAgreement.setDepartment(String.valueOf(saveBoqDetails.getExecutingDivision()));
@@ -334,6 +336,11 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		workOrderAgreement.setWorkLocation(saveBoqDetails.getWorkLocation());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		workOrderAgreement.setWorksWing(saveBoqDetails.getWorksWing());
+		workOrderAgreement.setSubdivision(saveBoqDetails.getSubdivision());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(saveBoqDetails.getExecutingDivision()));
+		workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(saveBoqDetails.getWorksWing())));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
@@ -376,10 +383,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
-		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",saveBoqDetails.getId());
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
-		workOrderAgreement.setEstDocuments(documents);
-		workOrderAgreement.setEstId(saveBoqDetails.getId());
 		workOrderAgreement.setBoQDetailsList(responseList);
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
 		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
@@ -392,6 +396,12 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		workOrderAgreement.setWorkLocation(saveBoqDetails.getWorkLocation());
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
+		
+		workOrderAgreement.setWorksWing(saveBoqDetails.getWorksWing());
+		workOrderAgreement.setSubdivision(saveBoqDetails.getSubdivision());
+		workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(saveBoqDetails.getExecutingDivision()));
+		workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(saveBoqDetails.getWorksWing())));
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
@@ -438,10 +448,15 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchBoqData(request, id);
 
 		estimateDetails.setBoQDetailsList(responseList);
+		estimateDetails.setDesignations(getDesignationsFromMs());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
-
-		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+        estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
+        estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		//estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setEstimateAmount(amount);
         
         Map<String, List<BoQDetails>> groupByMilesToneMap = 
@@ -505,7 +520,10 @@ public class WorkEstimateController extends GenericWorkFlowController{
         model.addAttribute("validActionList",
                 Arrays.asList("Forward/Reassign","Save As Draft"));
 	}
-
+	private void prepareValidActionListByCutOffDatednit(Model model) {
+        model.addAttribute("validActionList",
+                Arrays.asList("Forward/Reassign","Approve"));
+	}
 	
 	public List<Designation> getDesignationsFromMs() {
 		List<Designation> designations = microserviceUtils.getDesignations();

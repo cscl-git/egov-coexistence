@@ -888,5 +888,18 @@
         <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/paymentrefund/refundPreApprovedVoucher.jsp"/>
     </definition>
+    
+     <definition name="generalledgerreport-search-home" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/generalledgerreport-search-home.jsp"/>
+    </definition>
+    <definition name="capitalrevenue-search-home" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/capitalrevenue-search-home.jsp"/>
+    </definition>
+    <definition name="capitaldivision-search-home" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/capitaldivision-search-home.jsp"/>
+    </definition>
 
 </tiles-definitions>

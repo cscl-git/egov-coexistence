@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -100,6 +101,7 @@ import org.egov.utils.PaymentRefundUtils;
 import org.geotools.filter.IsNullImpl;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.python.netty.util.internal.ObjectUtil;
@@ -573,6 +575,44 @@ public class PaymentRefundController extends BaseBillController {
 		final List<Accountdetailtype> detailtypeIdList = new ArrayList<Accountdetailtype>();
 		BigDecimal dbAmount = BigDecimal.ZERO;
 		BigDecimal crAmount = BigDecimal.ZERO;
+		SQLQuery queryMain =  null;
+		final StringBuffer query1 = new StringBuffer(500);
+    	
+    	List<Object[]> list= null;
+    	query1
+        .append("select id,billid from eg_billregistermis eb where paymentvoucherheaderid ="+voucherHeader.getId());
+    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+    	list = queryMain.list();
+    	EgBillregister bill = null;
+    	List<EgBilldetails> egBilldetailsList = new ArrayList<EgBilldetails>();
+    	if (list.size() != 0) {
+    		LOGGER.info("size ::: "+list.size());
+    		for (final Object[] object : list)
+    		{
+    			bill=new EgBillregister();
+    			bill= expenseBillService.getById(Long.parseLong(object[1].toString()));
+    			if(bill != null)
+    			{
+    				egBilldetailsList.addAll(bill.getEgBilldetailes());
+    			}
+    		}
+    	}
+    	
+		
+		//egBilldetailsList.add(egBill);
+		//egBilldetailsList.add(egBill2);
+		
+		
+		HashMap<BigDecimal,BigDecimal> hs = new HashMap<BigDecimal,BigDecimal>();
+		for(EgBilldetails eg : egBilldetailsList) {
+			
+			if(hs.containsKey(eg.getGlcodeid())) {
+				hs.put(eg.getGlcodeid(), (eg.getDebitamount()).add(hs.get(eg.getGlcodeid())));
+			}else {
+				hs.put(eg.getGlcodeid(), eg.getDebitamount());
+			}
+			
+		}
 		
 		if(null!=voucherHeader) {
 			voucherDetails.setName(voucherHeader.getName());
@@ -590,6 +630,12 @@ public class PaymentRefundController extends BaseBillController {
 			voucherDetails.setCgvn(voucherHeader.getCgvn());
 			voucherDetails.setModuleId(voucherHeader.getModuleId());
 			voucherDetails.setVouchermis(voucherHeader.getVouchermis());
+			
+			
+			//EgBillregister egBillregister2 =paymentRefundUtils.getEgBillregisterByVoucherHeaderId(voucherHeader);			
+			//List<EgBillregister> egBillregisterList = expenseBillService.findByVoucherHeaderId(Long.valueOf(vhid));
+			
+			
 			
 			if(paymentRefundUtils.getEgBillregister(voucherHeader)!=null) {
 			 egBillregister = paymentRefundUtils.getEgBillregister(voucherHeader);
@@ -663,6 +709,16 @@ public class PaymentRefundController extends BaseBillController {
                 temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : gl.getDebitAmount());
                 temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : gl.getCreditAmount());
                 temp.put("billdetailid", gl.getId());
+                
+                for(Entry<BigDecimal,BigDecimal>bb : hs.entrySet()) {
+					System.out.println(BigDecimal.valueOf(coa.getId())+""+bb.getKey());
+					if(BigDecimal.valueOf(coa.getId()).equals(bb.getKey())) {
+						temp.put("previousAmount", bb.getValue());
+						break;
+					}else {
+						temp.put("previousAmount", 0);
+					}
+				}
                 tempList.add(temp);
                 for (CGeneralLedgerDetail gldetail : gl.getGeneralLedgerDetails()) {
                     if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(gl.getGlcodeId().getId(), gldetail.getDetailTypeId().getId().intValue()) != null) {
@@ -692,6 +748,30 @@ public class PaymentRefundController extends BaseBillController {
                     }
                 }
 			}
+			
+			
+/*			for(int i=0; i<tempList.size();i++) {
+				
+				for(HashMap<String, Object> entry :  tempList.get(i))
+		        {
+					for(Entry<BigDecimal,BigDecimal>bb : hs.entrySet()) {
+						
+						if(entry.getValue() == bb.getKey() ) {
+							((HashMap) entry).put("previousAmount",bb.getValue());
+							continue;
+						}else {
+							((HashMap) entry).put("previousAmount",0);
+						}
+					}
+		            //String key = entry.getKey();
+		            //Object value = entry.getValue();
+		            // ...
+		        } 
+				
+				
+			}*/
+			
+			//model.addAttribute("EgBilldetailsList", hs);
 			
 			populateDropDownValues(model);
 		

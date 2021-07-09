@@ -442,7 +442,8 @@
 				style="height: 30px;" title="BoQ Upload Format"
 				src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 			<br> <input type="file" name="file" id="file1"
-				style="color: #000000;"> <br>
+				style="color: #000000;">
+				<small class="error-msg">**Kindly use proper BOQ format to upload the BOQ details. Please ensure that there are no merge cells in the AOR Detail sheet</small> <br>
 			<form:hidden path="objectType" id="objectType"
 				class="checklist_description" value="BoqUploadFile"></form:hidden>
 					<br>

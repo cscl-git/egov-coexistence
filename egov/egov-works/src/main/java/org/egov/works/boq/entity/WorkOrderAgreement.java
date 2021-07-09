@@ -30,6 +30,8 @@ import org.egov.infra.microservice.models.Department;
 import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
+import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
+import org.egov.works.estimatepreparationapproval.entity.Workswing;
 
 
 
@@ -50,7 +52,7 @@ import org.egov.model.masters.Contractor;
 				@ColumnResult(name="createddate",type=String.class),@ColumnResult(name="lastmodifiedby",type=String.class),@ColumnResult(name="lastmodifieddate",type=String.class),
 				@ColumnResult(name="state_id",type=String.class),@ColumnResult(name="work_agreement_number",type=String.class),@ColumnResult(name="project_closure_comments",type=String.class),
 				@ColumnResult(name="contractor_performance_comments",type=String.class),@ColumnResult(name="actual_start_date",type=String.class),@ColumnResult(name="actual_end_date",type=String.class),
-				@ColumnResult(name="approval_competent_authority",type=String.class),@ColumnResult(name="status",type=String.class),@ColumnResult(name="percentage_completion",type=String.class)}
+				@ColumnResult(name="approval_competent_authority",type=String.class),@ColumnResult(name="status",type=String.class),@ColumnResult(name="percentage_completion",type=String.class),@ColumnResult(name="subdivision",type=String.class)}
 				)
 	})
 
@@ -58,7 +60,7 @@ import org.egov.model.masters.Contractor;
 		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address, aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_department,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast (aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
 				resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset"),
 
-		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreementByMileStone", query ="select aw.id,aw.agency_work_order,aw.agreement_details,aw.category, aw.contractor_address,aw.contractor_code, aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date, aw.estimated_cost,dep.name as executing_department , aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details, aw.work_end_date, aw.work_intended_date,aw.work_number, aw.work_start_date,aw.work_status, aw.ward_number, aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate, aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments, aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, case lower(aw.milestonestatus) when 'no' then round(sum(tb.measured_amount)/(sum(tb.amount))*100) when 'yes' THEN (select sum(pd.payment_percent)*(sum(pd.completion_percent)/(count(pd.completion_percent)*100.0)) from txn_work_agreement bw, txn_paymentdistribution pd where bw.id=pd.work_id and bw.id =aw.id ) end percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb where aw.statusid =es.id and cast(aw.executing_department as Integer) = dep.id and aw.id=tb.work_id group by aw.id,dep.name ,es.code,lower(aw.milestonestatus)",
+		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreementByMileStone", query ="select aw.id, aw.agency_work_order, aw.agreement_details, aw.category, aw.contractor_address, aw.contractor_code, aw.contractor_email, aw.contractor_name, aw.contractor_phone, aw.date, aw.estimated_cost, dep.name as executing_department , aw.fund, aw.name_work_order, aw.sector, aw.tender_cost, aw.time_limit, aw.work_location, aw.work_type, aw.work_agreement_status, aw.work_amount, aw.work_details, aw.work_end_date, aw.work_intended_date, aw.work_number, aw.work_start_date, aw.work_status, aw.ward_number, aw.statusid, aw.version, aw.createdby, aw.createddate, aw.lastmodifiedby, aw.lastmodifieddate, aw.state_id, aw.work_agreement_number, aw.project_closure_comments, aw.contractor_performance_comments, aw.actual_start_date, aw.actual_end_date, aw.approval_competent_authority, es.code as status, case lower(aw.milestonestatus) when 'no' then round(sum(tb.measured_amount)/(sum(tb.amount))* 100) when 'yes' then ( select sum(pd.payment_percent)*(sum(pd.completion_percent)/(count(pd.completion_percent)* 100.0)) from txn_work_agreement bw, txn_paymentdistribution pd where bw.id = pd.work_id and bw.id = aw.id ) end percentage_completion, sub.subdivision from txn_work_agreement aw, eg_department dep, egw_status es , txn_boqdetails tb, subdivision sub where aw.statusid = es.id and cast(aw.executing_department as Integer) = dep.id and aw.id = tb.work_id and aw.subdivision = sub.id group by aw.id, dep.name , es.code, lower(aw.milestonestatus)",
 		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
 	})
 
@@ -169,6 +171,24 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Column(name="milestonestatus")
 	private String milestonestatus;
 
+	@Column(name="subdivision")
+	private Long subdivision;
+	
+	@Column(name = "works_wing")
+	private String worksWing;
+	
+	@Transient
+	private List<Workswing> workswings = new ArrayList<Workswing>();
+	
+	@Transient
+	private List<Subdivisionworks> subdivisions = new ArrayList<Subdivisionworks>();
+	
+	@Transient
+	private List<org.egov.infra.admin.master.entity.Department> newdepartments = new ArrayList<org.egov.infra.admin.master.entity.Department>();
+
+	@Transient
+	private List<BoqUploadDocument> docUpload;
+	
 	@Transient
 	private List<BoQDetails> boQDetailsList;
 
@@ -247,6 +267,8 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	private String endDate;
 	@Transient
 	private String statusDescp;
+	@Transient
+	private String comments;
 	
 	@Column(name = "project_closure_comments")
 	private String project_closure_comments;
@@ -259,7 +281,7 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Transient
 	private String pendingWith;
-
+	
 	public Long getId() {
 		return id;
 	}
@@ -779,6 +801,62 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setEstId(Long estId) {
 		this.estId = estId;
+	}
+
+	public String getComments() {
+		return comments;
+	}
+	
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
+
+	public Long getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(Long subdivision) {
+		this.subdivision = subdivision;
+	}
+
+	public String getWorksWing() {
+		return worksWing;
+	}
+
+	public void setWorksWing(String worksWing) {
+		this.worksWing = worksWing;
+	}
+
+	public List<Workswing> getWorkswings() {
+		return workswings;
+	}
+
+	public void setWorkswings(List<Workswing> workswings) {
+		this.workswings = workswings;
+	}
+
+	public List<Subdivisionworks> getSubdivisions() {
+		return subdivisions;
+	}
+
+	public void setSubdivisions(List<Subdivisionworks> subdivisions) {
+		this.subdivisions = subdivisions;
+	}
+
+	public List<org.egov.infra.admin.master.entity.Department> getNewdepartments() {
+		return newdepartments;
+	}
+
+	public void setNewdepartments(List<org.egov.infra.admin.master.entity.Department> newdepartments) {
+		this.newdepartments = newdepartments;
+	}
+	
+	public List<BoqUploadDocument> getDocUpload() {
+		return docUpload;
+	}
+
+	public void setDocUpload(List<BoqUploadDocument> docUpload) {
+		this.docUpload = docUpload;
 	}
 
 }

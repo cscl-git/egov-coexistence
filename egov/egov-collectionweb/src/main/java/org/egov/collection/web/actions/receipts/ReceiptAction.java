@@ -79,6 +79,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.egov.collection.bean.SubDivison;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.AccountPayeeDetail;
+import org.egov.collection.entity.MisReceiptDetail;
 import org.egov.collection.entity.ReceiptDetail;
 import org.egov.collection.entity.ReceiptDetailInfo;
 import org.egov.collection.entity.ReceiptHeader;
@@ -118,7 +119,6 @@ import org.egov.commons.dao.FundSourceHibernateDAO;
 import org.egov.commons.dao.SchemeHibernateDAO;
 import org.egov.commons.dao.SubSchemeHibernateDAO;
 import org.egov.commons.dao.VoucherHeaderDAO;
-import org.egov.commons.dao.VoucherHeaderHibernateDAO;
 import org.egov.commons.dao.VouchermisHibernateDAO;
 import org.egov.commons.entity.Source;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -151,7 +151,6 @@ import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.instrument.InstrumentType;
 import org.egov.services.voucher.VoucherService;
 import org.hibernate.SQLQuery;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -860,9 +859,25 @@ public class ReceiptAction extends BaseFormAction {
         receiptResponse = receiptHeaderService.populateAndPersistReceipts(receiptHeader, receiptInstrList);
         System.out.println("Printing of data starts #####");
         System.out.println("payments_id :::::"+receiptResponse.getReceipts().get(0).getPaymentId());
-        System.out.println("payments_id :::::"+receiptResponse.getReceipts().get(0).getPaymentId());
+        System.out.println("amount :::::"+receiptResponse.getReceipts().get(0).getInstrument().getAmount());
+        System.out.println("receipt no :::::"+receiptResponse.getReceipts().get(0).getReceiptNumber());
+        System.out.println("receipt_date :::::"+receiptResponse.getReceipts().get(0).getReceiptDate());
+        System.out.println("paid by :::::"+receiptResponse.getReceipts().get(0).getBill().get(0).getPaidBy());
+        System.out.println("paid address :::::"+receiptResponse.getReceipts().get(0).getBill().get(0).getPayerAddress());
+        System.out.println("naration :::::"+receiptResponse.getReceipts().get(0).getBill().get(0).getNarration());
+        System.out.println("payment status :::::"+receiptResponse.getReceipts().get(0).getPaymentStatus());
+        System.out.println("bank name :::::"+receiptResponse.getReceipts().get(0).getInstrument().getBank().getName());
+        System.out.println("branch name :::::"+receiptResponse.getReceipts().get(0).getInstrument().getBranchName());
+        System.out.println("subdivison :::::"+receiptResponse.getReceipts().get(0).getSubdivison());
+        System.out.println("servicename :::::"+receiptResponse.getReceipts().get(0).getServicename());
+        System.out.println("collectedbyname :::::"+receiptResponse.getReceipts().get(0).getCollectedbyname());
+        System.out.println("gstno :::::"+receiptResponse.getReceipts().get(0).getGstNo());
+        System.out.println("payment_mode :::::"+receiptResponse.getReceipts().get(0).getInstrument().getInstrumentType().getName());
         
-        System.out.println("Printing of data ends #####");
+        boolean status=receiptHeaderService.populateMisReceiptsDetails(receiptResponse);
+        
+        
+        System.out.println("Printing of data ends ##### ::"+status);
 
         message = "Receipt created with receipt number: "
                 + receiptResponse.getReceipts().get(0).getBill().get(0).getBillDetails().get(0).getReceiptNumber();

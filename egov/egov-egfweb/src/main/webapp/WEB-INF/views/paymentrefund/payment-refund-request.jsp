@@ -53,15 +53,16 @@
 			 <td width="25%" class="greybox">${voucherDetails.financeSource}</td>
 			</tr>
 			<tr>
-			 <td width="10%" class="greybox"><b>Sub Division :  </b></td>
+			<!--  <td width="10%" class="greybox"><b>Sub Division :  </b></td> -->
 			 <c:if test="${voucherDetails.subdivision !=null && voucherDetails.subdivision !=''}">
+			 <td width="10%" class="greybox"><b>Sub Division :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.subdivision}</td>
 			 </c:if>
 			 <c:if test="${voucherDetails.subdivision ==null || voucherDetails.subdivision ==''}">
-			    <td width="25%" class="greybox">
-			     <td width="10%" class="greybox"><b>Sub division</b></td>
+			    
+			     <td width="10%" class="greybox"><b>Sub division</b><span class="mandatory"></span></td>
 			 <td width="25%" class="greybox">
-			 <select name="egBillregistermis.function"
+			 <select name="egBillregistermis.subdivision"
 									id="egBillregistermis.subdivision" required="required"
 									class="form-control">
 										<option value="">-Select-</option>
@@ -69,7 +70,6 @@
 											varStatus="loop">
 											<option value="${subdivision.subdivisionCode}">${subdivision.subdivisionName}</option>
 										</c:forEach>
-										<%-- <options items="${subdivision}" itemValue="id" itemLabel="name" /> --%>
 								</select>
 								</td>
 			    
@@ -121,7 +121,6 @@
 	<input type="hidden" name="egBillregistermis.budgetaryAppnumber" id="egBillregistermis.budgetaryAppnumber" value="${voucherDetails.banNumber}"/>
 	<input type="hidden" name="egBillregistermis.fundsource" id="egBillregistermis.fundsource" value="${fundsource}"/>
 	<%-- <input type="hidden" name="egBillregistermis.egBillSubType" id="egBillregistermis.egBillSubType" value="${billsubtype}"/>  --%>
-	 <td width="10%" class="greybox"><b>Sub Division :  </b></td>
 	<c:if test="${voucherDetails.subdivision !=null && voucherDetails.subdivision !=''}">
 	<input type="hidden" name="egBillregistermis.subdivision" id="egBillregistermis.subdivision" value="${voucherDetails.subdivision}"/> 
 	</c:if>
@@ -165,6 +164,7 @@
 					<th><spring:message code="lbl.account.head" text="Account Head"/></th>
 					<th><spring:message code="lbl.debit.amount" text="Debit Amount"/></th>
 					<th><spring:message code="lbl.credit.amount" text="Credit Amount"/></th>
+					<th><spring:message code="lbl.previous.debit.amount" text="privious Amount"/></th>
 					<th><spring:message code="lbl.refund.debit.amount" text="Refund Debit Amount"/></th>
 					<%-- <th><spring:message code="lbl.refund.credit.amount" text="Refund Credit Amount"/></th> --%>
 					
@@ -184,10 +184,11 @@
 					<td><input type="hidden" name="billDetails[${status.index}].chartOfAccounts.name" value="${accountDetail.chartOfAccounts.name}">${accountDetail.accounthead}</td>
 					<td>${accountDetail.debitamount}</td>
 					<td>${accountDetail.creditamount}</td>
+					<td>${accountDetail.previousAmount}</td>
 					<%--<input type="hidden" name="billDetails[${status.index}].detailTypeId" id="billDetails[${status.index}].detailTypeId" value="${accountDetail.glcodeid}" class="form-control table-input hidden-input accountDetailsDetailTypeId"/>
 					<input type="hidden" name="billDetails[${status.index}].detailKeyId" id="billDetails[${status.index}].detailKeyId" class="form-control table-input hidden-input accountDetailsDetailKeyId"/>
 						 --%>		
-					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}','${accountDetail.creditamount}','${status.index}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}','${accountDetail.creditamount}','${status.index}','${accountDetail.previousAmount}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
 					       class="form-control"/></td>
 					<%-- <td><input type="text" name="billDetails[${status.index}].creditamount" id="billDetails[${status.index}].creditamount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" 
 					       class="form-control"/></td> --%> 
@@ -275,7 +276,7 @@
 		  <c:otherwise>
 			<tr>
 			  <td>
-				  <select data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
+				  <select id="glcodeid" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
 				  <option value=""><spring:message code="lbl.select" text="Select"/>
 				  <c:forEach var="accountDetail" items="${accountDetails}">
 				    <c:if test="${not empty accountDetail.creditamount && accountDetail.creditamount ne '0.00'}">

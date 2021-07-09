@@ -42,11 +42,25 @@ function getVoucherNameByType(){
 	}
 }
 
-$('#btnsearch').click(function(e) {
+/*$('#btnsearch').click(function(e) {
 	if ($('form').valid()) {
 		callAjaxSearch();
 	} else {
 		e.preventDefault();
+	}
+});*/
+
+$('#btnsearch').click(function(e) {
+	if(document.getElementById('voucherNumber')!=null && document.getElementById('voucherNumber').value!="")
+	{
+	  callAjaxSearch();	
+	  
+	}else{			
+	if ($('form').valid()) {
+		callAjaxSearch();
+	} else {
+		e.preventDefault();
+	}
 	}
 });
 
@@ -84,6 +98,17 @@ function callAjaxSearch() {
 				"data" : null,
 				"searchable": false,
 	            "orderable": false
+			},
+			{
+				"data" : "id",
+				"className" : "text-left",
+				"render" : function(data, type, full, meta) {
+					if(full.receiptNo != 'NA'){
+						return '<a href="/services/EGF/refund/_paymentRequestForm?vhid='+full.id+'">Refund Request</a>';
+					}else{
+						return 'NA';
+					}					
+				}
 			},
 			{
 				"data" : "vouchernumber",
@@ -156,18 +181,6 @@ function callAjaxSearch() {
 			{
 				"data" : "pendingWith",
 				"className" : "text-left"
-			},
-			{
-				"data" : "id",
-				"className" : "text-left",
-				"render" : function(data, type, full, meta) {
-					if(full.receiptNo != 'NA'){
-						/*return '<a href="javascript:void(0);" onclick="refundRequest(\''+ full.id +'\')">Refund Request</a>';*/
-						return '<a href="/services/EGF/refund/_paymentRequestForm?vhid='+full.id+'">Refund Request</a>';
-					}else{
-						return 'NA';
-					}					
-				}
 			}
 		],
 		"fnRowCallback": function (nRow, aData, iDisplayIndex) {
@@ -186,5 +199,14 @@ function refundRequest(vhid){
 	window.open('/services/EGF/refund/_paymentRequestForm?vhid=' + vhid,'','width=1200, height=800');
 }
 
-
+function changeField()
+{
+	if(document.getElementById('voucherNumber')!=null && document.getElementById('voucherNumber').value!="")
+		{
+			document.getElementById("toDate").required = false;
+			document.getElementById("fromDate").required = false;
+			document.getElementById("fundId").required = false;
+			document.getElementById("voucherType").required = false;
+		}	
+}
 

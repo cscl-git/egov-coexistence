@@ -23,7 +23,7 @@
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.number" text="Voucher Number"/> </label>
 						<div class="col-sm-3 add-margin">
-							<form:input cssClass="form-control patternvalidation" data-pattern="address" maxlength="100" id="voucherNumber" path="voucherNumber"/>
+							<form:input cssClass="form-control patternvalidation" data-pattern="address" maxlength="100" id="voucherNumber" onblur="changeField();"  path="voucherNumber" />
 						</div>	
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.name" text="Voucher Name"/> </label>
 						<div class="col-sm-3 add-margin">
@@ -98,6 +98,7 @@
 			<thead>
 				<tr>
 					<th>Sl No</th>
+					<th>Action</th>
 					<th>Voucher Number</th>
 					<th>Receipt Number</th>
 					<th>Voucher Type</th>
@@ -110,7 +111,6 @@
 					<th>Total Amount</th>
 					<th>Status</th>
 					<th>Pending With</th>
-					<th>Action</th>
 				</tr>
 			</thead>
 		</table>

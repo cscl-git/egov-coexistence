@@ -1,5 +1,7 @@
 package org.egov.works.web.controller.estimatepreparationapproval;
 
+
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,10 +53,13 @@ import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
+import org.egov.works.boq.entity.BoqNewDetails;
+import org.egov.works.boq.entity.BoqUploadDocument;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.egov.works.estimatepreparationapproval.service.DNITCreationService;
@@ -140,9 +145,13 @@ private static Map<String, String> map;
 	public String showNewFormGet(
 			@ModelAttribute("dnitCreation") final DNITCreation dnitCreation,
 			final Model model, HttpServletRequest request) {
-
+		List<Workswing> worskwing = estimatePreparationApprovalService.getworskwing();
+		for(Workswing w:worskwing) {
+			System.out.println("::::: "+w.getWorkswingname());
+		}
 		dnitCreation.setDepartments(getDepartmentsFromMs());
 		dnitCreation.setDesignations(getDesignationsFromMs());
+		dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		model.addAttribute(STATE_TYPE, dnitCreation.getClass().getSimpleName());
         prepareWorkflow(model, dnitCreation, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
@@ -222,13 +231,43 @@ private static Map<String, String> map;
 
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
-        
+        try {
         DNITCreation savedEstimatePreparationApproval = dnitCreationService
 				.saveEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
+		Long id=savedEstimatePreparationApproval.getId();
+		if(dnitCreation.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:dnitCreation.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					dnitCreationService.updateDocuments(id,update);
+				}
+			}
+		}
 		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
         + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
+        }catch (Exception e) {
+        	e.printStackTrace();
+			
+		}
+        String msg="Dnit Not Forwarded .";
+		model.addAttribute("error", "Y");
+		model.addAttribute("message", msg);
+		//dnitCreation.setDepartments(getDepartmentsFromMs());
+		dnitCreation.setWorksWing(dnitCreation.getWorksWing());
+		dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		dnitCreation.setDepartment(dnitCreation.getDepartment());
+		dnitCreation.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(dnitCreation.getWorksWing())));
+		dnitCreation.setSubdivision(dnitCreation.getSubdivision());
+		dnitCreation.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dnitCreation.getDepartment())));
+		dnitCreation.setDesignations(getDesignationsFromMs());
+		dnitCreation.setDesignations(getDesignationsFromMs());
+		model.addAttribute(STATE_TYPE, dnitCreation.getClass().getSimpleName());
+        prepareWorkflow(model, dnitCreation, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
 
+		return "dnitCreation-form";
 	}
 		
 		
@@ -304,8 +343,123 @@ private static Map<String, String> map;
 		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
         + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
 
+        
 	}
+	//save as draft from estimate dnit by anshuman
+	@RequestMapping(value = "/dnitCreationEstApproval", params = "Save As Draft", method = RequestMethod.POST)
+	public String saveBoQDetailsfromestimateDataDraft(
+			@ModelAttribute("dnitCreation") final DNITCreation dnitCreation,
+			final Model model, @RequestParam("file1") MultipartFile[] files, @RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request)
+			throws Exception {
+		
+		String workFlowAction=dnitCreation.getWorkFlowAction();
+		System.out.println(":::::Works Wing:  "+dnitCreation.getWorksWing());
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(dnitCreation.getObjectType());
+				list.add(upload2);
+			}
+		dnitCreation.setDocumentDetail(list);
+		DateFormat inputFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+		if (dnitCreation.getEstimateDt() != null && dnitCreation.getEstimateDt() != "") {
+		Date estimateDate = inputFormat.parse(dnitCreation.getEstimateDt());
+		dnitCreation.setEstimateDate(estimateDate);
+		}
+
+		if (dnitCreation.getDt() != null && dnitCreation.getDt() != "") {
+		Date date = inputFormat.parse(dnitCreation.getDt());
+		dnitCreation.setDate(date);
+		}
+		Long department = null;
+		if (dnitCreation.getDepartment() != null || dnitCreation.getDepartment() != "") {
+			
+		
+		 department = Long.parseLong(dnitCreation.getDepartment());
+		 dnitCreation.setExecutingDivision(department);
+		}
+
+		String deptCode = "";
+		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
+		deptCode = dnitCreation.getDepartment();
+		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"works_div_"+deptCode).get(0).getValue();
+	    String estimateNumber = v.getDNITNumber(deptShortCode);
+	    dnitCreation.setEstimateNumber(estimateNumber);
+	    dnitCreation.setDepartment(dnitCreation.getDepartment());
+		//start of workflow
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        try {
+        DNITCreation saveddnitCreation = dnitCreationService
+				.saveDnitByEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+
+        Long id=saveddnitCreation.getId();
+		if(dnitCreation.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:dnitCreation.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					dnitCreationService.updateDocuments(id,update);
+				}
+			}
+		}
+        
+		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
+        + saveddnitCreation.getId()+"&workflowaction="+workFlowAction;
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+        String msg="Dnit Not Saved As Draft .";
+		model.addAttribute("error", "Y");
+		model.addAttribute("message", msg);
+		//dnitCreation.setDepartments(getDepartmentsFromMs());
+		dnitCreation.setDesignations(getDesignationsFromMs());
+		dnitCreation.setWorksWing(dnitCreation.getWorksWing());
+		dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		dnitCreation.setDepartment(dnitCreation.getDepartment());
+		dnitCreation.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(dnitCreation.getWorksWing())));
+		dnitCreation.setSubdivision(dnitCreation.getSubdivision());
+		dnitCreation.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dnitCreation.getDepartment())));
+		dnitCreation.setDesignations(getDesignationsFromMs());
+		model.addAttribute(STATE_TYPE, dnitCreation.getClass().getSimpleName());
+        prepareWorkflow(model, dnitCreation, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
+        model.addAttribute("estimatePreparationApproval", dnitCreation);
 	
+		return "dnitboqDetails";
+	}
 	
 	@RequestMapping(value = "/dnitCreationEstApproval", params = "Approve", method = RequestMethod.POST)
 	public String dnitCreationEstApprovalAprover(
@@ -413,6 +567,7 @@ private static Map<String, String> map;
 			throws Exception {
 		
 		String workFlowAction=dnitCreation.getWorkFlowAction();
+		System.out.println(":::::Works Wing:  "+dnitCreation.getWorksWing());
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -480,35 +635,72 @@ private static Map<String, String> map;
         
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
-        
+        try {
         DNITCreation saveddnitCreation = dnitCreationService
 				.saveEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
-		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
+        Long id=saveddnitCreation.getId();
+		if(dnitCreation.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:dnitCreation.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					dnitCreationService.updateDocuments(id,update);
+				}
+			}
+		}
+        
+		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
         + saveddnitCreation.getId()+"&workflowaction="+workFlowAction;
+	}catch (Exception e) {
+		e.printStackTrace();
+	}
+        String msg="Dnit Not Saved As Draft .";
+		model.addAttribute("error", "Y");
+		model.addAttribute("message", msg);
+		//dnitCreation.setDepartments(getDepartmentsFromMs());
+		dnitCreation.setDesignations(getDesignationsFromMs());
+		dnitCreation.setWorksWing(dnitCreation.getWorksWing());
+		dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		dnitCreation.setDepartment(dnitCreation.getDepartment());
+		dnitCreation.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(dnitCreation.getWorksWing())));
+		dnitCreation.setSubdivision(dnitCreation.getSubdivision());
+		dnitCreation.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dnitCreation.getDepartment())));
+		dnitCreation.setDesignations(getDesignationsFromMs());
+		model.addAttribute(STATE_TYPE, dnitCreation.getClass().getSimpleName());
+        prepareWorkflow(model, dnitCreation, new WorkflowContainer());
+        prepareValidActionListByCutOffDate(model);
 
+		return "dnitCreation-form";
 	}
 
 
 	@RequestMapping(value = "/dnitCreation", params = "save", method = RequestMethod.POST)
 	public String uploadBoqFileData(
 			@ModelAttribute("dnitCreation") final DNITCreation dnitCreation,
-			final Model model, @RequestParam("file") MultipartFile file, final HttpServletRequest request)
+			final Model model, @RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files, final HttpServletRequest request)
 			throws Exception {
 
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		List<DocumentUpload> docup = new ArrayList<>();
+		String comments =request.getParameter("comments");
 		HashSet<String> milesstoneList=new HashSet<>();
+		String userName = estimatePreparationApprovalService.getUserName();
+		Long userId = estimatePreparationApprovalService.getUserId();
+		System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
+		String refNo=null;
 		int count = 0;
 		String fileName = null;
 		String extension = null;
 		String filePath = null;
 		File fileToUpload = null;
+		Boolean error=true;
+		String msg="";
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
 		Double estAmt= 0.0;
-		// String documentPath = "D://Upload/";
 
 		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
 
@@ -530,37 +722,62 @@ private static Map<String, String> map;
 
 			Files.write(Path, bytes);
 		}
+		
+						
+			
 		File xlsFile = new File(fileToUpload.toString());
 		if (xlsFile.exists()) {
 
+			
 			FileInputStream inputStream = new FileInputStream(new File(filePath));
 			Workbook workbook = getWorkbook(inputStream, filePath);
-			Sheet firstSheet = workbook.getSheetAt(0);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+			error=false;
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+	   
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkFileDnit");
+						upload.setComments(comments);
+						upload.setUsername(userName);
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
+				
 			Iterator<Row> iterator = firstSheet.iterator();
-			boolean check=false;
+				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+				
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
-				int rowNum = nextRow.getRowNum();
-				
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
-				if(firstSheet.getRow(rowNum).getCell(2)!=null) {
-				 
-					//String string=firstSheet.getRow(rowNum).getCell(2).toString();
-				 //check=checkAvailableBoq(string);
-				
-				}else {
-					check=false;
-				}
-
+				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 				while (cellIterator.hasNext()) {
 					Cell cell = (Cell) cellIterator.next();
 
-
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
-//edited	
-						
-
 
 						if (cell.getColumnIndex() == 0) {
 							aBoQDetails.setMilestone(cell.getStringCellValue());
@@ -569,64 +786,54 @@ private static Map<String, String> map;
 						
 						else if (cell.getColumnIndex() == 1) {
 							
-							//if(check) {
-							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setItem_description(" ");
-							//}
+							//boqDetailsPop.setItem_description(cell.getStringCellValue());
 							
 						} else if (cell.getColumnIndex() == 2) {
 							
-							//if(check) {
-							
 							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setRef_dsr(" ");
-						//	}
+							//boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
 						}else if (cell.getColumnIndex() == 3) {
 							
-							//if(check) {
-								
 							aBoQDetails.setUnit(cell.getStringCellValue());
-							//}else {
-							//	aBoQDetails.setUnit(" ");
-						//	}
+							//boqDetailsPop.setUnit(cell.getStringCellValue());
 							
 						} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
-
+						if(cell.getColumnIndex() == 2) {
+							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
+							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
+						}
 						 if (cell.getColumnIndex() == 4) {
 							 
-							 //if(check) {
-								 
 							aBoQDetails.setRate(cell.getNumericCellValue());
-							 //}else {
-							//	 aBoQDetails.setRate(0.0); 
-							// }
+							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+								 
 						} else if (cell.getColumnIndex() == 5) {
 							
-							//if(check) {
-							
 							aBoQDetails.setQuantity(cell.getNumericCellValue());
-							//}else {
-							//	aBoQDetails.setQuantity(0.0);
-						//	}
+							
+							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
+							}else {
+								error=true;
+							msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
+							}
 						}
 
 					}
+
 
 					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
 							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
 							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
 						count=boQDetailsList.size();
 						aBoQDetails.setSlNo(Long.valueOf(count));
-						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
-						
+						//arrayboqDetailsPop.add(boqDetailsPop);
 					
 
 					}
@@ -636,21 +843,87 @@ private static Map<String, String> map;
 
 			// workbook.close();
 			inputStream.close();
+			}else {
+				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				//error=true;
+			}
+		}	
 
 		} else {
 			// response = "Please choose a file.";
 		}
+		int nextcount=1;
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		
+		if(dnitCreation.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:dnitCreation.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					boqUploadDocument.setUsername(boq.getUsername());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		dnitCreation.setDocumentDetail(docup);
+		dnitCreation.setRoughCostdocumentDetail(docup);
+		if(!error) {
+DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation);		
+		
+		
+		System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getUsername()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
+		
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		boqUploadDocument2.setUsername(savedocebefore.getUsername());
+		docUpload.add(boqUploadDocument2);
+		
+		
 		
 		  Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
 		 
+		  List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
+			
+			DocumentUpload doc1= new DocumentUpload();
+			Long fileStoreId = savedocebefore.getFileStore().getId();
+			doc1.setId(savedocebefore.getId());
+			doc1.setFileStore(savedocebefore.getFileStore());
+			uploadDoc.add(doc1);
+			model.addAttribute("milestoneList",groupByMilesToneMap);
+			model.addAttribute("uploadDocID",uploadDoc);
+			model.addAttribute("fileuploadAllowed","Y");
 		
+		}
 		  
-		  dnitCreation.setDepartments(getDepartmentsFromMs());
+		  //dnitCreation.setDepartments(getDepartmentsFromMs());
 		  dnitCreation.setBoQDetailsList(boQDetailsList);
 		  dnitCreation.setDesignations(getDesignationsFromMs());
 		  dnitCreation.setEstimateAmount(estAmt);
-		  
+		  dnitCreation.setDocUpload(docUpload);
+		  Map<String, List<BoqUploadDocument>> uploadDocument = 
+					docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		  model.addAttribute("uploadDocument", uploadDocument);
+		  dnitCreation.setBoQDetailsList(boQDetailsList);
+		  dnitCreation.setDesignations(getDesignationsFromMs());
+		  dnitCreation.setWorksWing(dnitCreation.getWorksWing());
+		  dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		  dnitCreation.setDepartment(dnitCreation.getDepartment());
+		  dnitCreation.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(dnitCreation.getWorksWing())));
+		  dnitCreation.setSubdivision(dnitCreation.getSubdivision());
+		  dnitCreation.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dnitCreation.getDepartment())));
+		  if(!error) {
 		  BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
 			if(estAmt >= 10000000){
 				BigDecimal  pct = new BigDecimal(3);
@@ -672,23 +945,29 @@ private static Map<String, String> map;
 				Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
 				dnitCreation.setEstimateAmount(dobestAmtPlusContingentAmt);
 			}
+		  }else {
 		  
+				model.addAttribute("error", "Y");
+				model.addAttribute("message", msg);
+		  }
 		model.addAttribute(STATE_TYPE, dnitCreation.getClass().getSimpleName());
         prepareWorkflow(model, dnitCreation, new WorkflowContainer());
         prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", dnitCreation);
-		model.addAttribute("fileuploadAllowed","Y");
-		model.addAttribute("milestoneList",groupByMilesToneMap);
+		
+		
 
 		return "dnitCreation-form";
 
 	}
-	public boolean checkAvailableBoq(final String ref) {
-		boolean b=false;
+	public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 
+		List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
 		if(ref!=null && ref !="")
 		{
 		
+			BoqNewDetails estimate=null;
+			
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
 		 query
@@ -700,12 +979,38 @@ private static Map<String, String> map;
 				System.out.println("Query :: "+query.toString());
 				list = persistenceService.findAllBy(query.toString(),ref);
 			
+			
+			 
+	        
 	     if (list.size() != 0) {
 	    	 
-	    	 b=true; 
+	        	 for (final Object[] object : list) {
+	        		 estimate = new BoqNewDetails();
+	        		 estimate.setId(Long.parseLong(object[0].toString()));
+	        		 if(object[1] != null)
+	        		 {
+	        			 estimate.setItem_description(object[1].toString());
+	        		 }
+	        		 if(object[2] != null)
+	        		 {
+	        			 estimate.setRef_dsr(object[2].toString());
+	        		 }
+	        		 if(object[3] != null)
+	        		 {
+	        			 estimate.setUnit(object[3].toString());
+	        		 }
+	        		 if(object[4] != null)
+	        		 {
+	        			 estimate.setRate(Double.parseDouble(object[4].toString()));
 	     }
+	        		 
+	        		 approvalList.add(estimate);
+	    	 
+	    	  
+	     }}
+	        	 return approvalList; 
 	     }
-		return b;
+		return approvalList;
 	}
 	
 	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
@@ -908,7 +1213,7 @@ private static Map<String, String> map;
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
-		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
 
 		
 		estimateDetails.setDocumentDetail(documents);
@@ -916,8 +1221,16 @@ private static Map<String, String> map;
 
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
+		//estimateDetails.setDepartment(dept);
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		estimateDetails.setDepartment(dept);
-
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
 		estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
@@ -960,7 +1273,7 @@ private static Map<String, String> map;
 		
 		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
-		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
 		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
 		
 		estimateDetails.setDocumentDetail(documents);
@@ -970,11 +1283,15 @@ private static Map<String, String> map;
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
-		estimateDetails.setDepartments(getDepartmentsFromMs());
+		//estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
-		
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
+estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
 		//System.out.println(estimateDetails.getStatus().getCode()+"+++++++++++++++++++++++++++++++++++++++++++");
 		
 		BoQDetails boq = new BoQDetails();
@@ -999,18 +1316,24 @@ private static Map<String, String> map;
 				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "edit-dnit-form";
 	}
-	/*@RequestMapping(value = "/deleteajaxdnit/{id}/{slno}", method = RequestMethod.GET)
-	public @ResponseBody String deleteajaxDnit(@PathVariable("id") final Long id,@PathVariable("slno") final Long slno, Model model) {
-System.out.println("++++++++++"+id+"++++++++++++++++++");
-System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
-		if (id !=null && id != 0 && slno!= null && slno!=0 ) {
+	@RequestMapping(value = "/deleteBoqdata", method = RequestMethod.POST,produces = "application/json")
+	public @ResponseBody String deleteBoqdata(@RequestParam("id") final String id,@RequestParam("slno") final String slno ) {
+		
+if (id !=null && id != "" && slno!= null && slno!="" ) {
+	
+	Long id1=Long.parseLong(id);
+	Long slno1=Long.parseLong(slno);
+	System.out.println("+++++ID+==++++++"+id+"+++++++slno==++++++"+slno+"+++++++++++++++++++");
 			
 			final StringBuffer query = new StringBuffer(500);
-			query.append("delete from BoQDetails bq where bq.slNo=? and bq.dnitCreation.id=? ");
-			persistenceService.deleteAllBy(query.toString(),slno, id);
-		}
+			query.append("update BoQDetails bq set bq.dnitCreation.id=null where bq.slNo=? and bq.dnitCreation.id=? ");
+			persistenceService.deleteAllBy(query.toString(),slno1, id1);
 		return "success";
-				}*/
+}
+		
+		return "fail";
+		
+		}
 		
 	@RequestMapping(value = "/deletednit/{id}/{slno}", method = RequestMethod.GET)
 	public String deleteDnit(@PathVariable("id") final Long id,@PathVariable("slno") final Long slno, Model model) {
@@ -1018,7 +1341,7 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		if (id !=null && id != 0 && slno!= null && slno!=0 ) {
 			
 			final StringBuffer query = new StringBuffer(500);
-			query.append("delete from BoQDetails bq where bq.slNo=? and bq.dnitCreation.id=? ");
+			query.append("update BoQDetails bq set bq.dnitCreation.id=null where bq.slNo=? and bq.dnitCreation.id=? ");
 			persistenceService.deleteAllBy(query.toString(),slno, id);
 		}
 		
@@ -1026,7 +1349,7 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		
 		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
-		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
 		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
 		
 		estimateDetails.setDocumentDetail(documents);
@@ -1191,7 +1514,7 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		
 		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
-		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
 		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
 		
 		estimateDetails.setDocumentDetail(documents);
@@ -1201,10 +1524,16 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
-		estimateDetails.setDepartments(getDepartmentsFromMs());
+		//estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
+		System.out.println("::::::::asdads  "+estimateDetails.getWorksWing());
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
 		
 		System.out.println(estimateDetails.getStatus().getCode()+"+++++++++++++++++++++++++++++++++++++++++++");
 		
@@ -1230,14 +1559,709 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		return "create-dnit-form";
 	}
+	@RequestMapping(value = "/edits/{id}", method = RequestMethod.GET)
+	public String editerr(@PathVariable("id") final Long id, Model model) {
 
-	@RequestMapping(value = "/edit/updateDnit",  method = RequestMethod.POST)
-	public String editEstimateData(
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		
+		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
+		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
+		
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
+		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+
+		//estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		
+		System.out.println(estimateDetails.getStatus().getCode()+"+++++++++++++++++++++++++++++++++++++++++++");
+		
+		BoQDetails boq = new BoQDetails();
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList.size());
+				boQDetailsList.add(boq);
+			}
+		String msg="Unable to Update Something Went Wrong !! please try Again.";
+		model.addAttribute("error", "Y");
+		model.addAttribute("message", msg);
+
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		 System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		return "create-dnit-form";
+				}
+	@RequestMapping(value = "/edit/updateDnit", params="save", method = RequestMethod.POST)
+	public String editEstimateData1(
+			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@RequestParam("file1") MultipartFile[] file1,Model model,
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,@RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files,final HttpServletRequest request) throws Exception {
+
+List<BoQDetails> boQDetailsList = new ArrayList();
+		Long id = dnitCreation.getId();
+System.out.println(":::::ID:::::: "+id);
+String userName = estimatePreparationApprovalService.getUserName();
+Long userId = estimatePreparationApprovalService.getUserId();
+//System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
+		//New File UPload....
+		List<DocumentUpload> docup = new ArrayList<>();
+		String refNo=null;
+		int count = 0;
+		String fileName = null;
+		String extension = null;
+		String filePath = null;
+		File fileToUpload = null;
+		Boolean error=true;
+		String msg="";
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
+		String FILE_PATH_SEPERATOR = "\\";
+		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+		Double estAmt= 0.0;
+		String comments =request.getParameter("comments");
+		// String documentPath = "D://Upload/";
+
+		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
+
+		long currentTime = new Date().getTime();
+		if (file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
+			fileName = file.getOriginalFilename().toString().split("\\.")[0];
+			extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			fileName = fileName.replace(" ", "") + "_" + currentTime + extension;
+			filePath = documentPath + fileName;
+			fileToUpload = new File(filePath);
+			byte[] bytes = file.getBytes();
+			Path Path = null;
+			Path = Paths.get(filePath);
+
+			Path doc = Paths.get(documentPath);
+			if (!Files.exists(doc)) {
+				Files.createDirectories(doc);
+			}
+		
+			Files.write(Path, bytes);
+				}
+		
+		
+		File xlsFile = new File(fileToUpload.toString());
+		if (xlsFile.exists()) {
+
+			
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+			}
+		}
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				error=false;
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+        {
+							continue;
+	   
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkFileDnit");
+						upload.setComments(comments);
+						upload.setUsername(userName);
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+        }
+        
+				Iterator<Row> iterator = firstSheet.iterator();
+				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+				
+			while (iterator.hasNext()) {
+				Row nextRow = iterator.next();
+				Iterator<Cell> cellIterator = nextRow.cellIterator();
+				BoQDetails aBoQDetails = new BoQDetails();
+				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
+				while (cellIterator.hasNext()) {
+					Cell cell = (Cell) cellIterator.next();
+        
+					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+
+						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+	   
+						}
+	  
+						else if (cell.getColumnIndex() == 1) {
+	   
+							aBoQDetails.setItem_description(cell.getStringCellValue());
+							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+	   
+						} else if (cell.getColumnIndex() == 2) {
+	   
+							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							//boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
+						}else if (cell.getColumnIndex() == 3) {
+	   
+							aBoQDetails.setUnit(cell.getStringCellValue());
+							//boqDetailsPop.setUnit(cell.getStringCellValue());
+
+						} 
+
+					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+						if(cell.getColumnIndex() == 2) {
+							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
+							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
+	}
+						 if (cell.getColumnIndex() == 4) {
+	
+							aBoQDetails.setRate(cell.getNumericCellValue());
+							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+	   
+						} else if (cell.getColumnIndex() == 5) {
+	   
+							aBoQDetails.setQuantity(cell.getNumericCellValue());
+	   
+							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
+							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
+							estAmt=estAmt+aBoQDetails.getAmount();
+							}else {
+								error=true;
+								msg="Please Check the uploaded Document,Error in Document Rate and Quantity must be number.";
+							}
+						}
+        
+	    }
+
+
+					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
+							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
+							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
+						count=boQDetailsList.size();
+						aBoQDetails.setSizeIndex(count);
+						boQDetailsList.add(aBoQDetails);
+						//arrayboqDetailsPop.add(boqDetailsPop);
+	 
+
+	                }
+	            }
+	
+			}
+
+			// workbook.close();
+			inputStream.close();
+			}else {
+				//error=true;
+				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
+			}
+		}	
+
+	} else {
+			// response = "Please choose a file.";
+		}
+		int nextcount=1;
+		
+		
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		if(dnitCreation.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:dnitCreation.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					boqUploadDocument.setUsername(boq.getUsername());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+                    }
+                }
+            }
+		dnitCreation.setDocumentDetail(docup);  
+		dnitCreation.setRoughCostdocumentDetail(docup);
+		if(!error) {
+		DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation);		
+		dnitCreationService.updateDocuments(id, savedocebefore.getId());
+		
+		System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getUsername()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
+		
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		boqUploadDocument2.setUsername(savedocebefore.getUsername());
+		docUpload.add(boqUploadDocument2);
+		//End of document Upload
+List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
+		
+		DocumentUpload doc1= new DocumentUpload();
+		//Long fileStoreId = savedocebefore.getFileStore().getId();
+		doc1.setId(savedocebefore.getId());
+		doc1.setFileStore(savedocebefore.getFileStore());
+		uploadDoc.add(doc1);
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute("uploadDocID",uploadDoc);
+		}
+		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		
+		estimateDetails.setDocUpload(docUpload);
+		if(!error) {
+		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
+		if(estAmt >= 10000000){
+			BigDecimal  pct = new BigDecimal(3);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimateDetails.setContingentPercentage(3.0);
+			estimateDetails.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimateDetails.setEstimateAmount(dobestAmtPlusContingentAmt);
+                }
+		else {
+			BigDecimal  pct = new BigDecimal(5);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimateDetails.setContingentPercentage(5.0);
+			estimateDetails.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimateDetails.setEstimateAmount(dobestAmtPlusContingentAmt);
+			
+			estimateDetails.setBoQDetailsList(boQDetailsList);
+		}
+		}else {
+			
+			model.addAttribute("error", "Y");
+			model.addAttribute("message", msg);
+		}
+		
+		
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
+		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
+		
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
+		
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		estimateDetails.setBoQDetailsList(boQDetailsList);
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		//estimateDetails.setDepartment(estimateDetails.getDepartment());
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(estimateDetails.getDepartment())));
+		List<BoQDetails> boQDetailsList1 = new ArrayList();
+		BoQDetails boq = new BoQDetails();
+		if(error) {
+			
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList1.size());
+				System.out.println("::: "+boq.getSlNo()+"::: "+boq.getRef_dsr());
+				boQDetailsList1.add(boq);
+			}
+		Map<String, List<BoQDetails>> groupByMilesToneMap1 = 
+				  boQDetailsList1.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		model.addAttribute("milestoneList",groupByMilesToneMap1);
+		}
+		
+		
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		model.addAttribute("uploadDocument", uploadDocument);
+		
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		return "create-dnit-form";
+		
+
+	}
+	@RequestMapping(value = "/edits/updateDnit", params="save", method = RequestMethod.POST)
+	public String editEstimateData1err(
+			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@RequestParam("file1") MultipartFile[] file1,Model model,
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,@RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files,final HttpServletRequest request) throws Exception {
+
+List<BoQDetails> boQDetailsList = new ArrayList();
+		Long id = dnitCreation.getId();
+System.out.println(":::::ID:::::: "+id);
+String userName = estimatePreparationApprovalService.getUserName();
+Long userId = estimatePreparationApprovalService.getUserId();
+System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
+		//New File UPload....
+		List<DocumentUpload> docup = new ArrayList<>();
+		String refNo=null;
+		int count = 0;
+		String fileName = null;
+		String extension = null;
+		String filePath = null;
+		File fileToUpload = null;
+		Boolean error=true;
+		String msg="";
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
+		String FILE_PATH_SEPERATOR = "\\";
+		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+		Double estAmt= 0.0;
+		String comments =request.getParameter("comments");
+		// String documentPath = "D://Upload/";
+
+		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
+
+		long currentTime = new Date().getTime();
+		if (file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
+			fileName = file.getOriginalFilename().toString().split("\\.")[0];
+			extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			fileName = fileName.replace(" ", "") + "_" + currentTime + extension;
+			filePath = documentPath + fileName;
+			fileToUpload = new File(filePath);
+			byte[] bytes = file.getBytes();
+			Path Path = null;
+			Path = Paths.get(filePath);
+
+			Path doc = Paths.get(documentPath);
+			if (!Files.exists(doc)) {
+				Files.createDirectories(doc);
+			}
+
+			Files.write(Path, bytes);
+		}
+		
+		
+		File xlsFile = new File(fileToUpload.toString());
+		if (xlsFile.exists()) {
+
+			
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				}
+			}
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				error=false;
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+	   
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkFileDnit");
+						upload.setComments(comments);
+						upload.setUsername(userName);
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
+				
+				Iterator<Row> iterator = firstSheet.iterator();
+				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+				
+			while (iterator.hasNext()) {
+				Row nextRow = iterator.next();
+				Iterator<Cell> cellIterator = nextRow.cellIterator();
+				BoQDetails aBoQDetails = new BoQDetails();
+				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
+				while (cellIterator.hasNext()) {
+					Cell cell = (Cell) cellIterator.next();
+
+					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+
+						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+	   
+						}
+	  
+						else if (cell.getColumnIndex() == 1) {
+	   
+							aBoQDetails.setItem_description(cell.getStringCellValue());
+							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+	   
+						} else if (cell.getColumnIndex() == 2) {
+	   
+							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							//boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
+						}else if (cell.getColumnIndex() == 3) {
+	   
+							aBoQDetails.setUnit(cell.getStringCellValue());
+							//boqDetailsPop.setUnit(cell.getStringCellValue());
+	   
+						} 
+
+					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+						if(cell.getColumnIndex() == 2) {
+							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
+							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
+						}
+						 if (cell.getColumnIndex() == 4) {
+		
+							aBoQDetails.setRate(cell.getNumericCellValue());
+							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
+	   
+						} else if (cell.getColumnIndex() == 5) {
+	   
+							aBoQDetails.setQuantity(cell.getNumericCellValue());
+	   
+							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
+							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
+							estAmt=estAmt+aBoQDetails.getAmount();
+							}else {
+								error=true;
+								msg="Please Check the uploaded Document,Error in Document Rate and Quantity must be number.";
+							}
+						}
+
+					}
+
+
+					if (aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
+							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
+							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
+						count=boQDetailsList.size();
+						aBoQDetails.setSizeIndex(count);
+						boQDetailsList.add(aBoQDetails);
+						//arrayboqDetailsPop.add(boqDetailsPop);
+	 
+
+					}
+				}
+	
+			}
+
+			// workbook.close();
+			inputStream.close();
+			}else {
+				//error=true;
+				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
+			}
+		}	
+
+	} else {
+			// response = "Please choose a file.";
+		}
+		int nextcount=1;
+		
+		
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		if(dnitCreation.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:dnitCreation.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					boqUploadDocument.setUsername(boq.getUsername());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		dnitCreation.setDocumentDetail(docup);  
+		dnitCreation.setRoughCostdocumentDetail(docup);
+		if(!error) {
+		DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation);		
+		dnitCreationService.updateDocuments(id, savedocebefore.getId());
+		
+		System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getUsername()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
+		
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		boqUploadDocument2.setUsername(savedocebefore.getUsername());
+		docUpload.add(boqUploadDocument2);
+		//End of document Upload
+List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
+		
+		DocumentUpload doc1= new DocumentUpload();
+		//Long fileStoreId = savedocebefore.getFileStore().getId();
+		doc1.setId(savedocebefore.getId());
+		doc1.setFileStore(savedocebefore.getFileStore());
+		uploadDoc.add(doc1);
+		Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		model.addAttribute("milestoneList",groupByMilesToneMap);
+		model.addAttribute("uploadDocID",uploadDoc);
+		}
+		DNITCreation estimateDetails = workDnitService.searchEstimateData(id);
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		
+		estimateDetails.setDocUpload(docUpload);
+		if(!error) {
+		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
+		if(estAmt >= 10000000){
+			BigDecimal  pct = new BigDecimal(3);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimateDetails.setContingentPercentage(3.0);
+			estimateDetails.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimateDetails.setEstimateAmount(dobestAmtPlusContingentAmt);
+		}
+		else {
+			BigDecimal  pct = new BigDecimal(5);
+			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+			estimateDetails.setContingentPercentage(5.0);
+			estimateDetails.setContingentAmount(ContingentAmt);
+			
+			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			estimateDetails.setEstimateAmount(dobestAmtPlusContingentAmt);
+			
+			estimateDetails.setBoQDetailsList(boQDetailsList);
+		}
+		}else {
+			
+			model.addAttribute("error", "Y");
+			model.addAttribute("message", msg);
+		}
+		
+		
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
+		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
+		
+		estimateDetails.setDocumentDetail(documents);
+		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+
+		
+		String dept = estimateDetails.getExecutingDivision().toString();
+		estimateDetails.setDepartment(dept);
+estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
+		estimateDetails.setDepartments(getDepartmentsFromMs());
+		estimateDetails.setDesignations(getDesignationsFromMs());
+		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
+		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
+		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
+		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		//estimateDetails.setDepartment(estimateDetails.getDepartment());
+		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
+		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(estimateDetails.getDepartment())));
+		List<BoQDetails> boQDetailsList1 = new ArrayList();
+		BoQDetails boq = new BoQDetails();
+		if(error) {
+			
+		for (int j = 0; j < estimateDetails.getBoQDetailsList().size(); j++) {
+			
+				boq = estimateDetails.getBoQDetailsList().get(j);
+				boq.setSizeIndex(boQDetailsList1.size());
+				System.out.println("::: "+boq.getSlNo()+"::: "+boq.getRef_dsr());
+				boQDetailsList1.add(boq);
+			}
+		Map<String, List<BoQDetails>> groupByMilesToneMap1 = 
+				  boQDetailsList1.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		model.addAttribute("milestoneList",groupByMilesToneMap1);
+		}
+		
+		
+		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
+		model.addAttribute("estimatePreparationApproval", estimateDetails);
+		model.addAttribute("uploadDocument", uploadDocument);
+		
+		prepareWorkflow(model, estimateDetails, new WorkflowContainer());
+		if (estimateDetails.getState() != null)
+            model.addAttribute("currentState", estimateDetails.getState().getValue());
+		model.addAttribute("workflowHistory",
+				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
+		return "create-dnit-form";
+		
+
+	}
+	
+	@RequestMapping(value = "/edits/updateDnit",  method = RequestMethod.POST)
+	public String editEstimateDataerr(
 			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@RequestParam("file1") MultipartFile[] files,
 			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
 
 		String workFlowAction=dnitCreation.getWorkFlowAction();
 		List<DocumentUpload> list = new ArrayList<>();
+		
+		Long id=dnitCreation.getId();
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		BoQDetails boq = new BoQDetails();
+		
+		if(dnitCreation.getDocUpload()!=null) {
+			
+			Long ids =dnitCreation.getId();
+			System.out.println("ids------"+ids);
+			
+			dnitCreationService.deleteBoqUploadData(ids);
+		}
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
@@ -1282,13 +2306,92 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
         
         if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
             approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
-        
+        try {
 		DNITCreation savedDNITCreation = dnitCreationService
 				.saveEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
 		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
         + savedDNITCreation.getId()+"&workflowaction="+workFlowAction;
+		
+        }catch (Exception e) {
+			e.printStackTrace();
+		}
+        return "redirect:/dnit/edits/"+id;
+	}
+	@RequestMapping(value = "/edit/updateDnit",  method = RequestMethod.POST)
+	public String editEstimateData(
+			@ModelAttribute("estimatePreparationApproval") final DNITCreation dnitCreation,@RequestParam("file1") MultipartFile[] files,
+			@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request) throws Exception {
 
+		String workFlowAction=dnitCreation.getWorkFlowAction();
+		List<DocumentUpload> list = new ArrayList<>();
+		
+		Long id=dnitCreation.getId();
+		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+		BoQDetails boq = new BoQDetails();
+		
+		if(dnitCreation.getDocUpload()!=null) {
+			
+			Long ids =dnitCreation.getId();
+			System.out.println("ids------"+ids);
+			
+			dnitCreationService.deleteBoqUploadData(ids);
+		}
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(dnitCreation.getObjectType());
+				list.add(upload2);
+			}
+		dnitCreation.setDocumentDetail(list);
+		if (dnitCreation.getDepartment() != null && dnitCreation.getDepartment() != ""
+				&& !dnitCreation.getDepartment().isEmpty()) {
+			dnitCreation
+					.setExecutingDivision(Long.parseLong(dnitCreation.getDepartment()));
+		}
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        try {
+		DNITCreation savedDNITCreation = dnitCreationService
+				.saveEstimatePreparationData(request, dnitCreation,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+
+		return "redirect:/dnit/success?approverDetails=" + approvalPosition + "&estId="
+        + savedDNITCreation.getId()+"&workflowaction="+workFlowAction;
+		
+        }catch (Exception e) {
+			e.printStackTrace();
+		}
+        return "redirect:/dnit/edits/"+id;
 	}
 	
 	public String getEmployeeName(Long empId){
@@ -1313,11 +2416,11 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
                 workflowHistory.put("status", stateHistory.getValue());
                 final Long owner = stateHistory.getOwnerPosition();
                 final State _sowner = stateHistory.getState();
-	                if(owner != 0) {
-	                if(microserviceUtils.getEmployee(owner, null, null, null)!=null) {
-	                ownerobj = this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
-	                }
-	            }
+                System.out.println(owner+"++++++++++++++owner+++++++++++++++++++++");
+               /* if(owner!=0) {
+                if(microserviceUtils.getEmployee(owner, null, null, null)!=null) {
+               ownerobj=    this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
+                }}*/
                 if (null != ownerobj) {
                     workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
                     if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
@@ -1421,9 +2524,9 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		estDetails.setDocumentDetail(documentDetailsList);
 		return estDetails;
 	}
-	private EstimatePreparationApproval getRoughWorkBillDocuments(final EstimatePreparationApproval estDetails) {
-		List<DocumentUpload> documentDetailsList = estimatePreparationApprovalService.findByObjectIdAndObjectType(estDetails.getId(),
-				"roughWorkFile");
+	private DNITCreation getRoughWorkBillDocuments(final DNITCreation estDetails) {
+		List<DocumentUpload> documentDetailsList = dnitCreationService.findByObjectIdAndObjectType(estDetails.getId(),
+				"roughWorkFileDnit");
 		estDetails.setDocumentDetail(documentDetailsList);
 		return estDetails;
 	}
@@ -1432,9 +2535,10 @@ System.out.println("+++++++++++++++"+slno+"++++++++++++++++");
 		final ServletContext context = request.getServletContext();
 		final String fileStoreId = request.getParameter("fileStoreId");
 		String fileName = "";
-		final File downloadFile = fileStoreService.fetch(fileStoreId, "roughWorkFile");
+		final File downloadFile = fileStoreService.fetch(fileStoreId, "roughWorkFileDnit");
 		final FileInputStream inputStream = new FileInputStream(downloadFile);
-		EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
+		//EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
+		DNITCreation estDetails = dNITCreationRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
 		estDetails = getRoughWorkBillDocuments(estDetails);
 
 		for (final DocumentUpload doc : estDetails.getDocumentDetail())

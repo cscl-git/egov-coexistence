@@ -42,6 +42,7 @@ public class DNITCreationRESTPOJO {
 	private String consultant_fee;
 	private String unforseen_charges;
 	private String status;
+	private String subdivision;
 	
 	
 	public DNITCreationRESTPOJO() {}
@@ -53,7 +54,7 @@ public class DNITCreationRESTPOJO {
 			String work_scope, String work_status, String work_type, String works_wing, String state_id, String version,
 			String statusid, String createdby, String createddate, String lastmodifiedby, String lastmodifieddate,
 			String aanumber, String aadate, String contingent_percentage, String contingent_amount,
-			String consultant_fee, String unforseen_charges, String status) {
+			String consultant_fee, String unforseen_charges, String status,String subdivision) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -94,6 +95,17 @@ public class DNITCreationRESTPOJO {
 		this.consultant_fee = consultant_fee;
 		this.unforseen_charges = unforseen_charges;
 		this.status = status;
+		this.subdivision=subdivision;
+	}
+	
+	
+	
+	
+	public String getSubdivision() {
+		return subdivision;
+	}
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 	public String getId() {
 		return id;

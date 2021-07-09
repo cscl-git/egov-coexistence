@@ -47,6 +47,7 @@ public class EstimatePreparationApprovalRESTPOJO {
 	private String meetdate;
 	private String expenditure_head_est;
 	private String status;
+	private String  subdivision;
 	
 	
 	public EstimatePreparationApprovalRESTPOJO() {}
@@ -65,7 +66,7 @@ public class EstimatePreparationApprovalRESTPOJO {
 			String aanumber, String aadate, String contingent_percentage, String contingent_amount,
 			String consultant_fee, String unforseen_charges, String expenditure_head, String expenditure_sub_category,
 			String expenditure_category, String meetnumber, String meetcategory, String meetdate,
-			String expenditure_head_est, String status) {
+			String expenditure_head_est, String status,String subdivision) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -113,6 +114,23 @@ public class EstimatePreparationApprovalRESTPOJO {
 		this.meetdate = meetdate;
 		this.expenditure_head_est = expenditure_head_est;
 		this.status = status;
+		this.subdivision=subdivision;
+	}
+
+
+
+
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+
+
+
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 
 
