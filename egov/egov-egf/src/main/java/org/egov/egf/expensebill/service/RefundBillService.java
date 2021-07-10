@@ -307,6 +307,111 @@ public class RefundBillService {
         return egbillReg;
     }
 
+    
+    
+    //
+    @Transactional
+    public EgBillregister createByBlankVoucher(final EgBillregister egBillregister, final Long approvalPosition, final String approvalComent
+            , final String additionalRule, final String workFlowAction,final String approvalDesignation, final String vhid) {
+        if (StringUtils.isBlank(egBillregister.getBilltype()))
+            egBillregister.setBilltype(FinancialConstants.BILLTYPE_FINAL_BILL);
+        egBillregister.setPassedamount(egBillregister.getBillamount());
+        egBillregister.getEgBillregistermis().setEgBillregister(egBillregister);
+        egBillregister.getEgBillregistermis().setLastupdatedtime(new Date());
+
+        if (egBillregister.getEgBillregistermis().getFund() != null
+                && egBillregister.getEgBillregistermis().getFund().getId() != null)
+            egBillregister.getEgBillregistermis().setFund(
+                    fundService.findOne(egBillregister.getEgBillregistermis().getFund().getId()));
+        if (egBillregister.getEgBillregistermis().getEgBillSubType() != null
+                && egBillregister.getEgBillregistermis().getEgBillSubType().getId() != null)
+            egBillregister.getEgBillregistermis().setEgBillSubType(
+                    egBillSubTypeService.getById(egBillregister.getEgBillregistermis().getEgBillSubType().getId()));
+        if (egBillregister.getEgBillregistermis().getSchemeId() != null)
+            egBillregister.getEgBillregistermis().setScheme(
+                    schemeService.findById(egBillregister.getEgBillregistermis().getSchemeId().intValue(), false));
+        else
+            egBillregister.getEgBillregistermis().setScheme(null);
+        if (egBillregister.getEgBillregistermis().getSubSchemeId() != null)
+            egBillregister.getEgBillregistermis().setSubScheme(
+                    subSchemeService.findById(egBillregister.getEgBillregistermis().getSubSchemeId().intValue(), false));
+        else
+            egBillregister.getEgBillregistermis().setSubScheme(null);
+
+        if (isBillNumberGenerationAuto())
+            egBillregister.setBillnumber(getNextBillNumber(egBillregister));        
+        
+        List<AppConfigValues> RefundGLCodeList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","RefundGLCode");
+        
+        List<String> glCodeList = new ArrayList<String>();
+        for(AppConfigValues v : RefundGLCodeList) {
+        	glCodeList.add(v.getValue());
+        }
+        
+        String glCode = "";
+        if(egBillregister.getBillDetails().get(0).getGlcodeid()!=null) {
+        	 glCode =   egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode();
+        }
+
+        if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT) && glCodeList.contains(glCode))
+    	{ 
+        try {
+            checkBudgetAndGenerateBANumber(egBillregister);
+        } catch (final ValidationException e) {
+            throw new ValidationException(e.getErrors());
+        }
+    	}
+      
+       // String VOUCHERQUERY = " from CVoucherHeader where id=?";
+       // CVoucherHeader  voucherHeader1 = (CVoucherHeader) persistenceService.find(VOUCHERQUERY, Long.valueOf(vhid));
+       // egBillregister.getEgBillregistermis().setVoucherHeader(voucherHeader1);
+        
+        final List<EgChecklists> checkLists = egBillregister.getCheckLists();
+
+        final EgBillregister savedEgBillregister = expenseBillRepository.save(egBillregister);
+
+        createCheckList(savedEgBillregister, checkLists);
+
+        if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE)) {
+            if (FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT.equals(egBillregister.getExpendituretype()))
+                savedEgBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                        FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS));
+        } else {
+            savedEgBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                    FinancialConstants.CONTINGENCYBILL_CREATED_STATUS));
+            createExpenseBillRegisterWorkflowTransition(savedEgBillregister, approvalPosition, approvalComent, additionalRule,
+                    workFlowAction,approvalDesignation);
+            
+            //CVoucherHeader  voucherHeader = (CVoucherHeader) persistenceService.find(VOUCHERQUERY, Long.valueOf(vhid));
+            //voucherHeader.setRefundable("Y");
+            //voucherService.persist(voucherHeader);
+           
+        }
+        List<DocumentUpload> files = egBillregister.getDocumentDetail() == null ? null : egBillregister.getDocumentDetail();
+        final List<DocumentUpload> documentDetails;
+        documentDetails = financialUtils.getDocumentDetails(files, savedEgBillregister,
+                FinancialConstants.FILESTORE_MODULEOBJECT);
+        if (!documentDetails.isEmpty()) {
+            savedEgBillregister.setDocumentDetail(documentDetails);
+            persistDocuments(documentDetails);
+        }
+
+
+        // TODO: add the code to handle new screen for view bills of all type
+        if (savedEgBillregister.getEgBillregistermis().getSourcePath() == null
+                || StringUtils.isBlank(savedEgBillregister.getEgBillregistermis().getSourcePath()))
+            savedEgBillregister.getEgBillregistermis().setSourcePath(
+                    "/services/EGF/expensebill/view/" + savedEgBillregister.getId().toString());
+
+
+        EgBillregister egbillReg = expenseBillRepository.save(savedEgBillregister);
+        persistenceService.getSession().flush();
+        finDashboardService.publishEvent(FinanceEventType.billCreateOrUpdate, egbillReg);
+
+       
+        return egbillReg;
+    }
+
     @Transactional
     public void deleteCheckList(final EgBillregister egBillregister) {
         final List<EgChecklists> checkLists = checkListService.getByObjectId(egBillregister.getId());

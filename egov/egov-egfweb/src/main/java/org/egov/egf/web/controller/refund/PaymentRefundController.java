@@ -22,6 +22,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -147,6 +148,7 @@ public class PaymentRefundController extends BaseBillController {
     private static final String APPROVAL_DESIGNATION = "approvalDesignation";
     private static final String EXPENSEBILL_VIEW = "expensebill-view";
     private static final String NET_PAYABLE_AMOUNT = "netPayableAmount";
+    private static final String REFUNDFOROLDVOUCHER_FORM = "refund-requestoldvoucher-form";
 
     private static final int BUFFER_SIZE = 4096;
 	
@@ -1496,4 +1498,293 @@ public class PaymentRefundController extends BaseBillController {
 		        egBillregister.getBillPayeeDetailsNotLink().clear();
 		        egBillregister.setBillPayeeDetailsNotLink(payeeDetailsNotMatched);
 		    }
+		    
+		    
+		    @RequestMapping(value = "/newform", method = RequestMethod.POST)
+		    public String showNewForm(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,HttpServletRequest request) {
+		        LOGGER.info("New expensebill creation request created");
+		        Cookie[] cookies = request.getCookies();
+		       List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+		    	
+		    	if(null!=cookies && cookies.length>0)
+		    	{
+		    	   for(Cookie ck:cookies) {
+		    		   System.out.println("Name:"+ck.getName()+" value"+ck.getValue());
+		    	   }
+		    	}
+		        setDropDownValues(model);
+		        
+		        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+						"receipt_sub_divison");
+		        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+		        SubDivision subdivision=null;
+		        for(AppConfigValues value:appConfigValuesList)
+		        {
+		        	subdivision = new SubDivision();
+		        	subdivision.setSubdivisionCode(value.getValue());
+		        	subdivision.setSubdivisionName(value.getValue());
+		        	subdivisionList.add(subdivision);
+		        }
+		        model.addAttribute("subdivision", subdivisionList);
+				
+		        
+		        model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
+		        prepareWorkflow(model, egBillregister, new WorkflowContainer());
+		       model.addAttribute("validActionList", validActions);
+		       model.addAttribute(BILL_TYPES, BillType.values());
+		        prepareValidActionListByCutOffDate(model);
+		        if(isBillDateDefaultValue){
+		            egBillregister.setBilldate(new Date());            
+		        }
+//		        User createdBy = new User();
+//		        createdBy.setId(ApplicationThreadLocals.getUserId());
+//		        egBillregister.setCreatedBy(createdBy);
+		        return REFUNDFOROLDVOUCHER_FORM;
+		    }
+		    
+		    @RequestMapping(value = "/_paymentRequestblankvoucherForm", method = {RequestMethod.GET, RequestMethod.POST})
+			public String paymentRequestFormBlankVoucher(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,@ModelAttribute("message") String message) {
+				setDropDownValues(model);
+		    	List<String>  validActions = Arrays.asList("Forward","SaveAsDraft");
+		        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF","receipt_sub_divison");
+		        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+		        SubDivision subdivision=null;
+		        for(AppConfigValues value:appConfigValuesList)
+		        {
+		        	subdivision = new SubDivision();
+		        	subdivision.setSubdivisionCode(value.getValue());
+		        	subdivision.setSubdivisionName(value.getValue());
+		        	subdivisionList.add(subdivision);
+		        }		       
+		        prepareWorkflow(model, egBillregister, new WorkflowContainer());       
+		        prepareValidActionListByCutOffDate(model);
+		        if(isBillDateDefaultValue){
+		            egBillregister.setBilldate(new Date());            
+		        }
+		        model.addAttribute("validActionList", validActions);
+			    model.addAttribute(BILL_TYPES, BillType.values());
+		        model.addAttribute("subdivision", subdivisionList);	        
+		        model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
+		    	
+		        if(message!=null) {
+					model.addAttribute("glcodedetailIdmsg", message);
+				}else {
+					message="";
+				}
+		    	
+		    	
+		    	
+		    	
+				
+					populateDropDownValues(model);
+				
+					//System.out.println("hello sonu state type is:   "+egBillregister.getClass().getSimpleName());
+					
+					  model.addAttribute(STATE_TYPE, egBillregister.getClass().getSimpleName());
+					  prepareWorkflow(model, egBillregister, new WorkflowContainer());
+					  model.addAttribute("validActionList", validActions);
+					  model.addAttribute(BILL_TYPES, BillType.values());
+					  model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
+					  prepareValidActionListByCutOffDate(model);
+				
+				//final List<Bank> banks = createBankService.getAll();
+				//EgBillSubType egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase("Refund")).findFirst().orElse(null);
+				/*System.out.println(egbillSubtype.getId());
+				model.addAttribute("voucherDetails", voucherDetails);
+				model.addAttribute("accountDetails", tempList);
+				model.addAttribute("subLedgerlist", payeeList);
+				model.addAttribute("dbAmount", dbAmount);
+				model.addAttribute("crAmount", crAmount);
+				model.addAttribute("vhid", vhid);
+				model.addAttribute("banks", banks);
+				model.addAttribute("billsubtype", egbillSubtype.getId());*/
+				//return PR_REQUEST_FORM;
+				return "ol-payRefund-request-form";
+}
+			
+
+
+@RequestMapping(value = "/refundCreateBlank", method = RequestMethod.POST)
+public String createRefundBYBlank(@ModelAttribute("egBillregister") final EgBillregister egBillregister, final Model model,
+     final BindingResult resultBinder, final HttpServletRequest request, @RequestParam final String workFlowAction,RedirectAttributes redirectAttributes)
+     throws IOException {
+        LOGGER.info("RefundBill is creating with user ::"+ApplicationThreadLocals.getUserId());
+     //User createdBy = new User();
+    // createdBy.setId(ApplicationThreadLocals.getUserId());
+        String vhid=request.getParameter("vhid");
+        System.out.println(vhid);
+        
+       
+        
+        
+       egBillregister.setRefundable("Y"); 
+       egBillregister.setBilldate(new Date());
+       BigDecimal totalCrAmt = BigDecimal.ZERO;
+       
+       //egBillregister.getState().setNatureOfTask("Refund Bill");
+	
+	 for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) { 
+		 
+		 totalCrAmt=totalCrAmt.add(checknull(egbilldetail.getDebitamount()));
+		 }
+	 //BigDecimal bg1 = egBillregister.getBillDetails().get(0).getFunctionid();
+	 
+	 Long bg1 = egBillregister.getEgBillregistermis().getFunction().getId();
+	 
+	 List<EgBilldetails> egbilldetailCusList=new ArrayList<EgBilldetails>();
+       for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) { 
+		  
+    	   if(checknullBigDecimal(egbilldetail.getDebitamount())==true || checknullBigDecimal(egbilldetail.getCreditamount())==true) {
+    		   egbilldetailCusList.add(egbilldetail);
+    	   }
+		 }
+	  
+	  egBillregister.setBillamount(totalCrAmt);
+	  egBillregister.setBillDetails(egbilldetailCusList);
+	
+	 System.out.println(totalCrAmt);
+
+	 EgBillSubType egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase("Refund")).findFirst().orElse(null);
+       
+       
+     egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
+     ExpenseBillNumberGenerator v = beanResolver.getAutoNumberServiceFor(ExpenseBillNumberGenerator.class);
+     
+	
+	 
+	  CFunction function= paymentRefundUtils.getFunction(bg1.longValue());
+	  egBillregister.getEgBillregistermis().setFunction(function);
+	  egBillregister.getEgBillregistermis().setEgBillSubType(egbillSubtype);
+	  //egbillregistermis.setFunction(function);
+	 
+    
+     
+     //egBillregister.setEgBillregistermis(egbillregistermis);
+    
+    String billNumber = v.getNextNumber(egBillregister);
+    System.out.println(billNumber);
+    
+    
+    	egBillregister.setBillnumber(billNumber);
+    
+     //String billNumber="refund-test-2021";
+    
+    if (StringUtils.isEmpty(egBillregister.getExpendituretype()))
+    egBillregister.setExpendituretype(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND);
+
+    String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
+    List<DocumentUpload> list = new ArrayList<>();
+    UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
+    String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
+    if(uploadedFiles!=null)
+    for (int i = 0; i < uploadedFiles.length; i++) {
+
+    Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+    byte[] fileBytes = Files.readAllBytes(path);
+    ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+    DocumentUpload upload = new DocumentUpload();
+    upload.setInputStream(bios);
+    upload.setFileName(fileName[i]);
+    upload.setContentType(contentType[i]);
+    list.add(upload);
+    }
+    
+    egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
+    populateBillDetails(egBillregister);
+    
+    validateBillNumber(egBillregister, resultBinder);
+    
+	
+	  if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT)) {
+		  refundvalidateLedgerAndSubledger(egBillregister, resultBinder);
+	  }
+	 
+	  validateSubledgeDetails(egBillregister);  
+	  System.out.println("------------------------------"+egBillregister.getBillPayeeDetailsNotLink().isEmpty());	  
+if(egBillregister.getBillPayeeDetailsNotLink().isEmpty()) {
+
+    if (resultBinder.hasErrors()) {
+    	System.out.println("from ResultBinder Error");
+    	for (Object object : resultBinder.getAllErrors()) {
+    	    if(object instanceof FieldError) {
+    	        FieldError fieldError = (FieldError) object;
+
+    	        System.out.println(fieldError.getCode());
+    	    }
+
+    	    if(object instanceof ObjectError) {
+    	        ObjectError objectError = (ObjectError) object;
+
+    	        System.out.println(objectError.getCode());
+    	    }
+    	}
+    	return "redirect:/refund/_paymentRequestblankvoucherForm";
+     //return "redirect:/refund/_paymentRequestForm";
+      } else {
+            Long approvalPosition = 0l;
+            String approvalComment = "";
+            String approvalDesignation = "";
+            if (request.getParameter("approvalComent") != null)
+             approvalComment = request.getParameter("approvalComent");
+            if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+              {
+               	if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+                  	{            		
+                     approvalPosition =populatePosition();            		
+                    }
+                  else
+                     approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+                }
+             else {
+                if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+                 {            		
+                  approvalPosition =populatePosition();            		
+                 }		            	
+              }
+             if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+                 approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+                    		            
+             EgBillregister savedEgBillregister;
+             egBillregister.setDocumentDetail(list);
+                  try {
+                	  System.out.println("From egbillregister Save method calling");
+                       savedEgBillregister = refundBillService.createByBlankVoucher(egBillregister, approvalPosition, approvalComment, null, 
+                       workFlowAction,approvalDesignation,vhid);
+                       
+                       
+                     } catch (ValidationException e) {
+                    	 System.out.println("From Exception saving time");
+                    	 e.printStackTrace();
+                    
+                    	 return "redirect:/refund/_paymentRequestblankvoucherForm";
+                    //return "redirect:/refund/_paymentRequestForm";
+                    }
+                   String approverName =null;
+                   if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+                    {        		
+                    approverName =populateEmpName();        		
+                    }
+                   else
+                    approverName = String.valueOf(request.getParameter("approverName"));
+                    final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
+                                 savedEgBillregister.getState(), savedEgBillregister.getId(), approvalPosition,approverName);
+                 		              
+                    return "redirect:/refund/successRefund?approverDetails=" + approverDetails + "&billNumber="
+                    		                    + savedEgBillregister.getBillnumber()+"&billId="
+                    		                            + savedEgBillregister.getId();
+                   }
+    
+}else {
+	StringBuilder message = new StringBuilder();
+	for(int i=0;i<egBillregister.getBillPayeeDetailsNotLink().size();i++) {
+		
+		message.append("account detial key "+egBillregister.getBillPayeeDetailsNotLink().get(i).getAccountDetailTypeId()+" not mapped with  glcodeid "+egBillregister.getBillPayeeDetailsNotLink().get(i).getEgBilldetailsId().getGlcodeid()+"\n");
+		
+	}
+	redirectAttributes.addFlashAttribute("message",message);
+	return "redirect:/refund/_paymentRequestblankvoucherForm";
+}
+             
+        }
+
 }

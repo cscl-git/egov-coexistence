@@ -176,22 +176,14 @@
 			  <c:when test="${!accountDetails.isEmpty()}">
 				<c:forEach items="${accountDetails}" var="accountDetail" varStatus="status">
 				 <tr>
-				   <%--  <td><input type="hidden" name="billDetails[${status.index}].functionid" value="${accountDetail.functionid}">${accountDetail.function}</td> --%>
 				    <input type="hidden" id="billDetails[${status.index}].glcodeid" readonly value="${accountDetail.glcodeid}">
 				    <input type="hidden" id="billDetails[${status.index}].glcode" readonly value="${accountDetail.glcode}"> 
-				       
 				    <td><input type="hidden" name="billDetails[${status.index}].glcodeid" value="${accountDetail.glcodeid}">${accountDetail.glcode}</td>
 					<td><input type="hidden" name="billDetails[${status.index}].chartOfAccounts.name" value="${accountDetail.chartOfAccounts.name}">${accountDetail.accounthead}</td>
 					<td>${accountDetail.debitamount}</td>
 					<td>${accountDetail.creditamount}</td>
 					<td>${accountDetail.previousAmount}</td>
-					<%--<input type="hidden" name="billDetails[${status.index}].detailTypeId" id="billDetails[${status.index}].detailTypeId" value="${accountDetail.glcodeid}" class="form-control table-input hidden-input accountDetailsDetailTypeId"/>
-					<input type="hidden" name="billDetails[${status.index}].detailKeyId" id="billDetails[${status.index}].detailKeyId" class="form-control table-input hidden-input accountDetailsDetailKeyId"/>
-						 --%>		
-					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}','${accountDetail.creditamount}','${status.index}','${accountDetail.previousAmount}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
-					       class="form-control"/></td>
-					<%-- <td><input type="text" name="billDetails[${status.index}].creditamount" id="billDetails[${status.index}].creditamount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" 
-					       class="form-control"/></td> --%> 
+					<td><input type="text" name="billDetails[${status.index}].debitamount" id="billDetails[${status.index}].debitamount" onchange="changeGlCode('${accountDetails.size()}','${accountDetail.creditamount}','${status.index}','${accountDetail.previousAmount}')"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"  class="form-control"/></td>
 				 </tr>
 				</c:forEach>
 				 <tr>

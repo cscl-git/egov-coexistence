@@ -901,5 +901,12 @@
         <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/contractorbill/capitaldivision-search-home.jsp"/>
     </definition>
+    <definition name="ol-payRefund-request-form"
+		extends="base_layout">
+		<put-attribute name="page-title"
+			value="title.pr.request" cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/paymentrefund/ol-payment-refund-request.jsp" />
+	</definition>
 
 </tiles-definitions>
