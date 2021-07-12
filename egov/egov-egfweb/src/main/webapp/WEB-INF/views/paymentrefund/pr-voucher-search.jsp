@@ -19,6 +19,10 @@
 								<form:options items="${voucherTypeList}"/>
 							</form:select>
 						</div>
+						 <label class="col-sm-3 control-label text-right">blank voucher create refund</label>
+						<div class="col-sm-3 add-margin">
+							<a href="/services/EGF/refund/_paymentRequestblankvoucherForm">link</a>
+						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.number" text="Voucher Number"/> </label>
