@@ -33,7 +33,7 @@
 		   <table border="0" width="100%" cellspacing="0">
 			<tr>
 			 <td width="10%" class="greybox"><b>Voucher Number :  </b></td>
-			 <td width="25%" class="greybox">${voucherDetails.voucherNumber}</td>
+			 <td width="25%" class="greybox"><a href="javascript:void(0);" onclick="viewVoucher('${vhid}')">${voucherDetails.voucherNumber}</a></td>
 			 <td width="10%" class="greybox"><b>Date :</b></td>
 			 <td width="25%" class="greybox">
 				<fmt:formatDate pattern="dd/MM/yyyy" value="${voucherDetails.voucherDate}" var="voucherDate" />
@@ -80,7 +80,13 @@
 			</tr>
 			<tr>
 			 <td width="10%" class="greybox"><b>Narration :</b></td>
-			 <td width="25%" class="greybox">${voucherDetails.narration}</td>
+			 <td width="25%" class="greybox">	 
+			 
+			 
+			 <textarea name="egBillregistermis.narration" id="narration"  class="form-control" maxlength="1024" >${voucherDetails.narration}</textarea>
+			 
+			 
+			 </td>
 			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.banNumber}</td>
 			</tr>
@@ -117,7 +123,7 @@
 	
 	<input type="hidden" name="egBillregistermis.fund" id="egBillregistermis.fund" value="${fundid}"/>
 	<input type="hidden" name="egBillregistermis.departmentcode" id="egBillregistermis.departmentcode" value="${departcode}"/>
-	<input type="hidden" name="egBillregistermis.narration" id="egBillregistermis.narration" value="${voucherDetails.narration}"/>
+	<%-- <input type="hidden" name="egBillregistermis.narration" id="egBillregistermis.narration" value="${voucherDetails.narration}"/> --%>
 	<input type="hidden" name="egBillregistermis.budgetaryAppnumber" id="egBillregistermis.budgetaryAppnumber" value="${voucherDetails.banNumber}"/>
 	<input type="hidden" name="egBillregistermis.fundsource" id="egBillregistermis.fundsource" value="${fundsource}"/>
 	<%-- <input type="hidden" name="egBillregistermis.egBillSubType" id="egBillregistermis.egBillSubType" value="${billsubtype}"/>  --%>
@@ -266,7 +272,7 @@
 				</tr>
 			</c:when>
 		  <c:otherwise>
-			<tr>
+			<tr id="subledgerdetailsrow">
 			  <td>
 				  <select id="glcodeid" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
 				  <option value=""><spring:message code="lbl.select" text="Select"/>
@@ -311,7 +317,7 @@
 	
  </div>
  
- <div class="panel panel-primary" data-collapsed="0" style=" scrollable:true;">
+<%--  <div class="panel panel-primary" data-collapsed="0" style=" scrollable:true;">
     <div class="panel-heading">
     
     <br>
@@ -323,7 +329,7 @@
 			<textarea class="form-control"  id="refundnarration" name="refundnarration"></textarea>
 		</div>
 	</div>
-   </div>
+   </div> --%>
  
  
  

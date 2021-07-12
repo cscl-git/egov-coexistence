@@ -344,6 +344,8 @@ public class ExpenseBillService {
             //egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
       
 //            commented as budget check was disabled
+            if(egBillregister.getRefundable()==null) {           
+                
            try {
         	   if(egBillregister.getEgBillregistermis().getBudgetaryAppnumber() == null || (egBillregister.getEgBillregistermis().getBudgetaryAppnumber() != null && egBillregister.getEgBillregistermis().getBudgetaryAppnumber().isEmpty()))
         	   {
@@ -352,6 +354,7 @@ public class ExpenseBillService {
            } catch (final ValidationException e) {
                throw new ValidationException(e.getErrors());
             }
+           }
 
         }
         if (updatedegBillregister != null) {

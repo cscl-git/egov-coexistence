@@ -21,7 +21,7 @@
 	  <div class="panel panel-primary" data-collapsed="0">
 		<div>
 		 <div class="panel-title">
-			<div class="subheadnew">Voucher View</div>
+			<div class="subheadnew"></div>
 			</div>
 		 </div>
 	<div>
@@ -30,107 +30,75 @@
 	 </c:if>
 	</div>
 	<div class="panel-body">
-		   <table border="0" width="100%" cellspacing="0">
-			<tr>
-			 <td width="10%" class="greybox"><b>Voucher Number :  </b></td>
-			 <td width="25%" class="greybox"></td>
 			 
-			 <td width="10%" class="greybox"><b>Date :</b></td>
-			 <td width="25%" class="greybox">
+			<div class="form-group">
+				<label class="col-sm-3 control-label text-right"><b>Date<span class="mandatory"></span> :</b></label>
+				<div class="col-sm-3 add-margin">
 				<input id="billdate" path="billdate" class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY"/>
-			 </td>
-			</tr>
-			<tr>
-			 <td width="10%" class="greybox"><b>Fund :  </b></td>			
-			 <td width="25%" class="greybox">
+				</div>
+			
+				<label class="col-sm-3 control-label text-right">Fund <span class="mandatory"></span>: </label>
+				<div class="col-sm-3 add-margin">
 			 <select name="egBillregistermis.fund" id="egBillregistermis.fund" required="required" class="form-control">
 					<option value="">-Select-</option>
 					<c:forEach items="${fundList}" var="fund" varStatus="loop">
 						<option value="${fund.id}">${fund.name}</option>
 					</c:forEach>
-					<options items="${funds}" itemValue="id" itemLabel="name" />
 			</select>
-			</td>
+				</div>				
+			</div>
 			 
-			 </td>
-			 <td width="10%" class="greybox"><b>Department code :</b></td>
-			 <td width="25%" class="greybox">
-			 
+			<div class="form-group">
+				<label class="col-sm-3 control-label text-right">Department <span class="mandatory"></span> :</b></label>
+				<div class="col-sm-3 add-margin">
 			  <select name="egBillregistermis.departmentcode" id="egBillregistermis.departmentcode" required="required" class="form-control">
 					<option value="">-Select-</option>
 					<c:forEach items="${departments}" var="dept" varStatus="loop">
 						<option value="${dept.code}">${dept.name}</option>
 					</c:forEach>
-					<options items="${departments}" itemValue="id" itemLabel="name" />
 			</select>
+				</div>
 			 
-			 </td>
-			</tr>
-			
-			<tr>
-			 <td width="10%" class="greybox"><b>Sub division</b></td>
-			 <td width="25%" class="greybox">
-			 <select name="egBillregistermis.subdivision"
-				id="egBillregistermis.subdivision" required="required"
-				class="form-control">
+				<label class="col-sm-3 control-label text-right"><b>Sub division <span class="mandatory"></span> :</b></label>
+				<div class="col-sm-3 add-margin">
+			    <select name="egBillregistermis.subdivision" id="egBillregistermis.subdivision" required="required" class="form-control">
 					<option value="">-Select-</option>
 					<c:forEach items="${subdivisionList}" var="subdivision"
 						varStatus="loop">
 						<option value="${subdivision.subdivisionCode}">${subdivision.subdivisionName}</option>
 					</c:forEach>
-					<%-- <%-- <options items="${subdivision}" itemValue="id" itemLabel="name" /> --%> --%>
 			</select>
-			</td>
+					</div>				
+				</div>			
 			    
-		<%-- 	 <td width="10%" class="greybox"><b>Fund Source</b></td>
-			 <td width="25%" class="greybox">
-			 <select name="egBillregistermis.fundsource" id="egBillregistermis.fundsource" required="required"	class="form-control">
+				<div class="form-group">
+				<label class="col-sm-3 control-label text-right"><b>Function<span class="mandatory"></span> :</b></label>
+				<div class="col-sm-3 add-margin">
+				<select name="egBillregistermis.function"	id="egBillregistermis.function" required="required"	class="form-control">
 					<option value="">-Select-</option>
-					<c:forEach items="${fundsources}" var="subdivision"
-						varStatus="loop">
-						<option value="${fundsources.id}">${fundsources.name}</option>
+					<c:forEach items="${cFunctions}" var="function"	varStatus="loop">
+						<option value="${function.id}">${function.name}</option>
 					</c:forEach>
-					<options items="${fundsources}" itemValue="id" itemLabel="name" />
 			</select>
-			</td>  --%>  
+				</div>
 			
-			</tr>
-			<tr>
-			 <td width="10%" class="greybox"><b>Narration :</b></td>
-			 <td width="25%" class="greybox">
-             	<textarea path="egBillregistermis.narration" id="narration"  class="form-control" maxlength="1024" ></textarea>
-			</td>
-			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
-			 <td width="25%" class="greybox"></td>
-			</tr>
-			
-			<tr>
-			 <td width="10%" class="greybox"><b>Function :</b></td>
-			 <td width="25%" class="greybox">
-			 <select name="egBillregistermis.function"
-									id="egBillregistermis.function" required="required"
-									class="form-control">
-										<option value="">-Select-</option>
-										<c:forEach items="${cFunctions}" var="function"
-											varStatus="loop">
-											<option value="${function.id}">${function.name}</option>
-										</c:forEach>
-										<options items="${cFunctions}" itemValue="id" itemLabel="name" />
-								</select>
-								</td>
-			 <td width="10%" class="greybox"><b>BiLL Type :  </b></td>
-			 <td width="25%" class="greybox">
+				<label class="col-sm-3 control-label text-right">BiLL Type <span class="mandatory"></span> :  </b></label>
+				<div class="col-sm-3 add-margin">
 			 <select name="egBillregistermis.egBillSubType" data-first-option="false" id="billSubType" class="form-control" required="required">
 				<option value=""><spring:message code="lbl.select" text="Select"/></option>
-				<c:forEach items="${billSubTypes}" var="subType"
-											varStatus="loop">
+					<c:forEach items="${billSubTypes}" var="subType" varStatus="loop">
 											<option value="${subType.id}">${subType.value}</option>
 										</c:forEach>
-				<options items="${billSubTypes}" itemValue="id" itemLabel="name" />
 			</select>
-			 </td>
-			</tr> 			
-		</table>
+				</div>				
+			</div>
+			
+			<div class="form-group">
+				<label class="col-sm-3 control-label text-right"><b>Narration :</label>
+				<div class="col-sm-3 add-margin">
+				    <textarea name="egBillregistermis.narration" id="narration"  class="form-control" maxlength="1024" ></textarea>
+				</div>					
+			</div>					
 	 </div>
 	</div>
 	
@@ -162,7 +130,7 @@
 					<th><spring:message code="lbl.account.code" text="Account Code"/></th>
 					<th><spring:message code="lbl.account.head" text="Account Head"/></th>
 					<th><spring:message code="lbl.debit.amount" text="Debit Amount"/></th>
-					<th><spring:message code="lbl.credit.amount" text="Credit Amount"/></th>										
+					<%-- <th><spring:message code="lbl.credit.amount" text="Credit Amount"/></th> --%>										
 					<th><spring:message code="lbl.previous.debit.amount" text="privious Debit Amount"/></th>
 					<th><spring:message code="lbl.refund.debit.amount" text="Refund Debit Amount"/></th>	
 					<th><spring:message code="lbl.action" text="Action"/></th>				
@@ -181,17 +149,17 @@
 					<form:hidden path="" name="billDetails[0].detailTypeName" id="billDetails[0].detailTypeName" class="form-control table-input hidden-input creditDetailTypeName"/>
 					<form:hidden path="" name="billDetails[0].detailKeyName" id="billDetails[0].detailKeyName" class="form-control table-input hidden-input creditDetailKeyName"/>  
 				
-				    <input type="hidden" id="billDetails[0].glcodeid" name="billDetails[0].glcodeid" >
-				    <input type="hidden" id="billDetails[0].glcode"  name="billDetails[0].glcode" > 
+				    <!-- <input type="hidden" id="billDetails[0].glcodeid" name="billDetails[0].glcodeid" >-->
+				    <input type="hidden" name="billDetails[0].creditamount"  value="0" >  
 				</td> 
 			   
 			   <td>	<input type="text" id="billDetails[0].creditAccountHead" name="billDetails[0].creditAccountHead"  class="form-control creditdetailname" disabled> </td>				
 				
 				
 				<td><input path="" name="billDetails[0].debitamount" id="billDetails[0].debitamount" data-errormsg="debitamount Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  /></td>
-				<td>
+				<!-- <td>
 					<input path="" name="billDetails[0].creditamount" id="billDetails[0].creditamount" data-errormsg="Credit Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  />
-				</td>
+				</td> -->
 				<td>0</td>
 				<td><input type="text" name="billDetails[0].refunddebitamount" id="billDetails[0].refunddebitamount" onchange="changeGlCodeBlank(this)"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
 			   class="form-control"/></td> 
@@ -303,7 +271,7 @@
 	
 	
  </div>
- 
+<%--  
  <div class="panel panel-primary" data-collapsed="0" style=" scrollable:true;">
     <div class="panel-heading">
     
@@ -316,7 +284,7 @@
 			<textarea class="form-control"  id="refundnarration" name="refundnarration"></textarea>
 		</div>
 	</div>
-   </div>
+   </div> --%>
  
  
  

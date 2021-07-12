@@ -1590,14 +1590,14 @@ function changeGlCode(totalrow,cramt,l,preamt){
 function changeGlCodeBlank(ele){
 
 	var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
-
-
 	$('#glcodeid').empty();
+
+
 	for(var i=0;i<creditDetailsCount;++i){
 	
 	if(document.getElementById('billDetails['+i+'].refunddebitamount').value != "" && document.getElementById('billDetails['+i+'].refunddebitamount').value !=null){
       var k= document.getElementById('billDetails['+i+'].refunddebitamount').value;         
-      var j = document.getElementById('billDetails['+i+'].creditamount').value;
+      var j = document.getElementById('billDetails['+i+'].debitamount').value;
 
      if(j!=null && j!="" && parseInt(k)<=parseInt(j)){
 

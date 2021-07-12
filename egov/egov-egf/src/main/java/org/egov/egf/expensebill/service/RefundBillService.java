@@ -469,12 +469,13 @@ public class RefundBillService {
             egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
       
 //            commented as budget check was disabled
+			if (egBillregister.getRefundable() == null) {
            try {
            checkBudgetAndGenerateBANumber(egBillregister);
            } catch (final ValidationException e) {
                throw new ValidationException(e.getErrors());
             }
-
+			}
         }
         if (updatedegBillregister != null) {
             if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE))

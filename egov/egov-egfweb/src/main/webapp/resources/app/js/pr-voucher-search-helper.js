@@ -51,7 +51,7 @@ function getVoucherNameByType(){
 });*/
 
 $('#btnsearch').click(function(e) {
-	if(document.getElementById('voucherNumber')!=null && document.getElementById('voucherNumber').value!="")
+	if((document.getElementById('voucherNumber')!=null && document.getElementById('voucherNumber').value!="") || (document.getElementById('receiptNumber')!=null && document.getElementById('receiptNumber').value!=""))
 	{
 	  callAjaxSearch();	
 	  
