@@ -52,7 +52,6 @@ package org.egov.egf.web.actions.contra;
 
 import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.GLEngine.Transaxtion;
-import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -70,7 +69,6 @@ import org.egov.commons.Fund;
 import org.egov.commons.Vouchermis;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.web.actions.voucher.BaseVoucherAction;
-import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -263,7 +261,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 		String fSignatory = firstsignatory;
 		String sSignatory = secondsignatory;
 		
-		System.out.println(voucherHeader.getVouchermis().getSubdivision());
+		
 			if(fSignatory!=null) {
 				voucherHeader.setFirstsignatory(fSignatory);
 			}
@@ -272,8 +270,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 			}
 		
 		
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Starting Bank to Bank Transfer ...");
+			LOGGER.info("Starting Bank to Bank Transfer ...");
 		try {
 			getHibObjectsFromContraBean();
 			if (egovCommon.isShowChequeNumber())
@@ -289,12 +286,12 @@ public class ContraBTBAction extends BaseVoucherAction {
 				LOGGER.debug("Completed Bank to Bank Transfer .");
 		} catch (final ValidationException e) {
 			LoadAjaxedDropDowns();
-			throw new ValidationException(Arrays
-					.asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
+			e.printStackTrace();
 		} catch (final Exception e) {
 			LoadAjaxedDropDowns();
-			throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
+			e.printStackTrace();
 		}
+		LOGGER.info("Ending Bank to Bank Transfer ...");
 		return SUCCESS;
 	}
 
@@ -594,18 +591,6 @@ public class ContraBTBAction extends BaseVoucherAction {
 			contraBean.setChequeDate(sdf.format(currDate));
 			contraBean.setModeOfCollection(MDC_OTHER);
 			voucherDate = sdf.parse(sdf.format(currDate));
-			 List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-						"receipt_sub_divison");
-		        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
-		        SubDivision subdivision=null;
-		        for(AppConfigValues value:appConfigValuesList)
-		        {
-		        	subdivision = new SubDivision();
-		        	subdivision.setSubdivisionCode(value.getValue());
-		        	subdivision.setSubdivisionName(value.getValue());
-		        	subdivisionList.add(subdivision);
-		        }
-		        addDropdownData("subdivisionList", subdivisionList);
 		} catch (ParseException e) {
 
 		}
@@ -1331,6 +1316,7 @@ public class ContraBTBAction extends BaseVoucherAction {
 	 * manually
 	 */
 	private void getHibObjectsFromContraBean() {
+		LOGGER.info("getHibObjectsFromContraBean starts");
 		final String bankQry = "from Bankaccount where id=?";
 		if (contraBean != null && contraBean.getFromBankAccountId() != null
 				&& !contraBean.getFromBankAccountId().equals("-1"))
@@ -1340,6 +1326,8 @@ public class ContraBTBAction extends BaseVoucherAction {
 				&& !contraBean.getToBankAccountId().equals("-1"))
 			contraVoucher.setToBankAccountId(
 					(Bankaccount) persistenceService.find(bankQry, Long.valueOf(contraBean.getToBankAccountId())));
+		
+		LOGGER.info("getHibObjectsFromContraBean ends");
 	}
 
 	/*

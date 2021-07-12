@@ -486,7 +486,11 @@ $('.subledgerGl_code').change(function () {
 		
 	}
 	
-	document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value="";
+	if(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode') != null)
+		{
+		document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value="";
+		}
+	
 	
 
 	var netPayableAccountCodeNode=document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
@@ -573,8 +577,11 @@ $('.subledgerGl_code').change(function () {
 		
 	}
 	
-		
-					document.getElementById('tempSubLedger[0].netPayableAccountCode').value="";
+		if(document.getElementById('tempSubLedger[0].netPayableAccountCode') != null)
+			{
+			document.getElementById('tempSubLedger[0].netPayableAccountCode').value="";
+			}
+					
 					
 				
 					var netPayableAccountCodeNode=document.getElementById('tempSubLedger[0].netPayableAccountCode');

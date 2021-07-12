@@ -87,4 +87,9 @@ public class AccountDetailKeyService {
 	    
 	    return accountDetailKeyRepository.findBy20(typeId, detailname);
 	}
+	
+	public List<Accountdetailkey> findByDetailContra(Integer typeId,Integer name){
+	    
+	    return accountDetailKeyRepository.findForContra(typeId, name);
+	}
 }

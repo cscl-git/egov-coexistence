@@ -1012,6 +1012,14 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             List<AppConfigValues> appList;
 
             worksBillGlcodeList = populateGlCodeIds(Constants.WORKS_BILL_PURPOSE_IDS);
+            if(worksBillGlcodeList != null && !worksBillGlcodeList.isEmpty())
+            {
+            	for(CChartOfAccounts coa :worksBillGlcodeList)
+            	{
+            		LOGGER.info("coa ::::"+coa.toString());
+            	}
+            	
+            }
             purchaseBillGlcodeList = populateGlCodeIds(Constants.PURCHASE_BILL_PURPOSE_IDS);
             salaryBillGlcodeList = populateGlCodeIds("salaryBillPurposeIds");
             pensionBillGlcodeList = populateGlCodeIds(Constants.PENSION_BILL_PURPOSE_IDS);
@@ -1087,11 +1095,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
             LOGGER.info(
                     "Calling getDeductionAmt..................................$$$$$$$$$$$$$$$$$$$$$$ " + list.size());
         for (final CChartOfAccounts coa : list)
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("#################################" + coa.getGlcode() + ":::::" + coa.getPurposeId());
+                LOGGER.info("#################################" + coa.getGlcode() + ":::::" + coa.getPurposeId());
         populateDeductionData(billList, deductionAmtMap, type, glCodeList.get(type));
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getDeductionAmt.");
+            LOGGER.info("Completed getDeductionAmt.");
         return deductionAmtMap;
     }
 
@@ -1119,8 +1125,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     @SuppressWarnings("unchecked")
     private List<Object[]> getDeductionList(final String expendituretype, final List<CChartOfAccounts> glcodeList) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getDeductionList...");
+            LOGGER.info("Starting getDeductionList...");
         List<Object[]> dedList;
         final String mainquery = "select bill.id as id, sum (gl.creditAmount) from eg_Billregister bill,eg_billregistermis billmis left join "
                 + "voucherheader vh on vh.id=billmis.voucherheaderid left join (select sum(paidamount) as paidamount,billvhid as billvhid from miscbilldetail misc,voucherheader vh1 where  misc.payvhid=vh1.id and vh1.status not in (1,2,4) group by "
@@ -1129,14 +1134,12 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 + "' and gl.voucherHeaderId=billmis.voucherHeaderid and gl.glcodeId not in(:glCodeList) and "
                 + "gl.creditAmount>0 and (misc.billvhid is null or (bill.passedamount > misc.paidamount)) group by bill.id";
         dedList = getSession().createSQLQuery(mainquery).setParameterList("glCodeList", glcodeList).list();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getDeductionList.");
+            LOGGER.info("Completed getDeductionList.");
         return dedList;
     }
 
     private List<Object[]> getEarlierPaymentAmtList(final String expendituretype) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getEarlierPaymentAmtList...");
+            LOGGER.info("Starting getEarlierPaymentAmtList...");
         List<Object[]> dedList;
         final String mainquery = "select bill.id as id,misc.paidamount from eg_Billregister bill,eg_billregistermis billmis left join "
                 + "voucherheader vh on vh.id=billmis.voucherheaderid left join (select sum(paidamount) as paidamount,billvhid as billvhid from miscbilldetail  misc,voucherheader vh where  misc.payvhid=vh.id and vh.status not in (1,2,4)    group by "
@@ -1144,8 +1147,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                 + "vh.status=0 and bill.expendituretype='" + expendituretype
                 + "' and (bill.passedamount > misc.paidamount)";
         dedList = getSession().createSQLQuery(mainquery).list();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed getEarlierPaymentAmtList.");
+            LOGGER.info("Completed getEarlierPaymentAmtList.");
         return dedList;
     }
 
@@ -2459,8 +2461,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     public List<InstrumentHeader> createInstrument(final List<ChequeAssignment> chequeAssignmentList,
             final String paymentMode, final Integer bankaccount, final Map<String, String[]> parameters,
             final String dept) throws ApplicationRuntimeException, Exception {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createInstrument...");
+            LOGGER.info("Starting creation of Instrument...");
         List<InstrumentHeader> instHeaderList = new ArrayList<InstrumentHeader>();
         final List<Long> selectedPaymentVHList = new ArrayList<Long>();
         final Map<String, BigDecimal> payeeMap = new HashMap<String, BigDecimal>();
@@ -2468,6 +2469,9 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
         for (final ChequeAssignment assignment : chequeAssignmentList)
             if (assignment.getIsSelected()) {
+            	LOGGER.info("assignment.getVoucherid()  ::: "+assignment.getVoucherid());
+            	LOGGER.info("assignment.getVoucherHeaderId()  ::: "+assignment.getVoucherHeaderId());
+            	LOGGER.info("assignment.getVoucherNumber()  ::: "+assignment.getVoucherNumber());
                 selectedPaymentVHList.add(assignment.getVoucherid());
                 if (payeeMap.containsKey(assignment.getPaidTo() + DELIMETER + assignment.getDetailtypeid() + DELIMETER
                         + assignment.getDetailkeyid())) // concatenate the
@@ -2483,8 +2487,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
                             + assignment.getDetailkeyid(), assignment.getPaidAmount());
                 totalPaidAmt = totalPaidAmt.add(assignment.getPaidAmount());
             }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("selectedPaymentList===" + selectedPaymentVHList);
+            LOGGER.info("selectedPaymentList===" + selectedPaymentVHList);
         final Bankaccount account = (Bankaccount) persistenceService.find(" from Bankaccount where  id=?",
                 bankaccount.longValue());
         // get voucherList
@@ -2861,8 +2864,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
 
     public List<PaymentBean> getCSList(final List<EgBillregister> billList, final Map<Long, BigDecimal> deductionAmtMap,
             final Map<Long, BigDecimal> paidAmtMap) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting getCSList...");
+            LOGGER.info("Starting getCSList...");
         final List<PaymentBean> contractorList = new ArrayList<PaymentBean>();
         PaymentBean paymentBean = null;
         if (billList != null && !billList.isEmpty())
@@ -3336,8 +3338,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
     }
 
     public Paymentheader createPaymentHeaderForContra(final CVoucherHeader voucherHeader, final Bankaccount ba,final String payModType,final String paidAmt) {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Starting createPaymentHeader...");
+            LOGGER.info("Starting createPaymentHeader...");
         final Paymentheader paymentheader = new Paymentheader();
         paymentheader.setType(payModType);
         paymentheader.setVoucherheader(voucherHeader);
@@ -3345,8 +3346,7 @@ public class PaymentService extends PersistenceService<Paymentheader, Long> {
         paymentheader.setPaymentAmount(BigDecimal.valueOf(Double.valueOf(paidAmt)));
         applyAuditing(paymentheader);
         persist(paymentheader);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed createPaymentHeader.");
+            LOGGER.info("Completed createPaymentHeader.");
         return paymentheader;
     }
     public String getEmployeeName(Long empId){

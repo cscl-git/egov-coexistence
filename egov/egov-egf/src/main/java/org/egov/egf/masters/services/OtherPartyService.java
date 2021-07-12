@@ -56,7 +56,7 @@ public class OtherPartyService implements EntityTypeService {
 
         setAuditDetails(otherParty);
         otherParty = otherpartyRepository.save(otherParty);
-        saveAccountDetailKey(otherParty);
+        //saveAccountDetailKey(otherParty);
         return otherParty;
     }
 
@@ -97,16 +97,18 @@ public class OtherPartyService implements EntityTypeService {
         final List<Predicate> predicates = new ArrayList<Predicate>();
         if (otherparty.getName() != null) {
             final String name = "%" + otherparty.getName().toLowerCase() + "%";
-            predicates.add(cb.isNotNull(otherpartys.get("name")));
+            predicates.add(cb.isNotNull(otherpartys.get("bankAccount")));
             predicates.add(cb.like(
-                    cb.lower(otherpartys.get(OtherParty_.getDeclaredSingularAttribute("name", String.class))), name));
+                    cb.lower(otherpartys.get(OtherParty_.getDeclaredSingularAttribute("bankAccount", String.class))), name));
         }
-        if (otherparty.getCode() != null) {
-            final String code = "%" + otherparty.getCode().toLowerCase() + "%";
-            predicates.add(cb.isNotNull(otherpartys.get("code")));
-            predicates.add(cb.like(
-                    cb.lower(otherpartys.get(OtherParty_.getDeclaredSingularAttribute("code", String.class))), code));
-        }
+		/*
+		 * if (otherparty.getCode() != null) { final String code = "%" +
+		 * otherparty.getCode().toLowerCase() + "%";
+		 * predicates.add(cb.isNotNull(otherpartys.get("code")));
+		 * predicates.add(cb.like(
+		 * cb.lower(otherpartys.get(OtherParty_.getDeclaredSingularAttribute("code",
+		 * String.class))), code)); }
+		 */
 
         createQuery.where(predicates.toArray(new Predicate[] {}));
         final TypedQuery<OtherParty> query = entityManager.createQuery(createQuery);

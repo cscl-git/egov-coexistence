@@ -176,11 +176,9 @@ public class CancelVoucherAction extends BaseFormAction {
 
 	@Override
 	public void prepare() {
-		System.out.println("2");
+
 		loggedInUser = ApplicationThreadLocals.getUserId().intValue();
-		System.out.println("3");
 		super.prepare();
-		System.out.println("4");
 		getHeaderFields();
 		loadDropDowns();
 	}
@@ -188,13 +186,9 @@ public class CancelVoucherAction extends BaseFormAction {
 	@SkipValidation
 	@Action(value = "/voucher/cancelVoucher-beforeSearch")
 	public String beforeSearch() {
-		System.out.println("1");
 		voucherHeader.reset();
-		System.out.println("CC");
 		setFromDate(null);
-		System.out.println("DD");
 		setToDate(null);
-		System.out.println("END");
 		return SEARCH;
 	}
 
@@ -589,7 +583,7 @@ public class CancelVoucherAction extends BaseFormAction {
 	}
 
 	private void loadDropDowns() {
-		System.out.println("Y1");
+
 		if (headerFields.contains("department")) {
 			List<org.egov.infra.microservice.models.Department> departments = masterDataCache.get("egi-department");
 			addDropdownData("departmentList", departments);
@@ -666,7 +660,6 @@ public class CancelVoucherAction extends BaseFormAction {
 	}
 
 	protected void getHeaderFields() {
-		System.out.println("X1");
 		final List<AppConfigValues> appConfigList = appConfigValueService.getConfigValuesByModuleAndKey("EGF",
 				"DEFAULT_SEARCH_MISATTRRIBUTES");
 
@@ -678,7 +671,6 @@ public class CancelVoucherAction extends BaseFormAction {
 			if (mandate.equalsIgnoreCase("M"))
 				mandatoryFields.add(header);
 		}
-		System.out.println("X2");
 
 	}
 

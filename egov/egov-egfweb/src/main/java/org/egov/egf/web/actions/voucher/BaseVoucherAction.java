@@ -350,7 +350,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 		checkMandatoryField("fundsource", voucherHeader.getVouchermis().getFundsource(),
 				"voucher.fundsource.mandatory");
 		checkMandatoryField("field", voucherHeader.getVouchermis().getDivisionid(), "voucher.field.mandatory");
-		checkMandatoryField("subdivision", voucherHeader.getVouchermis().getSubdivision(), "voucher.subdivision.mandatory");
+		//checkMandatoryField("subdivision", voucherHeader.getVouchermis().getSubdivision(), "voucher.subdivision.mandatory");
 	}
 
 	protected void checkMandatoryField(final String fieldName, final Object value, final String errorKey) {
@@ -676,19 +676,16 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 			final List<Bankaccount> bankAccountList = getPersistenceService().findAllBy(
 					"from Bankaccount ba where ba.bankbranch.id=? " + "  and isactive=true order by id", branchId);
 			addDropdownData("accNumList", bankAccountList);
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Account number list size " + bankAccountList.size());
+				LOGGER.info("Account number list size " + bankAccountList.size());
 		}
 
 	}
 
 	@SuppressWarnings("unchecked")
 	public void loadBankBranchForFund() {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("BaseVoucherAction | loadBankBranchForFund | Start");
+			LOGGER.info("BaseVoucherAction | loadBankBranchForFund | Start");
 		try {
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("FUND ID = " + voucherHeader.getFundId().getId());
+				LOGGER.info("FUND ID = " + voucherHeader.getFundId().getId());
 			final List<Object[]> bankBranch = getPersistenceService().findAllBy(
 					"select DISTINCT concat(concat(bank.id,'-'),bankBranch.id) as bankbranchid,concat(concat(bank.name,' '),bankBranch.branchname) as bankbranchname "
 							+ " FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount "
@@ -696,8 +693,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 							+ " and bankaccount.fund.id=?",
 					voucherHeader.getFundId().getId());
 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Bank list size is " + bankBranch.size());
+				LOGGER.info("Bank list size is " + bankBranch.size());
 			final List<Map<String, Object>> bankBranchList = new ArrayList<>();
 			Map<String, Object> bankBrmap;
 			for (final Object[] element : bankBranch) {
@@ -706,8 +702,7 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 				bankBrmap.put("bankBranchName", element[1].toString());
 				bankBranchList.add(bankBrmap);
 			}
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("Bank branch list size :" + bankBranchList.size());
+				LOGGER.info("Bank branch list size :" + bankBranchList.size());
 			addDropdownData("bankList", bankBranchList);
 		} catch (final HibernateException e) {
 			LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),

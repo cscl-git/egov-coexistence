@@ -78,7 +78,6 @@ import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.repository.ExpenseBillRepository;
-import org.egov.egf.model.BudgetVarianceEntry;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.entity.Assignment;
 import org.egov.infra.admin.master.entity.AppConfig;

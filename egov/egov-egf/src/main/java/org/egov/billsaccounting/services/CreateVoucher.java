@@ -1136,8 +1136,7 @@ public class CreateVoucher {
 		CVoucherHeader vh = null;
 		Vouchermis mis;
 
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("start | createVoucher API");
+			LOGGER.info("start | createVoucher API");
 		try {
                         if(headerdetails.containsKey(VoucherConstant.SERVICE_NAME) && headerdetails.containsKey(VoucherConstant.REFERENCEDOC)){
                             String serviceName = headerdetails.get(VoucherConstant.SERVICE_NAME).toString();
@@ -1155,8 +1154,7 @@ public class CreateVoucher {
 			vh.setVouchermis(mis);
 			// insertIntoVoucherHeader(vh);
 
-			if (LOGGER.isDebugEnabled())
-				LOGGER.debug("start | insertIntoVoucherHeader");
+				LOGGER.info("start | insertIntoVoucherHeader");
 			final String vdt = formatter.format(vh.getVoucherDate());
 			String fiscalPeriod = null;
 			try {
@@ -2069,6 +2067,7 @@ public class CreateVoucher {
 
 			if (null != subdetailDetailMap.get(VoucherConstant.DETAILKEYID)) {
 				detailKeyId = subdetailDetailMap.get(VoucherConstant.DETAILKEYID).toString();
+				LOGGER.info("Voucher DTLTP::::"+detailKeyId);
 				final Session session = persistenceService.getSession();
 				final Query qry = session.createQuery(
 						"from Accountdetailkey adk where adk.accountdetailtype.id=:detailtypeid and adk.detailkey=:detailkey");
@@ -2076,9 +2075,16 @@ public class CreateVoucher {
 				qry.setInteger("detailkey", Integer.valueOf(detailKeyId));
 				qry.setCacheable(true);
 				if (null == qry.list() || qry.list().size() == 0)
+				{
+					LOGGER.info("ERROR1");
 					throw new ApplicationRuntimeException("Subledger data is not valid for account code " + glcode);
+				}
 			} else
+			{
+				LOGGER.info("ERROR2");
 				throw new ApplicationRuntimeException("detailkeyid is missing");
+			}
+				
 
 			if (null != subdetailDetailMap.get(VoucherConstant.DEBITAMOUNT)
 					&& new BigDecimal(subdetailDetailMap.get(VoucherConstant.DEBITAMOUNT).toString())

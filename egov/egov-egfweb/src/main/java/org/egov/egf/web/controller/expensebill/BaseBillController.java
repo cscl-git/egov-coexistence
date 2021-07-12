@@ -302,18 +302,26 @@ public abstract class BaseBillController extends BaseVoucherController {
     }
 
     protected void populateEgBillregistermisDetails(final EgBillregister egBillregister) {
-    	   //final   String departmentCode = egBillregister.getEgBillregistermis().getDepartmentcode();
-    	
-    	   
+       final   String req_departmentCode = egBillregister.getEgBillregistermis().getDepartmentcode();    
+       final Department req_department = microserviceUtils.getDepartmentByCode(egBillregister.getEgBillregistermis().getDepartmentcode());  
+    final  CFunction req_function = egBillregister.getEgBillregistermis().getFunction();    
+    final  Fund req_fund = egBillregister.getEgBillregistermis().getFund();
+ 
+   BudgetDetail bd = new BudgetDetail();
+  bd.setFunction(req_function);
+  bd.setExecutingDepartment(req_departmentCode);
+  bd.setFund(req_fund);
+     
+   BigDecimal totalAmount=new BigDecimal(0);
        Date asOnDate = new Date();
        long milliseconds = (long) 365 * 24 * 60 * 60 * 1000;
        Date oneYearBefore = new Date(asOnDate.getTime() - milliseconds);
        String type = "Budget";
        String budgetType = Constants.BE;
-    	System.out.println("1");
-    	
+    System.out.println("1");
+    LOGGER.info("date--1"+asOnDate);
         final CFinancialYear financialYear = financialYearDAO.getFinancialYearByDate(asOnDate);
-        
+       
         final boolean hasApprovedReForYear = budgetService.hasApprovedReForYear(financialYear.getId());
         if (hasApprovedReForYear) {
             type = "Revised";
@@ -323,26 +331,36 @@ public abstract class BaseBillController extends BaseVoucherController {
                 + "' and " +
                 "budget.isActiveBudget=true and budget.status.code='Approved' and budget.financialYear.id="
                 + financialYear.getId()
-                + getMiscQuery() + " order by budget.name,budgetGroup.name");
+                + getMiscQuery(bd) + " order by budget.name,budgetGroup.name");
+       
         System.out.println("2");
+        System.out.println("debug :::: budget result size :: :: :: "+result.size());
+        if(result.size()!=0) {
         if (budgetVarianceEntries == null)
             budgetVarianceEntries = new ArrayList<BudgetVarianceEntry>();
         for (final BudgetDetail budgetDetail : result) {
             final BudgetVarianceEntry budgetVarianceEntry = new BudgetVarianceEntry();            
-            
+           
             budgetVarianceEntry.setBudgetHead(budgetDetail.getBudgetGroup().getName());
+           
             if (budgetDetail.getExecutingDepartment() != null) {
                 budgetVarianceEntry.setDepartmentCode(budgetDetail.getExecutingDepartment());
+                //LOGGER.info("department"+budgetDetail.getExecutingDepartment());
                 budgetVarianceEntry.setDepartmentName(microserviceUtils.getDepartmentByCode(budgetDetail.getExecutingDepartment()).getName());
+           
+                System.out.println("debug :::: DepartmentCode :: ::"+budgetVarianceEntry.getDepartmentCode()+" DepartmentName:: ::"+budgetVarianceEntry.getDepartmentName());
+
             }
             if (budgetDetail.getFund() != null)
                 budgetVarianceEntry.setFundCode(budgetDetail.getFund().getName());
+            //LOGGER.info("fund"+budgetVarianceEntry.getFundCode());
             if (budgetDetail.getFunction() != null)
                 budgetVarianceEntry.setFunctionCode(budgetDetail.getFunction().getName());
+            //LOGGER.info("functioncode"+budgetVarianceEntry.getFunctionCode());
             budgetVarianceEntry.setDetailId(budgetDetail.getId());
             budgetVarianceEntry.setBudgetCode(budgetDetail.getBudget().getName());
-            
-            
+           
+           
             if ("RE".equalsIgnoreCase(budgetType) && !getConsiderReAppropriationAsSeperate()) {
                 budgetVarianceEntry.setAdditionalAppropriation(BigDecimal.ZERO);
                 final BigDecimal estimateAmount = (budgetDetail.getApprovedAmount() == null ? BigDecimal.ZERO : budgetDetail
@@ -357,73 +375,96 @@ public abstract class BaseBillController extends BaseVoucherController {
                                 : budgetDetail.getApprovedReAppropriationsTotal());
             }
             budgetVarianceEntry.setTotal(budgetVarianceEntry.getEstimate().add(budgetVarianceEntry.getAdditionalAppropriation()));
+            System.out.println("debug :::: budget total :: :: "+budgetVarianceEntry.getTotal());
+            totalAmount=budgetVarianceEntry.getTotal();
+            System.out.println("debug :::: budget total  variable :: :: "+totalAmount);
             budgetVarianceEntries.add(budgetVarianceEntry);
         }
         List<BudgetVarianceEntry> budgetVarianceEntriesCopy = new ArrayList<BudgetVarianceEntry>();
         final BudgetDetail budgetDetail2 = result.get(0);
+        //LOGGER.info("budgetDetail--2"+budgetDetail2);
+       
         budgetVarianceEntriesCopy.add(budgetVarianceEntries.get(0));
         budgetVarianceEntries.clear();
         budgetVarianceEntries.addAll(budgetVarianceEntriesCopy);
-        
+       
+               
+       
         if (null == egBillregister.getEgBillregistermis().getBudget() ) {
-			egBillregister.getEgBillregistermis().setBudget(budgetVarianceEntries.get(0).getTotal());
-		}
-        if (null != egBillregister.getEgBillregistermis().getBudget() ) {
-			egBillregister.getEgBillregistermis().setBudget(budgetVarianceEntries.get(0).getTotal());
-		}
-        
-        
+        System.out.println("debug :::: budget total  variable :: :: "+totalAmount);
+        LOGGER.info("debug :::: budget total set(1):: ::"+budgetVarianceEntries.get(0).getTotal());
+egBillregister.getEgBillregistermis().setBudget(totalAmount);
+}
+     
+       /* if (null != egBillregister.getEgBillregistermis().getBudget() ) {
+        LOGGER.info("budget total if already set"+budgetVarianceEntries.get(0).getTotal());
+egBillregister.getEgBillregistermis().setBudget(budgetVarianceEntries.get(0).getTotal());
+}*/        
+       
         //final String fromDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getStartingDate());
        // final String toDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getEndingDate());
-        
+       
         final String fromDate = Constants.DDMMYYYYFORMAT2.format(financialYear.getStartingDate());
         final String asOnDateQ = Constants.DDMMYYYYFORMAT2.format(asOnDate);
         System.out.println("4");
         if (budgetVarianceEntries != null && budgetVarianceEntries.size() != 0) {
-        	System.out.println("5");
+        System.out.println("5");
             setQueryParams(budgetDetail2);
             try {
            /* final List<Object[]> resultForVoucher = budgetDetailService.fetchActualsForFYWithParams(fromDate, "'" + toDate + "'", formMiscQuery("vmis", "gl", "vh"));
             System.out.println(resultForVoucher);
-            
+           
             extractData(resultForVoucher);
             final List<Object[]> resultForBill = budgetDetailService.fetchActualsForBillWithVouchersParams(fromDate, "'" + toDate + "'", formMiscQuery("bmis", "bdetail", "bmis"));
             extractData(resultForBill);*/
-            	
-				//System.out.println("5");
-				//setQueryParams(budgetDetail2);
-				final List<Object[]> resultForVoucher = budgetDetailService.fetchActualsForFYWithParams(fromDate,
-						"'" + asOnDateQ + "'", formMiscQuery("vmis", "gl", "vh",budgetDetail2));
-				extractData(resultForVoucher);
-				final List<Object[]> resultForBill = budgetDetailService.fetchActualsForBillWithVouchersParams(fromDate,
-						"'" + asOnDateQ + "'",
-						formMiscQuery("bmis", "bdetail", "bmis",budgetDetail2));
-				extractData(resultForBill);
+           
+//System.out.println("5");
+//setQueryParams(budgetDetail2);
+final List<Object[]> resultForVoucher = budgetDetailService.fetchActualsForFYWithParams(fromDate,
+"'" + asOnDateQ + "'", formMiscQuery("vmis", "gl", "vh",budgetDetail2));
+extractData(resultForVoucher);
+final List<Object[]> resultForBill = budgetDetailService.fetchActualsForBillWithVouchersParams(fromDate,
+"'" + asOnDateQ + "'",
+formMiscQuery("bmis", "bdetail", "bmis",budgetDetail2));
+extractData(resultForBill);
 
             }catch(Exception e) {
-            	e.printStackTrace();
+            e.printStackTrace();
             }
         }
-		//System.out.println(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;--->"+budgetVarianceEntries.get(0).getVariance());
-		if (null == egBillregister.getEgBillregistermis().getBalance()) {
-			egBillregister.getEgBillregistermis().setBalance(budgetVarianceEntries.get(0).getVariance());
-		}
-	   //final String departmentCode = budgetDetail2.getExecutingDepartment();
-	   final Department department = microserviceUtils.getDepartmentByCode(budgetDetail2.getExecutingDepartment());
- 	   final  CFunction function = egBillregister.getEgBillregistermis().getFunction();
- 	   final  Fund fund = egBillregister.getEgBillregistermis().getFund();
- 	   final  BudgetGroup budgetGroup = budgetDetail2.getBudgetGroup();
-		
-		if (egBillregister.getEgBillregistermis().getPreviousexpenditure() == null) {
-			BigDecimal cumilativeTotal =  previousexpenditure(department,function,fund,budgetGroup);
-			egBillregister.getEgBillregistermis().setPreviousexpenditure(cumilativeTotal);
-		}
-		
-		
-		if(null==egBillregister.getEgBillregistermis().getCurrentexpenditure()) {
-			egBillregister.getEgBillregistermis().setCurrentexpenditure(egBillregister.getBillDetails().get(0).getDebitamount());
-    	}
-    	
+//System.out.println(";;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;--->"+budgetVarianceEntries.get(0).getVariance());
+       
+
+  //final String departmentCode = budgetDetail2.getExecutingDepartment();
+  final Department department = microserviceUtils.getDepartmentByCode(budgetDetail2.getExecutingDepartment());
+    final  CFunction function = egBillregister.getEgBillregistermis().getFunction();
+    final  Fund fund = egBillregister.getEgBillregistermis().getFund();
+    final  BudgetGroup budgetGroup = budgetDetail2.getBudgetGroup();
+
+
+if (egBillregister.getEgBillregistermis().getPreviousexpenditure() == null) {
+BigDecimal cumilativeTotal =  previousexpenditure(department,function,fund,budgetGroup);
+if(cumilativeTotal!=null) {
+	egBillregister.getEgBillregistermis().setPreviousexpenditure(cumilativeTotal);
+	LOGGER.info("debug :::: Previousexpenditure(2):: ::"+egBillregister.getEgBillregistermis().getPreviousexpenditure());
+	}
+}
+
+
+if(null==egBillregister.getEgBillregistermis().getCurrentexpenditure()) {
+egBillregister.getEgBillregistermis().setCurrentexpenditure(egBillregister.getBillDetails().get(0).getDebitamount());
+LOGGER.info("debug :::: Currentexpenditure(3) :: ::"+egBillregister.getBillDetails().get(0).getDebitamount());
+    }
+   
+if (null == egBillregister.getEgBillregistermis().getBalance() ) {
+	if(null == egBillregister.getEgBillregistermis().getPreviousexpenditure())
+	{
+		egBillregister.getEgBillregistermis().setPreviousexpenditure(new BigDecimal(0));
+	}
+egBillregister.getEgBillregistermis().setBalance((egBillregister.getEgBillregistermis().getBudget().subtract(egBillregister.getEgBillregistermis().getPreviousexpenditure())).subtract(egBillregister.getEgBillregistermis().getCurrentexpenditure()));
+System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregistermis().getBalance());
+}
+        }
     }
 
     protected void populateBillPayeeDetails(final EgBillregister egBillregister) {
@@ -444,7 +485,7 @@ public abstract class BaseBillController extends BaseVoucherController {
                     details.getEgBillPaydetailes().add(payeeDetail);
                 }
     }
-    
+   
     private List<Object[]> getAccountDetails(Integer accountDetailKeyId, Integer accountDetailTypeId) {
         String queryString = "select adk.detailname as detailkeyname,adt.name as detailtypename from accountdetailkey adk inner join accountdetailtype adt on adk.detailtypeid=adt.id where adk.detailtypeid=:detailtypeid and adk.detailkey=:detailkey";
         SQLQuery sqlQuery = persistenceService.getSession().createSQLQuery(queryString);
@@ -486,33 +527,33 @@ public abstract class BaseBillController extends BaseVoucherController {
 
         }
     }
-    
-    private String getMiscQuery() {
-    	String accountType = "";
-    	BudgetDetail budgetDetail = new BudgetDetail();
-    	 
+   
+    private String getMiscQuery(final BudgetDetail budgetDetail) {
+    String accountType = "";
+    //BudgetDetail budgetDetail = new BudgetDetail();
+   
         final StringBuilder query = new StringBuilder();
         if (budgetDetail.getExecutingDepartment() != null && !"".equals(budgetDetail.getExecutingDepartment()))
         {
-        	System.out.println("department : "+budgetDetail.getExecutingDepartment());
-        	query.append(" and executingDepartment='").append(budgetDetail.getExecutingDepartment()).append("' ");
+        System.out.println("department : "+budgetDetail.getExecutingDepartment());
+        query.append(" and executingDepartment='").append(budgetDetail.getExecutingDepartment()).append("' ");
         }
         if (budgetDetail.getBudgetGroup() != null && budgetDetail.getBudgetGroup().getId() != null
                 && budgetDetail.getBudgetGroup().getId() != -1)
         {
-        	System.out.println("budgetDetail.getBudgetGroup().getId() :: "+budgetDetail.getBudgetGroup().getId());
-        	query.append(" and budgetGroup.id=").append(budgetDetail.getBudgetGroup().getId());
+        System.out.println("budgetDetail.getBudgetGroup().getId() :: "+budgetDetail.getBudgetGroup().getId());
+        query.append(" and budgetGroup.id=").append(budgetDetail.getBudgetGroup().getId());
         }
         if (budgetDetail.getFunction() != null && budgetDetail.getFunction().getId() != null
                 && budgetDetail.getFunction().getId() != -1)
         {
-        	System.out.println("budgetDetail.getFunction().getId() :: "+budgetDetail.getFunction().getId());
-        	query.append(" and function.id=").append(budgetDetail.getFunction().getId());
+        System.out.println("budgetDetail.getFunction().getId() :: "+budgetDetail.getFunction().getId());
+        query.append(" and function.id=").append(budgetDetail.getFunction().getId());
         }
         if (budgetDetail.getFund() != null && budgetDetail.getFund().getId() != null && budgetDetail.getFund().getId() != -1)
         {
-        	System.out.println("budgetDetail.getFund().getId() ::"+budgetDetail.getFund().getId());
-        	query.append(" and fund.id=").append(budgetDetail.getFund().getId());
+        System.out.println("budgetDetail.getFund().getId() ::"+budgetDetail.getFund().getId());
+        query.append(" and fund.id=").append(budgetDetail.getFund().getId());
         }
         if (budgetDetail.getFunctionary() != null && budgetDetail.getFunctionary().getId() != null
                 && budgetDetail.getFunctionary().getId() != -1)
@@ -537,7 +578,7 @@ public abstract class BaseBillController extends BaseVoucherController {
         appValue = appList.get(0).getValue();
         return "Y".equalsIgnoreCase(appValue);
     }
-    
+   
     private void extractData(final List<Object[]> result) {
         final Map<String, String> budgetDetailIdsAndAmount = new HashMap<String, String>();
         if (result == null)
@@ -559,21 +600,19 @@ public abstract class BaseBillController extends BaseVoucherController {
                     row.getAdditionalAppropriation().subtract(row.getActual() == null ? BigDecimal.ZERO : row.getActual())));
         }
     }
-    
+   
     public boolean shouldShowHeaderField(final String fieldName) {
         return (headerFields.contains(fieldName) || gridFields.contains(fieldName)) && mandatoryFields.contains(fieldName);
     }
-    
-    private void setQueryParams(final BudgetDetail budgetDetail2) {
-    	System.out.println("7");
-        if (shouldShowHeaderField(Constants.EXECUTING_DEPARTMENT) && budgetDetail.getExecutingDepartment() != null
-                && budgetDetail.getExecutingDepartment() != "")
+   
+    private void setQueryParams(final BudgetDetail budgetDetail) {
+    System.out.println("7");
+        if ( budgetDetail.getExecutingDepartment() != null  && budgetDetail.getExecutingDepartment() != "")
             queryParamMap.put("deptId", budgetDetail.getExecutingDepartment());
-        if (shouldShowHeaderField(Constants.FUNCTION) && budgetDetail.getFunction() != null
-                && budgetDetail.getFunction().getId() != null && budgetDetail.getFunction().getId() != -1
+        if ( budgetDetail.getFunction() != null  && budgetDetail.getFunction().getId() != null && budgetDetail.getFunction().getId() != -1
                 && budgetDetail.getFunction().getId() != 0)
             queryParamMap.put("functionId", budgetDetail.getFunction().getId().toString());
-        if (shouldShowHeaderField(Constants.FUND) && budgetDetail.getFund() != null && budgetDetail.getFund().getId() != null
+        if (budgetDetail.getFund() != null && budgetDetail.getFund().getId() != null
                 && budgetDetail.getFund().getId() != -1 && budgetDetail.getFund().getId() != 0)
             queryParamMap.put("fundId", budgetDetail.getFund().getId().toString());
         if (shouldShowHeaderField(Constants.SCHEME) && budgetDetail.getScheme() != null
@@ -589,12 +628,12 @@ public abstract class BaseBillController extends BaseVoucherController {
                 && budgetDetail.getFunctionary().getId() != 0)
             queryParamMap.put("functionaryId", budgetDetail.getFunctionary().getId().toString());
     }
-    
+   
     private StringBuffer formMiscQuery(final String mis, final String gl, final String detail, final BudgetDetail budgetDetail ) {
         StringBuffer miscQuery = new StringBuffer();
-        if (shouldShowHeaderField(Constants.FUND) && queryParamMap.containsKey("fundId")) {
+        if (budgetDetail.getFund()!=null) {
             miscQuery = miscQuery.append(" and " + detail + ".fundId=bd.fund ");
-            miscQuery = miscQuery.append(" and bd.fund= " + Integer.parseInt(queryParamMap.get("fundId")));
+            miscQuery = miscQuery.append(" and bd.fund= " + budgetDetail.getFund().getId());
         }
         if (shouldShowHeaderField(Constants.SCHEME) && queryParamMap.containsKey("schemeId")) {
             miscQuery = miscQuery.append(" and " + mis + ".schemeid=bd.scheme ");
@@ -608,20 +647,20 @@ public abstract class BaseBillController extends BaseVoucherController {
             miscQuery = miscQuery.append(" and " + mis + ".functionaryid=bd.functionary ");
             miscQuery = miscQuery.append(" and bd.functionary= " + Integer.parseInt(queryParamMap.get("functionaryId")));
         }
-        if (shouldShowHeaderField(Constants.FUNCTION) && queryParamMap.containsKey("functionId")) {
+        if (budgetDetail.getFunction().getId()!=null) {
             miscQuery = miscQuery.append(" and " + gl + ".functionId=bd.function ");
-            miscQuery = miscQuery.append(" and bd.function= " + Long.parseLong(queryParamMap.get("functionId")));
+            miscQuery = miscQuery.append(" and bd.function= " + budgetDetail.getFunction().getId());
         }
-        if (shouldShowHeaderField(Constants.EXECUTING_DEPARTMENT) && queryParamMap.containsKey("deptId")) {
+        if (budgetDetail.getExecutingDepartment()!=null) {
             miscQuery = miscQuery.append(" and " + mis + ".departmentcode=bd.executing_department ");
-            miscQuery = miscQuery.append(" and bd.executing_department= '" + queryParamMap.get("deptId")+"' ");
+            miscQuery = miscQuery.append(" and bd.executing_department= '" + budgetDetail.getExecutingDepartment()+"' ");
         }
         return miscQuery;
     }
     private BigDecimal previousexpenditure(final Department department,final CFunction function,final Fund fund,final BudgetGroup budgetGroup) {
-    	
-    	BigDecimal cumilativeTotal = null;
-    	Date dtAsOnDate = new Date();
+   
+    BigDecimal cumilativeTotal = null;
+    Date dtAsOnDate = new Date();
         CFinancialYear financialYr = new CFinancialYear();
         financialYr = financialYearDAO.getFinancialYearByDate(dtAsOnDate);
         CFinancialYear financialYear = null;
@@ -665,8 +704,7 @@ public abstract class BaseBillController extends BaseVoucherController {
             strQuery.append(getFundQuery("bmis1.fundid",fund));
             strQuery.append("  order by bdgApprNumber ");
 
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("BudgetAppropriationRegisterReportAction -- strQuery...." + strQuery);
+                LOGGER.info("BudgetAppropriationRegisterReportAction -- strQuery...." + strQuery);
 
             query = persistenceService.getSession().createSQLQuery(strQuery.toString())
                     .addScalar("bdgApprNumber")
@@ -716,7 +754,7 @@ public abstract class BaseBillController extends BaseVoucherController {
                     .addScalar("debitAmount", BigDecimalType.INSTANCE)
                     .addScalar("creditAmount", BigDecimalType.INSTANCE)
                     .setResultTransformer(Transformers.aliasToBean(BudgetAppDisplay.class));
-            query=setParameterForBudgetAppDisplay(query,dtAsOnDate,dStartDate,department, function,fund,budgetGroup); 
+            query=setParameterForBudgetAppDisplay(query,dtAsOnDate,dStartDate,department, function,fund,budgetGroup);
             budgetApprRegNewList = query.list();
             if (budgetApprRegNewList.size() > 0) {
                 for (final BudgetAppDisplay budgetAppRtDisp : budgetApprRegNewList)
@@ -734,24 +772,24 @@ public abstract class BaseBillController extends BaseVoucherController {
             budgetAppropriationRegisterList.addAll(budgetApprRegUpdatedList1);
         }
         cumilativeTotal = updateBdgtAppropriationList(budgetAppropriationRegisterList,department, function,fund,budgetGroup);
-        
+        LOGGER.debug("debug :::: previousexpenditure  cumilativeTotal...." + cumilativeTotal);
         return cumilativeTotal;
     }
-    
+   
     private String getFunctionQuery(final String string, final CFunction function) {
         final String query = "";
         if (function.getId() != null && function.getId() != -1)
             return " and " + string + " =:functionId ";
         return query;
     }
-    
+   
     private String getDepartmentQuery(final String string, final Department department ) {
         final String query = "";
         if (department.getCode() != null )
             return " and " + string + " =:departmentcode ";
         return query;
     }
-    
+   
     private String getFundQuery(final String string, final Fund fund ) {
         final String query = "";
         if (fund.getId() != null && fund.getId() != -1)
@@ -762,38 +800,38 @@ public abstract class BaseBillController extends BaseVoucherController {
     {
         if (function.getId() != null && function.getId() != -1)
         {
-            query.setLong("functionId", function.getId()) ; 
+            query.setLong("functionId", function.getId()) ;
         }
         System.out.println("dept :"+department.getCode());
         if (department.getCode() != null )
         {
-            query.setString("departmentcode", department.getCode()) ; 
+            query.setString("departmentcode", department.getCode()) ;
         }
         if (fund.getId() != null && fund.getId() != -1)
         {
-            query.setLong("fundId", fund.getId()) ; 
+            query.setLong("fundId", fund.getId()) ;
         }
         if (budgetGroup.getMinCode().getId() != null )
         {
-            query.setLong("glCodeId", budgetGroup.getMinCode().getId()) ; 
+            query.setLong("glCodeId", budgetGroup.getMinCode().getId()) ;
         }
         if (asOnDate != null )
         {
-            query.setDate("strAODate", asOnDate) ; 
+            query.setDate("strAODate", asOnDate) ;
         }
-        
+       
         if (startDate != null )
         {
-            query.setDate("strStDate", startDate) ; 
+            query.setDate("strStDate", startDate) ;
         }
-        
-        
+       
+       
         return query;
     }
-    
+   
     private BigDecimal updateBdgtAppropriationList(List<BudgetAppDisplay> budgetAppropriationRegisterList,final Department department,final CFunction function,final Fund fund,final BudgetGroup budgetGroup) {
-    	List<BudgetAppDisplay> updatedBdgtAppropriationRegisterList = new ArrayList<BudgetAppDisplay>();
-    	BigDecimal totalGrant = null;
+    List<BudgetAppDisplay> updatedBdgtAppropriationRegisterList = new ArrayList<BudgetAppDisplay>();
+    BigDecimal totalGrant = null;
         BigDecimal cumulativeAmt = null;
         BigDecimal balanceAvailableAmt = new BigDecimal(0.0);
         BigDecimal totalDebit = new BigDecimal(0.0);
@@ -883,7 +921,7 @@ public abstract class BaseBillController extends BaseVoucherController {
                 iSerialNumber++;
             }
         }
-        
+        LOGGER.info("from updateBdgtAppropriationList cumilativeTotal...." + cumulativeAmt);
         return cumulativeAmt;
     }
 

@@ -515,17 +515,20 @@ public class PaymentAction extends BasePaymentAction {
         final String mainquery1 = "from EgBillregister bill where bill.expendituretype=? and bill.egBillregistermis.voucherHeader.status=0 "
                 + " and bill.egBillregistermis.voucherHeader NOT IN (select misc.billVoucherHeader from Miscbilldetail misc where misc.billVoucherHeader is not null and misc.payVoucherHeader.status <> 4)";
 
+        LOGGER.info("disableExpenditureType  ::::"+disableExpenditureType);
+        LOGGER.info("enablePensionType  ::::"+enablePensionType);
+        LOGGER.info("expType  ::::"+expType);
         if (disableExpenditureType == true && enablePensionType == false
                 || expType != null && !expType.equals("-1") && expType.equals("Salary"))
             return salaryBills(sql, mainquery, mainquery1);
         if (disableExpenditureType == true && enablePensionType == true
                 || expType != null && !expType.equals("-1") && expType.equals("Pension"))
             return pensionBills(sql, mainquery, mainquery1);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("start purchase bill");
+            LOGGER.info("start purchase bill");
         if (expType == null || expType.equals("-1") || expType.equals("Purchase")) {
-            egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("SBILL", "Approved");
-            final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("PURCHBILL", "Passed");
+        	LOGGER.info("inside exp type = -1");
+            egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("SBILL", "Approved");//77
+            final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("PURCHBILL", "Passed");//47
             String statusCheck = "";
             if (egwStatus == null)
                 statusCheck = " and bill.status in (" + egwStatus1.getId() + ") ";
@@ -534,56 +537,54 @@ public class PaymentAction extends BasePaymentAction {
 
             final String supplierBillSql = mainquery + statusCheck + sql.toString() + " order by bill.billdate desc";
             final String supplierBillSql1 = mainquery1 + statusCheck + sql.toString() + " order by bill.billdate desc";
-            supplierBillList = getPersistenceService().findPageBy(supplierBillSql, 1, 500, "Purchase").getList();
+            supplierBillList = getPersistenceService().findPageBy(supplierBillSql, 1, 1000, "Purchase").getList();
             if (supplierBillList != null)
                 supplierBillList
-                        .addAll(getPersistenceService().findPageBy(supplierBillSql1, 1, 500, "Purchase").getList());
+                        .addAll(getPersistenceService().findPageBy(supplierBillSql1, 1, 1000, "Purchase").getList());
             else
                 supplierBillList = getPersistenceService()
-                        .findPageBy(supplierBillSql1, 1, 500, "Purchase", egwStatus, egwStatus1).getList();
+                        .findPageBy(supplierBillSql1, 1, 1000, "Purchase", egwStatus, egwStatus1).getList();
             final Set<EgBillregister> tempBillList = new LinkedHashSet<EgBillregister>(supplierBillList);
             supplierBillList.clear();
             supplierBillList.addAll(tempBillList);
-            if (LOGGER.isDebugEnabled())
-                LOGGER.debug("supplierBillSql  ===> " + supplierBillSql);
+                LOGGER.info("supplierBillSql  ===> " + supplierBillSql);
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("end purchase bill");
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("start works bill");
+            LOGGER.info("end purchase bill");
+            LOGGER.info("start works bill");
         if (expType == null || expType.equals("-1") || expType.equals("Works")) {
             // right not we dont know, the EGW-Status for works bill, passed
             // from external system
             egwStatus = egwStatusHibernateDAO.getStatusByModuleAndCode("WORKSBILL", "Passed");
-            final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("CONTRACTORBILL", "APPROVED"); // for
+            final EgwStatus egwStatus1 = egwStatusHibernateDAO.getStatusByModuleAndCode("CONTRACTORBILL", "APPROVED"); // for 67
+            final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
             // external
             // systems
             String statusCheck = "";
-            if (egwStatus1 == null)
+            if (egwStatus1 == null && egwStatus2 == null)
                 statusCheck = " and bill.status in (" + egwStatus.getId() + ") ";
             else
-                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() + ") ";
+                statusCheck = " and bill.status in (" + egwStatus.getId() + "," + egwStatus1.getId() +","+ egwStatus2.getId()+") ";
 
             final String contractorBillSql = mainquery + statusCheck + sql.toString() + " order by bill.billdate desc";
             final String contractorBillSql1 = mainquery1 + statusCheck + sql.toString()
                     + " order by bill.billdate desc";
-            contractorBillList = getPersistenceService().findPageBy(contractorBillSql, 1, 500, "Works").getList();
+            LOGGER.info("contractorBillSql ::::"+contractorBillSql);
+            
+            contractorBillList = getPersistenceService().findPageBy(contractorBillSql, 1, 1000, "Works").getList();
             if (contractorBillList != null)
                 contractorBillList
-                        .addAll(getPersistenceService().findPageBy(contractorBillSql1, 1, 500, "Works").getList());
+                        .addAll(getPersistenceService().findPageBy(contractorBillSql1, 1, 1000, "Works").getList());
             else
-                contractorBillList = getPersistenceService().findPageBy(contractorBillSql1, 1, 500, "Works").getList();
+                contractorBillList = getPersistenceService().findPageBy(contractorBillSql1, 1, 1000, "Works").getList();
+            LOGGER.info("contractorBillSql1 ::::"+contractorBillSql1);
             final Set<EgBillregister> tempBillList = new LinkedHashSet<EgBillregister>(contractorBillList);
             contractorBillList.clear();
 
             contractorBillList.addAll(tempBillList);
-            if (LOGGER.isInfoEnabled())
                 LOGGER.info("contractorBillSql  ===> " + contractorBillSql);
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("end works bill");
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("start contingent bill");
+            LOGGER.info("end works bill");
+            LOGGER.info("start contingent bill");
         if (expType == null || expType.equals("-1")
                 || expType.equals(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
 
@@ -602,29 +603,34 @@ public class PaymentAction extends BasePaymentAction {
                                                                                                    // financial
                                                                                                    // expense
                                                                                                    // bills
-            final String cBillSql = cBillmainquery + " and bill.status in (?) " + sql.toString()
+            final EgwStatus egwStatus2 = egwStatusHibernateDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"); // for 481
+            final String cBillSql = cBillmainquery + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
-            final String cBillSql1 = cBillmainquery1 + " and bill.status in (?) " + sql.toString()
+            final String cBillSql1 = cBillmainquery1 + " and bill.status in ("+egwStatus.getId()+","+egwStatus2.getId()+") " + sql.toString()
                     + " order by bill.billdate desc";
-            contingentBillList = getPersistenceService()
-                    .findPageBy(cBillSql, 1, 500, FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus)
-                    .getList();
-            if (contingentBillList != null)
-                contingentBillList.addAll(getPersistenceService().findPageBy(cBillSql1, 1, 500,
-                        FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus).getList());
-            else
-                contingentBillList = getPersistenceService().findPageBy(cBillSql1, 1, 500,
-                        FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus).getList();
+            try
+            {
+            	contingentBillList = getPersistenceService()
+                        .findPageBy(cBillSql, 1, 1000, FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)
+                        .getList();
+                if (contingentBillList != null)
+                    contingentBillList.addAll(getPersistenceService().findPageBy(cBillSql1, 1, 1000,
+                            FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT).getList());
+                else
+                    contingentBillList = getPersistenceService().findPageBy(cBillSql1, 1, 1000,
+                            FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT).getList();
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+            
             final Set<EgBillregister> tempBillList = new LinkedHashSet<EgBillregister>(contingentBillList);
             contingentBillList.clear();
             contingentBillList.addAll(tempBillList);
             if (LOGGER.isInfoEnabled())
                 LOGGER.info("cBillSql  ===> " + cBillSql);
         }
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("end contingent bill");
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("getting glcodeids");
+            LOGGER.info("end contingent bill");
+            LOGGER.info("getting glcodeids");
         paymentService.getGlcodeIds();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("done glcodeids");
@@ -660,8 +666,7 @@ public class PaymentAction extends BasePaymentAction {
                 FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT));
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("paidamt contingent end");
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("getCSList all 3 start");
+            LOGGER.info("getCSList all 3 start");
         contractorList = paymentService.getCSList(contractorBillList, deductionAmtMap, paidAmtMap);
         supplierList = paymentService.getCSList(supplierBillList, deductionAmtMap, paidAmtMap);
 
@@ -692,7 +697,6 @@ public class PaymentAction extends BasePaymentAction {
         return "searchbills";
     }
 
-    
     private String salaryBills(final StringBuffer sql, final String mainquery, final String mainquery1) {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting salaryBills...");
@@ -806,13 +810,13 @@ public class PaymentAction extends BasePaymentAction {
                 + " order by bill.billdate desc";
         final String tnebBillSql1 = tnebSqlMainquery1 + " and bill.status in (?,?) " + sql.toString()
                 + " order by bill.billdate desc";
-        contingentBillList = getPersistenceService().findPageBy(tnebBillSql, 1, 500,
+        contingentBillList = getPersistenceService().findPageBy(tnebBillSql, 1, 1000,
                 FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus, egwStatus1).getList();
         if (contingentBillList != null)
-            contingentBillList.addAll(getPersistenceService().findPageBy(tnebBillSql1, 1, 500,
+            contingentBillList.addAll(getPersistenceService().findPageBy(tnebBillSql1, 1, 1000,
                     FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus, egwStatus1).getList());
         else
-            contingentBillList = getPersistenceService().findPageBy(tnebBillSql1, 1, 500,
+            contingentBillList = getPersistenceService().findPageBy(tnebBillSql1, 1, 1000,
                     FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT, egwStatus, egwStatus1).getList();
         final Set<EgBillregister> tempBillList = new LinkedHashSet<EgBillregister>(contingentBillList);
         contingentBillList.clear();
@@ -1546,11 +1550,17 @@ public class PaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/payment-ajaxGetAccountBalance")
     public String ajaxGetAccountBalance() throws ParseException {
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Inside ajaxGetAccountBalance.");
-        getBankBalance(parameters.get("bankaccount")[0], parameters.get("voucherDate")[0], null, null, null);
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("Completed ajaxGetAccountBalance.");
+            LOGGER.info("Inside ajaxGetAccountBalance.");
+            LOGGER.info("bankaccount ::: "+parameters.get("bankaccount")[0]);
+            LOGGER.info("voucherDate ::: "+parameters.get("voucherDate")[0]);
+            try
+            {
+            	getBankBalance(parameters.get("bankaccount")[0], parameters.get("voucherDate")[0], null, null, null);
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+        
+            LOGGER.info("Completed ajaxGetAccountBalance.");
         return "balance";
     }
 

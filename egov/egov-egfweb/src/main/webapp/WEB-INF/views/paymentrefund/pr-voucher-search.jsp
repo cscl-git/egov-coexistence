@@ -19,7 +19,7 @@
 								<form:options items="${voucherTypeList}"/>
 							</form:select>
 						</div>
-						 <label class="col-sm-3 control-label text-right">blank voucher create refund</label>
+						 <label class="col-sm-3 control-label text-right">Create Blank Refund</label>
 						<div class="col-sm-3 add-margin">
 							<a href="/services/EGF/refund/_paymentRequestblankvoucherForm">link</a>
 						</div>

@@ -165,7 +165,7 @@ function onSubmit()
 		   var bdate = new Date(billsplit[1] + "/" + billsplit[0] + "/" + billsplit[2]);
 		var vouchersplit = voucherDate.split("/");
 		   var vdate = new Date(vouchersplit[1] + "/" + vouchersplit[0] + "/" + vouchersplit[2]);
-		   if(vdate.setHours(0,0,0,0) > bdate.setHours(0,0,0,0)){
+		   if(vdate.setHours(0,0,0,0) >= bdate.setHours(0,0,0,0)){
 		document.preApprovedVoucher.action='${pageContext.request.contextPath}/voucher/preApprovedVoucher-save.action';
 		return true;
 		   }else {

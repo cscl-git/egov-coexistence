@@ -336,7 +336,7 @@ public class PaymentActionHelper {
         	if(workflowBean.getBillNumber() != null)
         	{
         		expenseBill = expenseBillService.getByBillnumber(workflowBean.getBillNumber());
-        		if(expenseBill != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
+        		if(expenseBill != null && expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
 				 {
 					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Processing"));
 		       		 expenseBillService.create(expenseBill);
@@ -368,7 +368,7 @@ public class PaymentActionHelper {
         			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
         			 if(expenseBill != null)
         			 {
-        				 if(expenseBill.getRefundable().equalsIgnoreCase("Y"))
+        				 if(expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
         				 {
         					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Approved"));
         				 }
