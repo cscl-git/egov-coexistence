@@ -161,305 +161,290 @@ public class GeneralLedgerReportService   {
 			  
 		}
 	
-	public List<DedicatedExpenseViewData> getDedicated(StringBuilder qs, Date fromdate, Date todate,String dept_code) {
-		
-		
-		//System.out.println("Inside dedicated");
-		StringBuilder query = new StringBuilder(" ");
-		String department = "";
-		query.append("select id as id,vouchernumber as vouchernumber ,voucherdate as voucherdate ,department as department,glcode as glcode ,creditamount as creditamount from exp_ded_view ");
-		query.append(" where ");
-		query.append(qs);
-		query.append(" order by glcode ASC ");
-		
-		Query q =entityManager.createNativeQuery(query.toString());
-		//q.setParameter("fromdate", fromdate);
-		//q.setParameter("todate", todate);
-		if(dept_code!=null) {
-			try {
+		public List<DedicatedExpenseViewData> getDedicated(StringBuilder qs, Date fromdate, Date todate,String dept_code) {
+			
+			
+			//System.out.println("Inside dedicated");
+			StringBuilder query = new StringBuilder(" ");
+			String department = "";
+			query.append("select id as id,vouchernumber as vouchernumber ,voucherdate as voucherdate ,department as department,glcode as glcode ,creditamount as creditamount,debitamount as debitamount from exp_ded_view ");
+			query.append(" where ");
+			query.append(qs);
+			query.append(" order by glcode ASC ");
+			
+			Query q =entityManager.createNativeQuery(query.toString());
+			//q.setParameter("fromdate", fromdate);
+			//q.setParameter("todate", todate);
+			if(dept_code!=null) {
+				try {
+					
+					department  = departmentService.getDepartmentByCode(dept_code).getName();
+					q.setParameter("department", department);
+				}catch(Exception ex) {
+					ex.printStackTrace();
+					
+				}
 				
-				department  = departmentService.getDepartmentByCode(dept_code).getName();
-				q.setParameter("department", department);
+			}
+			List<DedicatedExpense> data = new ArrayList<DedicatedExpense>();
+			//System.out.println("Query Printing---"+query.toString());
+			try {
+				List<Object[]> list = q.getResultList();
+				//System.out.println(list.size());
+				
+				
+				if(list.size()>0) {
+					for (final Object[] o : list)
+		    		{
+						DedicatedExpense a = new DedicatedExpense();
+						
+						a.setId(o[0].toString());
+						a.setVouchernumber(o[1].toString());
+						a.setVoucherdate(o[2].toString());
+						a.setDepartment(o[3].toString());
+						a.setGlcode(o[4].toString());
+						a.setCreditamount((null!=o[5])? new BigDecimal(o[5].toString()):new BigDecimal(0));
+						a.setDebitamount((null!=o[6])? new BigDecimal(o[6].toString()):new BigDecimal(0));
+						
+						//System.out.println(o[0].toString()+" "+o[1].toString()+"  "+o[2].toString()+" "+o[3].toString()+" "+o[4].toString()+" "+o[5].toString());
+						data.add(a);
+		    		}
+				}
+				
+				
+				System.out.println(list.size());
 			}catch(Exception ex) {
 				ex.printStackTrace();
 				
 			}
-			
-		}
-		List<DedicatedExpense> data = new ArrayList<DedicatedExpense>();
-		//System.out.println("Query Printing---"+query.toString());
-		try {
-			List<Object[]> list = q.getResultList();
-			System.out.println(list.size());
-			
-			
-			if(list.size()>0) {
-				for (final Object[] o : list)
-	    		{
-					DedicatedExpense a = new DedicatedExpense();
-					
-					a.setId(o[0].toString());
-					a.setVouchernumber(o[1].toString());
-					a.setVoucherdate(o[2].toString());
-					a.setDepartment(o[3].toString());
-					a.setGlcode(o[4].toString());
-					a.setCreditamount((null!=o[5])? new BigDecimal(o[5].toString()):new BigDecimal(0));
-					
-					System.out.println(o[0].toString()+" "+o[1].toString()+"  "+o[2].toString()+" "+o[3].toString()+" "+o[4].toString()+" "+o[5].toString());
-					data.add(a);
-	    		}
-			}
-			
-			
-			System.out.println(list.size());
-		}catch(Exception ex) {
-			ex.printStackTrace();
-			
-		}
-		List<DedicatedExpenseViewData> d = new ArrayList<DedicatedExpenseViewData>();
-		Department deparrtm = departmentservice.getDepartmentByCode(dept_code);
-				if(dept_code!=null) {
-			
-			 d = calculateSummation(data,deparrtm);
-		}else {
-			 d = calculateSummation(data,null);
-		}
-		
-		return d;
-	}
-	
-	
-
-	public List<DedicatedExpenseViewData>  calculateSummation(List<DedicatedExpense> dedicatedExpenses,Department depget) {
-		
-		List<DedicatedExpenseViewData> dvlist= new ArrayList<DedicatedExpenseViewData>();
-		List<Department> departmentList= new ArrayList<Department>();
-		if(depget==null) {
-			departmentList= departmentservice.getAllDepartments();
-		}else {
-			departmentList.add(depget);
-		}
-		 
-		prepare();
-		
-		Map<String,List<DedicatedExpense>> dedicatedListMap=new HashMap<String,List<DedicatedExpense>>();
-		List<DedicatedExpense> dedicatedList=null;
-		for(DedicatedExpense row : dedicatedExpenses)
-		{
-			if(dedicatedListMap.get(row.getDepartment())==null)
-			{
-				dedicatedList=new ArrayList<DedicatedExpense>();
-				dedicatedList.add(row);
-				dedicatedListMap.put(row.getDepartment(),dedicatedList);
-			}
-			else
-			{
-				dedicatedListMap.get(row.getDepartment()).add(row);
-			}
-		}
-		
-		for(Department dep:departmentList)
-		{
-			
-			int j=1,k=1;
-			
-			if(dedicatedListMap.get(dep.getName()) != null)
-			{	DedicatedExpenseViewData  dview = new DedicatedExpenseViewData();
-				dview.setName(dep.getName());
-				//totalRowSum1= new BigDecimal(0);
+			List<DedicatedExpenseViewData> d = new ArrayList<DedicatedExpenseViewData>();
+			Department deparrtm = departmentservice.getDepartmentByCode(dept_code);
+					if(dept_code!=null) {
 				
-				for(String g:glcode) {
-				
-					int i=1;
-				for(DedicatedExpense row:dedicatedListMap.get(dep.getName()))
+				 d = calculateSummation(data,deparrtm);
+			}else {
+				 d = calculateSummation(data,null);
+			}
+			
+			return d;
+		}
+	
+		public List<DedicatedExpenseViewData>  calculateSummation(List<DedicatedExpense> dedicatedExpenses,Department depget) {
+			
+			List<DedicatedExpenseViewData> dvlist= new ArrayList<DedicatedExpenseViewData>();
+			List<Department> departmentList= new ArrayList<Department>();
+			if(depget==null) {
+				departmentList= departmentservice.getAllDepartments();
+			}else {
+				departmentList.add(depget);
+			}
+			 
+			prepare();
+			
+			Map<String,List<DedicatedExpense>> dedicatedListMap=new HashMap<String,List<DedicatedExpense>>();
+			List<DedicatedExpense> dedicatedList=null;
+			for(DedicatedExpense row : dedicatedExpenses)
+			{
+				if(dedicatedListMap.get(row.getDepartment())==null)
 				{
-					BigDecimal summation =new BigDecimal(0);
-					
-					
-						if(g.equalsIgnoreCase(row.getGlcode())) {
-							
-
-						//	System.out.println("Credit amount"+row.getCreditamount());
-							if(i==1) {
-								//System.out.println(row.getCreditamount());
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum1((summation!=null)?summation.doubleValue():0.0);
-							
-							}
-							
-							if(i==2) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum2((summation!=null)?summation.doubleValue():0.0);
-								
-							}
-							
-							
-							if(i==3) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum3((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							
-							if(i==4) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum4((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							if(i==5) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum5((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							if(i==6) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum6(summation.doubleValue());
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							if(i==7) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum7((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							if(i==8) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum8((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							if(i==9) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum9((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-							
-							if(i==10) {
-								summation = summation.add((row.getCreditamount()!=null)?row.getCreditamount():new BigDecimal(0));
-								dview.setGlsum10((summation!=null)?summation.doubleValue():0.0);
-								//totalRowSum1=totalRowSum1.add(summation);
-							}
-						}else {
-							
-						}
-						i++;	
-					}
-				
-				
+					dedicatedList=new ArrayList<DedicatedExpense>();
+					dedicatedList.add(row);
+					dedicatedListMap.put(row.getDepartment(),dedicatedList);
 				}
-				dvlist.add(dview);
-				
+				else
+				{
+					dedicatedListMap.get(row.getDepartment()).add(row);
+				}
 			}
-			else
+			
+			DedicatedExpenseViewData  dview = null;
+			//System.out.println(dedicatedListMap);
+			for(Department dep:departmentList)
 			{
+				 BigDecimal glsum1=new BigDecimal(0);
+				 BigDecimal glsum2=new BigDecimal(0);
+				 BigDecimal glsum3=new BigDecimal(0);
+				 BigDecimal glsum4=new BigDecimal(0);
+				 BigDecimal glsum5=new BigDecimal(0);
+				 BigDecimal glsum6=new BigDecimal(0);
+				 BigDecimal glsum7=new BigDecimal(0);
+				 BigDecimal glsum8=new BigDecimal(0);
+				 BigDecimal glsum9=new BigDecimal(0);
+				 BigDecimal glsum10=new BigDecimal(0);
+				 BigDecimal sum=new BigDecimal(0);
+				if(dedicatedListMap.get(dep.getName()) != null)
+				{	
+				  dview = new DedicatedExpenseViewData();
+					dview.setName(dep.getName());		
+					for(DedicatedExpense row:dedicatedListMap.get(dep.getName()))
+					{	if(row.getGlcode().equalsIgnoreCase("3117001"))
+					{
+						glsum1=glsum1.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3501150"))
+					{
+						glsum2=glsum2.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3117002"))
+					{
+						glsum3=glsum3.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3502009"))
+					{
+						glsum4=glsum4.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3502002"))
+					{
+						glsum5=glsum5.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("4601002"))
+					{
+						glsum6=glsum6.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3503003"))
+					{
+						glsum7=glsum7.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3504101"))
+					{
+						glsum8=glsum8.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3502068"))
+					{
+						glsum9=glsum9.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					if(row.getGlcode().equalsIgnoreCase("3502064"))
+					{
+						glsum10=glsum10.add(row.getCreditamount().subtract(row.getDebitamount()));
+					}
+					}
+					dview.setGlsum1(glsum1);
+					dview.setGlsum2(glsum2);
+					
+					dview.setGlsum3(glsum3);
+					dview.setGlsum4(glsum4);
+					dview.setGlsum5(glsum5);
+					dview.setGlsum6(glsum6);
+					dview.setGlsum7(glsum7);
+					dview.setGlsum8(glsum8);
+					dview.setGlsum9(glsum9);
+					dview.setGlsum10(glsum10);
+					//dview set indidival values
+					//i++;
+					//}
+					dvlist.add(dview);//for each department
+					
+				}
+				else
+				{
+					
+					dview= new DedicatedExpenseViewData();
+					dview.setName(dep.getName());
+					
+					dview.setGlsum1(new BigDecimal(0.0));
+					dview.setGlsum2(new BigDecimal(0.0));
+					dview.setGlsum3(new BigDecimal(0.0));
+					dview.setGlsum4(new BigDecimal(0.0));
+					dview.setGlsum5(new BigDecimal(0.0));
+					dview.setGlsum6(new BigDecimal(0.0));
+					dview.setGlsum7(new BigDecimal(0.0));
+					dview.setGlsum8(new BigDecimal(0.0));
+					dview.setGlsum9(new BigDecimal(0.0));
+					dview.setGlsum10(new BigDecimal(0.0));
+					dview.setGlsum10(new BigDecimal(0.0));
+					dvlist.add(dview);
+					
+				}
 				
-				DedicatedExpenseViewData d= new DedicatedExpenseViewData();
-				d.setName(dep.getName());
 				
-				d.setGlsum1(0.0);
-				d.setGlsum2(0.0);
-				d.setGlsum3(0.0);
-				d.setGlsum4(0.0);
-				d.setGlsum5(0.0);
-				d.setGlsum6(0.0);
-				d.setGlsum7(0.0);
-				d.setGlsum8(0.0);
-				d.setGlsum9(0.0);
-				d.setGlsum10(0.0);
-				d.setGlsum10(0.0);
-				dvlist.add(d);
 				
 			}
 			
+			BigDecimal rowtotal =new BigDecimal(0.0);
+			BigDecimal coltotal1=new BigDecimal(0.0);
+			List<DedicatedExpenseViewData> dviewNew = new ArrayList<DedicatedExpenseViewData>();
+			List<DedicatedExpenseViewData> dviewNew1 = new ArrayList<DedicatedExpenseViewData>();
+			DedicatedExpenseViewData lastdata = new DedicatedExpenseViewData();
+			
+			lastdata.setGlsum1(new BigDecimal(0.0));
+			lastdata.setGlsum2(new BigDecimal(0.0));
+			lastdata.setGlsum3(new BigDecimal(0.0));
+			lastdata.setGlsum4(new BigDecimal(0.0));
+			lastdata.setGlsum5(new BigDecimal(0.0));
+			lastdata.setGlsum6(new BigDecimal(0.0));
+			lastdata.setGlsum7(new BigDecimal(0.0));
+			lastdata.setGlsum8(new BigDecimal(0.0));
+			lastdata.setGlsum9(new BigDecimal(0.0));
+			lastdata.setGlsum10(new BigDecimal(0.0));
+			lastdata.setSum(new BigDecimal(0.0));
+			for(DedicatedExpenseViewData dv:dvlist) {
+				
+				if(dv.getGlsum1()==null){
+					dv.setGlsum1(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum2()==null){
+					dv.setGlsum2(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum3()==null){
+					dv.setGlsum3(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum4()==null){
+					dv.setGlsum4(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum5()==null){
+					dv.setGlsum5(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum6()==null){
+					dv.setGlsum6(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum7()==null){
+					dv.setGlsum7(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum8()==null){
+					dv.setGlsum8(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum9()==null){
+					dv.setGlsum9(new BigDecimal(0.0));
+				}
+				if(dv.getGlsum10()==null){
+					dv.setGlsum10(new BigDecimal(0.0));
+				}
+				
+				if(dv.getSum()==null){
+					dv.setSum(new BigDecimal(0.0));
+				}
+		
+				
+			rowtotal = dv.getGlsum1().add(dv.getGlsum2()).add(dv.getGlsum3()).add(dv.getGlsum4()).add(dv.getGlsum5())
+					.add(dv.getGlsum6()).add(dv.getGlsum7()).add(dv.getGlsum8()).add(dv.getGlsum9()).add(dv.getGlsum10());
+			dv.setSum(rowtotal);
+			
+			lastdata.setGlsum1(lastdata.getGlsum1().add(dv.getGlsum1()));
+			lastdata.setGlsum2(lastdata.getGlsum2().add(dv.getGlsum2()));
+			lastdata.setGlsum3(lastdata.getGlsum3().add(dv.getGlsum3()));
+			lastdata.setGlsum4(lastdata.getGlsum4().add(dv.getGlsum4()));
+			lastdata.setGlsum5(lastdata.getGlsum5().add(dv.getGlsum5()));
+			lastdata.setGlsum6(lastdata.getGlsum6().add(dv.getGlsum6()));
+			lastdata.setGlsum7(lastdata.getGlsum7().add(dv.getGlsum7()));
+			lastdata.setGlsum8(lastdata.getGlsum8().add(dv.getGlsum8()));
+			lastdata.setGlsum9(lastdata.getGlsum9().add(dv.getGlsum9()));
+			lastdata.setGlsum10(lastdata.getGlsum10().add(dv.getGlsum10()));
+			
+			lastdata.setSum(lastdata.getSum().add(dv.getSum()));
+			
+			dviewNew.add(dv);
+		
+				
+				
+			}
+			
+			lastdata.setName("Total");
+			dviewNew.add(lastdata);
 			
 			
+			return dviewNew;
 		}
-		
-		double rowtotal =0.0;
-		double coltotal1=0.0;
-		List<DedicatedExpenseViewData> dviewNew = new ArrayList<DedicatedExpenseViewData>();
-		List<DedicatedExpenseViewData> dviewNew1 = new ArrayList<DedicatedExpenseViewData>();
-		DedicatedExpenseViewData lastdata = new DedicatedExpenseViewData();
-		
-		lastdata.setGlsum1(0.0);
-		lastdata.setGlsum2(0.0);
-		lastdata.setGlsum3(0.0);
-		lastdata.setGlsum4(0.0);
-		lastdata.setGlsum5(0.0);
-		lastdata.setGlsum6(0.0);
-		lastdata.setGlsum7(0.0);
-		lastdata.setGlsum8(0.0);
-		lastdata.setGlsum9(0.0);
-		lastdata.setGlsum10(0.0);
-		lastdata.setSum(0.0);
-		for(DedicatedExpenseViewData dv:dvlist) {
-			
-			if(dv.getGlsum1()==null){
-				dv.setGlsum1(0.0);
-			}
-			if(dv.getGlsum2()==null){
-				dv.setGlsum2(0.0);
-			}
-			if(dv.getGlsum3()==null){
-				dv.setGlsum3(0.0);
-			}
-			if(dv.getGlsum4()==null){
-				dv.setGlsum4(0.0);
-			}
-			if(dv.getGlsum5()==null){
-				dv.setGlsum5(0.0);
-			}
-			if(dv.getGlsum6()==null){
-				dv.setGlsum6(0.0);
-			}
-			if(dv.getGlsum7()==null){
-				dv.setGlsum7(0.0);
-			}
-			if(dv.getGlsum8()==null){
-				dv.setGlsum8(0.0);
-			}
-			if(dv.getGlsum9()==null){
-				dv.setGlsum9(0.0);
-			}
-			if(dv.getGlsum10()==null){
-				dv.setGlsum10(0.0);
-			}
-			
-			if(dv.getSum()==null){
-				dv.setSum(0.0);
-			}
-	
-		rowtotal = dv.getGlsum1()+dv.getGlsum2()+dv.getGlsum3()+dv.getGlsum4()+dv.getGlsum5()+dv.getGlsum6()+dv.getGlsum7()+dv.getGlsum8()+dv.getGlsum9()+dv.getGlsum10();
-		dv.setSum(rowtotal);
-		
-		lastdata.setGlsum1(lastdata.getGlsum1()+dv.getGlsum1());
-		lastdata.setGlsum2(lastdata.getGlsum2()+dv.getGlsum2());
-		lastdata.setGlsum3(lastdata.getGlsum3()+dv.getGlsum3());
-		lastdata.setGlsum4(lastdata.getGlsum4()+dv.getGlsum4());
-		lastdata.setGlsum5(lastdata.getGlsum5()+dv.getGlsum5());
-		lastdata.setGlsum6(lastdata.getGlsum6()+dv.getGlsum6());
-		lastdata.setGlsum7(lastdata.getGlsum7()+dv.getGlsum7());
-		lastdata.setGlsum8(lastdata.getGlsum8()+dv.getGlsum8());
-		lastdata.setGlsum9(lastdata.getGlsum9()+dv.getGlsum9());
-		lastdata.setGlsum10(lastdata.getGlsum10()+dv.getGlsum10());
-		
-		lastdata.setSum(lastdata.getSum()+dv.getSum());
-		
-		dviewNew.add(dv);
-	
-			
-			
-		}
-		
-		lastdata.setName("Total");
-		dviewNew.add(lastdata);
-		
-		
-		return dviewNew;
-	}
+
 	
 	public List<String> sendGlname(){
 		prepare();

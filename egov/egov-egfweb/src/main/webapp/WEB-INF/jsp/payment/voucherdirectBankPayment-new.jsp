@@ -438,6 +438,11 @@ function populateAccNum(branch){
 	
 	populateaccountNumber({fundId: fundObj.options[fundObj.selectedIndex].value,bankId:bankId,branchId:brId,typeOfAccount:vTypeOfAccount})
 }
+
+function process(date){
+	   var parts = date.split("/");
+	   return new Date(parts[2], parts[1] - 1, parts[0]);
+	}
 function onSubmit()
 {
 	enableAll();
@@ -446,6 +451,32 @@ function onSubmit()
 	var noBalanceCheck='<s:text name="payment.none"/>';
 	var firstsignatory='';
 	var backlogEntry='';
+	
+	if(document.getElementById('voucherDate').value!=null && document.getElementById('documentDate').value!=null){
+		
+		var v1 = document.getElementById('voucherDate').value;
+		var d1 = document.getElementById('documentDate').value;		
+		
+		if(process(v1) < process(d1)){
+            
+			bootbox.alert("Voucher date can not be older than bill date.");
+			undoLoadingMask();
+			return false;
+		}
+		
+	}
+	
+	if(document.getElementById('subdivision') == null || document.getElementById('subdivision').value == '-1')
+	{
+		bootbox.alert("Please select subDivision");
+		undoLoadingMask();
+		return false;
+	}
+	else
+		{
+			subdivision=document.getElementById('subdivision').value;
+		}
+	
 	if(document.getElementById('firstsignatory') == null || document.getElementById('firstsignatory').value == '-1')
 	{
 		bootbox.alert("Please select First Signatory");
