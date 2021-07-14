@@ -10,6 +10,7 @@ public class DedicatedExpense {
 	private String department;
 	private String glcode;
 	private BigDecimal creditamount;
+	private BigDecimal debitamount;
 	public String getId() {
 		return id;
 	}
@@ -45,6 +46,12 @@ public class DedicatedExpense {
 	}
 	public void setCreditamount(BigDecimal creditamount) {
 		this.creditamount = creditamount;
+	}
+	public BigDecimal getDebitamount() {
+		return debitamount;
+	}
+	public void setDebitamount(BigDecimal debitamount) {
+		this.debitamount = debitamount;
 	}
 	
 	

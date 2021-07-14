@@ -249,7 +249,15 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			bill = auditDetails.getEgBillregister();
 			auditDetail.setBillId(bill.getId());
-			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+			if(bill.getRefundable() != null && bill.getRefundable().equalsIgnoreCase("Y"))
+			{
+				model.addAttribute("billSource", "/services/EGF/refund/view/" + bill.getId());
+			}
+			else
+			{
+				model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+			}
+			
 		}
 		else
 		{
