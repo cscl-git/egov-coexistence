@@ -430,25 +430,7 @@ public class ExpenseBillService {
             {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         "Cancelled"));
-                //for audit
-                /*SQLQuery queryMain =  null;
-        		final StringBuffer query1 = new StringBuffer(500);
-            	
-            	List<Object[]> list= null;
-            	query1
-                .append("select id,auditno from audit_details aud where bill_id ="+egBillregister.getId);
-            	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
-            	list = queryMain.list();
-            	AuditDetails audit=new AuditDetails();
-            	if (list.size() != 0) {
-            		for (final Object[] object : list)
-            		{
-            			if(bill != null)
-            			{
-            				egBilldetailsList.addAll(bill.getEgBilldetailes());
-            			}
-            		}
-            	}*/
+                //for audit					
             }   
     }
 
