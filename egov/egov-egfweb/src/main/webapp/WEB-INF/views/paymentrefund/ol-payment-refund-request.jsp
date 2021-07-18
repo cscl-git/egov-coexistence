@@ -87,7 +87,7 @@
 			 <select name="egBillregistermis.egBillSubType" data-first-option="false" id="billSubType" class="form-control" required="required">
 				<option value=""><spring:message code="lbl.select" text="Select"/></option>
 					<c:forEach items="${billSubTypes}" var="subType" varStatus="loop">
-											<option value="${subType.id}">${subType.value}</option>
+											<option value="${subType.id}">${subType.name}</option>
 										</c:forEach>
 			</select>
 				</div>				

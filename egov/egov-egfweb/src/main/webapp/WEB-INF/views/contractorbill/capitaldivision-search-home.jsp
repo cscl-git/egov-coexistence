@@ -50,7 +50,7 @@
 				<c:if test="${error}">
 					<div class="col-sm-12 add-margin" style="font-size: large; text-align: center;"><b>${msg}</b></div>
 				</c:if>
-				<c:if test="${data_success}">	
+				<%-- <c:if test="${data_success}">	
 				<c:if test="${data!=null && data.size()>0}">	
 				 <div class="col-sm-12 add-margin" style="font-size: large; text-align: center;"><b>${headertag}</b></div>
 				
@@ -68,7 +68,7 @@
 				</c:if>
 				
 				<c:if test="${data==null||data.size()<=0}">	No Data Found</c:if>
-				</c:if>
+				</c:if> --%>
 				
 			</div>
 		</div>
@@ -82,7 +82,7 @@
 			if(isValid == false)
 		return false;
 
-	document.forms[0].action="../generalledgerreport/capitaldivisionresults";
+	document.forms[0].action="../generalledgerreport/capitaldivisionresultsXLS";
  	document.forms[0].submit();
 
 	

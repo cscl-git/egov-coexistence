@@ -43,10 +43,12 @@ import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.egov.model.report.CapitalRevenueDataPOJO;
 import org.egov.model.report.CapitalRevenueRequestPojo;
 import org.egov.model.report.DedicatedExpense;
 import org.egov.model.report.DedicatedExpenseViewData;
 import org.egov.model.report.DivisionReportPOJO;
+import org.egov.model.report.ReceiptReportPOJO;
 import org.egov.model.report.ReportBean;
 import org.egov.services.budget.BudgetDetailService;
 import org.egov.utils.FinancialConstants;
@@ -60,12 +62,12 @@ import org.springframework.ui.ModelMap;
 
 import com.exilant.eGov.src.reports.TrialBalanceBean;
 
-	
-	
+
+
 
 @Service
 public class GeneralLedgerReportService   {
-
+	
 	@Autowired
 	private DepartmentService departmentService;
 	@Autowired
@@ -81,7 +83,7 @@ public class GeneralLedgerReportService   {
 	@Autowired
     @Qualifier("chartOfAccountsService")
     private ChartOfAccountsService chartOfAccountsService;
-	
+
 	@Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
@@ -120,16 +122,16 @@ public class GeneralLedgerReportService   {
 		
 		private Date startDate = new Date();
 		private Date endDate = new Date();
-
-	    public Session getCurrentSession() {
-	        return entityManager.unwrap(Session.class);
-	    }
+		
+		 public Session getCurrentSession() {
+		        return entityManager.unwrap(Session.class);
+		    }
 		public class COAcomparator implements Comparator<TrialBalanceBean> {
 			@Override
 			public int compare(final TrialBalanceBean o1, final TrialBalanceBean o2) {
 				return o1.getAccCode().compareTo(o2.getAccCode());
 			}
-	
+
 		}
 		public void prepare() {
 			glcode.clear();
@@ -161,289 +163,295 @@ public class GeneralLedgerReportService   {
 			  
 		}
 	
-		public List<DedicatedExpenseViewData> getDedicated(StringBuilder qs, Date fromdate, Date todate,String dept_code) {
-			
-			
-			//System.out.println("Inside dedicated");
-			StringBuilder query = new StringBuilder(" ");
-			String department = "";
-			query.append("select id as id,vouchernumber as vouchernumber ,voucherdate as voucherdate ,department as department,glcode as glcode ,creditamount as creditamount,debitamount as debitamount from exp_ded_view ");
-			query.append(" where ");
-			query.append(qs);
-			query.append(" order by glcode ASC ");
-			
-			Query q =entityManager.createNativeQuery(query.toString());
-			//q.setParameter("fromdate", fromdate);
-			//q.setParameter("todate", todate);
-			if(dept_code!=null) {
-				try {
-					
-					department  = departmentService.getDepartmentByCode(dept_code).getName();
-					q.setParameter("department", department);
-				}catch(Exception ex) {
-					ex.printStackTrace();
-					
-				}
-				
-			}
-			List<DedicatedExpense> data = new ArrayList<DedicatedExpense>();
-			//System.out.println("Query Printing---"+query.toString());
+	public List<DedicatedExpenseViewData> getDedicated(StringBuilder qs, Date fromdate, Date todate,String dept_code) {
+		
+		
+		//System.out.println("Inside dedicated");
+		StringBuilder query = new StringBuilder(" ");
+		String department = "";
+		query.append("select id as id,vouchernumber as vouchernumber ,voucherdate as voucherdate ,department as department,glcode as glcode ,creditamount as creditamount,debitamount as debitamount from exp_ded_view ");
+		query.append(" where ");
+		query.append(qs);
+		query.append(" order by glcode ASC ");
+		
+		Query q =entityManager.createNativeQuery(query.toString());
+		//q.setParameter("fromdate", fromdate);
+		//q.setParameter("todate", todate);
+		if(dept_code!=null) {
 			try {
-				List<Object[]> list = q.getResultList();
-				//System.out.println(list.size());
 				
-				
-				if(list.size()>0) {
-					for (final Object[] o : list)
-		    		{
-						DedicatedExpense a = new DedicatedExpense();
-						
-						a.setId(o[0].toString());
-						a.setVouchernumber(o[1].toString());
-						a.setVoucherdate(o[2].toString());
-						a.setDepartment(o[3].toString());
-						a.setGlcode(o[4].toString());
-						a.setCreditamount((null!=o[5])? new BigDecimal(o[5].toString()):new BigDecimal(0));
-						a.setDebitamount((null!=o[6])? new BigDecimal(o[6].toString()):new BigDecimal(0));
-						
-						//System.out.println(o[0].toString()+" "+o[1].toString()+"  "+o[2].toString()+" "+o[3].toString()+" "+o[4].toString()+" "+o[5].toString());
-						data.add(a);
-		    		}
-				}
-				
-				
-				System.out.println(list.size());
+				department  = departmentService.getDepartmentByCode(dept_code).getName();
+				q.setParameter("department", department);
 			}catch(Exception ex) {
 				ex.printStackTrace();
 				
 			}
-			List<DedicatedExpenseViewData> d = new ArrayList<DedicatedExpenseViewData>();
-			Department deparrtm = departmentservice.getDepartmentByCode(dept_code);
-					if(dept_code!=null) {
-				
-				 d = calculateSummation(data,deparrtm);
-			}else {
-				 d = calculateSummation(data,null);
+			
+		}
+		List<DedicatedExpense> data = new ArrayList<DedicatedExpense>();
+		//System.out.println("Query Printing---"+query.toString());
+		try {
+			List<Object[]> list = q.getResultList();
+			System.out.println(list.size());
+			
+			
+			if(list.size()>0) {
+				for (final Object[] o : list)
+	    		{
+					DedicatedExpense a = new DedicatedExpense();
+					
+					a.setId(o[0].toString());
+					a.setVouchernumber(o[1].toString());
+					a.setVoucherdate(o[2].toString());
+					a.setDepartment(o[3].toString());
+					a.setGlcode(o[4].toString());
+					a.setCreditamount((null!=o[5])? new BigDecimal(o[5].toString()):new BigDecimal(0));
+					a.setDebitamount((null!=o[6])? new BigDecimal(o[6].toString()):new BigDecimal(0));
+					
+					//System.out.println(o[0].toString()+" "+o[1].toString()+"  "+o[2].toString()+" "+o[3].toString()+" "+o[4].toString()+" "+o[5].toString());
+					data.add(a);
+	    		}
 			}
 			
-			return d;
+			
+			System.out.println(list.size());
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			
 		}
+		List<DedicatedExpenseViewData> d = new ArrayList<DedicatedExpenseViewData>();
+		Department deparrtm = departmentservice.getDepartmentByCode(dept_code);
+				if(dept_code!=null) {
+			
+			 d = calculateSummation(data,deparrtm);
+		}else {
+			 d = calculateSummation(data,null);
+		}
+		
+		return d;
+	}
 	
-		public List<DedicatedExpenseViewData>  calculateSummation(List<DedicatedExpense> dedicatedExpenses,Department depget) {
+	
+
+	public List<DedicatedExpenseViewData>  calculateSummation(List<DedicatedExpense> dedicatedExpenses,Department depget) {
 			
-			List<DedicatedExpenseViewData> dvlist= new ArrayList<DedicatedExpenseViewData>();
-			List<Department> departmentList= new ArrayList<Department>();
-			if(depget==null) {
-				departmentList= departmentservice.getAllDepartments();
-			}else {
-				departmentList.add(depget);
-			}
-			 
-			prepare();
-			
-			Map<String,List<DedicatedExpense>> dedicatedListMap=new HashMap<String,List<DedicatedExpense>>();
-			List<DedicatedExpense> dedicatedList=null;
-			for(DedicatedExpense row : dedicatedExpenses)
-			{
-				if(dedicatedListMap.get(row.getDepartment())==null)
-				{
-					dedicatedList=new ArrayList<DedicatedExpense>();
-					dedicatedList.add(row);
-					dedicatedListMap.put(row.getDepartment(),dedicatedList);
-				}
-				else
-				{
-					dedicatedListMap.get(row.getDepartment()).add(row);
-				}
-			}
-			
-			DedicatedExpenseViewData  dview = null;
-			//System.out.println(dedicatedListMap);
-			for(Department dep:departmentList)
-			{
-				 BigDecimal glsum1=new BigDecimal(0);
-				 BigDecimal glsum2=new BigDecimal(0);
-				 BigDecimal glsum3=new BigDecimal(0);
-				 BigDecimal glsum4=new BigDecimal(0);
-				 BigDecimal glsum5=new BigDecimal(0);
-				 BigDecimal glsum6=new BigDecimal(0);
-				 BigDecimal glsum7=new BigDecimal(0);
-				 BigDecimal glsum8=new BigDecimal(0);
-				 BigDecimal glsum9=new BigDecimal(0);
-				 BigDecimal glsum10=new BigDecimal(0);
-				 BigDecimal sum=new BigDecimal(0);
-				if(dedicatedListMap.get(dep.getName()) != null)
-				{	
-				  dview = new DedicatedExpenseViewData();
-					dview.setName(dep.getName());		
-					for(DedicatedExpense row:dedicatedListMap.get(dep.getName()))
-					{	if(row.getGlcode().equalsIgnoreCase("3117001"))
-					{
-						glsum1=glsum1.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3501150"))
-					{
-						glsum2=glsum2.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3117002"))
-					{
-						glsum3=glsum3.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3502009"))
-					{
-						glsum4=glsum4.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3502002"))
-					{
-						glsum5=glsum5.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("4601002"))
-					{
-						glsum6=glsum6.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3503003"))
-					{
-						glsum7=glsum7.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3504101"))
-					{
-						glsum8=glsum8.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3502068"))
-					{
-						glsum9=glsum9.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					if(row.getGlcode().equalsIgnoreCase("3502064"))
-					{
-						glsum10=glsum10.add(row.getCreditamount().subtract(row.getDebitamount()));
-					}
-					}
-					dview.setGlsum1(glsum1);
-					dview.setGlsum2(glsum2);
-					
-					dview.setGlsum3(glsum3);
-					dview.setGlsum4(glsum4);
-					dview.setGlsum5(glsum5);
-					dview.setGlsum6(glsum6);
-					dview.setGlsum7(glsum7);
-					dview.setGlsum8(glsum8);
-					dview.setGlsum9(glsum9);
-					dview.setGlsum10(glsum10);
-					//dview set indidival values
-					//i++;
-					//}
-					dvlist.add(dview);//for each department
-					
-				}
-				else
-				{
-					
-					dview= new DedicatedExpenseViewData();
-					dview.setName(dep.getName());
-					
-					dview.setGlsum1(new BigDecimal(0.0));
-					dview.setGlsum2(new BigDecimal(0.0));
-					dview.setGlsum3(new BigDecimal(0.0));
-					dview.setGlsum4(new BigDecimal(0.0));
-					dview.setGlsum5(new BigDecimal(0.0));
-					dview.setGlsum6(new BigDecimal(0.0));
-					dview.setGlsum7(new BigDecimal(0.0));
-					dview.setGlsum8(new BigDecimal(0.0));
-					dview.setGlsum9(new BigDecimal(0.0));
-					dview.setGlsum10(new BigDecimal(0.0));
-					dview.setGlsum10(new BigDecimal(0.0));
-					dvlist.add(dview);
-					
-				}
-				
-				
-				
-			}
-			
-			BigDecimal rowtotal =new BigDecimal(0.0);
-			BigDecimal coltotal1=new BigDecimal(0.0);
-			List<DedicatedExpenseViewData> dviewNew = new ArrayList<DedicatedExpenseViewData>();
-			List<DedicatedExpenseViewData> dviewNew1 = new ArrayList<DedicatedExpenseViewData>();
-			DedicatedExpenseViewData lastdata = new DedicatedExpenseViewData();
-			
-			lastdata.setGlsum1(new BigDecimal(0.0));
-			lastdata.setGlsum2(new BigDecimal(0.0));
-			lastdata.setGlsum3(new BigDecimal(0.0));
-			lastdata.setGlsum4(new BigDecimal(0.0));
-			lastdata.setGlsum5(new BigDecimal(0.0));
-			lastdata.setGlsum6(new BigDecimal(0.0));
-			lastdata.setGlsum7(new BigDecimal(0.0));
-			lastdata.setGlsum8(new BigDecimal(0.0));
-			lastdata.setGlsum9(new BigDecimal(0.0));
-			lastdata.setGlsum10(new BigDecimal(0.0));
-			lastdata.setSum(new BigDecimal(0.0));
-			for(DedicatedExpenseViewData dv:dvlist) {
-				
-				if(dv.getGlsum1()==null){
-					dv.setGlsum1(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum2()==null){
-					dv.setGlsum2(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum3()==null){
-					dv.setGlsum3(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum4()==null){
-					dv.setGlsum4(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum5()==null){
-					dv.setGlsum5(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum6()==null){
-					dv.setGlsum6(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum7()==null){
-					dv.setGlsum7(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum8()==null){
-					dv.setGlsum8(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum9()==null){
-					dv.setGlsum9(new BigDecimal(0.0));
-				}
-				if(dv.getGlsum10()==null){
-					dv.setGlsum10(new BigDecimal(0.0));
-				}
-				
-				if(dv.getSum()==null){
-					dv.setSum(new BigDecimal(0.0));
-				}
-		
-				
-			rowtotal = dv.getGlsum1().add(dv.getGlsum2()).add(dv.getGlsum3()).add(dv.getGlsum4()).add(dv.getGlsum5())
-					.add(dv.getGlsum6()).add(dv.getGlsum7()).add(dv.getGlsum8()).add(dv.getGlsum9()).add(dv.getGlsum10());
-			dv.setSum(rowtotal);
-			
-			lastdata.setGlsum1(lastdata.getGlsum1().add(dv.getGlsum1()));
-			lastdata.setGlsum2(lastdata.getGlsum2().add(dv.getGlsum2()));
-			lastdata.setGlsum3(lastdata.getGlsum3().add(dv.getGlsum3()));
-			lastdata.setGlsum4(lastdata.getGlsum4().add(dv.getGlsum4()));
-			lastdata.setGlsum5(lastdata.getGlsum5().add(dv.getGlsum5()));
-			lastdata.setGlsum6(lastdata.getGlsum6().add(dv.getGlsum6()));
-			lastdata.setGlsum7(lastdata.getGlsum7().add(dv.getGlsum7()));
-			lastdata.setGlsum8(lastdata.getGlsum8().add(dv.getGlsum8()));
-			lastdata.setGlsum9(lastdata.getGlsum9().add(dv.getGlsum9()));
-			lastdata.setGlsum10(lastdata.getGlsum10().add(dv.getGlsum10()));
-			
-			lastdata.setSum(lastdata.getSum().add(dv.getSum()));
-			
-			dviewNew.add(dv);
-		
-				
-				
-			}
-			
-			lastdata.setName("Total");
-			dviewNew.add(lastdata);
-			
-			
-			return dviewNew;
+		List<DedicatedExpenseViewData> dvlist= new ArrayList<DedicatedExpenseViewData>();
+		List<Department> departmentList= new ArrayList<Department>();
+		if(depget==null) {
+			departmentList= departmentservice.getAllDepartments();
+		}else {
+			departmentList.add(depget);
 		}
+		 
+		prepare();
+		
+		Map<String,List<DedicatedExpense>> dedicatedListMap=new HashMap<String,List<DedicatedExpense>>();
+		List<DedicatedExpense> dedicatedList=null;
+		for(DedicatedExpense row : dedicatedExpenses)
+		{
+			if(dedicatedListMap.get(row.getDepartment())==null)
+			{
+				dedicatedList=new ArrayList<DedicatedExpense>();
+				dedicatedList.add(row);
+				dedicatedListMap.put(row.getDepartment(),dedicatedList);
+			}
+			else
+			{
+				dedicatedListMap.get(row.getDepartment()).add(row);
+			}
+		}
+		
+		DedicatedExpenseViewData  dview = null;
+		//System.out.println(dedicatedListMap);
+		for(Department dep:departmentList)
+		{
+			 BigDecimal glsum1=new BigDecimal(0);
+			 BigDecimal glsum2=new BigDecimal(0);
+			 BigDecimal glsum3=new BigDecimal(0);
+			 BigDecimal glsum4=new BigDecimal(0);
+			 BigDecimal glsum5=new BigDecimal(0);
+			 BigDecimal glsum6=new BigDecimal(0);
+			 BigDecimal glsum7=new BigDecimal(0);
+			 BigDecimal glsum8=new BigDecimal(0);
+			 BigDecimal glsum9=new BigDecimal(0);
+			 BigDecimal glsum10=new BigDecimal(0);
+			 BigDecimal sum=new BigDecimal(0);
+			if(dedicatedListMap.get(dep.getName()) != null)
+			{	
+			  dview = new DedicatedExpenseViewData();
+				dview.setName(dep.getName());		
+				for(DedicatedExpense row:dedicatedListMap.get(dep.getName()))
+				{	if(row.getGlcode().equalsIgnoreCase("3117001"))
+				{
+					glsum1=glsum1.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3501150"))
+				{
+					glsum2=glsum2.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3117002"))
+				{
+					glsum3=glsum3.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3502009"))
+				{
+					glsum4=glsum4.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3502002"))
+				{
+					glsum5=glsum5.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("4601002"))
+				{
+					glsum6=glsum6.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3503003"))
+				{
+					glsum7=glsum7.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3504101"))
+				{
+					glsum8=glsum8.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3502068"))
+				{
+					glsum9=glsum9.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				if(row.getGlcode().equalsIgnoreCase("3502064"))
+				{
+					glsum10=glsum10.add(row.getCreditamount().subtract(row.getDebitamount()));
+				}
+				}
+				dview.setGlsum1(glsum1);
+				dview.setGlsum2(glsum2);
+				
+				dview.setGlsum3(glsum3);
+				dview.setGlsum4(glsum4);
+				dview.setGlsum5(glsum5);
+				dview.setGlsum6(glsum6);
+				dview.setGlsum7(glsum7);
+				dview.setGlsum8(glsum8);
+				dview.setGlsum9(glsum9);
+				dview.setGlsum10(glsum10);
+				//dview set indidival values
+				//i++;
+				//}
+				dvlist.add(dview);//for each department
+				
+			}
+			else
+			{
+				
+				dview= new DedicatedExpenseViewData();
+				dview.setName(dep.getName());
+				
+				dview.setGlsum1(new BigDecimal(0.0));
+				dview.setGlsum2(new BigDecimal(0.0));
+				dview.setGlsum3(new BigDecimal(0.0));
+				dview.setGlsum4(new BigDecimal(0.0));
+				dview.setGlsum5(new BigDecimal(0.0));
+				dview.setGlsum6(new BigDecimal(0.0));
+				dview.setGlsum7(new BigDecimal(0.0));
+				dview.setGlsum8(new BigDecimal(0.0));
+				dview.setGlsum9(new BigDecimal(0.0));
+				dview.setGlsum10(new BigDecimal(0.0));
+				dview.setGlsum10(new BigDecimal(0.0));
+				dvlist.add(dview);
+				
+			}
+			
+			
+			
+		}
+		
+		BigDecimal rowtotal =new BigDecimal(0.0);
+		BigDecimal coltotal1=new BigDecimal(0.0);
+		List<DedicatedExpenseViewData> dviewNew = new ArrayList<DedicatedExpenseViewData>();
+		List<DedicatedExpenseViewData> dviewNew1 = new ArrayList<DedicatedExpenseViewData>();
+		DedicatedExpenseViewData lastdata = new DedicatedExpenseViewData();
+		
+		lastdata.setGlsum1(new BigDecimal(0.0));
+		lastdata.setGlsum2(new BigDecimal(0.0));
+		lastdata.setGlsum3(new BigDecimal(0.0));
+		lastdata.setGlsum4(new BigDecimal(0.0));
+		lastdata.setGlsum5(new BigDecimal(0.0));
+		lastdata.setGlsum6(new BigDecimal(0.0));
+		lastdata.setGlsum7(new BigDecimal(0.0));
+		lastdata.setGlsum8(new BigDecimal(0.0));
+		lastdata.setGlsum9(new BigDecimal(0.0));
+		lastdata.setGlsum10(new BigDecimal(0.0));
+		lastdata.setSum(new BigDecimal(0.0));
+		for(DedicatedExpenseViewData dv:dvlist) {
+			
+			if(dv.getGlsum1()==null){
+				dv.setGlsum1(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum2()==null){
+				dv.setGlsum2(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum3()==null){
+				dv.setGlsum3(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum4()==null){
+				dv.setGlsum4(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum5()==null){
+				dv.setGlsum5(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum6()==null){
+				dv.setGlsum6(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum7()==null){
+				dv.setGlsum7(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum8()==null){
+				dv.setGlsum8(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum9()==null){
+				dv.setGlsum9(new BigDecimal(0.0));
+			}
+			if(dv.getGlsum10()==null){
+				dv.setGlsum10(new BigDecimal(0.0));
+			}
+			
+			if(dv.getSum()==null){
+				dv.setSum(new BigDecimal(0.0));
+			}
+	
+			
+		rowtotal = dv.getGlsum1().add(dv.getGlsum2()).add(dv.getGlsum3()).add(dv.getGlsum4()).add(dv.getGlsum5())
+				.add(dv.getGlsum6()).add(dv.getGlsum7()).add(dv.getGlsum8()).add(dv.getGlsum9()).add(dv.getGlsum10());
+		dv.setSum(rowtotal);
+		
+		lastdata.setGlsum1(lastdata.getGlsum1().add(dv.getGlsum1()));
+		lastdata.setGlsum2(lastdata.getGlsum2().add(dv.getGlsum2()));
+		lastdata.setGlsum3(lastdata.getGlsum3().add(dv.getGlsum3()));
+		lastdata.setGlsum4(lastdata.getGlsum4().add(dv.getGlsum4()));
+		lastdata.setGlsum5(lastdata.getGlsum5().add(dv.getGlsum5()));
+		lastdata.setGlsum6(lastdata.getGlsum6().add(dv.getGlsum6()));
+		lastdata.setGlsum7(lastdata.getGlsum7().add(dv.getGlsum7()));
+		lastdata.setGlsum8(lastdata.getGlsum8().add(dv.getGlsum8()));
+		lastdata.setGlsum9(lastdata.getGlsum9().add(dv.getGlsum9()));
+		lastdata.setGlsum10(lastdata.getGlsum10().add(dv.getGlsum10()));
+		
+		lastdata.setSum(lastdata.getSum().add(dv.getSum()));
+		
+		dviewNew.add(dv);
+	
+			
+			
+		}
+		
+		lastdata.setName("Total");
+		dviewNew.add(lastdata);
+		
+		
+		return dviewNew;
+	}
+	
+	
+	
+	
 
 	
 	public List<String> sendGlname(){
@@ -549,7 +557,7 @@ public class GeneralLedgerReportService   {
 	}
 	
 	
-
+	
 	
 	
 	public byte[] CapitalRevenueExl(Map<String,String>headerData,List<ArrayList<String>>  exp,Set<String>depname) {
@@ -570,7 +578,7 @@ public class GeneralLedgerReportService   {
 			
 			Row row2 = sheet.createRow(i++);
 			int j=1;
-	
+			
 			for(ArrayList<String> s : exp) {
 				 	Row row = sheet.createRow(i++);
 				 	for(int z =0;z<s.size();z++) {
@@ -617,133 +625,123 @@ public class GeneralLedgerReportService   {
 		String startwithForglocode="";
 		String startwithForaccCode="";
 		String reportgenerated="The Report is generated for ";
-		 ReportBean rb = new ReportBean();
-		String sDate = capital.getFrom_date();
-		String eDate = capital.getTo_date();
-		Date dt = new Date();
-		Date dd = dt;
+		
 		
 		Set<String>deptname=new HashSet<String>();
 		Set<String>functionname=new HashSet<String>();
 		Map<String,String>headerData  = new HashMap<>();
 		
-		try {
-			dt = sdf.parse(sDate);
-		} catch (ParseException e1) {
-
-		}
-		CFinancialYear finYearByDate = financialYearDAO.getFinYearByDate(dt);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		try {
-			dd = sdf.parse(eDate);
-		} catch (ParseException e1) {
-
-		}
 		reportgenerated = reportgenerated+"From: "+capital.getFrom_date()+" to "+capital.getTo_date();
 		headerData.put("h1",reportgenerated );
-		String endFormat = formatter.format(dd);
-		String endDate1 = formatter.format(finYearByDate.getEndingDate());
-		rb.setFromDate(dt);
-		rb.setToDate(dd);
-		
-		if (endFormat.compareTo(endDate1) > 0) {
-			System.out.println("Start Date and End Date should be in same financial year");
-			m.put("success", false);
-			m.put("data", null);
-			m.put("msg", "Start Date and End Date should be in same financial year");
-			return null;
-			
-		}else {
+
 			if(capital.getExpense_type().equalsIgnoreCase("1")) {
 				startwithForglocode="2";
-			}else {
+			}if(capital.getExpense_type().equalsIgnoreCase("2")) {
 				startwithForglocode="4";
 			}
 			
 			startwithForaccCode="000";
-			List<TrialBalanceBean> fetchlist= Search(capital,rb);
+			StringBuilder queryString= new StringBuilder("");
+			queryString.append(" voucherdate >= TO_DATE('"+ capital.getFrom_date()+"','dd/mm/yyyy') and voucherdate <= TO_DATE('"+capital.getTo_date()+"','dd/mm/yyyy')" );
+			queryString.append(" and fundid = "+capital.getFund());
+			 if(capital.getDepartment()!=null) {
+				 queryString.append(" and deptcode = '"+capital.getDepartment()+"'");
+			 }
+			 List<CapitalRevenueDataPOJO> fetchlist = capitalRevenuDataFromView(queryString);
+			 List<CapitalRevenueDataPOJO> cleanList = new ArrayList<CapitalRevenueDataPOJO>();
 			
-			List <TrialBalanceBean>cleanList = new ArrayList<TrialBalanceBean>();
-			
-			
-			for(TrialBalanceBean a:fetchlist) {
-				TrialBalanceBean tb = new TrialBalanceBean();
-			
-				if(a.getAccCode().startsWith(startwithForglocode) /*&& !a.getFunctioncode().startsWith(startwithForaccCode)*/) {
-				
-					tb=a;
-			
-					cleanList.add(tb);
+			 for(CapitalRevenueDataPOJO a:fetchlist) {
+					CapitalRevenueDataPOJO tb = new CapitalRevenueDataPOJO();
+					if(a.getGlcode().startsWith(startwithForglocode) && null!=a.getFcode() && !a.getFcode().startsWith(startwithForaccCode)) {
+						if(capital.getExpense_type().equalsIgnoreCase("1")) {
+							int lbt =  Integer.parseInt(a.getFcode());
+							//>50 for reve
+							if(lbt>50) {
+							//System.out.println("fncname---->>>   "+a.getFname()+"   debit--->>  "+a.getDebitamount()+"  deptnmae---->>>  "+a.getDepartment()+"  fnccode--->>  "+a.getFcode());
+							tb=a;
+							cleanList.add(tb);
+							}
+						}
+						if(capital.getExpense_type().equalsIgnoreCase("2")) {
+							
+							int lbt =  Integer.parseInt(a.getFcode());
+							if(lbt<=50) {
+								//<=50 for capital
+							//System.out.println("fncname---->>>   "+a.getFname()+"   debit--->>  "+a.getDebitamount()+"  deptnmae---->>>  "+a.getDepartment()+"  fnccode--->>  "+a.getFcode());
+							tb=a;
+							cleanList.add(tb);
+							}
+						}
+					}
+					functionname.add(a.getFname());
+					deptname.add(a.getDepartment());
 				}
-				
-			}
 			
-			for(TrialBalanceBean tb:cleanList) {
-				functionname.add(tb.getFunctionname());
-				deptname.add(tb.getDepartmentname());
-				
-			
-			}
 			deptname.removeIf(x -> x == null);
-				List<CFunction> fn= functionDAO.getAllActiveFunctions();
 			
+			List<CFunction> fn= functionDAO.getAllActiveFunctions();
 			functionname.clear();
 			
-			if(capital.getExpense_type().equalsIgnoreCase("1")) {
-				
-				for(CFunction f:fn) {
-					
-					if(!f.getCode().startsWith(startwithForaccCode)) {
-						int lbt =  Integer.parseInt(f.getCode());
-						if(lbt<=50)
-						functionname.add(f.getName());
-					}
-					
-				}
-			}
-			
-			if(capital.getExpense_type().equalsIgnoreCase("2")) {
-				
-				for(CFunction f:fn) {
-					
-					if(!f.getCode().startsWith(startwithForaccCode)) {
-						int lbt =  Integer.parseInt(f.getCode());
-						if(lbt>50)
-						functionname.add(f.getName());
-					}
-			
-			}
-			}
-			
-			
+				if(capital.getExpense_type().equalsIgnoreCase("1")) {	
+								for(CFunction f:fn) {	
+									if(!f.getCode().startsWith(startwithForaccCode)) {
+										int lbt =  Integer.parseInt(f.getCode());
+										//>50 for reve
+										if(lbt>50) {
+											functionname.add(f.getName());
+										}
+										
+									}	
+								}
+							}
+							
+					if(capital.getExpense_type().equalsIgnoreCase("2")) {
+							for(CFunction f:fn) {
+									
+									if(!f.getCode().startsWith(startwithForaccCode)) {
+										
+										int lbt =  Integer.parseInt(f.getCode());
+										//<=50 for cap
+										if(lbt<=50) {
+											//System.out.println("Function Code"+f.getCode());
+											functionname.add(f.getName());
+										}
+									}
+									
+								}
+							}
+
 			functionname.removeIf(x -> x==null);
-			
-			fetchlist = new ArrayList<TrialBalanceBean>();
+			fetchlist = new ArrayList<CapitalRevenueDataPOJO>();
+			CapitalRevenueDataPOJO t =null;
 			for(String a :functionname ) {
+				
 				for(String d:deptname) {
 					
-					BigDecimal sum = new BigDecimal(0); 
-					TrialBalanceBean t = new TrialBalanceBean();
-					for(TrialBalanceBean tb:cleanList) {
+					BigDecimal sum = new BigDecimal(0.0); 
+					t =  new CapitalRevenueDataPOJO();
+					for(CapitalRevenueDataPOJO tb:cleanList) {
 						
-						if(tb.getFunctionname().equalsIgnoreCase(a)&&tb.getDepartmentname().equalsIgnoreCase(d)) {
-							
+						if(tb.getFname().equalsIgnoreCase(a)&&tb.getDepartment().equalsIgnoreCase(d)) {
 							t = tb;
-							sum =sum.add(tb.getDebitAmount());
-							t.setFinalRowlTotal(sum);
-							fetchlist.add(t);
-							
+							sum =sum.add(tb.getDebitamount());
+							t.setTotalSum(sum);
 						}
-						
 					}
+					fetchlist.add(t);
 				}
 				
 			}
-			
+			cleanList =new ArrayList<CapitalRevenueDataPOJO>();
+			  for(CapitalRevenueDataPOJO tb:fetchlist) { 
+				  if( null!=tb.getFcode() && null!=tb.getDepartment()) {
+					  cleanList.add(tb);
+				  } 
+			  }
 			ArrayList< ArrayList<String>> send = new ArrayList<ArrayList<String>>();
-			send = getcaptitalRevenueFinalData(fetchlist,functionname,deptname);
+			send = getcaptitalRevenueFinalData(cleanList,functionname,deptname);
 			return CapitalRevenueExl(headerData,send,deptname);
-		}
+		
 		
 	}
 	
@@ -751,181 +749,160 @@ public class GeneralLedgerReportService   {
 		finalList = null;
 		String startwithForglocode="";
 		String startwithForaccCode="";
-		 ReportBean rb = new ReportBean();
-		String sDate = capital.getFrom_date();
-		String eDate = capital.getTo_date();
-		Date dt = new Date();
-		Date dd = dt;
-		
+		ReportBean rb = new ReportBean();
 		Set<String>deptname=new HashSet<String>();
 		Set<String>functionname=new HashSet<String>();
+		  //1-50 capital
+		//>50 revenue
 		
-		try {
-			dt = sdf.parse(sDate);
-		} catch (ParseException e1) {
-
-		}
-		CFinancialYear finYearByDate = financialYearDAO.getFinYearByDate(dt);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		try {
-			dd = sdf.parse(eDate);
-		} catch (ParseException e1) {
-
-		}
-		String endFormat = formatter.format(dd);
-		String endDate1 = formatter.format(finYearByDate.getEndingDate());
-		rb.setFromDate(dt);
-		rb.setToDate(dd);
-		
-		if (endFormat.compareTo(endDate1) > 0) {
-			System.out.println("Start Date and End Date should be in same financial year");
-			
-			return null;
-		}else {
+		//1=revenue
+		//2=capital
 			if(capital.getExpense_type().equalsIgnoreCase("1")) {
 				startwithForglocode="2";
 			}else {
 				startwithForglocode="4";
 			}
-			
 			startwithForaccCode="000";
-			List<TrialBalanceBean> fetchlist= Search(capital,rb);
-			
-			List <TrialBalanceBean>cleanList = new ArrayList<TrialBalanceBean>();
-			  for(TrialBalanceBean a:fetchlist) {
-				TrialBalanceBean tb = new TrialBalanceBean();
-			  
-				if(a.getAccCode().startsWith(startwithForglocode) /*&& !a.getFunctioncode().startsWith(startwithForaccCode)*/) {	
-					tb=a;
-					cleanList.add(tb);
+			StringBuilder queryString= new StringBuilder("");
+			queryString.append(" voucherdate >= TO_DATE('"+ capital.getFrom_date()+"','dd/mm/yyyy') and voucherdate <= TO_DATE('"+capital.getTo_date()+"','dd/mm/yyyy')" );
+			queryString.append(" and fundid = "+capital.getFund());
+			 if(capital.getDepartment()!=null) {
+				 queryString.append(" and deptcode = '"+capital.getDepartment()+"'");
+			 }
+		 List<CapitalRevenueDataPOJO> fetchlist = capitalRevenuDataFromView(queryString);
+		 List<CapitalRevenueDataPOJO> cleanList = new ArrayList<CapitalRevenueDataPOJO>();
+			for(CapitalRevenueDataPOJO a:fetchlist) {
+				CapitalRevenueDataPOJO tb = new CapitalRevenueDataPOJO();
+				if(a.getGlcode().startsWith(startwithForglocode) && null!=a.getFcode() && !a.getFcode().startsWith(startwithForaccCode)) {
+						//>50 for reve
+					if(capital.getExpense_type().equalsIgnoreCase("1")) {
+						int lbt =  Integer.parseInt(a.getFcode());
+						if(lbt>50) {
+							//System.out.println("fncname---->>>   "+a.getFname()+"   debit--->>  "+a.getDebitamount()+"  deptnmae---->>>  "+a.getDepartment()+"  fnccode--->>  "+a.getFcode());
+						tb=a;
+						cleanList.add(tb);
+						}
+					}
+					if(capital.getExpense_type().equalsIgnoreCase("2")) {
+						//<=50 for capital
+						int lbt =  Integer.parseInt(a.getFcode());
+						if(lbt<=50) {
+							//System.out.println("fncname---->>>   "+a.getFname()+"   debit--->>  "+a.getDebitamount()+"  deptnmae---->>>  "+a.getDepartment()+"  fnccode--->>  "+a.getFcode());
+						tb=a;
+						cleanList.add(tb);
+						}
+					}
+				
+					
 				}
-				functionname.add(a.getFunctionname());
-				deptname.add(a.getDepartmentname());
+				functionname.add(a.getFname());
+				deptname.add(a.getDepartment());
 			}
-			  
+			
+			//rev <=50
+			//cap >50 fundcode
 			deptname.removeIf(x -> x == null);
-			
 			List<CFunction> fn= functionDAO.getAllActiveFunctions();
-			functionname.clear();
-			
-				if(capital.getExpense_type().equalsIgnoreCase("1")) {
-								
+			functionname.clear();	
+				if(capital.getExpense_type().equalsIgnoreCase("1")) {		
 								for(CFunction f:fn) {
-									
+									//>50 for reve
 									if(!f.getCode().startsWith(startwithForaccCode)) {
 										int lbt =  Integer.parseInt(f.getCode());
-										if(lbt<=50) {
-											//System.out.println("Function Code"+f.getCode());
+										if(lbt>50) {
 											functionname.add(f.getName());
 										}
 										
 									}
-			  
-			  }
+									
+								}
 							}
-			 
+							
 					if(capital.getExpense_type().equalsIgnoreCase("2")) {
 							for(CFunction f:fn) {
 									
 									if(!f.getCode().startsWith(startwithForaccCode)) {
-										
+										//<=50 for capital
 										int lbt =  Integer.parseInt(f.getCode());
-										if(lbt>50) {
-											//System.out.println("Function Code"+f.getCode());
+										if(lbt<=50) {
 											functionname.add(f.getName());
 										}
-			
-			
-									}
-					
-				}
-			}
-			
-			 // System.out.println(functionname.size());
-			 
-			
+									}	
+								}
+							}
+
 			functionname.removeIf(x -> x==null);
-			for(String f:functionname) {
-				//System.out.println("Function Name "+f);
-				
-			}
-			fetchlist = new ArrayList<TrialBalanceBean>();
-			
-			
+			fetchlist = new ArrayList<CapitalRevenueDataPOJO>();
+			CapitalRevenueDataPOJO t =null;
 			for(String a :functionname ) {
 				for(String d:deptname) {
-					
 					BigDecimal sum = new BigDecimal(0); 
-					TrialBalanceBean t = new TrialBalanceBean();
-					for(TrialBalanceBean tb:cleanList) {
+					t =  new CapitalRevenueDataPOJO();
+					for(CapitalRevenueDataPOJO tb:cleanList) {
 						
-						if(tb.getFunctionname().equalsIgnoreCase(a)&&tb.getDepartmentname().equalsIgnoreCase(d)) {
-							//System.out.println("Function Nmae--->>"+a+" depname  "+d);
-							
+						if(tb.getFname().equalsIgnoreCase(a)&&tb.getDepartment().equalsIgnoreCase(d)) {
 							t = tb;
-							sum =sum.add(tb.getDebitAmount());
-							t.setFinalRowlTotal(sum);
-							fetchlist.add(t);
-							
-							
+							sum =sum.add(tb.getDebitamount());
+							t.setTotalSum(sum);		
 						}
-						
-						
-						
-					}
-				}
-				
+					}	
+					fetchlist.add(t);
+				}		
 			}
 			
-			return getcaptitalRevenueFinalData(fetchlist,functionname,deptname);
-		}
-		
+		  cleanList =new ArrayList<CapitalRevenueDataPOJO>();
+		  for(CapitalRevenueDataPOJO tb:fetchlist) { 
+			  if( null!=tb.getFcode() && null!=tb.getDepartment()) {
+				  cleanList.add(tb);
+			  } 
+		  }
+		  return getcaptitalRevenueFinalData(cleanList,functionname,deptname);	
 	}
 	
-	public ArrayList<ArrayList<String>>getcaptitalRevenueFinalData(List <TrialBalanceBean>cleanList,Set<String> fncname,Set<String>depname){
+	public ArrayList<ArrayList<String>>getcaptitalRevenueFinalData(List <CapitalRevenueDataPOJO>cleanList,Set<String> fncname,Set<String>depname){
 		ArrayList<String> toprow = new ArrayList<String>();
 		ArrayList<ArrayList<String>> finallist = new ArrayList<ArrayList<String>>();
 		Set<String>depnamenew = new HashSet<String>();
 		depnamenew.add("Budget Heads");
 		ArrayList<String> dlist = new ArrayList<String>();
 		
-		
 		dlist.add(0,"Budget Heads");
-		
-		//dlist.add(1,"Trial Balance");
-		
-		
 		dlist.addAll(depname);
 		dlist.add("Total");	
 		for (String dep : dlist) {
 			toprow.add(dep);
 		}
 		finallist.add(toprow);
-		//System.out.println(finallist);
+		finallist.removeIf(x -> x == null);
 		ArrayList<String> bottomrow = new ArrayList<String>(toprow.size()-1);
 		bottomrow.add(0,"Total");
-		for(int i=0;i<toprow.size()-2;i++) {
+		//System.out.println(toprow);
+		for(int i=0;i<toprow.size()-1;i++) {
 		  	bottomrow.add("");
 		  }
-		  
+		Set <String> check = new HashSet<String>();
+		ArrayList<String> c = null;
+		int toprowsize=toprow.size();
+		if(toprow.size()>2) {
+			 toprowsize =toprow.size()-3;
+		}
 		
 		
 		for(String fs:fncname) {
-			ArrayList<String> c = new ArrayList<String>(toprow.size()-1);
+			c=new ArrayList<String>(toprowsize);
 			c.add(0,fs);
-		
-			
-			  for(int i=0;i<toprow.size()-3;i++) { c.add("0"); }
-			 
-			 	for(TrialBalanceBean tb: cleanList) {
-			
-				//if (fs.equalsIgnoreCase(tb.getFunctionname())) {
-					
-						int getIndex = toprow.indexOf(tb.getDepartmentname().toString());
-						c.add(getIndex,tb.getDebitAmount().toString());
-						finallist.add(c);					
-				//}
+			  for(int i=0;i<=toprowsize;i++) 
+			  { 
+				  c.add("0.0");
+			  }
+			 	for(CapitalRevenueDataPOJO tb: cleanList) {		
+				if (fs.equalsIgnoreCase(tb.getFname()) ) {
+						int getIndex = toprow.indexOf(tb.getDepartment().toString());
+						c.remove(getIndex);
+						c.add(getIndex,tb.getTotalSum().toString());
+						finallist.add(c);		
 				}
+			 }  	
 		}
 		
 		ArrayList<String> com = new ArrayList<String>();
@@ -937,22 +914,17 @@ public class GeneralLedgerReportService   {
 			}
 			com.add(fin);
 		}
-		
-		
 		//Side Summation Code
 		int z=0;
 		for(ArrayList<String> a : ultraFinal) {
 			if(z>0) {
 				//System.out.println(a.size());
-				BigDecimal sum = new BigDecimal(0);
+				BigDecimal sum = new BigDecimal(0.0);
 				for(int i=1;i<a.size();i++) {
-				
-					if(a.get(i)!=null && a.get(i)!="" & !a.get(i).isEmpty()) {
-						sum = sum.add(new BigDecimal( Double.parseDouble((a.get(i)))));
+					if(a.get(i)!=null && a.get(i)!="" && !a.get(i).isEmpty()  && !check.contains(a.get(0))) {
+						sum = sum.add(new BigDecimal(Double.parseDouble((a.get(i)))));
 					}
 				}
-				
-				//System.out.println("Index oF ultral Final Total"+ultraFinal.get(0).indexOf("Total"));
 				a.add(ultraFinal.get(0).indexOf("Total"),sum.toString());
 			}
 			z++;
@@ -960,114 +932,29 @@ public class GeneralLedgerReportService   {
 		
 		//Bottom Total
 		Integer size = finallist.get(0).size();
-		 for(int j=1;j<size;j++)
+		for(int j=1;j<size;j++)
 		 {
-			 BigDecimal sum = new BigDecimal(0);
+			 BigDecimal sum = new BigDecimal(0.0);
 			 int r = 0;
+			 check=new HashSet<String>();
 			 for(ArrayList<String> bf : finallist) 
 			 {
 				 if(r>0) {
-					 if(bf.get(j)!=null && bf.get(j)!="" & !bf.get(j).isEmpty()) {
+					 	if(bf.get(j)!=null && bf.get(j)!="" && !bf.get(j).isEmpty() && !check.contains(bf.get(0)) ) {
 							sum = sum.add(new BigDecimal( Double.parseDouble((bf.get(j)))));
 						} 
 				 }
-				 
-				
+				 check.add(bf.get(0));
 				r++;
 			 }
+			 bottomrow.remove(j);
 			 bottomrow.add(j,sum.toString());
 		 }
-		
-			ultraFinal.add(bottomrow);
-
+		ultraFinal.add(bottomrow);
 		return ultraFinal;
 	}
 	
-	public StringBuilder getFundQuery(CapitalRevenueRequestPojo capital) {
-		StringBuilder fund = new StringBuilder(" ");
-		
-		if(capital.getFund()!=null && !capital.getFund().isEmpty()) {
-			fund.append(" and v.fundid = :fund ");
-			
-		} 
-		return fund;
-	}
 	
-	public StringBuilder getfunctionQuery(CapitalRevenueRequestPojo capital) {
-		StringBuilder fund = new StringBuilder(" ");
-		
-		StringBuilder fund2 = new StringBuilder(" and f.in in ( select id from function f  where  cast (code as Integer) in(select cast (code as Integer) "
-				+ " from function where id not in((select  id from function where code like '00%')) "
-				+ "and cast(code as Integer)>= 1 and cast (code as Integer)<= 50 ) )");
-		
-		
-		StringBuilder fund1 = new StringBuilder(" and f.in in (select id from function f "
-				+ " where cast (code as Integer) in(select cast (code as Integer) "
-				+ "from function where id not in((select  id from function where code like '00%')) "
-				+ "and cast(code as Integer)> 50 ) )");
-		
-		
-		if(capital.getFunction()!=null && !capital.getFunction().isEmpty()) {
-			fund.append(" and f.id in ("+capital.getFunction() +")");
-			return fund;
-			
-		} else {
-			//Rev
-			if(capital.getExpense_type().equalsIgnoreCase("1")) {
-				fund.append( fund1 );
-			}
-			//cap
-			if(capital.getExpense_type().equalsIgnoreCase("2")) {
-				fund.append( fund2 );
-			}
-		}
-		return fund;
-	}
-	
-	
-	public StringBuilder getGlcodeQuery(CapitalRevenueRequestPojo capital) {
-		StringBuilder fund = new StringBuilder(" ");
-		//Rev
-		if(capital.getExpense_type().equalsIgnoreCase("1")) {
-			fund.append( " and g.glcode like '2%'"  );
-		}
-		//cap
-		if(capital.getExpense_type().equalsIgnoreCase("2")) {
-			fund.append( " g.glcode like '4%' " );
-		}
-		return fund;
-		
-		
-	}
-	
-	public StringBuilder getVoucherDateQuery (CapitalRevenueRequestPojo capital) {
-		StringBuilder voucherdate = new StringBuilder(" ");
-		
-		voucherdate.append("and v.voucherdate >=to_date("+capital.getFrom_date()+",'dd/mm/yyyy') ");
-		voucherdate.append("and v.voucherdate <=to_date("+capital.getTo_date()+",'dd/mm/yyyy') ");
-		
-		
-		return voucherdate;
-		
-		
-	}
-	
-	
-	public StringBuilder getDepartmentQuery (CapitalRevenueRequestPojo capital) {
-		StringBuilder department = new StringBuilder(" ");
-		if(capital.getDepartment()!=null && capital.getFunction().isEmpty()) {
-			
-			department.append(" and ed.id = "+capital.getDepartment()+" ");	
-		}	
-		return department;	
-	}
-	
-	
-	public StringBuilder getGroupByQuery (CapitalRevenueRequestPojo capital) {
-		StringBuilder groupby = new StringBuilder(" ");
-		groupby.append(" group  by ed.name,g.functionid,f.name,v.id,g.glcode,g.debitamount  ");
-		return groupby;	
-	}
 	
 	
 
@@ -1127,12 +1014,14 @@ public class GeneralLedgerReportService   {
 			tb = getReportForDateRange(rb);
 			List<TrialBalanceBean> retdata = new ArrayList<TrialBalanceBean>();
 			retdata = formatTBReport(tb);
-		 /*
-			 * else { if (rb.getFundId() == null) fundList =
-			 * masterDataCache.get("egi-fund"); else { fundList = new ArrayList<Fund>();
-			 * fundList.add((Fund) persistenceService.find("from Fund where id=?",
-			 * rb.getFundId())); } gererateReportForAsOnDate(); }
-			 */
+			
+			//System.out.println(retdata.size());
+			//for(TrialBalanceBean a:retdata) {
+			//	if(a.getDepartmentcode().equals("429")) {
+			//		System.out.println("glcode-->"+a.getAccCode()+"  credit -->"+a.getCreditAmount()+"  debit --> "+a.getDebit()+"depcode -->"+a.getDepartmentcode());
+			//	}
+		//	}
+		
 		return retdata;
 
 	
@@ -1145,12 +1034,6 @@ public class GeneralLedgerReportService   {
 					&& trailBalance.getDebit().equalsIgnoreCase("0.00")
 					&& trailBalance.getClosingBal().equalsIgnoreCase("0.00")))
 				tb.add(trailBalance);
-		//System.out.println("TESTING SIZE---->>>>"+nonZeroItemsList.size());
-		//finalList.clear();
-		//finalList = null;
-		//finalList= nonZeroItemsList;
-		//al=null;
-		//al = nonZeroItemsList;
 		return tb;
 	}
 	
@@ -1222,8 +1105,8 @@ public class GeneralLedgerReportService   {
 				+ tsfunctionaryCond + tsFunctionIdCond + tsdivisionIdCond
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate "
 				+ " GROUP BY ts.glcodeid,coa.glcode,coa.name,ed.name,ed.code,f.code,f.name ORDER BY coa.glcode ASC";
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Query Str" + openingBalanceStr);
+		//if (LOGGER.isDebugEnabled())
+			LOGGER.debug("First Query Str" + openingBalanceStr);
 		final org.hibernate.Query openingBalanceQry = persistenceService.getSession().createSQLQuery(openingBalanceStr)
 				.addScalar("accCode").addScalar("accName").addScalar("departmentname").addScalar("departmentcode").addScalar("functioncode").addScalar("functionname").addScalar("creditOPB", BigDecimalType.INSTANCE)
 				.addScalar("debitOPB", BigDecimalType.INSTANCE)
@@ -1259,6 +1142,7 @@ public class GeneralLedgerReportService   {
 				+ " AND vh.voucherdate>=fy.startingdate AND vh.voucherdate<=:fromDateMinus1 "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ")" + " GROUP BY gl.glcodeid,coa.glcode,coa.name,ed.name,ed.code,f.code,f.name ORDER BY coa.glcode ASC";
+				System.out.println("SecondQuery-->"+tillDateOPBStr);
 		final org.hibernate.Query tillDateOPBQry = persistenceService.getSession().createSQLQuery(tillDateOPBStr).addScalar("accCode")
 				.addScalar("accName").addScalar("departmentname").addScalar("departmentcode").addScalar("functioncode").addScalar("functionname").addScalar("tillDateCreditOPB", BigDecimalType.INSTANCE)
 				.addScalar("tillDateDebitOPB", BigDecimalType.INSTANCE)
@@ -1301,6 +1185,8 @@ public class GeneralLedgerReportService   {
 				+ " AND vh.voucherdate>=:fromDate AND vh.voucherdate<=:toDate "
 				+ " AND fy.startingdate<=:fromDate AND fy.endingdate>=:toDate" + " AND vh.status not in ("
 				+ defaultStatusExclude + ") " + " GROUP BY gl.glcodeid,coa.glcode,coa.name,ed.name,ed.code,f.code,f.name ORDER BY coa.glcode ASC";
+		System.out.println("finaquery-->"+currentDebitCreditStr);
+		
 		final org.hibernate.Query currentDebitCreditQry = persistenceService.getSession().createSQLQuery(currentDebitCreditStr)
 				.addScalar("accCode").addScalar("accName").addScalar("departmentname").addScalar("departmentcode").addScalar("functioncode").addScalar("functionname").addScalar("creditAmount", BigDecimalType.INSTANCE)
 				.addScalar("debitAmount", BigDecimalType.INSTANCE)
@@ -1548,6 +1434,59 @@ public List<TrialBalanceBean> getdivisionDataCheck(CapitalRevenueRequestPojo cap
 	}
 	
 	
+public List<ReceiptReportPOJO> getReceiptReportList(StringBuilder qs) {
+	
+	
+	//System.out.println("Inside dedicated");
+	StringBuilder query = new StringBuilder(" ");
+	String department = "";
+	query.append("select id as id,vouchernumber as vouchernumber ,voucherdate as voucherdate ,department as department,"
+			+ "glcode as glcode ,creditamount as creditamount,debitamount as debitamount,"
+			+ " deptcode as deptcode, fcode as fcode, fname as fname from exp_ded_view3 ");
+	query.append(" where ");
+	query.append(qs);
+	query.append(" order by glcode ASC ");
+	
+	
+	Query q =entityManager.createNativeQuery(query.toString());
+	List<ReceiptReportPOJO> data = new ArrayList<ReceiptReportPOJO>();
+	System.out.println("Query Printing---"+query.toString());
+	try {
+		List<Object[]> list = q.getResultList();
+		System.out.println(list.size());
+		
+		
+		if(list.size()>0) {
+			for (final Object[] o : list)
+    		{
+				ReceiptReportPOJO a = new ReceiptReportPOJO();
+				
+				a.setId(o[0].toString());
+				a.setVouchernumber(o[1].toString());
+				a.setVoucherdate(o[2].toString());
+				a.setDepartment(o[3].toString());
+				a.setGlcode(o[4].toString());
+				a.setCreditamount((null!=o[5])? new BigDecimal(o[5].toString()):new BigDecimal(0));
+				a.setDebitamount((null!=o[6])? new BigDecimal(o[6].toString()):new BigDecimal(0));
+				a.setDeptcode((null!=o[7])?o[7].toString():null);
+				a.setFcode((null!=o[8])?o[8].toString():null);
+				a.setFname((null!=o[9])?o[9].toString():null);
+				
+				//System.out.println(o[0].toString()+" "+o[1].toString()+"  "+o[2].toString()+" "+o[3].toString()+" "+o[4].toString()+" "+o[5].toString());
+				data.add(a);
+    		}
+		}
+		
+		
+	System.out.println(list.size());
+	}catch(Exception ex) {
+		ex.printStackTrace();
+		
+	}
+	
+	return data;
+}
+
 	public List<DivisionReportPOJO> getdivisionData(CapitalRevenueRequestPojo capital) {
 		DivisionReportPOJO d1 = new DivisionReportPOJO();
 		DivisionReportPOJO d2DivisionReportPOJO = new DivisionReportPOJO("Division", false, false, null, null,null);
@@ -1555,80 +1494,56 @@ public List<TrialBalanceBean> getdivisionDataCheck(CapitalRevenueRequestPojo cap
 		List<DivisionReportPOJO> datalistFinal= new ArrayList<DivisionReportPOJO>();
 		//datalistFinal.add(d2DivisionReportPOJO);
 		datalist.addAll(d1.getDataList());
+		StringBuilder queryString= new StringBuilder("");
+		queryString.append(" voucherdate >= TO_DATE('"+ capital.getFrom_date()+"','dd/mm/yyyy') and voucherdate <= TO_DATE('"+capital.getTo_date()+"','dd/mm/yyyy')" );
 		String startwithForglocode="1";
-		ReportBean rb = new ReportBean();
-		String sDate = capital.getFrom_date();
-		String eDate = capital.getTo_date();
-		Date dt = new Date();
-		Date dd = dt;
-
-		try {
-			dt = sdf.parse(sDate);
-		} catch (ParseException e1) {
-
+		List<ReceiptReportPOJO> fetchlist =  getReceiptReportList(queryString);
+		List <ReceiptReportPOJO>data = new ArrayList<ReceiptReportPOJO>();
+		for(ReceiptReportPOJO a:fetchlist) {
+			
+			ReceiptReportPOJO tb = new ReceiptReportPOJO();
+			if(a.getGlcode().startsWith(startwithForglocode)) {
+				tb=a;
+				data.add(tb);
+			}		
 		}
-		CFinancialYear finYearByDate = financialYearDAO.getFinYearByDate(dt);
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd");
-		try {
-			dd = sdf.parse(eDate);
-		} catch (ParseException e1) {
-
-		}
-		String endFormat = formatter.format(dd);
-		String endDate1 = formatter.format(finYearByDate.getEndingDate());
-		rb.setFromDate(dt);
-		rb.setToDate(dd);
-			//startwithForaccCode="000";
-			List<TrialBalanceBean> fetchlist= Search(capital,rb);
-			List <TrialBalanceBean>cleanList = new ArrayList<TrialBalanceBean>();
-			for(TrialBalanceBean a:fetchlist) {
-				TrialBalanceBean tb = new TrialBalanceBean();
-				if(a.getAccCode().startsWith(startwithForglocode)) {
-					tb=a;
-					cleanList.add(tb);
-				}		
-			}
 		
 			Set<String> excludingglcodefordep  = d1.getExlcudingGlcodeForDepartments();
 			BigDecimal finalSummation = new BigDecimal(0);
 			
 			for(DivisionReportPOJO d:datalist) {
+				;
 				BigDecimal currentsum = new BigDecimal(0);
 				BigDecimal total_credit =new BigDecimal(0);
 				BigDecimal total_debit =new BigDecimal(0);
-				if(d.isIsglcode()&& !d.isIsdep()) {
+				if(!d.isIsglcode()&& d.isIsdep()) {
 					
-					for(TrialBalanceBean a : cleanList) {
+					for(ReceiptReportPOJO a : data) {
 						
-						if(a.getDepartmentcode().equalsIgnoreCase(d.getDepcode()) && !excludingglcodefordep.contains(a.getAccCode())) {
+						if(a.getDeptcode().equals(d.getDepcode()) && !excludingglcodefordep.contains(a.getGlcode())) {
 							
-							total_credit = total_credit.add(a.getCreditAmount());
-							total_debit = total_debit.add(a.getDebitAmount());
-							//System.out.println("Acccode--"+a.getDepartmentname()+"Credit--"+a.getCreditAmount()+"Debit--"+a.getDebit());
-							
+							total_credit = total_credit.add(a.getCreditamount());
+							total_debit = total_debit.add(a.getDebitamount());
 						}
+						
 					}
 					
 				}
 				
 				if(d.isIsglcode()&&! d.isIsdep()) {
 					for(String s: d.getGlcodeused())
-					for(TrialBalanceBean a : cleanList) {
-						if(s.equalsIgnoreCase(a.getAccCode())) {
-							total_credit = total_credit.add(a.getCreditAmount());
-							total_debit = total_debit.add(a.getDebitAmount());
+					for(ReceiptReportPOJO a : data) {
+						if(s.equalsIgnoreCase(a.getGlcode())) {
+							total_credit = total_credit.add(a.getCreditamount());
+							total_debit = total_debit.add(a.getDebitamount());
 							
-							//System.out.println("Accname-"+a.getAccName()+"Acccode--"+a.getAccCode()+"Credit--"+a.getCreditAmount()+"Debit--"+a.getDebit());
+							
 						}
 					}
 					
 				}
-				
 				currentsum = total_credit.subtract(total_debit);
-			//	System.out.println("Current Sum:::"+currentsum);
 				finalSummation = finalSummation.add(currentsum);
-				
-			//	System.out.println("Final Sum:::"+finalSummation);
 				d.setAmount(currentsum);
 				
 			}
@@ -1636,15 +1551,62 @@ public List<TrialBalanceBean> getdivisionDataCheck(CapitalRevenueRequestPojo cap
 			DivisionReportPOJO d3DivisionReportPOJO = new DivisionReportPOJO("Total", false, false, null, finalSummation,null);
 			
 			datalistFinal.add(d3DivisionReportPOJO);
-			for(DivisionReportPOJO d:datalistFinal) {
-				if(d.isIsdep())
-			//	System.out.println("Deptname::"+d.getName()+"Amount::"+d.getAmount());
-				
-				if(d.isIsglcode()) {}
-				//	System.out.println("GLNAME::"+d.getName()+"Amount::"+d.getAmount());
-			}
+			
 			return datalistFinal;
 		
+	}
+	
+	
+	public List<CapitalRevenueDataPOJO> capitalRevenuDataFromView(StringBuilder qs) {
+		
+		
+		//System.out.println("Inside dedicated");
+		StringBuilder query = new StringBuilder(" ");
+		query.append("select id as id,vouchernumber as vouchernumber ,voucherdate as voucherdate ,department as department,"
+				+ "glcode as glcode ,creditamount as creditamount,debitamount as debitamount,"
+				+ " deptcode as deptcode, fcode as fcode, fname as fname, fundid as fundid from capitalrevenue ");
+		query.append(" where ");
+		query.append(qs);
+		query.append(" order by glcode ASC ");
+		
+		
+		Query q =entityManager.createNativeQuery(query.toString());
+		List<CapitalRevenueDataPOJO> data = new ArrayList<CapitalRevenueDataPOJO>();
+		System.out.println("Query Printing---"+query.toString());
+		try {
+			List<Object[]> list = q.getResultList();
+			System.out.println(list.size());
+			
+			
+			if(list.size()>0) {
+				for (final Object[] o : list)
+	    		{
+					CapitalRevenueDataPOJO a = new CapitalRevenueDataPOJO();
+					
+					a.setId(o[0].toString());
+					a.setVouchernumber(o[1].toString());
+					a.setVoucherdate(o[2].toString());
+					a.setDepartment(o[3].toString());
+					a.setGlcode(o[4].toString());
+					a.setCreditamount((null!=o[5])? new BigDecimal(o[5].toString()):new BigDecimal(0));
+					a.setDebitamount((null!=o[6])? new BigDecimal(o[6].toString()):new BigDecimal(0));
+					a.setDeptcode((null!=o[7])?o[7].toString():null);
+					a.setFcode((null!=o[8])?o[8].toString():null);
+					a.setFname((null!=o[9])?o[9].toString():null);
+					a.setFundid((null!=o[10])?Long.parseLong(o[10].toString()):null);	
+					//System.out.println(o[0].toString()+" "+o[1].toString()+"  "+o[2].toString()+" "+o[3].toString()+" "+o[4].toString()+" "+o[5].toString());
+					data.add(a);
+	    		}
+			}
+			
+			
+		System.out.println(list.size());
+		}catch(Exception ex) {
+			ex.printStackTrace();
+			
+		}
+		
+		return data;
 	}
 	
 	public byte[] getDivisionExl(Map<String,String>headerData,List<DivisionReportPOJO> exp) {
@@ -1656,16 +1618,7 @@ public List<TrialBalanceBean> getdivisionDataCheck(CapitalRevenueRequestPojo cap
 		try {
 			HSSFWorkbook wb = new HSSFWorkbook();
 			Sheet sheet = wb.createSheet("Reciept Report");
-	/*
-		 * sheet.getPrintSetup().setLandscape(true);
-		 * sheet.getPrintSetup().setPaperSize(HSSFPrintSetup.A5_PAPERSIZE);
-	 */
 			HSSFCellStyle style = wb.createCellStyle();  
-		/*
-		 * HSSFFont font = wb.createFont(); font.setFontHeightInPoints((short)11);
-		 * font.setFontName("Times New Roman"); font.setBoldweight((short)10);
-		 * style.setFont(font);
-		 */
 			int i =0;
 			Row row1 = sheet.createRow(i++);	  
 			Cell c1=  row1.createCell(0);
@@ -1698,7 +1651,7 @@ public List<TrialBalanceBean> getdivisionDataCheck(CapitalRevenueRequestPojo cap
 			        Sheet sheet1 = wb.getSheetAt(x);
 			        int total_row=sheet1.getLastRowNum();
 			        if (sheet1.getPhysicalNumberOfRows() > 0) {
-
+			        	
 			        		Row row = sheet1.getRow(total_row);
 				            Iterator<Cell> cellIterator = row.cellIterator();
 				            while (cellIterator.hasNext()) {
@@ -1707,8 +1660,8 @@ public List<TrialBalanceBean> getdivisionDataCheck(CapitalRevenueRequestPojo cap
 				               // System.out.println(columnIndex);
 				                sheet1.autoSizeColumn(columnIndex);
 				            }
-	
-	
+			        	
+			            
 			        }
 			    }
 			ByteArrayOutputStream os = new ByteArrayOutputStream();

@@ -1561,6 +1561,22 @@ public class PaymentRefundController extends BaseBillController {
 		        if(isBillDateDefaultValue){
 		            egBillregister.setBilldate(new Date());            
 		        }
+		        List<AppConfigValues> appConfigValuesList1 =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+						"RefundBillType");
+		    	List<String> billNames=new ArrayList<String>();
+		    	for(AppConfigValues row:appConfigValuesList1)
+		    	{
+		    		billNames.add(row.getValue());
+		    	}
+		    	List<EgBillSubType> billSubtypes=new ArrayList<EgBillSubType>();
+		    	for(EgBillSubType row:egBillSubTypeService.getByExpenditureType(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT))
+		    	{
+		    		if(billNames.contains(row.getName()))
+		    		{
+		    			billSubtypes.add(row);
+		    		}
+		    	}
+		    	model.addAttribute("billSubTypes", billSubtypes);
 		        model.addAttribute("validActionList", validActions);
 			    model.addAttribute(BILL_TYPES, BillType.values());
 		        model.addAttribute("subdivision", subdivisionList);	        
