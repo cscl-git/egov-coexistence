@@ -63,6 +63,17 @@
 				
 	}
 </script>
+<style>
+#outer
+{
+    width:100%;
+    text-align: center;
+}
+.inner
+{
+    display: inline-block;
+}
+</style>
 <div id="main">
 <div class="row">
 	<div class="col-md-12">
@@ -78,10 +89,23 @@
 		</div>
 	</div>			
 	
-	<div class="buttonbottom">
+<div class="outer buttonbottom">
+	
+	<c:choose>
+    <c:when test="${type=='refund'}">
+      <div class="inner">
+        <input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/refund/view/${billd}')" class="btn btn-default">
+      </div>
+    </c:when>    
+    <c:otherwise>
+      <div class="inner">
 	<input type="button" name="button2" id="button2" value="Print" onclick="openBill('/services/EGF/expensebill/view/${billd}')" class="btn btn-default">
-	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      </div>
+    </c:otherwise>
+</c:choose>
+  <div class="inner">
 	<input type="button" name="button2" id="button2" value="Close" class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();"/>
 	</div>
+</div>
 </div>					
 </div>

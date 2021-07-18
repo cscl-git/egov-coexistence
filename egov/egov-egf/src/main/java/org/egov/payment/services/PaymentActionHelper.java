@@ -184,6 +184,7 @@ public class PaymentActionHelper {
             System.out.println("Part 4");
             createMiscBillDetail(billVhId, commonBean, voucherHeader);
             System.out.println("Part 5");
+            workflowBean.setBillNumber(commonBean.getDocumentNumber());
             paymentheader = sendForApproval(paymentheader, workflowBean);
             System.out.println("Part 6");
         } catch (final ValidationException e) {
@@ -329,6 +330,21 @@ public class PaymentActionHelper {
         calendar.set(Calendar.MILLISECOND, 0);
         Date currentDate = calendar.getTime(); 
         CVoucherHeader voucherHeader =null;
+        
+        if(workflowBean.getWorkFlowAction().equals("Forward"))
+        {
+        	if(workflowBean.getBillNumber() != null)
+        	{
+        		expenseBill = expenseBillService.getByBillnumber(workflowBean.getBillNumber());
+        		if(expenseBill != null && expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
+				 {
+					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Processing"));
+		       		 expenseBillService.create(expenseBill);
+				 }
+        	}
+        			 
+        			 
+        }
         if(workflowBean.getWorkFlowAction().equals("Approve"))
         {
         	voucherHeader = paymentheader.getVoucherheader();
@@ -352,7 +368,14 @@ public class PaymentActionHelper {
         			 expenseBill = expenseBillService.getByBillnumber(row.getBillnumber());
         			 if(expenseBill != null)
         			 {
-        				 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+        				 if(expenseBill.getRefundable() != null && expenseBill.getRefundable().equalsIgnoreCase("Y"))
+        				 {
+        					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("REFUNDBILL", "Bill Payment Approved"));
+        				 }
+        				 else
+        				 {
+        					 expenseBill.setStatus(egwStatusDAO.getStatusByModuleAndCode("EXPENSEBILL", "Bill Payment Approved"));
+        				 }
                 		 expenseBillService.create(expenseBill);
         			 }
         		}

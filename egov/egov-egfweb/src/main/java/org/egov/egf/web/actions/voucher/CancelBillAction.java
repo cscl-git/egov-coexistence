@@ -69,6 +69,7 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.service.ManageAuditorService;
+import org.egov.audit.utils.AuditConstants;
 import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
 import org.egov.egf.dashboard.event.FinanceEventType;
@@ -76,8 +77,10 @@ import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
 import org.egov.egf.expensebill.repository.ExpenseBillRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.utils.FinancialUtils;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
@@ -115,6 +118,9 @@ public class CancelBillAction extends BaseFormAction {
 	public final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Constants.LOCALE);
 	@Autowired
 	private ExpenseBillRepository expenseBillRepository;
+	
+	@Autowired
+	protected AppConfigValueService appConfigValuesService;
 	
 	@Autowired
 	 private ManageAuditorService manageAuditorService;
@@ -367,8 +373,17 @@ public class CancelBillAction extends BaseFormAction {
 		EgBillregister egBillregister = expenseBillService.getById(billId);
 		User user = securityUtils.getCurrentUser();
 		Position owenrPos = new Position();
-		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(egBillregister.getEgBillregistermis().getDepartmentcode()), "RSA");
-        owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
+		//List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(egBillregister.getEgBillregistermis().getDepartmentcode()), "RSA");
+		List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                FinancialConstants.MODULE_NAME_APPCONFIG, AuditConstants.AUDIT_EXAMINER);
+		if(configValuesByModuleAndKey != null && !configValuesByModuleAndKey.isEmpty())
+    	{
+    		owenrPos.setId(Long.parseLong(configValuesByModuleAndKey.get(0).getValue()));
+    	}
+    	else
+    	{
+    		owenrPos.setId(null);
+    	}
 		 
 		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
 	                FinancialConstants.CONTINGENCYBILL_PENDING_CANCEL));

@@ -66,7 +66,7 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
-	
+	<c:if test="${type!=null && type=='refundbill'}">
 	<c:choose>
 		<c:when test="${headerFields.contains('fundsource')}">
 			<div class="col-md-3 col-xs-6 add-margin">
@@ -83,6 +83,7 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+	</c:if>
 </div>
 
 <div class="row add-border">
@@ -107,7 +108,7 @@
 			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-mobno">
 			</div>
 </div>
-
+<c:if test="${type!=null && type=='refundbill'}">
 <div class="row add-border">
 	<c:choose>
 		<c:when test="${headerFields.contains('scheme')}">
@@ -140,6 +141,7 @@
 			</div>
 		</c:otherwise>
 	</c:choose>
+	</c:if>
 </div>
 
 <div class="row add-border">

@@ -148,6 +148,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT);
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_WORKS);
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE);
+        expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND);
         /*expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_PENSION);
         expTypeList.add(FinancialConstants.STANDARD_EXPENDITURETYPE_SALARY);*/
         addDropdownData("expType", expTypeList);

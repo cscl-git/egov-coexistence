@@ -236,7 +236,7 @@
 			{key:"subledgerCode",hidden:true, formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".subledgerCode","hidden")},
 			{key:"glcode.id",label:'<s:text name="lbl.account.code"/> <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV(SUBLEDGERLIST,"loaddropdown(this)"),  dropdownOptions:glcodeOptions},
 			{key:"detailTypeName",hidden:true, formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".detailTypeName","hidden")},
-			{key:"detailType.id",label:'<s:text name="lbl.type"/> <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV1(SUBLEDGERLIST),dropdownOptions:detailtypeOptions},
+			{key:"detailType.id",label:'<s:text name="lbl.type"/> <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV1(SUBLEDGERLIST,"loaddropdown(this)"),dropdownOptions:detailtypeOptions},
 			{key:"detailCode",label:'<s:text name="lbl.code"/> <span class="mandatory1">*</span>', formatter:createSLDetailCodeTextFieldFormatterJV(SUBLEDGERLIST,".detailCode","splitEntitiesDetailCode(this)", ".search", "openSearchWindowFromJV(this)")},
 			{key:"detailKeyId",hidden:true, formatter:createSLHiddenFieldFormatterJV(SUBLEDGERLIST,".detailKeyId")},
 			{key:"detailKey",label:'<s:text name="lbl.name"/>', formatter:createSLLongTextFieldFormatterJV(SUBLEDGERLIST,".detailKey","")},

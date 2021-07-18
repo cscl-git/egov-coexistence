@@ -87,9 +87,54 @@ public class TrialBalanceBean {
     private String amount8;
     private String amount9;
     private String amount10;
+    private String departmentname;
+    private String departmentcode;
+    private String functioncode;
+    private String functionname;
+    private BigDecimal finalRowlTotal;
 
-    public String getAmount1() {
-        return amount1;
+    
+
+  
+
+    public BigDecimal getFinalRowlTotal() {
+		return finalRowlTotal;
+	}
+
+	public void setFinalRowlTotal(BigDecimal finalRowlTotal) {
+		this.finalRowlTotal = finalRowlTotal;
+	}
+
+	public String getFunctionname() {
+		return functionname;
+	}
+
+	public void setFunctionname(String functionname) {
+		this.functionname = functionname;
+	}
+
+	public String getFunctioncode() {
+		return functioncode;
+	}
+
+	public void setFunctioncode(String functioncode) {
+		this.functioncode = functioncode;
+	}
+
+	public String getDepartmentname() {
+		return departmentname;
+	}
+
+	public void setDepartmentname(String departmentname) {
+		this.departmentname = departmentname;
+	}
+
+	public String getDepartmentcode() {
+		return departmentcode;
+	}
+
+	public void setDepartmentcode(String departmentcode) {
+		this.departmentcode = departmentcode;
     }
 
     public String getAmount2() {

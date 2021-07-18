@@ -1246,11 +1246,11 @@ function validate(){
 		return false;
 	}
 	
-	if(!$netPayableAccountCodeId)
+	/*if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
 		return false;
-	}
+	}*/
 	return true;
 }
 
@@ -1386,7 +1386,7 @@ function validateWorkFlowApprover(name) {
 		 $('#approvalDepartment').removeAttr('required');
 	        $('#approvalDesignation').removeAttr('required');
 	        $('#approvalPosition').removeAttr('required');
-	        
+	        $('#approvalComent').removeAttr('required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {
 	        
@@ -1399,10 +1399,14 @@ function validateWorkFlowApprover(name) {
 	          $('#billSubType').removeAttr('required');
 	    }
 	if (button != null && button == 'Cancel') {
+		/*$('#approvalDepartment').removeAttr('required');
+		$('#approvalDesignation').removeAttr('required');
+		$('#approvalPosition').removeAttr('required');
+		$('#approvalComent').attr('required', 'required');*/
 		$('#approvalDepartment').removeAttr('required');
 		$('#approvalDesignation').removeAttr('required');
 		$('#approvalPosition').removeAttr('required');
-		$('#approvalComent').attr('required', 'required');
+	        $('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Forward') {
 		$('#approvalDepartment').attr('required', 'required');
@@ -1565,3 +1569,92 @@ function populateBdgetDetails()
 	}
 	
 	}
+
+
+function populateVarianceDetails()
+{
+	var budgetInd=document.getElementById('viewBudgetIndicator');
+	var indicator='N';
+	var pId =document.getElementById('paId');
+	if(budgetInd != null && budgetInd != '' && budgetInd.value == 'Y' && pId != null && pId != '')
+	{
+		indicator='Y';
+	}
+	if(indicator == 'Y')
+	{
+		var today = new Date();
+		var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+		var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&vtype=pv&vhId='+pId.value;
+		window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+	}
+	else
+	{
+		var dept=document.getElementById('department').value;
+		var fund=document.getElementById('fund').value;
+		var func=document.getElementById('egBillregistermis.function').value;
+		var accCode='';
+		var status = false;
+		if(dept == null || dept == '')
+		{
+			bootbox.alert('Please select department to view budget details');
+			status = true;
+		}
+		else if(fund == null || fund == '')
+		{
+			bootbox.alert('Please select fund to view budget details');
+			status = true;
+		}
+		else if(func == null || func == '')
+		{
+			bootbox.alert('Please select fund to view budget details');
+			status = true;
+		}
+		if(status == false)
+		{
+			accCode=document.getElementById('tempDebitDetails[0].glcodeid').value;
+			var amt =document.getElementById('tempDebitDetails[0].debitamount').value;
+			if(accCode == null || accCode == '' || amt == null || amt == '')
+			{
+				bootbox.alert('Please select Debit Account Code/Amount to view budget details');
+			}
+			else
+			{
+				var today = new Date();
+				var date = today.getDate()+'/'+(today.getMonth()+1)+'/'+today.getFullYear();
+				var url1 = '/services/EGF/report/budgetVarianceReport-loadData.action?asOnDate='+date+'&dept='+dept+'&funds='+fund+'&func='+func+'&accCode='+accCode+'&vtype=pr';
+				window.open(url1,'Source','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700')
+			}
+		}
+	}
+	
+	}
+
+function validateSubLedger(Curraction) {
+
+	if (Curraction.value == 'Forward') {
+		
+		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
+		var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
+		var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
+		var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
+		
+
+		if (subLedgerGlCode == null || subLedgerGlCode == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		}else if (subLedgerType == null || subLedgerType == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} else if (subLedgerName == null || subLedgerName == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} else if (subLedgerAmount == null || subLedgerAmount == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} 	
+
+	}else{
+		return true;
+	}
+
+}

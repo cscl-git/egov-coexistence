@@ -52,6 +52,7 @@ package org.egov.egf.web.actions.payment;
 
 import com.exilant.GLEngine.ChartOfAccounts;
 import com.exilant.GLEngine.Transaxtion;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.exility.common.TaskFailedException;
 import com.exilant.exility.dataservice.DatabaseConnectionException;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
@@ -67,14 +68,18 @@ import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Accountdetailtype;
+import org.egov.commons.Bank;
 import org.egov.commons.Bankaccount;
+import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFunction;
 import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Vouchermis;
+import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
@@ -87,10 +92,14 @@ import org.egov.infra.workflow.entity.StateAware;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
 import org.egov.infra.workflow.service.SimpleWorkflowService;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.bills.EgBillPayeedetails;
+import org.egov.model.bills.EgBilldetails;
+import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.payment.Paymentheader;
 import org.egov.model.voucher.CommonBean;
+import org.egov.model.voucher.PreApprovedVoucher;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.model.voucher.WorkflowBean;
 import org.egov.payment.services.PaymentActionHelper;
@@ -113,6 +122,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -131,6 +141,7 @@ import java.util.Set;
         @Result(name = DirectBankPaymentAction.EDIT, location = "directBankPayment-" + DirectBankPaymentAction.EDIT
                 + ".jsp"),
         @Result(name = "reverse", location = "directBankPayment-reverse.jsp"),
+        @Result(name = "vouchernew", location = "voucherdirectBankPayment-new.jsp"),
         @Result(name = "view", location = "directBankPayment-view.jsp") })
 public class DirectBankPaymentAction extends BasePaymentAction {
     private final static String FORWARD = "Forward";
@@ -142,6 +153,11 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
+    
+    @Autowired
+    private ExpenseBillService expenseBillService;
+    
+    
     @Autowired
     private CreateVoucher createVoucher;
     private PaymentService paymentService;
@@ -162,6 +178,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private static final String REVERSE = "reverse";
     private static final String REQUIRED = "required";
     private static final String PAYMENTID = "paymentid";
+    private static final String VOUCHERNEW = "vouchernew";
     private List<VoucherDetails> billDetailslist;
     private List<VoucherDetails> subLedgerlist;
     boolean showChequeNumber;
@@ -179,14 +196,39 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @Autowired
     @Qualifier("miscbilldetailService")
     private MiscbilldetailService miscbilldetailService;
+    
+    @Autowired
+    private ChartOfAccountDetailService chartOfAccountDetailService;
+    @Autowired
+    private EgovCommon egovCommon;
+    
     private String cutOffDate;
     DateFormat df = new SimpleDateFormat("dd-MMM-yyyy");
     DateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat formatter1 = new SimpleDateFormat("yyyy-MM-dd");
     Date date;
-    private String firstsignatory="-1";
-    private String secondsignatory="-1";
+    private String firstsignatory="";
+    private String secondsignatory="";
     private String backlogEntry="";
+    private String subdivision;
+
+    private EgBillregister egBillregister = new EgBillregister();
+    private List<EgBillregister> refundpreApprovedVoucherList;
+    private String type;
+    private static final String BILLID = "billid";
+    private boolean showVoucherDate;
+    private static final String VOUCHERQUERY = " from CVoucherHeader where id=?";
+    private static final String VOUCHERQUERYBYCGN = " from CVoucherHeader where cgn=?";
+    private static final String ACCDETAILTYPEQUERY = " from Accountdetailtype where id=?";
+    
+    private List<Map<String, Object>> bankBranchList = new ArrayList<Map<String, Object>>();;
+    public EgBillregister getEgBillregister() {
+		return egBillregister;
+	}
+
+	public void setEgBillregister(EgBillregister egBillregister) {
+		this.egBillregister = egBillregister;
+	}
 
     public BigDecimal getBalance() {
         return balance;
@@ -195,6 +237,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public void setBalance(final BigDecimal balance) {
         this.balance = balance;
     }
+
 
     @Override
     public StateAware getModel() {
@@ -254,13 +297,628 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             loadDefalutDates();            
         }
         voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisoinList", subdivisionList);
+        
+        
         // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck()))
             addActionMessage(getText("payment.bankbalance.controltype"));
         return NEW;
     }
+// author Sonu Pajapati
+    
+    
+    @SkipValidation
+    @Action(value = "/payment/refunddirectBankPayment-newform")
+    public String newRefundform() {
+    	
+    	List<Bank> bankList=new ArrayList<Bank>();
+		List<AppConfigValues> cutOffDateconfigValue = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"DataEntryCutOffDate");
+		if (cutOffDateconfigValue != null && !cutOffDateconfigValue.isEmpty()) {
+			System.out.println("check cutOffDateconfigValue is null or not");
+			try {
+				date = df.parse(cutOffDateconfigValue.get(0).getValue());
+				cutOffDate = formatter.format(date);
+				
+			} catch (ParseException e) {
+				System.out.println("Exception in cutOffDateconfigValue is null or not");
+			}
+		}
+		 
+        
+		    voucherHeader.reset();
+	        commonBean.reset();
+	        commonBean.setModeOfPayment(MDP_PEX);
+	        typeOfAccount = FinancialConstants.TYPEOFACCOUNT_PAYMENTS + ","
+	                + FinancialConstants.TYPEOFACCOUNT_RECEIPTS_PAYMENTS;
+	        voucherHeader.setVouchermis(new Vouchermis());
+	        // voucherHeader.getVouchermis().setDepartmentid((Department)paymentService.getAssignment().getDeptId());
+	        billDetailslist = new ArrayList<VoucherDetails>();
+	       // billDetailslist.add(new VoucherDetails());
+	        subLedgerlist = new ArrayList<VoucherDetails>();
+	        //subLedgerlist.add(new VoucherDetails());
+	        if(isDateAutoPopulateDefaultValueEnable()){
+	            loadDefalutDates();            
+	        }
+	        voucherHeader.getVouchermis().setDepartmentcode(getDefaultDepartmentValueForPayment());
+	        // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+	        
+        
+        egBillregister = (EgBillregister) getPersistenceService().find(" from EgBillregister where id=?",
+                Long.valueOf(parameters.get(BILLID)[0]));
+        System.out.println(egBillregister.getBillnumber());
+        if (egBillregister.getEgBillregistermis().getVoucherHeader() != null && egBillregister.getEgBillregistermis()
+                .getVoucherHeader().getStatus() != FinancialConstants.CANCELLEDVOUCHERSTATUS) {
+            voucherHeader = egBillregister.getEgBillregistermis().getVoucherHeader();
+            
+        }
+        else {
+        	voucherHeader.setFundId(egBillregister.getEgBillregistermis().getFund());
+        	voucherHeader.getVouchermis().setSchemeid(egBillregister.getEgBillregistermis().getScheme());
+        	voucherHeader.getVouchermis().setSubschemeid(egBillregister.getEgBillregistermis().getSubScheme());
+        	voucherHeader.getVouchermis().setFundsource(egBillregister.getEgBillregistermis().getFundsource());
+        	voucherHeader.getVouchermis().setDepartmentcode(egBillregister.getEgBillregistermis().getDepartmentcode());
+        	voucherHeader.getVouchermis().setDepartmentName(egBillregister.getEgBillregistermis().getDepartmentName());
+        	voucherHeader.getVouchermis().setFunction(egBillregister.getEgBillregistermis().getFunction());
+        	voucherHeader.getVouchermis().setFunctionary(egBillregister.getEgBillregistermis().getFunctionaryid());
+        	
+           
+        }
+        commonBean.setDocumentNumber(egBillregister.getBillnumber());
+        Date docu_date=egBillregister.getBilldate();
+        commonBean.setDocumentdate(formatter.format(docu_date));
+        commonBean.setAmount(egBillregister.getBillamount());
+        commonBean.setPaidTo(egBillregister.getEgBillregistermis().getPayto());
+        if(egBillregister.getRefundable() != null && egBillregister.getRefundable().equalsIgnoreCase("Y")) {
+        	commonBean.setRefundable(egBillregister.getRefundable());
+        	commonBean.setNarrtion(egBillregister.getRefundnarration());
+        }
+        else {
+        	commonBean.setNarrtion(egBillregister.getEgBillregistermis().getNarration());
+        }
+       // commonBean.setRefundable(egBillregister.getRefundable());
+         List<Map<String, Object>> bankBranchList=new ArrayList<Map<String, Object>>();;
+        int index = 0;
+        String[] strArray = null;
+        final StringBuffer query = new StringBuffer();
+        query.append(
+                "select DISTINCT concat(concat(bank.id,'-'),bankBranch.id) as bankbranchid,concat(concat(bank.name,' '),bankBranch.branchname) as bankbranchname ")
+                .append("FROM Bank bank,Bankbranch bankBranch,Bankaccount bankaccount where  bank.isactive=true  and bankBranch.isactive=true and ")
+                .append(" bankaccount.isactive=true and bank.id = bankBranch.bank.id and bankBranch.id = bankaccount.bankbranch.id ");
+        if (voucherHeader.getFundId() != null)
+            query.append("and bankaccount.fund.id=? and bankaccount.type in(");
+        else
+            query.append("and bankaccount.type in(");
+        if (typeOfAccount.indexOf(",") != -1) {
+            strArray = typeOfAccount.split(",");
+            for (final String type : strArray) {
+                index++;
+                query.append("'").append(type).append("'");
+                if (strArray.length > index)
+                    query.append(",");
+
+            }
+        } else
+            query.append("'").append(typeOfAccount).append("'");
+        query.append(") order by 2 ");
+        try {
+            List<Object[]> bankBranch = null;
+            if (voucherHeader.getFundId() != null)
+                bankBranch = getPersistenceService().findAllBy(query.toString(), voucherHeader.getFundId().getId());
+            else
+                bankBranch = getPersistenceService().findAllBy(query.toString());
+
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Bank list size is " + bankBranch.size());
+            
+            Map<String, Object> bankBrmap;
+            for (final Object[] element : bankBranch) {
+                bankBrmap = new HashMap<String, Object>();
+                bankBrmap.put("bankBranchId", element[0].toString());
+                bankBrmap.put("bankBranchName", element[1].toString());
+                bankBranchList.add(bankBrmap);
+            }
+
+        } catch (final HibernateException e) {
+            LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+                    new HibernateException(e.getMessage()));
+
+        } catch (final Exception e) {
+            LOGGER.error("Exception occured while getting the data for bank dropdown " + e.getMessage(),
+                    new Exception(e.getMessage()));
+        }
+       
+        addDropdownData("bankList",bankBranchList);
+        addDropdownData("designationList", Collections.EMPTY_LIST);
+        addDropdownData("userList", Collections.EMPTY_LIST);
+        addDropdownData("accNumList", Collections.EMPTY_LIST);
+	        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+	        
+        //if (LOGGER.isDebugEnabled()) {
+            //LOGGER.debug("egBillregister==" + egBillregister);
+        //}
+        final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+                "pjv_saveasworkingcopy_enabled");
+        final String pjv_wc_enabled = appList.get(0).getValue();
+        System.out.println(pjv_wc_enabled);
+        // loading aprover user info
+      
+        type = egBillregister.getExpendituretype();
+        //getHeaderMandateFields();
+        String purposeValueVN = "";
+        try {
+            final List<AppConfigValues> configValues = appConfigValuesService
+                    .getConfigValuesByModuleAndKey(FinancialConstants.MODULE_NAME_APPCONFIG, "VOUCHERDATE_FROM_UI");
+
+            for (final AppConfigValues appConfigVal : configValues) {
+                purposeValueVN = appConfigVal.getValue();
+            }
+            System.out.println(purposeValueVN);
+        } catch (final Exception e) {
+        	System.out.println("VOUCHERDATE_FROM_UI Exception");
+            throw new ApplicationRuntimeException(
+                    "Appconfig value for VOUCHERDATE_FROM_UI is not defined in the system");
+        }
+        if (purposeValueVN.equals("Y")) {
+        	showVoucherDate = true;
+        }
+        if (getBankBalanceCheck() == null || "".equals(getBankBalanceCheck())) {
+            addActionMessage(getText("payment.bankbalance.controltype"));
+        }   
+
+        // loadApproverUser(type);
+        if ("Y".equals(pjv_wc_enabled)) {
+            try {
+                // loading the bill detail info.
+                getMasterDataForBillVoucher();
+            } catch (final Exception e) {
+                final List<ValidationError> errors = new ArrayList<ValidationError>();
+                errors.add(new ValidationError("exp", e.getMessage()));
+                throw new ValidationException(errors);
+            }
+            return VOUCHERNEW;
+           // return NEW;
+        } else {
+            try {
+                // loading the bill detail info.
+                getMasterDataForBill(egBillregister.getId());
+            } catch (final Exception e) {
+            	 System.out.println("In Exception of Sonu Action java class");
+                final List<ValidationError> errors = new ArrayList<ValidationError>();
+                errors.add(new ValidationError("exp", e.getMessage()));
+                throw new ValidationException(errors);
+               
+            }
+            System.out.println( "End Sonu Action java class"+  Long.valueOf(parameters.get(BILLID)[0]));
+            return VOUCHERNEW;
+            //return NEW;
+            
+        }
+        
+        
+    }
+   
+    
+    public void getMasterDataForBillVoucher() throws ApplicationException {
+        //billDetails = new HashMap<String, Object>();
+        CChartOfAccounts coa = null;
+        VoucherDetails temp = null;
+        Map<String, Object> payeeMap = null;
+        final ArrayList<VoucherDetails> tempList = new ArrayList<VoucherDetails>();
+        final List<VoucherDetails> payeeList = new ArrayList<VoucherDetails>();
+        final List<Long> glcodeIdList = new ArrayList<Long>();
+        final List<Accountdetailtype> detailtypeIdList = new ArrayList<Accountdetailtype>();
+        VoucherDetails subledger = null;
+
+        if (voucherHeader != null) {
+            final List<CGeneralLedger> gllist = getPersistenceService().findAllBy(
+                    " from CGeneralLedger where voucherHeaderId.id=? order by id asc",
+                    Long.valueOf(voucherHeader.getId() + ""));
+
+            for (final CGeneralLedger gl : gllist) {
+                temp = new VoucherDetails();
+                if (gl.getFunctionId() != null) {
+                   // temp.put(Constants.FUNCTION, ((CFunction) getPersistenceService().find("from CFunction where id=?",
+                           // Long.valueOf(gl.getFunctionId()))).getName());
+                    temp.setFunctionDetail(((CFunction) getPersistenceService().find("from CFunction where id=?",
+                            Long.valueOf(gl.getFunctionId()))).getName());
+                    //temp.put("functionid", gl.getFunctionId());
+                    temp.setFunctionIdDetail(Long.valueOf(gl.getFunctionId()));
+                }
+                else if (voucherHeader.getVouchermis() != null && voucherHeader.getVouchermis().getFunction() !=null && voucherHeader.getVouchermis().getFunction().getName() != null)
+                {
+                	//temp.put(Constants.FUNCTION, voucherHeader.getVouchermis().getFunction().getName());
+                	temp.setFunctionDetail(voucherHeader.getVouchermis().getFunction().getName());
+                    //temp.put("functionid", voucherHeader.getVouchermis().getFunction().getId());
+                    temp.setFunctionIdDetail(voucherHeader.getVouchermis().getFunction().getId());
+                }
+                coa = (CChartOfAccounts) getPersistenceService().find("from CChartOfAccounts where glcode=?",
+                        gl.getGlcode());
+                temp.setGlcode(coa);
+                temp.setAccounthead(coa.getName());
+                //temp.put("glcodeid", coa.getId());
+                temp.setGlcodeIdDetail(coa.getId());
+                glcodeIdList.add(coa.getId());
+                //temp.put(Constants.GLCODE, coa.getGlcode());
+                temp.setGlcodeDetail(coa.getGlcode());
+                //temp.put("accounthead", coa.getName());
+                temp.setGlcodeNameDetail(coa.getName());
+                //temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : gl.getDebitAmount());
+                temp.setDebitAmountDetail(new BigDecimal(gl.getDebitAmount()));
+                //temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : gl.getCreditAmount());
+                temp.setCreditAmountDetail(new BigDecimal(gl.getCreditAmount()));
+                //temp.put("billdetailid", gl.getId());
+                tempList.add(temp);
+                for (CGeneralLedgerDetail gldetail : gl.getGeneralLedgerDetails()) {
+                    if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(gl.getGlcodeId().getId(),
+                            gldetail.getDetailTypeId().getId().intValue()) != null) {
+                        subledger = new VoucherDetails();
+                        subledger.setGlcode(coa);
+                        final Accountdetailtype detailtype = (Accountdetailtype) getPersistenceService()
+                                .find(ACCDETAILTYPEQUERY, gldetail.getDetailTypeId().getId());
+                        detailtypeIdList.add(detailtype);
+                        subledger.setSubledgerCode(coa.getGlcode());
+                        subledger.setDetailType(detailtype);
+                        subledger.setDetailTypeName(detailtype.getName());
+                        payeeMap = new HashMap<>();
+                        payeeMap = getAccountDetails(gldetail.getDetailTypeId().getId(), gldetail.getDetailKeyId(),
+                                payeeMap);
+                        subledger.setDetailKey(payeeMap.get(Constants.DETAILKEY) + "");
+                        if ((payeeMap.get(Constants.DETAILKEY) + "").contains(Constants.MASTER_DATA_DELETED))
+                            addActionError(Constants.VOUCHERERRORMESSAGE);
+                        subledger.setDetailCode(payeeMap.get(Constants.DETAILCODE) + "");
+                        subledger.setDetailKeyId(gldetail.getDetailKeyId());
+                        subledger.setAmount(gldetail.getAmount());
+                        
+                        subledger.setFunctionDetail(temp.getFunctionDetail() != null ? temp.getFunctionDetail().toString() : "");
+                        if (gl.getDebitAmount() == null || gl.getDebitAmount() == 0) {
+                            subledger.setDebitAmountDetail(BigDecimal.ZERO);
+                            subledger.setCreditAmountDetail(gldetail.getAmount());
+                        } else {
+                            subledger.setDebitAmountDetail(gldetail.getAmount());
+                            subledger.setCreditAmountDetail(BigDecimal.ZERO);
+                        }
+                        payeeList.add(subledger);
+                    }
+                }
+            }
+            /*
+             * // this is for only vouchers, which do not have the bills List<VoucherDetail> voucherDetailList=new
+             * ArrayList<VoucherDetail>(); voucherDetailList = persistenceService.findAllBy(
+             * "from VoucherDetail where voucherHeaderId.id=? order by decode(debitAmount,null,0, debitAmount) desc ,decode(creditAmount,null,0, creditAmount) asc"
+             * ,voucherHeader.getId()); billDetails.put("voucherDetailList", voucherDetailList);
+             */
+        } else
+            for (final EgBilldetails billdetails : egBillregister.getEgBilldetailes()) {
+                temp = new VoucherDetails();
+                if (billdetails.getFunctionid() != null) {
+                	temp.setFunctionDetail(((CFunction) getPersistenceService().find("from CFunction where id=?",
+                            Long.valueOf(billdetails.getFunctionid() + ""))).getName());
+                    //temp.put(Constants.FUNCTION, ((CFunction) getPersistenceService().find("from CFunction where id=?",
+                           // Long.valueOf(billdetails.getFunctionid() + ""))).getName());
+                	temp.setFunctionIdDetail(billdetails.getFunctionid().longValue());
+                    //temp.put("functionid", billdetails.getFunctionid());
+                }
+                coa = (CChartOfAccounts) getPersistenceService().find("from CChartOfAccounts where id=?",
+                        Long.valueOf(billdetails.getGlcodeid() + ""));
+                //temp.put("glcodeid", coa.getId());
+                temp.setGlcode(coa);
+                temp.setAccounthead(coa.getName());
+                temp.setGlcodeIdDetail(coa.getId());
+                glcodeIdList.add(coa.getId());
+                temp.setGlcodeDetail(coa.getGlcode());
+               // temp.put(Constants.GLCODE, coa.getGlcode());
+                //temp.put("accounthead", coa.getName());
+                //temp.put(Constants.DEBITAMOUNT, billdetails.getDebitamount() == null ? 0 : billdetails.getDebitamount());
+                temp.setDebitAmountDetail(billdetails.getDebitamount() == null ? BigDecimal.ZERO : billdetails.getDebitamount());
+                //temp.put(Constants.CREDITAMOUNT,billdetails.getCreditamount() == null ? 0 : billdetails.getCreditamount());
+                temp.setCreditAmountDetail(billdetails.getCreditamount() == null ? BigDecimal.ZERO : billdetails.getCreditamount());
+                //temp.put("billdetailid", billdetails.getId());
+                tempList.add(temp);
+
+                for (final EgBillPayeedetails payeeDetails : billdetails.getEgBillPaydetailes()) {
+                    if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(
+                            payeeDetails.getEgBilldetailsId().getGlcodeid().longValue(),
+                            payeeDetails.getAccountDetailTypeId().intValue()) != null) {
+                        subledger = new VoucherDetails();
+                        subledger.setGlcode(coa);
+                        final Accountdetailtype detailtype = (Accountdetailtype) getPersistenceService()
+                                .find(ACCDETAILTYPEQUERY, payeeDetails.getAccountDetailTypeId());
+                        detailtypeIdList.add(detailtype);
+                        subledger.setDetailType(detailtype);
+                        subledger.setSubledgerCode(coa.getGlcode());
+                        subledger.setDetailTypeName(detailtype.getName());
+                        payeeMap = new HashMap<>();
+                        payeeMap = getAccountDetails(payeeDetails.getAccountDetailTypeId(),
+                                payeeDetails.getAccountDetailKeyId(), payeeMap);
+                        subledger.setDetailKey(payeeMap.get(Constants.DETAILKEY) + "");
+                        subledger.setDetailCode(payeeMap.get(Constants.DETAILCODE) + "");
+                        subledger.setDetailKeyId(payeeDetails.getAccountDetailKeyId());
+                        if (payeeDetails.getDebitAmount() == null) {
+                            subledger.setDebitAmountDetail(BigDecimal.ZERO);
+                            subledger.setCreditAmountDetail(payeeDetails.getCreditAmount());
+                        } else {
+                            subledger.setDebitAmountDetail(payeeDetails.getDebitAmount());
+                            subledger.setCreditAmountDetail(BigDecimal.ZERO);
+                        }
+                        payeeList.add(subledger);
+                    }
+                }
+            }
+        billDetailslist.addAll(tempList);
+        subLedgerlist.addAll(payeeList);
+        //billDetails.put("tempList", tempList);
+       // billDetails.put("subLedgerlist", payeeList);
+    }
+
+    public void getMasterDataForBill(Long billId) throws ApplicationException {
+        //billDetails = new HashMap<String, Object>();
+        CChartOfAccounts coa = null;
+        VoucherDetails temp = null;
+        Map<String, Object> payeeMap = null;
+        final ArrayList<VoucherDetails> tempList = new ArrayList<VoucherDetails>();
+        final List<VoucherDetails> payeeList = new ArrayList<VoucherDetails>();
+        VoucherDetails subledger = null;
+
+       /* final List<EgBilldetails> egBillDetails = persistenceService
+                .findAllBy("from EgBilldetails where  egBillregister.id=? ", egBillregister.getId());*/
+
+        final EgBillregister egBillregister = expenseBillService.getById(billId);
+        
+        
+        
+
+        for (final EgBilldetails billdetails : egBillregister.getEgBilldetailes()) {
+            temp = new VoucherDetails();
+            if (billdetails.getFunctionid() != null)
+                //temp.put(Constants.FUNCTION, ((CFunction) getPersistenceService().find("from CFunction where id=?",
+                       // Long.valueOf(billdetails.getFunctionid() + ""))).getName());
+            	temp.setFunctionDetail(((CFunction) getPersistenceService().find("from CFunction where id=?",
+                        Long.valueOf(billdetails.getFunctionid() + ""))).getName());
+            temp.setFunctionIdDetail(billdetails.getFunctionid().longValue());
+            coa = (CChartOfAccounts) getPersistenceService().find("from CChartOfAccounts where id=?",
+                    Long.valueOf(billdetails.getGlcodeid() + ""));
+            //temp.put(Constants.GLCODE, coa.getGlcode());
+            temp.setGlcode(coa);
+            temp.setGlcodeIdDetail(coa.getId());
+            temp.setGlcodeDetail(coa.getGlcode());
+            temp.setAccounthead(coa.getName());
+            //temp.put("accounthead", coa.getName());
+            //temp.put(Constants.DEBITAMOUNT, billdetails.getDebitamount() == null ? 0 : billdetails.getDebitamount());
+            temp.setDebitAmountDetail(billdetails.getDebitamount() == null ? BigDecimal.ZERO : billdetails.getDebitamount());
+            //temp.put(Constants.CREDITAMOUNT, billdetails.getCreditamount() == null ? 0 : billdetails.getCreditamount());
+            temp.setCreditAmountDetail(billdetails.getCreditamount() == null ? BigDecimal.ZERO : billdetails.getCreditamount());
+            //temp.put("billdetailid", billdetails.getId());
+            tempList.add(temp);
+
+            for (final EgBillPayeedetails payeeDetails : billdetails.getEgBillPaydetailes()) {
+                payeeMap = new HashMap<>();
+                
+                System.out.println("result :::::::::::::::"+chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId( payeeDetails.getEgBilldetailsId().getGlcodeid().longValue(),payeeDetails.getAccountDetailTypeId().intValue()) != null);
+                
+                subledger = new VoucherDetails();
+                if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(
+                        payeeDetails.getEgBilldetailsId().getGlcodeid().longValue(),
+                        payeeDetails.getAccountDetailTypeId().intValue()) != null) {
+                    payeeMap = getAccountDetails(payeeDetails.getAccountDetailTypeId().intValue(),
+                            payeeDetails.getAccountDetailKeyId().intValue(), payeeMap);
+                    //payeeMap.put(Constants.GLCODE, coa.getGlcode());
+                    subledger.setGlcode(coa);
+                    final Accountdetailtype detailtype = (Accountdetailtype) getPersistenceService()
+                            .find(ACCDETAILTYPEQUERY, payeeDetails.getAccountDetailTypeId());
+                    subledger.setDetailType(detailtype);
+                    subledger.setSubledgerCode(coa.getGlcode());
+                    subledger.setDetailTypeName(detailtype.getName());
+                    subledger.setDetailKey(payeeMap.get(Constants.DETAILKEY) + "");
+                    subledger.setDetailCode(payeeMap.get(Constants.DETAILCODE) + "");
+                    subledger.setDetailKeyId(payeeDetails.getAccountDetailKeyId());
+                    //payeeMap.put(Constants.DEBITAMOUNT,payeeDetails.getDebitAmount() == null ? 0 : payeeDetails.getDebitAmount());
+                    
+                    //payeeMap.put(Constants.CREDITAMOUNT,payeeDetails.getCreditAmount() == null ? 0 : payeeDetails.getCreditAmount());
+                    if (payeeDetails.getDebitAmount() == null) {
+                        subledger.setDebitAmountDetail(BigDecimal.ZERO);
+                        subledger.setCreditAmountDetail(payeeDetails.getCreditAmount());
+                        subledger.setAmount(payeeDetails.getCreditAmount());
+                    } else {
+                        subledger.setDebitAmountDetail(payeeDetails.getDebitAmount());
+                        subledger.setCreditAmountDetail(BigDecimal.ZERO);
+                        subledger.setAmount(payeeDetails.getDebitAmount());
+                    }
+                    payeeList.add(subledger);
+                }
+
+            }
+        }
+        billDetailslist.addAll(tempList);
+        subLedgerlist.addAll(payeeList);
+        //billDetails.put("tempList", tempList);
+        //billDetails.put("payeeList", payeeList);
+    }
+    
+    
+    public Map<String, Object> getAccountDetails(final Integer detailtypeid, final Integer detailkeyid,
+            final Map<String, Object> tempMap) throws ApplicationException {
+    	try {
+        final Accountdetailtype detailtype = (Accountdetailtype) getPersistenceService().find(ACCDETAILTYPEQUERY,
+                detailtypeid);
+        tempMap.put("detailType", detailtype);
+        tempMap.put("detailtypeid", detailtype.getId());
+        tempMap.put("detailkeyid", detailkeyid);
+
+        egovCommon.setPersistenceService(persistenceService);
+        final EntityType entityType = egovCommon.getEntityType(detailtype, detailkeyid);
+        if (entityType == null) {
+            tempMap.put(Constants.DETAILKEY, detailkeyid + " " + Constants.MASTER_DATA_DELETED);
+            tempMap.put(Constants.DETAILCODE, Constants.MASTER_DATA_DELETED);
+        } else {
+            tempMap.put(Constants.DETAILKEY, entityType.getName());
+            tempMap.put(Constants.DETAILCODE, entityType.getCode());
+        }
+    	}catch(Exception e)
+    	{
+    		e.printStackTrace();
+    	}
+        return tempMap;
+    } 
+  
+   
+    @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.subdivison", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "commonBean.accountNumberId", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "commonBean.amount", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "voucherDate", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "commonBean.documentNumber", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "commonBean.documentDate", message = "", key = REQUIRED),
+            @RequiredFieldValidator(fieldName = "commonBean.paidTo", message = "", key = REQUIRED) })
+    @SkipValidation
+    @ValidationErrorPage(value = VOUCHERNEW)
+    @Action(value = "/payment/voucherdirectBankPayment-create")
+    public String createVoucher() {
+        CVoucherHeader billVhId = null;
+        voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+        loadAjaxedDropDowns();
+        removeEmptyRowsAccoutDetail(billDetailslist);
+        removeEmptyRowsSubledger(subLedgerlist);
+        final String voucherDate = formatter.format(voucherHeader.getVoucherDate());
+        String cutOffDate1 = null;
+        
+        try {
+            if (!validateDBPData(billDetailslist, subLedgerlist)) {
+                if (commonBean.getModeOfPayment().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS)) {
+                    if (LOGGER.isInfoEnabled())
+                        LOGGER.info("calling Validate RTGS");
+                    validateRTGS();
+                }
+
+                if (showMode != null && showMode.equalsIgnoreCase("nonbillPayment"))
+                    if (voucherHeader.getId() != null) {
+                        billVhId = persistenceService.getSession().load(CVoucherHeader.class,
+                                voucherHeader.getId());
+                    }
+                voucherHeader.setId(null);
+                populateWorkflowBean();
+                
+				
+				String[] arrOfStr1 = firstsignatory.split(",");
+				String[] arrOfStr2 = secondsignatory.split(",");
+				String[] arrOfStr3 = backlogEntry.split(",");
+
+				commonBean.setFirstsignatory(arrOfStr1[0]);
+				commonBean.setSecondsignatory(arrOfStr2[0]);
+				commonBean.setBackdateentry(arrOfStr3[0]);
+				 
+				voucherHeader.setBackdateentry(arrOfStr3[0]);
+				firstsignatory=arrOfStr1[0];
+				secondsignatory=arrOfStr2[0];
+				backlogEntry=arrOfStr3[0];
+				voucherHeader.setSubdivision(voucherHeader.getVouchermis().getSubdivision());
+				subdivision=voucherHeader.getVouchermis().getSubdivision();
+                paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
+                        commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
+                showMode = "create";
+                
+                paymentheader.getVoucherheader().getVouchermis().setSubdivision(subdivision);
+                
+                if (!cutOffDate.isEmpty() && cutOffDate != null)
+                    try {
+                        date = sdf.parse(cutOffDate);
+                        cutOffDate1 = formatter.format(date);
+                    } catch (final ParseException e) {
+
+                    }
+                if (cutOffDate1 != null && voucherDate.compareTo(cutOffDate1) <= 0
+                        && FinancialConstants.CREATEANDAPPROVE.equalsIgnoreCase(workflowBean.getWorkFlowAction())) {
+                    if (paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() == null)
+                        addActionMessage(getText("directbankpayment.transaction.success")
+                                + paymentheader.getVoucherheader().getVoucherNumber());
+                    else
+                        addActionMessage(getText("directbankpayment.transaction.success")
+                                + paymentheader.getVoucherheader().getVoucherNumber() + " and "
+                                + getText("budget.recheck.sucessful", new String[] {
+                                        paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() }));
+                } else {
+                    if (paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() == null)
+                        addActionMessage(getText("directbankpayment.transaction.success")
+                                + paymentheader.getVoucherheader().getVoucherNumber());
+                    else
+                        addActionMessage(getText("directbankpayment.transaction.success")
+                                + paymentheader.getVoucherheader().getVoucherNumber() + " and "
+                                + getText("budget.recheck.sucessful", new String[] {
+                                        paymentheader.getVoucherheader().getVouchermis().getBudgetaryAppnumber() }));
+                    addActionMessage(getText("payment.voucher.approved", new String[] {  this.getEmployeeName(paymentheader.getState()
+                            .getOwnerPosition())  }));
+                }
+            } else
+                throw new ValidationException(
+                        Arrays.asList(new ValidationError("engine.validation.failed", "Validation Faild")));
+
+        } catch (final ValidationException e) {
+            LOGGER.error(e.getMessage(), e);
+            final List<ValidationError> errors = new ArrayList<ValidationError>();
+            errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
+            throw new ValidationException(errors);
+        } catch (final NumberFormatException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+        } catch (final ApplicationRuntimeException e) {
+            LOGGER.error(e.getMessage(), e);
+            throw e;
+
+        } finally {
+            if (subLedgerlist.size() == 0)
+                subLedgerlist.add(new VoucherDetails());
+            // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
+        }
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+        return VIEW;
+    }
+    
+//end Code by Sonu Prajapati    
+    
+    
+    
 
     @Validations(requiredFields = { @RequiredFieldValidator(fieldName = "fundId", message = "", key = REQUIRED),
+    		@RequiredFieldValidator(fieldName = "vouchermis.subdivison", message = "", key = REQUIRED),
     		@RequiredFieldValidator(fieldName = "vouchermis.function", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "voucherNumber", message = "", key = REQUIRED),
             @RequiredFieldValidator(fieldName = "commonBean.bankId", message = "", key = REQUIRED),
@@ -281,6 +939,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         removeEmptyRowsSubledger(subLedgerlist);
         final String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;
+        
         try {
             if (!validateDBPData(billDetailslist, subLedgerlist)) {
                 if (commonBean.getModeOfPayment().equalsIgnoreCase(FinancialConstants.MODEOFPAYMENT_RTGS)) {
@@ -290,16 +949,32 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 }
 
                 if (showMode != null && showMode.equalsIgnoreCase("nonbillPayment"))
-                    if (voucherHeader.getId() != null)
+                    if (voucherHeader.getId() != null) {
                         billVhId = persistenceService.getSession().load(CVoucherHeader.class,
                                 voucherHeader.getId());
+                    }
                 voucherHeader.setId(null);
                 populateWorkflowBean();
-                voucherHeader.setBackdateentry(backlogEntry);
+                String[] arrOfStr1 = firstsignatory.split(",");
+				String[] arrOfStr2 = secondsignatory.split(",");
+				String[] arrOfStr3 = backlogEntry.split(",");
+               
+				commonBean.setFirstsignatory(arrOfStr1[0]);
+				commonBean.setSecondsignatory(arrOfStr2[0]);
+				commonBean.setBackdateentry(arrOfStr3[0]);
+               
+				voucherHeader.setBackdateentry(arrOfStr3[0]);
+				firstsignatory=arrOfStr1[0];
+				secondsignatory=arrOfStr2[0];
+				backlogEntry=arrOfStr3[0];
+                voucherHeader.setSubdivision(voucherHeader.getVouchermis().getSubdivision());
+                subdivision=voucherHeader.getVouchermis().getSubdivision();
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
 
+                paymentheader.getVoucherheader().getVouchermis().setSubdivision(subdivision);
+                
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
                     try {
                         date = sdf.parse(cutOffDate);
@@ -350,6 +1025,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 subLedgerlist.add(new VoucherDetails());
             // loadApproverUser(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT);
         }
+        
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+        
         return VIEW;
     }
 
@@ -457,6 +1146,18 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         if (subLedgerlist.size() == 0)
             subLedgerlist.add(new VoucherDetails());
         loadAjaxedDropDowns();
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         return NEW;
     }
 
@@ -569,22 +1270,20 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         voucherHeader = persistenceService.getSession().load(CVoucherHeader.class,
                 voucherHeader.getId());
         
-        LOGGER.info("voucherHeader.getId()  ::"+voucherHeader.getId());
+        LOGGER.info("vh Id :: "+voucherHeader.getId());
         paymentheader = (Paymentheader) persistenceService.find("from Paymentheader where voucherheader=?",
                 voucherHeader);
+        
+        LOGGER.info("paymentheader.getPaymentAmount() :: "+paymentheader.getPaymentAmount());
+        LOGGER.info("paymentheader.getBankaccount().getId().toString() :: "+paymentheader.getBankaccount().getId().toString());
+        LOGGER.info("paymentheader.getBankaccount().getNarration() :: "+voucherHeader.getId());
         commonBean.setAmount(paymentheader.getPaymentAmount());
         commonBean.setAccountNumberId(paymentheader.getBankaccount().getId().toString());
         commonBean.setAccnumnar(paymentheader.getBankaccount().getNarration());
-        
-        LOGGER.info("paymentheader.getPaymentAmount()  ::"+paymentheader.getPaymentAmount());
-        LOGGER.info("paymentheader.getBankaccount().getId().toString()  ::"+paymentheader.getBankaccount().getId().toString());
-        LOGGER.info("paymentheader.getBankaccount().getNarration()  ::"+paymentheader.getBankaccount().getNarration());
-        
-        
+
         final String bankBranchId = paymentheader.getBankaccount().getBankbranch().getBank().getId() + "-"
                 + paymentheader.getBankaccount().getBankbranch().getId();
-        
-        LOGGER.info("bankBranchId  ::"+bankBranchId);
+        LOGGER.info("bankBranchId :: "+bankBranchId);
         commonBean.setBankId(bankBranchId);
         commonBean.setModeOfPayment(paymentheader.getType());
         final Miscbilldetail miscbillDetail = (Miscbilldetail) persistenceService
@@ -593,27 +1292,43 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         commonBean.setDocumentDate(miscbillDetail.getBilldate());
         commonBean.setPaidTo(miscbillDetail.getPaidto());
         if (miscbillDetail.getBillVoucherHeader() != null) {
+        	
             commonBean.setDocumentId(miscbillDetail.getBillVoucherHeader().getId());
             commonBean.setLinkReferenceNumber(miscbillDetail.getBillVoucherHeader().getVoucherNumber());
         }
 
         final String bankGlcode = paymentheader.getBankaccount().getChartofaccounts().getGlcode();
-        LOGGER.info("bankGlcode  ::"+bankGlcode);
+        
         VoucherDetails bankdetail = null;
         final Map<String, Object> vhInfoMap = voucherService.getVoucherInfo(voucherHeader.getId());
-
-        // voucherHeader =
-        // (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);
+        
+        voucherHeader =
+         (CVoucherHeader)vhInfoMap.get(Constants.VOUCHERHEADER);
         billDetailslist = (List<VoucherDetails>) vhInfoMap.get(Constants.GLDEATILLIST);
         subLedgerlist = (List<VoucherDetails>) vhInfoMap.get("subLedgerDetail");
 
         for (final VoucherDetails vd : billDetailslist)
             if (vd.getGlcodeDetail().equalsIgnoreCase(bankGlcode))
                 bankdetail = vd;
+        //System.out.println(vd.getGlcodeDetail());
         if (bankdetail != null)
             billDetailslist.remove(bankdetail);
         loadAjaxedDropDowns();
         // find it last so that rest of the data loaded
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
+        
+        
         if ("view".equalsIgnoreCase(showMode)) {
             if (LOGGER.isDebugEnabled())
                 LOGGER.debug("fetching cheque detail ------------------------");
@@ -630,6 +1345,8 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         loadFundSource();
     }
 
+    
+    
     @SuppressWarnings("deprecation")
     @Action(value = "/payment/directBankPayment-edit")
     public String edit() throws SQLException {
@@ -669,6 +1386,19 @@ public class DirectBankPaymentAction extends BasePaymentAction {
             if (subLedgerlist.size() == 0)
                 subLedgerlist.add(new VoucherDetails());
             loadAjaxedDropDowns();
+            
+            List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+    				"receipt_sub_divison");
+            List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+            SubDivision subdivision=null;
+            for(AppConfigValues value:appConfigValuesList)
+            {
+            	subdivision = new SubDivision();
+            	subdivision.setSubdivisionCode(value.getValue());
+            	subdivision.setSubdivisionName(value.getValue());
+            	subdivisionList.add(subdivision);
+            }
+            addDropdownData("subdivisionList", subdivisionList);
         }
 
         return VIEW;
@@ -824,6 +1554,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         int index = 0;
         boolean isValFailed = false;
         // isValFailed = validateOnlyRTGS();
+       
         for (final VoucherDetails voucherDetails : billDetailslist) {
             index = index + 1;
             if (voucherDetails.getDebitAmountDetail() == null)
@@ -894,12 +1625,12 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/directBankPayment-viewInboxItem")
     public String viewInboxItem() {
+    	System.out.println("in Action for viewInbox");
         paymentheader = getPayment();
         showApprove = true;
         if (paymentheader.getVoucherheader() != null)
             voucherHeader.setId(paymentheader.getVoucherheader().getId());
         prepareForViewModifyReverse();
-        System.out.println("END");
         return VIEW;
 
     }
@@ -908,12 +1639,11 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     @SkipValidation
     @Action(value = "/payment/directBankPayment-sendForApproval")
     public String sendForApproval() {
-    	LOGGER.info("send for approval");
+
         if (paymentheader.getId() == null)
             paymentheader = getPayment();
-        LOGGER.info("before populate work flow bean");
+
         populateWorkflowBean();
-        LOGGER.info("before send for approval");
         paymentheader = paymentActionHelper.sendForApproval(paymentheader, workflowBean);
 
         if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workflowBean.getWorkFlowAction()))
@@ -977,8 +1707,10 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     public Paymentheader getPayment() {
         String paymentid = null;
         paymentid = parameters.get(PAYMENTID)[0];
+        System.out.println(paymentid);
         if (paymentid != null)
             paymentheader = paymentService.findById(Long.valueOf(paymentid), false);
+            System.out.println(paymentheader.getVoucherheader().getId());
         if (paymentheader == null)
             paymentheader = new Paymentheader();
 
@@ -1179,5 +1911,29 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
 	public void setBacklogEntry(String backlogEntry) {
 		this.backlogEntry = backlogEntry;
+	}
+
+	public List<EgBillregister> getRefundpreApprovedVoucherList() {
+		return refundpreApprovedVoucherList;
+	}
+
+	public void setRefundpreApprovedVoucherList(List<EgBillregister> refundpreApprovedVoucherList) {
+		this.refundpreApprovedVoucherList = refundpreApprovedVoucherList;
+	}
+
+	public List<Map<String, Object>> getBankBranchList() {
+		return bankBranchList;
+	}
+
+	public void setBankBranchList(List<Map<String, Object>> bankBranchList) {
+		this.bankBranchList = bankBranchList;
+	}
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 }

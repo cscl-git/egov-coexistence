@@ -249,7 +249,15 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			bill = auditDetails.getEgBillregister();
 			auditDetail.setBillId(bill.getId());
-			model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+			if(bill.getRefundable() != null && bill.getRefundable().equalsIgnoreCase("Y"))
+			{
+				model.addAttribute("billSource", "/services/EGF/refund/view/" + bill.getId());
+			}
+			else
+			{
+				model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+			}
+			
 		}
 		else
 		{
@@ -523,6 +531,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		{
 			for(AuditCheckList checkListUI : auditDetail.getCheckList())
 			{
+				if(checkListUI.getChecklist_description() == null || (checkListUI.getChecklist_description() != null && checkListUI.getChecklist_description().isEmpty()))
+				{
+					continue;
+				}
 				if(checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description()))
 				{
 					if(checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
@@ -642,6 +654,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetails.setAudit_sch_date(auditDetail.getAuditScheduledDate());
 		for(AuditCheckList row : auditDetail.getCheckList())
 		{
+			if(row.getChecklist_description() == null || (row.getChecklist_description() != null && row.getChecklist_description().isEmpty()))
+			{
+				continue;
+			}
 			row.setAuditDetails(auditDetails);
 			checkListHistoryList=new ArrayList<AuditChecklistHistory>();
 			checkListHistory=new AuditChecklistHistory();

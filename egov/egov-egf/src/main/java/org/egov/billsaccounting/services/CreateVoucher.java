@@ -2694,8 +2694,7 @@ public class CreateVoucher {
 
 	protected void checkMandatoryField(final String fieldName, final Object value,
 			final HashMap<String, Object> headerdetails, List<String> mandatoryFields) {
-		if (LOGGER.isDebugEnabled())
-			LOGGER.debug("Filed name :=" + fieldName + " Value = :" + value);
+			LOGGER.info("Filed name :=" + fieldName + " Value = :" + value);
 		String vNumGenMode = null;
 		if (fieldName.equals("vouchernumber")) {
 			if (headerdetails.get(VoucherConstant.VOUCHERTYPE) == null)

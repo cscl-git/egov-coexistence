@@ -878,5 +878,35 @@
         <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/paymentrefund/pr-request-form.jsp"/>
     </definition>
+    
+    <definition name="payRefund-request-form" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/payment-refund-request.jsp"/>
+    </definition>
+    
+    <definition name="re-pr-approvedvoucher" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/paymentrefund/refundPreApprovedVoucher.jsp"/>
+    </definition>
+    
+     <definition name="generalledgerreport-search-home" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/generalledgerreport-search-home.jsp"/>
+    </definition>
+    <definition name="capitalrevenue-search-home" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/capitalrevenue-search-home.jsp"/>
+    </definition>
+    <definition name="capitaldivision-search-home" extends="base_layout">
+        <put-attribute name="page-title" value="title.pr.request" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/contractorbill/capitaldivision-search-home.jsp"/>
+    </definition>
+    <definition name="ol-payRefund-request-form"
+		extends="base_layout">
+		<put-attribute name="page-title"
+			value="title.pr.request" cascade="true" />
+		<put-attribute name="body"
+			value="/WEB-INF/views/paymentrefund/ol-payment-refund-request.jsp" />
+	</definition>
 
 </tiles-definitions>

@@ -19,11 +19,15 @@
 								<form:options items="${voucherTypeList}"/>
 							</form:select>
 						</div>
+						 <label class="col-sm-3 control-label text-right">Create Blank Refund</label>
+						<div class="col-sm-3 add-margin">
+							<a href="/services/EGF/refund/_paymentRequestblankvoucherForm">link</a>
+						</div>
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.number" text="Voucher Number"/> </label>
 						<div class="col-sm-3 add-margin">
-							<form:input cssClass="form-control patternvalidation" data-pattern="address" maxlength="100" id="voucherNumber" path="voucherNumber"/>
+							<form:input cssClass="form-control patternvalidation" data-pattern="address" maxlength="100" id="voucherNumber" onblur="changeField();"  path="voucherNumber" />
 						</div>	
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.name" text="Voucher Name"/> </label>
 						<div class="col-sm-3 add-margin">
@@ -36,13 +40,13 @@
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.fromdate" text="From Date"/> <span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="fromDate" cssClass="form-control datepicker" title="Please enter a valid date" pattern="\d{1,2}/\d{1,2}/\d{4}"
-										data-date-end-date="-1d" id="fromDate" data-inputmask="'mask': 'd/m/y'" required="required" />
+										data-date-end-date="0d" id="fromDate" data-inputmask="'mask': 'd/m/y'" required="required" />
 							<form:errors path="fromDate" cssClass="add-margin error-msg" />
 						</div>
 						<label class="col-sm-3 control-label text-right"><spring:message code="voucher.todate" text="To Date"/> <span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="toDate" cssClass="form-control datepicker" title="Please enter a valid date" pattern="\d{1,2}/\d{1,2}/\d{4}"
-										data-date-end-date="-1d" id="toDate" data-inputmask="'mask': 'd/m/y'" required="required" />
+										data-date-end-date="0d" id="toDate" data-inputmask="'mask': 'd/m/y'" required="required" />
 							<form:errors path="toDate" cssClass="add-margin error-msg" />
 						</div>
 					</div>
@@ -62,17 +66,17 @@
 							</form:select>
 						</div>
 					</div>					
-					<div class="form-group receipt-info" style="display: none;">
-						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.receipt.no" text="Receipt Number"/></label>
-						<div class="col-sm-3 add-margin">
-							<form:input path="receiptNumber" id="receiptNumber" class="form-control text-left" maxlength="50" />
-						</div>
+					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.payee.name" text="Payee Name"/></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="partyName" id="partyName" class="form-control text-left" maxlength="50" />
 						</div>
 					</div>					
 					<div class="form-group receipt-info" style="display: none;">
+					   <label class="col-sm-3 control-label text-right"><spring:message code="lbl.receipt.no" text="Receipt Number"/></label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="receiptNumber" id="receiptNumber" class="form-control text-left" maxlength="50" />
+						</div>
 						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.service.type" text="Service Type"/></label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="serviceType" id="serviceType" cssClass="form-control" cssErrorClass="form-control error">
@@ -98,6 +102,7 @@
 			<thead>
 				<tr>
 					<th>Sl No</th>
+					<th>Action</th>
 					<th>Voucher Number</th>
 					<th>Receipt Number</th>
 					<th>Voucher Type</th>
@@ -110,7 +115,6 @@
 					<th>Total Amount</th>
 					<th>Status</th>
 					<th>Pending With</th>
-					<th>Action</th>
 				</tr>
 			</thead>
 		</table>
@@ -129,3 +133,5 @@
 <script type="text/javascript" src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
 <script src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>"	type="text/javascript"></script>
 <script src="<cdn:url value='/resources/app/js/pr-voucher-search-helper.js?rnd=${app_release_no}'/>"></script>
+
+

@@ -276,7 +276,11 @@ public abstract class BaseBillController extends BaseVoucherController {
 
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
             egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
-        } else {
+        } 
+        else if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+            egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
+        }
+        else {
             egBillregister.getEgBilldetailes().addAll(egBillregister.getDebitDetails());
             egBillregister.getEgBilldetailes().addAll(egBillregister.getCreditDetails());
             egBillregister.getEgBilldetailes().addAll(egBillregister.getNetPayableDetails());

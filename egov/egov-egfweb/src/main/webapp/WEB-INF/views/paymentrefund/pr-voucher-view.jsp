@@ -54,6 +54,10 @@
 							</td>
 						</tr>
 						<tr>
+						    <td width="10%" class="greybox"><b>Sub Division :  </b></td>
+							<td width="25%" class="greybox">
+								${voucherDetails.subdivision}
+							</td>
 							<td width="10%" class="greybox"><b>BAN Number :  </b></td>
 							<td width="25%" class="greybox">
 								${voucherDetails.banNumber}

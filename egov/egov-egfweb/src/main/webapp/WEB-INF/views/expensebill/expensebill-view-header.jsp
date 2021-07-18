@@ -118,7 +118,7 @@
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.budgetaryAppnumber }" />
 			</div>
 		</div>
-		<c:if test="${not empty egBillregister.egBillregistermis.budget ||not empty egBillregister.egBillregistermis.previousexpenditure}">
+		<c:if test="${not empty egBillregister.egBillregistermis.budget ||not empty egBillregister.egBillregistermis.balance}">
 		<div class="row add-border">
 			<c:if test="${not empty egBillregister.egBillregistermis.budget}">
 			<div class="col-md-3 col-xs-6 add-margin">
@@ -128,7 +128,19 @@
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.budget }" />				 
 			</div>
 			</c:if>
-			  <c:if test="${not empty egBillregister.egBillregistermis.previousexpenditure}">
+			<c:if test="${not empty egBillregister.egBillregistermis.balance}">
+			<div class="col-md-3 col-xs-6 add-margin">
+				<spring:message code="lbl.balance" text="Balance"/>
+			</div>
+			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email">
+				<c:out default="N/A" value="${egBillregister.egBillregistermis.balance }" />
+			</div>
+			</c:if>
+		</div>
+		</c:if>
+		<c:if test="${not empty egBillregister.egBillregistermis.previousexpenditure ||not empty egBillregister.egBillregistermis.currentexpenditure}">	
+		<div class="row add-border">
+		    <c:if test="${not empty egBillregister.egBillregistermis.previousexpenditure}">
 			<div class="col-md-3 col-xs-6 add-margin">
 				<spring:message code="lbl.previousexpenditure" text="Previous expenditure (Till Date)"/>
 			</div>
@@ -136,28 +148,12 @@
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.previousexpenditure }" />				 
 			</div>
 			</c:if>
-			
-		</div>
-		</c:if>
-		<c:if test="${ not empty egBillregister.egBillregistermis.balance ||not empty egBillregister.egBillregistermis.currentexpenditure}">	
-		<div class="row add-border">
-		  
 			<c:if test="${not empty egBillregister.egBillregistermis.currentexpenditure}">
 			<div class="col-md-3 col-xs-6 add-margin">
 				<spring:message code="lbl.currentexpenditure" text="Current Expenditure"/>
 			</div>
 			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email">
 				<c:out default="N/A" value="${egBillregister.egBillregistermis.currentexpenditure }"/>
-			</div>
-			</c:if>
-			
-			
-			<c:if test="${not empty egBillregister.egBillregistermis.balance}">
-			<div class="col-md-3 col-xs-6 add-margin">
-				<spring:message code="lbl.balance" text="Balance"/>
-			</div>
-			<div class="col-md-3 col-xs-6 add-margin view-content" id="ct-email">
-				<c:out default="N/A" value="${egBillregister.egBillregistermis.balance }" />
 			</div>
 			</c:if>
 		</div>

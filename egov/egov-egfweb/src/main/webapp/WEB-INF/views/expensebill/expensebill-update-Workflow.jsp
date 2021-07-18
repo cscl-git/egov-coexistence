@@ -85,7 +85,7 @@
 		color: white;
     }
 </style>
-<form:form name="expenseBillForm" role="form"
+<form:form name="expenseBillForm" role="form" action="${pageContext.request.contextPath}/expensebill/update/${egBillregister.id}" method="POST"
 	modelAttribute="egBillregister" id="egBillregister"
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
@@ -99,11 +99,26 @@
 		: &#8377 <span id="expenseBillTotalDebitAmount"> <c:out
 				value="${expenseBillTotalDebitAmount}" default="0.0"></c:out></span>
 	</div>
+	        <c:choose>
+            <c:when test="${refundable != null && !refundable.isEmpty()}">
+             <div class="position_alert2" style="display:none;">
+		      <spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/>
+		       : &#8377 <span id="expenseBillTotalCreditAmount"> <c:out
+			  value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
+	        </div>
+            </c:when>
+            <c:otherwise>
 	<div class="position_alert2">
 		<spring:message code="lbl.total.credit.amount" text="Total Credit Amount"/>
 		: &#8377 <span id="expenseBillTotalCreditAmount"> <c:out
 				value="${expenseBillTotalCreditAmount}" default="0.0"></c:out></span>
 	</div>
+            </c:otherwise>
+            </c:choose>
+	
+	
+	
+	<%--  --%>
 
 	<form:hidden path="" id="selectedCheckList"
 		value="${selectedCheckList}" />
@@ -114,6 +129,8 @@
 		value="${netPayableId}" />
 	<form:hidden path="" name="netPayableAmount" id="netPayableAmount"
 		value="${netPayableAmount}" />
+		<form:hidden path="refundable" id="refundable" value="${egBillregister.refundable}" />
+	<form:hidden path="expendituretype" id="expendituretype" value="${egBillregister.expendituretype}" />
 	<div class="panel-title text-center" style="color: green;">
 		<c:out value="${message}" />
 		<br />
@@ -136,30 +153,50 @@
 		<div class="tab-pane fade in active" id="expensebillheader">
 			<jsp:include page="expensebill-header.jsp" />
 			
+			<!-- <div class="panel panel-primary" data-collapsed="0"> -->
+			<c:choose>
+            <c:when test="${refundable != null && !refundable.isEmpty()}">
+             <div class="panel panel-primary" style="display: none;" data-collapsed="0">
+                <jsp:include page="expensebill-debitdetails.jsp" />
+				<jsp:include page="expensebill-creditdetails.jsp" />
+				<jsp:include page="expensebill-subledgerdetails.jsp" />
+				<jsp:include page="expensebill-netpayable.jsp" />
+			  </div>
+            </c:when>
+            <c:otherwise>
 			<div class="panel panel-primary" data-collapsed="0">
 				<jsp:include page="expensebill-debitdetails.jsp" />
 				<jsp:include page="expensebill-creditdetails.jsp" />
 				<jsp:include page="expensebill-subledgerdetails.jsp" />
 				<jsp:include page="expensebill-netpayable.jsp" />
 			</div>
+            </c:otherwise>
+            </c:choose>
+			
+			
+		<!-- </div> -->
 			<jsp:include page="expensebill-accountdetails.jsp" />
 			<jsp:include page="expensebill-subledgeraccountdetails.jsp" />
            <!--  <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
                 <jsp:include page="billdocument-upload.jsp"/>
             </c:if> -->
              <jsp:include page="billdocument-upload.jsp"/>
-		</div>
-		<div class="tab-pane fade" id="checklist">
+		
+         <%--  <div class="tab-pane fade" id="checklist">
 			<jsp:include page="expensebill-checklist.jsp" />
-		</div>
+		  </div> --%>
+		
          <!-- <div class="tab-pane fade" id="supportingDocuments">
             <jsp:include page="expensebill-view-supporingDocs.jsp"/>
         </div>-->
         
+         
             <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
       
        
             <jsp:include page="../common/commonworkflowmatrix.jsp"/>
+         
+            
             <div class="buttonbottom" align="center">
                 <jsp:include page="../common/commonworkflowmatrix-button.jsp"/>
             </div>
@@ -171,7 +208,7 @@
                            onclick="window.close();"/>
                 </div>
             </div> -->
-       
+      </div> 
     </div>
 
 </form:form>
@@ -179,8 +216,11 @@
         src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}'/>"></script>
+
 <script
 	src="<cdn:url value='/resources/app/js/expensebill/expensebill.js?rnd=${app_release_no}'/>"></script>
+<script
+	src="<cdn:url value='/resources/app/js/expensebill/refundbill.js?rnd=${app_release_no}'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}'/>"></script>
 

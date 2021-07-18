@@ -241,7 +241,7 @@ detailtypeOptions.push({label: '<s:property value="name"/>', value: '<s:property
 			{key:"glcode",hidden:true, formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".subledgerCode","hidden")},
 			{key:"glcode.id",label:'Account Code <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV(SUBLEDGERLIST,"loaddropdown(this)"),  dropdownOptions:glcodeOptions},
 			{key:"detailTypeName",hidden:true, formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".detailTypeName","hidden")},
-			{key:"detailType.id",label:'Type <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV1(SUBLEDGERLIST),dropdownOptions:detailtypeOptions},
+			{key:"detailType.id",label:'Type <span class="mandatory1">*</span>', formatter:createDropdownFormatterJV1(SUBLEDGERLIST,"loaddropdown(this)"), dropdownOptions:detailtypeOptions},
 			{key:"detailCode",label:'Code <span class="mandatory1">*</span>', formatter:createSLTextFieldFormatterJV(SUBLEDGERLIST,".detailCode","validateDetailCodeForJV(this)")},
 			{key:"detailKeyId",hidden:true, formatter:createSLHiddenFieldFormatterJV(SUBLEDGERLIST,".detailKeyId")},
 			{key:"detailKey",label:'Name', formatter:createSLLongTextFieldFormatterJV(SUBLEDGERLIST,".detailKey","")},

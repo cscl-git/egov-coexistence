@@ -203,6 +203,8 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
 
     @Transient
     private Long subSchemeId;
+    
+    private Long paymentvoucherheaderid;
 
     private Boolean budgetCheckReq = true;
     
@@ -620,6 +622,14 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
 
 	public void setSubdivision(String subdivision) {
 		this.subdivision = subdivision;
+	}
+
+	public Long getPaymentvoucherheaderid() {
+		return paymentvoucherheaderid;
+	}
+
+	public void setPaymentvoucherheaderid(Long paymentvoucherheaderid) {
+		this.paymentvoucherheaderid = paymentvoucherheaderid;
 	}
 
 }
