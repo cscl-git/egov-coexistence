@@ -146,6 +146,18 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
     @Transient
     private String departmentName;
 
+    
+    public String getSubType() {
+		return subType;
+	}
+
+	public void setSubType(String subType) {
+		this.subType = subType;
+	}
+
+	@Transient
+    private String subType;
+
     @ManyToOne
     @JoinColumn(name = "financialyearid")
     private CFinancialYear financialyear;

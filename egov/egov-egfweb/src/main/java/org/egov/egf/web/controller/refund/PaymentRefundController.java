@@ -674,7 +674,13 @@ public class PaymentRefundController extends BaseBillController {
 		        if (egBillregister.getEgBillregistermis().getSubScheme() != null) {
 		        	voucherDetails.setSubScheme(egBillregister.getEgBillregistermis().getSubScheme().getName());
 		        }
+		        
+		        
+		        if(egBillregister.getEgBillregistermis().getNarration()!=null && !egBillregister.getEgBillregistermis().getNarration().isEmpty()) {
 		        voucherDetails.setNarration(egBillregister.getEgBillregistermis().getNarration());
+		        }else {
+		        	voucherDetails.setNarration(voucherHeader.getDescription());
+		        }
 		        voucherDetails.setBanNumber(egBillregister.getEgBillregistermis().getBudgetaryAppnumber());
 		        if (egBillregister.getEgBillregistermis().getFundsource() != null) {
 		        	voucherDetails.setFinanceSource(egBillregister.getEgBillregistermis().getFundsource().getName());
@@ -827,14 +833,14 @@ public class PaymentRefundController extends BaseBillController {
         	subdivision.setSubdivisionCode(value.getValue());
         	subdivision.setSubdivisionName(value.getValue());
         	subdivisionList.add(subdivision);
+        	
         }
-        //addDropdownData("subdivisionList", subdivisionList);
-    	
         model.addAttribute("billNumberGenerationAuto", refundBillService.isBillNumberGenerationAuto());
         model.addAttribute("billSubTypes", billSubtypes);
         model.addAttribute("subLedgerTypes", accountdetailtypeService.findAll());
+        model.addAttribute("subdivisionList", subdivisionList);
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
-		model.addAttribute("subdivisionList", subdivisionList);
+        model.addAttribute("fundList",	paymentRefundUtils.getAllFunds());
     }
     
     public List<EgBillSubType> getBillSubTypesRef() {
@@ -901,9 +907,15 @@ public class PaymentRefundController extends BaseBillController {
 		  egBillregister.setBillamount(totalCrAmt);
 		  egBillregister.setBillDetails(egbilldetailCusList);
 		
-		 System.out.println(totalCrAmt);
 
-		 EgBillSubType egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase("Refund")).findFirst().orElse(null);
+		 
+		 //System.out.println(":::::::::::::::::::::::::::::::;;"+getBillSubTypes());
+		 
+		 //List<EgBillSubType> egbillSubtype2=(List<EgBillSubType>) getBillSubTypes();
+		  
+		  String subType = egBillregister.getEgBillregistermis().getSubType();
+
+		 EgBillSubType egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase(subType)).findFirst().orElse(null);
            
            
          egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
