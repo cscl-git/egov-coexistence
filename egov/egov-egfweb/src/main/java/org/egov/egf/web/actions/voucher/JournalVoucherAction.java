@@ -247,6 +247,18 @@ public class JournalVoucherAction extends BaseVoucherAction
         LOGGER.info("Backlog entry :::"+backlogEntry);
         
         System.out.println("hello  "+subdivision);
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	System.out.println("::::::::SUB DIVISION::: "+value.getValue());
+        	SubDivision subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         
         String voucherDate = formatter1.format(voucherHeader.getVoucherDate());
         String cutOffDate1 = null;

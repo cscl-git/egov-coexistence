@@ -466,7 +466,7 @@ public class RefundBillService {
 
             deleteCheckList(updatedegBillregister);
             createCheckList(updatedegBillregister, checkLists);
-            egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
+            //egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
       
 //            commented as budget check was disabled
 			if (egBillregister.getRefundable() == null) {

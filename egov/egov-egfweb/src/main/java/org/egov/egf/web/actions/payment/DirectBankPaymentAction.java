@@ -975,6 +975,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 
                 paymentheader.getVoucherheader().getVouchermis().setSubdivision(subdivision);
                 
+                
                 if (!cutOffDate.isEmpty() && cutOffDate != null)
                     try {
                         date = sdf.parse(cutOffDate);

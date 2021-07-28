@@ -76,6 +76,7 @@ $(document).ready(function(){
 	worksDiv();
 	$netPayableAccountCodeId = $('#netPayableId').val();
 	patternvalidation(); 
+	//creditGlcode_initialize();
 	//debitGlcode_initialize();
 	//creditGlcode_initialize();
 	$('#fund').val($('#fund').val());
@@ -1573,6 +1574,11 @@ function changeGlCode(totalrow,cramt,l,preamt){
 	}	
 		 
 	}	 
+}
+
+
+function viewVoucher(vhid){
+	window.open('/services/EGF/refund/_viewVoucher?vhid=' + vhid,'','width=1200, height=800');
 }
 /*function glCodeandIdvalidate(){
 		 

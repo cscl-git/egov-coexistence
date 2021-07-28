@@ -61,10 +61,13 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.script.ScriptContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.EgwStatus;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.CFinancialYearService;
 import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.CheckListService;
@@ -138,6 +141,8 @@ public class ExpenseBillService {
     private DocumentUploadRepository documentUploadRepository;
     @PersistenceContext
     private EntityManager entityManager;
+    @Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
     @Autowired
     private EgBillSubTypeService egBillSubTypeService;
     @Autowired
@@ -430,8 +435,39 @@ public class ExpenseBillService {
             {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                         "Cancelled"));
-                //for audit					
-            }   
+                //audit
+                SQLQuery queryMain =  null;
+        		final StringBuffer query1 = new StringBuffer(500);
+            	
+            	List<Object[]> list= null;
+            	query1
+                .append("select id,bill_id from audit_details where bill_id ="+egBillregister.getId());
+            	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+            	list = queryMain.list();
+            	Long auditId=0L;
+            	final EgwStatus cancelledStatus = egwStatusDAO.getStatusByModuleAndCode("Audit", "Cancelled");
+            	if (list.size() != 0) {
+            		for (final Object[] object : list)
+            		{
+            			auditId=Long.parseLong(object[0].toString());
+            			if(auditId != null && auditId != 0L)
+            			{
+            				
+            		        persistenceService.getSession()
+            		                .createSQLQuery(
+            		                        "update audit_details  set status_id = :cancelledStatus,state_id=null where id =:auditId ")
+            		                .setLong("cancelledStatus", cancelledStatus.getId()).setLong("auditId", auditId)
+            		                .executeUpdate();
+            			}
+            		}
+            	}
+                
+                
+                //audit
+                
+                
+                
+            }
     }
 
     @Transactional(readOnly = true)
