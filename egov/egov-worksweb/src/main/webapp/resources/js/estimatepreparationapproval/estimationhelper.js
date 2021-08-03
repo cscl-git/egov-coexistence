@@ -65,19 +65,21 @@ function ConfirmDelete()
 		 }
 		// debugger;
 		 
-				 var x = confirm("Are you sure you want to upload file again previous file will be deleted. !");
+		bootbox.confirm("Are you sure you want to upload file again previous file will be deleted. !", function(x){ 
+			if (x==true)
+			  {
+			  	txt = "You pressed OK!";
+			  	return true;
+			  }
+		     
+		  else
+			  {
+			  	txt = "You pressed Cancel!";
+			  	return false;
+			  }
+		});
 				 
-				  if (x==true)
-					  {
-					  	txt = "You pressed OK!";
-					  	return true;
-					  }
-				     
-				  else
-					  {
-					  	txt = "You pressed Cancel!";
-					  	return false;
-					  }
+				  
 				   
 				 
 		

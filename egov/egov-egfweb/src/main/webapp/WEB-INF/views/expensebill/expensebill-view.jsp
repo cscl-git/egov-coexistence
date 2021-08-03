@@ -157,7 +157,9 @@
             <jsp:include page="expensebill-view-supporingDocs.jsp"/>
         </div>-->
         <c:if test="${!workflowHistory.isEmpty() && mode != 'readOnly'}">
+        <div style="margin-top :1050px;">
             <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
+            </div>
         </c:if>
         <c:if test="${mode != 'readOnly'}">
             <jsp:include page="../common/commonworkflowmatrix.jsp"/>
@@ -167,7 +169,7 @@
         </c:if>
         <c:if test="${mode == 'readOnly'}">
             <div class="row">
-                <div class="col-sm-12 text-center">
+                <div class="col-sm-12 text-center" style="padding-top: 950px;">
                 <input name="button" type="button" class="buttonsubmit" id="button1" value="Print" onclick="window.print()">&nbsp;
                     <input type="submit" name="closeButton" id="closeButton" value='<spring:message code="lbl.close" text="Close"/>' Class="btn btn-default"
                            onclick="window.close();"/>

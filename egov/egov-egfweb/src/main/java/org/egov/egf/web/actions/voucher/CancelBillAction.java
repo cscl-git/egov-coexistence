@@ -47,8 +47,6 @@
  */
 package org.egov.egf.web.actions.voucher;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,21 +56,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
-import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.service.ManageAuditorService;
 import org.egov.audit.utils.AuditConstants;
-import org.egov.commons.EgwStatus;
 import org.egov.commons.Fund;
-import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
 import org.egov.egf.expensebill.repository.ExpenseBillRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
@@ -82,7 +73,6 @@ import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
-import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -94,7 +84,6 @@ import org.egov.pims.commons.Position;
 import org.egov.services.bills.BillsService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
-import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
@@ -120,10 +109,10 @@ public class CancelBillAction extends BaseFormAction {
 	private ExpenseBillRepository expenseBillRepository;
 	
 	@Autowired
-	protected AppConfigValueService appConfigValuesService;
+	 private ManageAuditorService manageAuditorService;
 	
 	@Autowired
-	 private ManageAuditorService manageAuditorService;
+    protected AppConfigValueService appConfigValuesService;
 	
 	@Autowired
     private FinancialUtils financialUtils;
@@ -264,8 +253,10 @@ public class CancelBillAction extends BaseFormAction {
 		if (expType == null || expType.equalsIgnoreCase("")) {
 //			query.append(" and billmis.egBillregister.expendituretype ='"
 //					+ FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT + "'");
-			query.append(" and billmis.egBillregister.status.description='"
-					+ FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS + "'");
+			/*
+			 * query.append(" and billmis.egBillregister.status.description='" +
+			 * FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS + "'");
+			 */
 		} else {
 			query.append(" and billmis.egBillregister.expendituretype ='" + expType + "'");
 			if (FinancialConstants.STANDARD_EXPENDITURETYPE_SALARY.equalsIgnoreCase(expType))
@@ -274,8 +265,7 @@ public class CancelBillAction extends BaseFormAction {
 						+ FinancialConstants.SALARYBILL_APPROVED_STATUS + "'");
 			else if (FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT.equalsIgnoreCase(expType))
 				query.append(" and billmis.egBillregister.status.moduletype='" + FinancialConstants.CONTINGENCYBILL_FIN
-						+ "' and billmis.egBillregister.status.description='"
-						+ FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS + "'");
+						+ "' ");
 			else if (FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE.equalsIgnoreCase(expType))
 				query.append(" and billmis.egBillregister.status.moduletype='" + FinancialConstants.SBILL
 						+ "' and billmis.egBillregister.status.code='"
@@ -285,7 +275,7 @@ public class CancelBillAction extends BaseFormAction {
 						+ "' and billmis.egBillregister.status.code='"
 						+ FinancialConstants.CONTRACTORBILL_APPROVED_STATUS + "'");
 		}
-		query.append(" and billmis.egBillregister.status.description not in ('Pending for Cancellation', 'Cancelled') ");
+		query.append(" and billmis.egBillregister.status.description not in ('Voucher Approved','Bill Payment Approved','Pending for Cancellation', 'Cancelled','Voucher Created','Rejected','Pending with Finance','Created','Pending with Post-Audit') ");
 
 		return query;
 

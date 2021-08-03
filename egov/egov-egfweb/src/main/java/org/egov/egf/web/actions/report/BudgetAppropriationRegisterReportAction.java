@@ -81,6 +81,7 @@ import org.hibernate.transform.Transformers;
 import org.hibernate.type.BigDecimalType;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -94,6 +95,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 @Results(value = {
         @Result(name = "result", location = "budgetAppropriationRegisterReport-form.jsp"),
         @Result(name = "PDF", type = "stream", location = Constants.INPUT_STREAM, params = { Constants.INPUT_NAME,
@@ -340,6 +342,111 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         updateBdgtAppropriationList();
     }
 
+    public void generateRestReport() {
+    
+         Query query = null;
+
+         if (budgetGroup != null) {
+             budgetHead = budgetGroup.getName();
+             StringBuilder strQuery = new StringBuilder();
+             strQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
+             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
+             strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid  ");
+             strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and (vh.state_id is not null and (select st.status from eg_wf_states st where st.id=vh.state_id)!=1) and vh.status != 4 ");
+            // strQuery.append(" and vh.voucherdate <=:strAODate");
+             strQuery.append(getFunctionQuery("gl.functionid"));
+             strQuery.append(getDepartmentQuery("vmis.departmentcode"));
+             strQuery.append(getFundQuery("vh.fundid"));
+             strQuery.append(" ");
+             strQuery.append(" union select distinct bmis.budgetary_appnumber as bdgApprNumber, vh1.vouchernumber as VoucherNumber, vh1.voucherdate as  voucherDate , br.narration as description,vh1.createddate as createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,  bd.debitamount as debitAmount, bd.creditamount as creditAmount  ");
+             strQuery.append(" from eg_billdetails bd, eg_billregistermis bmis, eg_billregister br, voucherHeader vh1 where br.id = bd.billid and br.id = bmis.billid  ");
+             strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid )  ");
+            // strQuery.append(" and br.billdate  <=:strAODate");
+             strQuery.append(getFunctionQuery("bd.functionid"));
+             strQuery.append(getDepartmentQuery("bmis.departmentcode"));
+             strQuery.append(getFundQuery("bmis.fundid"));
+             strQuery.append("  ");
+             strQuery.append(" union select distinct bmis1.budgetary_appnumber as bdgApprNumber, null as VoucherNumber,cast( null as date) voucherDate , ");
+             strQuery.append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br  ");
+             strQuery.append(" where br.id = bd1.billid and br.id = bmis1.billid  ");
+             strQuery.append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) ");
+             strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null ");
+           //  strQuery.append(" and br.billdate <=:strAODate");
+             strQuery.append(getFunctionQuery("bd1.functionid"));
+             strQuery.append(getDepartmentQuery("bmis1.departmentcode"));
+             strQuery.append(getFundQuery("bmis1.fundid"));
+             strQuery.append("  order by bdgApprNumber ");
+
+            
+                 LOGGER.debug("BudgetAppropriationRegisterReportAction -- strQuery...." + strQuery);
+
+             query = persistenceService.getSession().createSQLQuery(strQuery.toString())
+                     .addScalar("bdgApprNumber")
+                     .addScalar("voucherDate", StandardBasicTypes.DATE)
+                     .addScalar("billDate", StandardBasicTypes.DATE)
+                     .addScalar("createdDate",StandardBasicTypes.DATE)
+                     .addScalar("billCreatedDate", StandardBasicTypes.DATE)
+                     .addScalar("description")
+                     .addScalar("VoucherNumber")
+                     .addScalar("billNumber")
+                     .addScalar("debitAmount", BigDecimalType.INSTANCE)
+                     .addScalar("creditAmount", BigDecimalType.INSTANCE)
+                     .setResultTransformer(Transformers.aliasToBean(BudgetAppDisplay.class));
+             		//query=setParameterForBudgetAppDisplay(query,null,null);
+         }
+         budgetAppropriationRegisterList = query.list();
+
+         List<BudgetAppDisplay> budgetApprRegNewList = new ArrayList<BudgetAppDisplay>();
+         final List<BudgetAppDisplay> budgetApprRegUpdatedList1 = new ArrayList<BudgetAppDisplay>();
+         final HashMap<String, BudgetAppDisplay> regMap = new HashMap<String, BudgetAppDisplay>();
+         if (budgetAppropriationRegisterList.size() > 0) {
+             StringBuilder strsubQuery = new StringBuilder();
+             strsubQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
+             strsubQuery.append(" br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
+             strsubQuery.append(" voucherheader vh,  eg_billregistermis bmis, eg_billregister br  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and vh.id = bmis.voucherheaderid and bmis.billid = br.id ");
+           //  strsubQuery.append(" and  gl.glcodeid =:glCodeId ");
+             strsubQuery.append(" and  ");
+             strsubQuery.append(" (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 ");
+           //  strsubQuery.append(" and vh.voucherdate <=:strAODate");
+             strsubQuery.append(getFunctionQuery("gl.functionid"));
+             strsubQuery.append(getDepartmentQuery("vmis.departmentcode"));
+             strsubQuery.append(getFundQuery("vh.fundid"));
+             strsubQuery.append("  order by bdgApprNumber ");
+
+            
+                 LOGGER.debug("BudgetAppropriationRegisterReportAction -- strsubQuery...." + strsubQuery);
+
+             query = persistenceService.getSession().createSQLQuery(strsubQuery.toString())
+                     .addScalar("bdgApprNumber")
+                     .addScalar("voucherDate", StandardBasicTypes.DATE)
+                     .addScalar("billDate", StandardBasicTypes.DATE)
+                     .addScalar("createdDate", StandardBasicTypes.DATE)
+                     .addScalar("billCreatedDate", StandardBasicTypes.DATE)
+                     .addScalar("description")
+                     .addScalar("VoucherNumber")
+                     .addScalar("billNumber")
+                     .addScalar("debitAmount", BigDecimalType.INSTANCE)
+                     .addScalar("creditAmount", BigDecimalType.INSTANCE)
+                     .setResultTransformer(Transformers.aliasToBean(BudgetAppDisplay.class));
+             //query=setParameterForBudgetAppDisplay(query,null,null); 
+             budgetApprRegNewList = query.list();
+             if (budgetApprRegNewList.size() > 0) {
+                 for (final BudgetAppDisplay budgetAppRtDisp : budgetApprRegNewList)
+                     regMap.put(budgetAppRtDisp.getBdgApprNumber(), budgetAppRtDisp);
+
+                 for (final BudgetAppDisplay budgetAppropriationRegisterDisp : budgetAppropriationRegisterList)
+                     if (regMap.containsKey(budgetAppropriationRegisterDisp.getBdgApprNumber()))
+                         budgetApprRegUpdatedList1.add(regMap.get(budgetAppropriationRegisterDisp.getBdgApprNumber()));
+                     else
+                         budgetApprRegUpdatedList1.add(budgetAppropriationRegisterDisp);
+             }
+         }
+         if (budgetApprRegUpdatedList1.size() > 0) {
+             budgetAppropriationRegisterList.clear();
+             budgetAppropriationRegisterList.addAll(budgetApprRegUpdatedList1);
+         }
+         updateBdgtAppropriationList();
+    }
     private String getFundQuery(final String string) {
         final String query = "";
         if (fund.getId() != null && fund.getId() != -1)
@@ -442,11 +549,11 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
                 if (BudgetingType.ALL.equals(budgetGroup.getBudgetingType())) {
                     if (budgetAppropriationRegisterDisp.getDebitAmount() != null
                             && budgetAppropriationRegisterDisp.getDebitAmount().compareTo(BigDecimal.ZERO) == 1)
-                        balanceAvailableAmt = totalGrant.subtract(budgetAppropriationRegisterDisp.getCumulativeAmount().abs());
+                        balanceAvailableAmt = totalGrant.subtract((null!=budgetAppropriationRegisterDisp.getCumulativeAmount())?budgetAppropriationRegisterDisp.getCumulativeAmount().abs():BigDecimal.valueOf(0));
                     else
-                        balanceAvailableAmt = totalGrant.add(budgetAppropriationRegisterDisp.getCumulativeAmount());
+                        balanceAvailableAmt = totalGrant.add((null!=budgetAppropriationRegisterDisp.getCumulativeAmount())?budgetAppropriationRegisterDisp.getCumulativeAmount():BigDecimal.valueOf(0));
                 } else
-                    balanceAvailableAmt = totalGrant.subtract(budgetAppropriationRegisterDisp.getCumulativeAmount());
+                    balanceAvailableAmt = totalGrant.subtract((null!=budgetAppropriationRegisterDisp.getCumulativeAmount())?budgetAppropriationRegisterDisp.getCumulativeAmount():BigDecimal.valueOf(0));
                 budgetAppropriationRegisterDisp.setBalanceAvailableAmount(balanceAvailableAmt);
                 budgetAppropriationRegisterDisp.setSerailNumber(Integer.toString(iSerialNumber));
                 updatedBdgtAppropriationRegisterList.add(budgetAppropriationRegisterDisp);

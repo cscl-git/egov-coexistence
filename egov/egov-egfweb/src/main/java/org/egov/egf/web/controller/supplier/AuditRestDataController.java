@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.egov.audit.entity.AuditCheckList;
+import org.egov.audit.entity.AuditChecklistHistory;
 import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditRestDataPOJO;
@@ -15,17 +17,15 @@ import org.egov.model.common.ResponseInfo;
 import org.egov.model.common.ResponseInfoWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
-import org.egov.audit.entity.AuditCheckList;
-import org.egov.audit.entity.AuditChecklistHistory;
 
 
 @RestController
@@ -44,6 +44,12 @@ public class AuditRestDataController {
 	 private  DepartmentService departmentService;
 	@Autowired
 	private AuditService auditService;
+	
+	private   List<String> allowheaderList= new ArrayList<String>(); 
+	private HttpHeaders headers = new HttpHeaders();
+	private final String headername="Content-Security-Policy";
+	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	
 	
 	@SuppressWarnings("deprecation")
 	@ResponseBody
@@ -99,7 +105,7 @@ public class AuditRestDataController {
          
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(responseData).build(), HttpStatus.OK);
+				.responseBody(responseData).build(),getHeaders(), HttpStatus.OK);
 	}
 	
 	
@@ -111,7 +117,14 @@ public class AuditRestDataController {
 	
 		 List<AuditDetails> auditDetailsList= new ArrayList<>();
 		 List<AuditRestDataPOJO> responseData =  new ArrayList<>();
+		 auditDetailsList=null;
        auditDetailsList = (List<AuditDetails> )auditService.getAllAudit();
+       
+       if(null==auditDetailsList) {
+    	   return new ResponseEntity<>(ResponseInfoWrapper.builder()
+   				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+   				.responseBody("No Data").build(),getHeaders(), HttpStatus.OK);
+       }
        
        auditDetailsList.stream().forEach(audit->{
     	   AuditRestDataPOJO  a=  new AuditRestDataPOJO(); 
@@ -126,6 +139,8 @@ public class AuditRestDataController {
     	   a.setAudit_no(audit.getAuditno());
     	   a.setPassUnderobjection(audit.getPassUnderobjection());
     	   a.setBillid((null!=audit.getEgBillregister())?audit.getEgBillregister().getId().toString():null);
+    	   a.setAuditor_name(audit.getAuditor_name());
+    	   a.setRsa_name(audit.getRsa_name());
     	   a.setDepartment( departmentService.getDepartmentById(Long.parseLong(audit.getDepartment())).getName());
     	   if(audit.getCheckList().size()>0) {
     		   audit.getCheckList().stream().forEach(ck->{
@@ -150,6 +165,32 @@ public class AuditRestDataController {
          
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
-				.responseBody(responseData).build(), HttpStatus.OK);
+				.responseBody(responseData).build(),getHeaders(), HttpStatus.OK);
+	}
+	
+public HttpHeaders getHeaders() {
+		
+		return headers = updateHeaders(headers);
+	}
+
+
+
+	public void setHeaders(HttpHeaders headers) {
+		this.headers = headers;
+	}
+	
+	public HttpHeaders updateHeaders(HttpHeaders headers) {
+		allowheaderList.clear();
+		allowheaderList.add("https://egov.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-dev.chandigarhsmartcity.in");
+		allowheaderList.add("https://egov-uat.chandigarhsmartcity.in");
+		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
+		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
+		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("http://localhost:3010");
+		headers.set(headername, headervalue);
+		headers.setAccessControlAllowHeaders(allowheaderList);
+		return headers;
+		
 	}
 }

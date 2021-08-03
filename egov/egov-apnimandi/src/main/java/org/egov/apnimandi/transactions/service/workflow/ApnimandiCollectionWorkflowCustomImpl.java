@@ -52,7 +52,8 @@ public class ApnimandiCollectionWorkflowCustomImpl implements ApnimandiCollectio
             		wfmatrix = apnimandiCollectionWorkflowService.getWfMatrix(apnimandiCollectionDetails.getStateType(), null, null, null, apnimandiCollectionDetails.getCurrentState().getValue(), null);
             		apnimandiCollectionDetails.setStatus(getStatusByPassingStatusCode(ApnimandiConstants.APNIMANDI_STATUS_COLLECTION_RESUBMITTED));
             	}else {
-            		wfmatrix = apnimandiCollectionWorkflowService.getWfMatrix(apnimandiCollectionDetails.getStateType(), null, null, null, ApnimandiConstants.WF_NEW_STATE, null);
+            		//wfmatrix = apnimandiCollectionWorkflowService.getWfMatrix(apnimandiCollectionDetails.getStateType(), null, null, null, ApnimandiConstants.WF_NEW_STATE, null);
+            		wfmatrix = apnimandiCollectionWorkflowService.getWfMatrix(apnimandiCollectionDetails.getStateType(), null, null, null, "Created", null);
                     apnimandiCollectionDetails.setStatus(getStatusByPassingModuleAndCode(wfmatrix));
             	}                
                 if (null == apnimandiCollectionDetails.getState()

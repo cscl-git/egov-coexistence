@@ -47,12 +47,25 @@
  */
 package org.egov.services.report;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.egov.commons.Fund;
+import org.egov.egf.contract.model.AuditDetails;
 import org.egov.egf.model.IEStatementEntry;
 import org.egov.egf.model.Statement;
 import org.egov.egf.model.StatementResultObject;
 import org.egov.infra.admin.master.service.AppConfigValueService;
-import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.utils.Constants;
@@ -62,22 +75,6 @@ import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
-
-import javaxt.utils.Array;
-
-import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-
-import java.util.Set;
 @Service
 public class IncomeExpenditureService extends ReportService {
  @Autowired
@@ -621,4 +618,179 @@ public void populateIEStatement2(Statement ie) {
 	}
     	
 	}
+		
+		
+		public void populateIEStatementForApi(Statement ie) {
+	    	System.out.println("Inside populateIEStatement2 try");
+	    	
+	    	
+	    	try {
+	    		Date  fromDate = getFromDate(ie);
+		        Date  toDate = getToDate(ie);
+	    		
+	    		minorCodeLength =   Integer.valueOf(appConfigValuesService.getConfigValuesByModuleAndKey(Constants.EGF, "coa_minorcode_length").get(0).getValue());
+	    		
+	    		 
+	    	        coaType.add('I');
+	    	        coaType.add('E');
+	    	      
+
+	    	        final String filterQuery = getFilterQuery(ie);
+	    	        System.out.println("populateIEStatement");
+	    	        populateCurrentYearAmountPerFundNew(ie, filterQuery, toDate, fromDate, IE);
+	    	        // populateSchedule(ie,IE);
+	    	        ie = addBudgetDetails(ie);
+	    	        removeFundsWithNoDataIE(ie);     
+	    }catch(Exception ex) {
+			System.out.println("Exception here");
+			ex.printStackTrace();
+		}
+	    	
+	}
+		
+		public void populateCurrentYearAmountPerFundNew(final Statement statement, final String filterQuery, final Date toDate,
+	            final Date fromDate,
+	            final String scheduleReportType) {
+	        if (LOGGER.isDebugEnabled())
+	            LOGGER.debug(" inside populateCurrentYearAmountPerFund ");
+	        final BigDecimal divisor = statement.getDivisor();
+	        final Statement expenditure = new Statement();
+	        final Statement income = new Statement();
+	        List<StatementResultObject> allGlCodes =new ArrayList<StatementResultObject>();
+	        
+	        	 allGlCodes = getAllGlCodesFor(scheduleReportType);
+	        
+	          // has all the IE schedule codes
+
+	        // get all the net amount total fundwise for each major code
+
+	        //final List<StatementResultObject> results = getTransactionAmount(filterQuery, toDate, fromDate, "'I','E'", IE);
+
+	      // final List<StatementResultObject> PreYearResults = getTransactionAmount(filterQuery, getPreviousYearFor(toDate),
+	                //getPreviousYearFor(fromDate), "'I','E'", scheduleReportType);
+	        List<StatementResultObject> results = new ArrayList<StatementResultObject>();
+	        List<StatementResultObject> PreYearResults =new ArrayList<StatementResultObject>();
+	        
+	       
+	        		results = getTransactionAmountForApi(filterQuery, toDate, fromDate, "'I','E'", IE);
+
+	              PreYearResults = getTransactionAmountForApi(filterQuery, getPreviousYearFor(toDate),
+	                       getPreviousYearFor(fromDate), "'I','E'", scheduleReportType);
+	          
+	         
+	        
+
+	        for (final StatementResultObject queryObject : allGlCodes) {
+
+	            if (queryObject.getGlCode() == null)
+	                queryObject.setGlCode("");
+	            final List<StatementResultObject> rows = getRowWithGlCode(results, queryObject.getGlCode());
+	            if (rows.isEmpty() && queryObject.getGlCode() != null) {
+	                if (contains(PreYearResults, queryObject.getGlCode())) {
+	                    final List<StatementResultObject> preRow = getRowWithGlCode(PreYearResults, queryObject.getGlCode());
+	                    final IEStatementEntry preentry = new IEStatementEntry();
+	                    final AuditDetails a=  new AuditDetails();
+	                    for (final StatementResultObject pre : preRow) {
+	                    	
+
+	                        if (I.equalsIgnoreCase(queryObject.getType().toString())) {
+	                            if (pre.isIncome())
+	                                pre.negateAmount();
+	                            preentry.getPreviousYearAmount().put(
+	                                    getFundNameForId(statement.getFunds(), Integer.valueOf(pre.getFundId())),
+	                                    divideAndRound(pre.getAmount(), divisor));
+	                        } else if (E.equalsIgnoreCase(queryObject.getType().toString())) {
+	                            if (pre.isIncome())
+	                                pre.negateAmount();
+	                            preentry.getPreviousYearAmount().put(
+	                                    getFundNameForId(statement.getFunds(), Integer.valueOf(pre.getFundId())),
+	                                    divideAndRound(pre.getAmount(), divisor));
+	                        }
+	                        
+	                        System.out.println("Inside Above IF:::"+queryObject.getGlCode()+
+	  							  "............"+pre.getDepartmentcode());
+	  							  preentry.setDepartmentcode(pre.getDepartmentcode());
+	  							  a.setCreatedby(null!=pre.getCreatedby()?pre.getCreatedby().toString():null);
+	  							  a.setCreateddate(null!=pre.getCreateddate()?pre.getCreateddate().toString():
+	  							  null);
+	  							  a.setLastmodifiedby(null!=pre.getLastmodifiedby()?pre.getLastmodifiedby().
+	  							  toString():null);
+	  							  a.setLastmodifieddate(null!=pre.getLastmodifieddate()?pre.getLastmodifieddate
+	  							  ().toString():null); preentry.setAuditDetails(a);
+	                        
+	                    }
+	                    
+	                    if (queryObject.getGlCode() != null) {
+	                        preentry.setGlCode(queryObject.getGlCode());
+	                        preentry.setAccountName(queryObject.getScheduleName());
+	                        preentry.setScheduleNo(queryObject.getScheduleNumber());
+	                        System.out.println("Inside Above IF:::"+queryObject.getGlCode()+"............"+queryObject.getDepartmentcode());
+	                        
+	                        
+							  
+							 
+	                        
+	                    }
+	                    if (I.equalsIgnoreCase(queryObject.getType().toString()))
+	                        income.addIE(preentry);
+	                    else if (E.equalsIgnoreCase(queryObject.getType().toString()))
+	                        expenditure.addIE(preentry);
+	                }
+	            } else
+	                for (final StatementResultObject row : rows) {
+	                    if (row.isIncome())
+	                        row.negateAmount();
+	                    if (income.containsIEStatementEntry(row.getGlCode()) || expenditure.containsIEStatementEntry(row.getGlCode())) {
+	                        if (I.equalsIgnoreCase(row.getType().toString()))
+	                            addFundAmountIE(statement.getFunds(), income, divisor, row);
+	                        else if (E.equalsIgnoreCase(row.getType().toString()))
+	                            addFundAmountIE(statement.getFunds(), expenditure, divisor, row);
+	                    } else {
+	                        final IEStatementEntry entry = new IEStatementEntry();
+	                        final org.egov.egf.contract.model.AuditDetails a=  new org.egov.egf.contract.model.AuditDetails();
+	                        if (row.getAmount() != null && row.getFundId() != null) {
+	                            entry.getNetAmount().put(getFundNameForId(statement.getFunds(), Integer.valueOf(row.getFundId())),
+	                                    divideAndRound(row.getAmount(), divisor));
+	                            if (queryObject.getGlCode() != null && contains(PreYearResults, row.getGlCode())) {
+	                                final List<StatementResultObject> preRow = getRowWithGlCode(PreYearResults,
+	                                        queryObject.getGlCode());
+	                                for (final StatementResultObject pre : preRow) {
+	                                    if (pre.isIncome())
+	                                        pre.negateAmount();
+	                                    if (pre.getGlCode() != null && pre.getGlCode().equals(row.getGlCode()))
+	                                        entry.getPreviousYearAmount().put(
+	                                                getFundNameForId(statement.getFunds(), Integer.valueOf(pre.getFundId())),
+	                                                divideAndRound(pre.getAmount(), divisor));
+	                                    
+	                                  
+	                                   
+	                                }
+	                            }
+	                        }
+	                        if (queryObject.getGlCode() != null) {
+	                        	System.out.println("Inside Below IF:::"+queryObject.getGlCode()+"............"+queryObject.getDepartmentcode());
+	                            entry.setGlCode(queryObject.getGlCode());
+	                            entry.setAccountName(queryObject.getScheduleName());
+	                            entry.setScheduleNo(queryObject.getScheduleNumber());
+	                            
+	                            
+	                            entry.setDepartmentcode(row.getDepartmentcode());
+                                a.setCreatedby(null!=row.getCreatedby()?row.getCreatedby().toString():null);
+                                a.setCreateddate(null!=row.getCreateddate()?row.getCreateddate().toString():null);
+                                a.setLastmodifiedby(null!=row.getLastmodifiedby()?row.getLastmodifiedby().toString():null);
+                                a.setLastmodifieddate(null!=row.getLastmodifieddate()?row.getLastmodifieddate().toString():null);
+                                entry.setAuditDetails(a);
+	                           
+	                        }
+	                        if (I.equalsIgnoreCase(row.getType().toString()))
+	                            income.addIE(entry);
+	                        else if (E.equalsIgnoreCase(row.getType().toString()))
+	                            expenditure.addIE(entry);
+	                    }
+	                }
+
+	        }
+	        addRowsToStatement(statement, expenditure, income);
+
+	    }
 }

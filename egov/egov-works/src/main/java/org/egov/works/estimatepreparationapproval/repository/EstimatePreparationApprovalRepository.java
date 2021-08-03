@@ -1,5 +1,6 @@
 package org.egov.works.estimatepreparationapproval.repository;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -36,17 +37,11 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 			@Param("workCategory") String workCategory, @Param("executingDivision") Long executingDivision,
 			@Param("workName") String workName, @Param("workLocation") String workLocation,
 			@Param("sectorNumber") String sectorNumber, @Param("wardNumber") String wardNumber,
-			@Param("fundSource") String fundSource, @Param("estimateAmount") Double estimateAmount,
+			@Param("fundSource") String fundSource, @Param("estimateAmount") BigDecimal estimateAmount,
 			@Param("tenderCost") String tenderCost, @Param("agencyWorkOrder") String agencyWorkOrder,
 			@Param("date") Date date, @Param("timeLimit") String timeLimit);
 	
-	
-
 	 @Transactional
 	  @Query(nativeQuery = true) 
 	  List<EstimatePreparationApprovalRESTPOJO>  getEstimatePreparationApprovalRESTPOJO();
-	 
-	
-	
-
 }

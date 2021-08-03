@@ -342,10 +342,10 @@
 			<a href="#" onclick="populateBdgetDetails()">Click</a>
 		</div>
 		<label class="col-sm-2 control-label text-right">
-			<spring:message code="lbl.budget.details" text="Sanction Number"/>
+			
 		</label>
 		<div class="col-sm-3 add-margin">
-			<a href="#" onclick="populateVarianceDetails()">Click</a>
+			
 		</div>
 	</div>
   </c:otherwise>

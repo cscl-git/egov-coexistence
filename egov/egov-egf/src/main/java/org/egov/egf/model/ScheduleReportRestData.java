@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.egov.egf.contract.model.AuditDetails;
+
 public class ScheduleReportRestData {
 	
 	private String glCode;
@@ -16,6 +18,9 @@ public class ScheduleReportRestData {
     private Map<String, BigDecimal> netAmount = new HashMap<String, BigDecimal>();
     private Map<String, BigDecimal> previousYearAmount = new HashMap<String, BigDecimal>();
     private String type;
+    
+    private String department_name;
+    private AuditDetails auditDetails;
 	public String getGlCode() {
 		return glCode;
 	}
@@ -70,5 +75,19 @@ public class ScheduleReportRestData {
 	public void setScheduleWiseTotal(Map<String, BigDecimal> scheduleWiseTotal) {
 		this.scheduleWiseTotal = scheduleWiseTotal;
 	}
+	public String getDepartment_name() {
+		return department_name;
+	}
+	public void setDepartment_name(String department_name) {
+		this.department_name = department_name;
+	}
+	public AuditDetails getAuditDetails() {
+		return auditDetails;
+	}
+	public void setAuditDetails(AuditDetails auditDetails) {
+		this.auditDetails = auditDetails;
+	}
+	
+	
     
 }

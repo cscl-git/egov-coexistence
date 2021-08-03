@@ -108,15 +108,12 @@
 							</form:option>
 							<form:options items="${estimatePreparationApproval.subdivisions}"
 								itemValue="id" itemLabel="subdivision" />
-							<%-- <form:options items="${estimatePreparationApproval.workswings}"
-								itemValue="id" itemLabel="workswingname" /> --%>
-							<%-- <form:option value="Building & Roads">Building & Roads</form:option>
-							<form:option value="Public Health">Public Health</form:option>
-							<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
+							
 						</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.estimate.date" /></label>
+							code="lbl.estimate.preparation.estimate.date" /><span
+						class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
 									<form:input id="estimateDate" path="estimateDate"
 									class="form-control datepicker"  data-date-end-date="0d"
@@ -351,22 +348,25 @@
 				<!-- New field end here -->			
 							
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.name.work" /></label>
+							code="lbl.estimate.preparation.name.work" /><span
+						class="mandatory"></span></label>
 					<div class="col-sm-3 block-colm">
 						<form:textarea class="form-control-works" path="workName"
-							style="height: 100px;" maxlength="2000" />
+							style="height: 100px;" maxlength="2000" id="workName" />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.necessity" /></label>
+							code="lbl.estimate.preparation.necessity" /><span
+						class="mandatory"></span></label>
 					<div class="col-sm-3 block-colm">
 						<form:textarea class="form-control-works" path="necessity"
-							style="height: 100px;" maxlength="2000" />
+							style="height: 100px;" maxlength="2000"  id="necessity"/>
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.scope.work" /></label>
+							code="lbl.estimate.preparation.scope.work" /><span
+						class="mandatory"></span></label>
 					<div class="col-sm-3 block-colm">
 						<form:textarea class="form-control-works" path="workScope"
-							style="height: 100px;" maxlength="2000" />
+							style="height: 100px;" maxlength="2000" id="workScope" />
 					</div>
 				</div>
 			</div>
@@ -451,7 +451,8 @@
 						style="height: 30px;" title="BoQ Upload Format"
 						src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br> <input type="file" name="file" id="file1"
-						style="color: #000000;"> <br>
+						style="color: #000000;">
+						<small class="error-msg">**Kindly use proper BOQ format to upload the BOQ details. Please ensure that there are no merge cells in the AOR Detail sheet</small> <br>
 					<form:hidden path="objectType" id="objectType"
 						class="checklist_description" value="BoqUploadFile"></form:hidden>
 					<br>
@@ -702,5 +703,7 @@
 	$(document).ready(function(){
 	
 		$('#comments').val('');
+		
 	});
+	
 </script>

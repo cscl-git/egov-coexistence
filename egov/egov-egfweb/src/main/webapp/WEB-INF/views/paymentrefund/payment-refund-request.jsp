@@ -181,7 +181,7 @@
 			 <c:choose>
 			  <c:when test="${!accountDetails.isEmpty()}">
 				<c:forEach items="${accountDetails}" var="accountDetail" varStatus="status">
-				 <tr>
+				 <tr id="creditdetailsrow">				  
 				    <input type="hidden" id="billDetails[${status.index}].glcodeid" readonly value="${accountDetail.glcodeid}">
 				    <input type="hidden" id="billDetails[${status.index}].glcode" readonly value="${accountDetail.glcode}"> 
 				    <td><input type="hidden" name="billDetails[${status.index}].glcodeid" value="${accountDetail.glcodeid}">${accountDetail.glcode}</td>
@@ -231,6 +231,9 @@
 			<tbody>
 			 <c:choose>
 			  <c:when test="${!subLedgerlist.isEmpty()}">
+			<c:forEach items="${subLedgerlist}" var="subLedger" varStatus="count">
+			  
+			  
 				<tr id="subledgerdetailsrow">
 				  <td>
 				  <!-- <input type="hidden" name="billPayeedetails[0].id" id="subLedgerDetailsId_0" class ="subLedgerDetailsId"/>
@@ -238,43 +241,51 @@
 				  <input type="hidden" name="billPayeedetails[0].debitAmount" value="0" id="subLedgerDebitAmount_0" class ="subledgerdebitamount"/>
 				   -->
 				  
-				  <select id="glcodeid" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
-				  <option value=""><spring:message code="lbl.select" text="Select"/>
-				  <c:forEach var="subLedger"  items="${accountDetails}">
-				    <option value="${subLedger.glcodeid}">${subLedger.glcode}</option>
+				  <select id="tempSubLedger[${count.index}].netPayableAccountCode" data-first-option="false" name="billPayeedetails[${count.index}].egBilldetailsId.glcodeid" class="form-control" required="required">
+				  <option value="${subLedger.glcode.id}">${subLedger.glcode.glcode}</option>
+				  <c:forEach var="accountDetail" items="${accountDetails}">
+				    <c:if test="${not empty accountDetail.creditamount && accountDetail.creditamount ne '0.00'}">
+				    <option value="${accountDetail.glcodeid}">${accountDetail.glcode}</option>
+				    </c:if>
                     </c:forEach>
+				  
+				                     
 				  </select>
 				  </td>
 				  <td>
-				   <select name="billPayeedetails[0].egBilldetailsId.id" data-first-option="false" id="tempSubLedger[0].subLedgerType" data-idx="0" class="form-control subledgerGlType subledgerGl_code" >
-					<option value=""><spring:message code="lbl.select" text="Select"/></option>
+				   <select name="billPayeedetails[${count.index}].egBilldetailsId.id" data-first-option="false" id="tempSubLedger[${count.index}].subLedgerType" data-idx="0" class="form-control subledgerGlType" >
+					<option value="${subLedger.detailType.id}">${subLedger.detailType.description}</option>
 					<c:forEach items="${subLedgerTypes}" var="subLedgerType">
 						<option value="${subLedgerType.id}">${subLedgerType.name}</option>
 					</c:forEach>
-				  </select>
+					
+					
 				  </td>
 				  <td>
-				    <input type="hidden" name="billPayeedetails[0].accountDetailTypeId" id="tempSubLedger[0].detailTypeId"  class="form-control table-input hidden-input subLedgerDetailTypeId"/>
-					<input type="hidden" name="billPayeedetails[0].accountDetailKeyId" id="tempSubLedger[0].detailkeyId" class="debitDetailKeyId">
-					<input type="text" name="billPayeedetails[0].detailTypeName" id="tempSubLedger[0].subLedgerCode" data-idx="0" class="form-control subledger_code subLedgerCodeOT" value="" placeholder="Type any letters of SubLedger name"  />
+				    <input type="hidden" name="billPayeedetails[${count.index}].accountDetailTypeId" id="tempSubLedger[${count.index}].detailTypeId"  class="form-control table-input hidden-input subLedgerDetailTypeId" value="${subLedger.detailType.id}"/>
+					<input type="hidden" name="billPayeedetails[${count.index}].accountDetailKeyId" id="tempSubLedger[${count.index}].detailkeyId" class="debitDetailKeyId" value="${subLedger.detailKeyId}">
+					<input type="text" name="billPayeedetails[${count.index}].detailTypeName" id="tempSubLedger[${count.index}].subLedgerCode" data-idx="0" class="form-control subledger_code subLedgerCodeOT" value="${subLedger.detailKey}" placeholder="Type any letters of SubLedger name"  />
 				  </td>
 				  <td>
-				  <input type="text" class="form-control subledger_Payto" id="tempSubLedger[0].payTo" name="egBillregistermis.payto" value="" data-idx="0" maxlength="350" />
+				  <input type="text" class="form-control subledger_Payto" id="tempSubLedger[${count.index}].payTo" name="egBillregistermis.payto"  data-idx="0" maxlength="350" value="${subLedger.detailKey}"/>
 				  
 				  </td>
 				  <td>
-				  <input type="text" id="tempSubLedger[0].netPayable_Amount" name="billPayeedetails[0].creditAmount" 
-				     data-idx="0" class="form-control text-right netPayable_Amount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" data-pattern="decimalvalue"> 
+				  <input type="text" id="tempSubLedger[${count.index}].netPayable_Amount" name="billPayeedetails[${count.index}].creditAmount" 
+				     data-idx="0" class="form-control text-right netPayable_Amount" oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');" data-pattern="decimalvalue" value=""> 
 				  </td>
 				  <td class="text-center"><span style="cursor:pointer;" onclick="addSubledgerRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 <span class="add-padding subledge-delete-row" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>
 			
 				</tr>
+				
+				</c:forEach>	
+				
 			</c:when>
 		  <c:otherwise>
 			<tr id="subledgerdetailsrow">
 			  <td>
-				  <select id="glcodeid" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
+				  <select id="tempSubLedger[0].netPayableAccountCode" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
 				  <option value=""><spring:message code="lbl.select" text="Select"/>
 				  <c:forEach var="accountDetail" items="${accountDetails}">
 				    <c:if test="${not empty accountDetail.creditamount && accountDetail.creditamount ne '0.00'}">
@@ -461,7 +472,7 @@
 			<td id="actionButtons">
 				<c:if test="${mode != 'readOnly'}">
 					<c:forEach items="${validActionList}" var="validButtons">
-						<input type="submit" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"/>
+						<input type="button" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"  onclick="return validateFormGlcode(this.value);"/>
 					</c:forEach>
 				</c:if>
 				<input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />

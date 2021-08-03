@@ -1,84 +1,13 @@
-	
-//var data;
-//function makeFieldAsAutocomplete(field){
-//	console.log('--makeFieldAsAutocomplete--');
-//	var tr = $(field).closest('tr');
-//	tr.find('div[id^="worklist_"]').empty();
-//	$.ajax({
-//		 url:'/services/works/popup/getboq/'+$(field).val(),
-//		 contentType:"application/json",		
-//		 dataType:"json",
-//		 success:function(r)
-//		 {
-//			 data=r;
-//			for (var i=0; i<data.length; i++) {
-//				 console.log(data[i].id+ '------KK----' + data[i].ref_dsr +'--'+ data[i].item_description + '--'+data[i].unit+'--'+data[i].rate);
-//				 tr.find('div[id^="worklist_"]').append("<option value='"+data[i].id+"'   data-description='"+data[i].item_description+"'  data-rate1='"+data[i].rate+"' data-unit='"+data[i].unit+"'        >"+data[i].ref_dsr+"</option>");
-//			}
-//		 }
-//	 })
-//	
-//}
-
-
-
-//$(document).ready(function(){
-//    
-//    console.log('--------------------start------------------------');
-//    $('#mainContainerDiv').find('table[id^="boq"] > tbody').each(function(){
-//    	console.log(this);
-//    	$(this).on('keyup', 'input[type="text"][id$=".ref_dsr"]', function(){
-//    		console.log('keyup');	
-//    		makeFieldAsAutocomplete(this);	
-//    	});
-//    	$(this).on('click', 'div[id^="worklist_"] > option', function(){
-//    		console.log('keyup worklist_  option click' );
-//    		var row = $(this).closest('tr');
-//    		
-//    		row.find('input[type="text"][id$="ref_dsr"]').val($(this).text());
-//    		row.find('input[type="text"][id$="item_description"]').val($(this).data('description'));
-//    		row.find('input[type="number"][id$="rate"]').val($(this).data('rate1'));
-//    		row.find('input[type="text"][id$="unit"]').val($(this).data('unit'));
-//    		row.find('input[type="text"][id$="milestone"]').val('FOR THE WORK OF "STRENGTHENING OF SWD SYSTEM AT PHIRNI ROAD AND VARIOUS LOCATIONS IN VILLAGE BURAIL UT, CHANDIGARH ');
-    		
-//    		var rate = parseFloat($("[id*=rate]").val());
-//          var quantity = parseFloat($("[id*=quantity]").val());
-//          var total = parseFloat(rate * quantity);
-//            $("[id*=lblPrice]").val(total);
-//    		row.find('input[type="number"][id$="amount"]').val(total);
-//    		var optionDiv = $(this).closest('div[id^="worklist_"]');
-//    		optionDiv.css('display','none');
-//    		
-//    		
-//    	});
-//    });
-//    console.log('--------------------end------------------------');
-//    
-// }); //Ready end
-    
-   
-
-
-
-
-
-
-$( function() {
-    $( "#work_intended_date" ).datepicker();
-  } );
-
-
-/*$(document).ready(function(){
-	console.log('work_intended_date');
-	$("work_intended_date").datetimepicker({
-	    format: 'DD/MM/YYYY',
-	}).on('changeDate', function() {
-	    $('.datepicker').hide();
-	});
-});*/
-
 function setWorkflow(action)
 {
+	var a=document.getElementById('boQDetailsList[0].milestone');
+	var b=document.getElementById('boQDetailsList[0].item_description');
+	var c=document.getElementById('boQDetailsList[0].ref_dsr');
+	var d=document.getElementById('boQDetailsList[0].unit');
+	var e=document.getElementById('boQDetailsList[0].rate');
+	var f=document.getElementById('boQDetailsList[0].quantity');
+	
+	var file=document.getElementById('file');
 	
 	document.getElementById("workFlowAction").value = action;
 	if(action == null)
@@ -99,7 +28,35 @@ function setWorkflow(action)
 						bootbox.alert("Please select Approval Comment");
 						return false;
 					}
-					
+					if(document.getElementById('estimateDate') != null && document.getElementById('estimateDate').value == '')
+					{
+						bootbox.alert("Please select  Estimate Date");
+						document.getElementById('estimateDate').focus();
+						return false;
+					}
+					if(document.getElementById('workName') != null && document.getElementById('workName').value == '')
+					{
+						bootbox.alert("Please Fill Name of Work");
+						document.getElementById('workName').focus();
+						return false;
+					}
+					if(document.getElementById('necessity') != null && document.getElementById('necessity').value == '')
+					{
+						bootbox.alert("Please Fill Necessity");
+						document.getElementById('necessity').focus();
+						return false;
+					}
+					if(document.getElementById('workScope') != null && document.getElementById('workScope').value == '')
+					{
+						bootbox.alert("Please Fill Provision/Scope of work");
+						document.getElementById('workScope').focus();
+						return false;
+					}
+					if(!(a != null && a!="" && b != null && b!="" && c != null && c!="" && d != null && d!="" && e != null && e!="" && f != null && f!="")){
+						
+						bootbox.alert("Please Upload Boq File.")
+						return false;
+					}
 					if(document.getElementById('wardCheck') != null && document.getElementById('wardCheck').value != '')
 					{
 					var wardcheck=document.getElementById('wardCheck').value;
@@ -112,6 +69,36 @@ function setWorkflow(action)
 							return false;
 							}
 					}
+					//ts
+					if(document.getElementById('stateType') != null && document.getElementById('stateType').value !='' && document.getElementById('stateType').value == 'EstimatePreparationApproval' && document.getElementById('estStatus') != null && document.getElementById('estStatus').value !='' && document.getElementById('estStatus').value == 'TS Pending for Approval')
+						{
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With EXECUTIVE ENGINEER')
+								{
+									if(document.getElementById('approvalDesignation').value == '251')
+									{
+										if(parseInt(document.getElementById('estimatedCost').value) <= 1000000 )
+											{
+											bootbox.alert("Cannot Forward as the Amount is less than 10 Lakhs");
+											return false;
+											}
+									}
+								}
+							
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With SUPERINTENDENT ENGINEER')
+							{
+								if(document.getElementById('approvalDesignation').value == '217')
+								{
+									if(parseInt(document.getElementById('estimatedCost').value) <= 5000000 )
+										{
+										bootbox.alert("Cannot Forward as the Amount is less than 50 Lakhs");
+										return false;
+										}
+								}
+							}
+								
+								
+						}
+					//dnit
 					if(document.getElementById('stateType') != null && document.getElementById('stateType').value !='' && document.getElementById('stateType').value == 'DNITCreation')
 						{
 							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With EXECUTIVE ENGINEER')
@@ -158,6 +145,64 @@ function setWorkflow(action)
 								bootbox.alert("Cannot for Forward to Commissioner as this is "+document.getElementById('wardCheck').value);
 								return false;
 								}
+						}
+					if(document.getElementById('stateType') != null && document.getElementById('stateType').value !='' && document.getElementById('stateType').value == 'EstimatePreparationApproval' && document.getElementById('estStatus') != null && document.getElementById('estStatus').value !='' && document.getElementById('estStatus').value == 'TS Pending for Approval')
+						{
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With EXECUTIVE ENGINEER')
+								{
+									if(parseInt(document.getElementById('estimatedCost').value) > 1000000 )
+									{
+										bootbox.alert("Cannot Approve as the Amount is more than 10 Lakhs");
+										return false;
+									}
+								}
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With SUPERINTENDENT ENGINEER')
+							{
+								if(parseInt(document.getElementById('estimatedCost').value) > 5000000 )
+								{
+									bootbox.alert("Cannot Approve as the Amount is more than 50 Lakhs");
+									return false;
+								}
+								if(document.getElementById('prevState') != null && document.getElementById('prevState').value != null && document.getElementById('prevState').value != '' && document.getElementById('prevState').value != 'Pending With CIRCLE HEAD DRAFTSMAN')
+									{
+										bootbox.alert("Cannot Approve as estimate is not sent to Circle Head Draftsman");
+										return false;
+									}
+							}
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With CHIEF ENGINEER')
+							{
+								if(document.getElementById('prevState') != null && document.getElementById('prevState').value != null && document.getElementById('prevState').value != '' && document.getElementById('prevState').value != 'Pending With HEAD DRAFTSMAN')
+									{
+										bootbox.alert("Cannot Approve as estimate is not sent to Head Draftsman");
+										return false;
+									}
+							}
+						}
+					
+					//dnit
+					if(document.getElementById('stateType') != null && document.getElementById('stateType').value !='' && document.getElementById('stateType').value == 'DNITCreation')
+						{
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With EXECUTIVE ENGINEER')
+							{
+								if(parseInt(document.getElementById('estimateAmount').value) > 1000000 )
+									{
+									bootbox.alert("Cannot Approve DNIT as the Amount is more than 10 Lakhs");
+									return false;
+									}
+								if(document.getElementById('prevState') != null && document.getElementById('prevState').value != null && document.getElementById('prevState').value != '' && document.getElementById('prevState').value != 'Pending With SUPERINTENDENT')
+								{
+								bootbox.alert("Cannot Approve as DNIT as the Amount is not sent to Executive Engineer");
+								return false;
+								}
+							}
+							if(document.getElementById('currentState') != null && document.getElementById('currentState').value !='' && document.getElementById('currentState').value == 'Pending With SUPERINTENDENT')
+							{
+								if(document.getElementById('prevState') != null && document.getElementById('prevState').value != null && document.getElementById('prevState').value != '' && document.getElementById('prevState').value != 'Pending With EXECUTIVE ENGINEER')
+								{
+								bootbox.alert("Cannot Approve as DNIT as the Amount is not sent to Executive Engineer");
+								return false;
+								}
+							}
 						}
 				}
 		return true;
@@ -250,3 +295,12 @@ function filecheck(){
 		return false;
 	}
 }
+$(document).ready(function(){
+	/*$(window).unload(function(){
+		parent.window.opener.inboxloadmethod();
+	});*/
+	$(window).on("unload", function(e) {
+	   console.log("Unloading Function");
+	    parent.window.opener.inboxloadmethod();
+	});
+});

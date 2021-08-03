@@ -34,6 +34,8 @@ import org.egov.infra.workflow.entity.StateAware;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.boq.entity.BoqUploadDocument;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 
 
 //Added Bikash Dhal
@@ -55,10 +57,10 @@ import org.egov.works.boq.entity.BoqUploadDocument;
 				@ColumnResult (name="contingent_percentage",type=String.class),@ColumnResult (name="contingent_amount",type=String.class),@ColumnResult (name="consultant_fee",type=String.class),
 				@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="expenditure_head",type=String.class),@ColumnResult (name="expenditure_sub_category",type=String.class),
 				@ColumnResult (name="expenditure_category",type=String.class),@ColumnResult (name="meetnumber",type=String.class),@ColumnResult (name="meetcategory",type=String.class),
-				@ColumnResult (name="meetdate",type=String.class),@ColumnResult (name="expenditure_head_est",type=String.class),@ColumnResult (name="status",type=String.class) }
+				@ColumnResult (name="meetdate",type=String.class),@ColumnResult (name="expenditure_head_est",type=String.class),@ColumnResult (name="status",type=String.class),@ColumnResult (name="subdivision",type=String.class) }
 				)
 })
-@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = " select tep.id, tep.agency_work_order ,tep.date, tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status from txn_estimate_preparation tep , egw_status es, eg_department dep where tep.statusid =es.id and tep.executing_division = dep.id",
+@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = " select tep.id, tep.agency_work_order ,tep.date, tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status,sub.subdivision from txn_estimate_preparation tep , egw_status es, eg_department dep,eg_subdivision sub where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id",
 			resultClass = EstimatePreparationApprovalRESTPOJO.class,resultSetMapping = "AllEstimatePreparationApprovalresultset")
 
 
@@ -115,7 +117,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private Long workStatus;
 
 	@Column(name = "estimate_amount")
-	private Double estimateAmount;
+	private BigDecimal estimateAmount;
 	
 	@Column(name = "estimate_prepared_by")
 	private String estimatePreparedBy;
@@ -168,7 +170,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private Long subdivision;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
-	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>();
+	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>(1000);
 
 	/*@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoqUploadDocument> uploadDocument=new ArrayList<BoqUploadDocument>();*/
@@ -208,6 +210,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	
 	@Transient
 	private String pendingWith;
+
+	@Transient
+	private String dnitfromestimate;
 
 	public Double getContingentPercentage() {
 		return contingentPercentage;
@@ -269,7 +274,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private Date toDt;
 
 	@Transient
-	private List<BoQDetails> boQDetailsList;
+	private List<BoQDetails> boQDetailsList = new ArrayList<BoQDetails>(1000);
 
 	@Transient
 	private List<BoqUploadDocument> docUpload;
@@ -431,13 +436,7 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 		this.workStatus = workStatus;
 	}
 
-	public Double getEstimateAmount() {
-		return estimateAmount;
-	}
 
-	public void setEstimateAmount(Double estimateAmount) {
-		this.estimateAmount = estimateAmount;
-	}
 
 
 	public Long getPreparationDesignation() {
@@ -924,8 +923,24 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 		this.newdepartments = newdepartments;
 }
 
+	public BigDecimal getEstimateAmount() {
+		return estimateAmount;
+	}
+
+	public void setEstimateAmount(BigDecimal estimateAmount) {
+		this.estimateAmount = estimateAmount;
+	}
+	
+	public String getDnitfromestimate() {
+		return dnitfromestimate;
+	}
+
+	public void setDnitfromestimate(String dnitfromestimate) {
+		this.dnitfromestimate = dnitfromestimate;
+	}
+
 	
 	
-	
+
 
 }

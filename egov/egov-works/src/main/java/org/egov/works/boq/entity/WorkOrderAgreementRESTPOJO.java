@@ -44,6 +44,7 @@ public class WorkOrderAgreementRESTPOJO {
 	private String approval_competent_authority;
 	private String status;
 	private String percentage_completion;
+	private String subdivision;
 	
 	
 	public WorkOrderAgreementRESTPOJO() {}
@@ -61,7 +62,7 @@ public class WorkOrderAgreementRESTPOJO {
 			String createddate, String lastmodifiedby, String lastmodifieddate, String state_id,
 			String work_agreement_number, String project_closure_comments, String contractor_performance_comments,
 			String actual_start_date, String actual_end_date, String approval_competent_authority, String status,
-			String percentage_completion) {
+			String percentage_completion,String subdivision) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -106,6 +107,21 @@ public class WorkOrderAgreementRESTPOJO {
 		this.approval_competent_authority = approval_competent_authority;
 		this.status = status;
 		this.percentage_completion = percentage_completion;
+		this.subdivision=subdivision;
+	}
+
+
+
+
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+
+
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
 	}
 
 

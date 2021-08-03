@@ -96,6 +96,7 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.EgBillregistermis;
 import org.egov.model.masters.OtherParty;
 import org.egov.model.voucher.PreApprovedVoucher;
+import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.egov.utils.PaymentRefundUtils;
@@ -242,6 +243,10 @@ public class PaymentRefundController extends BaseBillController {
     @Autowired
     @Qualifier("messageSource")
     private MessageSource messageSource;
+    
+    @Autowired
+    VoucherService voucherService;
+    
     
     public PaymentRefundController(final AppConfigValueService appConfigValuesService) {
         super(appConfigValuesService);
@@ -876,27 +881,28 @@ public class PaymentRefundController extends BaseBillController {
          final BindingResult resultBinder, final HttpServletRequest request, @RequestParam final String workFlowAction,RedirectAttributes redirectAttributes)
          throws IOException {
             LOGGER.info("RefundBill is creating with user ::"+ApplicationThreadLocals.getUserId());
-         //User createdBy = new User();
-        // createdBy.setId(ApplicationThreadLocals.getUserId());
             String vhid=request.getParameter("vhid");
             System.out.println(vhid);
-            
-           
-            
-            
+            Long bg1=null;
+           CVoucherHeader voucher = new CVoucherHeader();
+            Vouchermis vouchermis = new Vouchermis();
+           egBillregister.setIsCitizenRefund("Y");
            egBillregister.setRefundable("Y"); 
            egBillregister.setBilldate(new Date());
            BigDecimal totalCrAmt = BigDecimal.ZERO;
            
-           //egBillregister.getState().setNatureOfTask("Refund Bill");
-		
 		 for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) { 
 			 
 			 totalCrAmt=totalCrAmt.add(checknull(egbilldetail.getDebitamount()));
 			 }
-		 //BigDecimal bg1 = egBillregister.getBillDetails().get(0).getFunctionid();
 		 
-		 Long bg1 = egBillregister.getEgBillregistermis().getFunction().getId();
+		 
+		 if(null!=egBillregister.getEgBillregistermis().getFunction()) {
+			 bg1 = egBillregister.getEgBillregistermis().getFunction().getId();
+		 }else {
+			 vouchermis = vouchermisService.getVouchermisByVoucherId(Long.parseLong(vhid));
+			 bg1 = vouchermis.getFunction().getId();
+		 }
 		 
 		 List<EgBilldetails> egbilldetailCusList=new ArrayList<EgBilldetails>();
            for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) { 
@@ -909,40 +915,24 @@ public class PaymentRefundController extends BaseBillController {
 		  egBillregister.setBillamount(totalCrAmt);
 		  egBillregister.setBillDetails(egbilldetailCusList);
 		
-		 System.out.println(totalCrAmt);
+		  EgBillSubType egbillSubtype=null;
 
+		   final String subType = (null!=egBillregister.getEgBillregistermis().getEgBillSubType())?egBillregister.getEgBillregistermis().getEgBillSubType().getName():null;
+		  if(null!=subType && !subType.isEmpty() &&!subType.equals("")) {
 		 
-		 //System.out.println(":::::::::::::::::::::::::::::::;;"+getBillSubTypes());
-		 
-		 //List<EgBillSubType> egbillSubtype2=(List<EgBillSubType>) getBillSubTypes();
-		  
-		  String subType = egBillregister.getEgBillregistermis().getSubType();
-
-		 EgBillSubType egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase(subType)).findFirst().orElse(null);
-           
+			  egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase(subType)).findFirst().orElse(null);
+		  }
            
          egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
          ExpenseBillNumberGenerator v = beanResolver.getAutoNumberServiceFor(ExpenseBillNumberGenerator.class);
          
-		
-		 
 		  CFunction function= paymentRefundUtils.getFunction(bg1.longValue());
 		  egBillregister.getEgBillregistermis().setFunction(function);
 		  egBillregister.getEgBillregistermis().setEgBillSubType(egbillSubtype);
-		  //egbillregistermis.setFunction(function);
-		 
-        
-         
-         //egBillregister.setEgBillregistermis(egbillregistermis);
         
         String billNumber = v.getNextNumber(egBillregister);
         System.out.println(billNumber);
-        
-        
         	egBillregister.setBillnumber(billNumber);
-        
-         //String billNumber="refund-test-2021";
-        
         if (StringUtils.isEmpty(egBillregister.getExpendituretype()))
         egBillregister.setExpendituretype(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND);
 
@@ -1675,7 +1665,14 @@ public String createRefundBYBlank(@ModelAttribute("egBillregister") final EgBill
 	
 	 System.out.println(totalCrAmt);
 
-	 EgBillSubType egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase("Refund")).findFirst().orElse(null);
+
+	  EgBillSubType egbillSubtype=null;
+	
+	   final String subType = (null!=egBillregister.getEgBillregistermis().getEgBillSubType())?egBillregister.getEgBillregistermis().getEgBillSubType().getName():null;
+	  if(null!=subType && !subType.isEmpty() &&!subType.equals("")) {
+		  
+		  egbillSubtype=(EgBillSubType) getBillSubTypes().stream().filter(e-> e.getName().equalsIgnoreCase(subType)).findFirst().orElse(null);
+	  }
        
        
      egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());

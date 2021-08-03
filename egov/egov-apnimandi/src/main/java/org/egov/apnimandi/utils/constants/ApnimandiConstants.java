@@ -59,6 +59,7 @@ public class ApnimandiConstants {
 	public static final String PENALITIES_FINES_APNI_MANDI="PENALITIES_FINES_APNI_MANDI";
 	
 	public static final String GROUND_RENT_DAY_MARKET="GROUND_RENT_DAY_MARKET";
+	public static final String GROUND_RENT_MARKETS_DAY_MARKET="GROUND_RENT_MARKETS_DAY_MARKET";
 	public static final String SECURITY_DAY_MARKET="SECURITY_DAY_MARKET";
 	public static final String CGST_UTGST_DAY_MARKET="CGST_UTGST_DAY_MARKET";
 	public static final String IGST_DAY_MARKET="IGST_DAY_MARKET";

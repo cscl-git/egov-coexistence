@@ -14,9 +14,15 @@ import org.apache.http.HttpStatus;
 import org.apache.log4j.Logger;
 import org.egov.billsaccounting.services.CreateVoucher;
 import org.egov.billsaccounting.services.VoucherConstant;
+
+import org.egov.collection.entity.MisReceiptDetail;
+import org.egov.collection.service.MisReceiptDetailService;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.EgModules;
 import org.egov.egf.contract.model.AccountDetailContract;
+import org.egov.egf.contract.model.MisReceiptsDetailsRequest;
+import org.egov.egf.contract.model.MisReceiptsDetailsResponse;
+import org.egov.egf.contract.model.MisReceiptsPOJO;
 import org.egov.egf.contract.model.SubledgerDetailContract;
 import org.egov.egf.contract.model.Voucher;
 import org.egov.egf.contract.model.VoucherRequest;
@@ -29,6 +35,7 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.services.voucher.VoucherService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.query.Param;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -42,6 +49,8 @@ public class VoucherController {
 	private CreateVoucher createVoucher;
 	@Autowired
 	private VoucherService voucherService;
+	@Autowired
+	MisReceiptDetailService misReceiptDetailService;
 
 	@PostMapping(value = "/rest/voucher/_search")
 	@ResponseBody
@@ -204,5 +213,49 @@ public class VoucherController {
                         throw new ApplicationRuntimeException(e.getMessage());
                 }
         }
+	
+	@PostMapping(value = "/rest/voucher/_misreceipt")
+	@ResponseBody
+	public MisReceiptsDetailsResponse  createMiscReceiptDetails(@RequestBody MisReceiptsDetailsRequest misReceiptsDetailsRequest ){
+		System.out.println("1....nEW");
+		ModelMap model =null;
+		MisReceiptsDetailsResponse res = new MisReceiptsDetailsResponse();
+		res.setSuccess(false);
+		MisReceiptDetail misReceiptDetail = null;
+		MisReceiptsPOJO m = misReceiptsDetailsRequest.getMisReceiptsPOJO();
+		Date date   = null;
+		 try {
+			 model= new ModelMap();
+			date   = new Date(m.getReceipt_date());
+			misReceiptDetail = new MisReceiptDetail();
+         	misReceiptDetail.setBank_branch(m.getBank_branch());
+         	misReceiptDetail.setBank_name(m.getBank_name());
+         	misReceiptDetail.setCollectedbyname(m.getCollectedbyname());
+         	misReceiptDetail.setGstno(m.getGstno());
+         	misReceiptDetail.setNarration(m.getNarration());
+         	misReceiptDetail.setPaid_by(m.getPaid_by());
+         	misReceiptDetail.setPayer_address(m.getPayer_address());
+         	misReceiptDetail.setPayment_mode(m.getPayment_mode());
+         	misReceiptDetail.setPayment_status(m.getPayment_status());
+         	misReceiptDetail.setPayments_id(m.getPayments_id());
+         	misReceiptDetail.setReceipt_number(m.getReceipt_number());
+         	misReceiptDetail.setReceipt_date(date);
+         	misReceiptDetail.setServicename(m.getServicename());
+         	misReceiptDetail.setSubdivison(m.getSubdivison());
+         	misReceiptDetail.setTotal_amt_paid(m.getTotal_amt_paid());
+         	misReceiptDetail  = misReceiptDetailService.save(misReceiptDetail);
+         	res.setSuccess(true);
+         	res.setMessage("Saved Successfully");
+         	model.addAttribute("response", res);
+        	model.addAttribute("data",misReceiptDetail);
+         } catch (Exception e) {
+                 LOGGER.error(e.getMessage(), e);
+               //  throw new ApplicationRuntimeException(e.getMessage());
+                 e.printStackTrace();
+         }
+			 return res;
+	       
+	 
+	}
 
 }

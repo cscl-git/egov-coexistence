@@ -481,5 +481,8 @@ public class EstimatePreparationApprovalService {
 		List<Department> departments = departmentrepository.findByWorkswingid(id);
 	return departments;
 	}
-	
+	public List<Department> getAlldepartment() {
+		List<Department> departments = departmentrepository.findAll();
+	return departments;
+	}
 }

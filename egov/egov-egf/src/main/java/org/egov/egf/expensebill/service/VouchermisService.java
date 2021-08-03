@@ -17,5 +17,10 @@ public class VouchermisService {
 		
 		return vouchermisRepository.getVouchermisByReceiptNumber(receiptNumber);
 	}
+	
+public Vouchermis getVouchermisByVoucherId(Long id) {
+		
+		return vouchermisRepository.getVouchermisByVoucherId(id);
+	}
 
 }

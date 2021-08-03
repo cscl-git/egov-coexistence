@@ -61,27 +61,27 @@
 		<c:if
 			test="${estimatePreparationApproval.status.code == 'AA Initiated' }">
 			
-				<jsp:include page="viewestimate.jsp" />
+				<jsp:include page="editestimate.jsp" />
 			
 		</c:if>
 
 		<c:if
 			test="${estimatePreparationApproval.status.code == 'AA Pending for Approval' }">
 			
-				<jsp:include page="viewestimate.jsp" />
+				<jsp:include page="editestimate.jsp" />
 			
 		</c:if>
 
 		<c:if
 			test="${estimatePreparationApproval.status.code == 'TS Initiated' }">
 			
-				<jsp:include page="boq.jsp" />
+				<jsp:include page="editestimate.jsp" />
 		</c:if>
 
 		<c:if
 			test="${estimatePreparationApproval.status.code == 'TS Pending for Approval' }">
 			
-				<jsp:include page="boq.jsp" />
+				<jsp:include page="editestimate.jsp" />
 			
 		</c:if>
 

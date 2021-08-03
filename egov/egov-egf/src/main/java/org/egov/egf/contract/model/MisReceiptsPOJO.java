@@ -1,58 +1,33 @@
-package org.egov.collection.entity;
+package org.egov.egf.contract.model;
 
 import java.math.BigDecimal;
-import java.util.Date;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.SequenceGenerator;
-import javax.persistence.Table;
-
-@Entity
-@Table(name = "MIS_RECEIPTS_DETAILS")
-@SequenceGenerator(name = MisReceiptDetail.SEQ_MIS_RECEIPTS_DETAILS, sequenceName = MisReceiptDetail.SEQ_MIS_RECEIPTS_DETAILS, allocationSize = 1)
-public class MisReceiptDetail {
+public class MisReceiptsPOJO {
 	
-	public static final String SEQ_MIS_RECEIPTS_DETAILS = "SEQ_MIS_RECEIPTS_DETAILS";
+	private String payments_id;
+	private BigDecimal total_amt_paid;
+	private String receipt_number;
+	private Long receipt_date;
+	private String paid_by;
+	private String payer_address;
+	private String narration;
+	private String payment_status;
+	private String bank_name;
+	private String bank_branch;
+	private String subdivison;
+	private String servicename;
+	private String collectedbyname;
+	private String gstno;
+	private String payment_mode;
 	
-	@Id
-    @GeneratedValue(generator = SEQ_MIS_RECEIPTS_DETAILS, strategy = GenerationType.SEQUENCE)
-	private Long id ;
-	private String payments_id	;
-	private BigDecimal total_amt_paid ;
-	private String receipt_number ;
-	private Date receipt_date ;
-	private String paid_by ;
-	private String payer_address ;
-	private String narration ;
-	private String payment_status ;
-	private String bank_name ;
-	private String bank_branch ;
-	private String subdivison ;
-	private String servicename ;
-	private String collectedbyname ;
-	private String gstno ;
-	private String payment_mode ;
-	public Long getId() {
-		return id;
-	}
-	public void setId(Long id) {
-		this.id = id;
-	}
+	
 	public String getPayments_id() {
 		return payments_id;
 	}
 	public void setPayments_id(String payments_id) {
 		this.payments_id = payments_id;
 	}
-	public BigDecimal getTotal_amt_paid() {
-		return total_amt_paid;
-	}
-	public void setTotal_amt_paid(BigDecimal total_amt_paid) {
-		this.total_amt_paid = total_amt_paid;
-	}
+	
 	public String getReceipt_number() {
 		return receipt_number;
 	}
@@ -60,6 +35,15 @@ public class MisReceiptDetail {
 		this.receipt_number = receipt_number;
 	}
 	
+	
+	
+	
+	public Long getReceipt_date() {
+		return receipt_date;
+	}
+	public void setReceipt_date(Long receipt_date) {
+		this.receipt_date = receipt_date;
+	}
 	public String getPaid_by() {
 		return paid_by;
 	}
@@ -126,14 +110,16 @@ public class MisReceiptDetail {
 	public void setPayment_mode(String payment_mode) {
 		this.payment_mode = payment_mode;
 	}
-	public static String getSeqMisReceiptsDetails() {
-		return SEQ_MIS_RECEIPTS_DETAILS;
+	public BigDecimal getTotal_amt_paid() {
+		return total_amt_paid;
 	}
-	public Date getReceipt_date() {
-		return receipt_date;
+	public void setTotal_amt_paid(BigDecimal total_amt_paid) {
+		this.total_amt_paid = total_amt_paid;
 	}
-	public void setReceipt_date(Date receipt_date) {
-		this.receipt_date = receipt_date;
-	}
-
+	
+	
+	  
+	 
+	
+	
 }

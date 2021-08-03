@@ -1567,19 +1567,97 @@ function changeGlCode(totalrow,cramt,l,preamt){
 			
 			continue;
 		}
-		var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
-		var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
-		  var k ='<option value="'+glId_+'">'+glcode_+'</option>';
-		  $('#glcodeid').append(k);  
+		//var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
+		//var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
+		  //var k ='<option value="'+glId_+'">'+glcode_+'</option>';
+		  //$('#glcodeid').append(k);  
 	}	
 		 
-	}	 
+ }
 }
 
 
 function viewVoucher(vhid){
 	window.open('/services/EGF/refund/_viewVoucher?vhid=' + vhid,'','width=1200, height=800');
 }
+
+function validateFormGlcode(workFlowAction){
+	var status = false;
+	var glcodeArr =[];
+	
+	var creditDetailsCount = $("#tblaccountdetails > tbody > tr:visible[id='creditdetailsrow']").length;
+	
+	for(var i=0;i<creditDetailsCount;++i){
+		
+		if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
+	             
+	      //var j = document.getElementById('billDetails['+i+'].debitamount').value;
+
+		var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
+		var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
+			  //var k ='<option value="'+glId_+'">'+glcode_+'</option>';
+			  //$('#glcodeid').append(k);
+			
+			glcodeArr.push(glId_);
+
+	}	
+		 
+	}	 
+			 
+
+	var subledgerDetailsCount = $("#tblSubledgerAdd > tbody > tr:visible[id='subledgerdetailsrow']").length;
+	
+	for(var j=0;j<subledgerDetailsCount;j++){
+		
+		if((document.getElementById('tempSubLedger['+j+'].netPayable_Amount').value!=null)  && (document.getElementById('tempSubLedger['+j+'].netPayable_Amount').value!="")){
+			
+		var glcode = document.getElementById('tempSubLedger['+j+'].netPayableAccountCode').value;
+		
+		if(!glcodeArr.includes(glcode)){
+			bootbox.alert('Please fill in valid glcode');						
+			return false;
+		}
+		}
+}
+
+	document.getElementById("workFlowAction").value = workFlowAction;
+	
+	
+	//var dept=document.getElementById('department').value;
+	//var fund=document.getElementById('fund').value;
+	var func=document.getElementById('egBillregistermis.function').value;
+	var billtype = document.getElementById('billSubType').value;
+	
+	var accCode='';
+	var status = false;
+	
+	
+	
+	
+	/* if(billtype == null || billtype == '' ||billtype=='-1')
+		{
+			bootbox.alert('Please select Function to view budget details');
+			status = true;
+			return false
+		}
+	
+	 if(func == null || func == '' ||func=='-1')
+	{
+		bootbox.alert('Please select Function to view budget details');
+		status = true;
+		return false
+	}*/
+	 
+	 
+	 
+	
+	document.forms[0].action='/services/EGF/refund/refundCreate';
+	document.forms[0].submit();
+	return true;
+
+}
+
+
 /*function glCodeandIdvalidate(){
 		 
 	 event.preventDefault();		 

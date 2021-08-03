@@ -53,9 +53,57 @@ public class ExcelGenerator {
 				row.createCell(0).setCellValue(estimate.getWorkName());
 				row.createCell(1).setCellValue(estimate.getEstimateNumber());
 				row.createCell(2).setCellValue(estimate.getEstimateDt());
-	            row.createCell(3).setCellValue(estimate.getEstimateAmount());
+	            row.createCell(3).setCellValue(Double.parseDouble(estimate.getEstimateAmount().toString()));
 	            row.createCell(4).setCellValue(estimate.getStatusDescription());
 	            row.createCell(5).setCellValue(estimate.getPendingWith());
+			}
+	 
+			workbook.write(out);
+			return new ByteArrayInputStream(out.toByteArray());
+		}
+	}
+	
+	public static ByteArrayInputStream estimateResultToExcel1(List<EstimatePreparationApproval> estimatelist,String[] COLUMNS)
+			throws IOException {
+		
+		try(
+				Workbook workbook = new XSSFWorkbook();
+				ByteArrayOutputStream out = new ByteArrayOutputStream();
+		   ){
+			CreationHelper createHelper = workbook.getCreationHelper();
+	 
+			Sheet sheet = workbook.createSheet("EstimateResult");
+	 
+			Font headerFont = workbook.createFont();
+			headerFont.setBold(true);
+			headerFont.setColor(IndexedColors.BLACK.getIndex());
+	 
+			CellStyle headerCellStyle = workbook.createCellStyle();
+			headerCellStyle.setFont(headerFont);
+	 
+			// Row for Header
+			Row headerRow = sheet.createRow(0);
+	 
+			// Header
+			for (int col = 0; col < COLUMNS.length; col++) {
+				Cell cell = headerRow.createCell(col);
+				cell.setCellValue(COLUMNS[col]);
+				cell.setCellStyle(headerCellStyle);
+			}
+	 
+			int rowIdx = 1;
+			int slno=1;
+			for (EstimatePreparationApproval estimate : estimatelist) {
+				Row row = sheet.createRow(rowIdx++);
+				row.createCell(0).setCellValue(slno);
+				row.createCell(1).setCellValue(estimate.getWorkName());
+				row.createCell(2).setCellValue(estimate.getExecuteDiv());
+				row.createCell(3).setCellValue(estimate.getWorksWing());
+	            row.createCell(4).setCellValue(estimate.getExpHead_est());
+	            row.createCell(5).setCellValue(Double.parseDouble(estimate.getEstimateAmount().toString()));
+	            row.createCell(6).setCellValue(estimate.getEstimateDt());
+	            row.createCell(7).setCellValue(estimate.getCreatedDt());
+	            slno++;
 			}
 	 
 			workbook.write(out);

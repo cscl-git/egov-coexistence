@@ -136,8 +136,10 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         model.addAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_CREATE);
         model.addAttribute(CURRENT_STATE, "NEW");
+        
         //model.addAttribute(ADDITIONALRULE, ApnimandiConstants.RD1);
         prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
+       model.addAttribute("validActionList", "Approve");
         return APNIMANDI_COLLECTION_DETAILS_NEW;
     }
 	
@@ -151,6 +153,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         
         int receiptHeadCount = Integer.valueOf(request.getParameter("receiptHeadCount"));
+        
         if(receiptHeadCount==0) {
         	errors.reject("account.head.empty");
         }
@@ -169,6 +172,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 	        model.addAttribute(CURRENT_STATE, "NEW");
 	        //model.addAttribute(ADDITIONALRULE, apnimandiCollectionDetails.getZone().getRoadDivision());
 	        prepareWorkFlowOnLoad(model, apnimandiCollectionDetails);
+	        model.addAttribute("validActionList", "Approve");
 	        return APNIMANDI_COLLECTION_DETAILS_NEW;
 	    }
 		if(uploadedFiles!=null) {
@@ -185,6 +189,7 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
         }
 		List<ApnimandiCollectionAmountDetails> collectionAmountDetails = new ArrayList<ApnimandiCollectionAmountDetails>();
 		for(int i=0;i<receiptHeadCount;i++) {
+			//System.out.println("::::: "+request.getParameter("apnimandiCollectionAmountDetails["+i+"].accountHead"));
 			ApnimandiCollectionAmountDetails collectionAmountDetail = new ApnimandiCollectionAmountDetails();
 			collectionAmountDetail.setAccountHead(request.getParameter("apnimandiCollectionAmountDetails["+i+"].accountHead"));
 			collectionAmountDetail.setAmountType(request.getParameter("apnimandiCollectionAmountDetails["+i+"].amountType"));
@@ -224,7 +229,8 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 		apnimandiCollectionDetailService.persist(apnimandiCollectionDetails, attachedDocuments, collectionAmountDetails, approvalPosition, approvalComment, workFlowAction);
 		redirectAttrs.addFlashAttribute(APNIMANDI_COLLECTION_DETAILS, apnimandiCollectionDetails);
         model.addAttribute(MODE, MODE_VIEW);        
-        model.addAttribute("message", getMessage("msg.collection.create",approvalDesignation,approverName));
+        //model.addAttribute("message", getMessage("msg.collection.create",approvalDesignation,approverName));
+        model.addAttribute("message", "Collection details saved successfully. Record has been Generated");
         model.addAttribute(APPLICATION_HISTORY, apnimandiThirdPartyService.getHistory(apnimandiCollectionDetails));     
         return APNIMANDI_COLLECTION_DETAILS_RESULT;
 	}
@@ -500,11 +506,13 @@ public class ApnimandiCollectionController extends GenericWorkFlowController{
 					}
 				}else if(ApnimandiConstants.DAY_MARKET.equalsIgnoreCase(apnimandiCollectionType.getCode())) {
 					if(ApnimandiConstants.SERVICE_TYPE_CONTRACTOR_SECURITY_FEE.equalsIgnoreCase(servicetype)) {					
-						if((ApnimandiConstants.SECURITY_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
+						if((ApnimandiConstants.SECURITY_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+								|| (ApnimandiConstants.CGST_UTGST_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+								|| (ApnimandiConstants.IGST_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {
 							isFound=true;
 						}
 					}else if(ApnimandiConstants.SERVICE_TYPE_RENT_AMOUNT.equalsIgnoreCase(servicetype)) {
-						if((ApnimandiConstants.GROUND_RENT_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
+						if((ApnimandiConstants.GROUND_RENT_MARKETS_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 							|| (ApnimandiConstants.PENALITIES_FINES_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 								|| (ApnimandiConstants.CGST_UTGST_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())
 									|| (ApnimandiConstants.IGST_DAY_MARKET + "_" + zoneMaster.getRoadDivision()).equalsIgnoreCase(accountHead.getCode())) {

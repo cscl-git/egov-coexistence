@@ -12,9 +12,10 @@
 	<%@ include file="apnimandicollection-form.jsp"%>
 	<%@ include file="apnimandicollection-documentdetails.jsp"%>
 	<input type="hidden" name="apnimandiCollectionDetails" value="${apnimandiCollectionDetails.id}" />
-	<jsp:include page="../workflow/commonWorkflowMatrix.jsp" />
+	<%-- <jsp:include page="../workflow/commonWorkflowMatrix.jsp" /> --%>
 	<div class="buttonbottom" align="center">
-		<jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" />
+		 <jsp:include page="../workflow/commonWorkflowMatrix-button-apnicollection.jsp" /> 
+		<%-- <jsp:include page="../workflow/commonWorkflowMatrix-button.jsp" /> --%>
 	</div>		
 </form:form>
 

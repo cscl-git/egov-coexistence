@@ -57,6 +57,9 @@
 					<c:forEach items="${validActionList}" var="validButtons">
 						<input type="submit" id="${validButtons}" name="${validButtons}" class="btn btn-primary btn-wf-primary" onclick="return setWorkflow('${validButtons}')" value="${validButtons}"/>
 					</c:forEach>
+					<c:if test="${(estStatus =='TS Pending for Approval' && currentState =='Pending With EXECUTIVE ENGINEER') ||  (estStatus =='TS Pending for Approval' && currentState =='Pending With SUPERINTENDENT ENGINEER')}">
+					<input type="submit" id="Approve" name="Approve" class="btn btn-primary btn-wf-primary" onclick="return setWorkflow('Approve')" value="Approve"/>
+					</c:if>
 				</c:if>
 				<input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />
 			</td>

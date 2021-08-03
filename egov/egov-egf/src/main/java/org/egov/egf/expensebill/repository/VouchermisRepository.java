@@ -14,5 +14,8 @@ public interface VouchermisRepository extends JpaRepository<Vouchermis, Long>{
 
 	@Query("from Vouchermis where recieptNumber = ?1")
 	Vouchermis getVouchermisByReceiptNumber(String receiptNumber);
+	
+	@Query("from Vouchermis where voucherheaderid.id = ?1")
+	Vouchermis getVouchermisByVoucherId(Long id);
     
 }

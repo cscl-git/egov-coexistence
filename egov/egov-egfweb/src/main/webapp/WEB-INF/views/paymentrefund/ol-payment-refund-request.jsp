@@ -49,6 +49,40 @@
 			</div>
 			 
 			<div class="form-group">
+				<label class="col-sm-3 control-label text-right">Fund Source: </label>
+				<div class="col-sm-3 add-margin">
+				<select name="egBillregistermis.fundsource" id="egBillregistermis.fundsource"  class="form-control">
+					<option value="">-Select-</option>
+					<c:forEach items="${fundsourceList}" var="fundSource" varStatus="loop">
+						<option value="${fundSource.id}">${fundSource.name}</option>
+					</c:forEach>
+				</select>
+				</div>	
+				
+				<label class="col-sm-3 control-label text-right">scheme: </label>
+				<div class="col-sm-3 add-margin">
+				<select name="egBillregistermis.schemeId" id="egBillregistermis.schemeId"  class="form-control">
+					<option value="">-Select-</option>
+					<c:forEach items="${schemeList}" var="scheme" varStatus="loop">
+						<option value="${scheme.id}">${scheme.name}</option>
+					</c:forEach>
+				</select>
+				</div>			
+			</div>
+			
+			<div class="form-group">
+			<label class="col-sm-3 control-label text-right">Sub Scheme :</b></label>
+				<div class="col-sm-3 add-margin">
+				<select name="egBillregistermis.subSchemeId" id="egBillregistermis.subSchemeId"  class="form-control">
+					<option value="">-Select-</option>
+					<c:forEach items="${SubSchemeList}" var="subScheme" varStatus="loop">
+						<option value="${subScheme.id}">${subScheme.name}</option>
+					</c:forEach>
+				</select>
+				</div>				
+			</div>
+			
+			<div class="form-group">
 				<label class="col-sm-3 control-label text-right">Department <span class="mandatory"></span> :</b></label>
 				<div class="col-sm-3 add-margin">
 			  <select name="egBillregistermis.departmentcode" id="egBillregistermis.departmentcode" required="required" class="form-control">
@@ -84,11 +118,20 @@
 			
 				<label class="col-sm-3 control-label text-right">BiLL Type <span class="mandatory"></span> :  </b></label>
 				<div class="col-sm-3 add-margin">
-			 <select name="egBillregistermis.egBillSubType" data-first-option="false" id="billSubType" class="form-control" required="required">
+				<%--  <select name="egBillregistermis.egBillSubType" data-first-option="false" id="billSubType" class="form-control" required="required">
 				<option value=""><spring:message code="lbl.select" text="Select"/></option>
 					<c:forEach items="${billSubTypes}" var="subType" varStatus="loop">
-											<option value="${subType.id}">${subType.name}</option>
+							<option value="${subType.id}">${subType.value}</option>
 										</c:forEach>
+			   </select> --%>
+			   
+			    <select name="egBillregistermis.subType" data-first-option="false" id="billSubType" class="form-control" required="required">
+				<option value=""><spring:message code="lbl.select" text="Select"/></option>
+				<c:forEach items="${billSubTypes}" var="subType"
+											varStatus="loop">
+											<option value="${subType.value}">${subType.value}</option>
+										</c:forEach>
+				<%-- <options items="${billSubTypes}" itemValue="id" itemLabel="name" /> --%>
 			</select>
 				</div>				
 			</div>
@@ -129,9 +172,9 @@
 				 
 					<th><spring:message code="lbl.account.code" text="Account Code"/></th>
 					<th><spring:message code="lbl.account.head" text="Account Head"/></th>
-					<th><spring:message code="lbl.debit.amount" text="Debit Amount"/></th>
+					<%-- <th><spring:message code="lbl.debit.amount" text="Debit Amount"/></th> --%>
 					<%-- <th><spring:message code="lbl.credit.amount" text="Credit Amount"/></th> --%>										
-					<th><spring:message code="lbl.previous.debit.amount" text="privious Debit Amount"/></th>
+					<%-- <th><spring:message code="lbl.previous.debit.amount" text="privious Debit Amount"/></th> --%>
 					<th><spring:message code="lbl.refund.debit.amount" text="Refund Debit Amount"/></th>	
 					<th><spring:message code="lbl.action" text="Action"/></th>				
 			</tr>
@@ -156,11 +199,11 @@
 			   <td>	<input type="text" id="billDetails[0].creditAccountHead" name="billDetails[0].creditAccountHead"  class="form-control creditdetailname" disabled> </td>				
 				
 				
-				<td><input path="" name="billDetails[0].debitamount" id="billDetails[0].debitamount" data-errormsg="debitamount Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  /></td>
-				<!-- <td>
+<!-- 				<td><input type="hidden" name="billDetails[0].debitamount" id="billDetails[0].debitamount" data-errormsg="debitamount Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  /></td>
+ -->				<!-- <td>
 					<input path="" name="billDetails[0].creditamount" id="billDetails[0].creditamount" data-errormsg="Credit Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  />
 				</td> -->
-				<td>0</td>
+				<!-- <td>0</td> -->
 				<td><input type="text" name="billDetails[0].refunddebitamount" id="billDetails[0].refunddebitamount" onchange="changeGlCodeBlank(this)"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
 			   class="form-control"/></td> 
 								
@@ -416,7 +459,7 @@
 			<td id="actionButtons">
 				<c:if test="${mode != 'readOnly'}">
 					<c:forEach items="${validActionList}" var="validButtons">
-						<input type="submit" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"/>
+						<input type="button" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}" onclick="return validateFormGlcode(this.value);"/>
 					</c:forEach>
 				</c:if>
 				<input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />

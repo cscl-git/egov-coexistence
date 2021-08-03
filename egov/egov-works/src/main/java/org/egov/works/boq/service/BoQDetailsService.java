@@ -29,6 +29,7 @@ import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.entity.WorkOrderAgreementRESTPOJO;
 import org.egov.works.boq.repository.BoqNewDetailsRepository;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
+import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,14 +73,17 @@ private BoqNewDetailsRepository boqNewDetailsRepository;
 		//edited
 		if(workOrderAgreement.getBoQDetailsList()!=null) {
 		for (BoQDetails boq : workOrderAgreement.getBoQDetailsList()) {
+			System.out.println("++++++++++++ "+boq.getItem_description()+"++++++++");
+			 
 			boq.setWorkOrderAgreement(workOrderAgreement);
 			list.add(boq);
 		}}
 		List<PaymentDistribution> PaymentDistributionlist = new ArrayList<PaymentDistribution>();
+		if(workOrderAgreement.getPaymentDistribution() != null) {
 		for (PaymentDistribution boq : workOrderAgreement.getPaymentDistribution()) {
 			boq.setWorkOrderAgreement(workOrderAgreement);
 			PaymentDistributionlist.add(boq);
-		}
+		}}
 		workOrderAgreement.setPaymentDistribution(PaymentDistributionlist);
 		workOrderAgreement.setNewBoQDetailsList(list);
 		if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Save as Draft")) && workOrderAgreement.getStatus() == null)
@@ -205,7 +209,7 @@ private BoqNewDetailsRepository boqNewDetailsRepository;
 	public Boolean updateBoqData(BoqNewDetails boqNewDetails) {
 		// TODO Auto-generated method stub
 		
-		boqNewDetailsRepository.updateById(boqNewDetails.getId(),boqNewDetails.getItem_description(), boqNewDetails.getRef_dsr(),boqNewDetails.getUnit(),boqNewDetails.getRate());
+		//boqNewDetailsRepository.updateById(boqNewDetails.getItem_description(), boqNewDetails.getRef_dsr(),boqNewDetails.getUnit(),boqNewDetails.getRate());
 		
 		return true;
 	}
@@ -391,6 +395,86 @@ private BoqNewDetailsRepository boqNewDetailsRepository;
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
+	
+	
+	// For testing only   
+	//saving document before 
+	public DocumentUpload savedocebefore(WorkOrderAgreement estimatePreparationApproval) {
+		List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
+				: estimatePreparationApproval.getDocumentDetail();
+		List<DocumentUpload> documentDetails = new ArrayList<>();
+		DocumentUpload documentUpload=new DocumentUpload();
+		
+		documentDetails = getDocumentDetailsbefore(files, estimatePreparationApproval,
+				"roughWorkAgreementFile");
+			
+		
+		
+		if (!documentDetails.isEmpty()) {
+			
+		 documentUpload=	persistDocument1(documentDetails);
+		System.out.println("::::::::::: "+ documentUpload.getId()+":::::::::: " +documentUpload.getObjectType()+":::::::::::: "+documentUpload.getFileStore().getId());
+		System.out.println(":::::::::::Changed:::::::::");
+		}
+	return documentUpload;	
+	}
+	
+	public List<DocumentUpload> getDocumentDetailsbefore(final List<DocumentUpload> files, final Object object,
+            final String objectType) {
+        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
+
+        Long id;
+        Method method;
+        try {
+            method = object.getClass().getMethod("getId", null);
+            id = (Long) method.invoke(object, null);
+            System.out.println("::::::::::ID:::::::: "+id);
+        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+                | InvocationTargetException e) {
+            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
+        }
+
+        for (DocumentUpload doc : files) {
+            final DocumentUpload documentDetails = new DocumentUpload();
+            //documentDetails.setObjectId(id);
+            
+        
+          
+           
+            if(doc.getObjectType()!=null) {
+            	System.out.println(":::::::::: "+doc.getObjectType());
+	            if(doc.getObjectType().equals("roughWorkAgreementFile")) {
+	            	System.out.println(":::getObjectType():::::+ "+doc.getFileName());
+	            	 documentDetails.setObjectType("roughWorkAgreementFile");
+	            	 documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+	                         doc.getContentType(), "roughWorkAgreementFile"));
+	            	 documentDetails.setComments(doc.getComments());
+	            	 documentDetails.setUsername(doc.getUsername());
+	            }
+            }
+            else {
+            documentDetails.setObjectType(objectType);
+            System.out.println("::::::::+ "+doc.getFileName());
+            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+                    doc.getContentType(), "Works_Est"));
+            documentDetails.setComments(doc.getComments());
+            }
+           
+            documentDetailsList.add(documentDetails);
+
+        }
+        return documentDetailsList;
+    }
+	public DocumentUpload persistDocument1(final List<DocumentUpload> documentDetailsList) {
+		DocumentUpload docs= new DocumentUpload();
+		if (documentDetailsList != null && !documentDetailsList.isEmpty()) {
+			for (final DocumentUpload doc : documentDetailsList)
+			{
+				docs=documentUploadRepository.saveAndFlush(doc);
+			}
+		}
+		return docs;
+	}
 
 	public List<WorkOrderAgreementRESTPOJO>getAllWorkOrderAgreementRest(){
 		List<WorkOrderAgreementRESTPOJO> w=null;
@@ -409,6 +493,28 @@ private BoqNewDetailsRepository boqNewDetailsRepository;
 			ex.printStackTrace();
 		}
 		return w;
+	}
+	
+	public String getUserName() {
+		final User user = securityUtils.getCurrentUser();
+		String name = user.getName();
+		System.out.println(":::Service::: "+name);
+	return name;
+	}
+	public Long getUserId() {
+		final User user = securityUtils.getCurrentUser();
+		Long id = user.getId();
+	return id;
+	}
+	public void updateDocuments(Long id,Long uploadId)
+	{
+	
+			documentUploadRepository.updateDoc(id,uploadId);
+	
+	}
+	public void deleteBoqUploadData(Long id) {
+		// TODO Auto-generated method stub
+		documentUploadRepository.deleteData(id);
 	}
 
 }

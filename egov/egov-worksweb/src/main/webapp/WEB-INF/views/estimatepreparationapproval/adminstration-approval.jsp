@@ -2,6 +2,19 @@
 <%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
+ <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+    <script>
+				$(document).ready(function() {
+		$('input[id$=meetDate]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+		$('input[id$=aadate]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+	});
+</script>
 
 <spring:hasBindErrors name="estimatePreparationApproval">
 	<div class="alert alert-danger"
@@ -10,6 +23,7 @@
 		<br />
 	</div>
 </spring:hasBindErrors>
+
 
 
 <div class="tab-pane fade in active">
@@ -67,8 +81,8 @@
 					code="lbl.estimate.preparation.estimate.aadate" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-				<form:input id="aadate" path="aadate"
-									class="form-control datepicker" data-date-end-date="0d"
+				<form:input type="text" id="aadate" path="aadate"
+									class="form-control" 
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="aadate" cssClass="add-margin error-msg" />
 					</div>
@@ -180,8 +194,8 @@
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.aa.meeting.date" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:input id="meetDate" path="meetDate"
-									class="form-control datepicker" data-date-end-date="0d"
+				<form:input type="text" id="meetDate" path="meetDate"
+									class="form-control"  
 									placeholder="DD/MM/YYYY" />
 				</div>
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -193,4 +207,5 @@
 		</div>	
 				</div>	
 				</div>
+				
 

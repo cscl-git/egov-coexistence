@@ -167,15 +167,27 @@ $('.btn-wf-primary').click(function(){
 			return false;
 	 }
 	else if (button != null && (button == 'Reject')) {
-		if(!validateWorkFlowApprover(button))
+		
+		/*if(!validateWorkFlowApprover(button)){
+			alert("11");
+			return false;}*/
+		document.getElementById("workFlowAction").value = name;
+		var b= document.getElementById("workFlowAction").value;
+		
+		$('#approvalDepartment').removeAttr('required');
+        $('#approvalDesignation').removeAttr('required');
+        $('#approvalPosition').removeAttr('required');
+        $('#approvalComent').attr('required', 'required');
+		if(!$("form").valid()){
+			
 			return false;
-		if(!$("form").valid())
-			return false;
+			}
 		if(validate()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
 			return false;
+		return true;
 	 }
 	   else if (button != null && (button == 'SaveAsDraft')) {
 	      
@@ -1372,21 +1384,21 @@ function calculateBillAmount(){
 function validateWorkFlowApprover(name) {
 	document.getElementById("workFlowAction").value = name;
 	var button = document.getElementById("workFlowAction").value;
+	
 	if (button != null && button == 'Submit') {
+		
 		$('#approvalDepartment').attr('required', 'required');
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Reject') {
-		/*$('#approvalDepartment').attr('required', 'required');
-		$('#approvalDesignation').attr('required', 'required');
-		$('#approvalPosition').attr('required', 'required');
-		$('#approvalComent').attr('required', 'required');*/
+		
+	
 		 $('#approvalDepartment').removeAttr('required');
 	        $('#approvalDesignation').removeAttr('required');
 	        $('#approvalPosition').removeAttr('required');
-	        $('#approvalComent').removeAttr('required');
+	        /*$('#approvalComent').removeAttr('required');*/
 	}
 	 if (button != null && button == 'SaveAsDraft') {
 	        
@@ -1409,6 +1421,7 @@ function validateWorkFlowApprover(name) {
 	        $('#approvalComent').removeAttr('required');
 	}
 	if (button != null && button == 'Forward') {
+		
 		$('#approvalDepartment').attr('required', 'required');
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
@@ -1653,7 +1666,10 @@ function validateSubLedger(Curraction) {
 			return false;
 		} 	
 
+
 	}else{
+		
+		
 		return true;
 	}
 

@@ -77,8 +77,13 @@ public class DNITCreationService {
 		List<BoQDetails> list = new ArrayList<BoQDetails>();
 		List<BoQDetails> list2 =  dNITCreation.getBoQDetailsList();
 			for (BoQDetails boq : dNITCreation.getBoQDetailsList()) {
+				//System.out.println("++++++++++++ "+boq.getItem_description()+"++++++++");
+				//if(boq.getMilestone() !=null && boq.getItem_description() !=null && boq.getRef_dsr() !=null && boq.getQuantity() != null && boq.getRate() !=null && boq.getUnit() != null) 
+				
 				boq.setDnitCreation(dNITCreation);
+				
 				list.add(boq);
+				
 			}
 			dNITCreation.setNewBoQDetailsList(list);
 		
@@ -87,6 +92,7 @@ public class DNITCreationService {
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Created"));
 			
 		}
+		
 		else if (workFlowAction.equalsIgnoreCase("Save as Draft") && dNITCreation.getStatus().getCode().equals("Created"))
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Created"));
@@ -149,7 +155,7 @@ public class DNITCreationService {
 				list.add(boq);
 			}
 			dNITCreation.setNewBoQDetailsList(list);
-		
+		System.out.println("::::::Dnit status::: "+dNITCreation.getStatus());
 		if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Save as Draft")) && dNITCreation.getStatus() == null)
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Created"));
@@ -166,8 +172,7 @@ public class DNITCreationService {
 		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& dNITCreation.getStatus().getCode().equals("Pending for Approval"))
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Pending for Approval"));
-		}
-		else if((workFlowAction.equalsIgnoreCase("Approve"))&& dNITCreation.getStatus().getCode().equals("Pending for Approval"))
+		}else if((workFlowAction.equalsIgnoreCase("Approve"))&& dNITCreation.getStatus().getCode().equals("Pending for Approval"))
 		{
 			dNITCreation.setStatus(egwStatusDAO.getStatusByModuleAndCode("DNITCreation", "Approved"));
 		}
@@ -202,8 +207,9 @@ public class DNITCreationService {
             final Long approvalPosition, final String approvalComent, final String additionalRule,
             final String workFlowAction,final String approvalDesignation) {
 		LOG.info(" Create WorkFlow Transition Started  ...");
-		
+		System.out.println("::::Workflow::::: "+workFlowAction);
 		final User user = securityUtils.getCurrentUser();
+		System.out.println(":::::::User Name:: "+user.getUsername());
         final DateTime currentDate = new DateTime();
         Map<String, String> finalDesignationNames = new HashMap<>();
         final String currState = "";
@@ -241,6 +247,7 @@ public class DNITCreationService {
             .withtLastModifiedBy(user.getId());
         
         }
+        
         else if (null == estimatePreparationApproval.getState() && !workFlowAction.equals("Save As Draft"))
         {
         	wfmatrix = estimateWorkflowService.getWfMatrix(estimatePreparationApproval.getStateType(), null,
@@ -394,4 +401,96 @@ public class DNITCreationService {
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
+	
+	//saving document before 
+		public DocumentUpload savedocebefore(DNITCreation estimatePreparationApproval) {
+			List<DocumentUpload> files = estimatePreparationApproval.getDocumentDetail() == null ? null
+					: estimatePreparationApproval.getDocumentDetail();
+			List<DocumentUpload> documentDetails = new ArrayList<>();
+			DocumentUpload documentUpload=new DocumentUpload();
+			
+			documentDetails = getDocumentDetailsbefore(files, estimatePreparationApproval,
+					"Works_Est");
+				
+			
+			
+			if (!documentDetails.isEmpty()) {
+				
+			 documentUpload=	persistDocument1(documentDetails);
+			//System.out.println("::::::::::: "+ documentUpload.getId()+":::::::::: " +documentUpload.getObjectType()+":::::::::::: "+documentUpload.getFileStore().getId());
+			//System.out.println(":::::::::::Changed:::::::::");
+			}
+		return documentUpload;	
+		}
+		
+		public List<DocumentUpload> getDocumentDetailsbefore(final List<DocumentUpload> files, final Object object,
+	            final String objectType) {
+	        final List<DocumentUpload> documentDetailsList = new ArrayList<>();
+
+	        Long id;
+	        Method method;
+	        try {
+	            method = object.getClass().getMethod("getId", null);
+	            id = (Long) method.invoke(object, null);
+	            System.out.println("::::::::::ID:::::::: "+id);
+	        } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException
+	                | InvocationTargetException e) {
+	            throw new ApplicationRuntimeException("error.expense.bill.document.error", e);
+	        }
+
+	        for (DocumentUpload doc : files) {
+	            final DocumentUpload documentDetails = new DocumentUpload();
+	            //documentDetails.setObjectId(id);
+	            
+	        
+	          
+	           
+	            if(doc.getObjectType()!=null) {
+	            	System.out.println(":::::::::: "+doc.getObjectType());
+		            if(doc.getObjectType().equals("roughWorkFileDnit")) {
+		            	System.out.println(":::getObjectType():::::+ "+doc.getFileName());
+		            	 documentDetails.setObjectType("roughWorkFileDnit");
+		            	 documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+		                         doc.getContentType(), "roughWorkFileDnit"));
+		            	 documentDetails.setComments(doc.getComments());
+		            	 documentDetails.setUsername(doc.getUsername());
+		            }
+	            }
+	            else {
+	            documentDetails.setObjectType(objectType);
+	            System.out.println("::::::::+ "+doc.getFileName());
+	            documentDetails.setFileStore(fileStoreService.store(doc.getInputStream(), doc.getFileName(),
+	                    doc.getContentType(), "Works_Est"));
+	            documentDetails.setComments(doc.getComments());
+	            documentDetails.setUsername(doc.getUsername());
+	            }
+	           
+	            documentDetailsList.add(documentDetails);
+
+	        }
+	        return documentDetailsList;
+	    }
+		public DocumentUpload persistDocument1(final List<DocumentUpload> documentDetailsList) {
+			DocumentUpload docs= new DocumentUpload();
+			if (documentDetailsList != null && !documentDetailsList.isEmpty()) {
+				for (final DocumentUpload doc : documentDetailsList)
+				{
+					docs=documentUploadRepository.save(doc);
+				}
+			}
+			return docs;
+		}
+		
+		public void updateDocuments(Long id,Long uploadId)
+		{
+		
+				documentUploadRepository.updateDoc(id,uploadId);
+		
+		}
+		
+		
+		public void deleteBoqUploadData(Long id) {
+			// TODO Auto-generated method stub
+			documentUploadRepository.deleteDataDnit(id);
+		}
 }

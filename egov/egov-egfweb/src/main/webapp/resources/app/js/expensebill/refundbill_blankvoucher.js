@@ -574,13 +574,13 @@ $('.subledgerGl_code').change(function () {
 		
 	}
 	
-		
-					document.getElementById('tempSubLedger[0].netPayableAccountCode').value="";
+			//Changed For Removing Error
+					//document.getElementById('tempSubLedger[0].netPayableAccountCode').value="";
 					
 				
-					var netPayableAccountCodeNode=document.getElementById('tempSubLedger[0].netPayableAccountCode');
-					netPayableAccountCodeNode.options.length = 0;
-					netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option('Select from below','')
+					//var netPayableAccountCodeNode=document.getElementById('tempSubLedger[0].netPayableAccountCode');
+					//netPayableAccountCodeNode.options.length = 0;
+					//netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option('Select from below','')
 					
 					 $('#tblcreditdetails  > tbody > tr:visible[id="creditdetailsrow"]').each(function(index) {
 						var selected="";
@@ -1693,24 +1693,73 @@ function creditGlcode_initialize() {
 		}
  });
 }
-/*function glCodeandIdvalidate(){
 	
-	 event.preventDefault();		 
-	// var rowCount = $("#tblSubledgerAdd > tbody").children().length-1;
-	 var n = document.getElementById("glcode");
-	 var formdata={};
-	 var glArray=[];
-	 var glcodeid;
-	 var subLedgerType;
+
+function validateFormGlcode(workFlowAction){
+	
+	var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
+			for(var i=0;i<creditDetailsCount;i++){
+				var total_to_check = document.getElementById('billDetails['+i+'].refunddebitamount').value;
+				var glcode_to_check = document.getElementById('billDetails['+i+'].glcodeid').value;
+				var glocode_alert =  document.getElementById('billDetails['+i+'].glcode').value;
+				var subledgerDetailsCount = $("#tblSubledgerAdd > tbody > tr:visible[id='subledgerdetailsrow']").length;
+				var sum= 0;
+				for(var j = 0;j<subledgerDetailsCount;j++){
+					
+					var glname_now = "billPayeedetails["+j+"].egBilldetailsId.glcodeid";
+					$("billPayeedetails["+j+"].egBilldetailsId.glcodeid").val();
+					var subledgerglcode=  $("[name='"+glname_now+"']").val();
+					if(subledgerglcode!=null && glcode_to_check!=null && glcode_to_check==subledgerglcode){
+					var amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_0mount').value;
+						if(amount ==null || amount==""){
+							alert("Amount is empty in Subledger for glocode "+glocode_alert);
+							return;
+						}else{
+							sum = parseInt(sum)+parseInt(amount);
+							
+						}	
+					}		
+				}
+	
+				if(sum!=total_to_check){
+					alert("Amount is invalid in Subledger for glocode "+glocode_alert);
+					return ;
+				}		 
+			}	 
+		
+	             
+			document.getElementById("workFlowAction").value = workFlowAction;
+
+			//var dept=document.getElementById('department').value;
+			//var fund=document.getElementById('fund').value;
+			var func=document.getElementById('egBillregistermis.function').value;
+			var billtype = document.getElementById('billSubType').value;
+			
+			var accCode='';
+			var status = false;
+
+					 
 	 
-	 for(var i=0;i<n.length;i++){
-		 //tempSubLedger[0].subLedgerType
-	if ($('#tempSubLedger['+i+'].subLedgerType').val() != null && $('#tempSubLedger['+i+'].subLedgerType').val() != '') {
-		   subLedgerType = $('#tempSubLedger['+i+'].subLedgerType').val();		
-		}
-			glArray.push({'glcodeid':glcodeid[i]},{'subLedgerType':subLedgerType});
-	 }
-	 
-	 //formdata =	{glArray}; 
-	return false;
-}*/
+
+			/* if(billtype == null || billtype == '' ||billtype=='-1')
+				{
+					bootbox.alert('Please select Function to view budget details');
+					status = true;
+					return false
+				}
+	
+			 if(func == null || func == '' ||func=='-1')
+			{
+				bootbox.alert('Please select Function to view budget details');
+				status = true;
+				return false
+			}*/
+		
+			
+		
+	
+	document.forms[0].action='/services/EGF/refund/refundCreateBlank';
+	document.forms[0].submit();
+	return true;
+	
+}
