@@ -86,6 +86,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private char receipttype;
     private String receiptnumber;
     private Date receiptdate;
+    private String receiptdatenew;
     private String manualreceiptnumber;
     private Date manualreceiptdate;
     private Boolean isModifiable;
@@ -141,6 +142,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String subdivison;
     private String gstno;
     private String createdByName;
+	private String department;
     public ReceiptHeader() {
     }
 
@@ -981,6 +983,23 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setCreatedByName(String createdByName) {
 		this.createdByName = createdByName;
+	}
+
+	
+	public String getReceiptdatenew() {
+		return receiptdatenew;
+	}
+
+	public void setReceiptdatenew(String receiptdatenew) {
+		this.receiptdatenew = receiptdatenew;
+	}
+	
+	public String getDepartment() {
+		return department;
+	}
+
+	public void setDepartment(String department) {
+		this.department = department;
 	}
 
 	

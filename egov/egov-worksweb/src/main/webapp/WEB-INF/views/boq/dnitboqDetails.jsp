@@ -251,6 +251,7 @@
 									<form:option value="23">23</form:option>
 									<form:option value="24">24</form:option>
 									<form:option value="25">25</form:option>
+									<form:option value="26">26</form:option>
 								</form:select>
 							</div>
 						
@@ -284,21 +285,6 @@
 				
 				
 					
-				<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.estimate.Contingency.Percentage" /></label>
-
-					<div class="col-sm-3 add-margin">
-						<form:input type="text" path="contingentPercentage"
-							id="contingentPercentage" cssClass="form-control-works"
-							cssErrorClass="form-control-works error" readonly="true"/>
-					</div>
-<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.estimate.Contingency.amount" /></label>
-					<div class="col-sm-3 add-margin">
-						<form:input type="number" path="contingentAmount"
-							id="contingentAmount" value="" cssClass="form-control-works" readonly="true"
-							cssErrorClass="form-control-works error" />
-							</div>	
 										
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.Consultancy.fee" /></label>

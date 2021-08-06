@@ -508,6 +508,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		{
 			subPart="S34";
 		}
+		else if(subdivision2 == 46)
+		{
+			subPart="S4";
+		}
 		
 		return worksWingPart+deptPart+subPart;
 	}

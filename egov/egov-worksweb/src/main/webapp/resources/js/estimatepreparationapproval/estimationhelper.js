@@ -784,8 +784,8 @@ function calculateTotal() {
 		
 		
 		
-		contengencyPercentage(estimateAmt);
-		contingentAmount=$('#contingentAmount').val();
+		//contengencyPercentage(estimateAmt);
+		//contingentAmount=$('#contingentAmount').val();
 		consultantFee=$('#consultantFee').val();
 		unforseenCharges=$('#unforseenCharges').val();
 		
@@ -794,7 +794,7 @@ function calculateTotal() {
 		if(consultantFee==""||consultantFee==null||consultantFee=='null')
 		{consultantFee=0;}
 		
-		estimateAmt=	parseFloat(estimateAmt)+ parseFloat(unforseenCharges)+parseFloat(consultantFee)+ parseFloat(contingentAmount);
+		estimateAmt=	parseFloat(estimateAmt)+ parseFloat(unforseenCharges)+parseFloat(consultantFee);
 		
 		document.getElementById("estimatedCost").value = estimateAmt.toFixed(2);
 	}
@@ -815,7 +815,7 @@ function caluclateestamt(){
 		
 		document.getElementById("estimatedCost").value = estimateAmt;
 	 
-		contengencyPercentage(estimateAmt);
+		//contengencyPercentage(estimateAmt);
 
 }
 $(document).ready(function()

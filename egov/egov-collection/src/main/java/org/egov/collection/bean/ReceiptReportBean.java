@@ -21,6 +21,13 @@ public class ReceiptReportBean {
 	private BigDecimal depositAmount;
 	private String gstNo;
 	private String status;
+	private String department;
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
 	public String getSlNo() {
 		return slNo;
 	}

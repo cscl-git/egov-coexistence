@@ -239,21 +239,7 @@
 				
 				
 					
-				<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.estimate.Contingency.Percentage" /></label>
-
-					<div class="col-sm-3 add-margin">
-						<form:input type="text" path="contingentPercentage"
-							id="contingentPercentage" cssClass="form-control-works"
-							cssErrorClass="form-control-works error" readonly="true"/>
-					</div>
-<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.estimate.Contingency.amount" /></label>
-					<div class="col-sm-3 add-margin">
-			<form:input type="text" path="contingentAmount" id="contingentAmount"
-				value="" cssClass="form-control-works" readonly="true"
-							cssErrorClass="form-control-works error" />
-							</div>	
+					
 										
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.Consultancy.fee" /></label>

@@ -36,6 +36,7 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
@@ -205,10 +206,11 @@ private static Map<String, String> map;
 		String estimateNumber ="";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = dnitCreation.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
 		if(dnitCreation.getEstimateNumber() == null || (dnitCreation.getEstimateNumber()!=null && dnitCreation.getEstimateNumber().isEmpty()))
 		{
+			String deptShortCode=populateShortCode(deptCode,dnitCreation.getWorksWing(),dnitCreation.getSubdivision());
 			estimateNumber = v.getDNITNumber(deptShortCode);
 		    dnitCreation.setEstimateNumber(estimateNumber);
 		}
@@ -312,10 +314,11 @@ private static Map<String, String> map;
 		String estimateNumber ="";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = dnitCreation.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
 		if(dnitCreation.getEstimateNumber() == null || (dnitCreation.getEstimateNumber() !=null && dnitCreation.getEstimateNumber().isEmpty()))
 		{
+			String deptShortCode=populateShortCode(deptCode,dnitCreation.getWorksWing(),dnitCreation.getSubdivision());
 			estimateNumber = v.getDNITNumber(deptShortCode);
 		    dnitCreation.setEstimateNumber(estimateNumber);
 		}
@@ -400,8 +403,9 @@ private static Map<String, String> map;
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = dnitCreation.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
+		String deptShortCode=populateShortCode(deptCode,dnitCreation.getWorksWing(),dnitCreation.getSubdivision());
 	    String estimateNumber = v.getDNITNumber(deptShortCode);
 	    dnitCreation.setEstimateNumber(estimateNumber);
 	    dnitCreation.setDepartment(dnitCreation.getDepartment());
@@ -614,8 +618,9 @@ private static Map<String, String> map;
 		String deptCode = "";
 		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
 		deptCode = dnitCreation.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
+		String deptShortCode=populateShortCode(deptCode,dnitCreation.getWorksWing(),dnitCreation.getSubdivision());
 	    String estimateNumber = v.getDNITNumber(deptShortCode);
 	    dnitCreation.setEstimateNumber(estimateNumber);
 	    dnitCreation.setDepartment(dnitCreation.getDepartment());
@@ -712,22 +717,22 @@ private static Map<String, String> map;
 			Path Path = null;
 			Path = Paths.get(filePath);
 
-			Path doc = Paths.get(documentPath);
-			if (!Files.exists(doc)) {
-				Files.createDirectories(doc);
-			}
-
-			Files.write(Path, bytes);
+			/*
+			 * Path doc = Paths.get(documentPath); if (!Files.exists(doc)) {
+			 * Files.createDirectories(doc); }
+			 * 
+			 * Files.write(Path, bytes);
+			 */
 		}
 		
 						
 			
-		File xlsFile = new File(fileToUpload.toString());
-		if (xlsFile.exists()) {
+		//File xlsFile = new File(fileToUpload.toString());
+		//if (xlsFile.exists()) {
 
 			
-			FileInputStream inputStream = new FileInputStream(new File(filePath));
-			Workbook workbook = getWorkbook(inputStream, filePath);
+			//FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
@@ -867,16 +872,16 @@ Double d = cell.getNumericCellValue();
 			}
 
 			// workbook.close();
-			inputStream.close();
+			//inputStream.close();
 			}else {
 				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
 				//error=true;
 			}
 		}	
 
-		} else {
+		//} else {
 			// response = "Please choose a file.";
-		}
+		//}
 		int nextcount=1;
 		List<BoqUploadDocument> docUpload=new ArrayList<>();
 		
@@ -950,26 +955,8 @@ DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation)
 		  dnitCreation.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dnitCreation.getDepartment())));
 		  if(!error) {
 		  BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-			if(estAmt >= 10000000){
-				BigDecimal  pct = new BigDecimal(3);
-				BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
-				dnitCreation.setContingentPercentage(3.0);
-				dnitCreation.setContingentAmount(ContingentAmt.setScale(2,BigDecimal.ROUND_HALF_UP));
-				
-				BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
-				Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
-				dnitCreation.setEstimateAmount(BigDecimal.valueOf(dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
-			}
-			else {
-				BigDecimal  pct = new BigDecimal(5);
-				BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
-				dnitCreation.setContingentPercentage(5.0);
-				dnitCreation.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
-				
-				BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
-				Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
-				dnitCreation.setEstimateAmount(BigDecimal.valueOf(dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
-			}
+			
+			dnitCreation.setEstimateAmount(bgestAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
 		  }else {
 		  
 				model.addAttribute("error", "Y");
@@ -1694,22 +1681,21 @@ Long userId = estimatePreparationApprovalService.getUserId();
 			byte[] bytes = file.getBytes();
 			Path Path = null;
 			Path = Paths.get(filePath);
-
-			Path doc = Paths.get(documentPath);
-			if (!Files.exists(doc)) {
-				Files.createDirectories(doc);
-			}
-		
-			Files.write(Path, bytes);
+			/*
+			 * Path doc = Paths.get(documentPath); if (!Files.exists(doc)) {
+			 * Files.createDirectories(doc); }
+			 * 
+			 * Files.write(Path, bytes);
+			 */
 				}
 		
 		
-		File xlsFile = new File(fileToUpload.toString());
-		if (xlsFile.exists()) {
+		//File xlsFile = new File(fileToUpload.toString());
+		//if (xlsFile.exists()) {
 
 			
-			FileInputStream inputStream = new FileInputStream(new File(filePath));
-			Workbook workbook = getWorkbook(inputStream, filePath);
+			//FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
@@ -1849,16 +1835,16 @@ Double d = cell.getNumericCellValue();
 			}
 
 			// workbook.close();
-			inputStream.close();
+			//inputStream.close();
 			}else {
 				//error=true;
 				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
 			}
 		}	
 
-	} else {
+	//} else {
 			// response = "Please choose a file.";
-		}
+		//}
 		int nextcount=1;
 		
 		
@@ -1917,28 +1903,32 @@ List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
 		if(!error) {
 			estimateDetails.setBoQDetailsList(boQDetailsList);
 		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-		if(estAmt >= 10000000){
-			BigDecimal  pct = new BigDecimal(3);
-			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
-			estimateDetails.setContingentPercentage(3.0);
-			estimateDetails.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
-			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
-			estimateDetails.setEstimateAmount(BigDecimal.valueOf(dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
-                }
-		else {
-			BigDecimal  pct = new BigDecimal(5);
-			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
-			estimateDetails.setContingentPercentage(5.0);
-			estimateDetails.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
-			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
-			estimateDetails.setEstimateAmount(BigDecimal.valueOf(dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			
-		}
+			/*
+			 * if(estAmt >= 10000000){ BigDecimal pct = new BigDecimal(3); BigDecimal
+			 * ContingentAmt=percentage(bgestAmt,pct);
+			 * estimateDetails.setContingentPercentage(3.0);
+			 * estimateDetails.setContingentAmount(ContingentAmt.setScale(2,
+			 * BigDecimal.ROUND_HALF_UP));
+			 * 
+			 * BigDecimal estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt); Double
+			 * dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			 * estimateDetails.setEstimateAmount(BigDecimal.valueOf(
+			 * dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP)); } else {
+			 * BigDecimal pct = new BigDecimal(5); BigDecimal
+			 * ContingentAmt=percentage(bgestAmt,pct);
+			 * estimateDetails.setContingentPercentage(5.0);
+			 * estimateDetails.setContingentAmount(ContingentAmt.setScale(2,
+			 * BigDecimal.ROUND_HALF_UP));
+			 * 
+			 * BigDecimal estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt); Double
+			 * dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			 * estimateDetails.setEstimateAmount(BigDecimal.valueOf(
+			 * dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
+			 * 
+			 * 
+			 * }
+			 */
+		estimateDetails.setEstimateAmount(bgestAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
 		}else {
 			estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 			model.addAttribute("error", "Y");
@@ -2040,21 +2030,21 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 			Path Path = null;
 			Path = Paths.get(filePath);
 
-			Path doc = Paths.get(documentPath);
-			if (!Files.exists(doc)) {
-				Files.createDirectories(doc);
-			}
-
-			Files.write(Path, bytes);
+			/*
+			 * Path doc = Paths.get(documentPath); if (!Files.exists(doc)) {
+			 * Files.createDirectories(doc); }
+			 * 
+			 * Files.write(Path, bytes);
+			 */
 		}
 		
 		
-		File xlsFile = new File(fileToUpload.toString());
-		if (xlsFile.exists()) {
+		//File xlsFile = new File(fileToUpload.toString());
+		//if (xlsFile.exists()) {
 
 			
-			FileInputStream inputStream = new FileInputStream(new File(filePath));
-			Workbook workbook = getWorkbook(inputStream, filePath);
+			//FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = WorkbookFactory.create(file.getInputStream());
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
 				Sheet firstSheet = workbook.getSheetAt(i);
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
@@ -2194,16 +2184,16 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 			}
 
 			// workbook.close();
-			inputStream.close();
+			//inputStream.close();
 			}else {
 				//error=true;
 				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
 			}
 		}	
 
-	} else {
+	//} else {
 			// response = "Please choose a file.";
-		}
+		//}
 		int nextcount=1;
 		
 		
@@ -2261,28 +2251,33 @@ List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
 		estimateDetails.setDocUpload(docUpload);
 		if(!error) {
 		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-		if(estAmt >= 10000000){
-			BigDecimal  pct = new BigDecimal(3);
-			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
-			estimateDetails.setContingentPercentage(3.0);
-			estimateDetails.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
-			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
-			estimateDetails.setEstimateAmount(BigDecimal.valueOf(dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
-		}
-		else {
-			BigDecimal  pct = new BigDecimal(5);
-			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
-			estimateDetails.setContingentPercentage(5.0);
-			estimateDetails.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
-			Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
-			estimateDetails.setEstimateAmount(BigDecimal.valueOf(dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
-			
-			estimateDetails.setBoQDetailsList(boQDetailsList);
-		}
+			/*
+			 * if(estAmt >= 10000000){ BigDecimal pct = new BigDecimal(3); BigDecimal
+			 * ContingentAmt=percentage(bgestAmt,pct);
+			 * estimateDetails.setContingentPercentage(3.0);
+			 * estimateDetails.setContingentAmount(ContingentAmt.setScale(2,
+			 * BigDecimal.ROUND_HALF_UP));
+			 * 
+			 * BigDecimal estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt); Double
+			 * dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			 * estimateDetails.setEstimateAmount(BigDecimal.valueOf(
+			 * dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP)); } else {
+			 * BigDecimal pct = new BigDecimal(5); BigDecimal
+			 * ContingentAmt=percentage(bgestAmt,pct);
+			 * estimateDetails.setContingentPercentage(5.0);
+			 * estimateDetails.setContingentAmount(ContingentAmt.setScale(2,
+			 * BigDecimal.ROUND_HALF_UP));
+			 * 
+			 * BigDecimal estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt); Double
+			 * dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+			 * estimateDetails.setEstimateAmount(BigDecimal.valueOf(
+			 * dobestAmtPlusContingentAmt).setScale(2, BigDecimal.ROUND_HALF_UP));
+			 * 
+			 * 
+			 * }
+			 */
+		estimateDetails.setEstimateAmount(bgestAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
+		estimateDetails.setBoQDetailsList(boQDetailsList);
 		}else {
 			
 			model.addAttribute("error", "Y");
@@ -2774,5 +2769,212 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		}
 		return pendingWith;
 	}
+	
+private String populateShortCode(String deptCode, String worksWing, Long subdivision2) {
+		
+		String deptPart=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"works_div_"+deptCode).get(0).getValue();
+		String worksWingPart="";
+		if(worksWing.equalsIgnoreCase("1"))
+		{
+			worksWingPart="BR";
+		}
+		else if(worksWing.equalsIgnoreCase("2"))
+		{
+			worksWingPart="PH";
+		}
+		else
+		{
+			worksWingPart="HE";
+		}
+		String subPart="";
+		if(subdivision2 ==1)
+		{
+			subPart="S1";
+		}
+		else if(subdivision2 ==2)
+		{
+			subPart="S2";
+		}
+		else if(subdivision2 ==3)
+		{
+			subPart="S22";
+		}
+		else if(subdivision2 ==4)
+		{
+			subPart="S3";
+		}
+		else if(subdivision2 ==5)
+		{
+			subPart="S4";
+		}
+		else if(subdivision2 ==6)
+		{
+			subPart="S7";
+		}
+		else if(subdivision2 ==7)
+		{
+			subPart="S8";
+		}
+		else if(subdivision2 ==8)
+		{
+			subPart="S9";
+		}
+		else if(subdivision2 ==9)
+		{
+			subPart="S14";
+		}
+		else if(subdivision2 ==10)
+		{
+			subPart="S15";
+		}
+		else if(subdivision2 ==11)
+		{
+			subPart="S20";
+		}
+		else if(subdivision2 ==12)
+		{
+			subPart="S1";
+		}
+		else if(subdivision2 ==13)
+		{
+			subPart="S10";
+		}
+		else if(subdivision2 ==14)
+		{
+			subPart="S11";
+		}
+		else if(subdivision2 ==15)
+		{
+			subPart="S16";
+		}
+		else if(subdivision2 ==16)
+		{
+			subPart="S17";
+		}
+		else if(subdivision2 ==17)
+		{
+			subPart="S21";
+		}
+		else if(subdivision2 ==18)
+		{
+			subPart="S12";
+		}
+		else if(subdivision2 ==19)
+		{
+			subPart="S13";
+		}
+		else if(subdivision2 ==20)
+		{
+			subPart="S18";
+		}
+		else if(subdivision2 ==21)
+		{
+			subPart="S6";
+		}
+		else if(subdivision2 ==22)
+		{
+			subPart="S1";
+		}
+		else if(subdivision2 ==23)
+		{
+			subPart="S3";
+		}
+		else if(subdivision2 ==24)
+		{
+			subPart="S6";
+		}
+		else if(subdivision2 ==25)
+		{
+			subPart="S5";
+		}
+		else if(subdivision2 ==26)
+		{
+			subPart="S14";
+		}
+		else if(subdivision2 ==27)
+		{
+			subPart="S2";
+		}
+		else if(subdivision2 ==28)
+		{
+			subPart="S4";
+		}
+		else if(subdivision2 ==29)
+		{
+			subPart="S5";
+		}
+		else if(subdivision2 ==30)
+		{
+			subPart="S19";
+		}
+		else if(subdivision2 ==31)
+		{
+			subPart="S1";
+		}
+		else if(subdivision2 ==32)
+		{
+			subPart="S2";
+		}
+		else if(subdivision2 ==33)
+		{
+			subPart="S3";
+		}
+		else if(subdivision2 ==34)
+		{
+			subPart="S9";
+		}
+		else if(subdivision2 ==35)
+		{
+			subPart="S10";
+		}
+		else if(subdivision2 ==36)
+		{
+			subPart="S12";
+		}
+		else if(subdivision2 ==37)
+		{
+			subPart="S13";
+		}
+		else if(subdivision2 ==38)
+		{
+			subPart="S5";
+		}
+		else if(subdivision2 ==39)
+		{
+			subPart="S6";
+		}
+		else if(subdivision2 ==40)
+		{
+			subPart="S7";
+		}
+		else if(subdivision2 ==41)
+		{
+			subPart="S8";
+		}
+		else if(subdivision2 ==42)
+		{
+			subPart="S15";
+		}
+		else if(subdivision2 ==43)
+		{
+			subPart="S1";
+		}
+		else if(subdivision2 ==44)
+		{
+			subPart="S3";
+		}
+		else if(subdivision2 ==45)
+		{
+			subPart="S34";
+		}
+		else if(subdivision2 == 46)
+		{
+			subPart="S4";
+		}
+		
+		return worksWingPart+deptPart+subPart;
+	}
+
 
 }
