@@ -47,6 +47,12 @@
  */
 package org.egov.collection.web.actions.receipts;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -58,7 +64,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -67,16 +73,23 @@ import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.displaytag.pagination.PaginatedList;
 import org.egov.collection.bean.ReceiptBean;
+import org.egov.collection.bean.SubDivison;
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.collection.entity.CollectionBankRemittanceReport;
 import org.egov.collection.entity.ReceiptHeader;
 import org.egov.collection.service.RemittanceServiceImpl;
 import org.egov.collection.utils.CollectionsUtil;
+import org.egov.infra.microservice.models.RemitancePOJO;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.dao.BankaccountHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.BankAccountServiceMapping;
 import org.egov.infra.microservice.models.BusinessDetails;
@@ -86,11 +99,13 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.egov.infra.persistence.utils.Page;
+import org.egov.infra.web.utils.EgovPaginatedList;
 
-@Results({
-        @Result(name = BankRemittanceAction.NEW, location = "bankRemittance-new.jsp"),
+@Results({ @Result(name = BankRemittanceAction.NEW, location = "bankRemittance-new.jsp"),
         @Result(name = BankRemittanceAction.PRINT_BANK_CHALLAN, type = "redirectAction", location = "remittanceStatementReport-printCashBankChallan.action", params = {
                 "namespace", "/reports", "totalCashAmount", "${totalCashAmount}", "totalChequeAmount",
                 "${totalChequeAmount}", "bank", "${bank}", "bankAccount", "${bankAccount}", "remittanceDate",
@@ -127,11 +142,18 @@ public class BankRemittanceAction extends BaseFormAction {
     private Integer positionUser;
     private Integer designationId;
     private Date remittanceDate;
+	private String narration;
     @Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
     private transient BankaccountHibernateDAO bankaccountHibernateDAO;
 
+	@Autowired
+	private DepartmentService departmentService;
+	@Autowired
+	protected EgovMasterDataCaching masterDataCache;
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
     private Double totalCashAmount;
     private Double totalChequeAmount;
     private List<CollectionBankRemittanceReport> bankRemittanceList;
@@ -144,13 +166,136 @@ public class BankRemittanceAction extends BaseFormAction {
     private String voucherNumber;
     private Date fromDate;
     private Date toDate;
-    private Integer pageSize;
+	//private Integer pageSize;
     private String remittanceAmount;
     private static final String REMITTANCE_LIST = "REMITTANCE_LIST";
     private Boolean isBankCollectionRemitter;
     private String remitAccountNumber;
-    private List<ReceiptBean> resultList = new ArrayList<>();
+	private List resultList = new ArrayList<>();
+	private List resultListNew = new ArrayList<>();
+	private List resultListFinal = new ArrayList<>();
     private List<ReceiptBean> finalList = new ArrayList<>();
+	private File[] file; // added abhishek
+	private String[] fileContentType; // added abhishek
+	private String[] fileFileName; // added abhishek
+	private List<DocumentUploads> documentDetail = new ArrayList<>(); // added abhishek
+	private String deptId = "-1";
+	private String collectedBy = "";
+	private String modeOfPayment = "";
+	private String searchAmount;
+	private String subdivison = "-1";
+	private String receiptNo;
+	private List<RemitancePOJO> remittance = new ArrayList<>();
+	private int pageNum = 1;
+	private int pageSize = 20;
+	protected PaginatedList searchResult;
+	
+	public void setPage(final int pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	/**
+	 * @return the current page number
+	 */
+	public int getPage() {
+		return this.pageNum;
+	}
+	
+	public int getPageNum() {
+		return pageNum;
+	}
+
+	public void setPageNum(int pageNum) {
+		this.pageNum = pageNum;
+	}
+
+	public void setPageSize(int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
+	}
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
+	}
+
+	public String getCollectedBy() {
+		return collectedBy;
+	}
+
+	public void setCollectedBy(String collectedBy) {
+		this.collectedBy = collectedBy;
+	}
+
+	public String getModeOfPayment() {
+		return modeOfPayment;
+	}
+
+	public void setModeOfPayment(String modeOfPayment) {
+		this.modeOfPayment = modeOfPayment;
+	}
+
+	public String getSearchAmount() {
+		return searchAmount;
+	}
+
+	public void setSearchAmount(String searchAmount) {
+		this.searchAmount = searchAmount;
+	}
+
+	public String getDeptId() {
+		return deptId;
+	}
+
+	public void setDeptId(String deptId) {
+		this.deptId = deptId;
+	}
+
+	public List<DocumentUploads> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
+	public File[] getFile() {
+		return file;
+	}
+
+	public void setFile(File[] file) {
+		this.file = file;
+	}
+
+	public String[] getFileContentType() {
+		return fileContentType;
+	}
+
+	public void setFileContentType(String[] fileContentType) {
+		this.fileContentType = fileContentType;
+	}
+
+	public String[] getFileFileName() {
+		return fileFileName;
+	}
+
+	public void setFileFileName(String[] fileFileName) {
+		this.fileFileName = fileFileName;
+	}
+
+	Map<String, String> serviceCategoryNames = new HashMap<String, String>();
+	Map<String, Map<String, String>> serviceTypeMap = new HashMap<>();
+	private String serviceTypeId = null;
 
     /**
      * @param collectionsUtil the collectionsUtil to set
@@ -162,6 +307,9 @@ public class BankRemittanceAction extends BaseFormAction {
     @Override
     public void prepare() {
         super.prepare();
+
+		this.getServiceCategoryList();
+		setupDropdownDataExcluding();
         final String showColumn = collectionsUtil.getAppConfigValue(CollectionConstants.MODULE_NAME_COLLECTIONS_CONFIG,
                 CollectionConstants.APPCONFIG_VALUE_COLLECTION_BANKREMITTANCE_SHOWCOLUMNSCARDONLINE);
         if (!showColumn.isEmpty() && showColumn.equals(CollectionConstants.YES))
@@ -173,8 +321,56 @@ public class BankRemittanceAction extends BaseFormAction {
             showRemittanceDate = true;
 
         isBankCollectionRemitter = collectionsUtil.isBankCollectionOperator(collectionsUtil.getLoggedInUser());
-        addDropdownData("bankBranchList", Collections.emptyList());
-        addDropdownData(ACCOUNT_NUMBER_LIST, Collections.emptyList());
+		// addDropdownData("bankBranchList", Collections.emptyList());
+		// addDropdownData(ACCOUNT_NUMBER_LIST, Collections.emptyList());
+		Map<String, BankAccountServiceMapping> accountNumberMap = new HashMap<>();
+		for (BankAccountServiceMapping basm : microserviceUtils.getBankAcntServiceMappings()) {
+			accountNumberMap.put(basm.getBankAccount(), basm);
+		}
+		List bank=remittanceService.getallBank();
+		addDropdownData("accountNumberList", new ArrayList<>(accountNumberMap.values()));
+		addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
+		addDropdownData("departmentList", masterDataCache.get("egi-department"));
+		addDropdownData("bankaccountNumberList", remittanceService.getallBank());
+		// addDropdownData("bankBranchList",
+		// collectionsUtil.getBankCollectionBankBranchList());
+
+		List<AppConfigValues> appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+		List<SubDivison> subdivisonList = new ArrayList<SubDivison>();
+		SubDivison subdivison = null;
+		for (AppConfigValues value : appConfigValuesList) {
+			subdivison = new SubDivison();
+			subdivison.setSubdivisonCode(value.getValue());
+			subdivison.setSubdivisonName(value.getValue());
+			subdivisonList.add(subdivison);
+		}
+		addDropdownData("subdivisonList", subdivisonList);
+
+	}
+
+	private void getServiceCategoryList() {
+		List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
+		for (BusinessService bs : businessService) {
+			String[] splitServName = bs.getBusinessService().split(Pattern.quote("."));
+			String[] splitSerCode = bs.getCode().split(Pattern.quote("."));
+			if (splitServName.length == 2 && splitSerCode.length == 2) {
+				if (!serviceCategoryNames.containsKey(splitSerCode[0])) {
+					serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+				}
+				if (serviceTypeMap.containsKey(splitSerCode[0])) {
+					Map<String, String> map = serviceTypeMap.get(splitSerCode[0]);
+					map.put(splitSerCode[1], splitServName[1]);
+					serviceTypeMap.put(splitSerCode[0], map);
+				} else {
+					Map<String, String> map = new HashMap<>();
+					map.put(splitSerCode[1], splitServName[1]);
+					serviceTypeMap.put(splitSerCode[0], map);
+				}
+			} else {
+				serviceCategoryNames.put(splitSerCode[0], splitServName[0]);
+			}
+		}
     }
 
     @Action(value = "/receipts/bankRemittance-newform")
@@ -185,52 +381,103 @@ public class BankRemittanceAction extends BaseFormAction {
     }
 
     private void populateRemittanceList() {
+		this.getServiceCategoryList();
+		setupDropdownDataExcluding();
+
         Map<String, BankAccountServiceMapping> accountNumberMap = new HashMap<>();
         for (BankAccountServiceMapping basm : microserviceUtils.getBankAcntServiceMappings()) {
             accountNumberMap.put(basm.getBankAccount(), basm);
         }
         addDropdownData("accountNumberList", new ArrayList<>(accountNumberMap.values()));
-        addDropdownData("financialYearList", financialYearDAO.getAllActivePostingAndNotClosedFinancialYears());
+
+		addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
+		addDropdownData("departmentList", masterDataCache.get("egi-department"));
+
+		List<AppConfigValues> appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+
+		List<SubDivison> subdivisonList = new ArrayList<SubDivison>();
+		SubDivison subdivison = null;
+		for (AppConfigValues value : appConfigValuesList) {
+			subdivison = new SubDivison();
+			subdivison.setSubdivisonCode(value.getValue());
+			subdivison.setSubdivisonName(value.getValue());
+			subdivisonList.add(subdivison);
+		}
+		addDropdownData("subdivisonList", subdivisonList);
+
     }
 
     @Action(value = "/receipts/bankRemittance-listData")
     @SkipValidation
     public String listData() {
-    	LOGGER.info("listData method");
-        isListData = true;
-        remitAccountNumber = "";
-        if (accountNumberId != null) {
+		String serviceTId = getServiceTypeId();
+		System.out.println("LIST DATA ACTION >>>>" + serviceTId);
 
-            final Query bankAccountQry = persistenceService.getSession().createSQLQuery(BANK_ACCOUNT_NUMBER_QUERY);
-            bankAccountQry.setString("accountNumberId", accountNumberId);
-            final Object bankAccountResult = bankAccountQry.uniqueResult();
-            remitAccountNumber = (String) bankAccountResult;
-        }
+        isListData = true;
 
         populateRemittanceList();
 
         if (fromDate != null && toDate != null && toDate.before(fromDate))
             addActionError(getText("bankremittance.before.fromdate"));
-        if (!hasErrors() && accountNumberId != null) {
-            final List<String> serviceCodeList = new ArrayList<>(0);
-            final HashSet<String> fundCodeSet = new HashSet<>(0);
-            List<BankAccountServiceMapping> mappings = microserviceUtils
-                    .getBankAcntServiceMappingsByBankAcc(accountNumberId.toString(),null);
-            for (BankAccountServiceMapping basm : mappings) {
-                serviceCodeList.add(basm.getBusinessDetails());
-            }
-            final CFinancialYear financialYear = financialYearDAO.getFinancialYearById(finYearId);
-            LOGGER.info("before  findCashRemittanceDetailsForServiceAndFund method");
-            resultList = remittanceService.findCashRemittanceDetailsForServiceAndFund("", StringUtils.join(serviceCodeList, ","),
-                    StringUtils.join(fundCodeSet, ","), fromDate == null ? financialYear.getStartingDate() : fromDate,
-                    toDate == null ? financialYear.getEndingDate() : toDate);
-            LOGGER.info("after  findCashRemittanceDetailsForServiceAndFund method");
-            if (fromDate != null && toDate != null)
-                pageSize = resultList.size();
-            else
-                pageSize = CollectionConstants.DEFAULT_PAGE_SIZE;
-        }
-        LOGGER.info("End");
+		
+		
+			if (getServiceTypeId().equalsIgnoreCase("") || getServiceTypeId().equalsIgnoreCase("-1")
+					|| getServiceTypeId().equalsIgnoreCase(" ")) {
+				setServiceTypeId(null);
+			}
+
+			if (deptId == null || deptId.equals("")) {
+				deptId = "-1";
+				setDeptId("-1");
+			}
+			/*
+			 * resultList =
+			 * remittanceService.findCashRemittanceDetailsForServiceAndFund("MISCELLANEOUS",
+			 * fromDate, toDate, getServiceTypeId(), receiptNo, deptId, "search",
+			 * searchAmount, subdivison, collectedBy);
+			 */
+			try {
+			resultList = remittanceService.findCashRemittanceDetailsForServiceAndFundNew("MISCELLANEOUS", fromDate, toDate,
+					getServiceTypeId(), receiptNo, deptId, "search", searchAmount, subdivison, collectedBy,"Cash");
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			System.out.println("Result LIST>>>" + resultList);
+
+			if(getPage()>=1) {
+				int showlist=490*getPage();
+				int fromIndex=0;
+				int toIndex=0;
+				if(showlist>resultList.size()) {
+					fromIndex=(490*(getPage()-1));
+					toIndex=resultList.size();
+				}else {
+					if(resultList.size()<490) {
+						fromIndex=0;
+						toIndex=resultList.size();
+					}else {
+					fromIndex=showlist-490;
+					toIndex=showlist;
+					}
+				}
+				System.out.println("from::: "+fromIndex+"to:::: "+toIndex);
+				resultListFinal=resultList.subList(fromIndex, toIndex);
+				System.out.println("11");
+			}
+			if (searchResult == null) {
+				Page page = new Page<List>(getPage(), resultListFinal.size(), resultListFinal);
+				searchResult = new EgovPaginatedList(page, resultList.size());
+			} else {
+				searchResult.getList().clear();
+				searchResult.getList().addAll(resultList);
+		}
+			System.out.println("22");
+			resultListNew = searchResult.getList();
+			System.out.println("33");
+		
         return NEW;
     }
 
@@ -251,26 +498,115 @@ public class BankRemittanceAction extends BaseFormAction {
     @ValidationErrorPage(value = "error")
     @Action(value = "/receipts/bankRemittance-create")
     public String create() {
+		List<ReceiptBean> eblist=new ArrayList<ReceiptBean>();
+		for(ReceiptBean f: finalList)
+		{
+			if(f.getSelected()!=null)
+			{
+				eblist.add(f);
+			}
+		}
+		System.out.println("selectfinalList ---->>> "+eblist);
+		System.out.println("finalList>>>>>>>" + finalList + ".............." + accountNumberId + ".............."
+				+ remittanceDate);
         final long startTimeMillis = System.currentTimeMillis();
-        if (accountNumberId == null || accountNumberId.isEmpty() || accountNumberId.equalsIgnoreCase("-1"))
-            throw new ValidationException(Arrays.asList(new ValidationError("Please select Account number",
-                    "bankremittance.error.noaccountNumberselected")));
-        // voucherHeaderValues =
-        LOGGER.info("accountNumberId  :"+accountNumberId);
-        List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
+		List<RemitancePOJO> re = getRemittance();
+		System.out.println("::::::re Size::: " + re.size());
+		List<ReceiptBean> receipts =null;
+		
+		receipts =remittanceService.createCashBankRemittance(eblist, re, remittanceDate,narration);
+		//List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
         final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
-        bankRemittanceList = remittanceService.prepareCashRemittanceReport(receipts);
-        if (getSession().get(REMITTANCE_LIST) != null)
-            getSession().remove(REMITTANCE_LIST);
-        getSession().put(REMITTANCE_LIST, bankRemittanceList);
-        populateNames(bankRemittanceList);
-        final Bankaccount bankAcc = bankaccountHibernateDAO.getByAccountNumber(accountNumberId);
-        bankAccount = bankAcc.getAccountnumber();
-        bank = bankAcc.getBankbranch().getBank().getName();
-        totalCashAmount = getSum(finalList);
+		bankRemittanceList = remittanceService.prepareCashRemittanceReportNew(receipts);
+		
+		/*
+		 * if (getSession().get(REMITTANCE_LIST) != null)
+		 * getSession().remove(REMITTANCE_LIST); getSession().put(REMITTANCE_LIST,
+		 * bankRemittanceList);
+		 */
+		 
+		//populateNames(bankRemittanceList);
+		/*
+		 * final Bankaccount bankAcc =
+		 * bankaccountHibernateDAO.getByAccountNumber(accountNumberId); bankAccount =
+		 * bankAcc.getAccountnumber(); bank =
+		 * bankAcc.getBankbranch().getBank().getName(); totalCashAmount =
+		 * getSum(finalList);
+		 */
+		// added by abhishek on 24032021
+		File[] uploadedFiles = getFile();
+		String[] fileName = getFileFileName();
+		String[] contentType = getFileContentType();
+
+		
+		/*
+		 * if (uploadedFiles[0] != null ) { //byte[] fileBytes; for (int i = 0; i
+		 * <uploadedFiles.length; i++) { Path path =
+		 * Paths.get(uploadedFiles[i].getAbsolutePath()); try { byte[] fileBytes =
+		 * Files.readAllBytes(path); ByteArrayInputStream bios= new
+		 * ByteArrayInputStream(fileBytes); DocumentUploads upload = new
+		 * DocumentUploads(); upload.setInputStream(bios);
+		 * upload.setFileName(fileName[i]); upload.setContentType(contentType[i]);
+		 * documentDetail.add(upload); } catch (IOException e) { // TODO Auto-generated
+		 * catch block e.printStackTrace(); }
+		 * receiptHeaderIntsance.setDocumentDetail(documentDetail); } }
+		 */
+				 
+		// end
         return INDEX;
     }
+
+	/*
+	 * @ValidationErrorPage(value = "error")
+	 * 
+	 * @Action(value = "/receipts/bankRemittance-create") public String create_old()
+	 * { System.out.println("finalList>>>>>>>"+finalList+".............."+
+	 * accountNumberId+".............."+ remittanceDate); final long startTimeMillis
+	 * = System.currentTimeMillis();
+	 * 
+	 * if (accountNumberId == null || accountNumberId.isEmpty() ||
+	 * accountNumberId.equalsIgnoreCase("-1")) throw new
+	 * ValidationException(Arrays.asList(new
+	 * ValidationError("Please select Account number",
+	 * "bankremittance.error.noaccountNumberselected")));
+	 * 
+	 * // voucherHeaderValues = List<RemitancePOJO> re = getRemittance();
+	 * System.out.println("::::::re Size::: "+re.size()); for(RemitancePOJO r:re) {
+	 * System.out.println("::GL Name::: "+r.getGlName()+":::Gl :: "+r.getGlcode()
+	 * +"::Amount:: "+r.getAmount()+"::::BANK:: "+r.getBankaccount()); }
+	 * 
+	 * List<Receipt> receipts =
+	 * remittanceService.createCashBankRemittance(finalList, accountNumberId,
+	 * remittanceDate); final long elapsedTimeMillis = System.currentTimeMillis() -
+	 * startTimeMillis;
+	 * LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " +
+	 * elapsedTimeMillis); bankRemittanceList =
+	 * remittanceService.prepareCashRemittanceReport(receipts); if
+	 * (getSession().get(REMITTANCE_LIST) != null)
+	 * getSession().remove(REMITTANCE_LIST); getSession().put(REMITTANCE_LIST,
+	 * bankRemittanceList); populateNames(bankRemittanceList); final Bankaccount
+	 * bankAcc = bankaccountHibernateDAO.getByAccountNumber(accountNumberId);
+	 * bankAccount = bankAcc.getAccountnumber(); bank =
+	 * bankAcc.getBankbranch().getBank().getName(); totalCashAmount =
+	 * getSum(finalList); //added by abhishek on 24032021 File[] uploadedFiles =
+	 * getFile(); String[] fileName = getFileFileName(); String[] contentType =
+	 * getFileContentType();
+	 * 
+	 * if(uploadedFiles!=null) { //byte[] fileBytes; for (int i = 0; i <
+	 * uploadedFiles.length; i++) {
+	 * 
+	 * Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+	 * 
+	 * try { byte[] fileBytes = Files.readAllBytes(path); ByteArrayInputStream bios
+	 * = new ByteArrayInputStream(fileBytes); DocumentUploads upload = new
+	 * DocumentUploads(); upload.setInputStream(bios);
+	 * upload.setFileName(fileName[i]); upload.setContentType(contentType[i]);
+	 * documentDetail.add(upload); } catch (IOException e) { // TODO Auto-generated
+	 * catch block e.printStackTrace(); }
+	 * receiptHeaderIntsance.setDocumentDetail(documentDetail); } } //end return
+	 * INDEX; }
+	 */
 
     private void populateNames(List<CollectionBankRemittanceReport> bankRemittanceList) {
         List<BusinessService> businessServList = microserviceUtils.getBusinessService(null);
@@ -586,6 +922,14 @@ public class BankRemittanceAction extends BaseFormAction {
         this.remittanceDate = remittanceDate;
     }
 
+	public String getNarration() {
+		return narration;
+	}
+
+	public void setNarration(String narration) {
+		this.narration = narration;
+	}
+
     public Long getFinYearId() {
         return finYearId;
     }
@@ -677,5 +1021,39 @@ public class BankRemittanceAction extends BaseFormAction {
     public void setFinalList(List<ReceiptBean> finalList) {
         this.finalList = finalList;
     }
+
+	public Map<String, String> getServiceCategoryNames() {
+		return serviceCategoryNames;
+	}
+
+	public void setServiceCategoryNames(Map<String, String> serviceCategoryNames) {
+		this.serviceCategoryNames = serviceCategoryNames;
+	}
+
+	public Map<String, Map<String, String>> getServiceTypeMap() {
+		return serviceTypeMap;
+	}
+
+	public void setServiceTypeMap(Map<String, Map<String, String>> serviceTypeMap) {
+		this.serviceTypeMap = serviceTypeMap;
+	}
+
+	public String getServiceTypeId() {
+		return serviceTypeId;
+	}
+
+	public void setServiceTypeId(String serviceTypeId) {
+		this.serviceTypeId = serviceTypeId;
+	}
+
+	public List<RemitancePOJO> getRemittance() {
+		return remittance;
+	}
+
+	public void setRemittance(List<RemitancePOJO> remittance) {
+		this.remittance = remittance;
+	}
+	
+	
 
 }

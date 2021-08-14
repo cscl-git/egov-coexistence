@@ -1342,8 +1342,7 @@ public class CreateAuditController extends GenericWorkFlowController {
             	if(auditDetail.getLeadAuditorEmpNo() != null && auditDetail.getLeadAuditorEmpNo() != -1 )
             	{
             		System.out.println("auditDetail.getLeadAuditorEmpNo() ::"+auditDetail.getLeadAuditorEmpNo());
-            		System.out.println("auditDetails.getCurrentState().getOwnerPosition() ::"+auditDetails.getCurrentState().getOwnerPosition());
-            		if(String.valueOf(auditDetails.getCurrentState().getOwnerPosition()).equals(String.valueOf(auditDetail.getLeadAuditorEmpNo())))
+            		if(auditDetails.getCurrentState() != null && auditDetails.getCurrentState().getOwnerPosition() != null && String.valueOf(auditDetails.getCurrentState().getOwnerPosition()).equals(String.valueOf(auditDetail.getLeadAuditorEmpNo())))
             		{
             			System.out.println("not continue");
             		}
@@ -1356,11 +1355,9 @@ public class CreateAuditController extends GenericWorkFlowController {
             	}
             	else
             	{
-            		System.out.println("auditDetail.getType() :: "+auditDetail.getType());
             		if(auditDetail.getType().equalsIgnoreCase("Auditor") )
             		{
-            			System.out.println("Auditor :"+auditDetails.getCurrentState().getOwnerPosition());
-            			if(!checkAuditor(auditDetails.getCurrentState().getOwnerPosition(),auditorListAudit))
+            			if(auditDetails.getCurrentState() != null && auditDetails.getCurrentState().getOwnerPosition() != null && !checkAuditor(auditDetails.getCurrentState().getOwnerPosition(),auditorListAudit))
             			{
             				System.out.println("continue Auditor");
             				continue;
@@ -1368,16 +1365,21 @@ public class CreateAuditController extends GenericWorkFlowController {
             		}
             		else
             		{
-            			System.out.println("RSA :"+auditDetails.getCurrentState().getOwnerPosition());
-            			if(!checkRSA(auditDetails.getCurrentState().getOwnerPosition(),auditorListRSA))
+            			if(auditDetails.getCurrentState() != null && auditDetails.getCurrentState().getOwnerPosition() != null && !checkRSA(auditDetails.getCurrentState().getOwnerPosition(),auditorListRSA))
             			{
             				System.out.println("continue RSA");
             				continue;
             			}
             		}
             	}
-            	result.setAuditno(object[1].toString());
-            	result.setType(object[2].toString());
+            	if(object[1] != null)
+            	{
+                	result.setAuditno(object[1].toString());	
+            	}
+            	if(object[2] != null)
+            	{
+            		result.setType(object[2].toString());
+            	}
             	if(object[3] != null)
             	{
             		result.setSchdDate(object[3].toString());

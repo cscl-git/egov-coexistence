@@ -1,4 +1,4 @@
-package org.egov.collection.web.controller;
+package org.egov.infra.microservice.models;
 
 public class RemitancePOJO {
 

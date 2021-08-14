@@ -308,8 +308,17 @@ function checkprintforselectedrecord()
 	// single receipt has been chosen. Print is allowed
 	else
 	{
+		/* var cnt=document.getElementsByName('selectedReceipts');
+		var selectedRece = new Array();
+		for (i = 0; i < cnt.length; i++)
+		{
+		if(cnt[i].checked == true){
+			
+			selectedRece.push(cnt[i].value);
+		}} */
 		dom.get("selectprinterror").style.display="none";
 		document.searchReceiptForm.action="receipt-printReceipts.action";
+		//document.searchReceiptForm.action="receipt-printReceiptsNew.action?selectedRece="+selectedRece;
 		document.searchReceiptForm.submit();
 	}
 	//document.searchReceiptForm.action="receipt-printReceipts.action";
@@ -407,10 +416,18 @@ function checkCheckboxValidator(){
 	}
 	// multiple records have been chosen . Viewing is allowed
 	else
+	{	/* var cnt=document.getElementsByName('selectedReceipts');
+	var selectedRece = new Array();
+	for (i = 0; i < cnt.length; i++)
 	{	
+	if(cnt[i].checked == true){
+		
+		selectedRece.push(cnt[i].value);
+	}} */
 		console.log("inside else block>>>"+j);		
 		doLoadingMask('#loadingMask');
 		document.searchReceiptForm.action="receipt-viewReceiptsChangeStatus.action";
+		//document.searchReceiptForm.action="receipt-viewReceiptsChangeStatusNew.action?selectedRece="+selectedRece;
 		document.searchReceiptForm.submit();
 	}	
 
@@ -423,9 +440,15 @@ function checkviewforselectedrecord()
 	dom.get("selectcancelerror").style.display="none";
 	var cnt=document.getElementsByName('selectedReceipts');
 	var receiptstatus=document.getElementsByName('receiptstatus');
+	var selectedRece = new Array();
 	var j=0;
 	for (i = 0; i < cnt.length; i++)
 	{
+		
+		/* if(cnt[i].checked == true){
+			
+			selectedRece.push(cnt[i].value);
+		} */
 		if (cnt[i].checked == true )
 		{
 			j++; 
@@ -453,8 +476,10 @@ function checkviewforselectedrecord()
 	// multiple records have been chosen . Viewing is allowed
 	else
 	{	
+		
 		doLoadingMask('#loadingMask');
 		document.searchReceiptForm.action="receipt-viewReceipts.action";
+		//document.searchReceiptForm.action="receipt-viewReceiptsNew.action?selectedRece="+selectedRece;
 		document.searchReceiptForm.submit();
 	}	
 
@@ -621,6 +646,8 @@ function onChangeServiceClass(obj)
       </s:if>
       
 </div>
+<%-- </s:form>
+<s:form> --%>
 <s:if test='%{resultList.isEmpty()}'>
 		<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0" class="tablebottom">
 		<tr> 
@@ -647,7 +674,8 @@ function onChangeServiceClass(obj)
 <input type="hidden" name="receipttype" id="receipttype" value="${currentreceipttype}" />
 </display:column>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:8%;text-align:right" property="receiptnumber"/>
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdatenew" title="Receipt Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" />
+<%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdatenew" title="Receipt Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" /> --%>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdatenew" title="Receipt Date"  style="width:8%;text-align: center" />
 <!-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="G8 Receipt number/Date" style="width:8%;text-align:right" property="g8data"/>-->
 <%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="manualreceiptdate" title="G8 Receipt Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" /> --%>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service" style="width:12%;text-align:left" property="service" />
@@ -675,7 +703,7 @@ function onChangeServiceClass(obj)
 </display:table>	 
 </div>
 <br/>
-<div class="buttonbottom">
+<div class="buttonbottom" align="center">
   <input name="button32" type="button" class="buttonsubmit" id="button32" value="View" onclick="return checkviewforselectedrecord()"/>
   <input name="button32" type="button" class="buttonsubmit" id="button32" value="Print" onclick="return checkprintforselectedrecord()"/> 
    <%-- <egov-authz:authorize actionName="CancelReceipt">
@@ -687,6 +715,7 @@ function onChangeServiceClass(obj)
   
 </div>
 </s:if>
+
 </s:form>
  <!-- Modal --> 
 	<div class="modal fade" id="myModal" role="dialog" style="display: none;">

@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.egov.infra.microservice.models.RemitancePOJO;
 import org.egov.infstr.services.PersistenceService;
 import org.hibernate.SQLQuery;
 

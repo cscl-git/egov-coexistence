@@ -75,7 +75,7 @@ public class Remittance extends StateAware implements Auditable {
     private Set<RemittanceDetail> remittanceDetails = new LinkedHashSet<>();
     private Set<ReceiptHeader> collectionRemittance = new HashSet<>();
     private Set<RemittanceInstrument> remittanceInstruments = new LinkedHashSet<>();
-
+    private String referenceVoucherNumber;
     private Bankaccount bankAccount;
 
     @Override
@@ -188,6 +188,14 @@ public class Remittance extends StateAware implements Auditable {
     public void setRemittanceInstruments(Set<RemittanceInstrument> remittanceInstruments) {
         this.remittanceInstruments = remittanceInstruments;
     }
+
+	public String getReferenceVoucherNumber() {
+		return referenceVoucherNumber;
+	}
+
+	public void setReferenceVoucherNumber(String referenceVoucherNumber) {
+		this.referenceVoucherNumber = referenceVoucherNumber;
+	}
 
 
 }

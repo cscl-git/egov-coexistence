@@ -190,6 +190,7 @@ public class ReceiptAction extends BaseFormAction {
     /**
      * An array of <code>ReceiptHeader</code> instances which have to be displayed for view/print/cancel purposes
      */
+    private String[] selectedRece;
     private ReceiptHeader[] receipts;
     private ReceiptHeaderService receiptHeaderService;
     private CollectionService collectionService;
@@ -1659,17 +1660,40 @@ public class ReceiptAction extends BaseFormAction {
     	System.out.println("In side viewReceiptsChangeStatus function");
     	return changeStatus();
     }
+    @Action(value = "/receipts/receipt-viewReceiptsChangeStatusNew")
+    public String viewReceiptsChangeStatusNew() {
+    	System.out.println("In side viewReceiptsChangeStatus function");
+    	String ss=getSelectedRece()[0];
+    	String[] selected = ss.split(",");
+    	setSelectedReceipts(selected);
+    	return changeStatus();
+    }
 
     @Action(value = "/receipts/receipt-viewReceipts")
     public String viewReceipts() {
         return viewReceipts(false);
     }
+    @Action(value = "/receipts/receipt-viewReceiptsNew")
+    public String viewReceiptsNew() {
+    	String ss=getSelectedRece()[0];
+    	String[] selected = ss.split(",");
+    	setSelectedReceipts(selected);
 
+       return viewReceipts(false);
+    }
     @Action(value = "/receipts/receipt-printReceipts")
     public String printReceipts() {
         return viewReceipts(true);
     }
 
+    @Action(value = "/receipts/receipt-printReceiptsNew")
+    public String printReceiptsNew() {
+    	String ss=getSelectedRece()[0];
+    	String[] selected = ss.split(",");
+    	setSelectedReceipts(selected);
+    	
+        return viewReceipts(true);
+    }
     @ValidationErrorPage(value = "error")
     @Action(value = "/receipts/receipt-cancel")
     public String cancel() {
@@ -2735,5 +2759,13 @@ public class ReceiptAction extends BaseFormAction {
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
 	
-	
+	public String[] getSelectedRece() {
+		return selectedRece;
+	}
+
+
+
+	public void setSelectedRece(String[] selectedRece) {
+		this.selectedRece = selectedRece;
+	}
 }

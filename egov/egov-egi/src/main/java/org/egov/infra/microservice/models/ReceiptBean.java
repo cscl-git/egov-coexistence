@@ -46,7 +46,7 @@
  *
  */
 
-package org.egov.collection.bean;
+package org.egov.infra.microservice.models;
 
 import java.math.BigDecimal;
 

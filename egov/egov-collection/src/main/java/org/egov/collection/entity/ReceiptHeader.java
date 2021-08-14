@@ -58,7 +58,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.Transient;
+
 import org.egov.collection.constants.CollectionConstants;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.Location;
 import org.egov.infra.persistence.entity.Auditable;
@@ -128,7 +131,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private Long version;
     private String serviceCategory;
     private BigDecimal totalcramount;
-
+    private String remittanceVoucherNumber;
     private String curretnStatus;
     private String currentreceipttype;
     private String modOfPayment;
@@ -143,6 +146,26 @@ public class ReceiptHeader extends StateAware implements Auditable {
     private String gstno;
     private String createdByName;
 	private String department;
+	private String depositDate;
+	@Transient
+    private List<DocumentUploads> documentDetail = new ArrayList<>();//added abhishek
+    
+    public String getRemittanceVoucherNumber() {
+		return remittanceVoucherNumber;
+	}
+
+	public void setRemittanceVoucherNumber(String remittanceVoucherNumber) {
+		this.remittanceVoucherNumber = remittanceVoucherNumber;
+	}
+
+	public List<DocumentUploads> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+		this.documentDetail = documentDetail;
+	}
+
     public ReceiptHeader() {
     }
 
@@ -1000,6 +1023,14 @@ public class ReceiptHeader extends StateAware implements Auditable {
 
 	public void setDepartment(String department) {
 		this.department = department;
+	}
+
+	public String getDepositDate() {
+		return depositDate;
+	}
+
+	public void setDepositDate(String depositDate) {
+		this.depositDate = depositDate;
 	}
 
 	

@@ -58,8 +58,11 @@
 
 
 <table width="100%" cellpadding="0" cellspacing="0" border="0" class="main" align="center">
+<%-- <tr>
+<td class="mainheading" colspan="6" align="center">Receipt(s) Remittance created successfully with  voucher:-<s:property value="%{finalList[0].remittanceVouherNumber}" /> &nbsp; & With Voucher Number:- <s:property value="%{voucherNumber}" /></b><br/></td>
+</tr> --%>
 <tr>
-<td class="mainheading" colspan="6" align="center"><s:text name="bankremittance.confirmation"/>&nbsp;<b></b><s:property value="%{finalList[0].remittanceReferenceNumber}" /></b><br/></td>
+<td class="mainheading" colspan="6" align="center">Receipt(s) Remittance created successfully</b><br/></td>
 </tr>
 <tr>
 <td>&nbsp;</td>
@@ -67,16 +70,17 @@
 	<td align="center"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="tablebottom">
 		<tr>
 			<th class="bluebgheadtd" width="5%"> <s:text name="service.slNo.table.header"/></th>
+			<th class="bluebgheadtd" width="20%" >Voucher Number</th>
 			<th class="bluebgheadtd" width="20%" ><s:text name="bankremittance.receiptnumber"/></th>
 			<th class="bluebgheadtd" width="20%" ><s:text name="bankremittance.receiptdate"/></th>
-			<th class="bluebgheadtd" width="20%" ><s:text name="bankremittance.servicename"/></th>
 		</tr>
 		<s:iterator value="%{bankRemittanceList}" status="s"> 
 		<tr>
 			<td width="5%"  class="blueborderfortd"><div align="center"><s:property value="#s.index+1" /></div>  </td>
+			<td class="blueborderfortd"><div align="center"><s:property value="%{voucherNumber}" /></div></td>
 			<td class="blueborderfortd"><div align="center"><s:property value="%{receiptNumber}" /></div></td>
 			<td class="blueborderfortd"><div align="center"><s:date name="%{receiptDate}" format="dd/MM/yyyy" /></div></td>
-			<td class="blueborderfortd"><div align="center"><s:property value="%{serviceName}" /></div></td>
+			
 			
 		</s:iterator>
 		<s:hidden name="totalCashAmount" value="%{totalCashAmount}"/>
@@ -90,8 +94,8 @@
 <br/>
 <div class="buttonbottom">
 <input name="button2" type="button" class="button" id="button" onclick="window.close()" value="Close"/>
-<input type="button" class="buttonsubmit" id="buttonCashReport" value="<s:text name='bankremittance.print.bankchallan'/>"
-			onclick="window.open('${pageContext.request.contextPath}/receipts/bankRemittance-printBankChallan.action?totalCashAmount=<s:property value="%{totalCashAmount}"/>&totalChequeAmount=<s:property value="%{totalChequeAmount}"/>&totalOnlineAmount=<s:property value="%{totalOnlineAmount}"/>&bank=<s:property value="%{bank}"/>&bankAccount=<s:property value="%{bankAccount}"/>&remittanceDate=<s:property value="%{remittanceDate}"/>', '_blank', 'height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');"/> &nbsp;
+<%-- <input type="button" class="buttonsubmit" id="buttonCashReport" value="<s:text name='bankremittance.print.bankchallan'/>"
+			onclick="window.open('${pageContext.request.contextPath}/receipts/bankRemittance-printBankChallan.action?totalCashAmount=<s:property value="%{totalCashAmount}"/>&totalChequeAmount=<s:property value="%{totalChequeAmount}"/>&totalOnlineAmount=<s:property value="%{totalOnlineAmount}"/>&bank=<s:property value="%{bank}"/>&bankAccount=<s:property value="%{bankAccount}"/>&remittanceDate=<s:property value="%{remittanceDate}"/>', '_blank', 'height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');"/> &nbsp; --%>
 	
 </div>
 </s:form>

@@ -652,6 +652,7 @@ function onBodyLoad(){
 		              <s:text name="report.bankbranch.note"/>
 		</div> --%>
 </div>
+
 <div id="loadingMask" style="display: none; overflow: hidden; text-align: center"><img src="/services/collection/resources/images/bar_loader.gif"/> <span style="color: red">Please wait....</span></div>
     <div class="buttonbottom">
       <label><s:submit type="submit" cssClass="buttonsubmit" id="button" key="lbl.search" onclick="return validate();"/></label>
@@ -661,6 +662,8 @@ function onBodyLoad(){
       </s:if>
       
 </div>
+
+
 <s:if test='%{resultList.isEmpty()}'>
 		<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0" class="tablebottom">
 		<tr> 
@@ -685,7 +688,8 @@ function onBodyLoad(){
 <input type="hidden" name="receiptstatus" id="receiptstatus" value="${currentRow.curretnStatus}" />
 <input type="hidden" name="receipttype" id="receipttype" value="${currentreceipttype}" />
 </display:column>
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdatenew" title="Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" />
+<%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdatenew" title="Date" format="{0,date,dd/MM/yyyy}" style="width:8%;text-align: center" /> --%>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" property="receiptdatenew" title="Date"  style="width:8%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:8%;text-align:right" property="receiptnumber"/>
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST No." style="width:8%;text-align:left" property="gstno" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Collected By" style="width:8%;text-align:right" property="createdUser"/> 
@@ -699,7 +703,7 @@ function onBodyLoad(){
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST (Rs.)" property="gstAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Amount (Rs.)" property="totalAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date Of Deposit"  format="{0,date,dd/MM/yyyy}" style="width:12%;text-align:left" property="rrDate" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date Of Deposit"  property="depositDate"  style="width:8%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Remitance No." style="width:16%;text-align:left" property="referencenumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bank Account No." style="width:12%;text-align:left" property="bankAccountNumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Deposit Amount." style="width:27%;text-align:left" property="depositAmount" />
@@ -724,7 +728,7 @@ function onBodyLoad(){
 </display:table>	 
 </div>
 <br/>
-<div class="buttonbottom">
+<div class="buttonbottom" align="center">
   
     <input name="button32" type="button" class="buttonsubmit" id="button32" value="Excel" onclick="return downloadExcel()"/> 
   
@@ -734,6 +738,7 @@ function onBodyLoad(){
   <input name="button32" type="button" class="button" id="button32" value="<s:text name='lbl.close'/>" onclick="window.parent.postMessage('close','*');window.close();"/>
 </div>
 </s:if>
+
 </s:form>
 </body>
 
