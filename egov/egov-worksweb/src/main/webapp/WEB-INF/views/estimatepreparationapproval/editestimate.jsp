@@ -54,7 +54,8 @@
 				value="${prevState}" />
 				 <label
 				class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.works.wing" /></label>
+									code="lbl.estimate.preparation.works.wing" /><span
+						class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 			<form:select path="worksWing" id="worksWing"
 				cssClass="form-control-works"
@@ -64,9 +65,6 @@
 									</form:option>
 				<form:options items="${estimatePreparationApproval.workswings}"
 								itemValue="id" itemLabel="workswingname" />
-				<%-- <form:option value="Building & Roads">Building & Roads</form:option>
-									<form:option value="Public Health">Public Health</form:option>
-				<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
 								</form:select>
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -99,7 +97,8 @@
 						</form:select>
 					</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.estimate.date" /></label>
+				code="lbl.estimate.preparation.estimate.date" /><span
+						class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 									<form:input id="estimateDate" path="estimateDate"
 									class="form-control-works datepicker" data-date-end-date="0d"
@@ -132,6 +131,11 @@
 								<form:option value="Revenue">Revenue</form:option>
 								<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
 								<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+								<form:option value="Mayor Dev Fund">Mayor Dev Fund</form:option>
+								<form:option value="SR.DY.DEV Fund">SR.DY.DEV Fund</form:option>
+								<form:option value="DY.MAYOR DEV Fund">DY.MAYOR DEV Fund</form:option>
+								<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
+								<form:option value="CARPETTING WORK">CARPETTING WORK</form:option>
 							</form:select>
 						</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -145,94 +149,98 @@
 						
 									</form:option>
 									<form:option value="1">1 </form:option>
-<form:option value="2">2 </form:option>
-<form:option value="3">3 </form:option>
-<form:option value="4">4 </form:option>
-<form:option value="5">5 </form:option>
-<form:option value="6">6 </form:option>
-<form:option value="7">7 </form:option>
-<form:option value="8">8 </form:option>
-<form:option value="9">9 </form:option>
-<form:option value="10">10 </form:option>
-<form:option value="11">11 </form:option>
-<form:option value="12">12 </form:option>
-<form:option value="14">14 </form:option>
-<form:option value="15">15 </form:option>
-<form:option value="16">16 </form:option>
-<form:option value="17">17 </form:option>
-<form:option value="18">18 </form:option>
-<form:option value="19">19 </form:option>
-<form:option value="20">20 </form:option>
-<form:option value="21">21 </form:option>
-<form:option value="22">22 </form:option>
-<form:option value="23">23 </form:option>
-<form:option value="24">24 </form:option>
-<form:option value="25">25 </form:option>
-<form:option value="26">26 </form:option>
-<form:option value="26 (E)">26 (E) </form:option>
-<form:option value="27">27 </form:option>
-<form:option value="28">28 </form:option>
-<form:option value="29">29 </form:option>
-<form:option value="30">30 </form:option>
-<form:option value="31">31 </form:option>
-<form:option value="32">32 </form:option>
-<form:option value="33">33 </form:option>
-<form:option value="34">34 </form:option>
-<form:option value="35">35 </form:option>
-<form:option value="36">36 </form:option>
-<form:option value="37">37 </form:option>
-<form:option value="38">38 </form:option>
-<form:option value="38 West">38 West </form:option>
-<form:option value="39">39 </form:option>
-<form:option value="40">40 </form:option>
-<form:option value="41">41 </form:option>
-<form:option value="42">42 </form:option>
-<form:option value="43">43 </form:option>
-<form:option value="44">44 </form:option>
-<form:option value="45">45 </form:option>
-<form:option value="46">46 </form:option>
-<form:option value="47">47 </form:option>
-<form:option value="48">48 </form:option>
-<form:option value="49">49 </form:option>
-<form:option value="50">50 </form:option>
-<form:option value="51 (Nizam Pur Burail)">51 (Nizam Pur Burail) </form:option>
-<form:option value="51 (Colony number 5 Brick- Kilin)">51 (Colony number 5 Brick- Kilin) </form:option>
-<form:option value="51">51 </form:option>
-<form:option value="52">52 </form:option>
-<form:option value="53 (Nehru Colony)">53 (Nehru Colony) </form:option>
-<form:option value="54">54 </form:option>
-<form:option value="55 (Housing Board)">55 (Housing Board) </form:option>
-<form:option value="55 (Indira)">55 (Indira) </form:option>
-<form:option value="61">61 </form:option>
-<form:option value="63">63 </form:option>
-<form:option value="Bapudham Trangt Camp I Phase I)">Bapudham Trangt Camp I Phase I) </form:option>
-<form:option value="Bapudham Trangt Camp II Phase II)">Bapudham Trangt Camp II Phase II) </form:option>
-<form:option value="Bapudham Trangt Camp III Phase III)">Bapudham Trangt Camp III Phase III) </form:option>
-<form:option value="Sarangpur">Sarangpur </form:option>
-<form:option value="Dadu Majara">Dadu Majara </form:option>
-<form:option value="Kaimbala">Kaimbala </form:option>
-<form:option value="Kishangarh">Kishangarh </form:option>
-<form:option value="Malaya">Malaya </form:option>
-<form:option value="Khudda Lahora">Khudda Lahora </form:option>
-<form:option value="Khudda Jassu">Khudda Jassu </form:option>
-<form:option value="Khudda Alisher">Khudda Alisher </form:option>
-<form:option value="Dhanas">Dhanas </form:option>
-<form:option value="Palsora">Palsora </form:option>
-<form:option value="Badheri">Badheri </form:option>
-<form:option value="Baterla">Baterla </form:option>
-<form:option value="Attawa">Attawa </form:option>
-<form:option value="Faidan Burail">Faidan Burail </form:option>
-<form:option value="Char Taraf Burail">Char Taraf Burail </form:option>
-<form:option value="Kajheri Hallo Majra">Kajheri Hallo Majra </form:option>
-<form:option value="Bohlana">Bohlana </form:option>
-<form:option value="Raipur Khurd">Raipur Khurd </form:option>
-<form:option value="Raipur Kalan">Raipur Kalan </form:option>
-<form:option value="Makhan Majra">Makhan Majra </form:option>
-<form:option value="Mauli Jagran">Mauli Jagran </form:option>
-<form:option value="Daria">Daria </form:option>
-<form:option value="Mani Majara">Mani Majara </form:option>
-<form:option value="Indusrial Area Phase I">Indusrial Area Phase I </form:option>
-<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>
+							<form:option value="2">2 </form:option>
+							<form:option value="3">3 </form:option>
+							<form:option value="4">4 </form:option>
+							<form:option value="5">5 </form:option>
+							<form:option value="6">6 </form:option>
+							<form:option value="7">7 </form:option>
+							<form:option value="8">8 </form:option>
+							<form:option value="9">9 </form:option>
+							<form:option value="10">10 </form:option>
+							<form:option value="11">11 </form:option>
+							<form:option value="12">12 </form:option>
+							<form:option value="14">14 </form:option>
+							<form:option value="15">15 </form:option>
+							<form:option value="16">16 </form:option>
+							<form:option value="17">17 </form:option>
+							<form:option value="18">18 </form:option>
+							<form:option value="19">19 </form:option>
+							<form:option value="20">20 </form:option>
+							<form:option value="21">21 </form:option>
+							<form:option value="22">22 </form:option>
+							<form:option value="23">23 </form:option>
+							<form:option value="24">24 </form:option>
+							<form:option value="25">25 </form:option>
+							<form:option value="26">26 </form:option>
+							<form:option value="26 (E)">26 (E) </form:option>
+							<form:option value="27">27 </form:option>
+							<form:option value="28">28 </form:option>
+							<form:option value="29">29 </form:option>
+							<form:option value="30">30 </form:option>
+							<form:option value="31">31 </form:option>
+							<form:option value="32">32 </form:option>
+							<form:option value="33">33 </form:option>
+							<form:option value="34">34 </form:option>
+							<form:option value="35">35 </form:option>
+							<form:option value="36">36 </form:option>
+							<form:option value="37">37 </form:option>
+							<form:option value="38">38 </form:option>
+							<form:option value="38 West">38 West </form:option>
+							<form:option value="39">39 </form:option>
+							<form:option value="40">40 </form:option>
+							<form:option value="41">41 </form:option>
+							<form:option value="42">42 </form:option>
+							<form:option value="43">43 </form:option>
+							<form:option value="44">44 </form:option>
+							<form:option value="45">45 </form:option>
+							<form:option value="46">46 </form:option>
+							<form:option value="47">47 </form:option>
+							<form:option value="48">48 </form:option>
+							<form:option value="49">49 </form:option>
+							<form:option value="50">50 </form:option>
+							<form:option value="51 (Nizam Pur Burail)">51 (Nizam Pur Burail) </form:option>
+							<form:option value="51 (Colony number 5 Brick- Kilin)">51 (Colony number 5 Brick- Kilin) </form:option>
+							<form:option value="51">51 </form:option>
+							<form:option value="52">52 </form:option>
+							<form:option value="53 (Nehru Colony)">53 (Nehru Colony) </form:option>
+							<form:option value="54">54 </form:option>
+							<form:option value="55 (Housing Board)">55 (Housing Board) </form:option>
+							<form:option value="55 (Indira)">55 (Indira) </form:option>
+							<form:option value="61">61 </form:option>
+							<form:option value="63">63 </form:option>
+							<form:option value="Bapudham Trangt Camp I Phase I)">Bapudham Trangt Camp I Phase I) </form:option>
+							<form:option value="Bapudham Trangt Camp II Phase II)">Bapudham Trangt Camp II Phase II) </form:option>
+							<form:option value="Bapudham Trangt Camp III Phase III)">Bapudham Trangt Camp III Phase III) </form:option>
+							<form:option value="Sarangpur">Sarangpur </form:option>
+							<form:option value="Dadu Majara">Dadu Majara </form:option>
+							<form:option value="Kaimbala">Kaimbala </form:option>
+							<form:option value="Kishangarh">Kishangarh </form:option>
+							<form:option value="Malaya">Malaya </form:option>
+							<form:option value="Khudda Lahora">Khudda Lahora </form:option>
+							<form:option value="Khudda Jassu">Khudda Jassu </form:option>
+							<form:option value="Khudda Alisher">Khudda Alisher </form:option>
+							<form:option value="Dhanas">Dhanas </form:option>
+							<form:option value="Palsora">Palsora </form:option>
+							<form:option value="Badheri">Badheri </form:option>
+							<form:option value="Baterla">Baterla </form:option>
+							<form:option value="Attawa">Attawa </form:option>
+							<form:option value="Faidan">Faidan</form:option>
+							<form:option value="Char Taraf Burail">Char Taraf Burail </form:option>
+							<form:option value="Kajhri">Kajhri</form:option>
+							<form:option value="Behlana">Behlana </form:option>
+							<form:option value="Raipur Khurd">Raipur Khurd </form:option>
+							<form:option value="Raipur Kalan">Raipur Kalan </form:option>
+							<form:option value="Makhan Majra">Makhan Majra </form:option>
+							<form:option value="Mauli Jagran">Mauli Jagran </form:option>
+							<form:option value="Daria">Daria </form:option>
+							<form:option value="Manimajra">Manimajra</form:option>
+							<form:option value="Indusrial Area Phase I">Indusrial Area Phase I </form:option>
+							<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>
+							<form:option value="SECTOR 56">SECTOR 56</form:option>
+							<form:option value="RAMDERVAR">RAMDERVAR</form:option>
+							<form:option value="BURAIL">BURAIL</form:option>
+							<form:option value="HALLOMAJRA">HALLOMAJRA</form:option>
 								</form:select>
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -347,22 +355,25 @@
 				style="visibility: hidden" />
 							</div>				
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.name.work" /></label>
+				code="lbl.estimate.preparation.name.work" /><span
+						class="mandatory"></span></label>
 		<div class="col-sm-3 block-colm">
 			<form:textarea class="form-control-works" path="workName"
-				maxlength="2000" style="height: 100px;" />
+				maxlength="2000" style="height: 100px;" id="workName" />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.necessity" /></label>
+				code="lbl.estimate.preparation.necessity" /><span
+						class="mandatory"></span></label>
 		<div class="col-sm-3 block-colm">
 			<form:textarea class="form-control-works" path="necessity"
-				maxlength="2000" style="height: 100px;" />
+				maxlength="2000" style="height: 100px;" id="necessity" />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
-									code="lbl.estimate.preparation.scope.work" /></label>
+				code="lbl.estimate.preparation.scope.work" /><span
+						class="mandatory"></span></label>
 		<div class="col-sm-3 block-colm">
 			<form:textarea class="form-control-works" path="workScope"
-				maxlength="2000" style="height: 100px;" />
+				maxlength="2000" style="height: 100px;" id="workScope" />
 			</div>
 							</div>
 						</div>
@@ -447,7 +458,7 @@
 				href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img
 				style="height: 30px;" title="BoQ Upload Format"
 				src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
-			<br> <input type="file" name="file" id="file1"
+			<br> <input type="file" name="file" id="fileboq"
 				style="color: #000000;">
 				<small class="error-msg">**Kindly use proper BOQ format to upload the BOQ details. Please ensure that there are no merge cells in the AOR Detail sheet</small> <br>
 			<form:hidden path="objectType" id="objectType"
@@ -601,14 +612,14 @@
 	$(document).ready(function(){
 		
 		$('#comments').val('');
-		$('#file1').val('');
+		$('#fileboq').val('');
 	});
 	
 	function ConfirmDelete1() {
 	 var txt;
 	 var estId=document.getElementById("uploadId");
 	 var comments=document.getElementById("comments").value;
-	 var file=document.getElementById('file1');
+		var file = document.getElementById('fileboq');
 
 		if(file.files.length >0){
 

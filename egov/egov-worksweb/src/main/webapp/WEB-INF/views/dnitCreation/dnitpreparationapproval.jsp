@@ -191,18 +191,22 @@
 							<form:option value="Badheri">Badheri </form:option>
 							<form:option value="Baterla">Baterla </form:option>
 							<form:option value="Attawa">Attawa </form:option>
-							<form:option value="Faidan Burail">Faidan Burail </form:option>
+							<form:option value="Faidan">Faidan</form:option>
 							<form:option value="Char Taraf Burail">Char Taraf Burail </form:option>
-							<form:option value="Kajheri Hallo Majra">Kajheri Hallo Majra </form:option>
-							<form:option value="Bohlana">Bohlana </form:option>
+							<form:option value="Kajhri">Kajhri</form:option>
+							<form:option value="Behlana">Behlana </form:option>
 							<form:option value="Raipur Khurd">Raipur Khurd </form:option>
 							<form:option value="Raipur Kalan">Raipur Kalan </form:option>
 							<form:option value="Makhan Majra">Makhan Majra </form:option>
 							<form:option value="Mauli Jagran">Mauli Jagran </form:option>
 							<form:option value="Daria">Daria </form:option>
-							<form:option value="Mani Majara">Mani Majara </form:option>
+							<form:option value="Manimajra">Manimajra</form:option>
 							<form:option value="Indusrial Area Phase I">Indusrial Area Phase I </form:option>
 							<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>
+							<form:option value="SECTOR 56">SECTOR 56</form:option>
+							<form:option value="RAMDERVAR">RAMDERVAR</form:option>
+							<form:option value="BURAIL">BURAIL</form:option>
+							<form:option value="HALLOMAJRA">HALLOMAJRA</form:option>
 								</form:select>
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -239,7 +243,7 @@
 									<form:option value="23">23</form:option>
 									<form:option value="24">24</form:option>
 									<form:option value="25">25</form:option>
-									<form:option value="25">26</form:option>
+									<form:option value="26">26</form:option>
 								</form:select>
 							</div>
 					
@@ -486,8 +490,9 @@
 							style="height: 30px;" title="BoQ Upload Format"
 							src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br>
-						<input type="file" name="file" id="file1" style="color: #000000;">
-						<br>
+						<input type="file" name="file" id="fileboq" style="color: #000000;">
+						<small class="error-msg">**Kindly use proper BOQ format to upload the BOQ details. Please ensure that there are no merge cells in the AOR Detail sheet</small> <br>
+						
 						<h4 style="color: #000000;">
 						Boq Upload Remarks:<span class="mandatory"></span>
 					</h4>
@@ -497,7 +502,7 @@
 					</div>
 					<br>
 					<div class="buttonbottom" align="center">
-							<input type="submit" id="save" class="btn btn-primary"
+							<input type="submit" id="save" class="btn btn-primary" id="uploaddoc"
 								name="save" onclick="return ConfirmDelete();" value="Upload" /> <br>
 					</div>
 					<%-- </c:if> --%>
@@ -635,6 +640,8 @@
 				</div>
 	</div>
 </form:form>
+<!-- for document upload confirmation -->
+
 <!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
@@ -643,4 +650,6 @@
 		
 		$('#comments').val('');
 	});
+	
+
 </script>

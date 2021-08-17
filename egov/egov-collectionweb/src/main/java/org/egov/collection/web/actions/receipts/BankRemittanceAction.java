@@ -143,6 +143,10 @@ public class BankRemittanceAction extends BaseFormAction {
     private Integer designationId;
     private Date remittanceDate;
 	private String narration;
+	private String deptIdnew;
+	private String functionNew;
+	private String subdivisonNew;
+	
     @Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
@@ -331,6 +335,7 @@ public class BankRemittanceAction extends BaseFormAction {
 		addDropdownData("accountNumberList", new ArrayList<>(accountNumberMap.values()));
 		addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
 		addDropdownData("departmentList", masterDataCache.get("egi-department"));
+		addDropdownData("functionList", masterDataCache.get("egi-function"));
 		addDropdownData("bankaccountNumberList", remittanceService.getallBank());
 		// addDropdownData("bankBranchList",
 		// collectionsUtil.getBankCollectionBankBranchList());
@@ -465,7 +470,6 @@ public class BankRemittanceAction extends BaseFormAction {
 				}
 				System.out.println("from::: "+fromIndex+"to:::: "+toIndex);
 				resultListFinal=resultList.subList(fromIndex, toIndex);
-				System.out.println("11");
 			}
 			if (searchResult == null) {
 				Page page = new Page<List>(getPage(), resultListFinal.size(), resultListFinal);
@@ -474,9 +478,8 @@ public class BankRemittanceAction extends BaseFormAction {
 				searchResult.getList().clear();
 				searchResult.getList().addAll(resultList);
 		}
-			System.out.println("22");
+
 			resultListNew = searchResult.getList();
-			System.out.println("33");
 		
         return NEW;
     }
@@ -499,22 +502,49 @@ public class BankRemittanceAction extends BaseFormAction {
     @Action(value = "/receipts/bankRemittance-create")
     public String create() {
 		List<ReceiptBean> eblist=new ArrayList<ReceiptBean>();
+		String receiptNumbers="";
 		for(ReceiptBean f: finalList)
 		{
 			if(f.getSelected()!=null)
 			{
 				eblist.add(f);
+				
+				if(receiptNumbers.equalsIgnoreCase(""))
+					receiptNumbers=f.getReceiptNumber();
+				else
+					receiptNumbers+=","+f.getReceiptNumber();
 			}
 		}
-		System.out.println("selectfinalList ---->>> "+eblist);
+		System.out.println("receiptnumbers ---->>> "+receiptNumbers);
 		System.out.println("finalList>>>>>>>" + finalList + ".............." + accountNumberId + ".............."
 				+ remittanceDate);
         final long startTimeMillis = System.currentTimeMillis();
 		List<RemitancePOJO> re = getRemittance();
 		System.out.println("::::::re Size::: " + re.size());
-		List<ReceiptBean> receipts =null;
+		ReceiptBean receipts =null;
 		
-		receipts =remittanceService.createCashBankRemittance(eblist, re, remittanceDate,narration);
+		receipts=remittanceService.createCashBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers);
+		if(receipts!=null)
+		{
+			try 
+			{
+				for(ReceiptBean f: finalList)
+				{
+					if(f.getSelected()!=null)
+					{
+						eblist.add(f);
+						persistenceService.getSession()
+		                .createSQLQuery(
+		                        "update mis_receipts_details set payment_status = 'DEPOSITED' where receipt_number ='"+f.getReceiptNumber()+"'")
+		                .executeUpdate();
+					}
+				}
+			}
+            catch(Exception e)
+            {
+            	e.printStackTrace();
+            }
+		}
 		//List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
         final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
@@ -1054,6 +1084,30 @@ public class BankRemittanceAction extends BaseFormAction {
 		this.remittance = remittance;
 	}
 	
+	public String getDeptIdnew() {
+		return deptIdnew;
+	}
+
+	public void setDeptIdnew(String deptIdnew) {
+		this.deptIdnew = deptIdnew;
+	}
+
+	public String getFunctionNew() {
+		return functionNew;
+	}
+
+	public void setFunctionNew(String functionNew) {
+		this.functionNew = functionNew;
+	}
+
+	public String getSubdivisonNew() {
+		return subdivisonNew;
+	}
+
+	public void setSubdivisonNew(String subdivisonNew) {
+		this.subdivisonNew = subdivisonNew;
+	}
+
 	
 
 }

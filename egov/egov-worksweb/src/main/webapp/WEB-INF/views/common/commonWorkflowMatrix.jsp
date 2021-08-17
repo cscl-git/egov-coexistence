@@ -56,8 +56,8 @@
 	<c:if test="${nextAction !='END'}" > 
 			
 			<div class="panel-heading">
-				<div class="panel-title">
-				<spring:message code="lbl.approverdetails" text="Approval Details"/>
+				<div class="panel-title"> Forward
+				<%-- <spring:message code="lbl.approverdetails" text="Approval Details"/> --%>
 				</div>					
 			</div>
 	</c:if>
@@ -80,7 +80,7 @@
 				<div class="show-row"  id="approverDetailHeading">
 				<c:if test="${nextAction !='END'}" > 
 				<div class="show-row row  form-group" >
-						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.approverdepartment" text="Approver Department"/><span class="mandatory"></span></label>
+						<label class="col-sm-3 control-label text-right">Department<span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="approvalDepartment" data-first-option="false" name="approvalDepartment"
 							id="approvalDepartment" cssClass="form-control"
@@ -92,7 +92,7 @@
 								itemLabel="name" />     
 						</form:select>
 					</div>
-						<label class="col-sm-2 control-label text-right"><spring:message code="lbl.approverdesignation" text="Approver Designation"/><span class="mandatory"></span></label>
+						<label class="col-sm-2 control-label text-right">Designation<span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 					<input type="hidden" id="approvalDesignationValue" value="${approvalDesignation }" />
 						<form:select path="" data-first-option="false" name="approvalDesignation"
@@ -106,7 +106,7 @@
 					</div>
 				</div>
 				<div class="show-row row form-group">
-						<label class="col-sm-3 control-label text-right"><spring:message code="lbl.approver" text="Approver"/><span class="mandatory"></span></label>
+						<label class="col-sm-3 control-label text-right">Name<span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 					<input type="hidden" id="approvalPositionValue" value="${approvalPosition }" />
 						<input type="hidden" id="approverName" name="approverName" />

@@ -16,6 +16,8 @@ import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.masters.services.ContractorService;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
@@ -55,6 +57,8 @@ public class WorkEstimateController extends GenericWorkFlowController{
 
 	@Autowired
 	BoQDetailsService boQDetailsService;
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
 	
 	private static final String STATE_TYPE = "stateType";
 	 @Autowired
@@ -325,12 +329,14 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		DNITCreation saveBoqDetails = workEstimateService.searchDnitBoqData(request, id);
+		BigDecimal bd=new BigDecimal(amount).setScale(2,BigDecimal.ROUND_HALF_UP);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		workOrderAgreement.setWorkfrom("EstandDnit");
 		workOrderAgreement.setBoQDetailsList(responseList);
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
 		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
 		workOrderAgreement.setDepartment(String.valueOf(saveBoqDetails.getExecutingDivision()));
-		workOrderAgreement.setWork_amount(String.valueOf(amount));
+		workOrderAgreement.setWork_amount(String.valueOf(bd));
 		workOrderAgreement.setCategory(saveBoqDetails.getWorkCategory());
 		workOrderAgreement.setWardNumber(saveBoqDetails.getWardNumber());
 		workOrderAgreement.setFund(saveBoqDetails.getFundSource());
@@ -349,7 +355,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
         
         Map<String, List<BoQDetails>> groupByMilesToneMap = 
         		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		 
+        model.addAttribute("editable","N"); 
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
@@ -385,12 +391,16 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
+		BigDecimal bd=new BigDecimal(amount).setScale(2,BigDecimal.ROUND_HALF_UP);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		workOrderAgreement.setWorkfrom("EstandDnit");
+		//workOrderAgreement.setSectorlist(getsectorlist());
+		//workOrderAgreement.setWardnumber(getwardlist());
 		workOrderAgreement.setBoQDetailsList(responseList);
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
 		workOrderAgreement.setWork_number(saveBoqDetails.getEstimateNumber());
 		workOrderAgreement.setDepartment(String.valueOf(saveBoqDetails.getExecutingDivision()));
-		workOrderAgreement.setWork_amount(String.valueOf(amount));
+		workOrderAgreement.setWork_amount(String.valueOf(bd));
 		workOrderAgreement.setCategory(saveBoqDetails.getWorkCategory());
 		workOrderAgreement.setWardNumber(saveBoqDetails.getWardNumber());
 		workOrderAgreement.setFund(saveBoqDetails.getFundSource());
@@ -410,7 +420,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
         
         Map<String, List<BoQDetails>> groupByMilesToneMap = 
         		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		 
+        model.addAttribute("editable","N"); 
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute("fileuploadAllowed","Y");
@@ -605,5 +615,25 @@ public class WorkEstimateController extends GenericWorkFlowController{
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
-	
+	public List<String> getsectorlist(){
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"Sector/Locality");
+			
+			List<String> sector1=new ArrayList<>();
+			for(AppConfigValues as:sector) {
+				System.out.println("::::sector:: "+as.getValue());
+				sector1.add(as.getValue());
+			}
+			return sector1;
+	 }
+	 public List<String> getwardlist(){
+		 List<AppConfigValues> wardNumber =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"WardNumber");
+			List<String> wardnumber=new ArrayList<>();
+			for(AppConfigValues wa:wardNumber) {
+				System.out.println("::::ward:: "+wa.getValue());
+				wardnumber.add(wa.getValue());
+			}
+			return wardnumber;
+	 }
 }

@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,6 +38,7 @@ import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.masters.services.ContractorService;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
@@ -51,15 +53,13 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.masters.Contractor;
 import org.egov.works.boq.entity.BoQDetails;
-import org.egov.works.boq.entity.BoqDateUpdate;
 import org.egov.works.boq.entity.BoqNewDetails;
 import org.egov.works.boq.entity.BoqUploadDocument;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.egov.works.boq.service.BoQDetailsService;
-import org.egov.works.boq.service.BoqDateUpdateService;
-import org.egov.works.boq.service.BoqDetailsPopService;
 import org.egov.works.estimatepreparationapproval.autonumber.WorkNoGenerator;
+import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,11 +116,6 @@ public class BoQDetailsController extends GenericWorkFlowController{
     @Autowired
     private SecurityUtils securityUtils;
 
-    @Autowired
-    BoqDateUpdateService boqDateUpdateService;
-    
-    @Autowired
-    BoqDetailsPopService boqDetailsPopService;
     
 private static Map<String, String> map; 
     
@@ -152,12 +147,12 @@ private static Map<String, String> map;
 	}
 
 	@RequestMapping(value = "/newboqform", method = RequestMethod.POST)
-	public String newBoqFormGet(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
-			final Model model, HttpServletRequest request) {
-	
+	public String newBoqFormGet(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, final Model model,
+			HttpServletRequest request) {
 		
 		return "newboqDetails-form";
 	}
+
 	@RequestMapping(value = "/saveboqform", method = RequestMethod.POST)
 	public String savenewBoqFormGet(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
 			final Model model, HttpServletRequest request) {
@@ -166,60 +161,51 @@ private static Map<String, String> map;
 		
 		return "redirect:/boq/savesuccess?ref_dsr=" + boqNewDetails.getRef_dsr();
 	}
+
 	@RequestMapping(value = "/editboqnew",  method = RequestMethod.POST)
-	public String editBoqData(
-			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
-			final Model model, HttpServletRequest request) throws Exception {
+	public String editBoqData(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, final Model model,
+			HttpServletRequest request) throws Exception {
 	
 		return "editnew-boq-details";
 	}
+
 	@RequestMapping(value = "/editboqnew", params = "editboqnew", method = RequestMethod.POST)
-	public String editnewBoqData(
-			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
-			final Model model, HttpServletRequest request) throws Exception {
+	public String editnewBoqData(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, final Model model,
+			HttpServletRequest request) throws Exception {
 		List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
 
 		// Convert input string into a date
 
-		
 		BoqNewDetails estimate=null;
 		
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
-		 query
-	        .append(
-	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
-		 if (boqNewDetails.getRef_dsr() != null && boqNewDetails.getRef_dsr() != "" && !boqNewDetails.getRef_dsr().isEmpty()) {
+		query.append("select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		if (boqNewDetails.getRef_dsr() != null && boqNewDetails.getRef_dsr() != ""
+				&& !boqNewDetails.getRef_dsr().isEmpty()) {
 				query.append("where bq.ref_dsr = ? ");
 				
 				System.out.println("Query :: "+query.toString());
-				list = persistenceService.findAllBy(query.toString(),
-		        		 boqNewDetails.getRef_dsr());
-			}
-		 else {
+			list = persistenceService.findAllBy(query.toString(), boqNewDetails.getRef_dsr());
+		} else {
 			 list = persistenceService.findAllBy(query.toString());
 		 }
 		 
-        
          if (list.size() != 0) {
         	 
         	 for (final Object[] object : list) {
         		 estimate = new BoqNewDetails();
         		 estimate.setId(Long.parseLong(object[0].toString()));
-        		 if(object[1] != null)
-        		 {
+				if (object[1] != null) {
         			 estimate.setItem_description(object[1].toString());
         		 }
-        		 if(object[2] != null)
-        		 {
+				if (object[2] != null) {
         			 estimate.setRef_dsr(object[2].toString());
         		 }
-        		 if(object[3] != null)
-        		 {
+				if (object[3] != null) {
         			 estimate.setUnit(object[3].toString());
         		 }
-        		 if(object[4] != null)
-        		 {
+				if (object[4] != null) {
         			 estimate.setRate(Double.parseDouble(object[4].toString()));
         		 }
         		 
@@ -229,66 +215,56 @@ private static Map<String, String> map;
          }
        boqNewDetails.setEstimateList(approvalList);
 		
-
 		model.addAttribute("boqNewDetails",boqNewDetails);
 
 		return "editnew-boq-details";
 
 	}
+
 	@RequestMapping(value = "/searchboqnew",  method = RequestMethod.POST)
-	public String searcBoqData(
-			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
-			final Model model, HttpServletRequest request) throws Exception {
+	public String searcBoqData(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, final Model model,
+			HttpServletRequest request) throws Exception {
 	
 		return "search-boq-details";
 	}
+
 	@RequestMapping(value = "/searchboqnew", params = "searchboqnew", method = RequestMethod.POST)
-	public String searchBoqData(
-			@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails,
-			final Model model, HttpServletRequest request) throws Exception {
+	public String searchBoqData(@ModelAttribute("boqNewDetails") final BoqNewDetails boqNewDetails, final Model model,
+			HttpServletRequest request) throws Exception {
 		List<BoqNewDetails> approvalList = new ArrayList<BoqNewDetails>();
 
 		// Convert input string into a date
 
-		
 		BoqNewDetails estimate=null;
 		
 		final StringBuffer query = new StringBuffer(500);
 		 List<Object[]> list =null;
-		 query
-	        .append(
-	                "select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
-		 if (boqNewDetails.getRef_dsr() != null && boqNewDetails.getRef_dsr() != "" && !boqNewDetails.getRef_dsr().isEmpty()) {
+		query.append("select bq.id,bq.item_description,bq.ref_dsr,bq.unit,bq.rate from BoqNewDetails bq ");
+		if (boqNewDetails.getRef_dsr() != null && boqNewDetails.getRef_dsr() != ""
+				&& !boqNewDetails.getRef_dsr().isEmpty()) {
 				query.append("where bq.ref_dsr = ? ");
 				
 				System.out.println("Query :: "+query.toString());
-				list = persistenceService.findAllBy(query.toString(),
-		        		 boqNewDetails.getRef_dsr());
-			}
-		 else {
+			list = persistenceService.findAllBy(query.toString(), boqNewDetails.getRef_dsr());
+		} else {
 			 list = persistenceService.findAllBy(query.toString());
 		 }
 		 
-        
          if (list.size() != 0) {
         	 
         	 for (final Object[] object : list) {
         		 estimate = new BoqNewDetails();
         		 estimate.setId(Long.parseLong(object[0].toString()));
-        		 if(object[1] != null)
-        		 {
+				if (object[1] != null) {
         			 estimate.setItem_description(object[1].toString());
         		 }
-        		 if(object[2] != null)
-        		 {
+				if (object[2] != null) {
         			 estimate.setRef_dsr(object[2].toString());
         		 }
-        		 if(object[3] != null)
-        		 {
+				if (object[3] != null) {
         			 estimate.setUnit(object[3].toString());
         		 }
-        		 if(object[4] != null)
-        		 {
+				if (object[4] != null) {
         			 estimate.setRate(Double.parseDouble(object[4].toString()));
         		 }
         		 
@@ -298,26 +274,27 @@ private static Map<String, String> map;
          }
        boqNewDetails.setEstimateList(approvalList);
 		
-
 		model.addAttribute("boqNewDetails",boqNewDetails);
 
 		return "search-boq-details";
 
 	}
+
 	@RequestMapping(value = "/work", params = "Forward/Reassign", method = RequestMethod.POST)
 	public String saveBoQDetailsData(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
-			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
+			final Model model, @RequestParam("file1") MultipartFile[] files, final HttpServletRequest request)
+			throws Exception {
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
 		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
+		System.out.println("::::::::: "+workOrderAgreement.getWorkfrom());
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
-				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
-				{
+				if (files[i] == null || files[i].getOriginalFilename().isEmpty()) {
 					continue;
 				}
 				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
@@ -329,8 +306,9 @@ private static Map<String, String> map;
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
 		deptCode = workOrderAgreement.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();a
+		String deptShortCode=populateShortCode(deptCode,workOrderAgreement.getWorksWing(),workOrderAgreement.getSubdivision());
 		String estimateNumber ="";
 		if(workOrderAgreement.getWork_agreement_number() == null || (workOrderAgreement.getWork_agreement_number() != null && workOrderAgreement.getWork_agreement_number().isEmpty()))
 		{
@@ -392,6 +370,7 @@ private static Map<String, String> map;
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
 			workOrderAgreement.setExecuting_department(workOrderAgreement.getDepartment());
 		}
+		System.out.println("::::::::: "+workOrderAgreement.getWorkfrom());
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -409,8 +388,9 @@ private static Map<String, String> map;
 		String deptCode = "";
 		WorkNoGenerator v = beanResolver.getAutoNumberServiceFor(WorkNoGenerator.class);
 		deptCode = workOrderAgreement.getDepartment();
-		String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"works_div_"+deptCode).get(0).getValue();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
+		String deptShortCode=populateShortCode(deptCode,workOrderAgreement.getWorksWing(),workOrderAgreement.getSubdivision());
 		String estimateNumber ="";
 		if(workOrderAgreement.getWork_agreement_number() == null || (workOrderAgreement.getWork_agreement_number() != null && workOrderAgreement.getWork_agreement_number().isEmpty()))
 		{
@@ -550,37 +530,7 @@ private static Map<String, String> map;
 		Double estAmt= 0.0;
 		// for testing only
 		List<DocumentUpload> docup = new ArrayList<>();
-		/*for (int i = 0; i < workOrderAgreement.getBoQDetailsList().size(); i++) {
-			BoQDetails aBoQDetails1 = new BoQDetails();
-			List<BoQDetails> boqq = workOrderAgreement.getBoQDetailsList();
-			
-			
-			if(boqq.get(i).getMilestone() != null && boqq.get(i).getItem_description() !=null && boqq.get(i).getRef_dsr() !=null && boqq.get(i).getRate() !=null && boqq.get(i).getAmount() !=null && boqq.get(i).getQuantity() !=null && boqq.get(i).getUnit() !=null ) {
-			
-				aBoQDetails1.setMilestone(boqq.get(i).getMilestone());
-
-				aBoQDetails1.setItem_description(boqq.get(i).getItem_description());
 				
-				aBoQDetails1.setRef_dsr(boqq.get(i).getRef_dsr());
-				
-				aBoQDetails1.setUnit(boqq.get(i).getUnit());
-				
-				aBoQDetails1.setRate(boqq.get(i).getRate());
-				
-				aBoQDetails1.setQuantity(boqq.get(i).getQuantity());
-				aBoQDetails1.setAmount(aBoQDetails1.getRate() * aBoQDetails1.getQuantity());
-				estAmt=estAmt+aBoQDetails1.getAmount();
-				count=boQDetailsList.size();
-				
-				aBoQDetails1.setSlNo(Long.valueOf(count));
-				
-				aBoQDetails1.setSizeIndex(count);
-				
-				
-				boQDetailsList.add(aBoQDetails1);
-			}
-		}
-*/
 		// String documentPath = "D://Upload/";
 
 		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
@@ -613,7 +563,7 @@ private static Map<String, String> map;
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 		error=false;
 			}else{
-				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
 				}
 			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -621,6 +571,24 @@ private static Map<String, String> map;
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+			//error=false;
+				Row row = firstSheet.getRow(0);
+					System.out.println("00 " + row.getCell(0).getStringCellValue() + " 111  "
+							+ row.getCell(1).getStringCellValue() + "22 " + row.getCell(2).getStringCellValue() + " 33 "
+							+ row.getCell(3).getStringCellValue() + " 44: " + row.getCell(4).getStringCellValue()
+							+ " dd " + row.getCell(5).getStringCellValue());
+					if (!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone")
+							|| !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
+							|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS")
+							|| !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit")
+							|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate")
+							|| !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}
+					
+					System.out.println("Physical number of rows  "+firstSheet.getPhysicalNumberOfRows());
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -630,26 +598,47 @@ private static Map<String, String> map;
 							continue;
 
 						}
-						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+							upload.setInputStream(
+									new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
 						upload.setFileName(files[j].getOriginalFilename());
-						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+							System.out.println(
+									"files[i].getOriginalFilename():;;;;;;;;" + files[j].getOriginalFilename());
 						upload.setContentType(files[j].getContentType());
 						upload.setObjectType("roughWorkAgreementFile");
 						upload.setComments(comments);
-						upload.setUsername(userName);;
+							upload.setUsername(userName);
+							;
 						//System.out.println("comments--------"+comments);
 						docup.add(upload);
 																																							
 					}
 			Iterator<Row> iterator = firstSheet.iterator();
+					
+			first:	
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
+						//erow=erow+1;
 				//int rowNum = nextRow.getRowNum();
 				while (cellIterator.hasNext()) {
+							System.out.println("nextRow.getRowNum()"+nextRow.getRowNum());
+							int erow = nextRow.getRowNum()+1;
+							if(erow>250) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 250 items are allowed. ";
+								break first;
+							}
 					Cell cell = (Cell) cellIterator.next();
+					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
+								System.out.println("::Cell Type::: " + cell.getCellType() + "::::::Blank:: "
+										+ cell.CELL_TYPE_BLANK);
+						error=true;
+								msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Blank column check row "
+										+ erow;
+						break first;
 
+					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
@@ -659,20 +648,37 @@ private static Map<String, String> map;
 						
 						else if (cell.getColumnIndex() == 1) {
 							
-							aBoQDetails.setItem_description(cell.getStringCellValue());
-							
+								aBoQDetails.setItem_description(cell.getStringCellValue());
+							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+							int length = cell.getStringCellValue().length();
+							System.out.println("item Description length   "+length);
+							if(cell.getStringCellValue().length()>10000) {
+								error=true;
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Item Description exceeds 10000 character limit.Check Row "
+												+ erow;
+								break first;
+							}
 							
 						} else if (cell.getColumnIndex() == 2) {
 							
-							aBoQDetails.setRef_dsr(cell.getStringCellValue());
-							
+								aBoQDetails.setRef_dsr(cell.getStringCellValue());
 							
 						}else if (cell.getColumnIndex() == 3) {
 							
-							aBoQDetails.setUnit(cell.getStringCellValue());
+								aBoQDetails.setUnit(cell.getStringCellValue());
 							
+						}else if (cell.getColumnIndex() == 5) {
+							if (aBoQDetails.getRate() != null)  {
+								
+								if(aBoQDetails.getQuantity()==null ) {
+									error=true;
+											msg = "Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check Row number "
+													+ erow;
+								break first;
+							}
 							
 						} 
+							} 
 
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 						if(cell.getColumnIndex() == 2) {
@@ -681,19 +687,39 @@ private static Map<String, String> map;
 						}
 						 if (cell.getColumnIndex() == 4) {
 
-							aBoQDetails.setRate(cell.getNumericCellValue());
+								 aBoQDetails.setRate(cell.getNumericCellValue());
+Double d = cell.getNumericCellValue();
+
+							String[] splitter = d.toString().split("\\.");
 							
-							
+							if(splitter[1].length()>4) {
+								error=true;
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal place are allowed in Rate and Quantity.Check row number "
+												+ erow;
+								break first;
+							 }
 						} else if (cell.getColumnIndex() == 5) {
 							
-							aBoQDetails.setQuantity(cell.getNumericCellValue());
+								aBoQDetails.setQuantity(cell.getNumericCellValue());
+							Double d = cell.getNumericCellValue();
+							String[] splitter = d.toString().split("\\.");
 							
+									// System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa:
+									// "+aBoQDetails.getQuantity());
+							if(splitter[1].length()>4) {
+								error=true;
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal place are allowed in Rate and Quantity.Check row number "
+												+ erow;
+							break first;
+							}
 								if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 								}else {
 									error=true;
-									msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row number "
+												+ erow;
+							break first;
 									}
 						}
 
@@ -707,15 +733,16 @@ private static Map<String, String> map;
 						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
 						
+							}
+						}
+						
 					
 
 					}
-				}
-            
-			}
 
 			// workbook.close();
 			inputStream.close();
+					
 			}else {
 				
 			}
@@ -729,7 +756,8 @@ private static Map<String, String> map;
 		
 		if(workOrderAgreement.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
-				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				System.out.println(":::: " + boq.getId() + ":::::::" + boq.getUsername() + ":::::::::"
+						+ boq.getObjectId() + ":::::" + boq.getFilestoreid());
 				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
 				if(boq.getObjectId()!=null) {
 					boqUploadDocument.setId(Long.valueOf(nextcount));
@@ -747,7 +775,8 @@ private static Map<String, String> map;
 		workOrderAgreement.setDocumentDetail(docup);
 		if(!error) {
 		DocumentUpload savedocebefore = boQDetailsService.savedocebefore(workOrderAgreement);
-		System.out.println("::::username"+savedocebefore.getUsername()+":::::: "+savedocebefore.getObjectType()+" :::   "+savedocebefore.getFileStore().getId());
+			System.out.println("::::username" + savedocebefore.getUsername() + ":::::: "
+					+ savedocebefore.getObjectType() + " :::   " + savedocebefore.getFileStore().getId());
 		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
 		//adding
 		boqUploadDocument2.setId(Long.valueOf(nextcount));
@@ -757,22 +786,29 @@ private static Map<String, String> map;
 		boqUploadDocument2.setComments(comments);
 		boqUploadDocument2.setUsername(savedocebefore.getUsername());
 		docUpload.add(boqUploadDocument2);
-		 Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
-		workOrderAgreement.setWork_amount(String.valueOf(estAmt));
+			Map<String, List<BoQDetails>> groupByMilesToneMap = boQDetailsList.stream()
+					.collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		BigDecimal bd=new BigDecimal(estAmt).setScale(2,BigDecimal.ROUND_HALF_UP);
+		System.out.println("::::::::work amount  :"+bd);
+		workOrderAgreement.setWork_amount(String.valueOf(bd));
 		 model.addAttribute("milestoneList",groupByMilesToneMap);
 		 model.addAttribute("fileuploadAllowed","Y");
 		}else {
 					
 				model.addAttribute("error", "Y");
 				model.addAttribute("message", msg);
-				}
-		Map<String, List<BoqUploadDocument>> uploadDocument = 
-				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		  }
+		Map<String, List<BoqUploadDocument>> uploadDocument = docUpload.stream()
+				.collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
 	  model.addAttribute("uploadDocument", uploadDocument);
-		 
-		/*Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));*/
+		workOrderAgreement.setDocUpload(docUpload);
+		/*
+		 * Map<String, List<BoQDetails>> groupByMilesToneMap =
+		 * boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::
+		 * getMilestone));
+		 */
+	  workOrderAgreement.setSectorlist(getsectorlist());
+		workOrderAgreement.setWardnumber(getwardlist());
 	  workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
 	  workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 	  workOrderAgreement.setDepartment(workOrderAgreement.getDepartment());
@@ -783,7 +819,7 @@ private static Map<String, String> map;
 		workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
 		workOrderAgreement.setBoQDetailsList(boQDetailsList);
-		workOrderAgreement.setWork_amount(String.valueOf(estAmt));
+		//workOrderAgreement.setWork_amount(String.valueOf(estAmt));
 		model.addAttribute("workOrderAgreement", workOrderAgreement);
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
         prepareWorkflow(model, workOrderAgreement, new WorkflowContainer());
@@ -1138,9 +1174,15 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
 			System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkAgreementFile",workOrderAgreement.getId());
+		String checkwork=workOrderAgreement.getWorkfrom();
+		if(checkwork !=null && checkwork.equalsIgnoreCase("EstandDnit")) {
+			model.addAttribute("editable","N");
+		}
 		workOrderAgreement.setDocumentDetail(documents);
-
-		
+		workOrderAgreement.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+		//workOrderAgreement.setSectorlist(getsectorlist());
+		//workOrderAgreement.setWardnumber(getwardlist());
 		workOrderAgreement.setBoQDetailsList(workOrderAgreement.getNewBoQDetailsList());
 		workOrderAgreement.setDepartment(workOrderAgreement.getExecuting_department());
 		String dept = workOrderAgreement.getExecuting_department();
@@ -1226,7 +1268,6 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		// for testing only
 		List<DocumentUpload> docup = new ArrayList<>();
 		
-
 		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
 
 		long currentTime = new Date().getTime();
@@ -1257,7 +1298,7 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 		error=false;
 			}else{
-				msg="Uploaded document must contain Sheet with name Abst. with AOR";
+				msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
 				}
 			}
 			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -1265,6 +1306,23 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 				System.out.println("firstSheet;;"+firstSheet.getSheetName());
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				//error=false;
+				Row row = firstSheet.getRow(0);
+					System.out.println("00 " + row.getCell(0).getStringCellValue() + " 111  "
+							+ row.getCell(1).getStringCellValue() + "22 " + row.getCell(2).getStringCellValue() + " 33 "
+							+ row.getCell(3).getStringCellValue() + " 44: " + row.getCell(4).getStringCellValue()
+							+ " dd " + row.getCell(5).getStringCellValue());
+					if (!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone")
+							|| !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
+							|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS")
+							|| !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit")
+							|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate")
+							|| !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}
+					
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -1274,26 +1332,45 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 							continue;
 
 						}
-						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+							upload.setInputStream(
+									new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
 						upload.setFileName(files[j].getOriginalFilename());
-						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+							System.out.println(
+									"files[i].getOriginalFilename():;;;;;;;;" + files[j].getOriginalFilename());
 						upload.setContentType(files[j].getContentType());
 						upload.setObjectType("roughWorkAgreementFile");
 						upload.setComments(comments);
-						upload.setUsername(userName);;
+							upload.setUsername(userName);
+							;
 						//System.out.println("comments--------"+comments);
 						docup.add(upload);
 																																							
 					}
 			Iterator<Row> iterator = firstSheet.iterator();
-		while (iterator.hasNext()) {
+				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+					
+					first: while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
 				//int rowNum = nextRow.getRowNum();
 				while (cellIterator.hasNext()) {
+							int erow = nextRow.getRowNum()+1;
+							if(erow>250) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 250 items are allowed. ";
+								break first;
+							}
 					Cell cell = (Cell) cellIterator.next();
-
+					
+					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
+								System.out.println("::Cell Type::: " + cell.getCellType() + "::::::Blank:: "
+										+ cell.CELL_TYPE_BLANK);
+						error=true;
+								msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Blank Column in Row "
+										+ erow;
+						break first;
+					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
@@ -1304,20 +1381,36 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 						else if (cell.getColumnIndex() == 1) {
 							
 								aBoQDetails.setItem_description(cell.getStringCellValue());
+							int length = cell.getStringCellValue().length();
 							
+							if(cell.getStringCellValue().length()>10000) {
+								error=true;
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Item Description exceeds 10000 character limit.Check Row "
+												+ erow;
+								break first;
+							}
+						//boqDetailsPop.setItem_description(cell.getStringCellValue());
 							
 						} else if (cell.getColumnIndex() == 2) {
 							
 								aBoQDetails.setRef_dsr(cell.getStringCellValue());
 							
-							
 						}else if (cell.getColumnIndex() == 3) {
 							
 								aBoQDetails.setUnit(cell.getStringCellValue());
 							
-							
-						} 
-
+						}else if (cell.getColumnIndex() == 5) {
+							if (aBoQDetails.getRate() != null)  {
+								
+								if(aBoQDetails.getQuantity()==null ) {
+									error=true;
+											msg = "Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check Row "
+													+ erow;
+									break first;
+								}
+								
+							}
+							}
 					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
 						if(cell.getColumnIndex() == 2) {
 							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
@@ -1326,18 +1419,39 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 						 if (cell.getColumnIndex() == 4) {
 							 
 								 aBoQDetails.setRate(cell.getNumericCellValue());
+							Double d = cell.getNumericCellValue();
 							
+							String[] splitter = d.toString().split("\\.");
 							
+							if(splitter[1].length()>4) {
+								error=true;
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 Digits are allowed after Decimal.Check row "
+												+ erow;
+								break first;
+							}
 						} else if (cell.getColumnIndex() == 5) {
 							
 								aBoQDetails.setQuantity(cell.getNumericCellValue());
+Double d = cell.getNumericCellValue();
+							String[] splitter = d.toString().split("\\.");
+							
+									// System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa:
+									// "+aBoQDetails.getQuantity());
+							if(splitter[1].length()>4) {
+								error=true;
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet. Only 4 Digits are allowed after Decimal.Check row "
+												+ erow;
+								break first;
+							}
 							
 								if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 								}else {
 									error=true;
-									msg="Please Check the upload Document,Error in Document Rate and Quantity must be number.";
+										msg = "Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row "
+												+ erow;
+							break first;
 									}
 						}
 
@@ -1351,16 +1465,14 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 						aBoQDetails.setSizeIndex(count);
 						boQDetailsList.add(aBoQDetails);
 						
-					
-
-					}
 				}
             
-			}
+				}
 
 			// workbook.close();
 			inputStream.close();
-			}else {
+		}
+			}	else {
 				
 			}
 			}
@@ -1373,7 +1485,8 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		
 		if(workOrderAgreement.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
-				System.out.println(":::: "+boq.getId()+":::::::"+boq.getUsername()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				System.out.println(":::: " + boq.getId() + ":::::::" + boq.getUsername() + ":::::::::"
+						+ boq.getObjectId() + ":::::" + boq.getFilestoreid());
 				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
 				if(boq.getObjectId()!=null) {
 					boqUploadDocument.setId(Long.valueOf(nextcount));
@@ -1392,7 +1505,8 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		if(!error) {
 		DocumentUpload savedocebefore = boQDetailsService.savedocebefore(workOrderAgreement);
 		boQDetailsService.updateDocuments(id, savedocebefore.getId());
-		System.out.println("::::username :: "+savedocebefore.getUsername()+":::::: "+savedocebefore.getObjectType()+" :::   "+savedocebefore.getFileStore().getId());
+			System.out.println("::::username :: " + savedocebefore.getUsername() + ":::::: "
+					+ savedocebefore.getObjectType() + " :::   " + savedocebefore.getFileStore().getId());
 		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
 		//adding
 		boqUploadDocument2.setId(Long.valueOf(nextcount));
@@ -1402,8 +1516,9 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		boqUploadDocument2.setComments(comments);
 		boqUploadDocument2.setUsername(savedocebefore.getUsername());
 		docUpload.add(boqUploadDocument2);
-		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+			Map<String, List<BoQDetails>> groupByMilesToneMap = boQDetailsList.stream()
+					.collect(Collectors.groupingBy(BoQDetails::getMilestone));
+		
 		workOrderAgreement1.setWork_amount(String.valueOf(estAmt));
 		 model.addAttribute("milestoneList",groupByMilesToneMap);
 		 model.addAttribute("fileuploadAllowed","Y");
@@ -1412,8 +1527,8 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 				model.addAttribute("error", "Y");
 				model.addAttribute("message", msg);
 		  }
-		Map<String, List<BoqUploadDocument>> uploadDocument = 
-				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		Map<String, List<BoqUploadDocument>> uploadDocument = docUpload.stream()
+				.collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
 	  model.addAttribute("uploadDocument", uploadDocument);
 		
 	  if(error) {
@@ -1425,12 +1540,19 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 					responseList.add(boq);
 					
 				}
-	        Map<String, List<BoQDetails>> groupByMilesToneMap = 
-	        		responseList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+			Map<String, List<BoQDetails>> groupByMilesToneMap = responseList.stream()
+					.collect(Collectors.groupingBy(BoQDetails::getMilestone));
 	        model.addAttribute("milestoneList",groupByMilesToneMap);
 			}
-	  final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement1.getId());
-		workOrderAgreement1.setDocumentDetail(documents);
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",
+				workOrderAgreement1.getId());
+		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository
+				.findByobjectTypeAndObjectId("roughWorkAgreementFile", workOrderAgreement.getId());
+	  workOrderAgreement1.setRoughCostdocumentDetail(roughCostEstmatedocuments);
+	  workOrderAgreement1.setDocUpload(docUpload);
+	  workOrderAgreement1.setDocumentDetail(documents);
+		workOrderAgreement.setSectorlist(getsectorlist());
+		workOrderAgreement.setWardnumber(getwardlist());
 	  workOrderAgreement1.setWorksWing(workOrderAgreement1.getWorksWing());
 	  workOrderAgreement1.setWorkswings(estimatePreparationApprovalService.getworskwing());
 	  workOrderAgreement1.setDepartment(workOrderAgreement1.getDepartment());
@@ -1445,17 +1567,20 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		 model.addAttribute("fileuploadAllowed","Y");
 		model.addAttribute("workOrderAgreement", workOrderAgreement1);
 		model.addAttribute(STATE_TYPE, workOrderAgreement1.getClass().getSimpleName());
-    prepareWorkflow(model, workOrderAgreement1, new WorkflowContainer());
+ //  prepareWorkflow(model, workOrderAgreement1, new WorkflowContainer());
         //model.addAttribute("milestoneList",groupByMilesToneMap);
         //prepareValidActionListByCutOffDate(model);
-       /* if (workOrderAgreement1.getState() != null)
-            model.addAttribute("currentState", workOrderAgreement1.getState().getValue());
-		model.addAttribute("workflowHistory",
-				getHistory(workOrderAgreement1.getState(), workOrderAgreement1.getStateHistory()));*/
-	
-		
+		/*
+		 * if (workOrderAgreement1.getState() != null)
+		 * model.addAttribute("currentState",
+		 * workOrderAgreement1.getState().getValue());
+		 * model.addAttribute("workflowHistory",
+		 * getHistory(workOrderAgreement1.getState(),
+		 * workOrderAgreement1.getStateHistory()));
+		 */
         
-		//System.out.println("::::::::state:::: "+workOrderAgreement1.getState().getValue());
+		// System.out.println("::::::::state::::
+		// "+workOrderAgreement1.getState().getValue());
 		prepareValidActionListByCutOffDate(model);
         org.egov.infra.admin.master.entity.User user =null;
         if((workOrderAgreement1.getProject_closure_comments() == null || workOrderAgreement1.getProject_closure_comments().isEmpty()) && workOrderAgreement1.getStatus().getDescription().equals("Approved"))
@@ -1532,29 +1657,6 @@ if(workOrderAgreement.getDocUpload()!=null) {
         + savedWorkOrderAgreement.getId()+"&workflowaction="+workFlowAction;
 
 	}
-	
-	/* Added By Kundan Kumar for save Modify Date on date change */	
-	public void saveModifyDateDate(long id,HttpServletRequest request)
-	{
-		org.egov.infra.admin.master.entity.User user = securityUtils.getCurrentUser();
-		String desig=getEmployeeName(user.getId()); 
-		System.out.println("desig............................"+desig);
-		BoqDateUpdate boqDateUpdate = new BoqDateUpdate();
-		boqDateUpdate.setCreatedby(desig);
-		boqDateUpdate.setActualEndDate(request.getParameter("actual_end_date"));
-		boqDateUpdate.setReason(request.getParameter("reason"));
-		boqDateUpdate.setSl_no(id);
-		Date date=new Date();
-		boqDateUpdate.setCreatedDate(date);
-		boqDateUpdateService.saveUpdateDate(boqDateUpdate);
-	}
-//	@RequestMapping("/boq/viewdata")
-//	public String viewModifyDate()
-//	{
-//		System.out.println("kundan view data here ............");
-//		return "view-data";
-//	}
-	/* Ended By Kundan Kumar for save Modify Date on date change */	
 	
 	@RequestMapping(value = "/progress/updateProgress", method = RequestMethod.POST)
 	public String updateProgress(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
@@ -1868,6 +1970,55 @@ if(workOrderAgreement.getDocUpload()!=null) {
 		return "search-progress-work-agreement-page-form";
 
 	}
+	private WorkOrderAgreement getRoughWorkBillDocuments(final WorkOrderAgreement estDetails) {
+		List<DocumentUpload> documentDetailsList = boQDetailsService.findByObjectIdAndObjectType(estDetails.getId(),
+				"roughWorkAgreementFile");
+		estDetails.setDocumentDetail(documentDetailsList);
+		return estDetails;
+	}
+	@RequestMapping(value = "/downloadRoughWorkBillDoc", method = RequestMethod.GET)
+	public void getBillDocRoughWork(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+		final ServletContext context = request.getServletContext();
+		final String fileStoreId = request.getParameter("fileStoreId");
+		String fileName = "";
+		final File downloadFile = fileStoreService.fetch(fileStoreId, "roughWorkAgreementFile");
+		final FileInputStream inputStream = new FileInputStream(downloadFile);
+		//EstimatePreparationApproval estDetails = estimatePreparationApprovalRepository.findById(Long.parseLong(request.getParameter("estDetailsId")));
+		WorkOrderAgreement estDetails = workOrderAgreementRepository.findById(Long.parseLong(request.getParameter("workDetailsId")));
+		estDetails = getRoughWorkBillDocuments(estDetails);
+
+		for (final DocumentUpload doc : estDetails.getDocumentDetail())
+			if (doc.getFileStore().getFileStoreId().equalsIgnoreCase(fileStoreId))
+				fileName = doc.getFileStore().getFileName();
+
+		// get MIME type of the file
+		String mimeType = context.getMimeType(downloadFile.getAbsolutePath());
+		if (mimeType == null)
+			// set to binary type if MIME mapping not found
+			mimeType = "application/octet-stream";
+
+		// set content attributes for the response
+		response.setContentType(mimeType);
+		response.setContentLength((int) downloadFile.length());
+
+		// set headers for the response
+		final String headerKey = "Content-Disposition";
+		final String headerValue = String.format("attachment; filename=\"%s\"", fileName);
+		response.setHeader(headerKey, headerValue);
+
+		// get output stream of the response
+		final OutputStream outStream = response.getOutputStream();
+
+		final byte[] buffer = new byte[BUFFER_SIZE];
+		int bytesRead = -1;
+
+		// write bytes read from the input stream into the output stream
+		while ((bytesRead = inputStream.read(buffer)) != -1)
+			outStream.write(buffer, 0, bytesRead);
+
+		inputStream.close();
+		outStream.close();
+	}
 	
 	@RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
 	public void getBillDoc(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
@@ -2092,6 +2243,231 @@ if (id !=null && id != "" && slno!= null && slno!="" ) {
 		return pendingWith;
 	}
 
-	
+	public List<String> getsectorlist(){
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"Sector/Locality");
+			
+			List<String> sector1=new ArrayList<>();
+			for(AppConfigValues as:sector) {
+				//System.out.println("::::sector:: "+as.getValue());
+				sector1.add(as.getValue());
+			}
+			return sector1;
+	 }
+	 public List<String> getwardlist(){
+		 List<AppConfigValues> wardNumber =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"WardNumber");
+			List<String> wardnumber=new ArrayList<>();
+			for(AppConfigValues wa:wardNumber) {
+				//System.out.println("::::ward:: "+wa.getValue());
+				wardnumber.add(wa.getValue());
+			}
+			return wardnumber;
+	 }
+	 private String populateShortCode(String deptCode, String worksWing, Long subdivision2) {
+			
+			String deptPart=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+						"works_div_"+deptCode).get(0).getValue();
+			String worksWingPart="";
+			if(worksWing.equalsIgnoreCase("1"))
+			{
+				worksWingPart="BR";
+			}
+			else if(worksWing.equalsIgnoreCase("2"))
+			{
+				worksWingPart="PH";
+			}
+			else
+			{
+				worksWingPart="HE";
+			}
+			String subPart="";
+			if(subdivision2 ==1)
+			{
+				subPart="S1";
+			}
+			else if(subdivision2 ==2)
+			{
+				subPart="S2";
+			}
+			else if(subdivision2 ==3)
+			{
+				subPart="S22";
+			}
+			else if(subdivision2 ==4)
+			{
+				subPart="S3";
+			}
+			else if(subdivision2 ==5)
+			{
+				subPart="S4";
+			}
+			else if(subdivision2 ==6)
+			{
+				subPart="S7";
+			}
+			else if(subdivision2 ==7)
+			{
+				subPart="S8";
+			}
+			else if(subdivision2 ==8)
+			{
+				subPart="S9";
+			}
+			else if(subdivision2 ==9)
+			{
+				subPart="S14";
+			}
+			else if(subdivision2 ==10)
+			{
+				subPart="S15";
+			}
+			else if(subdivision2 ==11)
+			{
+				subPart="S20";
+			}
+			else if(subdivision2 ==12)
+			{
+				subPart="S1";
+			}
+			else if(subdivision2 ==13)
+			{
+				subPart="S10";
+			}
+			else if(subdivision2 ==14)
+			{
+				subPart="S11";
+			}
+			else if(subdivision2 ==15)
+			{
+				subPart="S16";
+			}
+			else if(subdivision2 ==16)
+			{
+				subPart="S17";
+			}
+			else if(subdivision2 ==17)
+			{
+				subPart="S21";
+			}
+			else if(subdivision2 ==18)
+			{
+				subPart="S12";
+			}
+			else if(subdivision2 ==19)
+			{
+				subPart="S13";
+			}
+			else if(subdivision2 ==20)
+			{
+				subPart="S18";
+			}
+			else if(subdivision2 ==21)
+			{
+				subPart="S6";
+			}
+			else if(subdivision2 ==22)
+			{
+				subPart="S1";
+			}
+			else if(subdivision2 ==23)
+			{
+				subPart="S3";
+			}
+			else if(subdivision2 ==24)
+			{
+				subPart="S6";
+			}
+			else if(subdivision2 ==25)
+			{
+				subPart="S5";
+			}
+			else if(subdivision2 ==26)
+			{
+				subPart="S14";
+			}
+			else if(subdivision2 ==27)
+			{
+				subPart="S2";
+			}
+			else if(subdivision2 ==28)
+			{
+				subPart="S4";
+			}
+			else if(subdivision2 ==29)
+			{
+				subPart="S5";
+			}
+			else if(subdivision2 ==30)
+			{
+				subPart="S19";
+			}
+			else if(subdivision2 ==31)
+			{
+				subPart="S1";
+			}
+			else if(subdivision2 ==32)
+			{
+				subPart="S2";
+			}
+			else if(subdivision2 ==33)
+			{
+				subPart="S3";
+			}
+			else if(subdivision2 ==34)
+			{
+				subPart="S9";
+			}
+			else if(subdivision2 ==35)
+			{
+				subPart="S10";
+			}
+			else if(subdivision2 ==36)
+			{
+				subPart="S12";
+			}
+			else if(subdivision2 ==37)
+			{
+				subPart="S13";
+			}
+			else if(subdivision2 ==38)
+			{
+				subPart="S5";
+			}
+			else if(subdivision2 ==39)
+			{
+				subPart="S6";
+			}
+			else if(subdivision2 ==40)
+			{
+				subPart="S7";
+			}
+			else if(subdivision2 ==41)
+			{
+				subPart="S8";
+			}
+			else if(subdivision2 ==42)
+			{
+				subPart="S15";
+			}
+			else if(subdivision2 ==43)
+			{
+				subPart="S1";
+			}
+			else if(subdivision2 ==44)
+			{
+				subPart="S3";
+			}
+			else if(subdivision2 ==45)
+			{
+				subPart="S34";
+			}
+			else if(subdivision2 == 46)
+			{
+				subPart="S4";
+			}
+			
+			return worksWingPart+deptPart+subPart;
+		}
 	
 }

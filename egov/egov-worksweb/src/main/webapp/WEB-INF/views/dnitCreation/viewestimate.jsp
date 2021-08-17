@@ -161,6 +161,11 @@
 					<form:option value="Revenue">Revenue</form:option>
 					<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
 					<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+					<form:option value="Mayor Dev Fund">Mayor Dev Fund</form:option>
+					<form:option value="SR.DY.DEV Fund">SR.DY.DEV Fund</form:option>
+					<form:option value="DY.MAYOR DEV Fund">DY.MAYOR DEV Fund</form:option>
+					<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
+					<form:option value="CARPETTING WORK">CARPETTING WORK</form:option>
 				</form:select>
 			</div>
 			<!-- <label class="col-sm-3 control-label text-left-audit1"></label>

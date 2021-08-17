@@ -177,6 +177,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Column(name = "works_wing")
 	private String worksWing;
 	
+	@Column(name="workfrom")
+	private String workfrom;
+	
+	@Transient
+	private List<String> sectorlist;
+	@Transient
+	private List<String> wardnumber;
+	
 	@Transient
 	private List<Workswing> workswings = new ArrayList<Workswing>();
 	
@@ -231,6 +239,8 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	private Double progressCompletion;
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
+	@Transient
+    private List<DocumentUpload> roughCostdocumentDetail = new ArrayList<>();
 	@Transient
     private List<DocumentUpload> documents = new ArrayList<>();
 	@Transient
@@ -858,5 +868,40 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	public void setDocUpload(List<BoqUploadDocument> docUpload) {
 		this.docUpload = docUpload;
 	}
+
+	public List<String> getWardnumber() {
+		return wardnumber;
+	}
+
+	public void setWardnumber(List<String> wardnumber) {
+		this.wardnumber = wardnumber;
+	}
+
+	public List<String> getSectorlist() {
+		return sectorlist;
+	}
+
+	public void setSectorlist(List<String> sectorlist) {
+		this.sectorlist = sectorlist;
+	}
+
+	public List<DocumentUpload> getRoughCostdocumentDetail() {
+		return roughCostdocumentDetail;
+	}
+
+	public void setRoughCostdocumentDetail(List<DocumentUpload> roughCostdocumentDetail) {
+		this.roughCostdocumentDetail = roughCostdocumentDetail;
+	}
+
+	public String getWorkfrom() {
+		return workfrom;
+	}
+
+	public void setWorkfrom(String workfrom) {
+		this.workfrom = workfrom;
+	}
+
+	
+	
 
 }

@@ -3,7 +3,7 @@
   ~    eGov  SmartCity eGovernance suite aims to improve the internal efficiency,transparency,
   ~    accountability and the service delivery of the government  organizations.
   ~
-  ~     Copyright (C) 2017  eGovernments Foundation
+  ~     Copyright (C) 2018  eGovernments Foundation
   ~
   ~     The updated version of eGov suite of products as by eGovernments Foundation
   ~     is available at http://www.egovernments.org
@@ -50,7 +50,7 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>Cheque Remittance</title>
+<title><s:text name="cheque.remittance.title" /></title>
 
 <script type="text/javascript">
 	jQuery.noConflict();
@@ -69,7 +69,7 @@
 						} */
 						
 						//hide or show date fields on selecting year from drop down
-						/* jQuery("#finYearId").on("change",function(){
+						/*jQuery("#finYearId").on("change",function(){
 							if(jQuery("#finYearId").val()!=-1){
 								$("#dateDiv").hide();
 								$("#fromDate").val("");
@@ -97,9 +97,8 @@
 											endDate : nowTemp,
 											autoclose : true,
 											onRender : function(date) {
-												return date.valueOf() < now
-														.valueOf() ? 'disabled'
-														: '';
+												//return date.valueOf() < now.valueOf() ? 'disabled': '';
+												return date.valueOf();
 											}
 										}).on('changeDate', function(ev) {
 									var string = jQuery(this).val();
@@ -114,9 +113,8 @@
 											endDate : nowTemp,
 											autoclose : true,
 											onRender : function(date) {
-												return date.valueOf() < now
-														.valueOf() ? 'disabled'
-														: '';
+												//return date.valueOf() < now.valueOf() ? 'disabled': '';
+												return date.valueOf();
 											}
 										}).on('changeDate', function(ev) {
 									var string = jQuery(this).val();
@@ -129,12 +127,11 @@
 								.datepicker(
 										{
 											format : 'dd/mm/yyyy',
-											endDate : nowTemp,
+											//endDate : nowTemp,
 											autoclose : true,
 											onRender : function(date) {
-												return date.valueOf() < now
-														.valueOf() ? 'disabled'
-														: '';
+												//return date.valueOf() < now.valueOf() ? 'disabled': '';
+												return date.valueOf();
 											}
 										}).on('changeDate', function(ev) {
 									var string = jQuery(this).val();
@@ -170,7 +167,59 @@
 		}
 		document.getElementById("remittanceAmount").value = totalAmtDisplay;
 	}
+	
 	function handleReceiptSelectionEvent(rownum) {
+
+		dom.get("multipleserviceselectionerror").style.display = "none";
+		dom.get("selectremittanceerror").style.display = "none";
+		dom.get("button32").disabled = false;
+		dom.get("button32").className = "buttonsubmit";
+		var receipts=document.getElementsByName('receiptNumber');
+		var receiptNos="";
+		for (i = 0; i < receipts.length; i++) {
+			if(document.getElementById("selected_"+i).checked){
+				document.getElementById("selected_"+i).value= true;
+				if(receiptNos=="")
+				{
+					receiptNos+= document.getElementById("receiptNumber_"+i).value;
+				}else{
+					receiptNos+="','"+document.getElementById("receiptNumber_"+i).value;
+					
+				}
+			}else{
+				document.getElementById("selected_"+i).value= false;
+			}
+		}
+		
+		jQuery("#historyDetailTable tbody").empty();
+		jQuery.ajax({
+			 url:'/services/collection/remittanceBankdetail/gldetails?receiptNo='+receiptNos,
+			 contentType:"application/json",		
+			 dataType:"json",
+			 success:function(r)
+			 {
+
+				 data=r;
+				for (var i=0; i<data.length; i++) {
+						
+						console.log(":::name  :::: "+data[i].glName+"::::Code:: "+data[i].glcode+":::amount:: "+data[i].amount);
+						jQuery("#historyDetailTable tbody").append('<tr>'+'<td>'+'<input type="text" name="remittance['+i+'].glName" readonly="true" value="'+data[i].glName+'" style="width:100%"/></td>'
+								+'<td >'+'<input type="text" name="remittance['+i+'].glcode" readonly="true" value="'+data[i].glcode+'" style="width:100%"/></td>'
+								+'<td >'+'<input type="text" name="remittance['+i+'].amount" readonly="true" value="'+data[i].amount+'" style="width:100%"/></td>'
+								+'<td align="center" >'+'<select id="remitAccountNumber" name="remittance['+i+'].bankaccount" >'
+								+'<option value="-1">Select</option>'
+								+'<c:forEach items="${dropdownData.bankaccountNumberList}" var="accNum">'
+									+'<option value="${accNum}" >${accNum}</option>'
+								+'</c:forEach>'
+							+'</select>'+'</td>'
+								+'</tr>');
+				}
+				document.getElementById("historyDetailTable").scrollIntoView();
+			 }
+		 })
+	}
+	
+	function handleReceiptSelectionEvent1(rownum) {
 
 		dom.get("multipleserviceselectionerror").style.display = "none";
 		dom.get("selectremittanceerror").style.display = "none";
@@ -217,23 +266,6 @@
 		 })
 	}
 
-	// Check if at least one receipt is selected
-	function isChecked(chk) {
-		if (chk.length == undefined) {
-			if (chk.checked == true) {
-				return true;
-			} else {
-				return false;
-			}
-		} else {
-			for (i = 0; i < chk.length; i++) {
-				if (chk[i].checked == true) {
-					return true;
-				}
-			}
-			return false;
-		}
-	}
 
 	// Changes selection of all receipts to given value (checked/unchecked)
 	function changeSelectionOfAllReceipts(checked) {
@@ -255,34 +287,43 @@
 	}
 	
 	function validate() {
-		dom.get("bankselectionerror").style.display = "none";
-		dom.get("accountselectionerror").style.display = "none";
+		//dom.get("bankselectionerror").style.display = "none";
+		//dom.get("accountselectionerror").style.display = "none";
 		dom.get("selectremittanceerror").style.display = "none";
 		dom.get("approvalSelectionError").style.display = "none";
-		
-		
+
+		var narration=document.getElementById("narration").value;
+		var dept=document.getElementById("deptIdnew").value;
+		var func=document.getElementById("functionNew").value;
+		var subdiv=document.getElementById("subdivisonNew").value;
 		var valSuccess = true;
-		
-		/* if(serviceType==-1){
-			valSuccess=false;
-			dom.get("error_area").style.display="block";
-			dom.get("error_area").innerHTML = '<s:text name="service.servictype.null" />' + '<br>';
-			window.scroll(0,0);
+		if(narration==""){
+			bootbox.alert("Please Enter Narration");
 			return false;
 		}
-		if (dom.get("accountNumberId").value != null && dom.get("accountNumberId").value == -1) {
-			dom.get("bankselectionerror").innerHTML = "";
-			dom.get("accountselectionerror").style.display = "block";
+		if(dept=='-1') {
+			bootbox.alert("Please Select Department");
 			return false;
-		} */
-		<s:if test="showRemittanceDate">
-		if (dom.get("remittanceDate") != null && dom.get("remittanceDate").value == "") {
+		}
+		if(func =='-1')
+		{
+			bootbox.alert("Please Select Function Details");
+			return false;
+		}
+		if(subdiv =='-1')
+		{
+			bootbox.alert("Please Select Subdivison Details");
+			return false;
+		}
+		
+		if (dom.get("remittanceDate") != null
+				&& dom.get("remittanceDate").value == "") {
 			bootbox.alert("Please Enter Date of Remittance");
 			return false;
-		} else {
+		} /* else {
 			var remittanceDate = dom.get("remittanceDate").value;
 			var receiptDate;
-			isSelected = document.getElementsByName('selected');
+			isSelected = document.getElementsByName('receiptIds');
 			for (i = 0; i < isSelected.length; i++) {
 				if (isSelected[i].checked == true) {
 					date = new Date(document.getElementsByName('receiptDateTempArray')[i].value);
@@ -301,8 +342,8 @@
 					}
 				}
 			}
-		}
-		</s:if>
+		} */
+		
 		var acc= document.getElementById("remitAccountNumber").value;
 		if(acc =='-1')
 		{
@@ -310,7 +351,7 @@
 				document.getElementById("remitAccountNumber").focus();
 				return false;
 		}
-		/* if(document.getElementById('accountNumberId').options[document.getElementById('accountNumberId').selectedIndex].value != dom.get("remitAccountNumber").value.trim())
+		/* if(document.getElementById('accountNumberId').value != dom.get("remitAccountNumber").value.trim())
 			{
 				 alert("Account number for which search result has displayed and selected account number in search drop down are different. \n Please make sure account number in drop down and account number for which search has done are same.");
 				 return false;
@@ -320,14 +361,14 @@
         {
          return false;
         }
-		if (!isChecked()) {
+		if (!isChecked(document.getElementsByName('receiptIds'))) {
 			dom.get("selectremittanceerror").style.display = "block";
 			window.scroll(0, 0);
 			return false;
 		} else {
 		       	doLoadingMask('#loadingMask');
-				jQuery('#finYearId').prop("disabled", false);
-				document.bankRemittanceForm.action = "chequeRemittance-create.action";
+				//jQuery('#finYearId').prop("disabled", false);
+				document.chequeRemittanceForm.action = "chequeRemittance-create.action";
 				return true;
 		}
 
@@ -343,30 +384,41 @@
 			branchId : branchId,
 		});
 	}
-	
-	
+
 	function searchDataToRemit() {
-		
-		
+		var serviceType=dom.get("serviceType").value;
+		/* if(serviceType==-1){
+			bootbox.alert("Please Select Service Type");
+			return false;
+		}
+		if(jQuery("#finYearId").val()==-1 && jQuery("#fromDate").val()=="" && jQuery("#toDate").val()==""){
+			bootbox.alert("<s:text name='msg.please.enter.either.financial.year.or.fromDate.and.toDate'/>");
+			return false;
+		}
+		if (dom.get("accountNumberId").value != null
+				&& dom.get("accountNumberId").value == -1) {
+			dom.get("bankselectionerror").innerHTML = "";
+			dom.get("accountselectionerror").style.display = "block";
+			return false;
+		} */
 		if(jQuery("#fromDate").val()=="" && jQuery("#toDate").val()==""){
 			bootbox.alert("Please enter from date and to date");
 			return false;
 		}
-		
-		if (document.getElementById("toDate") != null && document.getElementById("toDate").value == ""
-				&& document.getElementById("fromDate") != null
-				&& document.getElementById("fromDate").value != "") {
+		if (dom.get("toDate") != null && dom.get("toDate").value == ""
+				&& dom.get("fromDate") != null
+				&& dom.get("fromDate").value != "") {
 			bootbox.alert("Please Enter To Date");
 			return false;
 		}
-		if (document.getElementById("fromDate") != null && document.getElementById("fromDate").value == ""
-				&& document.getElementById("toDate") != null && document.getElementById("toDate").value != "") {
+		if (dom.get("fromDate") != null && dom.get("fromDate").value == ""
+				&& dom.get("toDate") != null && dom.get("toDate").value != "") {
 			bootbox.alert("Please Enter From Date");
 			return false;
 		}
 		//jQuery('#finYearId').prop("disabled", false);
 		jQuery('#remittanceAmount').val("");
-		document.bankRemittanceForm.action = "chequeRemittance-listData.action";
+		document.chequeRemittanceForm.action = "chequeRemittance-listData.action";
 		return true;
 	}
 
@@ -395,7 +447,6 @@
 
 	// Check if at least one receipt is selected
 	function isChecked(chk) {
-		
 		var list = document.getElementsByName('instrumentAmount');
 		for (i = 0; i < list.length; i++) {
 			if(document.getElementById("selected_"+i).checked){
@@ -417,25 +468,17 @@
 		ddAmount = 0;
 		cardAmount = 0;
 
-		dom.get("multipleserviceselectionerror").style.display = "block";
-		dom.get("selectremittanceerror").style.display = "block";
+		// Refresh the summary section
+		refreshSummary();
 
-		dom.get("button32").disabled = true;
-		dom.get("button32").className = "buttonsubmit";
-		
-		
+		// Enable/disable buttons
+		enableButtons();
 	}
 
 	// Select all receipts
 	function selectAll() {
 		// Select all checkboxes
 		changeSelectionOfAllReceipts(true);
-		
-		dom.get("multipleserviceselectionerror").style.display = "none";
-		dom.get("selectremittanceerror").style.display = "none";
-
-		dom.get("button32").disabled = false;
-		dom.get("button32").className = "buttonsubmit";
 	}
 
 	function setCheckboxStatuses(isSelected) {
@@ -445,15 +488,9 @@
 			deSelectAll();
 		}
 	}
-	function onBodyLoad()
-	{
-		<s:if test="%{isBankCollectionRemitter}">
-			document.getElementById('bankBranchMaster').disabled=true;
-		</s:if>
-	}
 </script>
 </head>
-<body>
+<body >
 	<div class="errorstyle" id="error_area" style="display: none;"></div>
 	<span align="center" style="display: none" id="selectremittanceerror">
 		<li><font size="2" color="red"><b><s:text name="bankremittance.error.norecordselected" /> </b></font></li>
@@ -470,7 +507,7 @@
 	<span align="center" style="display: none" id="approvalSelectionError">
 		<li><font size="2" color="red"><b><s:text name="bankremittance.error.noApproverselected" /> </b></font></li>
 	</span>
-	<s:form theme="simple" name="bankRemittanceForm" >
+	<s:form theme="simple" name="chequeRemittanceForm" >
 		<s:push value="model">
 			<s:token />
 			<s:if test="%{hasErrors()}">
@@ -486,45 +523,52 @@
 			</s:if>
 			<div class="formmainbox">
 				<div class="subheadnew">
-					<s:text name="cash.bankRemittance.title" />
+					<s:text name="cheque.remittance.title" />
 				</div>
 				<div align="center">
 					<table width="100%" border="0" cellspacing="0" cellpadding="0">
 						<tr id="dateDiv">
 							<td width="4%" class="bluebox">&nbsp;</td>
-							<td class="bluebox"><s:text name="bankremittance.fromdate" /><span class="mandatory1">*</span></td>
-							<s:date name="fromDate" var="fromFormat" format="dd/MM/yyyy" />
+							<td class="bluebox"><s:text name="bankremittance.fromdate" /></td>
+								<s:date name="fromDate" var="fromFormat" format="dd/MM/yyyy" />
 							<td class="bluebox"><s:textfield id="fromDate" name="fromDate" data-inputmask="'mask': 'd/m/y'" value="%{fromFormat}" placeholder="DD/MM/YYYY" /></td>
-							<td class="bluebox"><s:text name="bankremittance.todate" /><span class="mandatory1">*</span></td>
-							<s:date name="toDate" var="toFormat" format="dd/MM/yyyy" />
+							<td class="bluebox"><s:text name="bankremittance.todate" /></td>
+								<s:date name="toDate" var="toFormat" format="dd/MM/yyyy" />
 							<td class="bluebox"><s:textfield id="toDate" name="toDate" value="%{toFormat}" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
 						</tr>
 						<tr>
-						 	<td width="4%" class="bluebox">&nbsp;</td>
-			     			<%-- <td width="21%" class="bluebox"><s:text	name="miscreceipt.service.category" /></td>
-							<td width="30%" class="bluebox"><s:select headerKey="-1"
-									headerValue="----Choose----" name="serviceCategory"
-									id="serviceCategoryid" cssClass="selectwk"
-									list="serviceCategoryNames" value="%{service.serviceCategory}"
-									onChange="populateServiceType(this.value);" /></td> --%>
+							<td width="4%" class="bluebox">&nbsp;</td>
+							<%-- <td class="bluebox"><s:text name="bankremittance.accountnumber" />: <span class="mandatory1">*</span></td>
+							<td class="bluebox">
+								<select id="accountNumberId" name="accountNumberId" value="%{accountNumberId}">
+										<option value="-1">Select</option>
+										<c:forEach items="${dropdownData.accountNumberList}" var="accNum">
+											<c:if test="${accNum.bankAccount == accountNumberId }">
+												<option value="${accNum.bankAccount}" selected="selected">${accNum.bank} - ${accNum.bankAccount}</option>
+											</c:if>
+											<c:if test="${accNum.bankAccount != accountNumberId }">
+												<option value="${accNum.bankAccount}" >${accNum.bank} - ${accNum.bankAccount}</option>
+											</c:if>
+										</c:forEach>
+								</select>		
+							</td> --%>
 							<td width="21%" class="bluebox">Department</td>
 		  					<td width="24%" class="bluebox"><s:select headerKey=""
 							headerValue="----Choose----" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptId}"/> </td>
 	    
 							<td width="21%" class="bluebox">
-							 	<s:text name="searchreceipts.criteria.servicetype"/> 
+							 	<s:text name="searchreceipts.criteria.servicetype"/>
 							 </td>
 	     					 <td width="24%" class="bluebox">
 	     					 	 <s:select headerKey="-1"  
 	     					 			headerValue="%{getText('searchreceipts.servicetype.select')}"  
 	     					 			name="serviceTypeId" 
-	     					 			id="serviceTypeId" cssClass="selectwk" 
+	     					 			id="serviceType" cssClass="selectwk" 
 	     					 			list="dropdownData.serviceTypeList" 
 	     					 			listKey="code" 
 	     					 			listValue="businessService" value="%{serviceTypeId}" />  
 	     					 </td>
-			      		</tr>
-	      		
+						</tr>
 						<tr>
 						 	<td width="4%" class="bluebox">&nbsp;</td>
 						    <td width="21%" class="bluebox">Amount</td>
@@ -545,45 +589,49 @@
 							<td width="21%" class="bluebox"><s:text name="Collected By"/></td>
 						    <td width="24%" class="bluebox">
 						    <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy"/></td>
-	      
-						</tr>    
-						
+	      				</tr>
+						<%-- <tr>
+							<td width="4%" class="bluebox">&nbsp;</td>
+							<td class="bluebox"><s:text name="bankremittance.financialyear" />:</td>
+							<td class="bluebox"><s:select headerKey="-1" headerValue="--Select--" list="dropdownData.financialYearList" listKey="id" id="finYearId" listValue="finYearRange" label="finYearRange" name="finYearId" value="%{finYearId}" /></td>
+							<td class="bluebox">&nbsp;</td>
+							<td class="bluebox">&nbsp;</td>
+						</tr> --%>
 						
 					</table>
 					</div>
 					<div class="buttonbottom">
-						<input name="search" type="submit" class="buttonsubmit" id="search" value="Search" onclick="return searchDataToRemit()" />
+						<input name="search" type="submit" class="buttonsubmit" id="search" value="<s:text name='lbl.search'/>" onclick="return searchDataToRemit()" />
 					</div>
-					
-						
-					<s:if test="%{!resultList.isEmpty()}">
-						<display:table name="resultList" id="currentRow" class="table table-bordered" uid="currentRow" pagesize="${pageSize}" style="border:1px;width:100%" cellpadding="0" cellspacing="0" export="false" requestURI="">
+					<s:if test="%{!receiptBeanList.isEmpty()}">
+						<display:table name="receiptBeanList" class="table table-bordered" uid="currentRow" pagesize="${pageSize}" style="border:1px;width:100%" cellpadding="0" cellspacing="0" export="false" requestURI="">
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Select" style="width:5%; text-align: center">
 								<c:set var="rowNumber" value="${currentRow_rowNum-1}" ></c:set>
-								<input type='checkbox' name='finalList[${rowNumber}].selected'  id='selected_${rowNumber}' value ="false" onClick="handleReceiptSelectionEvent(${rowNumber})" />
-								<input type="hidden" name="finalList[${rowNumber}].service"  id="service_${rowNumber}" value="${currentRow.service}" />
-								<input type="hidden" name="finalList[${rowNumber}].serviceName"  id="serviceName_${rowNumber}" value="${currentRow.serviceName}" />
-								<input type="hidden" name="finalList[${rowNumber}].receiptId"  id="receiptId_${rowNumber}" value="${currentRow.receiptId}" />
-								<input type="hidden" name="finalList[${rowNumber}].receiptNumber"  id="receiptNumber_${rowNumber}" value="${currentRow.receiptNumber}" />
-								<input type="hidden" name="finalList[${rowNumber}].fund"  id="fund_${rowNumber}" value="${currentRow.fund}" />
-								<input type="hidden" name="finalList[${rowNumber}].fundName"  id="fundName_${rowNumber}" value="${currentRow.fundName}" />
-								<input type="hidden" name="finalList[${rowNumber}].functionCode"  id="functionCode_${rowNumber}" value="${currentRow.functionCode}" />
-								<input type="hidden" name="finalList[${rowNumber}].department" id="department_${rowNumber}"  value="${currentRow.departmentName}" />
-								<input type="hidden" name="finalList[${rowNumber}].instrumentAmount"  id="instrumentAmount_${rowNumber}" value="${currentRow.instrumentAmount}" />
-								<input type="hidden" name="finalList[${rowNumber}].instrumentType"  id="instrumentType_${rowNumber}" value="${currentRow.instrumentType}" />
-								<input type="hidden" name="finalList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
-								<input type="hidden" name="finalList[${rowNumber}].createdUser"  id="createdUser_${rowNumber}" value="${currentRow.createdUser}" />
+								<input type='checkbox' name='finalBeanList[${rowNumber}].selected'  id='selected_${rowNumber}' value ="false" onClick="handleReceiptSelectionEvent(${rowNumber})" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].service"  id="service_${rowNumber}" value="${currentRow.service}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].serviceName"  id="serviceName_${rowNumber}" value="${currentRow.serviceName}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].receiptId"  id="receiptId_${rowNumber}" value="${currentRow.receiptId}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].receiptNumber"  id="receiptNumber_${rowNumber}" value="${currentRow.receiptNumber}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].fund"  id="fund_${rowNumber}" value="${currentRow.fund}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].fundName"  id="fundName_${rowNumber}" value="${currentRow.fundName}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].functionCode"  id="functionCode_${rowNumber}" value="${currentRow.functionCode}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].department" id="department_${rowNumber}"  value="${currentRow.departmentName}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].instrumentAmount"  id="instrumentAmount_${rowNumber}" value="${currentRow.instrumentAmount}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].instrumentType"  id="instrumentType_${rowNumber}" value="${currentRow.instrumentType}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].createdUser"  id="createdUser_${rowNumber}" value="${currentRow.createdUser}" />
 								<input type="hidden" name="instrumentAmount" disabled="disabled" id="instrumentAmount" value="${currentRow.instrumentAmount}" />
+								<input type="hidden" name="receiptNumber" disabled="disabled" id="receiptNumber" value="${currentRow.receiptNumber}" />
 							</display:column>
-							
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:10%;text-align: center" value="${currentRow.receiptNumber}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date" style="width:10%;text-align: center" value="${currentRow.receiptDate}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:20%;text-align: center" value="${currentRow.serviceName}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Fund" style="width:10%;text-align: center" value="${currentRow.fundName}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Department" style="width:10%;text-align: center" value="${currentRow.departmentName}" />
+
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt number" style="width:10%;text-align: center" value="${currentRow.receiptNumber}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt date" style="width:10%;text-align: center" value="${currentRow.receiptDate}" format="{0,date,dd/MM/yyyy}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:15%;text-align: center" value="${currentRow.serviceName}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Fund" style="width:15%;text-align: center" value="${currentRow.fundName}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Department" style="width:15%;text-align: center" value="${currentRow.departmentName}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Collected By" style="width:15%;text-align: center" value="${currentRow.createdUser}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode Of Payment" style="width:10%;text-align: center" value="${currentRow.instrumentType}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Total Cash Collection" style="width:10%;text-align: center">
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of Payment" style="width:10%;text-align: center" value="${currentRow.instrumentType}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Cheque /DD Amount (Rs)" style="width:10%;text-align: center">
 									<div align="center">
 										<c:if test="${not empty currentRow.instrumentAmount}">
 											<c:out value="${currentRow.instrumentAmount}" />
@@ -620,15 +668,30 @@
 				<div align="center">
 					<table>
 						<tr>					
+							<td class="bluebox" colspan="3">&nbsp;</td>
+							<td class="bluebox"><s:text name="bankremittance.remittancedate" /><span class="mandatory" /></td>
+							<td class="bluebox"><s:textfield id="remittanceDate" name="remittanceDate" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
 							
-								<td class="bluebox" colspan="3">&nbsp;</td>
-								<td class="bluebox"><s:text name="bankremittance.remittancedate" /><span class="mandatory" /></td>
-								<td class="bluebox"><s:textfield id="remittanceDate" name="remittanceDate" readonly="true" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
-							
-							<td class="bluebox">Narration</td>
-							<td class="bluebox" colspan="3"><s:textarea id="narration"
-									name="narration" cols="100" rows="3"/></td>								
-									
+							<td class="bluebox">Narration<span class="mandatory" /></td>
+							<td class="bluebox" colspan="3"><s:textarea id="narration" name="narration" cols="100" rows="3"/></td>	
+						</tr>
+						<tr>
+							<td class="bluebox" colspan="3">&nbsp;</td>
+							<td class="bluebox">Department<span class="mandatory" /></td>
+		  					<td class="bluebox"><s:select headerKey="-1"
+							headerValue="----Choose----" name="deptIdnew" id="deptIdnew" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptIdnew}"/> 
+							</td>
+							<td class="bluebox">Function<span class="mandatory"/></td>
+							<td class="bluebox"><s:select headerKey="-1"
+							headerValue="----Choose----" name="functionNew" id="functionNew" cssClass="selectwk" list="dropdownData.functionList" listKey="code" listValue="name"  value="%{functionNew}"/> 
+							</td>
+						</tr>
+						<tr>
+							<td class="bluebox" colspan="3">&nbsp;</td>
+							<td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
+						    <td class="bluebox">
+						    <div class="yui-skin-sam"><s:select headerKey="-1"
+								headerValue="----Choose----" name="subdivisonNew" id="subdivisonNew"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivisonNew}"/></td>
 						</tr>
 					</table>
 				</div>
@@ -638,15 +701,14 @@
 				</div>
 				<div class="buttonbottom">
 					<input name="button32" type="submit" class="buttonsubmit" id="button32" value="Remit to Bank" onclick="return validate();" />
-					&nbsp;
-					<input name="buttonClose" type="button" class="button" id="button" value="Close" onclick="window.close()" />
+						&nbsp; 
+					<input name="buttonClose" type="button" class="button" id="button" value="<s:text name='lbl.close'/>" onclick="window.close()" />
 				</div>
 				</s:if>
 				<s:if test="%{isListData}">
-					<s:if test="%{resultList.isEmpty()}">
+					<s:if test="%{receiptBeanList.isEmpty()}">
 						<div class="formmainbox">
-							<table width="90%" border="0" align="center" cellpadding="0"
-								cellspacing="0">
+							<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0">
 								<tr>
 									<div>&nbsp;</div>
 									<div class="billhead2">
@@ -657,7 +719,7 @@
 							<br />
 						</div>
 						<div class="buttonbottom">
-							<input name="buttonClose" type="button" class="button" id="buttonClose" value="Close" onclick="window.close()" />
+							<input name="buttonClose" type="button" class="button" id="buttonClose" value="<s:text name='lbl.close'/>" onclick="window.close()" />
 						</div>
 					</s:if>
 				</s:if>

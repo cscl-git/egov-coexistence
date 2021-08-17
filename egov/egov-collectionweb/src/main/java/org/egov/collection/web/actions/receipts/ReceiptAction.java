@@ -1226,6 +1226,18 @@ public class ReceiptAction extends BaseFormAction {
         }else {
         	throw new ApplicationRuntimeException("Please Select Only One Receipt!");
         }
+        //for update Status in Mis_receipt table check condition if required to do after something
+        try {
+     	   System.out.println("Selected Receipt : "+selectedReceipts[0]);
+            persistenceService.getSession()
+                .createSQLQuery(
+                        "update mis_receipts_details set payment_status = 'CANCELLED' where payments_id ='"+selectedReceipts[0]+"'")
+                .executeUpdate();
+            }
+            catch(Exception e)
+            {
+            e.printStackTrace();
+            }
         receiptlist.stream().forEach(receipt -> {
         	receiptHeader.setCurretnStatus(receipt.getPaymentStatus());
             receipt.getBill().forEach(bill -> {
@@ -1403,6 +1415,8 @@ public class ReceiptAction extends BaseFormAction {
        EmployeeInfo empInfo =microserviceUtils.getEmployee(user.getId(), null, null, null).get(0);
        String dept="";
        String desig="";
+      
+
        for(Assignment row :empInfo.getAssignments())
        {
     	   dept=row.getDepartment();

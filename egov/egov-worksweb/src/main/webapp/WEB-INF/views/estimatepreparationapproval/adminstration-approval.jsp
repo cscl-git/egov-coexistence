@@ -55,8 +55,9 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:option value="1">2020-21</form:option>
-								<form:option value="2">2019-20</form:option>
+								<form:option value="1">2021-22</form:option>
+								<form:option value="2">2020-21</form:option>
+								<form:option value="3">2019-20</form:option>
 								<form:option value="3">2018-19</form:option>
 							</form:select>
 						</div>
@@ -111,6 +112,11 @@
 								<form:option value="Revenue">Revenue</form:option>
 								<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
 								<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+								<form:option value="Mayor Dev Fund">Mayor Dev Fund</form:option>
+								<form:option value="SR.DY.DEV Fund">SR.DY.DEV Fund</form:option>
+								<form:option value="DY.MAYOR DEV Fund">DY.MAYOR DEV Fund</form:option>
+								<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
+								<form:option value="CARPETTING WORK">CARPETTING WORK</form:option>
 							</form:select>
 						</div>
 				<label
@@ -140,32 +146,78 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:option value="Aug. of city W/S system including Ph- V&VI, VII&VIII">Aug. of city W/S system including Ph- V&VI, VII&VIII</form:option>
-<form:option value="Urban Development - Sewerage and Sewerage treatment plant">Urban Development - Sewerage and Sewerage treatment plant</form:option>
-<form:option value="Urban Development - Strom water drainage">Urban Development - Strom water drainage</form:option>
-<form:option value="Urban Development - Civic works / Public toilets">Urban Development - Civic works / Public toilets</form:option>
-<form:option value="Urban Development - NR Buildings">Urban Development - NR Buildings</form:option>
-<form:option value="Minor Irrigation (Fountains/ water features)">Minor Irrigation (Fountains/ water features)</form:option>
-<form:option value="Providing basic amenities/ services to economically weeker section">Providing basic amenities/ services to economically weeker section</form:option>
-<form:option value="Infrastructure facilities in villages under MCC jurisdiction">Infrastructure facilities in villages under MCC jurisdiction</form:option>
-<form:option value="Improvement of roads, parking places and infrastructure facilities">Improvement of roads, parking places and infrastructure facilities</form:option>
-<form:option value="Civic works">Civic works</form:option>
-<form:option value="Non-Residential Buildings">Non-Residential Buildings</form:option>
-<form:option value="Providing basic amenities/ services to economically weeker section">Providing basic amenities/ services to economically weeker section</form:option>
-<form:option value="Infrastructure facilities in villages under MCC jurisdiction">Infrastructure facilities in villages under MCC jurisdiction</form:option>
-<form:option value="Swatch Bharat Mission">Swatch Bharat Mission</form:option>
-<form:option value="Residential Buildings">Residential Buildings</form:option>
-<form:option value="Motor and Vehicles">Motor and Vehicles</form:option>
-<form:option value="Construction of Sehaj Safai Kendra (SSK)">Construction of Sehaj Safai Kendra (SSK)</form:option>
+								<form:option value="Augmentation of Water Supply">Augmentation of Water Supply</form:option>
+<form:option value="Sewerage Treatment Plant (STP)">Sewerage Treatment Plant (STP)</form:option>
+<form:option value="Storm Water Drainage (SWD)">Storm Water Drainage (SWD)</form:option>
+<form:option value="Civic Works/Public Toilets">Civic Works/Public Toilets</form:option>
+<form:option value="Non residential Buildings (NRB)">Non residential Buildings (NRB)</form:option>
+<form:option value="Minor Irrigation">Minor Irrigation</form:option>
+<form:option value="Basic Ammenities to EWS">Basic Ammenities to EWS</form:option>
+<form:option value="Infrastructure Facilities in Villages">Infrastructure Facilities in Villages</form:option>
+<form:option value="Improvement of Roads, Parking, Recarpeting">Improvement of Roads, Parking, Recarpeting</form:option>
+<form:option value="Swacchh Bharat Mission (SBM)">Swacchh Bharat Mission (SBM)</form:option>
+<form:option value="Residential Buildings (Govt. Quarters of MCC)">Residential Buildings (Govt. Quarters of MCC)</form:option>
+<form:option value="Sehaj Safai Kendra">Sehaj Safai Kendra</form:option>
 <form:option value="Electrification">Electrification</form:option>
-<form:option value="Landscaping and Horticulture">Landscaping and Horticulture</form:option>
+<form:option value="Landscaping/Horticulture">Landscaping/Horticulture</form:option>
+<form:option value="Sanitation">Sanitation</form:option>
+<form:option value="Meat Hygiene">Meat Hygiene</form:option>
+<form:option value="Cattle Pond">Cattle Pond</form:option>
+<form:option value="Primary Health">Primary Health</form:option>
+<form:option value="Purchase of Machinery and Equipments">Purchase of Machinery and Equipments</form:option>
 <form:option value="Minor Works">Minor Works</form:option>
-<form:option value="Minor Works">Minor Works</form:option>
-<form:option value="C&D waste project">C&D waste project</form:option>
-<form:option value="Minor Works">Minor Works</form:option>
-<form:option value="MP LAD">MP LAD</form:option>
-<form:option value="Any other">Any other</form:option>
-<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+<form:option value="Other Charges (Capital)">Other Charges (Capital)</form:option>
+<form:option value="Fire Academy">Fire Academy</form:option>
+<form:option value="Acquisition Cost of Land">Acquisition Cost of Land</form:option>
+<form:option value="Motor and Vehicles">Motor and Vehicles</form:option>
+<form:option value="Capital Head Under Transport">Capital Head Under Transport</form:option>
+<form:option value="Contruction of Sheds for Sanitation Asstt/Helpers">Contruction of Sheds for Sanitation Asstt/Helpers</form:option>
+<form:option value="Construction of Smart School">Construction of Smart School</form:option>
+<form:option value="Housing scheme for councillor/officers/officials">Housing scheme for councillor/officers/officials</form:option>
+<form:option value="Cow Fee">Cow Fee</form:option>
+<form:option value="Contruction of Vehicle washing and parking slots">Contruction of Vehicle washing and parking slots</form:option>
+<form:option value="Infrastructure at Petrol pumps">Infrastructure at Petrol pumps</form:option>
+<form:option value="Salaries">Salaries</form:option>
+<form:option value="Wages">Wages</form:option>
+<form:option value="Medical Treatment">Medical Treatment</form:option>
+<form:option value="Office Expenses">Office Expenses</form:option>
+<form:option value="Payment of Electricity Bills">Payment of Electricity Bills</form:option>
+<form:option value="Minor works">Minor works</form:option>
+<form:option value="Rent, Rate and Taxes">Rent, Rate and Taxes</form:option>
+<form:option value="C and D waste Project">C and D waste Project</form:option>
+<form:option value="Travelling Expenses">Travelling Expenses</form:option>
+<form:option value="Supply and Material">Supply and Material</form:option>
+<form:option value="Repair and Maintenance of Works (Fire Wing)">Repair and Maintenance of Works (Fire Wing)</form:option>
+<form:option value="Repair and Maintenance of Machinery and Equipments">Repair and Maintenance of Machinery and Equipments</form:option>
+<form:option value="Disaster Management">Disaster Management</form:option>
+<form:option value="Pension Contribution">Pension Contribution</form:option>
+<form:option value="Defined Pension and Contributory Schemes (DPCS)">Defined Pension and Contributory Schemes (DPCS)</form:option>
+<form:option value="Estate Expenditure">Estate Expenditure</form:option>
+<form:option value="Loan and Advances">Loan and Advances</form:option>
+<form:option value="Computerization and IT">Computerization and IT</form:option>
+<form:option value="Professional/Legal Fees">Professional/Legal Fees</form:option>
+<form:option value="Hospitality">Hospitality</form:option>
+<form:option value="Art and Culture and Sports Activities">Art and Culture and Sports Activities</form:option>
+<form:option value="Capacity Building Prograames/Exposure Visits">Capacity Building Prograames/Exposure Visits</form:option>
+<form:option value="Refund of Booking (Liability Account)">Refund of Booking (Liability Account)</form:option>
+<form:option value="Service Tax/Luxury Tax (Liability Account)">Service Tax/Luxury Tax (Liability Account)</form:option>
+<form:option value="Refund of Security (Liability Account)">Refund of Security (Liability Account)</form:option>
+<form:option value="IEC Activities">IEC Activities</form:option>
+<form:option value="P.O. L/HSD- Petrol, oil and Lubricant and High Speed Diesel">P.O. L/HSD- Petrol, oil and Lubricant and High Speed Diesels</form:option>
+<form:option value="Other Charges (Revenue)">Other Charges (Revenue)</form:option>
+<form:option value="Covid-19">Covid-19</form:option>
+<form:option value="Cow Fee (Revenue)">Cow Fee (Revenue)</form:option>
+<form:option value="Garbage/Processing/Transportation/Collection">Garbage/Processing/Transportation/Collection</form:option>
+<form:option value="Wages/OC(Primary Health)">Wages/OC(Primary Health)</form:option>
+<form:option value="Covid Cess">Covid Cess</form:option>
+<form:option value="Welfare Fund">Welfare Fund</form:option>
+<form:option value="Ward Development fund">Ward Development fund</form:option>
+<form:option value="Mayor Development Fund">Mayor Development Fund</form:option>
+<form:option value="SR.DY.DEV.FUND">SR.DY.DEV.FUND</form:option>
+<form:option value="DY.MAYOR DEV FUND">DY.MAYOR DEV FUND</form:option>
+<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
+<form:option value="CARPETTING WORKs">CARPETTING WORK</form:option>
+<form:option value="Deposit Works">Deposit Works</form:option>
 							</form:select>
 						</div>
 		</div>

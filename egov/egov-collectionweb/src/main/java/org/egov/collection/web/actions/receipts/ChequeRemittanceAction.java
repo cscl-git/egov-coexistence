@@ -145,6 +145,9 @@ public class ChequeRemittanceAction extends BaseFormAction {
     private Integer designationId;
     private Date remittanceDate;
     private String narration;
+    private String deptIdnew;
+	private String functionNew;
+	private String subdivisonNew;
     @Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
@@ -185,7 +188,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
     private int pageNum = 1;
 	private int pageSize = 20;
 	protected PaginatedList searchResult;
-
+	
 	public void setPage(final int pageNum) {
 		this.pageNum = pageNum;
 	}
@@ -255,7 +258,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		this.receiptNo = receiptNo;
 	}
 
-    @Action(value = "/receipts/chequeRemittance-newform")
+	@Action(value = "/receipts/chequeRemittance-newform")
     @SkipValidation
     public String newform() {
         populateRemittanceList();
@@ -290,25 +293,25 @@ public class ChequeRemittanceAction extends BaseFormAction {
     @SkipValidation
     public String listData() {
     	String serviceTId = getServiceTypeId();
-    	System.out.println("LIST DATA ACTION >>>>"+serviceTId);
+		System.out.println("LIST DATA ACTION >>>>" + serviceTId);
 
-        isListData = true;
+		isListData = true;
+		
+		populateRemittanceList();
 
-        populateRemittanceList();
-
-        if (fromDate != null && toDate != null && toDate.before(fromDate))
-            addActionError(getText("bankremittance.before.fromdate"));
-
-			
+		if (fromDate != null && toDate != null && toDate.before(fromDate))
+			addActionError(getText("bankremittance.before.fromdate"));
+		
+		
 			if (getServiceTypeId().equalsIgnoreCase("") || getServiceTypeId().equalsIgnoreCase("-1")
 					|| getServiceTypeId().equalsIgnoreCase(" ")) {
-			        setServiceTypeId(null);
-			        }	
-				
-				if(deptId==null || deptId.equals("")) {
-					deptId="-1";
-					setDeptId("-1");
-				}
+				setServiceTypeId(null);
+			}
+
+			if (deptId == null || deptId.equals("")) {
+				deptId = "-1";
+				setDeptId("-1");
+			}
 			/*
 			 * resultList =
 			 * remittanceService.findCashRemittanceDetailsForServiceAndFund("MISCELLANEOUS",
@@ -350,11 +353,11 @@ public class ChequeRemittanceAction extends BaseFormAction {
 			} else {
 				searchResult.getList().clear();
 				searchResult.getList().addAll(receiptBeanList);
-    			}
+			}
 
 			resultListNew = searchResult.getList();
 		
-        return NEW;
+		return NEW;
             
     }
 
@@ -399,6 +402,8 @@ public class ChequeRemittanceAction extends BaseFormAction {
         //addDropdownData("serviceTypeList", microserviceUtils.getBusinessService("Finance"));
         addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
         addDropdownData("departmentList", masterDataCache.get("egi-department"));
+        addDropdownData("functionList", masterDataCache.get("egi-function"));
+		addDropdownData("bankaccountNumberList", remittanceService.getallBank());
 		
 		  List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "receipt_sub_divison");
 		
@@ -417,26 +422,53 @@ public class ChequeRemittanceAction extends BaseFormAction {
     @Action(value = "/receipts/chequeRemittance-create")
     public String create() {
         List<ReceiptBean> eblist=new ArrayList<ReceiptBean>();
+        String receiptNumbers="";
 		for(ReceiptBean f: finalBeanList)
-        {
+		{
 			if(f.getSelected()!=null)
-        	{
+			{
 				eblist.add(f);
-        	}
-        }
+				
+				if(receiptNumbers.equalsIgnoreCase(""))
+					receiptNumbers=f.getReceiptNumber();
+				else
+					receiptNumbers+=","+f.getReceiptNumber();
+			}
+		}
 		System.out.println("selectfinalList ---->>> "+eblist);
 		System.out.println("finalList>>>>>>>" + finalBeanList + ".............." + accountNumberId + ".............."
 				+ remittanceDate);
 		final long startTimeMillis = System.currentTimeMillis();
-        List<RemitancePOJO> re = getRemittance();
-        System.out.println("::::::re Size::: "+re.size());
-		List<ReceiptBean> receipts =null;
-
-		receipts =remittanceService.createChequeBankRemittance(eblist, re, remittanceDate,narration);
+		List<RemitancePOJO> re = getRemittance();
+		System.out.println("::::::re Size::: " + re.size());
+		ReceiptBean receipts =null;
+		
+		receipts=remittanceService.createChequeBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers);
 		//List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
-        final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
+		if(receipts!=null)
+		{
+			try 
+			{
+				for(ReceiptBean f: finalBeanList)
+				{
+					if(f.getSelected()!=null)
+					{
+						eblist.add(f);
+						persistenceService.getSession()
+		                .createSQLQuery(
+		                        "update mis_receipts_details set payment_status = 'DEPOSITED' where receipt_number ='"+f.getReceiptNumber()+"'")
+		                .executeUpdate();
+					}
+				}
+			}
+            catch(Exception e)
+            {
+            	e.printStackTrace();
+            }
+		}
+		final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
-        bankRemittanceList = remittanceService.prepareCashRemittanceReportNew(eblist);
+        bankRemittanceList = remittanceService.prepareChequeRemittanceReport(receipts);
 		
 		/*
 		 * if (getSession().get(REMITTANCE_LIST) != null)
@@ -453,7 +485,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		 * getSum(finalList);
 		 */
 		
-        
+				 
 		// end
         return INDEX;
     }
@@ -926,5 +958,31 @@ public class ChequeRemittanceAction extends BaseFormAction {
 	public void setNarration(String narration) {
 		this.narration = narration;
 	}
+
+	public String getDeptIdnew() {
+		return deptIdnew;
+	}
+
+	public void setDeptIdnew(String deptIdnew) {
+		this.deptIdnew = deptIdnew;
+	}
+
+	public String getFunctionNew() {
+		return functionNew;
+	}
+
+	public void setFunctionNew(String functionNew) {
+		this.functionNew = functionNew;
+	}
+
+	public String getSubdivisonNew() {
+		return subdivisonNew;
+	}
+
+	public void setSubdivisonNew(String subdivisonNew) {
+		this.subdivisonNew = subdivisonNew;
+	}
+
+	
 
 }

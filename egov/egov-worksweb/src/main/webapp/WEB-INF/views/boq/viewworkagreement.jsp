@@ -56,10 +56,6 @@
 						<form:input type="text" class="form-control" path="work_agreement_number" readonly="true" />
 					</div>
 					
-					<c:if test="${ProjectModInitiated == 'Project Modification Initiated'}">
-						<a href="#" onclick="openWork('${workOrderAgreement.id}')">Extension History</a>
-					</c:if>
-					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.start.date" /></label>
 					<div class="col-sm-3 add-margin">
@@ -89,15 +85,43 @@
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
+					code="lbl.estimate.preparation.works.wing" /></label>
+			<div class="col-sm-3 add-margin">
+				<form:select path="worksWing" id="worksWing" cssClass="form-control"
+					cssErrorClass="form-control error" readonly="true" disabled="true">
+					<form:option value="">
+						<spring:message code="lbl.select" />
+					</form:option>
+					<form:options items="${workOrderAgreement.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+					
+				</form:select>
+			</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="department" id="department" readonly="true"
-							class="form-control" required="required">
+							class="form-control" required="required" disabled="true">
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
-							<form:options items="${workOrderAgreement.departments}"
+							<form:options items="${workOrderAgreement.newdepartments}"
 								itemValue="code" itemLabel="name" />
+							<%-- <form:options items="${workOrderAgreement.departments}"
+								itemValue="code" itemLabel="name" /> --%>
+						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-left-audit">Sub-Division</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control"
+							cssErrorClass="form-control error" readonly="true" disabled="true">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${workOrderAgreement.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
+							
 						</form:select>
 					</div>
 
@@ -324,7 +348,7 @@
 							<th><c:out value="${mapboq.key}"/></th>
 							</tr>
 							<tr>
-								<th><spring:message code="lbl.item.Milestone" /></th>	
+								<%-- <th><spring:message code="lbl.item.Milestone" /></th>	 --%>
 									<th><spring:message code="lbl.item.description" /></th>
 									<th><spring:message code="lbl.ref.dsr" /></th>
 									<th><spring:message code="lbl.unit" /></th>
@@ -345,15 +369,14 @@
 										<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
-								<form:input type="text" style="width:150px;"
-											path="boQDetailsList[${boq.sizeIndex}].milestone"
-											id="boQDetailsList[${boq.sizeIndex}].milestone"
-											required="required" readonly="true" class="form-control milestone" title="${boq.milestone}"></form:input></td>
-									<td><form:input type="text" style="width:200px;"
+								<form:hidden path="boQDetailsList[${boq.sizeIndex}].milestone"
+											id="boQDetailsList[${boq.sizeIndex}].milestone"/>
+								<form:textarea type="text" style="height: 100px;"
 											path="boQDetailsList[${boq.sizeIndex}].item_description"
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 											required="required" readonly="true" class="form-control item_description"
-											 title="${boq.item_description}"></form:input></td>
+											 title="${boq.item_description}"></form:textarea></td>
+									
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"

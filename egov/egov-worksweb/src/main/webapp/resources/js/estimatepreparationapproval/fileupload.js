@@ -1,4 +1,4 @@
-var maxSize = 2097152;
+var maxSize = 52428800;
 var inMB = maxSize/1024/1024;
 var fileformatsinclude = ['doc','docx','xls','xlsx','rtf','pdf','jpeg','jpg','png','txt','zip','dxf'];
 
@@ -35,10 +35,10 @@ function getTotalFileSize() {
     var trNo = (tbody.childElementCount ? tbody.childElementCount : tbody.childNodes.length) + 1;
     var totalSize = 0;
     for(var i = 1; i < trNo; i++) {
-        totalSize += $("#file1"+i)[0].files[0].size; // in bytes
+        totalSize += $("#file"+i)[0].files[0].size; // in bytes
         if(totalSize > maxSize) {
             bootbox.alert('File size should not exceed '+ inMB +' MB!');
-            $("#file1"+i).val('');
+            $("#file"+i).val('');
             return;
         }
     }

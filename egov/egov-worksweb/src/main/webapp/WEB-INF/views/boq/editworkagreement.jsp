@@ -6,7 +6,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
-<c:set var="contextPath" value="${pageContext.request.contextPath}"/>
 <style>
 .table thead > tr > th {
     color: black;
@@ -17,31 +16,17 @@
     color: black;
     vertical-align: top;
 }
-
-.popup {
-    display: inline-block;
-}
-.popup .popuptext {
-    visibility: hidden;
-   /*  background-color: #b1b1b1;
-    text-align: right;
-    border-radius: 6px;
-    padding: 20px; */
-}
-.popup .show {
-    visibility: visible;
-    -webkit-animation: fadeIn 1s;
-    animation: fadeIn 1s;
-}
-</style> 
+</style>
 <script>
-	
-</script>
+  $( function() {
+    $( "#work_start_date" ).datepicker();
+    $( "#work_intended_date" ).datepicker();
+    $( "#actual_start_date" ).datepicker();
+    $( "#actual_end_date" ).datepicker();
+  } );
+  </script>   
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
-<%-- <form:input type="hidden" class="form-control" path="estId"  /> --%>
-
-	
 <form:form name="workOrderAgreementForm" role="form" method="post"
 	action="work1" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
@@ -54,6 +39,7 @@
 			<br />
 		</div>
 	</spring:hasBindErrors>
+
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="auditheader">
 			<div class="panel panel-primary" data-collapsed="0">
@@ -71,7 +57,6 @@
 							code="lbl.estimate.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input type="text" class="form-control" path="work_number"  />
-						
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
@@ -79,50 +64,49 @@
 						<form:input type="text" class="form-control" path="work_agreement_number"  />
 					</div>
 					
-					<c:if test="${ProjectModInitiated == 'Project Modification Initiated'}">
-						<a href="#" onclick="openWork('${workOrderAgreement.id}')">Extension History</a>
-					</c:if>
-					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.start.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="work_start_date" path="work_start_date"
-							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.intended.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="work_intended_date" path="work_intended_date"
-							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualstart.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="actual_start_date" path="actual_start_date"
-							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
+							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
-							
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualend.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="actual_end_date" path="actual_end_date" onblur="pop()"
-							class="form-control datepicker" data-provide="datepicker" data-date-end-date="0d"
+						<form:input id="actual_end_date" path="actual_end_date"
+							class="form-control datepicker" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
-					<div style="text-align:center;"> 
-					 <div class="popup">
-					    <span class="popuptext" id="myPopup">
-					     <!--  <input type="text" id="reason" name="reason" required="required"/> -->
-					     <div class="form-group purple-border">
-						  <label for="exampleFormControlTextarea4"><spring:message
-							code="lbl.reason.extenstion" /></label>
-						  <textarea class="form-control" id="reason" name="reason" required="required" rows="3"></textarea>
-						</div>
-					    </span>
- 						 </div>
+					<label class="col-sm-3 control-label text-left-audit1"><spring:message
+							code="lbl.estimate.preparation.works.wing" /><span class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="worksWing" id="worksWing"
+							cssClass="form-control"
+							cssErrorClass="form-control-works error" required="required">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${workOrderAgreement.workswings}"
+								itemValue="id" itemLabel="workswingname" />
+							<%-- <form:option value="Building & Roads">Building & Roads</form:option>
+							<form:option value="Public Health">Public Health</form:option>
+							<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
+						</form:select>
  						 </div> 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.executing.department" /><span class="mandatory"></span></label>
@@ -132,11 +116,26 @@
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
-							<form:options items="${workOrderAgreement.departments}"
+							<form:options items="${workOrderAgreement.newdepartments}"
 								itemValue="code" itemLabel="name" />
+							<%-- <form:options items="${workOrderAgreement.departments}"
+								itemValue="code" itemLabel="name" /> --%>
 						</form:select>
 					</div>
+				<label class="col-sm-3 control-label text-left-audit">Sub-Division<span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="subdivision" id="subdivision"
+							cssClass="form-control"
+							cssErrorClass="form-control-works error" required="required">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${workOrderAgreement.subdivisions}"
+								itemValue="id" itemLabel="subdivision" />
 
+						</form:select>
+						</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.amount.wrk" /></label>
 					<div class="col-sm-3 add-margin">
@@ -234,18 +233,22 @@
 							<form:option value="Badheri">Badheri </form:option>
 							<form:option value="Baterla">Baterla </form:option>
 							<form:option value="Attawa">Attawa </form:option>
-							<form:option value="Faidan Burail">Faidan Burail </form:option>
+							<form:option value="Faidan">Faidan</form:option>
 							<form:option value="Char Taraf Burail">Char Taraf Burail </form:option>
-							<form:option value="Kajheri Hallo Majra">Kajheri Hallo Majra </form:option>
-							<form:option value="Bohlana">Bohlana </form:option>
+							<form:option value="Kajhri">Kajhri</form:option>
+							<form:option value="Behlana">Behlana </form:option>
 							<form:option value="Raipur Khurd">Raipur Khurd </form:option>
 							<form:option value="Raipur Kalan">Raipur Kalan </form:option>
 							<form:option value="Makhan Majra">Makhan Majra </form:option>
 							<form:option value="Mauli Jagran">Mauli Jagran </form:option>
 							<form:option value="Daria">Daria </form:option>
-							<form:option value="Mani Majara">Mani Majara </form:option>
+							<form:option value="Manimajra">Manimajra</form:option>
 							<form:option value="Indusrial Area Phase I">Indusrial Area Phase I </form:option>
 							<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>
+							<form:option value="SECTOR 56">SECTOR 56</form:option>
+							<form:option value="RAMDERVAR">RAMDERVAR</form:option>
+							<form:option value="BURAIL">BURAIL</form:option>
+							<form:option value="HALLOMAJRA">HALLOMAJRA</form:option>
 								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -281,6 +284,7 @@
 									<form:option value="23">23</form:option>
 									<form:option value="24">24</form:option>
 									<form:option value="25">25</form:option>
+									<form:option value="26">26</form:option>
 								</form:select>
 							</div>
 
@@ -445,17 +449,85 @@
 				</div>
 
 				<br>
+				<div style="display :none; " >
+					<c:forEach var="mapboq" items="${uploadDocument}"
+						varStatus="mapstatus">
+						<table id="boq${mapstatus.index}tableBoq"
+							class="table table-bordered tableBoq">
+							<thead>
+								<tr>
+									<th><c:out value="${mapboq.key}" /></th>
+								</tr>
+								<tr>
+
+									<th>ID</th>
+									<th>ObjectId</th>
+									<th>File store id</th>
+									<th>objectType</th>
+									<th>comments</th>
+									<th>user</th>
+
+								</tr>
+							</thead>
+							<tbody>
+								<c:forEach var="boq" items="${mapboq.value}" varStatus="status">
+									
+										<tr id="boq${mapstatus.index}tableBoqrow"
+											class="boq${status.index}repeat-address">
+											
+
+											<td><form:input type="number" style="width:75px; "
+													path="docUpload[${boq.id}].id"
+													id="docUpload[${boq.id}].id" required="required"
+													readonly="true" class="form-control item_description"
+													title="${boq.id}" value="${boq.id}"></form:input></td>
+											<td><form:input type="number" style="width:75px;"
+													path="docUpload[${boq.id}].objectId"
+													id="docUpload[${boq.id}].objectId" required="required"
+													readonly="true" class="form-control ref_dsr"
+													title="${boq.objectId}" value="${boq.objectId}"></form:input></td>
+											<td><form:input type="text" style="width:80px;"
+													path="docUpload[${boq.id}].objectType"
+													id="docUpload[${boq.id}].objectType" required="required"
+													readonly="true" class="form-control ref_dsr" value="${boq.objectType}"></form:input></td>
+											<td><form:input type="text" style="width:100px;"
+													path="docUpload[${boq.id}].filestoreid"
+													id="docUpload[${boq.id}].filestoreid" required="required"
+													readonly="true" class="form-control ref_dsr" value="${boq.filestoreid}"></form:input></td>
+											<td><form:input type="text" style="width:100px;"
+													path="docUpload[${boq.id}].comments"
+													id="docUpload[${boq.id}].comments" required="required"
+													readonly="true" class="form-control ref_dsr" value="${boq.comments}"></form:input></td>
+											<td><form:input type="text" style="width:100px;"
+												path="docUpload[${boq.id}].username"
+												id="docUpload[${boq.id}].username" required="required"
+												readonly="true" class="form-control ref_dsr"
+												value="${boq.username}"></form:input></td>
+										</tr>
+								</c:forEach>
+							</tbody>
+						</table>
+					</c:forEach>
+					
+				</div>
 				<div>
 
-					<c:if test="${fileuploadAllowed != 'Y' }">
+					<c:if test="${editable != 'N' }">
 					<a target="_blank" style="float:right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img style="height:30px;" title="BoQ Upload Format" src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 					<br>
-					<input type="file" name="file" style="color: #000000;"> <br>
+					<input type="file" name="file" id="fileboq" style="color: #000000;"> <br>
 					<br>
+					<h4 style="color: #000000;">
+							Boq Upload Remarks:<span class="mandatory"></span>
+						</h4>
+						<div>
+							<form:textarea class="form-control-works" style="height: 80px;"
+								path="comments" id="comments" maxlength="500" />
+						</div>
 					<div class="buttonbottom" align="center">
 						<input type="submit" id="save" class="btn btn-primary" name="save"
-							value="Upload" /> <br>
+							value="Upload" onclick="return ConfirmDelete();"/> <br>
 					</div>
 					</c:if>
 					
@@ -471,14 +543,14 @@
 							<th><c:out value="${mapboq.key}"/></th>
 							</tr>
 							<tr>
-								<th><spring:message code="lbl.item.Milestone" /></th>	
+								<%-- <th><spring:message code="lbl.item.Milestone" /></th>	 --%>
 								<th><spring:message code="lbl.item.description" /></th>
 								<th><spring:message code="lbl.ref.dsr" /></th>
 								<th><spring:message code="lbl.unit" /></th>
 								<th><spring:message code="lbl.rate" /></th>
 								<th><spring:message code="lbl.quantity" /></th>
 								<th><spring:message code="lbl.amount" /></th>
-								<th><spring:message code="lbl.action" /></th>
+								<%-- <th><spring:message code="lbl.action" /></th> --%>
 							</tr>
 						</thead>
 						
@@ -493,44 +565,45 @@
 								<td>
 								<form:hidden path="boQDetailsList[${boq.sizeIndex}].slNo"
 												id="boQDetailsList[${boq.sizeIndex}].slNo" />
-								<form:input type="text" style="width:150px;"
+								<form:hidden 
 											path="boQDetailsList[${boq.sizeIndex}].milestone"
 											id="boQDetailsList[${boq.sizeIndex}].milestone"
-											required="required"  class="form-control milestone" title="${boq.milestone}"></form:input></td>
-									<td><form:input type="text" style="width:200px;"
+											></form:hidden>
+								<form:textarea type="text" style="height: 100px;"
 											path="boQDetailsList[${boq.sizeIndex}].item_description"
 											id="boQDetailsList[${boq.sizeIndex}].item_description"
 											required="required"  class="form-control item_description"
-											 title="${boq.item_description}"></form:input></td>
+											 title="${boq.item_description}" readonly="true"></form:textarea></td>
+									
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											id="boQDetailsList[${boq.sizeIndex}].ref_dsr"
 											required="required" class="form-control ref_dsr"
-											maxlength="200" title="${boq.ref_dsr}"></form:input></td>
+											maxlength="200" title="${boq.ref_dsr}" readonly="true"></form:input></td>
 									<td><form:input type="text" style="width:80px;"
 											path="boQDetailsList[${boq.sizeIndex}].unit"
 												id="boQDetailsList[${boq.sizeIndex}].unit"
 												required="required"  class="form-control unit"
-												maxlength="200"></form:input></td>
+												maxlength="200" readonly="true"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].rate" step=".01"
 												id="boQDetailsList[${boq.sizeIndex}].rate"
 												required="required"  class="form-control rate"
-												onchange="valueChanged()"></form:input></td>
+												onchange="valueChanged()" readonly="true"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].quantity" step=".01"
 											id="boQDetailsList[${boq.sizeIndex}].quantity"
 											required="required"  class="form-control quantity"
-											name="quantity" onchange="valueChanged()"></form:input></td>
+											name="quantity" onchange="valueChanged()" readonly="true"></form:input></td>
 									<td><form:input type="number" style="width:100px;"
 											path="boQDetailsList[${boq.sizeIndex}].amount"
 											id="boQDetailsList[${boq.sizeIndex}].amount"
 											required="required"  class="form-control amount"
-											maxlength="200" name="amount" ></form:input></td>
-									 <td class="text-center"><span style=" cursor:pointer;  color: black;" onclick="addcheckListRow(${mapstatus.index});" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
+											maxlength="200" name="amount" readonly="true"></form:input></td>
+									<%--  <td class="text-center"><span style=" cursor:pointer;  color: black;" onclick="addcheckListRow(${mapstatus.index});" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 				<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick="$(this).closest('tr').remove();"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
 				 		
-				 				 </td> 
+				 				 </td>  --%>
 			
 								</tr>
 							</c:forEach>
@@ -543,6 +616,10 @@
 				</c:forEach>
 						</c:if>
 					</div>
+				</div>
+				<div class="panel-title">Boq Upload Details</div>
+				<div>
+					<jsp:include page="RoughWorkfileupload2.jsp" />
 				</div>
 			</div>
 		</div>
@@ -561,59 +638,16 @@
 
 	</div>
 </form:form>
-	<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="myModalLabel">Reason</h4>
-            </div>
-            <div class="modal-body">
-            <div class="form-group">
-	            <label for="message-text" class="col-form-label">Reason:</label>
-	            <textarea class="form-control" id="reason" path="reason" id="message-text"></textarea>
-	          </div>
-          <!--       <input type="text" path="reason" id="reason" required="true"> -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Ok</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!--  <button class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal">
-    </button>   -->
-    
-  
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script type="text/javascript">
-function openWork(woId)
-{
-	var url = "/services/works/timeExt/viewdata/"+ woId;
-	window.open(url,'','width=900, height=700');
-}
+$(document).ready(function() {
 
-	
-function pop() {
-/* 	alert("ok"); */
-    var popup = document.getElementById('myPopup');
-    popup.classList.toggle('show');
-}
-	
-/*  $(document).ready(function () {
-    // Attach Button click event listener 
-   $("#actual_end_date").keyup(function(){
-	   alert("open model");
-        // show Modal
-        $('#myModal').modal('show');
+	$('#comments').val('');
    });
-});  */
-
-
 	
 	function getContractorDetails(obj){
 		var id=obj.value;

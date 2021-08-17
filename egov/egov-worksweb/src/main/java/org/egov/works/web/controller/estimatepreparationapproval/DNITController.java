@@ -67,6 +67,7 @@ import org.egov.works.estimatepreparationapproval.service.DNITCreationService;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkDnitService;
 import org.egov.works.workestimate.service.WorkEstimateService;
+import org.python.icu.text.RuleBasedBreakIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -747,6 +748,15 @@ private static Map<String, String> map;
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 			//error=false;
+				Row row = firstSheet.getRow(0);
+				System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
+						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
+						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -769,19 +779,26 @@ private static Map<String, String> map;
 					}
 				
 			Iterator<Row> iterator = firstSheet.iterator();
-				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
 				
+			first:	
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 				while (cellIterator.hasNext()) {
+					int erow = nextRow.getRowNum()+1;
+					if(erow>250) {
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 250 items are allowed. ";
+						break first;
+					}
 					Cell cell = (Cell) cellIterator.next();
 					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 						System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
 						error=true;
-						msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Blank column check row "+erow;
+						break first;
 
 					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
@@ -795,6 +812,13 @@ private static Map<String, String> map;
 							
 							aBoQDetails.setItem_description(cell.getStringCellValue());
 							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+							int length = cell.getStringCellValue().length();
+							System.out.println("item Description length   "+length);
+							if(cell.getStringCellValue().length()>10000) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Item Description exceeds 10000 character limit.Check Row "+erow;
+								break first;
+							}
 							
 						} else if (cell.getColumnIndex() == 2) {
 							
@@ -811,7 +835,8 @@ private static Map<String, String> map;
 								
 								if(aBoQDetails.getQuantity()==null ) {
 									error=true;
-									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check Row number "+erow;
+								break first;
 								}
 								
 							}
@@ -830,9 +855,10 @@ Double d = cell.getNumericCellValue();
 								 
 							String[] splitter = d.toString().split("\\.");
 							
-							if(splitter[1].length()>2) {
+							if(splitter[1].length()>4) {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal place are allowed in Rate and Quantity.Check row number "+erow;
+								break first;
 							}
 						} else if (cell.getColumnIndex() == 5) {
 							
@@ -841,16 +867,18 @@ Double d = cell.getNumericCellValue();
 							String[] splitter = d.toString().split("\\.");
 							
 							//System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa: "+aBoQDetails.getQuantity());
-							if(splitter[1].length()>2) {
+							if(splitter[1].length()>4) {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal place are allowed in Rate and Quantity.Check row number "+erow;
+							break first;
 							}
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-							msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+							msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row number "+erow;
+							break first;
 							}
 						}
 
@@ -868,7 +896,7 @@ Double d = cell.getNumericCellValue();
 
 					}
 				}
-				
+	
 			}
 
 			// workbook.close();
@@ -1536,7 +1564,7 @@ if (id !=null && id != "" && slno!= null && slno!="" ) {
 		}
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
-estimateDetails.setEstimateAmount(estimateDetails.getEstimateAmount());
+estimateDetails.setEstimateAmount(estimateDetails.getEstimateAmount().setScale(2,BigDecimal.ROUND_HALF_UP));
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
@@ -1710,6 +1738,15 @@ Long userId = estimatePreparationApprovalService.getUserId();
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 				//error=false;
+				Row row = firstSheet.getRow(0);
+				System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
+						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
+						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -1732,19 +1769,26 @@ Long userId = estimatePreparationApprovalService.getUserId();
         }
         
 				Iterator<Row> iterator = firstSheet.iterator();
-				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
 				
+			first:	
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 				while (cellIterator.hasNext()) {
+					int erow = nextRow.getRowNum()+1;
+					if(erow>250) {
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 250 items are allowed. ";
+						break first;
+					}
 					Cell cell = (Cell) cellIterator.next();
 					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 						System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
 						error=true;
-						msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Blank Column in row number "+erow;
+						break first;
         
 					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
@@ -1758,6 +1802,13 @@ Long userId = estimatePreparationApprovalService.getUserId();
 	   
 							aBoQDetails.setItem_description(cell.getStringCellValue());
 							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+							int length = cell.getStringCellValue().length();
+							System.out.println("item Description length   "+length);
+							if(cell.getStringCellValue().length()>10000) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Item Description exceeds 10000 character limit.Check Row "+erow;
+								break first;
+							}
 	   
 						} else if (cell.getColumnIndex() == 2) {
 	   
@@ -1774,7 +1825,8 @@ Long userId = estimatePreparationApprovalService.getUserId();
 								
 								if(aBoQDetails.getQuantity()==null ) {
 									error=true;
-									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row number "+erow;
+									break first;
 								}
 								
 							}
@@ -1793,9 +1845,10 @@ Double d = cell.getNumericCellValue();
 							
 							String[] splitter = d.toString().split("\\.");
 	   
-							if(splitter[1].length()>2) {
+							if(splitter[1].length()>4) {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal places are allowed in Rate and Quantity check row number "+erow;
+								break first;
 							}
 						} else if (cell.getColumnIndex() == 5) {
 	   
@@ -1804,16 +1857,18 @@ Double d = cell.getNumericCellValue();
 							String[] splitter = d.toString().split("\\.");
 	   
 							//System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa: "+aBoQDetails.getQuantity());
-							if(splitter[1].length()>2) {
+							if(splitter[1].length()>4) {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal places are allowed in Rate and Quantity check row number "+erow;
+								break first;
 							}
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row number "+erow;
+								break first;
 							}
 						}
         
@@ -2059,6 +2114,15 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 	//			Sheet firstSheet = workbook.getSheetAt(0);
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 				//error=false;
+				Row row = firstSheet.getRow(0);
+				System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
+						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
+						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -2081,19 +2145,26 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 					}
 				
 				Iterator<Row> iterator = firstSheet.iterator();
-				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
 				
+			first:	
 			while (iterator.hasNext()) {
 				Row nextRow = iterator.next();
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 				BoQDetails aBoQDetails = new BoQDetails();
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 				while (cellIterator.hasNext()) {
+					int erow = nextRow.getRowNum()+1;
+					if(erow>250) {
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 250 items are allowed. ";
+						break first;
+					}
 					Cell cell = (Cell) cellIterator.next();
 					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 						System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
 						error=true;
-						msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Blank Column in row number "+erow;
+						break first;
 
 					   }
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
@@ -2107,6 +2178,13 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 	   
 							aBoQDetails.setItem_description(cell.getStringCellValue());
 							//boqDetailsPop.setItem_description(cell.getStringCellValue());
+							int length = cell.getStringCellValue().length();
+							System.out.println("item Description length   "+length);
+							if(cell.getStringCellValue().length()>10000) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Item Description exceeds 10000 character limit.Check Row "+erow;
+								break first;
+							}
 	   
 						} else if (cell.getColumnIndex() == 2) {
 	   
@@ -2123,7 +2201,8 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 								
 								if(aBoQDetails.getQuantity()==null ) {
 									error=true;
-									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row number "+erow;
+									break first;
 								}
 								
 							}
@@ -2142,9 +2221,10 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 	   
 							String[] splitter = d.toString().split("\\.");
 							
-							if(splitter[1].length()>2) {
+							if(splitter[1].length()>4) {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal places are allowed in Rate and Quantity check row number "+erow;
+								break first;
 							}
 						} else if (cell.getColumnIndex() == 5) {
 	   
@@ -2153,16 +2233,18 @@ System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
 							String[] splitter = d.toString().split("\\.");
 	   
 							//System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa: "+aBoQDetails.getQuantity());
-							if(splitter[1].length()>2) {
+							if(splitter[1].length()>4) {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 decimal places are allowed in Rate and Quantity check row number "+erow;
+								break first;
 							}
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
 							estAmt=estAmt+aBoQDetails.getAmount();
 							}else {
 								error=true;
-								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.";
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row number "+erow;
+								break first;
 							}
 						}
 

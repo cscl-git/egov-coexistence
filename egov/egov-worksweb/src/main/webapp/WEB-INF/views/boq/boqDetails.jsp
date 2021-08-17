@@ -21,7 +21,15 @@
     color: black;
     vertical-align: top;
 }
-</style>        
+</style>
+<script>
+  $( function() {
+    $( "#work_start_date" ).datepicker();
+    $( "#work_intended_date" ).datepicker();
+    $( "#actual_start_date" ).datepicker();
+    $( "#actual_end_date" ).datepicker();
+  } );
+  </script>        
 <form:form name="workOrderAgreementForm" role="form" method="post"
 	action="/services/works/boq/work" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
@@ -45,7 +53,9 @@
 			</c:if>
 				<div class="form-group" style="padding: 50px 20px 0;">
 					<input type="hidden" name="workOrderAgreement"
-						value="${workOrderAgreement.id}" /> <label
+						value="${workOrderAgreement.id}" /> 
+						<form:input type="hidden" path="workfrom" value="${workOrderAgreement.workfrom}"
+						 /><label
 						class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.name.work" /></label>
 					<div class="col-sm-9 add-margin">
@@ -99,7 +109,7 @@
 							placeholder="DD/MM/YYYY" />
 					</div>
 					
-	<label class="col-sm-3 control-label text-left-audit1"><spring:message
+	<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.preparation.works.wing" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="worksWing" id="worksWing"
@@ -132,7 +142,7 @@
 								itemValue="code" itemLabel="name" /> --%>
 						</form:select>
 					</div>
-					<label class="col-sm-3 control-label text-left-audit1">Sub-Division<span
+					<label class="col-sm-3 control-label text-left-audit">Sub-Division<span
 						class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="subdivision" id="subdivision"
@@ -245,18 +255,22 @@
 							<form:option value="Badheri">Badheri </form:option>
 							<form:option value="Baterla">Baterla </form:option>
 							<form:option value="Attawa">Attawa </form:option>
-							<form:option value="Faidan Burail">Faidan Burail </form:option>
+							<form:option value="Faidan">Faidan</form:option>
 							<form:option value="Char Taraf Burail">Char Taraf Burail </form:option>
-							<form:option value="Kajheri Hallo Majra">Kajheri Hallo Majra </form:option>
-							<form:option value="Bohlana">Bohlana </form:option>
+							<form:option value="Kajhri">Kajhri</form:option>
+							<form:option value="Behlana">Behlana </form:option>
 							<form:option value="Raipur Khurd">Raipur Khurd </form:option>
 							<form:option value="Raipur Kalan">Raipur Kalan </form:option>
 							<form:option value="Makhan Majra">Makhan Majra </form:option>
 							<form:option value="Mauli Jagran">Mauli Jagran </form:option>
 							<form:option value="Daria">Daria </form:option>
-							<form:option value="Mani Majara">Mani Majara </form:option>
+							<form:option value="Manimajra">Manimajra</form:option>
 							<form:option value="Indusrial Area Phase I">Indusrial Area Phase I </form:option>
 							<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>
+							<form:option value="SECTOR 56">SECTOR 56</form:option>
+							<form:option value="RAMDERVAR">RAMDERVAR</form:option>
+							<form:option value="BURAIL">BURAIL</form:option>
+							<form:option value="HALLOMAJRA">HALLOMAJRA</form:option>
 								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -292,6 +306,7 @@
 									<form:option value="23">23</form:option>
 									<form:option value="24">24</form:option>
 									<form:option value="25">25</form:option>
+									<form:option value="26">26</form:option>
 								</form:select>
 							</div>
 
@@ -475,11 +490,11 @@
 						varStatus="mapstatus">
 						<table id="boq${mapstatus.index}tableBoq"
 							class="table table-bordered tableBoq">
-						<thead>
+							<thead>
 								<tr>
-							 <th><c:out value="${mapboq.key}"/></th> 
-							</tr>
-							<tr>
+									<th><c:out value="${mapboq.key}" /></th>
+								</tr>
+								<tr>
 
 									<th>ID</th>
 									<th>ObjectId</th>
@@ -496,7 +511,7 @@
 										<tr id="boq${mapstatus.index}tableBoqrow"
 											class="boq${status.index}repeat-address">
 											
-					
+
 											<td><form:input type="number" style="width:75px; "
 													path="docUpload[${boq.id}].id"
 													id="docUpload[${boq.id}].id" required="required"
@@ -527,7 +542,7 @@
 										</tr>
 								</c:forEach>
 							</tbody>
-					</table>
+						</table>
 					</c:forEach>
 					
 				</div>
@@ -535,34 +550,34 @@
 
 					
 						<%-- <div>
-					
-					
+
+
 							 <table class="table table-bordered tableBoq" id="tblchecklist">
-				
-				
-				
-							<thead>
-
-							<tr>
-								<th><spring:message code="lbl.item.Milestone" /></th>	
-									<th><spring:message code="lbl.item.description" /></th>
-									<th><spring:message code="lbl.ref.dsr" /></th>
-									<th><spring:message code="lbl.unit" /></th>
-									<th><spring:message code="lbl.rate" /></th>
-									<th><spring:message code="lbl.quantity" /></th>
-									<th><spring:message code="lbl.amount" /></th>
-									<th><spring:message code="lbl.action" /></th>
-								</tr>
-							</thead> 
 
 
-							<tbody>
-						
-											 
-								
+
+								<thead>
+
+									<tr>
+										<th><spring:message code="lbl.item.Milestone" /></th>
+										<th><spring:message code="lbl.item.description" /></th>
+										<th><spring:message code="lbl.ref.dsr" /></th>
+										<th><spring:message code="lbl.unit" /></th>
+										<th><spring:message code="lbl.rate" /></th>
+										<th><spring:message code="lbl.quantity" /></th>
+										<th><spring:message code="lbl.amount" /></th>
+										<th><spring:message code="lbl.action" /></th>
+									</tr>
+								</thead>
+
+
+								<tbody>
+
+
+
 									<tr id="tblchecklistRow">
 										<c:if test="${mapboq.key == boq.milestone }">
-										
+
 										<td><form:input type="text" style="width:150px;"
 												path="boQDetailsList[0].milestone"
 												id="boQDetailsList[0].milestone"
@@ -590,7 +605,7 @@
 										<td><form:input type="number" style="width:100px;"
 												path="boQDetailsList[0].amount"
 												id="boQDetailsList[0].amount" class="form-control amount"
-											maxlength="200" name="amount" ></form:input></td>
+												maxlength="200" name="amount"></form:input></td>
 										<td class="text-center"><span
 											style="cursor: pointer; color: black;"
 											onclick="addcheckListRow2(this);" tabindex="0"
@@ -604,19 +619,20 @@
 												title="" data-original-title="Delete!"></i></span></td>
 
 									</tr>
-				 		
-			
-							</tbody>
+
+
+								</tbody>
 							</table>
 							<br>
-					
+
 						</div> --%>
+						<c:if test="${editable != 'N' }">
 						<a target="_blank" style="float: right;"
 							href="/services/works/resources/app/formats/BOQ_Upload_Format.xlsx"><img
 							style="height: 30px;" title="BoQ Upload Format"
 							src="/services/egi/resources/erp2/images/download.gif" border="0" /></a>
 						<br>
-						<input type="file" name="file" id="file1" style="color: #000000;">
+						<input type="file" name="file" id="fileboq" style="color: #000000;">
 						<br>
 						<br>
 						<h4 style="color: #000000;">
@@ -631,7 +647,7 @@
 							<input type="submit" id="save" class="btn btn-primary"
 								name="save" onclick="return ConfirmDelete();" value="Upload" /> <br>
 						</div>
-					
+					</c:if>
 					
 					<div>
 					<c:if test="${fileuploadAllowed == 'Y' }">
@@ -744,6 +760,10 @@
 						</c:if>
 					</div>
 				</div>
+				<div class="panel-title">Boq Upload Details</div>
+				<div>
+					<jsp:include page="RoughWorkfileupload1.jsp" />
+				</div>
 			</div>
 		</div>
 
@@ -763,6 +783,8 @@
 
 
 <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 

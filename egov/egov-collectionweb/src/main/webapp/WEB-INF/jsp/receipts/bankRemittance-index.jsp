@@ -61,13 +61,15 @@
 <%-- <tr>
 <td class="mainheading" colspan="6" align="center">Receipt(s) Remittance created successfully with  voucher:-<s:property value="%{finalList[0].remittanceVouherNumber}" /> &nbsp; & With Voucher Number:- <s:property value="%{voucherNumber}" /></b><br/></td>
 </tr> --%>
+<s:iterator value="%{bankRemittanceList}" status="s"> 
 <tr>
-<td class="mainheading" colspan="6" align="center">Receipt(s) Remittance created successfully</b><br/></td>
+<td class="mainheading" colspan="6" align="center">Receipt(s) Remittance created successfully with Voucher Number:- <s:property value="%{voucherNumber}" /></b><br/></td>
 </tr>
+</s:iterator>
 <tr>
 <td>&nbsp;</td>
 </tr>
-	<td align="center"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="tablebottom">
+	<%-- <td align="center"><table width="100%" border="0" cellpadding="0" cellspacing="0" class="tablebottom">
 		<tr>
 			<th class="bluebgheadtd" width="5%"> <s:text name="service.slNo.table.header"/></th>
 			<th class="bluebgheadtd" width="20%" >Voucher Number</th>
@@ -89,7 +91,7 @@
 		<s:hidden name="bank" value="%{bank}"/>
 		<s:hidden name="bankAccount" value="%{bankAccount}"/>
 		
-	</table></td>
+	</table></td> --%>
 </table>
 <br/>
 <div class="buttonbottom">

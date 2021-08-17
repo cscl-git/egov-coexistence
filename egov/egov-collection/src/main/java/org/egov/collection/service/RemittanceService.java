@@ -75,7 +75,7 @@ public abstract class RemittanceService implements Serializable {
     private DocumentUtils docUtils; // added abhishek 24032021
     @Autowired
     private static CommonDocumentUploadRepository documentUploadRepository;// added abhishek 24032021
-
+    
     public abstract List<Receipt> createCashBankRemittance(List<ReceiptBean> receiptList, final String accountNumberId,
             final Date remittanceDate);
 
@@ -118,23 +118,17 @@ public abstract class RemittanceService implements Serializable {
         return reportList;
     }
 
-    public List<CollectionBankRemittanceReport> prepareChequeRemittanceReport(final List<ReceiptBean> receiptHeaders) {
-        final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
-        for (final ReceiptBean receiptHead : receiptHeaders) {
+    public List<CollectionBankRemittanceReport> prepareChequeRemittanceReport(final ReceiptBean receiptHeaders) {
+    	final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
+       // for (final ReceiptBean receiptHead : receiptHeaders) {
             final CollectionBankRemittanceReport collBankRemitReport = new CollectionBankRemittanceReport();
-            if (receiptHead.getSelected() != null && receiptHead.getSelected()) {
-                collBankRemitReport.setChequeNo(receiptHead.getInstrumentNumber());
-                collBankRemitReport.setBranchName(receiptHead.getBankBranch());
-                collBankRemitReport.setBankName(receiptHead.getBank());
-                collBankRemitReport.setChequeDate(DateUtils.toDateUsingDefaultPattern(receiptHead.getInstrumentDate().split(" ")[0]));
-                collBankRemitReport.setPaymentMode(receiptHead.getInstrumentType());
-                collBankRemitReport.setAmount(receiptHead.getInstrumentAmount().doubleValue());
-                collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
-                collBankRemitReport.setReceiptDate(DateUtils.toDateUsingDefaultPattern(receiptHead.getReceiptDate().split(" ")[0]));
-                collBankRemitReport.setVoucherNumber(receiptHead.getRemittanceReferenceNumber());
-                reportList.add(collBankRemitReport);
-            }
-        }
+            //collBankRemitReport.setVoucherNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptDate(new Date(receiptHead.getReceiptDate()));
+            //collBankRemitReport.setServiceType(receiptHead.getServiceName());
+            collBankRemitReport.setVoucherNumber(receiptHeaders.getRemittanceVouherNumber());
+            reportList.add(collBankRemitReport);
+        //}
         return reportList;
     }
 
@@ -150,18 +144,18 @@ public abstract class RemittanceService implements Serializable {
         }
         return reportList;
     }
-
-    public List<CollectionBankRemittanceReport> prepareCashRemittanceReportNew(final List<ReceiptBean> receiptHeaders) {
+    
+    public List<CollectionBankRemittanceReport> prepareCashRemittanceReportNew(final ReceiptBean receiptHeaders) {
         final List<CollectionBankRemittanceReport> reportList = new ArrayList<CollectionBankRemittanceReport>(0);
-        for (final ReceiptBean receiptHead : receiptHeaders) {
+        //for (final ReceiptBean receiptHead : receiptHeaders) {
             final CollectionBankRemittanceReport collBankRemitReport = new CollectionBankRemittanceReport();
             //collBankRemitReport.setVoucherNumber(receiptHead.getReceiptNumber());
-            collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
-            collBankRemitReport.setReceiptDate(new Date(receiptHead.getReceiptDate()));
-            collBankRemitReport.setServiceType(receiptHead.getServiceName());
-            collBankRemitReport.setVoucherNumber(receiptHead.getRemittanceVouherNumber());
+            //collBankRemitReport.setReceiptNumber(receiptHead.getReceiptNumber());
+            //collBankRemitReport.setReceiptDate(new Date(receiptHead.getReceiptDate()));
+            //collBankRemitReport.setServiceType(receiptHead.getServiceName());
+            collBankRemitReport.setVoucherNumber(receiptHeaders.getRemittanceVouherNumber());
             reportList.add(collBankRemitReport);
-        }
+       // }
         return reportList;
     }
     

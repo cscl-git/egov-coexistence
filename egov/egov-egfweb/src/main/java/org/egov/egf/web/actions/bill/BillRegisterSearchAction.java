@@ -292,7 +292,7 @@ public class BillRegisterSearchAction extends BaseFormAction {
                 if (object[11] != null)
                 {
                     if (!(getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS) || getStringValue(
-                            object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS)))
+                            object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS) || getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_PENDING_STATUS)))
                         billMap.put(
                                 "ownerName",
                                 stateIdAndOwnerNameMap.get(getLongValue(object[11])) != null ? stateIdAndOwnerNameMap

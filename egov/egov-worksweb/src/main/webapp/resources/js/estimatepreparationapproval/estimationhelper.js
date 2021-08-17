@@ -50,10 +50,10 @@
 
 function ConfirmDelete()
 {
- var txt;
+ var txt=false;
  var estId=document.getElementById("uploadId");
  var comments=document.getElementById("comments").value;
- var file=document.getElementById('file1');
+ var file=document.getElementById('fileboq');
 
 	if(file.files.length >0){
 		
@@ -64,8 +64,12 @@ function ConfirmDelete()
 			 
 		 }
 		// debugger;
-		 
-		bootbox.confirm("Are you sure you want to upload file again previous file will be deleted. !", function(x){ 
+		/* bootbox.confirm("Are you sure you want to upload file again previous file will be deleted. !", function(result) {
+		      alert("Confirm result: " + result);
+		      txt=true;
+		      
+		    });*/
+				 var x = bootbox.confirm("Are you sure you want to upload file again previous file will be deleted. !");
 			if (x==true)
 			  {
 			  	txt = "You pressed OK!";
@@ -77,9 +81,6 @@ function ConfirmDelete()
 			  	txt = "You pressed Cancel!";
 			  	return false;
 			  }
-		});
-				 
-				  
 				   
 				 
 		

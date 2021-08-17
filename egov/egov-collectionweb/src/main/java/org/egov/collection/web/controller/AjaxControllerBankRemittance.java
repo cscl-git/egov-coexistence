@@ -32,12 +32,16 @@ public class AjaxControllerBankRemittance {
 	    	
 		 try
 	    	{
-			 query = this.persistenceService.getSession().createSQLQuery("select (select c2.name from chartofaccounts c2 where c2.glcode=gl.glcode),gl.glcode,gl.creditamount from generalledger gl where voucherheaderid =(select vmis.voucherheaderid from vouchermis vmis where vmis.reciept_number =:receipt_no) and gl.creditamount >0");
-	    	    query.setString("receipt_no", receiptNo);
+			 /*query = this.persistenceService.getSession().createSQLQuery("select (select c2.name from chartofaccounts c2 where c2.glcode=gl.glcode),gl.glcode,gl.creditamount from generalledger gl where voucherheaderid =(select vmis.voucherheaderid from vouchermis vmis where vmis.reciept_number =:receipt_no) ) and gl.creditamount >0");
+	    	    query.setString("receipt_no", receiptNo);*/
+			 query = this.persistenceService.getSession().createSQLQuery("select c2.name,gl.glcode,sum(gl.creditamount) from chartofaccounts c2,generalledger gl,vouchermis vmis " + 
+			 		" where c2.glcode = gl.glcode and gl.voucherheaderid =vmis.voucherheaderid and vmis.reciept_number in ('"+receiptNo+"') and gl.creditamount >0 group by c2.name,gl.glcode ");
+	    	    
 	    	    System.out.println("::::::>>>>>"+query);
 	    	    
 	    	    System.out.println("HELLO------------------->>>>>>");
 	    	    rows = query.list();
+	    	    System.out.println("row size "+rows.size());
 	    	   if(rows.size()!=0) {
 	    		   
 	    		   for(Object[] e : rows)

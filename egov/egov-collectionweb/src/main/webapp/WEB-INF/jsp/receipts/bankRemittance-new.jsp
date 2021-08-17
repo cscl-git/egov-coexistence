@@ -181,6 +181,57 @@
 		dom.get("selectremittanceerror").style.display = "none";
 		dom.get("button32").disabled = false;
 		dom.get("button32").className = "buttonsubmit";
+		var receipts=document.getElementsByName('receiptNumber');
+		var receiptNos="";
+		for (i = 0; i < receipts.length; i++) {
+			if(document.getElementById("selected_"+i).checked){
+				document.getElementById("selected_"+i).value= true;
+				if(receiptNos=="")
+				{
+					receiptNos+= document.getElementById("receiptNumber_"+i).value;
+				}else{
+					receiptNos+="','"+document.getElementById("receiptNumber_"+i).value;
+					
+				}
+			}else{
+				document.getElementById("selected_"+i).value= false;
+			}
+		}
+		
+		jQuery("#historyDetailTable tbody").empty();
+		jQuery.ajax({
+			 url:'/services/collection/remittanceBankdetail/gldetails?receiptNo='+receiptNos,
+			 contentType:"application/json",		
+			 dataType:"json",
+			 success:function(r)
+			 {
+
+				 data=r;
+				for (var i=0; i<data.length; i++) {
+						
+						console.log(":::name  :::: "+data[i].glName+"::::Code:: "+data[i].glcode+":::amount:: "+data[i].amount);
+						jQuery("#historyDetailTable tbody").append('<tr>'+'<td>'+'<input type="text" name="remittance['+i+'].glName" readonly="true" value="'+data[i].glName+'" style="width:100%"/></td>'
+								+'<td >'+'<input type="text" name="remittance['+i+'].glcode" readonly="true" value="'+data[i].glcode+'" style="width:100%"/></td>'
+								+'<td >'+'<input type="text" name="remittance['+i+'].amount" readonly="true" value="'+data[i].amount+'" style="width:100%"/></td>'
+								+'<td align="center" >'+'<select id="remitAccountNumber" name="remittance['+i+'].bankaccount" >'
+								+'<option value="-1">Select</option>'
+								+'<c:forEach items="${dropdownData.bankaccountNumberList}" var="accNum">'
+									+'<option value="${accNum}" >${accNum}</option>'
+								+'</c:forEach>'
+							+'</select>'+'</td>'
+								+'</tr>');
+				}
+				document.getElementById("historyDetailTable").scrollIntoView();
+			 }
+		 })
+	}
+	
+	function handleReceiptSelectionEvent1(rownum) {
+
+		dom.get("multipleserviceselectionerror").style.display = "none";
+		dom.get("selectremittanceerror").style.display = "none";
+		dom.get("button32").disabled = false;
+		dom.get("button32").className = "buttonsubmit";
 		//var instrumentAmount = document.getElementsByName('instrumentAmount');
 		//var totalAmtDisplay = 0.00;
 		
@@ -265,27 +316,34 @@
 		dom.get("accountselectionerror").style.display = "none";
 		dom.get("selectremittanceerror").style.display = "none";
 		dom.get("approvalSelectionError").style.display = "none";
-		
-		
+		var narration=document.getElementById("narration").value;
+		var dept=document.getElementById("deptIdnew").value;
+		var func=document.getElementById("functionNew").value;
+		var subdiv=document.getElementById("subdivisonNew").value;
 		var valSuccess = true;
-		
-		/* if(serviceType==-1){
-			valSuccess=false;
-			dom.get("error_area").style.display="block";
-			dom.get("error_area").innerHTML = '<s:text name="service.servictype.null" />' + '<br>';
-			window.scroll(0,0);
+		if(narration==""){
+			bootbox.alert("Please Enter Narration");
 			return false;
 		}
-		if (dom.get("accountNumberId").value != null && dom.get("accountNumberId").value == -1) {
-			dom.get("bankselectionerror").innerHTML = "";
-			dom.get("accountselectionerror").style.display = "block";
+		if(dept=='-1') {
+			bootbox.alert("Please Select Department");
 			return false;
-		} */
-		<s:if test="showRemittanceDate">
+		}
+		if(func =='-1')
+		{
+			bootbox.alert("Please Select Function Details");
+			return false;
+		}
+		if(subdiv =='-1')
+		{
+			bootbox.alert("Please Select Subdivison Details");
+			return false;
+		}
+		
 		if (dom.get("remittanceDate") != null && dom.get("remittanceDate").value == "") {
 			bootbox.alert("Please Enter Date of Remittance");
 			return false;
-		} else {
+		} /* else {
 			var remittanceDate = dom.get("remittanceDate").value;
 			var receiptDate;
 			isSelected = document.getElementsByName('selected');
@@ -307,8 +365,7 @@
 					}
 				}
 			}
-		}
-		</s:if>
+		} */
 		var acc= document.getElementById("remitAccountNumber").value;
 		if(acc =='-1')
 		{
@@ -316,6 +373,8 @@
 				document.getElementById("remitAccountNumber").focus();
 				return false;
 		}
+		
+		
 		/* if(document.getElementById('accountNumberId').options[document.getElementById('accountNumberId').selectedIndex].value != dom.get("remitAccountNumber").value.trim())
 			{
 				 alert("Account number for which search result has displayed and selected account number in search drop down are different. \n Please make sure account number in drop down and account number for which search has done are same.");
@@ -580,6 +639,7 @@
 								<input type="hidden" name="finalList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
 								<input type="hidden" name="finalList[${rowNumber}].createdUser"  id="createdUser_${rowNumber}" value="${currentRow.createdUser}" />
 								<input type="hidden" name="instrumentAmount" disabled="disabled" id="instrumentAmount" value="${currentRow.instrumentAmount}" />
+								<input type="hidden" name="receiptNumber" disabled="disabled" id="receiptNumber" value="${currentRow.receiptNumber}" />
 							</display:column>
 							
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt No." style="width:10%;text-align: center" value="${currentRow.receiptNumber}" />
@@ -626,15 +686,31 @@
 				<div align="center">
 					<table>
 						<tr>					
+							<td class="bluebox" colspan="3">&nbsp;</td>
+							<td class="bluebox"><s:text name="bankremittance.remittancedate" /><span class="mandatory" /></td>
+							<td class="bluebox"><s:textfield id="remittanceDate" name="remittanceDate" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
 							
-								<td class="bluebox" colspan="3">&nbsp;</td>
-								<td class="bluebox"><s:text name="bankremittance.remittancedate" /><span class="mandatory" /></td>
-								<td class="bluebox"><s:textfield id="remittanceDate" name="remittanceDate" readonly="true" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
-							
-							<td class="bluebox">Narration</td>
-							<td class="bluebox" colspan="3"><s:textarea id="narration"
-									name="narration" cols="100" rows="3"/></td>								
-									
+							<td class="bluebox">Narration<span class="mandatory" /></td>
+							<td class="bluebox" colspan="3"><s:textarea id="narration" name="narration" cols="100" rows="3"/></td>	
+						</tr>
+						<tr>
+							<td class="bluebox" colspan="3">&nbsp;</td>
+							<td class="bluebox">Department<span class="mandatory" /></td>
+		  					<td class="bluebox"><s:select headerKey="-1"
+							headerValue="----Choose----" name="deptIdnew" id="deptIdnew" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptIdnew}"/> 
+							</td>
+							<td class="bluebox">Function<span class="mandatory"/></td>
+							<td class="bluebox"><s:select headerKey="-1"
+							headerValue="----Choose----" name="functionNew" id="functionNew" cssClass="selectwk" list="dropdownData.functionList" listKey="code" listValue="name"  value="%{functionNew}"/> 
+							</td>
+	    					
+						</tr>
+						<tr>
+							<td class="bluebox" colspan="3">&nbsp;</td>
+							<td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
+						    <td class="bluebox">
+						    <div class="yui-skin-sam"><s:select headerKey="-1"
+								headerValue="----Choose----" name="subdivisonNew" id="subdivisonNew"  cssClass="selectwk" list="dropdownData.subdivisonList" listKey="subdivisonCode" listValue="subdivisonName"  value="%{subdivisonNew}"/></td>
 						</tr>
 					</table>
 				</div>
