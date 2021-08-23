@@ -190,6 +190,27 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "estimatepreparationapproval-form";
 	}
 
+@RequestMapping(value = "/newformdetail", method = RequestMethod.POST)
+	public String detailestimate(
+			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, HttpServletRequest request) {
+		estimatePreparationApproval.setSector(getsectorlist());
+		estimatePreparationApproval.setWardnumber(getwardlist());
+		
+		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
+		//edited...
+		estimatePreparationApproval.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		
+		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
+        prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
+        model.addAttribute("validActionList",
+                Arrays.asList("Forward/Reassign"));										   
+										
+        System.out.println("Detail Estimate starting....");
+		return "estimatepreparationapproval-form-detail";
+	}
+
 
 	
 	private void prepareValidActionListByCutOffDate(Model model) {
@@ -307,6 +328,130 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
        prepareValidActionListByCutOffDate(model);
 		
 		return "estimatepreparationapproval-form";
+		
+	}
+	
+	@RequestMapping(value = "/estimatedetail", params = "Forward/Reassign", method = RequestMethod.POST)
+	public String savedetailBoQDetailsData(
+			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, @RequestParam("file1") MultipartFile[] files,@RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,  final HttpServletRequest request)
+			throws Exception {
+//System.out.println(":::::::::: " +workFlowAction1);
+		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
+		System.out.println("::::::::::: "+workFlowAction);
+		System.out.println("::::::::::: "+estimatePreparationApproval.getWorksWing());
+		
+		List<DocumentUpload> list = new ArrayList<>();
+		if (files != null)
+			for (int i = 0; i < files.length; i++) {
+				DocumentUpload upload = new DocumentUpload();
+				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
+				upload.setFileName(files[i].getOriginalFilename());
+				upload.setContentType(files[i].getContentType());
+				list.add(upload);
+			}
+		if (fileRoughCost != null)
+			for (int i = 0; i < fileRoughCost.length; i++) {
+				DocumentUpload upload2 = new DocumentUpload();
+				if(fileRoughCost[i] == null || fileRoughCost[i].getOriginalFilename().isEmpty())
+				{
+					continue;
+				}
+				upload2.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(fileRoughCost[i].getInputStream())));
+				upload2.setFileName(fileRoughCost[i].getOriginalFilename());
+				upload2.setContentType(fileRoughCost[i].getContentType());
+				upload2.setObjectType(estimatePreparationApproval.getObjectType());
+				list.add(upload2);
+			}
+		
+		estimatePreparationApproval.setDocumentDetail(list);
+		if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+			estimatePreparationApproval
+					.setExecutingDivision(Long.parseLong(estimatePreparationApproval.getDepartment()));
+		}
+		
+		String deptCode = "";
+		EstimateNoGenerator v = beanResolver.getAutoNumberServiceFor(EstimateNoGenerator.class);
+		deptCode = estimatePreparationApproval.getDepartment();
+		//String deptShortCode=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+			//	"works_div_"+deptCode).get(0).getValue();
+		String deptShortCode=populateShortCode(deptCode,estimatePreparationApproval.getWorksWing(),estimatePreparationApproval.getSubdivision());
+	    String estimateNumber = v.getEstimateNumber(deptShortCode);
+		estimatePreparationApproval.setEstimateNumber(estimateNumber);
+		String aaNumber=v.getAANumber(deptShortCode);
+		estimatePreparationApproval.setAanumber(aaNumber);
+		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
+		if(estimatePreparationApproval.getState()==null) {
+			EgwStatus statusnew=new EgwStatus();
+			statusnew.setModuletype("EstimatePreparationApproval");
+			statusnew.setDescription("AA Pending for Approval");
+			statusnew.setCode("AA Pending for Approval");
+			statusnew.setOrderId("4");
+			estimatePreparationApproval.setStatus(statusnew);
+		}
+		//start of workflow
+		Long approvalPosition = 0l;
+        String approvalComment = "";
+        String approvalDesignation = "";
+        if (request.getParameter("approvalComent") != null)
+            approvalComment = request.getParameter("approvalComent");
+        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
+        {
+            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
+        }
+        
+        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
+            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
+        System.out.println(":::::workFlowAction::::::: "+workFlowAction +"::::::estimate::::::::: "+estimatePreparationApproval.getStatus());
+       try {
+        EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
+				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+
+		Long id=savedEstimatePreparationApproval.getId();
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+				if(boq.getObjectId()!=null) {
+					Long update=boq.getObjectId();
+					estimatePreparationApprovalService.updateDocuments(id,update);
+				}
+			}
+		}
+		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
+        + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
+       }catch(Exception e) {
+    	   e.printStackTrace();
+       }
+			//estimatePreparationApprovalService.updateDocuments(id,uploadId);
+        
+        
+		/*return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
+        + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;*/
+       String msg="Estimate Not Forwarded .";
+		model.addAttribute("error", "Y");
+		model.addAttribute("message", msg);
+       
+      // estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+       estimatePreparationApproval.setWorksWing(estimatePreparationApproval.getWorksWing());
+		estimatePreparationApproval.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimatePreparationApproval.getWorksWing())));
+		estimatePreparationApproval.setSubdivision(estimatePreparationApproval.getSubdivision());
+		estimatePreparationApproval.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(estimatePreparationApproval.getDepartment())));
+		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
+		//edited...
+		
+		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
+       prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
+       model.addAttribute("validActionList",
+               Arrays.asList("Forward/Reassign"));										   
+										
+       System.out.println("Detail Estimate starting....");
+		return "estimatepreparationapproval-form-detail";
 		
 	}
 	
@@ -1198,6 +1343,382 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 
 	}
 	
+@RequestMapping(value = "/estimatedetail", params = "save1", method = RequestMethod.POST)
+	public String detailuploadboqData(
+			@ModelAttribute("estimatePreparationApproval")  EstimatePreparationApproval estimatePreparationApproval,
+			final Model model, @RequestParam("file") MultipartFile file,@RequestParam("file") MultipartFile[] files,final HttpServletRequest request,final Long id)
+			throws Exception {
+//		estimatePreparationApproval=workEstimateService.searchEstimateData(id);
+		List<BoQDetails> boQDetailsList = new ArrayList();
+		List<BoQDetails> boQDetailsList2 = new ArrayList();
+		String userName = estimatePreparationApprovalService.getUserName();
+		Long userId = estimatePreparationApprovalService.getUserId();
+		System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
+		
+		//List<BoqDetailsPop> arrayboqDetailsPop =new ArrayList();
+		HashSet<String> milesstoneList=new HashSet<>();
+		String refNo=null;
+		//file upload info
+		List<DocumentUpload> docup = new ArrayList<>();
+		int count = 0;
+		String fileName = null;
+		String extension = null;
+		String filePath = null;
+		File fileToUpload = null;
+		
+		List<Integer> rowerror=new ArrayList<>();
+		Boolean error=true;
+		String msg="";
+		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
+		String FILE_PATH_SEPERATOR = "\\";
+		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
+		Double estAmt= 0.0;
+		String comments =request.getParameter("comments");
+		// String documentPath = "D://Upload/";
+
+		String documentPath = FILE_PATH_PROPERTIES + FILE_PATH_SEPERATOR;
+
+		long currentTime = new Date().getTime();
+		if (file.getOriginalFilename() != null && !file.getOriginalFilename().equals("")) {
+			fileName = file.getOriginalFilename().toString().split("\\.")[0];
+			extension = file.getOriginalFilename().substring(file.getOriginalFilename().lastIndexOf("."));
+			fileName = fileName.replace(" ", "") + "_" + currentTime + extension;
+			filePath = documentPath + fileName;
+			fileToUpload = new File(filePath);
+			byte[] bytes = file.getBytes();
+			Path Path = null;
+			Path = Paths.get(filePath);
+
+			Path doc = Paths.get(documentPath);
+			if (!Files.exists(doc)) {
+				Files.createDirectories(doc);
+			}
+
+			Files.write(Path, bytes);
+		}
+		
+		
+		File xlsFile = new File(fileToUpload.toString());
+		if (xlsFile.exists()) {
+
+			
+			FileInputStream inputStream = new FileInputStream(new File(filePath));
+			Workbook workbook = getWorkbook(inputStream, filePath);
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+		error=false;
+			}else{
+				msg="Please check the uploaded document as there is an issue in AOR detail sheet.";
+				}
+			}
+			for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+				Sheet firstSheet = workbook.getSheetAt(i);
+				//System.out.println("firstSheet;;"+firstSheet.getSheetName());
+	//			Sheet firstSheet = workbook.getSheetAt(0);
+				
+			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
+				//error=false;
+				Row row = firstSheet.getRow(0);
+				System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
+						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
+						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}
+				System.out.println("::::Physicah::last row  "+firstSheet.getPhysicalNumberOfRows());
+				if (files != null)
+					for (int j = 0; j< files.length; j++) {
+						DocumentUpload upload = new DocumentUpload();
+						if(files[j] == null || files[j].getOriginalFilename().isEmpty())
+						
+						{
+							continue;
+	   
+						}
+						upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[j].getInputStream())));
+						upload.setFileName(files[j].getOriginalFilename());
+						System.out.println("files[i].getOriginalFilename():;;;;;;;;"+files[j].getOriginalFilename());
+						upload.setContentType(files[j].getContentType());
+						upload.setObjectType("roughWorkFile");
+						upload.setComments(comments);
+						upload.setUsername(userName);
+//						upload.setComments(comments);
+						//System.out.println("comments--------"+comments);
+						docup.add(upload);
+																																							
+					}
+				
+				Iterator<Row> iterator = firstSheet.iterator();
+				//List<BoqDetailsPop> array1boqDetailsPop = new ArrayList<BoqDetailsPop>(); 
+				
+			first:
+			while (iterator.hasNext()) {
+				Row nextRow = iterator.next();
+				Iterator<Cell> cellIterator = nextRow.cellIterator();
+		
+				BoQDetails aBoQDetails = new BoQDetails();
+				System.out.println("::::::last row  "+nextRow.getRowNum());
+				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
+				
+				while (cellIterator.hasNext()) {
+					int erow = nextRow.getRowNum()+1;
+					if(erow>250) {
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 250 items are allowed. ";
+						break first;
+					}
+					Cell cell = (Cell) cellIterator.next();
+					
+					if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
+						System.out.println("::Cell Type::: "+cell.getCellType()+"::::::Blank:: "+cell.CELL_TYPE_BLANK); 
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Blank Column in Row "+erow;
+						break first;
+					   }
+					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
+
+						if (cell.getColumnIndex() == 0) {
+							aBoQDetails.setMilestone(cell.getStringCellValue());
+							String value = cell.getStringCellValue();
+	  
+	   
+						}
+	  
+						else if (cell.getColumnIndex() == 1) {
+	   
+							aBoQDetails.setItem_description(cell.getStringCellValue());
+							int length = cell.getStringCellValue().length();
+							
+							if(cell.getStringCellValue().length()>10000) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Item Description exceeds 10000 character limit.Check Row "+erow;
+								break first;
+							}
+						//boqDetailsPop.setItem_description(cell.getStringCellValue());
+	   
+						} else if (cell.getColumnIndex() == 2) {
+	   
+							aBoQDetails.setRef_dsr(cell.getStringCellValue());
+							//boqDetailsPop.setRef_dsr(cell.getStringCellValue());
+							refNo =cell.getStringCellValue();
+						
+							//System.out.println(":::::Ref No::: "+cell.getStringCellValue());
+						}else if (cell.getColumnIndex() == 3) {
+	   
+							aBoQDetails.setUnit(cell.getStringCellValue());
+							//boqDetailsPop.setUnit(cell.getStringCellValue());
+							//System.out.println("Checking Uom ::: "+uom.contains(cell.getStringCellValue()));
+						}else if (cell.getColumnIndex() == 5) {
+							if (aBoQDetails.getRate() != null)  {
+								
+								if(aBoQDetails.getQuantity()==null ) {
+									error=true;
+									msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check Row "+erow;
+									break first;
+								}
+								
+							}
+							}
+					} else if (Cell.CELL_TYPE_NUMERIC == cell.getCellType()) {
+						if(cell.getColumnIndex() == 2) {
+							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
+							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
+						}
+						
+						 if (cell.getColumnIndex() == 4) {
+		
+							aBoQDetails.setRate(cell.getNumericCellValue());
+							Double d = cell.getNumericCellValue();
+							
+							String[] splitter = d.toString().split("\\.");
+							
+							if(splitter[1].length()>4) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.Only 4 Digits are allowed after Decimal.Check row "+erow;
+								break first;
+							}
+						} else if (cell.getColumnIndex() == 5) {
+							
+							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							Double d = cell.getNumericCellValue();
+							String[] splitter = d.toString().split("\\.");
+							
+							//System.out.println("::::Quantity::"+cell.getNumericCellValue()+"::oa: "+aBoQDetails.getQuantity());
+							if(splitter[1].length()>4) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Only 4 Digits are allowed after Decimal.Check row "+erow;
+								break first;
+							}
+							//System.out.println("::unit:: "+uom.contains(aBoQDetails.getUnit()));
+							/*if(!uom.contains(aBoQDetails.getUnit())) {
+								error=true;
+								msg="Please check the uploaded document as there is an issue in AOR detail sheet.";	
+							}*/
+							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() !=null)  {
+								
+							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
+							estAmt=estAmt+aBoQDetails.getAmount();
+							
+							}else {
+							rowerror.add(erow);	
+							error=true;
+							msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check row "+erow;
+							break first;
+							}
+						}
+						 
+
+					}
+					
+
+
+					if (aBoQDetails.getMilestone()!=null && aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
+							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
+							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null ) {
+						count=boQDetailsList.size();
+						aBoQDetails.setSlNo(Long.valueOf(count));
+						boQDetailsList.add(aBoQDetails);
+						//arrayboqDetailsPop.add(boqDetailsPop);
+	 
+
+					}
+					
+				}
+				
+			}
+			
+			// workbook.close();
+			inputStream.close();
+			}else {
+				//error=true;
+				//msg="Uploaded document must contain Sheet with name Abst. with AOR";
+			}
+		}	
+
+	} else {
+			// response = "Please choose a file.";
+		}
+		int nextcount=1;
+		System.out.println("::::ERROR::::: "+error);
+		
+		List<BoqUploadDocument> docUpload=new ArrayList<>();
+		if(estimatePreparationApproval.getDocUpload()!=null) {
+			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
+				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getUsername());
+				BoqUploadDocument boqUploadDocument=new BoqUploadDocument();
+				if(boq.getObjectId()!=null) {
+					boqUploadDocument.setId(Long.valueOf(nextcount));
+					boqUploadDocument.setObjectId(boq.getObjectId());
+					boqUploadDocument.setObjectType(boq.getObjectType());
+					boqUploadDocument.setFilestoreid(boq.getFilestoreid());
+					boqUploadDocument.setComments(boq.getComments());
+					boqUploadDocument.setUsername(boq.getUsername());
+					docUpload.add(boqUploadDocument);
+					nextcount=nextcount+1;
+				}
+			}
+		}
+		estimatePreparationApproval.setDocumentDetail(docup);  
+		estimatePreparationApproval.setRoughCostdocumentDetail(docup);
+		
+		if(!error) {
+		DocumentUpload savedocebefore = estimatePreparationApprovalService.savedocebefore(estimatePreparationApproval);		
+		
+		
+		System.out.println("::OBJECT ID:: "+savedocebefore.getId()+" ::ObjectType:::: "+savedocebefore.getUsername()+" :::::FileStore():::: "+savedocebefore.getFileStore().getId());
+		
+		BoqUploadDocument boqUploadDocument2=new BoqUploadDocument();
+		//adding
+		boqUploadDocument2.setId(Long.valueOf(nextcount));
+		boqUploadDocument2.setObjectId(savedocebefore.getId());
+		boqUploadDocument2.setObjectType(savedocebefore.getFileStore().getFileName());
+		boqUploadDocument2.setFilestoreid(savedocebefore.getFileStore().getId());
+		boqUploadDocument2.setComments(comments);
+		boqUploadDocument2.setUsername(savedocebefore.getUsername());
+		docUpload.add(boqUploadDocument2);
+		
+		
+		 Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
+		 
+		 estimatePreparationApproval.setDocUpload(docUpload);
+		 List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
+			System.out.println("::::::::filesStoreId::::::::::::: "+savedocebefore.getId()+"-----"+savedocebefore.getFileStore().getId()+"------"+savedocebefore.getObjectType()+"------"+savedocebefore.getFileStore().getFileName());
+			DocumentUpload doc1= new DocumentUpload();
+			Long fileStoreId = savedocebefore.getFileStore().getId();
+			doc1.setId(savedocebefore.getId());
+			doc1.setFileStore(savedocebefore.getFileStore());
+			uploadDoc.add(doc1);
+			model.addAttribute("milestoneList",groupByMilesToneMap);
+			model.addAttribute("uploadDocID",uploadDoc);
+			
+			model.addAttribute("fileuploadAllowed","Y");
+			
+			BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
+			if(estAmt >= 10000000){
+				BigDecimal  pct = new BigDecimal(3);
+				BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+				estimatePreparationApproval.setContingentPercentage(3.0);
+				estimatePreparationApproval.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
+				
+				BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+				
+				Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+				estimatePreparationApproval.setEstimateAmount(estAmtPlusContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
+			}
+			else {
+				BigDecimal  pct = new BigDecimal(5);
+				BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
+				estimatePreparationApproval.setContingentPercentage(5.0);
+				estimatePreparationApproval.setContingentAmount(ContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
+				
+				BigDecimal  estAmtPlusContingentAmt=ContingentAmt.add(bgestAmt);
+				
+				Double dobestAmtPlusContingentAmt=estAmtPlusContingentAmt.doubleValue();
+				estimatePreparationApproval.setEstimateAmount(estAmtPlusContingentAmt.setScale(2, BigDecimal.ROUND_HALF_UP));
+			}
+			
+		}else {
+			
+			model.addAttribute("error", "Y");
+			model.addAttribute("message", msg);
+		}
+		
+		Map<String, List<BoqUploadDocument>> uploadDocument = 
+				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
+		 
+		 System.out.println("::::::::: "+estimatePreparationApproval.getRoughCostdocumentDetail().size());
+		 estimatePreparationApproval.setSector(getsectorlist());
+			estimatePreparationApproval.setWardnumber(getwardlist());
+		//estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
+		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
+		estimatePreparationApproval.setWorksWing(estimatePreparationApproval.getWorksWing());
+		estimatePreparationApproval.setWorkswings(estimatePreparationApprovalService.getworskwing());
+		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
+		estimatePreparationApproval.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimatePreparationApproval.getWorksWing())));
+		estimatePreparationApproval.setSubdivision(estimatePreparationApproval.getSubdivision());
+		estimatePreparationApproval.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(estimatePreparationApproval.getDepartment())));
+		model.addAttribute("uploadDocument", uploadDocument);
+		model.addAttribute("validActionList",
+                Arrays.asList("Forward/Reassign"));	
+		
+		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
+        prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
+       // prepareValidActionListByCutOffDate(model);
+		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
+		
+		
+		//model.addAttribute("uploadDocuments", uploadDocuments);
+		model.addAttribute("mode", "create");
+		
+		
+		return "estimatepreparationapproval-form-detail";
+
+	}
 	
 	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
 		BigDecimal  bg100 = new BigDecimal(100);
@@ -1365,9 +1886,15 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		 List<Object[]> list =null;
 		 query
 	        .append(
-	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es where es.executingDivision = ? ")
+	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es  ")
+					 query.append(" where es.id> ? ");
+		 if(estimatePreparationApproval.getExecutingDivision()!=null)
+	        	{
+	        	query.append("and es.executingDivision ='").append(estimatePreparationApproval.getExecutingDivision()).append("'");
+	        	}
 	        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
 	        .append(getMisQuery(estimatePreparationApproval));
+			estimatePreparationApproval.setId(0l);
 		 System.out.println("Query :: "+query.toString());
          list = persistenceService.findAllBy(query.toString(),
         		 estimatePreparationApproval.getExecutingDivision());
@@ -1411,6 +1938,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
         	 }
         	 
          }
+		estimatePreparationApproval.setWorkswings(estimatePreparationApprovalService.getworskwing());
         estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setEstimateList(approvalList);
 

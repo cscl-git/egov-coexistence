@@ -62,10 +62,12 @@ import javax.persistence.Transient;
 
 import org.egov.collection.constants.CollectionConstants;
 import org.egov.commons.DocumentUploads;
+//import org.egov.commons.DocumentUploads;
 import org.egov.commons.EgwStatus;
 import org.egov.infra.admin.master.entity.Location;
 import org.egov.infra.persistence.entity.Auditable;
 import org.egov.infra.workflow.entity.StateAware;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.model.instrument.InstrumentHeader;
 
 public class ReceiptHeader extends StateAware implements Auditable {
@@ -148,7 +150,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
 	private String department;
 	private String depositDate;
 	@Transient
-    private List<DocumentUploads> documentDetail = new ArrayList<>();//added abhishek
+    private List<DocumentUpload> documentDetail = new ArrayList<>();
     
     public String getRemittanceVoucherNumber() {
 		return remittanceVoucherNumber;
@@ -158,12 +160,13 @@ public class ReceiptHeader extends StateAware implements Auditable {
 		this.remittanceVoucherNumber = remittanceVoucherNumber;
 	}
 
-	public List<DocumentUploads> getDocumentDetail() {
+    public List<DocumentUpload> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
-		this.documentDetail = documentDetail;
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		if (documentDetail != null)
+            this.documentDetail.addAll(documentDetail);
 	}
 
     public ReceiptHeader() {

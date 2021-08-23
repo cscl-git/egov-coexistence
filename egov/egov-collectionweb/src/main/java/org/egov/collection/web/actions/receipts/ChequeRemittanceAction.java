@@ -48,7 +48,12 @@
 
 package org.egov.collection.web.actions.receipts;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -67,6 +72,8 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.displaytag.pagination.PaginatedList;
 import org.egov.collection.bean.ReceiptBean;
@@ -80,6 +87,7 @@ import org.egov.infra.microservice.models.RemitancePOJO;
 import org.egov.infra.persistence.utils.Page;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
+import org.egov.commons.DocumentUploads;
 import org.egov.commons.dao.BankaccountHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -95,6 +103,7 @@ import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infra.web.utils.EgovPaginatedList;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.egov.model.bills.DocumentUpload;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -148,6 +157,10 @@ public class ChequeRemittanceAction extends BaseFormAction {
     private String deptIdnew;
 	private String functionNew;
 	private String subdivisonNew;
+	private File[] file; // added abhishek
+	private String[] fileContentType; // added abhishek
+	private String[] fileFileName; // added abhishek
+	private List<DocumentUpload> documentDetail = new ArrayList<>(); // added abhishek
     @Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
@@ -348,7 +361,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 				resultListFinal=receiptBeanList.subList(fromIndex, toIndex);
 			}
 			if (searchResult == null) {
-				Page page = new Page<List>(getPage(), resultListFinal.size(), resultListFinal);
+				Page page = new Page<List>(getPage(), 490, resultListFinal);
 				searchResult = new EgovPaginatedList(page, receiptBeanList.size());
 			} else {
 				searchResult.getList().clear();
@@ -468,24 +481,35 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		}
 		final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
+        if(receipts!=null)
         bankRemittanceList = remittanceService.prepareChequeRemittanceReport(receipts);
 		
-		/*
-		 * if (getSession().get(REMITTANCE_LIST) != null)
-		 * getSession().remove(REMITTANCE_LIST); getSession().put(REMITTANCE_LIST,
-		 * bankRemittanceList);
-		 */
-		 
-		//populateNames(bankRemittanceList);
-		/*
-		 * final Bankaccount bankAcc =
-		 * bankaccountHibernateDAO.getByAccountNumber(accountNumberId); bankAccount =
-		 * bankAcc.getAccountnumber(); bank =
-		 * bankAcc.getBankbranch().getBank().getName(); totalCashAmount =
-		 * getSum(finalList);
-		 */
+        File[] uploadedFiles = getFile();
+		String[] fileName = getFileFileName();
+		String[] contentType = getFileContentType();
+		System.out.println("files "+uploadedFiles[0]);
 		
+		if(uploadedFiles[0]!=null) { 
+			byte[] fileBytes; 
+			for (int i = 0; i <uploadedFiles.length; i++) {
+			  Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+			  try { 
+				  fileBytes = Files.readAllBytes(path); 
+				  ByteArrayInputStream bios= new ByteArrayInputStream(fileBytes); 
+				  DocumentUpload upload = new DocumentUpload(); 
+				  upload.setInputStream(bios);
+				  upload.setFileName(fileName[i]); 
+				  upload.setContentType(contentType[i]);
+				  documentDetail.add(upload); 
+			  } catch (IOException e) { // TODO Auto-generated
+				  e.printStackTrace(); 
+			  }
 				 
+			}
+			receiptHeaderIntsance.setId(receipts.getVoucherid());
+			receiptHeaderIntsance.setDocumentDetail(documentDetail);
+			remittanceService.saveDocuments(receiptHeaderIntsance);
+		} 
 		// end
         return INDEX;
     }
@@ -981,6 +1005,38 @@ public class ChequeRemittanceAction extends BaseFormAction {
 
 	public void setSubdivisonNew(String subdivisonNew) {
 		this.subdivisonNew = subdivisonNew;
+	}
+
+	public File[] getFile() {
+		return file;
+	}
+
+	public void setFile(File[] file) {
+		this.file = file;
+	}
+
+	public String[] getFileContentType() {
+		return fileContentType;
+	}
+
+	public void setFileContentType(String[] fileContentType) {
+		this.fileContentType = fileContentType;
+	}
+
+	public String[] getFileFileName() {
+		return fileFileName;
+	}
+
+	public void setFileFileName(String[] fileFileName) {
+		this.fileFileName = fileFileName;
+	}
+
+	public List<DocumentUpload> getDocumentDetail() {
+		return documentDetail;
+	}
+
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+		this.documentDetail = documentDetail;
 	}
 
 	

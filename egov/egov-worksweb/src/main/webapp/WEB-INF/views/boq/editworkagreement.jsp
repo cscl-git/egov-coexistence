@@ -17,12 +17,26 @@
     vertical-align: top;
 }
 </style>
+<script
+        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+        <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
 <script>
-  $( function() {
-    $( "#work_start_date" ).datepicker();
-    $( "#work_intended_date" ).datepicker();
-    $( "#actual_start_date" ).datepicker();
-    $( "#actual_end_date" ).datepicker();
+				$(document).ready(function() {
+		$('input[id$=work_start_date]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+		$('input[id$=work_intended_date]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+		$('input[id$=actual_start_date]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+		$('input[id$=actual_end_date]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+		
   } );
   </script>   
 <script
@@ -67,29 +81,29 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.start.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="work_start_date" path="work_start_date"
-							class="form-control datepicker" data-date-end-date="0d"
+						<form:input type="text" id="work_start_date" path="work_start_date"
+							class="form-control" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.intended.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="work_intended_date" path="work_intended_date"
-							class="form-control datepicker" data-date-end-date="0d"
+						<form:input type="text" id="work_intended_date" path="work_intended_date"
+							class="form-control" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualstart.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="actual_start_date" path="actual_start_date"
-							class="form-control datepicker" data-date-end-date="0d"
+						<form:input type="text" id="actual_start_date" path="actual_start_date"
+							class="form-control" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.actualend.date" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input id="actual_end_date" path="actual_end_date"
-							class="form-control datepicker" data-date-end-date="0d"
+						<form:input type="text" id="actual_end_date" path="actual_end_date"
+							class="form-control" data-date-end-date="0d"
 							placeholder="DD/MM/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -640,9 +654,8 @@
 </form:form>
 
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<!-- <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script> -->
+
 <script type="text/javascript">
 $(document).ready(function() {
 

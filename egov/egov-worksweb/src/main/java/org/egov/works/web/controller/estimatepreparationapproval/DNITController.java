@@ -2574,7 +2574,6 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	    }
-
 	public List<HashMap<String, Object>> getHistory(final State state, final List<StateHistory> history) {
         User user = null;
         EmployeeInfo ownerobj = null;
@@ -2592,15 +2591,15 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
                 workflowHistory.put("status", stateHistory.getValue());
                 final Long owner = stateHistory.getOwnerPosition();
                 final State _sowner = stateHistory.getState();
-                System.out.println(owner+"++++++++++++++owner+++++++++++++++++++++");
-               /* if(owner!=0) {
-                if(microserviceUtils.getEmployee(owner, null, null, null)!=null) {
                ownerobj=    this.microserviceUtils.getEmployee(owner, null, null, null).get(0);
-                }}*/
                 if (null != ownerobj) {
                     workflowHistory.put("user",ownerobj.getUser().getUserName()+"::"+ownerobj.getUser().getName());
+                    
+                    //edited....
                     if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
+                   
                     Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+                
                     if(null != department)
                         workflowHistory.put("department", department.getName());
                     }
@@ -2617,27 +2616,24 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
             map.put("updatedBy", state.getLastModifiedBy() + "::" + getEmployeeName(state.getLastModifiedBy()));
             map.put("status", state.getValue());
             final Long ownerPosition = state.getOwnerPosition();
-            System.out.println(ownerPosition+"++++++++++++++++++++++++++++++++++++++++++++++++");
-         /* if(ownerPosition!=null) {
-            	if((this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0))!=null)
-            	{
             ownerobj=    this.microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0);
-            }}
             if(null != ownerobj){
                 map.put("user", ownerobj.getUser().getUserName() + "::" + ownerobj.getUser().getName());
+                //edited...
                 if(ownerobj.getAssignments().get(0).getDepartment()!=null) {
               Department department=   this.microserviceUtils.getDepartmentByCode(ownerobj.getAssignments().get(0).getDepartment());
+             // Department department=   this.microserviceUtils.getDepartmentByCode(state.getDeptCode());
               if(null != department)
                   map.put("department", department.getName());
+              //
               //                map.put("department", null != eisCommonService.getDepartmentForUser(user.getId()) ? eisCommonService
 //                        .getDepartmentForUser(user.getId()).getName() : "");
                 }
             } else if (null != ownerPosition && null != state.getDeptName()) {
                 user = microserviceUtils.getEmployee(ownerPosition, null, null, null).get(0).getUser();
-                */
-               // map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
+                map.put("user", null != user.getUserName() ? user.getUserName() + "::" + user.getName() : "");
                 map.put("department", null != state.getDeptName() ? state.getDeptName() : "");
-       // }
+            }
             historyTable.add(map);
             Collections.sort(historyTable, new Comparator<Map<String, Object>> () {
 
@@ -2650,6 +2646,7 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
         }
         return historyTable;
     }
+	
 	
 	@RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
 	public void getBillDoc(final HttpServletRequest request, final HttpServletResponse response) throws IOException {

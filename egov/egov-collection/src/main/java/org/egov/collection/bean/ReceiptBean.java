@@ -74,7 +74,7 @@ public class ReceiptBean {
     private String createdUser;
     private String functionCode;
     private String remittanceVouherNumber;
-    
+    private Long voucherid;
     
     public String getRemittanceVouherNumber() {
 		return remittanceVouherNumber;
@@ -251,5 +251,13 @@ public class ReceiptBean {
     public void setRemittanceReferenceNumber(String remittanceReferenceNumber) {
         this.remittanceReferenceNumber = remittanceReferenceNumber;
     }
+
+	public Long getVoucherid() {
+		return voucherid;
+	}
+
+	public void setVoucherid(Long voucherid) {
+		this.voucherid = voucherid;
+	}
 
 }

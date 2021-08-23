@@ -320,29 +320,25 @@
 				&& dom.get("remittanceDate").value == "") {
 			bootbox.alert("Please Enter Date of Remittance");
 			return false;
-		} /* else {
-			var remittanceDate = dom.get("remittanceDate").value;
-			var receiptDate;
-			isSelected = document.getElementsByName('receiptIds');
-			for (i = 0; i < isSelected.length; i++) {
-				if (isSelected[i].checked == true) {
-					date = new Date(document.getElementsByName('receiptDateTempArray')[i].value);
-					var dd=date.getDate();
-					if(dd<10)dd='0'+dd;
-					var mm=date.getMonth()+1;
-					if(mm<10)mm='0'+mm;
-					receiptDate = dd + '/' + mm + '/' +  date.getFullYear();
-					if (receiptDate != null && receiptDate != '' && remittanceDate!= null && remittanceDate != '') {
-						if (processDate(receiptDate) > processDate(remittanceDate)) {
-							document.getElementById("error_area").style.display="block";
-							document.getElementById("error_area").innerHTML = '<s:text name="bankremittance.before.receiptdate" />'+ '<br>';
-							window.scroll(0, 0);
+		} else{
+			var receipts=document.getElementsByName('receiptNumber');
+			var receiptNos="";
+			for (i = 0; i < receipts.length; i++) {
+				if(document.getElementById("selected_"+i).checked){
+					var recdate=document.getElementById("receiptDate_"+i).value;
+					var remdate=dom.get("remittanceDate").value;
+					var part1= recdate.split("/");
+					var part2 = remdate.split("/");
+					var date1 = new Date(part1[1] + "/" + part1[0] + "/" + part1[2]);
+					var date2 = new Date(part2[1] + "/" + part2[0] + "/" + part2[2]);
+					if(date1.setHours(0,0,0,0) > date2.setHours(0,0,0,0)) {
+						bootbox.alert("Remittance Date should not be before Receipt Date");
 							return false;
 						}
 					}
 				}
+			
 			}
-		} */
 		
 		var acc= document.getElementById("remitAccountNumber").value;
 		if(acc =='-1')
@@ -507,7 +503,7 @@
 	<span align="center" style="display: none" id="approvalSelectionError">
 		<li><font size="2" color="red"><b><s:text name="bankremittance.error.noApproverselected" /> </b></font></li>
 	</span>
-	<s:form theme="simple" name="chequeRemittanceForm" >
+	<s:form theme="simple" name="chequeRemittanceForm" enctype = "multipart/form-data">
 		<s:push value="model">
 			<s:token />
 			<s:if test="%{hasErrors()}">
@@ -616,6 +612,7 @@
 								<input type="hidden" name="finalBeanList[${rowNumber}].fundName"  id="fundName_${rowNumber}" value="${currentRow.fundName}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].functionCode"  id="functionCode_${rowNumber}" value="${currentRow.functionCode}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].department" id="department_${rowNumber}"  value="${currentRow.departmentName}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].subDivision" id="subDivision_${rowNumber}"  value="${currentRow.subDivision}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].instrumentAmount"  id="instrumentAmount_${rowNumber}" value="${currentRow.instrumentAmount}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].instrumentType"  id="instrumentType_${rowNumber}" value="${currentRow.instrumentType}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
@@ -625,10 +622,11 @@
 							</display:column>
 
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt number" style="width:10%;text-align: center" value="${currentRow.receiptNumber}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt date" style="width:10%;text-align: center" value="${currentRow.receiptDate}" format="{0,date,dd/MM/yyyy}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Receipt date" style="width:10%;text-align: center" value="${currentRow.receiptDate}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Name" style="width:15%;text-align: center" value="${currentRow.serviceName}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Fund" style="width:15%;text-align: center" value="${currentRow.fundName}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Department" style="width:15%;text-align: center" value="${currentRow.departmentName}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="subDivision" style="width:10%;text-align: center" value="${currentRow.subDivision}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Collected By" style="width:15%;text-align: center" value="${currentRow.createdUser}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of Payment" style="width:10%;text-align: center" value="${currentRow.instrumentType}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Cheque /DD Amount (Rs)" style="width:10%;text-align: center">
@@ -685,9 +683,6 @@
 							<td class="bluebox"><s:select headerKey="-1"
 							headerValue="----Choose----" name="functionNew" id="functionNew" cssClass="selectwk" list="dropdownData.functionList" listKey="code" listValue="name"  value="%{functionNew}"/> 
 							</td>
-						</tr>
-						<tr>
-							<td class="bluebox" colspan="3">&nbsp;</td>
 							<td class="bluebox"><s:text name="Sub divison"/><span class="mandatory"/></td>
 						    <td class="bluebox">
 						    <div class="yui-skin-sam"><s:select headerKey="-1"
@@ -695,7 +690,9 @@
 						</tr>
 					</table>
 				</div>
-
+				<div  align="center">
+					<jsp:include page="common-documentsUpload.jsp" />
+				</div>
 				<div align="left" class="mandatorycoll">
 					<s:text name="common.mandatoryfields" />
 				</div>

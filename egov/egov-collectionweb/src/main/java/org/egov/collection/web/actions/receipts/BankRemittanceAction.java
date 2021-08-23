@@ -72,6 +72,8 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
+import org.apache.struts2.dispatcher.multipart.UploadedFile;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.displaytag.pagination.PaginatedList;
 import org.egov.collection.bean.ReceiptBean;
@@ -100,6 +102,7 @@ import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.utils.EgovMasterDataCaching;
+import org.egov.model.bills.DocumentUpload;
 import org.hibernate.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.egov.infra.persistence.utils.Page;
@@ -182,7 +185,7 @@ public class BankRemittanceAction extends BaseFormAction {
 	private File[] file; // added abhishek
 	private String[] fileContentType; // added abhishek
 	private String[] fileFileName; // added abhishek
-	private List<DocumentUploads> documentDetail = new ArrayList<>(); // added abhishek
+	private List<DocumentUpload> documentDetail = new ArrayList<>(); // added abhishek
 	private String deptId = "-1";
 	private String collectedBy = "";
 	private String modeOfPayment = "";
@@ -265,11 +268,11 @@ public class BankRemittanceAction extends BaseFormAction {
 		this.deptId = deptId;
 	}
 
-	public List<DocumentUploads> getDocumentDetail() {
+	public List<DocumentUpload> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 
@@ -472,7 +475,7 @@ public class BankRemittanceAction extends BaseFormAction {
 				resultListFinal=resultList.subList(fromIndex, toIndex);
 			}
 			if (searchResult == null) {
-				Page page = new Page<List>(getPage(), resultListFinal.size(), resultListFinal);
+				Page page = new Page<List>(getPage(), 490, resultListFinal);
 				searchResult = new EgovPaginatedList(page, resultList.size());
 			} else {
 				searchResult.getList().clear();
@@ -548,41 +551,37 @@ public class BankRemittanceAction extends BaseFormAction {
 		//List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
         final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
+		if(receipts!=null)
 		bankRemittanceList = remittanceService.prepareCashRemittanceReportNew(receipts);
 		
-		/*
-		 * if (getSession().get(REMITTANCE_LIST) != null)
-		 * getSession().remove(REMITTANCE_LIST); getSession().put(REMITTANCE_LIST,
-		 * bankRemittanceList);
-		 */
 		 
-		//populateNames(bankRemittanceList);
-		/*
-		 * final Bankaccount bankAcc =
-		 * bankaccountHibernateDAO.getByAccountNumber(accountNumberId); bankAccount =
-		 * bankAcc.getAccountnumber(); bank =
-		 * bankAcc.getBankbranch().getBank().getName(); totalCashAmount =
-		 * getSum(finalList);
-		 */
 		// added by abhishek on 24032021
 		File[] uploadedFiles = getFile();
 		String[] fileName = getFileFileName();
 		String[] contentType = getFileContentType();
+		System.out.println("files "+uploadedFiles[0]);
 
+		if(uploadedFiles[0]!=null) { 
+			byte[] fileBytes; 
+			for (int i = 0; i <uploadedFiles.length; i++) {
+			  Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
+			  try { 
+				  fileBytes = Files.readAllBytes(path); 
+				  ByteArrayInputStream bios= new ByteArrayInputStream(fileBytes); 
+				  DocumentUpload upload = new DocumentUpload(); 
+				  upload.setInputStream(bios);
+				  upload.setFileName(fileName[i]); 
+				  upload.setContentType(contentType[i]);
+				  documentDetail.add(upload); 
+			  } catch (IOException e) { // TODO Auto-generated
+				  e.printStackTrace(); 
+			  }
 		
-		/*
-		 * if (uploadedFiles[0] != null ) { //byte[] fileBytes; for (int i = 0; i
-		 * <uploadedFiles.length; i++) { Path path =
-		 * Paths.get(uploadedFiles[i].getAbsolutePath()); try { byte[] fileBytes =
-		 * Files.readAllBytes(path); ByteArrayInputStream bios= new
-		 * ByteArrayInputStream(fileBytes); DocumentUploads upload = new
-		 * DocumentUploads(); upload.setInputStream(bios);
-		 * upload.setFileName(fileName[i]); upload.setContentType(contentType[i]);
-		 * documentDetail.add(upload); } catch (IOException e) { // TODO Auto-generated
-		 * catch block e.printStackTrace(); }
-		 * receiptHeaderIntsance.setDocumentDetail(documentDetail); } }
-		 */
-				 
+			}
+			receiptHeaderIntsance.setId(receipts.getVoucherid());
+			receiptHeaderIntsance.setDocumentDetail(documentDetail);
+			remittanceService.saveDocuments(receiptHeaderIntsance);
+		} 
 		// end
         return INDEX;
     }

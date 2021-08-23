@@ -13,6 +13,14 @@
     color: black;
     vertical-align: top;
 }
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+    position: absolute;
+    z-index: 9999999;
+    width: 100%;
+    background-color: white;
+	margin-left: -1px;
+}
 </style>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>

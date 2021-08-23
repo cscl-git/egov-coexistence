@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -322,19 +323,20 @@ private static Map<String, String> map;
 		        String approvalDesignation = "";
 		        if (request.getParameter("approvalComent") != null)
 		            approvalComment = request.getParameter("approvalComent");
-		        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
-		        {
+		if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty()) {
 		            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
 		        }
 		        
 		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
 		            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 		        try {
-		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+			WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request,
+					workOrderAgreement, approvalPosition, approvalComment, approvalDesignation, workFlowAction);
 		Long id=savedWorkOrderAgreement.getId();
 		if(workOrderAgreement.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
-				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+					System.out.println(":::: " + boq.getId() + ":::::::" + boq.getComments() + ":::::::::"
+							+ boq.getObjectId() + ":::::" + boq.getFilestoreid());
 				if(boq.getObjectId()!=null) {
 					Long update=boq.getObjectId();
 					boQDetailsService.updateDocuments(id,update);
@@ -349,9 +351,11 @@ private static Map<String, String> map;
 		        workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
 		        workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		        workOrderAgreement.setDepartment(workOrderAgreement.getDepartment());
-		        workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+		workOrderAgreement.setNewdepartments(
+				estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
 		        workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
-		        workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment())));
+		workOrderAgreement.setSubdivisions(
+				estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment())));
      workOrderAgreement.setDepartments(getDepartmentsFromMs());
 		workOrderAgreement.setContractors(getAllActiveContractors());
 		model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
@@ -361,10 +365,10 @@ private static Map<String, String> map;
 
 	}
 	
-	
 	@RequestMapping(value = "/work", params = "Save As Draft", method = RequestMethod.POST)
-	public String saveBoQDetailsDataDraft(@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement,
-			final Model model,@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
+	public String saveBoQDetailsDataDraft(
+			@ModelAttribute("workOrderAgreement") final WorkOrderAgreement workOrderAgreement, final Model model,
+			@RequestParam("file1") MultipartFile[] files, final HttpServletRequest request) throws Exception {
 		String workFlowAction=workOrderAgreement.getWorkFlowAction();
 		if (workOrderAgreement.getDepartment() != null && workOrderAgreement.getDepartment() != ""
 				&& !workOrderAgreement.getDepartment().isEmpty()) {
@@ -375,8 +379,7 @@ private static Map<String, String> map;
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
-				if(files[i] == null || files[i].getOriginalFilename().isEmpty())
-				{
+				if (files[i] == null || files[i].getOriginalFilename().isEmpty()) {
 					continue;
 				}
 				upload.setInputStream(new ByteArrayInputStream(IOUtils.toByteArray(files[i].getInputStream())));
@@ -403,19 +406,20 @@ private static Map<String, String> map;
 		        String approvalDesignation = "";
 		        if (request.getParameter("approvalComent") != null)
 		            approvalComment = request.getParameter("approvalComent");
-		        if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty())
-		        {
+		if (request.getParameter(APPROVAL_POSITION) != null && !request.getParameter(APPROVAL_POSITION).isEmpty()) {
 		            approvalPosition = Long.valueOf(request.getParameter(APPROVAL_POSITION));
 		        }
 		        
 		        if (request.getParameter(APPROVAL_DESIGNATION) != null && !request.getParameter(APPROVAL_DESIGNATION).isEmpty())
 		            approvalDesignation = String.valueOf(request.getParameter(APPROVAL_DESIGNATION));
 		        try {
-		WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request, workOrderAgreement,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
+			WorkOrderAgreement savedWorkOrderAgreement = boQDetailsService.saveBoQDetailsData(request,
+					workOrderAgreement, approvalPosition, approvalComment, approvalDesignation, workFlowAction);
 		Long id=savedWorkOrderAgreement.getId();
 		if(workOrderAgreement.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:workOrderAgreement.getDocUpload()) {
-				System.out.println(":::: "+boq.getId()+":::::::"+boq.getComments()+":::::::::"+boq.getObjectId()+":::::"+boq.getFilestoreid());
+					System.out.println(":::: " + boq.getId() + ":::::::" + boq.getComments() + ":::::::::"
+							+ boq.getObjectId() + ":::::" + boq.getFilestoreid());
 				if(boq.getObjectId()!=null) {
 					Long update=boq.getObjectId();
 					boQDetailsService.updateDocuments(id,update);
@@ -430,9 +434,11 @@ private static Map<String, String> map;
 		        workOrderAgreement.setWorksWing(workOrderAgreement.getWorksWing());
 		        workOrderAgreement.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		        workOrderAgreement.setDepartment(workOrderAgreement.getDepartment());
-		        workOrderAgreement.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
+		workOrderAgreement.setNewdepartments(
+				estimatePreparationApprovalService.getdepartment(Long.valueOf(workOrderAgreement.getWorksWing())));
 		        workOrderAgreement.setSubdivision(workOrderAgreement.getSubdivision());
-		        workOrderAgreement.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment())));
+		workOrderAgreement.setSubdivisions(
+				estimatePreparationApprovalService.getsubdivision(Long.valueOf(workOrderAgreement.getDepartment())));
 		        workOrderAgreement.setDepartments(getDepartmentsFromMs());
 				workOrderAgreement.setContractors(getAllActiveContractors());
 				model.addAttribute(STATE_TYPE, workOrderAgreement.getClass().getSimpleName());
@@ -443,7 +449,8 @@ private static Map<String, String> map;
 	}
 	
 	@RequestMapping(value = "/success", method = RequestMethod.GET)
-    public String showSuccessPage(@RequestParam("approverDetails") final String approverDetails,@RequestParam("workflowaction") final String workflowaction, final Model model,
+	public String showSuccessPage(@RequestParam("approverDetails") final String approverDetails,
+			@RequestParam("workflowaction") final String workflowaction, final Model model,
                                   final HttpServletRequest request,@RequestParam("estId") final String estId) {
 		
 		WorkOrderAgreement savedWorkOrderAgreement=workOrderAgreementRepository.getOne(Long.parseLong(estId));
@@ -453,8 +460,10 @@ private static Map<String, String> map;
 
         return "works-success";
     }
+
 	@RequestMapping(value = "/savesuccess", method = RequestMethod.GET)
-    public String showSavePage(@RequestParam("ref_dsr") final String ref_dsr, final Model model,final HttpServletRequest request) {
+	public String showSavePage(@RequestParam("ref_dsr") final String ref_dsr, final Model model,
+			final HttpServletRequest request) {
 		
 		String message="BOQ Detail is successfully saved with Ref_Dsr/NS id : " +ref_dsr;
 
@@ -497,6 +506,7 @@ private static Map<String, String> map;
 		}
 		return msg;
 	}
+
 	public String getEmployeeName(Long empId){
         
 	       return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
@@ -849,9 +859,6 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 			System.out.println("Query :: "+query.toString());
 			list = persistenceService.findAllBy(query.toString(),ref);
 		
-		
-		 
-        
      if (list.size() != 0) {
     	 
         	 for (final Object[] object : list) {
@@ -1036,8 +1043,10 @@ public List<BoqNewDetails> checkAvailableBoq(final String ref) {
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 
 		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
-			//System.out.println("workOrderAgreement.getNewBoQDetailsList().size() :"+workOrderAgreement.getNewBoQDetailsList().size());
-		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",workOrderAgreement.getId());
+		// System.out.println("workOrderAgreement.getNewBoQDetailsList().size()
+		// :"+workOrderAgreement.getNewBoQDetailsList().size());
+		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Agreement",
+				workOrderAgreement.getId());
 		workOrderAgreement.setDocumentDetail(documents);
 
 		

@@ -18,7 +18,7 @@
 </style>
 <div class="tab-pane fade in active">
 	<div class="panel panel-primary" data-collapsed="0">
-		<div class="form-group" style="padding: 50px 20px 1000px;">
+		<div class="form-group" style="padding: 50px 20px 650px;">
 
 			
 			<input type="hidden" name="estimatePreparationApproval"

@@ -16,6 +16,14 @@
     color: black;
     vertical-align: top;
 }
+.nav-tabs {
+    border-bottom: 1px solid #ddd;
+    position: absolute;
+    z-index: 9999999;
+    width: 100%;
+    background-color: white;
+	margin-left: -1px;
+}
 </style>
 	
 		<form:form name="create-estimate-form" role="form"

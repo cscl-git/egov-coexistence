@@ -248,11 +248,11 @@ public class RemittanceServiceImpl extends RemittanceService {
                         final Remittance remittance = populateAndPersistRemittanceNew(totalCashAmt, null, fundCode,
                                 cashInHandGLCode, null, serviceGlCodes, functionCode, receiptBean, createVoucher,
                                 narration,voucherDate, depositedBankAccount, totalCashVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
-                                null,deptIdnew);
+                                null,deptIdnew,subdivisonNew);
                         
                         receiptBean.setRemittanceReferenceNumber(remittance.getReferenceNumber());
                         receiptBean.setRemittanceVouherNumber(remittance.getReferenceVoucherNumber());
-                        
+                        receiptBean.setVoucherid(remittance.getVoucherid());
                         for(String key : keys)
                         {
                         	try {
@@ -452,10 +452,11 @@ public class RemittanceServiceImpl extends RemittanceService {
                     + " between bank challan and the remittance voucher , please contact system administrator ";
             throw new ValidationException(Arrays.asList(new ValidationError(validationMessage, validationMessage)));
         }
+        String subdivisonNew="";
         final Remittance remittance = populateAndPersistRemittance(totalCashAmt, BigDecimal.ZERO, fundCode,
                 cashInHandGLCode, null, serviceGlCode, functionCode, bankRemittanceList, createVoucher,
                 voucherDate, depositedBankAccount, totalCashVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
-                receiptInstrumentMap);
+                receiptInstrumentMap,subdivisonNew);
 
         switch (ApplicationThreadLocals.getCollectionVersion().toUpperCase()) {
         case "V2":
@@ -489,7 +490,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     @Transactional
     public CVoucherHeader createVoucherForRemittance(final String cashInHandGLCode, final String chequeInHandGLcode,
             final String serviceGLCode, final String functionCode, final BigDecimal totalCashVoucherAmt,
-            final BigDecimal totalChequeVoucherAmt, final Date voucherDate, final String fundCode, final String narration) {
+            final BigDecimal totalChequeVoucherAmt, final Date voucherDate, final String fundCode, final String narration, String subdivisonNew) {
         CVoucherHeader voucherHeader;
         final List<HashMap<String, Object>> accountCodeList = new ArrayList<>(0);
         HashMap<String, Object> accountcodedetailsHashMap;
@@ -509,7 +510,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     totalDebitAmount);
             accountCodeList.add(accountcodedetailsHashMap);
         }
-        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,null),
+        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,null,subdivisonNew),
                 accountCodeList, new ArrayList<HashMap<String, Object>>(0));
         return voucherHeader;
     }
@@ -517,7 +518,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     @Transactional
     public CVoucherHeader createVoucherForRemittanceNew(final String cashInHandGLCode, final String chequeInHandGLCode,
             final Map<String, BigDecimal> serviceGlCodes, final String functionCode, final List<BigDecimal> totalCashAmount,
-            final List<BigDecimal> totalChequeAmount, final Date voucherDate, final String fundCode, final String narration, String deptIdnew) {
+            final List<BigDecimal> totalChequeAmount, final Date voucherDate, final String fundCode, final String narration, String deptIdnew,String subdivisonNew) {
         CVoucherHeader voucherHeader;
         final List<HashMap<String, Object>> accountCodeList = new ArrayList<>(0);
         HashMap<String, Object> accountcodedetailsHashMap;
@@ -557,7 +558,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         }
 		
        
-        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,deptIdnew),
+        voucherHeader = financialsUtil.createRemittanceVoucher(prepareHeaderDetails(fundCode, functionCode, voucherDate,narration,deptIdnew,subdivisonNew),
                 accountCodeList, new ArrayList<HashMap<String, Object>>(0));
         return voucherHeader;
     }
@@ -583,7 +584,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             final Map<String, BigDecimal> serviceGlCodes, final String functionCode, final ReceiptBean receiptBean,
             final String createVoucher,final String narration, final Date voucherDate, final List<Bankaccount> depositedBankAccount,
             final BigDecimal totalCashVoucherAmt, final BigDecimal totalChequeVoucherAmt, List<String> instrumentId,
-            Map<String, Set<Instrument>> receiptInstrumentMap, String deptIdnew) {
+            Map<String, Set<Instrument>> receiptInstrumentMap, String deptIdnew, String subdivisonNew) {
     	System.out.println("fundCode "+fundCode);
     	System.out.println("cashInHandGLCode "+cashInHandGLCode);
     	System.out.println("chequeInHandGLcode "+chequeInHandGLcode);
@@ -640,8 +641,9 @@ public class RemittanceServiceImpl extends RemittanceService {
                 && (totalCashVoucherAmt.compareTo(BigDecimal.ZERO) > 0
                         || totalChequeVoucherAmt.compareTo(BigDecimal.ZERO) > 0)) {
             voucherHeader = createVoucherForRemittanceNew(cashInHandGLCode, chequeInHandGLcode, serviceGlCodes,
-                    functionCode, totalCashAmount, totalChequeAmount, voucherDate, fundCode,narration,deptIdnew);
+                    functionCode, totalCashAmount, totalChequeAmount, voucherDate, fundCode,narration,deptIdnew,subdivisonNew);
             remittance.setVoucherHeader(voucherHeader);
+            remittance.setVoucherid(voucherHeader.getId());
             remittance.setReferenceVoucherNumber(voucherHeader.getVoucherNumber());
         }
         
@@ -663,7 +665,7 @@ public class RemittanceServiceImpl extends RemittanceService {
             final String serviceGLCode, final String functionCode, final Set<Receipt> receiptHeadList,
             final String createVoucher, final Date voucherDate, final Bankaccount depositedBankAccount,
             final BigDecimal totalCashVoucherAmt, final BigDecimal totalChequeVoucherAmt, List<String> instrumentId,
-            Map<String, Set<Instrument>> receiptInstrumentMap) {
+            Map<String, Set<Instrument>> receiptInstrumentMap,String subdivisonNew) {
     	System.out.println("fundCode "+fundCode);
     	System.out.println("cashInHandGLCode "+cashInHandGLCode);
     	System.out.println("chequeInHandGLcode "+chequeInHandGLcode);
@@ -704,7 +706,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                 && (totalCashVoucherAmt.compareTo(BigDecimal.ZERO) > 0
                         || totalChequeVoucherAmt.compareTo(BigDecimal.ZERO) > 0)) {
             voucherHeader = createVoucherForRemittance(cashInHandGLCode, chequeInHandGLcode, serviceGLCode,
-                    functionCode, totalCashVoucherAmt, totalChequeVoucherAmt, voucherDate, fundCode,null);
+                    functionCode, totalCashVoucherAmt, totalChequeVoucherAmt, voucherDate, fundCode,null,subdivisonNew);
             remittance.setVoucherHeader(voucherHeader);
 			/*
 			 * for (Receipt receiptHeader : receiptHeadList) { Set<Instrument> instSet =
@@ -804,7 +806,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     }
 
     public HashMap<String, Object> prepareHeaderDetails(final String fundCode, final String functionCode,
-            final Date voucherDate,final String narration, String deptIdnew) {
+            final Date voucherDate,final String narration, String deptIdnew,String subdivisonNew) {
         final HashMap<String, Object> headerdetails = new HashMap<>(0);
 
         //final String deptCode = departmentService.getDepartmentByCode(deptIdnew).getCode();
@@ -822,6 +824,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         headerdetails.put(VoucherConstant.FUNDCODE, fundCode);
         headerdetails.put(VoucherConstant.DEPARTMENTCODE, deptIdnew);
         headerdetails.put(VoucherConstant.FUNCTIONCODE, functionCode);
+        headerdetails.put(VoucherConstant.SUBDIVISON, subdivisonNew);
         return headerdetails;
     }
 
@@ -1228,7 +1231,7 @@ public class RemittanceServiceImpl extends RemittanceService {
            		query.append(" and mrd.receipt_number = '"+ receiptNo+"'");
            	}		
            	if(collectedBy!=null && !collectedBy.equalsIgnoreCase("")) {
-           		query.append(" and mrd.collectedbyname = '"+ collectedBy+"'");
+           		query.append(" and lower(mrd.collectedbyname) like ('%"+ collectedBy.toLowerCase()+"%')");
            	}	 	
            	if(businessCode!=null && !businessCode.equalsIgnoreCase("-1")) {
            		query.append(" and mrd.servicename = '" + businessCode+"'");
@@ -1260,7 +1263,7 @@ public class RemittanceServiceImpl extends RemittanceService {
  	    			receiptBean.setReceiptId((object[10]!=null)?object[10].toString():"");
  	    			receiptBean.setReceiptNumber((object[1]!=null)?object[1].toString():"");
  	    		 	receiptBean.setReceiptDate((object[2]!=null)?object[2].toString():"");
- 	    		 	receiptBean.setSubDivision((object[3]!=null)?object[3].toString():"-1");
+ 	    		 	receiptBean.setSubDivision((object[3]!=null)?object[3].toString():"");
  	    		 	if(object[4]!= null) {
  						String s3 = null;
  						String s4 = null;
@@ -1295,6 +1298,7 @@ public class RemittanceServiceImpl extends RemittanceService {
  	    		 	if(object[1]!=null)
  	    		 	{
  	    		 		if(deptMap.containsKey(object[1].toString())){
+ 	    		 			LOGGER.info("departmentCode "+deptMap.get(object[1].toString()));
  	    		 			receiptBean.setDepartment(deptMap.get(object[1].toString()));
  	    		 		}
  	    		 	}
@@ -1304,6 +1308,7 @@ public class RemittanceServiceImpl extends RemittanceService {
  	    		 	if(object[1]!=null)
  	    		 	{
  	    		 		if(deptNameMap.containsKey(object[1].toString())){
+ 	    		 			LOGGER.info("departmentName "+deptNameMap.get(object[1].toString()));
  	    		 			receiptBean.setDepartmentName(deptNameMap.get(object[1].toString()));
  	    		 		}
  	    		 	}
@@ -2096,10 +2101,11 @@ public class RemittanceServiceImpl extends RemittanceService {
                     + " between bank challan and the remittance voucher , please contact system administrator ";
             throw new ValidationException(Arrays.asList(new ValidationError(validationMessage, validationMessage)));
         }
+        String subdivisonNew="";
         final Remittance remittance = populateAndPersistRemittance(BigDecimal.ZERO, totalChequeAmount, fundCode, null,
                 chequeInHandGlcode, serviceGlCode, functionCode, new HashSet(receiptList), createVoucher,
                 voucherDate, depositedBankAccount, BigDecimal.ZERO, totalChequeVoucherAmt,
-                instrumentIdList, receiptInstrumentMap);
+                instrumentIdList, receiptInstrumentMap,subdivisonNew);
 
         // For cheque update instrument status to deposited.
         for (final RemittanceInstrument bankRemitInstrument : remittance.getRemittanceInstruments()) {
@@ -2216,10 +2222,11 @@ public class RemittanceServiceImpl extends RemittanceService {
                         final Remittance remittance = populateAndPersistRemittanceNew(null, totalChequeAmt, fundCode,
                                 chequeInHandGlcode, null, serviceGlCodes, functionCode, receiptBeanList, createVoucher,
                                 narration,voucherDate, depositedBankAccount, totalChequeVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
-                                null,deptCode);
+                                null,deptCode,subdivisonNew);
                         
                         receiptBeanList.setRemittanceReferenceNumber(remittance.getReferenceNumber());
                         receiptBeanList.setRemittanceVouherNumber(remittance.getReferenceVoucherNumber());
+                        receiptBeanList.setVoucherid(remittance.getVoucherid());
                         for(String key : keys)
                         {
                         	try {

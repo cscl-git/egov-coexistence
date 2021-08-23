@@ -309,6 +309,10 @@
         <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/preparationapproval.jsp"/>
     </definition>
+    <definition name="estimatepreparationapproval-form-detail" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.preparation.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/preparationapprovaldetail.jsp"/>
+    </definition>
     
     <definition name="estimate-detail-search-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.search.create" cascade="true"/>
@@ -323,6 +327,11 @@
     <definition name="search-estimate-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate.jsp"/>
+    </definition>
+    
+    <definition name="search-estimate-form1" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate1.jsp"/>
     </definition>
     
     <definition name="search-detailed-estimate-form" extends="base_layout">
@@ -452,7 +461,6 @@
         <put-attribute name="body" value="/WEB-INF/views/boq/viewnewboqdetails.jsp"/>
     </definition>
     
-   <!-- Added edititable DNIT -->
    <definition name="search-edit-dnit-form" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/dnitCreation/searcheditdnit.jsp"/>
@@ -481,16 +489,10 @@
         <put-attribute name="page-title" value="title.work.estimate.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/workestimate/searchworkestimate-dnitCreation.jsp"/>
     </definition>
-    
-
 <definition name="view-data" extends="base_layout">
         <put-attribute name="page-title" value="lbl.work.edit" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/boq/viewdata.jsp"/>
     </definition>
- <definition name="search-estimate-form1" extends="base_layout">
-        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
-        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate1.jsp"/>
-    </definition>    
     
 </tiles-definitions>
 
