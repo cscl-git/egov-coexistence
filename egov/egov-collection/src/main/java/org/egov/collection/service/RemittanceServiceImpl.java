@@ -824,7 +824,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         headerdetails.put(VoucherConstant.FUNDCODE, fundCode);
         headerdetails.put(VoucherConstant.DEPARTMENTCODE, deptIdnew);
         headerdetails.put(VoucherConstant.FUNCTIONCODE, functionCode);
-        headerdetails.put(VoucherConstant.SUBDIVISON, subdivisonNew);
+        headerdetails.put("subdivison", subdivisonNew);
         return headerdetails;
     }
 

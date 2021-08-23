@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -37,8 +38,9 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.apache.poi.ss.usermodel.WorkbookFactory;												   
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
@@ -58,7 +60,6 @@ import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.works.boq.entity.BoQDetails;
-import org.egov.works.boq.entity.BoqNewDetails;
 import org.egov.works.boq.entity.BoqUploadDocument;
 //import org.egov.works.boq.service.BoqDetailsPopService;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
@@ -78,7 +79,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -87,8 +87,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.support.WebBindingInitializer;
-import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
 
 @Controller
@@ -108,6 +106,9 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	
 	@Autowired
 	private SudivisionRepository subdivision;
+	
+	@Autowired
+    private EgwStatusHibernateDAO egwStatusDAO;
 
 	@Autowired
 	WorkEstimateService workEstimateService;
@@ -194,8 +195,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	public String detailestimate(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
-		estimatePreparationApproval.setSector(getsectorlist());
-		estimatePreparationApproval.setWardnumber(getwardlist());
+		//estimatePreparationApproval.setSector(getsectorlist());
+		//estimatePreparationApproval.setWardnumber(getwardlist());
 		
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
@@ -287,7 +288,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
         EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalService
 				.saveEstimatePreparationData(request, estimatePreparationApproval,approvalPosition,approvalComment,approvalDesignation,workFlowAction);
 
-	
 		Long id=savedEstimatePreparationApproval.getId();
 		if(estimatePreparationApproval.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
@@ -298,7 +298,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				}
 			}
 		}
-																							  
 		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
         + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
        }catch(Exception e) {
@@ -386,12 +385,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		estimatePreparationApproval.setAanumber(aaNumber);
 		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
 		if(estimatePreparationApproval.getState()==null) {
-			EgwStatus statusnew=new EgwStatus();
-			statusnew.setModuletype("EstimatePreparationApproval");
-			statusnew.setDescription("AA Pending for Approval");
-			statusnew.setCode("AA Pending for Approval");
-			statusnew.setOrderId("4");
-			estimatePreparationApproval.setStatus(statusnew);
+			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Pending for Approval"));
 		}
 		//start of workflow
 		Long approvalPosition = 0l;
@@ -939,7 +933,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				}
 			}
 		}
-        											
 		return "redirect:/estimatePreparation/success?approverDetails=" + approvalPosition + "&estId="
         + savedEstimatePreparationApproval.getId()+"&workflowaction="+workFlowAction;
         }catch(Exception e) {
@@ -1265,7 +1258,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		
 		
 		 Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		 
 		 estimatePreparationApproval.setDocUpload(docUpload);
 		 List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
@@ -1691,8 +1684,8 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 				docUpload.stream().collect(Collectors.groupingBy(BoqUploadDocument::getObjectType));
 		 
 		 System.out.println("::::::::: "+estimatePreparationApproval.getRoughCostdocumentDetail().size());
-		 estimatePreparationApproval.setSector(getsectorlist());
-			estimatePreparationApproval.setWardnumber(getwardlist());
+		 //estimatePreparationApproval.setSector(getsectorlist());
+			//estimatePreparationApproval.setWardnumber(getwardlist());
 		//estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
@@ -1752,6 +1745,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 			@ModelAttribute("workEstimateDetails") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
 
+		estimatePreparationApproval.setWorkswings(estimatePreparationApprovalService.getworskwing());
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		model.addAttribute("workEstimateDetails", estimatePreparationApproval);
 
@@ -1886,18 +1880,17 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		 List<Object[]> list =null;
 		 query
 	        .append(
-	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es  ")
+	                "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es  ");
 					 query.append(" where es.id> ? ");
 		 if(estimatePreparationApproval.getExecutingDivision()!=null)
 	        	{
 	        	query.append("and es.executingDivision ='").append(estimatePreparationApproval.getExecutingDivision()).append("'");
 	        	}
-	        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
+	        query.append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
 	        .append(getMisQuery(estimatePreparationApproval));
 			estimatePreparationApproval.setId(0l);
 		 System.out.println("Query :: "+query.toString());
-         list = persistenceService.findAllBy(query.toString(),
-        		 estimatePreparationApproval.getExecutingDivision());
+         list = persistenceService.findAllBy(query.toString(),estimatePreparationApproval.getId());
 		 
          if (list.size() != 0) {
         	 
@@ -2072,7 +2065,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 			}
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		 
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		
@@ -2129,7 +2122,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		 
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
@@ -2446,7 +2439,7 @@ Double d = cell.getNumericCellValue();
 	uploadDoc.add(doc1);
 	
 	Map<String, List<BoQDetails>> groupByMilesToneMap = 
-			  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 	model.addAttribute("milestoneList",groupByMilesToneMap);
 	int k=1;
 	System.out.println(":::::Size:::: "+boQDetailsList.size());
@@ -2971,7 +2964,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		uploadDoc.add(doc1);
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		
 		}else {
