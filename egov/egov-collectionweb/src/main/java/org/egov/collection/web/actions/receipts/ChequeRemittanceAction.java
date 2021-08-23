@@ -160,7 +160,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 	private File[] file; // added abhishek
 	private String[] fileContentType; // added abhishek
 	private String[] fileFileName; // added abhishek
-	private List<DocumentUpload> documentDetail = new ArrayList<>(); // added abhishek
+	private List<DocumentUploads> documentDetail = new ArrayList<>(); // added abhishek
     @Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
@@ -496,7 +496,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 			  try { 
 				  fileBytes = Files.readAllBytes(path); 
 				  ByteArrayInputStream bios= new ByteArrayInputStream(fileBytes); 
-				  DocumentUpload upload = new DocumentUpload(); 
+				  DocumentUploads upload = new DocumentUploads(); 
 				  upload.setInputStream(bios);
 				  upload.setFileName(fileName[i]); 
 				  upload.setContentType(contentType[i]);
@@ -1031,11 +1031,11 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		this.fileFileName = fileFileName;
 	}
 
-	public List<DocumentUpload> getDocumentDetail() {
+	public List<DocumentUploads> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 

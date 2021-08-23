@@ -150,7 +150,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
 	private String department;
 	private String depositDate;
 	@Transient
-    private List<DocumentUpload> documentDetail = new ArrayList<>();
+    private List<DocumentUploads> documentDetail = new ArrayList<>();
     
     public String getRemittanceVoucherNumber() {
 		return remittanceVoucherNumber;
@@ -160,11 +160,11 @@ public class ReceiptHeader extends StateAware implements Auditable {
 		this.remittanceVoucherNumber = remittanceVoucherNumber;
 	}
 
-    public List<DocumentUpload> getDocumentDetail() {
+    public List<DocumentUploads> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
 		if (documentDetail != null)
             this.documentDetail.addAll(documentDetail);
 	}

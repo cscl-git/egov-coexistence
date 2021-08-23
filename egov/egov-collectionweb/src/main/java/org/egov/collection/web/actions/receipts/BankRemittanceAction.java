@@ -185,7 +185,7 @@ public class BankRemittanceAction extends BaseFormAction {
 	private File[] file; // added abhishek
 	private String[] fileContentType; // added abhishek
 	private String[] fileFileName; // added abhishek
-	private List<DocumentUpload> documentDetail = new ArrayList<>(); // added abhishek
+	private List<DocumentUploads> documentDetail = new ArrayList<>(); // added abhishek
 	private String deptId = "-1";
 	private String collectedBy = "";
 	private String modeOfPayment = "";
@@ -268,11 +268,11 @@ public class BankRemittanceAction extends BaseFormAction {
 		this.deptId = deptId;
 	}
 
-	public List<DocumentUpload> getDocumentDetail() {
+	public List<DocumentUploads> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
+	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 
@@ -568,7 +568,7 @@ public class BankRemittanceAction extends BaseFormAction {
 			  try { 
 				  fileBytes = Files.readAllBytes(path); 
 				  ByteArrayInputStream bios= new ByteArrayInputStream(fileBytes); 
-				  DocumentUpload upload = new DocumentUpload(); 
+				  DocumentUploads upload = new DocumentUploads(); 
 				  upload.setInputStream(bios);
 				  upload.setFileName(fileName[i]); 
 				  upload.setContentType(contentType[i]);
