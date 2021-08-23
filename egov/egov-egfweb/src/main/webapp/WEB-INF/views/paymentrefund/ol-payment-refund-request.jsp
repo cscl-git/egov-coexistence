@@ -129,7 +129,7 @@
 				<option value=""><spring:message code="lbl.select" text="Select"/></option>
 				<c:forEach items="${billSubTypes}" var="subType"
 											varStatus="loop">
-											<option value="${subType.value}">${subType.value}</option>
+											<option value="${subType.id}">${subType.name}</option>
 										</c:forEach>
 				<%-- <options items="${billSubTypes}" itemValue="id" itemLabel="name" /> --%>
 			</select>
@@ -204,7 +204,7 @@
 					<input path="" name="billDetails[0].creditamount" id="billDetails[0].creditamount" data-errormsg="Credit Amount is mandatory!" onkeyup="decimalvalue(this);" onblur="calcualteNetpaybleAmount();" data-pattern="decimalvalue" data-idx="0" data-optional="0" class="form-control table-input text-right creditAmount"   maxlength="12"  />
 				</td> -->
 				<!-- <td>0</td> -->
-				<td><input type="text" name="billDetails[0].refunddebitamount" id="billDetails[0].refunddebitamount" onchange="changeGlCodeBlank(this)"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
+				<td><input type="text" name="billDetails[0].debitamount" id="billDetails[0].debitamount" onchange="changeGlCodeBlank(this)"  oninput="this.value=this.value.replace(/[^0-9.]/g, '').replace(/(\..*)\./g, '$1');"
 			   class="form-control"/></td> 
 								
 				<td class="text-center"><span style="cursor:pointer;" onclick="addCreditDetailsRow();" tabindex="0" id="tempCreditDetails[0].addButton" data-toggle="tooltip" title="" data-original-title="press ENTER to Add!" aria-hidden="true"><i class="fa fa-plus"></i></span>

@@ -1581,7 +1581,7 @@ function viewVoucher(vhid){
 	window.open('/services/EGF/refund/_viewVoucher?vhid=' + vhid,'','width=1200, height=800');
 }
 
-function validateFormGlcode(workFlowAction){
+function validateFormGlcode(){
 	var status = false;
 	var glcodeArr =[];
 	

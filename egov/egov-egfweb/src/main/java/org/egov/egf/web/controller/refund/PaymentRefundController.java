@@ -1,6 +1,7 @@
 package org.egov.egf.web.controller.refund;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -39,6 +40,9 @@ import org.egov.commons.CGeneralLedger;
 import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
+import org.egov.commons.Fundsource;
+import org.egov.commons.Scheme;
+import org.egov.commons.SubScheme;
 import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.FunctionDAO;
 import org.egov.commons.service.AccountdetailtypeService;
@@ -130,6 +134,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.exilant.eGov.src.common.SubDivision;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
 @RequestMapping("/refund")
@@ -840,7 +845,10 @@ public class PaymentRefundController extends BaseBillController {
         	subdivisionList.add(subdivision);
         	
         }
-        //addDropdownData("subdivisionList", subdivisionList);
+        
+         List<Scheme> schemeList = new ArrayList<Scheme>();
+         List<SubScheme> subSchemes = new ArrayList<SubScheme>();
+         List<Fundsource> fundSource = new ArrayList<Fundsource>();
     	
         model.addAttribute("billNumberGenerationAuto", refundBillService.isBillNumberGenerationAuto());
         model.addAttribute("billSubTypes", billSubtypes);
@@ -848,6 +856,10 @@ public class PaymentRefundController extends BaseBillController {
         model.addAttribute("subdivisionList", subdivisionList);
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
         model.addAttribute("fundList",	paymentRefundUtils.getAllFunds());
+        
+        model.addAttribute("subSchemeList",subSchemes);
+        model.addAttribute("schemeList",schemeList);
+        model.addAttribute("fundsourceList",fundSource);
     }
     
     public List<EgBillSubType> getBillSubTypesRef() {

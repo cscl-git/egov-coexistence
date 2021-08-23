@@ -582,7 +582,7 @@ $('.subledgerGl_code').change(function () {
 					//netPayableAccountCodeNode.options.length = 0;
 					//netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option('Select from below','')
 					
-					 $('#tblcreditdetails  > tbody > tr:visible[id="creditdetailsrow"]').each(function(index) {
+					 /*$('#tblcreditdetails  > tbody > tr:visible[id="creditdetailsrow"]').each(function(index) {
 						var selected="";
 						
 						 var glcodeid =document.getElementById('tempCreditDetails['+index+'].glcodeid').value;
@@ -594,7 +594,7 @@ $('.subledgerGl_code').change(function () {
 						netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option(glcode + '-' +name + '~' + issubledger,  glcodeid);
 					
 							 }
-					});
+					});*/
 
 		
 });
@@ -1595,8 +1595,8 @@ function changeGlCodeBlank(ele){
 
 	for(var i=0;i<creditDetailsCount;++i){
 	
-	if(document.getElementById('billDetails['+i+'].refunddebitamount').value != "" && document.getElementById('billDetails['+i+'].refunddebitamount').value !=null){
-      var k= document.getElementById('billDetails['+i+'].refunddebitamount').value;         
+	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
+      var k= document.getElementById('billDetails['+i+'].debitamount').value;         
       var j = document.getElementById('billDetails['+i+'].debitamount').value;
 
      if(j!=null && j!="" && parseInt(k)<=parseInt(j)){
@@ -1607,7 +1607,7 @@ function changeGlCodeBlank(ele){
 		  $('#glcodeid').append(k); 
 
       }else{
-      	document.getElementById('billDetails['+i+'].refunddebitamount').value='';
+      	document.getElementById('billDetails['+i+'].debitamount').value='';
 			bootbox.alert('Please fill valid debit amount for '+document.getElementById('billDetails['+i+'].glcode').value+' code.');	
 			
 	   }
@@ -1699,7 +1699,7 @@ function validateFormGlcode(workFlowAction){
 	
 	var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
 			for(var i=0;i<creditDetailsCount;i++){
-				var total_to_check = document.getElementById('billDetails['+i+'].refunddebitamount').value;
+				var total_to_check = document.getElementById('billDetails['+i+'].debitamount').value;
 				var glcode_to_check = document.getElementById('billDetails['+i+'].glcodeid').value;
 				var glocode_alert =  document.getElementById('billDetails['+i+'].glcode').value;
 				var subledgerDetailsCount = $("#tblSubledgerAdd > tbody > tr:visible[id='subledgerdetailsrow']").length;
@@ -1709,45 +1709,52 @@ function validateFormGlcode(workFlowAction){
 					var glname_now = "billPayeedetails["+j+"].egBilldetailsId.glcodeid";
 					$("billPayeedetails["+j+"].egBilldetailsId.glcodeid").val();
 					var subledgerglcode=  $("[name='"+glname_now+"']").val();
+
 					if(subledgerglcode!=null && glcode_to_check!=null && glcode_to_check==subledgerglcode){
-					var amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_0mount').value;
+						var amount = null
+						if(i<=creditDetailsCount){
+                               amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_Amount').value;
+						}if(i>1){
+							   amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_0mount').value;
+						}
+					  
 						if(amount ==null || amount==""){
 							alert("Amount is empty in Subledger for glocode "+glocode_alert);
 							return;
 						}else{
 							sum = parseInt(sum)+parseInt(amount);
-							
+					
 						}	
 					}		
 				}
-	
+				
 				if(sum!=total_to_check){
 					alert("Amount is invalid in Subledger for glocode "+glocode_alert);
 					return ;
 				}		 
 			}	 
+							
 		
-	             
 			document.getElementById("workFlowAction").value = workFlowAction;
-
+	             
 			//var dept=document.getElementById('department').value;
 			//var fund=document.getElementById('fund').value;
 			var func=document.getElementById('egBillregistermis.function').value;
 			var billtype = document.getElementById('billSubType').value;
-			
+
 			var accCode='';
 			var status = false;
+			
 
 					 
 	 
-
 			/* if(billtype == null || billtype == '' ||billtype=='-1')
 				{
 					bootbox.alert('Please select Function to view budget details');
 					status = true;
 					return false
 				}
-	
+
 			 if(func == null || func == '' ||func=='-1')
 			{
 				bootbox.alert('Please select Function to view budget details');

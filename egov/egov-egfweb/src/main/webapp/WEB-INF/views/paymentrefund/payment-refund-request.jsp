@@ -285,7 +285,7 @@
 		  <c:otherwise>
 			<tr id="subledgerdetailsrow">
 			  <td>
-				  <select id="tempSubLedger[0].netPayableAccountCode" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
+				  <select id="glcodeid" data-first-option="false" name="billPayeedetails[0].egBilldetailsId.glcodeid" class="form-control netPayableAccount_Code" required="required">
 				  <option value=""><spring:message code="lbl.select" text="Select"/>
 				  <c:forEach var="accountDetail" items="${accountDetails}">
 				    <c:if test="${not empty accountDetail.creditamount && accountDetail.creditamount ne '0.00'}">
@@ -472,7 +472,7 @@
 			<td id="actionButtons">
 				<c:if test="${mode != 'readOnly'}">
 					<c:forEach items="${validActionList}" var="validButtons">
-						<input type="button" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"  onclick="return validateFormGlcode(this.value);"/>
+						<input type="submit" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"  onclick="return validateFormGlcode();"/>
 					</c:forEach>
 				</c:if>
 				<input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />
