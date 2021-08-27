@@ -130,7 +130,14 @@
 							
 						</form:select>
 						</div>
+<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.estimate.preparation.aa.exp.head" /><span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+					<form:input type="text" class="form-control" path="expHead_est"
+					value="${workOrderAgreement.expHead_est}" readonly="true" />
 
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.amount.wrk" /></label>
 					<div class="col-sm-3 add-margin">
@@ -281,6 +288,7 @@
 									<form:option value="23">23</form:option>
 									<form:option value="24">24</form:option>
 									<form:option value="25">25</form:option>
+									<form:option value="26">26</form:option>
 								</form:select>
 							</div>
 

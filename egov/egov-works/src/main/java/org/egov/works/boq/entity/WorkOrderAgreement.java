@@ -180,6 +180,9 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Column(name="workfrom")
 	private String workfrom;
 	
+	@Column(name = "expenditure_head_est")
+	private String expHead_est;
+	
 	@Transient
 	private List<String> sectorlist;
 	@Transient
@@ -899,6 +902,14 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setWorkfrom(String workfrom) {
 		this.workfrom = workfrom;
+	}
+
+	public String getExpHead_est() {
+		return expHead_est;
+	}
+
+	public void setExpHead_est(String expHead_est) {
+		this.expHead_est = expHead_est;
 	}
 
 	

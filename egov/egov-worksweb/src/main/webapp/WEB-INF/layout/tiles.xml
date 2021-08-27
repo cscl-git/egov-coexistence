@@ -328,6 +328,10 @@
         <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/searchEstimate.jsp"/>
     </definition>
+    <definition name="worksabstractliabilities-excel" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatepreparationapproval/worksabstractsearch.jsp"/>
+    </definition>
     
     <definition name="search-estimate-form1" extends="base_layout">
         <put-attribute name="page-title" value="title.estimate.search" cascade="true"/>

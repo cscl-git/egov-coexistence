@@ -191,7 +191,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "estimatepreparationapproval-form";
 	}
 
-@RequestMapping(value = "/newformdetail", method = RequestMethod.POST)
+	@RequestMapping(value = "/newformdetail", method = RequestMethod.POST)
 	public String detailestimate(
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {

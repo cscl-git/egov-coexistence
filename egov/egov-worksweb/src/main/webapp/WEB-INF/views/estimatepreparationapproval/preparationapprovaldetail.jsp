@@ -52,15 +52,6 @@
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
 
-	<%-- <c:if test="${error == 'Y' }">
-<div class="panel panel-primary" data-collapsed="0">
-			<div class="panel-heading">
-				<div class="panel-title text-center">
-					<c:out value="${message }" /><br />
-					
-				</div>
-			</div>
-</c:if> --%>
 
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="estimate">
@@ -84,9 +75,6 @@
 							</form:option>
 							<form:options items="${estimatePreparationApproval.workswings}"
 								itemValue="id" itemLabel="workswingname" />
-							<%-- <form:option value="Building & Roads">Building & Roads</form:option>
-							<form:option value="Public Health">Public Health</form:option>
-							<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
 						</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -144,6 +132,11 @@
 							<form:option value="Revenue">Revenue</form:option>
 							<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
 							<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+							<form:option value="Mayor Dev Fund">Mayor Dev Fund</form:option>
+								<form:option value="SR.DY.DEV Fund">SR.DY.DEV Fund</form:option>
+								<form:option value="DY.MAYOR DEV Fund">DY.MAYOR DEV Fund</form:option>
+								<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
+								<form:option value="CARPETTING WORK">CARPETTING WORK</form:option>
 						</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -152,11 +145,10 @@
 						<form:select path="sectorNumber" id="sectorNumber"
 							multiple="multiple" cssClass="form-control-works"
 							cssErrorClass="form-control-works error">
-							<form:option value="">
-								<spring:message code="lbl.select" /></form:option>
-							<form:options items="${estimatePreparationApproval.sector}"
-								 />
-							<%-- <form:option value="1">1 </form:option>
+									<form:option value="">
+										<spring:message code="lbl.select" />
+									</form:option>
+							<form:option value="1">1 </form:option>
 							<form:option value="2">2 </form:option>
 							<form:option value="3">3 </form:option>
 							<form:option value="4">4 </form:option>
@@ -233,19 +225,23 @@
 							<form:option value="Badheri">Badheri </form:option>
 							<form:option value="Baterla">Baterla </form:option>
 							<form:option value="Attawa">Attawa </form:option>
-							<form:option value="Faidan Burail">Faidan Burail </form:option>
+							<form:option value="Faidan">Faidan</form:option>
 							<form:option value="Char Taraf Burail">Char Taraf Burail </form:option>
-							<form:option value="Kajheri Hallo Majra">Kajheri Hallo Majra </form:option>
-							<form:option value="Bohlana">Bohlana </form:option>
+							<form:option value="Kajhri">Kajhri</form:option>
+							<form:option value="Behlana">Behlana </form:option>
 							<form:option value="Raipur Khurd">Raipur Khurd </form:option>
 							<form:option value="Raipur Kalan">Raipur Kalan </form:option>
 							<form:option value="Makhan Majra">Makhan Majra </form:option>
 							<form:option value="Mauli Jagran">Mauli Jagran </form:option>
 							<form:option value="Daria">Daria </form:option>
-							<form:option value="Mani Majara">Mani Majara </form:option>
+							<form:option value="Manimajra">Manimajra</form:option>
 							<form:option value="Indusrial Area Phase I">Indusrial Area Phase I </form:option>
-							<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>--%>
-						</form:select> 
+							<form:option value="Indusrial Area Phase II">Indusrial Area Phase II </form:option>
+							<form:option value="SECTOR 56">SECTOR 56</form:option>
+							<form:option value="RAMDERVAR">RAMDERVAR</form:option>
+							<form:option value="BURAIL">BURAIL</form:option>
+							<form:option value="HALLOMAJRA">HALLOMAJRA</form:option>
+								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.ward.number" /></label>
@@ -253,37 +249,36 @@
 						<form:select path="wardNumber" id="wardNumber" multiple="multiple"
 							cssClass="form-control-works"
 							cssErrorClass="form-control-works error">
-							<form:option value="">
-								<spring:message code="lbl.select" /></form:option>
-								<form:options items="${estimatePreparationApproval.wardnumber}"
-								 />
-							<%-- </form:option>
-							<form:option value="1">1 </form:option>
-							<form:option value="2">2</form:option>
-							<form:option value="3">3</form:option>
-							<form:option value="4">4</form:option>
-							<form:option value="5">5</form:option>
-							<form:option value="6">6</form:option>
-							<form:option value="7">7</form:option>
-							<form:option value="8">8</form:option>
-							<form:option value="9">9</form:option>
-							<form:option value="10">10</form:option>
-							<form:option value="11">11</form:option>
-							<form:option value="12">12</form:option>
-							<form:option value="13">13</form:option>
-							<form:option value="14">14</form:option>
-							<form:option value="15">15</form:option>
-							<form:option value="16">16</form:option>
-							<form:option value="17">17</form:option>
-							<form:option value="18">18</form:option>
-							<form:option value="19">19</form:option>
-							<form:option value="20">20</form:option>
-							<form:option value="21">21</form:option>
-							<form:option value="22">22</form:option>
-							<form:option value="23">23</form:option>
-							<form:option value="24">24</form:option>
-							<form:option value="25">25</form:option>--%>
-						</form:select> 
+									<form:option value="">
+										<spring:message code="lbl.select" />
+									</form:option>
+									<form:option value="1">1 </form:option>
+									<form:option value="2">2</form:option>
+									<form:option value="3">3</form:option>
+									<form:option value="4">4</form:option>
+									<form:option value="5">5</form:option>
+									<form:option value="6">6</form:option>
+									<form:option value="7">7</form:option>
+									<form:option value="8">8</form:option>
+									<form:option value="9">9</form:option>
+									<form:option value="10">10</form:option>
+									<form:option value="11">11</form:option>
+									<form:option value="12">12</form:option>
+									<form:option value="13">13</form:option>
+									<form:option value="14">14</form:option>
+									<form:option value="15">15</form:option>
+									<form:option value="16">16</form:option>
+									<form:option value="17">17</form:option>
+									<form:option value="18">18</form:option>
+									<form:option value="19">19</form:option>
+									<form:option value="20">20</form:option>
+									<form:option value="21">21</form:option>
+									<form:option value="22">22</form:option>
+									<form:option value="23">23</form:option>
+									<form:option value="24">24</form:option>
+									<form:option value="25">25</form:option>
+									<form:option value="26">26</form:option>
+								</form:select> 
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message

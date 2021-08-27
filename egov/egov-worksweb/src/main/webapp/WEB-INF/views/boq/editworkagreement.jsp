@@ -39,8 +39,6 @@
 		
   } );
   </script>   
-<script
-        src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
 <form:form name="workOrderAgreementForm" role="form" method="post"
 	action="work1" modelAttribute="workOrderAgreement"
 	id="workOrderAgreement" class="form-horizontal form-groups-bordered"
@@ -150,6 +148,21 @@
 
 						</form:select>
 						</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.estimate.preparation.aa.exp.head" /><span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="expHead_est" id="wardCheck"
+							cssClass="form-control" cssErrorClass="form-control error">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:option value="Capital">Capital</form:option>
+							<form:option value="Revenue">Revenue</form:option>
+							<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
+							<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+						</form:select>
+					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.amount.wrk" /></label>
 					<div class="col-sm-3 add-margin">

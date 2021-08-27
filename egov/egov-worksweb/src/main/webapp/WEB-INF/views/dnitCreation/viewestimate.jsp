@@ -69,6 +69,14 @@
 				</form:select>
 			</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
+							code="lbl.estimate.preparation.aa.exp.head" /><span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+					<form:input type="text" class="form-control" path="expHead_est"
+					value="${estimatePreparationApproval.expHead_est}" readonly="true" />
+						
+					</div>
+			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.estimate.date" /><span
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">

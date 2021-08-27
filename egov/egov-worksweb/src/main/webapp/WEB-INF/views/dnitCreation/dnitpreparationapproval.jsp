@@ -91,6 +91,21 @@
 								</form:select>
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
+							code="lbl.estimate.preparation.aa.exp.head" /><span
+						class="mandatory"></span></label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="expHead_est" id="wardCheck"
+							cssClass="form-control" cssErrorClass="form-control error">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:option value="Capital">Capital</form:option>
+							<form:option value="Revenue">Revenue</form:option>
+							<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
+							<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.dnit.date" /><span
 						class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">

@@ -52,11 +52,20 @@ function setWorkflow(action)
 						document.getElementById('workScope').focus();
 						return false;
 					}
-					if(!(a != null && a!="" && b != null && b!="" && c != null && c!="" && d != null && d!="" && e != null && e!="" && f != null && f!="")){
+					if(document.getElementById('wardCheck') != null && document.getElementById('wardCheck').value == '')
+					{
+						bootbox.alert("Please Select Expenditure Head.");
+						document.getElementById('wardCheck').focus();
+						return false;
+					}
+					if(a != null && a!="" && b != null && b!="" && c != null && c!="" && d != null && d!="" && e != null && e!="" && f != null && f!=""){
 						
+						return true;
+					}else{
 						bootbox.alert("Please Upload Boq File.")
 						return false;
 					}
+					
 					if(document.getElementById('wardCheck') != null && document.getElementById('wardCheck').value != '')
 					{
 					var wardcheck=document.getElementById('wardCheck').value;

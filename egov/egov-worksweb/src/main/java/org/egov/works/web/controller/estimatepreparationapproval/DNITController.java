@@ -21,11 +21,16 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,6 +46,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.Department;
@@ -60,16 +66,21 @@ import org.egov.works.boq.entity.BoqUploadDocument;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.WorksAbstractliabilities;
 import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.egov.works.estimatepreparationapproval.service.DNITCreationService;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
+import org.egov.works.utils.ExcelGenerator;
 import org.egov.works.workestimate.service.WorkDnitService;
 import org.egov.works.workestimate.service.WorkEstimateService;
 import org.python.icu.text.RuleBasedBreakIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -118,6 +129,7 @@ public class DNITController extends GenericWorkFlowController {
     private static final int BUFFER_SIZE = 4096;
     public static final Locale LOCALE = new Locale("en", "IN");
     public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
+    public static final SimpleDateFormat DDMMYYYYFORMAT2 = new SimpleDateFormat("yyyy/MM/dd", LOCALE);
     
     @Autowired
 	private FileStoreService fileStoreService;
@@ -125,6 +137,9 @@ public class DNITController extends GenericWorkFlowController {
     @Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
+    
+    @PersistenceContext
+   	private EntityManager entityManager;
     
     @Autowired
 	private DocumentUploadRepository documentUploadRepository;
@@ -950,7 +965,7 @@ DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation)
 		
 		
 		  Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		 
 		  List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
 			
@@ -1291,7 +1306,7 @@ DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation)
 		
 		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		 
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		
@@ -1342,10 +1357,10 @@ estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartme
 				boq.setSizeIndex(boQDetailsList.size());
 				boQDetailsList.add(boq);
 			}
-		
-		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
+		
+		
 		 //System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
@@ -1415,9 +1430,9 @@ if (id !=null && id != "" && slno!= null && slno!="" ) {
 				boQDetailsList.add(boq);
 			}
 		
-		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
+		
 		 System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
@@ -1590,9 +1605,9 @@ estimateDetails.setEstimateAmount(estimateDetails.getEstimateAmount().setScale(2
 				boQDetailsList.add(boq);
 			}
 		
-		
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
+		
 		 System.out.println(groupByMilesToneMap+"+++++++++++++++++++++++++++++++++++++++++");
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute(STATE_TYPE, estimateDetails.getClass().getSimpleName());
@@ -1946,7 +1961,7 @@ List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
 		doc1.setFileStore(savedocebefore.getFileStore());
 		uploadDoc.add(doc1);
 		Map<String, List<BoQDetails>> groupByMilesToneMap = 
-				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		model.addAttribute("milestoneList",groupByMilesToneMap);
 		model.addAttribute("uploadDocID",uploadDoc);
 		}
@@ -2848,6 +2863,721 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		}
 		return pendingWith;
 	}
+	public List<String> getsectorlist(){
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"Sector/Locality");
+			
+			List<String> sector1=new ArrayList<>();
+			for(AppConfigValues as:sector) {
+				//System.out.println("::::sector:: "+as.getValue());
+				sector1.add(as.getValue());
+			}
+			return sector1;
+	 }
+	 public List<String> getwardlist(){
+		 List<AppConfigValues> wardNumber =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"WardNumber");
+			List<String> wardnumber=new ArrayList<>();
+			for(AppConfigValues wa:wardNumber) {
+				//System.out.println("::::ward:: "+wa.getValue());
+				wardnumber.add(wa.getValue());
+			}
+			return wardnumber;
+	 }
+
+	@RequestMapping(value = "/abstractliabilities", method = RequestMethod.POST)
+		public String excelreport(@ModelAttribute("worksabstractliabilities") final WorksAbstractliabilities worksabstractliabilities,
+				final Model model, HttpServletRequest request) {
+			
+			
+		return "worksabstractliabilities-excel";
+		}
+
+		@RequestMapping(value = "/abstractliabilitiesexcel", method = {RequestMethod.GET,RequestMethod.POST})
+			public @ResponseBody ResponseEntity<InputStreamResource> excelreportdownload( @RequestParam("fromdate") Date fromdate,@RequestParam("todate") Date todate,
+					final Model model, HttpServletRequest request) throws Exception {
+				Map<String, WorksAbstractliabilities> worksdata=new LinkedHashMap<>();
+				
+				final StringBuffer query = new StringBuffer(500);
+				final StringBuffer querydnit = new StringBuffer(500);
+				final StringBuffer queryworks = new StringBuffer(500);
+				List<Object[]> listest = null;
+				List<Object[]> listdnit = null;
+				List<Object[]> listworks = null;
+				System.out.println("::from :: "+fromdate+" ::: todate:: "+todate);
+				query.append("select tdc.estimate_number ,tdc.expenditure_head_est ,tdc.works_wing ,(select es.code from egw_status es where es.id =tdc.statusid ),tdc.estimate_amount from txn_estimate_preparation tdc ");
+				query.append("where tdc.statusid in (select es.id from egw_status es where es.moduletype='EstimatePreparationApproval' and (es.code='Approved' or es.code='AA Initiated' or es.code='TS Initiated')) and tdc.works_wing notnull");
+				query.append(getDateQuerynew(fromdate, todate));
+				
+				querydnit.append("select tdc.estimate_amount ,tdc.expenditure_head_est ,tdc.works_wing,(select es.code from egw_status es where es.id = tdc.statusid ) from txn_dnit_creation tdc where tdc.statusid in (select es.id from egw_status es where es.moduletype = 'DNITCreation'and (es.code = 'Approved')) and tdc.works_wing notnull ");
+				querydnit.append(getDateQuerynew(fromdate, todate));
+				
+				queryworks.append("select tdc.work_amount ,tdc.expenditure_head_est ,tdc.works_wing,(select es.code from egw_status es where es.id = tdc.statusid ) from txn_work_agreement tdc where tdc.works_wing notnull");
+				queryworks.append(getDateQuerynew(fromdate, todate));
+				
+				System.out.println("Query est:: "+query);
+							System.out.println("Query Dnit:: "+querydnit);
+							System.out.println("Query works:: "+queryworks);
+				try {
+					Query q = entityManager.createNativeQuery(query.toString());
+					listest = q.getResultList();
+					Query qdnit = entityManager.createNativeQuery(querydnit.toString());
+					listdnit = qdnit.getResultList();
+					Query qworks = entityManager.createNativeQuery(queryworks.toString());
+					listworks = qworks.getResultList();
+
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+				System.out.println("List of est "+listest.size()+"list of dnit "+listdnit.size()+" list of works "+listworks.size());
+
+				if(listest.size()!=0) {
+					
+					for (final Object[] ob : listest) {
+						WorksAbstractliabilities filterdata=new WorksAbstractliabilities();
+						
+						if(ob[1]!=null ) {//Matching expenditure head and if already exists
+							System.out.println("::expenditure::: "+ob[1].toString());
+							String[] split = ob[1].toString().split(",");
+							String expen=split[0];
+							if(worksdata.containsKey(expen)) {
+								if(ob[3]!=null) { //Matching status and checking if already not  exist in map
+									if(ob[3].toString().equalsIgnoreCase("AA Initiated")) {
+										if(ob[2]!=null) {
+											if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+												filterdata.setRoughPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setRoughHE(new BigDecimal(0));
+												filterdata.setRoughBR(new BigDecimal(0));
+												filterdata.setGtotalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+												filterdata.setRoughHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setRoughPH(new BigDecimal(0));
+												filterdata.setRoughBR(new BigDecimal(0));
+												filterdata.setGtotalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+											}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+												filterdata.setRoughBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setRoughHE(new BigDecimal(0));
+												filterdata.setRoughPH(new BigDecimal(0));
+												filterdata.setGtotalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+											}
+											filterdata.setRoughtotal(filterdata.getRoughPH().add(filterdata.getRoughHE()).add(filterdata.getRoughBR()));
+											filterdata.setGtotaltotal(filterdata.getRoughtotal());
+											filterdata.setGrandtotalrough(filterdata.getRoughtotal());
+											
+										}
+										
+									}else if(ob[3].toString().equalsIgnoreCase("TS Initiated")) {
+										if(ob[2]!=null) {
+											if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+												filterdata.setEstimatePH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setEstimateHE(new BigDecimal(0));
+												filterdata.setEstimateBR(new BigDecimal(0));
+												filterdata.setGtotalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+												filterdata.setEstimateHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setEstimatePH(new BigDecimal(0));
+												filterdata.setEstimateBR(new BigDecimal(0));
+												filterdata.setGtotalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+												filterdata.setEstimateBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setEstimateHE(new BigDecimal(0));
+												filterdata.setEstimatePH(new BigDecimal(0));
+												filterdata.setGtotalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+											}
+											filterdata.setEstimatehtotal(filterdata.getEstimatePH().add(filterdata.getEstimateHE()).add(filterdata.getEstimateBR()));
+											filterdata.setGtotaltotal(filterdata.getEstimatehtotal());
+											filterdata.setGrandtotalestimate(filterdata.getEstimatehtotal());
+										}
+										
+									}else if(ob[3].toString().equalsIgnoreCase("Approved")) {
+										if(ob[2]!=null) {
+											if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+												filterdata.setTechnicalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setTechnicalHE(new BigDecimal(0));
+												filterdata.setTechnicalBR(new BigDecimal(0));
+												filterdata.setGtotalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+												filterdata.setTechnicalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setTechnicalPH(new BigDecimal(0));
+												filterdata.setTechnicalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+												filterdata.setTechnicalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setTechnicalHE(new BigDecimal(0));
+												filterdata.setTechnicalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+											}
+											filterdata.setTechnicaltotal(filterdata.getTechnicalPH().add(filterdata.getTechnicalHE()).add(filterdata.getTechnicalBR()));
+											filterdata.setGtotaltotal(filterdata.getTechnicaltotal());
+											filterdata.setGrandtotaltechnical(filterdata.getTechnicaltotal());
+										}
+									}
+								}
+								WorksAbstractliabilities valuedata = worksdata.get(ob[1].toString());
+								if(filterdata.getRoughPH()!=null )
+								valuedata.setRoughPH(valuedata.getRoughPH().add(filterdata.getRoughPH()));
+								if(filterdata.getRoughBR()!=null)
+								valuedata.setRoughBR(valuedata.getRoughBR().add(filterdata.getRoughBR()));
+								if(filterdata.getRoughHE()!=null)
+								valuedata.setRoughHE(valuedata.getRoughHE().add(filterdata.getRoughHE()));
+								if(filterdata.getRoughtotal()!=null)
+								valuedata.setRoughtotal(valuedata.getRoughtotal().add(filterdata.getRoughtotal()));
+								if(filterdata.getEstimatePH()!=null)
+								valuedata.setEstimatePH(valuedata.getEstimatePH().add(filterdata.getEstimatePH()));
+								if(filterdata.getEstimateBR()!=null)
+								valuedata.setEstimateBR(valuedata.getEstimateBR().add(filterdata.getEstimateBR()));
+								if(filterdata.getEstimateHE()!=null)
+								valuedata.setEstimateHE(valuedata.getEstimateHE().add(filterdata.getEstimateHE()));
+								if(filterdata.getEstimatehtotal()!=null)
+								valuedata.setEstimatehtotal(valuedata.getEstimatehtotal().add(filterdata.getEstimatehtotal()));
+								if(filterdata.getTechnicalPH()!=null)
+								valuedata.setTechnicalPH(valuedata.getTechnicalPH().add(filterdata.getTechnicalPH()));
+								if(filterdata.getTechnicalBR()!=null)
+								valuedata.setTechnicalBR(valuedata.getTechnicalBR().add(filterdata.getTechnicalBR()));
+								if(filterdata.getTechnicalHE()!=null)
+								valuedata.setTechnicalHE(valuedata.getTechnicalHE().add(filterdata.getTechnicalHE()));
+								if(filterdata.getTechnicaltotal()!=null)
+								valuedata.setTechnicaltotal(valuedata.getTechnicaltotal().add(filterdata.getTechnicaltotal()));
+								if(filterdata.getGtotalPH()!=null)
+									valuedata.setGtotalPH(valuedata.getGtotalPH().add(filterdata.getGtotalPH()));
+								if(filterdata.getGtotalBR()!=null)
+									valuedata.setGtotalBR(valuedata.getGtotalBR().add(filterdata.getGtotalBR()));
+								if(filterdata.getGtotalHE()!=null)
+									valuedata.setGtotalHE(valuedata.getGtotalHE().add(filterdata.getGtotalHE()));
+								if(filterdata.getGtotaltotal()!=null)
+									valuedata.setGtotaltotal(valuedata.getGtotaltotal().add(filterdata.getGtotaltotal()));
+								if(filterdata.getGrandtotalrough()!=null)
+									valuedata.setGrandtotalrough(valuedata.getGrandtotalrough().add(filterdata.getGrandtotalrough()));
+								if(filterdata.getGrandtotalestimate()!=null)
+									valuedata.setGrandtotalestimate(valuedata.getGrandtotalestimate().add(filterdata.getGrandtotalestimate()));
+								if(filterdata.getGrandtotaltechnical()!=null)
+									valuedata.setGrandtotaltechnical(valuedata.getGrandtotaltechnical().add(filterdata.getGrandtotaltechnical()));
+								
+								
+								worksdata.put(expen, valuedata);
+								
+							}else {
+								if(ob[3]!=null) { //Matching status and checking if already not  exist in map
+									if(ob[3].toString().equalsIgnoreCase("AA Initiated")) {
+										if(ob[2]!=null) {
+											if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+												filterdata.setRoughPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setRoughHE(new BigDecimal(0));
+												filterdata.setRoughBR(new BigDecimal(0));
+												filterdata.setGtotalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+												filterdata.setRoughHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setRoughPH(new BigDecimal(0));
+												filterdata.setRoughBR(new BigDecimal(0));
+												filterdata.setTechnicalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+												filterdata.setRoughBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setRoughHE(new BigDecimal(0));
+												filterdata.setRoughPH(new BigDecimal(0));
+												filterdata.setGtotalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+											}
+											filterdata.setRoughtotal(filterdata.getRoughPH().add(filterdata.getRoughHE()).add(filterdata.getRoughBR()));
+											filterdata.setGtotaltotal(filterdata.getRoughtotal());
+											filterdata.setGrandtotalrough(filterdata.getRoughtotal());
+											filterdata.setGrandtotalestimate(new BigDecimal(0));
+											filterdata.setGrandtotaltechnical(new BigDecimal(0));
+										    filterdata.setEstimatePH(new BigDecimal(0));
+											filterdata.setEstimateBR(new BigDecimal(0));
+											filterdata.setEstimateHE(new BigDecimal(0));
+											filterdata.setEstimatehtotal(new BigDecimal(0));
+											filterdata.setTechnicalPH(new BigDecimal(0));
+											filterdata.setTechnicalBR(new BigDecimal(0));
+											filterdata.setTechnicalHE(new BigDecimal(0));
+											filterdata.setTechnicaltotal(new BigDecimal(0));
+											filterdata.setDnitPH(new BigDecimal(0));
+											filterdata.setDnitHE(new BigDecimal(0));
+											filterdata.setDnitBR(new BigDecimal(0));
+											filterdata.setDnittotal(new BigDecimal(0));
+											filterdata.setWorksPH(new BigDecimal(0));
+											filterdata.setWorksHE(new BigDecimal(0));
+											filterdata.setWorksBR(new BigDecimal(0));
+											filterdata.setWorkstotal(new BigDecimal(0));
+											filterdata.setOngoingworksPH(new BigDecimal(0));
+											filterdata.setOngoingworksHE(new BigDecimal(0));
+											filterdata.setOngoingworksBR(new BigDecimal(0));
+											filterdata.setOngoingworkstotal(new BigDecimal(0));
+											filterdata.setGrandtotaldnit(new BigDecimal(0));
+											filterdata.setGrandtotalworks(new BigDecimal(0));
+											filterdata.setGrandtotalongoing(new BigDecimal(0));
+										}
+										
+									}else if(ob[3].toString().equalsIgnoreCase("TS Initiated")) {
+										if(ob[2]!=null) {
+											if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+												filterdata.setEstimatePH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setEstimateHE(new BigDecimal(0));
+												filterdata.setEstimateBR(new BigDecimal(0));
+												filterdata.setGtotalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+												filterdata.setEstimateHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setEstimatePH(new BigDecimal(0));
+												filterdata.setEstimateBR(new BigDecimal(0));
+												filterdata.setGtotalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+												filterdata.setEstimateBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setEstimateHE(new BigDecimal(0));
+												filterdata.setEstimatePH(new BigDecimal(0));
+												filterdata.setGtotalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+											}
+											System.out.println("::"+filterdata.getEstimatePH()+":::"+filterdata.getEstimateHE()+"::"+filterdata.getEstimateBR());
+											filterdata.setEstimatehtotal(filterdata.getEstimatePH().add(filterdata.getEstimateHE()).add(filterdata.getEstimateBR()));
+											filterdata.setGtotaltotal(filterdata.getEstimatehtotal());
+											filterdata.setGrandtotalestimate(filterdata.getEstimatehtotal());
+											filterdata.setGrandtotalrough(new BigDecimal(0));
+											filterdata.setGrandtotaltechnical(new BigDecimal(0));
+											filterdata.setRoughPH(new BigDecimal(0));
+											filterdata.setRoughBR(new BigDecimal(0));
+											filterdata.setRoughHE(new BigDecimal(0));
+											filterdata.setRoughtotal(new BigDecimal(0));
+											filterdata.setTechnicalPH(new BigDecimal(0));
+											filterdata.setTechnicalBR(new BigDecimal(0));
+											filterdata.setTechnicalHE(new BigDecimal(0));
+											filterdata.setTechnicaltotal(new BigDecimal(0));
+											filterdata.setDnitPH(new BigDecimal(0));
+											filterdata.setDnitHE(new BigDecimal(0));
+											filterdata.setDnitBR(new BigDecimal(0));
+											filterdata.setDnittotal(new BigDecimal(0));
+											filterdata.setWorksPH(new BigDecimal(0));
+											filterdata.setWorksHE(new BigDecimal(0));
+											filterdata.setWorksBR(new BigDecimal(0));
+											filterdata.setWorkstotal(new BigDecimal(0));
+											filterdata.setOngoingworksPH(new BigDecimal(0));
+											filterdata.setOngoingworksHE(new BigDecimal(0));
+											filterdata.setOngoingworksBR(new BigDecimal(0));
+											filterdata.setOngoingworkstotal(new BigDecimal(0));
+											filterdata.setGrandtotaldnit(new BigDecimal(0));
+											filterdata.setGrandtotalworks(new BigDecimal(0));
+											filterdata.setGrandtotalongoing(new BigDecimal(0));
+											
+										}
+										
+									}else if(ob[3].toString().equalsIgnoreCase("Approved")) {
+										if(ob[2]!=null) {
+											if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+												filterdata.setTechnicalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setTechnicalHE(new BigDecimal(0));
+												filterdata.setTechnicalBR(new BigDecimal(0));
+												filterdata.setGtotalPH(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+												filterdata.setTechnicalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setTechnicalPH(new BigDecimal(0));
+												filterdata.setTechnicalBR(new BigDecimal(0));
+												filterdata.setGtotalHE(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(new BigDecimal(0));
+												
+											}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+												filterdata.setTechnicalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setTechnicalHE(new BigDecimal(0));
+												filterdata.setTechnicalPH(new BigDecimal(0));
+												filterdata.setGtotalBR(ob[4]!=null?new BigDecimal(ob[4].toString()):new BigDecimal(0));
+												filterdata.setGtotalHE(new BigDecimal(0));
+												filterdata.setGtotalPH(new BigDecimal(0));
+											}
+											filterdata.setTechnicaltotal(filterdata.getTechnicalPH().add(filterdata.getTechnicalHE()).add(filterdata.getTechnicalBR()));
+											filterdata.setGtotaltotal(filterdata.getTechnicaltotal());
+											filterdata.setGrandtotaltechnical(filterdata.getTechnicaltotal());
+											filterdata.setGrandtotalestimate(new BigDecimal(0));
+											filterdata.setGrandtotalrough(new BigDecimal(0));
+											filterdata.setGrandtotaltechnical(filterdata.getTechnicalPH().add(filterdata.getTechnicalHE()).add(filterdata.getTechnicalBR()));
+											filterdata.setRoughPH(new BigDecimal(0));
+											filterdata.setRoughBR(new BigDecimal(0));
+											filterdata.setRoughHE(new BigDecimal(0));
+											filterdata.setRoughtotal(new BigDecimal(0));
+											filterdata.setEstimatePH(new BigDecimal(0));
+											filterdata.setEstimateBR(new BigDecimal(0));
+											filterdata.setEstimateHE(new BigDecimal(0));
+											filterdata.setEstimatehtotal(new BigDecimal(0));
+											filterdata.setDnitPH(new BigDecimal(0));
+											filterdata.setDnitHE(new BigDecimal(0));
+											filterdata.setDnitBR(new BigDecimal(0));
+											filterdata.setDnittotal(new BigDecimal(0));
+											filterdata.setWorksPH(new BigDecimal(0));
+											filterdata.setWorksHE(new BigDecimal(0));
+											filterdata.setWorksBR(new BigDecimal(0));
+											filterdata.setWorkstotal(new BigDecimal(0));
+											filterdata.setOngoingworksPH(new BigDecimal(0));
+											filterdata.setOngoingworksHE(new BigDecimal(0));
+											filterdata.setOngoingworksBR(new BigDecimal(0));
+											filterdata.setOngoingworkstotal(new BigDecimal(0));
+											filterdata.setGrandtotaldnit(new BigDecimal(0));
+											filterdata.setGrandtotalworks(new BigDecimal(0));
+											filterdata.setGrandtotalongoing(new BigDecimal(0));
+										}
+									}
+								}
+								
+								worksdata.put(expen, filterdata);
+							}
+							
+						}
+						
+				}
+					
+			}//forloop
+				if(listdnit.size()!=0) {
+					for (final Object[] ob : listdnit) {
+						WorksAbstractliabilities filterdnit=new WorksAbstractliabilities();
+						if(ob[1]!=null && ob[2] !=null ) {
+							if(worksdata.containsKey(ob[1].toString())) {
+								if(ob[3].toString().equalsIgnoreCase("Approved")) {
+									if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+										filterdnit.setDnitPH((ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0)));
+										filterdnit.setDnitHE(new BigDecimal(0));
+										filterdnit.setDnitBR(new BigDecimal(0));
+										filterdnit.setGtotalPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalBR(new BigDecimal(0));
+										filterdnit.setGtotalHE(new BigDecimal(0));
+									}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+										filterdnit.setDnitPH(new BigDecimal(0));
+										filterdnit.setDnitHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setDnitBR(new BigDecimal(0));
+										filterdnit.setGtotalHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalPH(new BigDecimal(0));
+										filterdnit.setGtotalBR(new BigDecimal(0));
+										
+									}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+										filterdnit.setDnitPH(new BigDecimal(0));
+										filterdnit.setDnitHE(new BigDecimal(0));
+										filterdnit.setDnitBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalPH(new BigDecimal(0));
+										filterdnit.setGtotalBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalHE(new BigDecimal(0));
+									}
+									filterdnit.setDnittotal(filterdnit.getDnitBR().add(filterdnit.getDnitHE()).add(filterdnit.getDnitPH()));
+									filterdnit.setGtotaltotal(filterdnit.getDnittotal());
+									filterdnit.setGrandtotaldnit(filterdnit.getDnittotal());
+									WorksAbstractliabilities valuednit = worksdata.get(ob[1].toString());
+									if(filterdnit.getDnitPH()!=null)
+										valuednit.setDnitPH(valuednit.getDnitPH().add(filterdnit.getDnitPH()));
+									if(filterdnit.getDnitBR()!=null)
+										valuednit.setDnitBR(valuednit.getDnitBR().add(filterdnit.getDnitBR()));
+									if(filterdnit.getDnitHE()!=null)
+										valuednit.setDnitHE(valuednit.getDnitHE().add(filterdnit.getDnitHE()));
+									if(filterdnit.getDnittotal()!=null)
+										valuednit.setDnittotal(valuednit.getDnittotal().add(filterdnit.getDnittotal()));
+									if(filterdnit.getGtotalPH()!=null)
+											valuednit.setGtotalPH(valuednit.getGtotalPH().add(filterdnit.getGtotalPH()));
+										if(filterdnit.getGtotalBR()!=null)
+											valuednit.setGtotalBR(valuednit.getGtotalBR().add(filterdnit.getGtotalBR()));
+										if(filterdnit.getGtotalHE()!=null)
+											valuednit.setGtotalHE(valuednit.getGtotalHE().add(filterdnit.getGtotalHE()));
+										if(filterdnit.getGtotaltotal()!=null)
+											valuednit.setGtotaltotal(valuednit.getGtotaltotal().add(filterdnit.getGtotaltotal()));
+										if(filterdnit.getGrandtotaldnit()!=null)
+											valuednit.setGrandtotaldnit(valuednit.getGrandtotaldnit().add(filterdnit.getGrandtotaldnit()));
+										worksdata.put(ob[1].toString(), valuednit);
+								}
+							}else {
+								if(ob[3].toString().equalsIgnoreCase("Approved")) {
+									if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+										filterdnit.setDnitPH((ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0)));
+										filterdnit.setDnitHE(new BigDecimal(0));
+										filterdnit.setDnitBR(new BigDecimal(0));
+										filterdnit.setGtotalPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalBR(new BigDecimal(0));
+										filterdnit.setGtotalHE(new BigDecimal(0));
+									}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+										filterdnit.setDnitPH(new BigDecimal(0));
+										filterdnit.setDnitHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setDnitBR(new BigDecimal(0));
+										filterdnit.setGtotalHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalPH(new BigDecimal(0));
+										filterdnit.setGtotalBR(new BigDecimal(0));
+										
+									}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+										filterdnit.setDnitPH(new BigDecimal(0));
+										filterdnit.setDnitHE(new BigDecimal(0));
+										filterdnit.setDnitBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalPH(new BigDecimal(0));
+										filterdnit.setGtotalBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterdnit.setGtotalHE(new BigDecimal(0));
+									}
+									filterdnit.setDnittotal(filterdnit.getDnitBR().add(filterdnit.getDnitHE()).add(filterdnit.getDnitPH()));
+									filterdnit.setGtotaltotal(filterdnit.getDnittotal());
+									filterdnit.setGrandtotaldnit(filterdnit.getDnittotal());
+									filterdnit.setWorksPH(new BigDecimal(0));
+									filterdnit.setWorksHE(new BigDecimal(0));
+									filterdnit.setWorksBR(new BigDecimal(0));
+									filterdnit.setWorkstotal(new BigDecimal(0));
+									filterdnit.setOngoingworksPH(new BigDecimal(0));
+									filterdnit.setOngoingworksHE(new BigDecimal(0));
+									filterdnit.setOngoingworksBR(new BigDecimal(0));
+									filterdnit.setOngoingworkstotal(new BigDecimal(0));
+									filterdnit.setGrandtotalworks(new BigDecimal(0));
+									filterdnit.setGrandtotalongoing(new BigDecimal(0));
+									worksdata.put(ob[1].toString(), filterdnit);
+							}
+							
+						}
+					}
+					}
+	}
+				if(listworks.size()!=0) {
+					for (final Object[] ob : listworks) {
+						if(ob[1]!=null && ob[2] !=null ) {
+							WorksAbstractliabilities filterworks=new WorksAbstractliabilities();
+							if(worksdata.containsKey(ob[1].toString())) {
+								if(ob[3]!=null && ob[3].toString().equalsIgnoreCase("Approved")) {
+									if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+										filterworks.setOngoingworksPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setOngoingworksHE(new BigDecimal(0));
+										filterworks.setOngoingworksBR(new BigDecimal(0));
+										filterworks.setGtotalPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+									}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+										filterworks.setOngoingworksPH(new BigDecimal(0));
+										filterworks.setOngoingworksBR(new BigDecimal(0));
+										filterworks.setOngoingworksHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										
+									}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+										filterworks.setOngoingworksPH(new BigDecimal(0));
+										filterworks.setOngoingworksHE(new BigDecimal(0));
+										filterworks.setOngoingworksBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+									}
+									filterworks.setOngoingworkstotal(filterworks.getOngoingworksPH().add(filterworks.getOngoingworksHE()).add(filterworks.getOngoingworksBR()));
+									filterworks.setGtotaltotal(filterworks.getOngoingworkstotal());
+									filterworks.setGrandtotalongoing(filterworks.getOngoingworkstotal());
+								}else {
+									if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+										filterworks.setWorksPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setWorksHE(new BigDecimal(0));
+										filterworks.setWorksBR(new BigDecimal(0));
+										filterworks.setGtotalPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+									}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+										filterworks.setWorksPH(new BigDecimal(0));
+										filterworks.setWorksBR(new BigDecimal(0));
+										filterworks.setWorksHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										
+									}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+										filterworks.setWorksPH(new BigDecimal(0));
+										filterworks.setWorksHE(new BigDecimal(0));
+										filterworks.setWorksBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+									}
+									filterworks.setWorkstotal(filterworks.getWorksPH().add(filterworks.getWorksHE()).add(filterworks.getWorksBR()));
+									filterworks.setGtotaltotal(filterworks.getWorkstotal());
+									filterworks.setGrandtotalworks(filterworks.getWorkstotal());
+								}
+								WorksAbstractliabilities valuednit = worksdata.get(ob[1].toString());
+								if(filterworks.getWorksPH()!=null)
+									valuednit.setWorksPH(valuednit.getWorksPH().add(filterworks.getWorksPH()));
+								if(filterworks.getWorksBR()!=null)
+									valuednit.setWorksBR(valuednit.getWorksBR().add(filterworks.getWorksBR()));
+								if(filterworks.getWorksHE()!=null)
+									valuednit.setWorksHE(valuednit.getWorksHE().add(filterworks.getWorksHE()));
+								if(filterworks.getWorkstotal()!=null)
+									valuednit.setWorkstotal(valuednit.getWorkstotal().add(filterworks.getWorkstotal()));
+								if(filterworks.getOngoingworksPH()!=null)
+									valuednit.setOngoingworksPH(valuednit.getOngoingworksPH().add(filterworks.getOngoingworksPH()));
+								if(filterworks.getOngoingworksBR()!=null)
+									valuednit.setOngoingworksBR(valuednit.getOngoingworksBR().add(filterworks.getOngoingworksBR()));
+								if(filterworks.getOngoingworksHE()!=null)
+									valuednit.setOngoingworksHE(valuednit.getOngoingworksHE().add(filterworks.getOngoingworksHE()));
+								if(filterworks.getOngoingworkstotal()!=null)
+									valuednit.setOngoingworkstotal(valuednit.getOngoingworkstotal().add(filterworks.getOngoingworkstotal()));
+								if(filterworks.getGtotalPH()!=null)
+										valuednit.setGtotalPH(valuednit.getGtotalPH().add(filterworks.getGtotalPH()));
+									if(filterworks.getGtotalBR()!=null)
+										valuednit.setGtotalBR(valuednit.getGtotalBR().add(filterworks.getGtotalBR()));
+									if(filterworks.getGtotalHE()!=null)
+										valuednit.setGtotalHE(valuednit.getGtotalHE().add(filterworks.getGtotalHE()));
+									if(filterworks.getGtotaltotal()!=null)
+										valuednit.setGtotaltotal(valuednit.getGtotaltotal().add(filterworks.getGtotaltotal()));
+									if(filterworks.getGrandtotalongoing()!=null)
+										valuednit.setGrandtotalongoing(valuednit.getGrandtotalongoing().add(filterworks.getGrandtotalongoing()));
+									if(filterworks.getGrandtotalworks()!=null)
+										valuednit.setGrandtotalworks(valuednit.getGrandtotalworks().add(filterworks.getGrandtotalworks()));
+									worksdata.put(ob[1].toString(), valuednit);
+							}else {
+				//if not found in map
+								
+								if(ob[3]!=null && ob[3].toString().equalsIgnoreCase("Approved")) {
+									if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+										filterworks.setOngoingworksPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setOngoingworksHE(new BigDecimal(0));
+										filterworks.setOngoingworksBR(new BigDecimal(0));
+										filterworks.setGtotalPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+									}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+										filterworks.setOngoingworksPH(new BigDecimal(0));
+										filterworks.setOngoingworksBR(new BigDecimal(0));
+										filterworks.setOngoingworksHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										
+									}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+										filterworks.setOngoingworksPH(new BigDecimal(0));
+										filterworks.setOngoingworksHE(new BigDecimal(0));
+										filterworks.setOngoingworksBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+									}
+									filterworks.setOngoingworkstotal(filterworks.getOngoingworksPH().add(filterworks.getOngoingworksHE()).add(filterworks.getOngoingworksBR()));
+									filterworks.setGtotaltotal(filterworks.getOngoingworkstotal());
+									filterworks.setGrandtotalongoing(filterworks.getOngoingworkstotal());
+									filterworks.setGrandtotalworks(new BigDecimal(0));
+									filterworks.setWorksPH(new BigDecimal(0));
+									filterworks.setWorksHE(new BigDecimal(0));
+									filterworks.setWorksBR(new BigDecimal(0));
+									filterworks.setWorkstotal(new BigDecimal(0));
+								}else {
+									if(ob[2].toString().equalsIgnoreCase("Public Health") || ob[2].toString().equalsIgnoreCase("1")){
+										filterworks.setWorksPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setWorksHE(new BigDecimal(0));
+										filterworks.setWorksBR(new BigDecimal(0));
+										filterworks.setGtotalPH(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+									}else if(ob[2].toString().equalsIgnoreCase("Horticulture & Electrical") || ob[2].toString().equalsIgnoreCase("2")){
+										filterworks.setWorksPH(new BigDecimal(0));
+										filterworks.setWorksBR(new BigDecimal(0));
+										filterworks.setGtotalHE(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(new BigDecimal(0));
+										
+									}else if(ob[2].toString().equalsIgnoreCase("B&R") || ob[2].toString().equalsIgnoreCase("3")||ob[2].toString().equalsIgnoreCase("Building & Roads")){
+										filterworks.setWorksPH(new BigDecimal(0));
+										filterworks.setWorksHE(new BigDecimal(0));
+										filterworks.setWorksBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+										filterworks.setGtotalHE(new BigDecimal(0));
+										filterworks.setGtotalPH(new BigDecimal(0));
+										filterworks.setGtotalBR(ob[0]!=null?new BigDecimal(ob[0].toString()):new BigDecimal(0));
+									}
+									filterworks.setWorkstotal(filterworks.getWorksPH().add(filterworks.getWorksHE().add(filterworks.getWorksBR())));
+									filterworks.setGtotaltotal(filterworks.getWorkstotal());
+									filterworks.setGrandtotalworks(filterworks.getWorkstotal());
+									filterworks.setGrandtotalongoing(new BigDecimal(0));
+									filterworks.setOngoingworksPH(new BigDecimal(0));
+									filterworks.setOngoingworksHE(new BigDecimal(0));
+									filterworks.setOngoingworksBR(new BigDecimal(0));
+								}
+								worksdata.put(ob[1].toString(), filterworks);
+							}
+						}
+						
+					}
+				}
+				WorksAbstractliabilities granddata=new WorksAbstractliabilities();
+				granddata.setGrandtotalrough(new BigDecimal(0));
+				granddata.setGrandtotalestimate(new BigDecimal(0));
+				granddata.setGrandtotaltechnical(new BigDecimal(0));
+				granddata.setGrandtotalg(new BigDecimal(0));
+				granddata.setGrandtotaldnit(new BigDecimal(0));
+				granddata.setGrandtotalongoing(new BigDecimal(0));
+				granddata.setGrandtotalworks(new BigDecimal(0));
+				for(Entry<String, WorksAbstractliabilities> test:worksdata.entrySet()) {
+					System.out.println("Expenditure:: "+test.getKey()+"::value:: "+test.getValue().getRoughPH()+":"+test.getValue().getRoughBR()+":"+test.getValue().getRoughtotal()+": "+test.getValue().getEstimatehtotal()+" : "+test.getValue().getTechnicaltotal());
+				granddata.setGrandtotalrough(granddata.getGrandtotalrough().add(test.getValue().getGrandtotalrough()!=null?test.getValue().getGrandtotalrough():new BigDecimal(0)));
+				granddata.setGrandtotalestimate(granddata.getGrandtotalestimate().add(test.getValue().getGrandtotalestimate()!=null?test.getValue().getGrandtotalestimate():new BigDecimal(0)));
+				granddata.setGrandtotaltechnical(granddata.getGrandtotaltechnical().add(test.getValue().getGrandtotaltechnical()!=null?test.getValue().getGrandtotaltechnical():new BigDecimal(0)));
+				granddata.setGrandtotaldnit(granddata.getGrandtotaldnit().add(test.getValue().getGrandtotaldnit()!=null?test.getValue().getGrandtotaldnit():new BigDecimal(0)));
+				granddata.setGrandtotalongoing(granddata.getGrandtotalongoing().add(test.getValue().getGrandtotalongoing()!=null?test.getValue().getGrandtotalongoing():new BigDecimal(0)));
+				granddata.setGrandtotalworks(granddata.getGrandtotalworks().add(test.getValue().getGrandtotalworks()!=null?test.getValue().getGrandtotalworks():new BigDecimal(0)));
+				granddata.setGrandtotalg(granddata.getGrandtotalg().add(test.getValue().getGtotaltotal()!=null?test.getValue().getGtotaltotal():new BigDecimal(0)));
+				}
+				worksdata.put("Grand Total", granddata);
+				System.out.println(":::::List size:::: "+listest.size()+":::Size of map:: "+worksdata.size());
+				String[] COLUMNS = {"DESCRIPT ON OF WORK"," ", "Rough Cost Estimate Approved", "Estimate Administrative approval awarded", "Technical Estimate Approval awarded", "DNIT awarded", "Work agreement awarded but work yet to start","Onging Work","TOTAL"};
+				String startdate = DDMMYYYYFORMAT1.format(fromdate);
+				String enddate = DDMMYYYYFORMAT1.format(todate);
+				System.out.println("from date "+startdate+"end date "+enddate);
+				String heading="ABSTRACT/LIABILITIES OF WORK  (Date - "+ startdate +" to " +enddate+")";
+				ByteArrayInputStream in = ExcelGenerator.estimateworksToExcel(worksdata, COLUMNS,heading);
+				
+				HttpHeaders headers = new HttpHeaders();
+		        headers.add("Content-Disposition", "attachment; filename=ABSTRACTWorks.xlsx");
+				return ResponseEntity
+						.ok().headers(headers)
+		                .body(new InputStreamResource(in));
+		              
+				
+			}
+		 private  String getDateQuerynew(final Date fromdate, final Date todate) {
+				final StringBuffer numDateQuery = new StringBuffer();
+				try {
+
+					if (null != fromdate) {
+						numDateQuery.append(" and to_char(tdc.createddate,'yyyy/mm/dd')>='")
+								.append(DDMMYYYYFORMAT2.format(fromdate))
+								.append("'");
+					}
+					if (null != todate) {
+						numDateQuery.append(" and  to_char(tdc.createddate,'yyyy/mm/dd')<='");
+						numDateQuery.append(DDMMYYYYFORMAT2.format(todate));
+						numDateQuery.append("'");
+					}
+				} catch (final Exception e) {
+					e.printStackTrace();
+				}
+				return numDateQuery.toString();
+			}
 	
 private String populateShortCode(String deptCode, String worksWing, Long subdivision2) {
 		

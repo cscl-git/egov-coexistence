@@ -291,7 +291,6 @@
 									<form:option value="26">26</form:option>
 								</form:select>
 							</div>
-					
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.amount" /></label>
 					<div class="col-sm-3 add-margin">
@@ -319,10 +318,6 @@
 							</div>
 							
 				<!-- New field added here -->		
-				
-				
-				
-					
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.estimate.Contingency.Percentage" /></label>
 
