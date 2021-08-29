@@ -7,6 +7,7 @@ import java.util.List;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApprovalRESTPOJO;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -44,4 +45,15 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 	 @Transactional
 	  @Query(nativeQuery = true) 
 	  List<EstimatePreparationApprovalRESTPOJO>  getEstimatePreparationApprovalRESTPOJO();
+	
+	 @Modifying(clearAutomatically = true)
+	  @Query(value = "delete from EstimatePreparationApproval tep WHERE tep.id=:id")
+	  public void deleteestimateById(@Param("id") Long id);
+	 
+	 @Modifying(clearAutomatically = true)
+	    @Transactional
+	    @Query("delete from BoQDetails where estimate_preparation_id = :id")
+	   public void deleteboqData( @Param("id")Long id);
+	 
+	
 }

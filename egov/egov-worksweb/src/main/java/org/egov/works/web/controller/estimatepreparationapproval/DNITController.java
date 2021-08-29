@@ -8,7 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -75,7 +74,6 @@ import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApp
 import org.egov.works.utils.ExcelGenerator;
 import org.egov.works.workestimate.service.WorkDnitService;
 import org.egov.works.workestimate.service.WorkEstimateService;
-import org.python.icu.text.RuleBasedBreakIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -163,6 +161,7 @@ private static Map<String, String> map;
 		for(Workswing w:worskwing) {
 			System.out.println("::::: "+w.getWorkswingname());
 		}
+		dnitCreation.setDesignatationlist(getdesignationlist());
 		dnitCreation.setDepartments(getDepartmentsFromMs());
 		dnitCreation.setDesignations(getDesignationsFromMs());
 		dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
@@ -269,6 +268,7 @@ private static Map<String, String> map;
         String msg="Dnit Not Forwarded .";
 		model.addAttribute("error", "Y");
 		model.addAttribute("message", msg);
+		dnitCreation.setDesignatationlist(getdesignationlist());
 		//dnitCreation.setDepartments(getDepartmentsFromMs());
 		dnitCreation.setWorksWing(dnitCreation.getWorksWing());
 		dnitCreation.setWorkswings(estimatePreparationApprovalService.getworskwing());
@@ -461,6 +461,7 @@ private static Map<String, String> map;
         String msg="Dnit Not Saved As Draft .";
 		model.addAttribute("error", "Y");
 		model.addAttribute("message", msg);
+		dnitCreation.setDesignatationlist(getdesignationlist());
 		//dnitCreation.setDepartments(getDepartmentsFromMs());
 		dnitCreation.setDesignations(getDesignationsFromMs());
 		dnitCreation.setWorksWing(dnitCreation.getWorksWing());
@@ -676,6 +677,7 @@ private static Map<String, String> map;
         String msg="Dnit Not Saved As Draft .";
 		model.addAttribute("error", "Y");
 		model.addAttribute("message", msg);
+		dnitCreation.setDesignatationlist(getdesignationlist());
 		//dnitCreation.setDepartments(getDepartmentsFromMs());
 		dnitCreation.setDesignations(getDesignationsFromMs());
 		dnitCreation.setWorksWing(dnitCreation.getWorksWing());
@@ -979,7 +981,7 @@ DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation)
 			model.addAttribute("fileuploadAllowed","Y");
 		
 		}
-		  
+		dnitCreation.setDesignatationlist(getdesignationlist());		  
 		  //dnitCreation.setDepartments(getDepartmentsFromMs());
 		  dnitCreation.setBoQDetailsList(boQDetailsList);
 		  dnitCreation.setDesignations(getDesignationsFromMs());
@@ -1272,6 +1274,7 @@ DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation)
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
 
 		
+		estimateDetails.setDesignatationlist(getdesignationlist());
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 
@@ -1334,7 +1337,7 @@ DocumentUpload savedocebefore = dnitCreationService.savedocebefore(dnitCreation)
 		
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
-
+		estimateDetails.setDesignatationlist(getdesignationlist());
 		estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
@@ -1577,6 +1580,7 @@ if (id !=null && id != "" && slno!= null && slno!="" ) {
 		if(checkdnit !=null && checkdnit.equalsIgnoreCase("fromEstimate")) {
 			model.addAttribute("editable","N");
 		}
+		estimateDetails.setDesignatationlist(getdesignationlist());
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 estimateDetails.setEstimateAmount(estimateDetails.getEstimateAmount().setScale(2,BigDecimal.ROUND_HALF_UP));
@@ -1640,7 +1644,12 @@ estimateDetails.setEstimateAmount(estimateDetails.getEstimateAmount().setScale(2
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Dnit",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFileDnit",estimateDetails.getId());
 		System.out.println(estimateDetails.getDepartment()+"++++++"+estimateDetails.getSectorNumber()+"++++++++");
-		
+		String checkdnit = estimateDetails.getDnitfromestimate();
+		//System.out.println(":::::::::::::::::::DNIT ORIGIN::::: "+checkdnit);
+		if(checkdnit !=null && checkdnit.equalsIgnoreCase("fromEstimate")) {
+			model.addAttribute("editable","N");
+		}
+		estimateDetails.setDesignatationlist(getdesignationlist());		
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 
@@ -2014,6 +2023,8 @@ List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 
 		
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
@@ -2388,8 +2399,8 @@ List<DocumentUpload> uploadDoc= new ArrayList<DocumentUpload>();
 		
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
-
-		
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
@@ -2884,6 +2895,19 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 			}
 			return wardnumber;
 	 }
+
+	 public List<String> getdesignationlist(){
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"Designation");
+			
+			List<String> designation=new ArrayList<>();
+			for(AppConfigValues as:sector) {
+				System.out.println("::::designation:: "+as.getValue());
+				designation.add(as.getValue());
+			}
+			return designation;
+	 }
+	 
 
 	@RequestMapping(value = "/abstractliabilities", method = RequestMethod.POST)
 		public String excelreport(@ModelAttribute("worksabstractliabilities") final WorksAbstractliabilities worksabstractliabilities,

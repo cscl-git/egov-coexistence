@@ -92,6 +92,11 @@ public interface DocumentUploadRepository extends JpaRepository<DocumentUpload, 
     
     @Modifying(clearAutomatically = true)
     @Transactional
+    @Query("update DocumentUpload  set objectId = null where id = :id")
+   public void deleteDocument(@Param("id")Long id);
+    
+    @Modifying(clearAutomatically = true)
+    @Transactional
     @Query("delete from BoQDetails where estimate_preparation_id = :id")
    public void deleteData( @Param("id")Long id);
     

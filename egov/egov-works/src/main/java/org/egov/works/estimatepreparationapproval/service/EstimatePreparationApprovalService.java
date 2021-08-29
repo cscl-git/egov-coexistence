@@ -127,6 +127,10 @@ public class EstimatePreparationApprovalService {
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Pending for Approval"));
 		}
+		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") )&& estimatePreparationApproval.getStatus().getCode().equals("TS Pending for Approval"))
+		{
+			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Pending for Approval"));
+		}
 		else if(( workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("TS Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Approved"));
@@ -483,5 +487,13 @@ public class EstimatePreparationApprovalService {
 	public List<Department> getAlldepartment() {
 		List<Department> departments = departmentrepository.findAll();
 	return departments;
+	}
+	public void deletedocument(Long id,Long objectId) {
+		try {
+			
+			documentUploadRepository.deleteDocument( objectId);
+		}catch (Exception e) {
+			System.out.println("unable to delete document  "+e.getMessage());// TODO: handle exception
+		}
 	}
 }

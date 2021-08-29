@@ -192,6 +192,11 @@ public class DNITCreation extends StateAware implements Serializable {
 	private Long uploadId;
 	
 	@Transient
+	private List<String> sector;
+	@Transient
+	private List<String> wardnumber;
+
+	@Transient
 	private List<BoqUploadDocument> docUpload;
 	
 	@Column(name = "expenditure_head_est")
@@ -199,6 +204,12 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	@Column(name = "corriandumm_status")
 	private String corriandumm_status;
+
+	@Column(name = "preparation_designation_new")
+	private String preparationDesignationNew;
+	
+	@Transient
+	private List<String> designatationlist;
 
 	public Double getContingentPercentage() {
 		return contingentPercentage;
@@ -856,6 +867,38 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	public void setEstimateAmount(BigDecimal estimateAmount) {
 		this.estimateAmount = estimateAmount;
+	}
+
+	public List<String> getSector() {
+		return sector;
+	}
+
+	public void setSector(List<String> sector) {
+		this.sector = sector;
+	}
+
+	public List<String> getWardnumber() {
+		return wardnumber;
+	}
+
+	public void setWardnumber(List<String> wardnumber) {
+		this.wardnumber = wardnumber;
+	}
+
+	public List<String> getDesignatationlist() {
+		return designatationlist;
+	}
+
+	public void setDesignatationlist(List<String> designatationlist) {
+		this.designatationlist = designatationlist;
+	}
+
+	public String getPreparationDesignationNew() {
+		return preparationDesignationNew;
+	}
+
+	public void setPreparationDesignationNew(String preparationDesignationNew) {
+		this.preparationDesignationNew = preparationDesignationNew;
 	}
 
 }

@@ -5,9 +5,17 @@
 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
-<link rel="stylesheet"
-	href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
- <link rel="stylesheet" href="/resources/demos/style.css">
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+    <script>
+				$(document).ready(function() {
+		$('input[id$=estimateDate]').datepicker({
+			dateFormat: 'dd/mm/yy'
+		});
+		
+	});
+				</script>
 <style>
 .dropdown-content option{
 	BACKGROUND-COLOR: LIGHTGRAY;
@@ -22,11 +30,7 @@
 }
 </style>
 
- <script>
-  $( function() {
-    $( "#estimateDate" ).datepicker();
- } );  
-  </script>
+
 
 		<spring:hasBindErrors name="estimatePreparationApproval">
 			<div class="alert alert-danger"
@@ -100,8 +104,8 @@
 				code="lbl.estimate.preparation.estimate.date" /><span
 						class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
-									<form:input id="estimateDate" path="estimateDate"
-									class="form-control-works datepicker" data-date-end-date="0d"
+			<form:input type="text" id="estimateDate" path="estimateDate"
+				class="form-control-works" data-date-end-date="0d"
 									placeholder="DD/MM/YYYY" />
 								<form:errors path="estimateDt" cssClass="add-margin error-msg" />
 							</div>
@@ -123,7 +127,7 @@
 				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 							<form:select path="expHead_est"  id="wardCheck"
-								cssClass="form-control" cssErrorClass="form-control error">
+				cssClass="form-control-works" cssErrorClass="form-control error">
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
@@ -297,13 +301,14 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.designation" /></label>
 			<div class="col-sm-3 add-margin">
-			<form:select path="preparationDesignation"
+						<form:select path="preparationDesignationNew"
 				id="preparationDesignation" class="form-control-works">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-							<form:options items="${estimatePreparationApproval.designations}"
-										itemValue="code" itemLabel="name" />
+							<%-- <form:options items="${estimatePreparationApproval.designations}"
+								itemValue="code" itemLabel="name" /> --%>
+								<form:options items="${estimatePreparationApproval.designatationlist}"/>
 								</form:select>
 								</div>
 								
@@ -603,9 +608,7 @@
 
 
 
-<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
-<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 		<script type="text/javascript">

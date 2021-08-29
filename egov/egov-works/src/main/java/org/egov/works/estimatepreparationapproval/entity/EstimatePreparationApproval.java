@@ -124,6 +124,8 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Column(name = "preparation_designation")
 	private Long preparationDesignation;
+	@Column(name = "preparation_designation_new")
+	private String preparationDesignationNew;
 
 	@Column(name = "financing_details")
 	private Long financingDetails;
@@ -212,6 +214,9 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	private String pendingWith;
 
 	@Transient
+	private String currentstate;
+	
+	@Transient
 	private String dnitfromestimate;
 
 	public Double getContingentPercentage() {
@@ -284,6 +289,13 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Transient
 	private String department = "";
+
+	@Transient
+	private List<String> sector;
+	@Transient
+	private List<String> designatationlist;
+	@Transient
+	private List<String> wardnumber;
 
 	@Transient
 	private List<Department> departments = new ArrayList<Department>();
@@ -937,6 +949,46 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setDnitfromestimate(String dnitfromestimate) {
 		this.dnitfromestimate = dnitfromestimate;
+	}
+
+	public List<String> getSector() {
+		return sector;
+	}
+
+	public void setSector(List<String> sector) {
+		this.sector = sector;
+	}
+
+	public List<String> getWardnumber() {
+		return wardnumber;
+	}
+
+	public void setWardnumber(List<String> wardnumber) {
+		this.wardnumber = wardnumber;
+	}
+
+	public List<String> getDesignatationlist() {
+		return designatationlist;
+	}
+
+	public void setDesignatationlist(List<String> designatationlist) {
+		this.designatationlist = designatationlist;
+	}
+
+	public String getPreparationDesignationNew() {
+		return preparationDesignationNew;
+	}
+
+	public void setPreparationDesignationNew(String preparationDesignationNew) {
+		this.preparationDesignationNew = preparationDesignationNew;
+	}
+
+	public String getCurrentstate() {
+		return currentstate;
+	}
+
+	public void setCurrentstate(String currentstate) {
+		this.currentstate = currentstate;
 	}
 
 	

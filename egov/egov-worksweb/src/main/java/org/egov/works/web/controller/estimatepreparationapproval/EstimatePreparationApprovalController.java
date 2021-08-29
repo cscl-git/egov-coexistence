@@ -20,12 +20,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -71,6 +74,7 @@ import org.egov.works.estimatepreparationapproval.repository.SudivisionRepositor
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.utils.ExcelGenerator;
 import org.egov.works.workestimate.service.WorkEstimateService;
+import org.python.core.exceptions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -127,6 +131,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     private static final int BUFFER_SIZE = 4096;
     public static final Locale LOCALE = new Locale("en", "IN");
     public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
+    public static final SimpleDateFormat DDMMYYYYFORMAT2 = new SimpleDateFormat("yyyy/MM/dd", LOCALE);
     
     @Autowired
 	private FileStoreService fileStoreService;
@@ -147,14 +152,17 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
     @Autowired
     private NotificationService notificationService;
     
-    @InitBinder
+    @PersistenceContext
+	private EntityManager entityManager;
+    
+   /* @InitBinder
     public void initBinder(WebDataBinder binder) {
     	
     	System.out.println(":::Limit:::Auto grow::: "+binder.getAutoGrowCollectionLimit());
     	//dataBinder.setAutoGrowCollectionLimit(autoGrowCollectionLimit);
     	//binder.setAutoGrowCollectionLimit(1000);
     	System.out.println("::::::Auto grow::: "+binder.getAutoGrowCollectionLimit());
-    }
+    }*/
     
     private static Map<String, String> map;
     
@@ -176,6 +184,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
 
+		estimatePreparationApproval.setDesignatationlist(getdesignationlist());
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
 		//edited...
@@ -197,7 +206,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			final Model model, HttpServletRequest request) {
 		//estimatePreparationApproval.setSector(getsectorlist());
 		//estimatePreparationApproval.setWardnumber(getwardlist());
-		
+		estimatePreparationApproval.setDesignatationlist(getdesignationlist());		
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
 		//edited...
@@ -213,7 +222,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	}
 
 
-	
 	private void prepareValidActionListByCutOffDate(Model model) {
             model.addAttribute("validActionList",
                     Arrays.asList("Forward/Reassign","Save As Draft"));
@@ -270,6 +278,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String aaNumber=v.getAANumber(deptShortCode);
 		estimatePreparationApproval.setAanumber(aaNumber);
 		estimatePreparationApproval.setDepartment(estimatePreparationApproval.getDepartment());
+		
 		//start of workflow
 		Long approvalPosition = 0l;
         String approvalComment = "";
@@ -448,7 +457,6 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		return "estimatepreparationapproval-form-detail";
 		
 	}
-	
 	private String populateShortCode(String deptCode, String worksWing, Long subdivision2) {
 		
 		String deptPart=appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
@@ -847,8 +855,14 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, @RequestParam("file1") MultipartFile[] files, @RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request)
 			throws Exception {
+		/*ServletRequestDataBinder binder = new ServletRequestDataBinder(estimatePreparationApproval);
+	    binder.setAutoGrowCollectionLimit(1000); // set limit to 3 items
+	    binder.bind(request);*/
 		
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
+		System.out.println("::::::::::: "+workFlowAction);
+		System.out.println("::::::::::: "+estimatePreparationApproval.getWorksWing());
+		
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -1308,6 +1322,8 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		 
 		 System.out.println("::::::::: "+estimatePreparationApproval.getRoughCostdocumentDetail().size());
 		//estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
+		estimatePreparationApproval.setDesignatationlist(getdesignationlist());
+			estimatePreparationApproval.setPreparationDesignationNew(estimatePreparationApproval.getPreparationDesignationNew());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
 		estimatePreparationApproval.setWorksWing(estimatePreparationApproval.getWorksWing());
@@ -1686,6 +1702,8 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		 System.out.println("::::::::: "+estimatePreparationApproval.getRoughCostdocumentDetail().size());
 		 //estimatePreparationApproval.setSector(getsectorlist());
 			//estimatePreparationApproval.setWardnumber(getwardlist());
+		estimatePreparationApproval.setDesignatationlist(getdesignationlist());
+			estimatePreparationApproval.setPreparationDesignationNew(estimatePreparationApproval.getPreparationDesignationNew());
 		//estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setBoQDetailsList(boQDetailsList);
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
@@ -1696,14 +1714,14 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		estimatePreparationApproval.setSubdivision(estimatePreparationApproval.getSubdivision());
 		estimatePreparationApproval.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(estimatePreparationApproval.getDepartment())));
 		model.addAttribute("uploadDocument", uploadDocument);
-		model.addAttribute("validActionList",
-                Arrays.asList("Forward/Reassign"));	
+		
 		
 		model.addAttribute(STATE_TYPE, estimatePreparationApproval.getClass().getSimpleName());
         prepareWorkflow(model, estimatePreparationApproval, new WorkflowContainer());
        // prepareValidActionListByCutOffDate(model);
 		model.addAttribute("estimatePreparationApproval", estimatePreparationApproval);
-		
+		model.addAttribute("validActionList",
+                Arrays.asList("Forward/Reassign"));	
 		
 		//model.addAttribute("uploadDocuments", uploadDocuments);
 		model.addAttribute("mode", "create");
@@ -1712,6 +1730,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		return "estimatepreparationapproval-form-detail";
 
 	}
+	
 	
 	public  BigDecimal percentage(BigDecimal base, BigDecimal pct){
 		BigDecimal  bg100 = new BigDecimal(100);
@@ -1835,6 +1854,12 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
         		 if(estimate.getStatusDescription() != null && !estimate.getStatusDescription().equalsIgnoreCase("Approved"))
         		 {
 //        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        			 List<String> statedetail = populatePendingWith(estimate.getId());
+        			 String pendingwith = statedetail.get(0);
+        			 String currentstate=statedetail.get(1);
+        			 System.out.println("pending with "+pendingwith+"current State "+currentstate);
+        			 //estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        			 estimate.setPendingWith(pendingwith);
         		 }
         		 approvalList.add(estimate);
         	 }
@@ -1886,12 +1911,12 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 	        	{
 	        	query.append("and es.executingDivision ='").append(estimatePreparationApproval.getExecutingDivision()).append("'");
 	        	}
-	        query.append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
-	        .append(getMisQuery(estimatePreparationApproval));
+	        query.append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()));
+	        query.append(getMisQuery(estimatePreparationApproval));
+	        
 			estimatePreparationApproval.setId(0l);
 		 System.out.println("Query :: "+query.toString());
          list = persistenceService.findAllBy(query.toString(),estimatePreparationApproval.getId());
-		 
          if (list.size() != 0) {
         	 
         	 for (final Object[] object : list) {
@@ -1925,7 +1950,19 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
         		 }
         		 if(status != null && !status.equalsIgnoreCase("Approved"))
         		 {
-        			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        			// estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        			 List<String> statedetail = populatePendingWith(estimate.getId());
+      System.out.println("Size:  "+statedetail.size());
+      if(statedetail.size()!=0) {
+        			 if(statedetail.size()!=0) {
+        			 String pendingwith = statedetail.get(0);
+        			 String currentstate=statedetail.get(1);
+        			 System.out.println("pending with "+pendingwith+"current State "+currentstate);
+        			 //estimate.setPendingWith(populatePendingWith(estimate.getId()));
+        			 estimate.setPendingWith(pendingwith);
+        			 estimate.setCurrentstate(currentstate);
+        			 }
+      }
         		 }
         		 approvalList.add(estimate);
         	 }
@@ -1941,20 +1978,26 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 
 	}
 	
-	private String populatePendingWith(Long id) {
+	private List<String> populatePendingWith(Long id) {
+		List<String> statedetail=new LinkedList<String>();
 		String pendingWith="";
+		String currentsate="";
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		if(estimateDetails != null && estimateDetails.getState() != null && estimateDetails.getState().getOwnerPosition() != null && estimateDetails.getState().getOwnerPosition() != 0L)
 		{
 			try
 			{
 				pendingWith=getEmployeeName(estimateDetails.getState().getOwnerPosition());
+				currentsate=estimateDetails.getState().getValue();
+				statedetail.add(pendingWith);
+				statedetail.add(currentsate);
+				System.out.println(":::pending::"+pendingWith+"curre "+currentsate);
 			}catch (Exception e) {
 				pendingWith="";
 			}
 			
 		}
-		return pendingWith;
+		return statedetail;
 	}
 
 	@RequestMapping(value = "/workEstimateDetailedSearch",  method = RequestMethod.POST)
@@ -2034,7 +2077,8 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
-
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
@@ -2092,6 +2136,8 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
 
+		estimateDetails.setDesignatationlist(getdesignationlist());
+estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
 		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
 		estimateDetails.setDocumentDetail(documents);
@@ -2438,8 +2484,11 @@ Double d = cell.getNumericCellValue();
 	doc1.setFileStore(savedocebefore.getFileStore());
 	uploadDoc.add(doc1);
 	
+		/*Map<String, List<BoQDetails>> groupByMilesToneMap = 
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));*/
 	Map<String, List<BoQDetails>> groupByMilesToneMap = 
 				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
+		
 	model.addAttribute("milestoneList",groupByMilesToneMap);
 	int k=1;
 	System.out.println(":::::Size:::: "+boQDetailsList.size());
@@ -2510,7 +2559,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 	
 	estimateDetails.setDocumentDetail(documents);
 	estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
-
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 	
 	String dept = estimateDetails.getExecutingDivision().toString();
 	estimateDetails.setDepartment(dept);
@@ -2640,7 +2690,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
-
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
@@ -2902,7 +2953,6 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 
 					}
 				}
-	
 			}
 
 			// workbook.close();
@@ -3013,7 +3063,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		estimateDetails.setDocumentDetail(documents);
 		estimateDetails.setRoughCostdocumentDetail(roughCostEstmatedocuments);
 
-		
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 
@@ -3041,7 +3092,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 				boQDetailsList1.add(boq);
 			}
 		Map<String, List<BoQDetails>> groupByMilesToneMap1 = 
-				  boQDetailsList1.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone));
+				  boQDetailsList.stream().collect(Collectors.groupingBy(BoQDetails::getMilestone,LinkedHashMap::new,Collectors.toList()));
 		model.addAttribute("milestoneList",groupByMilesToneMap1);
 		}
 		
@@ -3392,7 +3443,14 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		 }
 		 if(status != null && !status.equalsIgnoreCase("Approved"))
 		 {
-			 estimate.setPendingWith(populatePendingWith(estimate.getId()));
+			 List<String> statedetail = populatePendingWith(estimate.getId());
+			 if(statedetail.size()!=0) {
+			 String pendingwith = statedetail.get(0);
+			 String currentstate=statedetail.get(1);
+			 System.out.println("pending with "+pendingwith+"current State "+currentstate);
+			 //estimate.setPendingWith(populatePendingWith(estimate.getId()));
+			 estimate.setPendingWith(pendingwith);
+			 }
 		 }
 		 approvalList.add(estimate);
 	   }
@@ -3448,6 +3506,36 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 	        return Division;
 
 	    }
+	 @RequestMapping(value = "/deleteestimate", method = RequestMethod.GET, produces = "application/json")
+	    @ResponseBody
+	    public String deleteestimate(@RequestParam final Long id) {
+            System.out.println(":::::::  "+id);
+            String status="";
+            try {
+            	workEstimateService.deleteEstimateData(id);
+            	status="success";
+            }catch(Exception e){
+            	System.out.println("Error in Deleting Data  "+e.getMessage());
+            	status="fail";
+            }
+	    	 return status;
+
+	    }
+	 
+	 @RequestMapping(value = "/deletedocument", method = RequestMethod.GET, produces = "application/json")
+	    @ResponseBody
+	    public String deletedocument(@RequestParam final Long id,@RequestParam final Long docId) {
+         System.out.println(":::IDD::::  "+id+" :::::docId:::: "+docId);
+         String status="fail";
+        try {
+        	estimatePreparationApprovalService.deletedocument(id, docId);
+        	status="success";
+        }catch (Exception e) {
+			e.printStackTrace();// TODO: handle exception
+		}
+	    	 return status;
+
+	    }
 		 public List<String> getsectorlist(){
 		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
 					"Sector/Locality");
@@ -3468,6 +3556,23 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 				wardnumber.add(wa.getValue());
 			}
 			return wardnumber;
+			
+	 }
+	 public List<String> getdesignationlist(){
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"Designation");
+			
+			List<String> designation=new ArrayList<>();
+			for(AppConfigValues as:sector) {
+				System.out.println("::::designation:: "+as.getValue());
+				designation.add(as.getValue());
+			}
+			return designation;
+	 }
+	 
+	private void listest(List<Object[]> listest) {
+		// TODO Auto-generated method stub
+		
 	 }
 
 }
