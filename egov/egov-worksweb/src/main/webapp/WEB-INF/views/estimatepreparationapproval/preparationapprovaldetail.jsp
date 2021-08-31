@@ -52,6 +52,15 @@
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data" style="margin-top:-20px;">
 
+	<%-- <c:if test="${error == 'Y' }">
+<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title text-center">
+					<c:out value="${message }" /><br />
+					
+				</div>
+			</div>
+</c:if> --%>
 
 	<div class="tab-content">
 		<div class="tab-pane fade in active" id="estimate">
@@ -63,6 +72,8 @@
 					</div>
 				</c:if>
 				<div class="form-group" style="padding: 50px 20px 0;">
+				<form:input type="hidden" id="createdbyuser" path="createdbyuser"
+				value="${estimatePreparationApproval.createdbyuser}"/>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.works.wing" /><span
 						class="mandatory"></span></label>
@@ -297,16 +308,16 @@
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.designation" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="preparationDesignation"
+						<form:select path="preparationDesignationNew"
 							id="preparationDesignation" class="form-control-works">
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
-							<form:options items="${estimatePreparationApproval.designations}"
-								itemValue="code" itemLabel="name" />
+							<%-- <form:options items="${estimatePreparationApproval.designations}"
+								itemValue="code" itemLabel="name" /> --%>
+								<form:options items="${estimatePreparationApproval.designatationlist}"/>
 						</form:select>
 					</div>
-
 					<!-- New field added here -->
 
 

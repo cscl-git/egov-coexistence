@@ -527,7 +527,7 @@
 				<div class="col-sm-3 add-margin">
 				<select data-first-option="false" name="bank" id="bank" class="form-control">
 				  <option value="">select</option>
-				  <c:forEach var="banks" items="${banks}">
+				  <c:forEach var="banks" items="${bankList}">
 				    <option value="${banks.id}">${banks.name}</option>
                     </c:forEach>
 				  </select>
@@ -591,7 +591,9 @@
 	
 	 $(".subledgerGlType").on("change", function () {        
 	      $modal = $('#myModal');
-	      if($(this).val() == '23'){
+	      var subtype=$(".subledgerGlType option:selected").text();
+	      //if($(this).val() == '23'){
+	    	 if(subtype=='OtherParty'){  
 	    	  var id = $(this).attr("id");
 	    	  $('#indexRef').val(id);
 	        $modal.modal('show');

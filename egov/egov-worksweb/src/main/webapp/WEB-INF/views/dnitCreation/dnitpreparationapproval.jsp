@@ -45,6 +45,8 @@
 			</div>
 			</c:if>
 				<div class="form-group" style="padding: 50px 20px 0;">
+				<form:input type="hidden" id="createdbyuser" path="createdbyuser"
+				value="${dnitCreation.createdbyuser}"/>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 							code="lbl.estimate.preparation.works.wing" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
@@ -277,6 +279,7 @@
 							</div>
 					<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.designation" /></label>
+					
 					<div class="col-sm-3 add-margin">
 						<form:select path="preparationDesignationNew"
 							id="preparationDesignation" class="form-control-works">

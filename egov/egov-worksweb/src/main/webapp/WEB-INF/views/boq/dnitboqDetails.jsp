@@ -56,7 +56,8 @@
 
 			<div class="panel panel-primary" data-collapsed="0">
 		<div class="form-group" style="padding: 50px 20px 800px;">
-
+<form:input type="hidden" id="createdbyuser" path="createdbyuser"
+				value="${dnitCreation.createdbyuser}"/>
 				<form:input type="hidden" id="dnitfromestimate" path="dnitfromestimate"
 				value="${estimatePreparationApproval.dnitfromestimate}"/>
 					<input type="hidden" name="estimatePreparationApproval"

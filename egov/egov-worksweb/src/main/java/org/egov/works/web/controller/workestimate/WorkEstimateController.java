@@ -33,7 +33,6 @@ import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApprovalService;
 import org.egov.works.workestimate.service.WorkEstimateService;
-import org.opengis.metadata.identification.Identification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -331,6 +330,8 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		DNITCreation saveBoqDetails = workEstimateService.searchDnitBoqData(request, id);
 		BigDecimal bd=new BigDecimal(amount).setScale(2,BigDecimal.ROUND_HALF_UP);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		System.out.println("Expenditure head "+saveBoqDetails.getExpHead_est());
+		workOrderAgreement.setExpHead_est(saveBoqDetails.getExpHead_est());
 		workOrderAgreement.setWorkfrom("EstandDnit");
 		workOrderAgreement.setBoQDetailsList(responseList);
 		workOrderAgreement.setName_work_order(saveBoqDetails.getWorkName());
@@ -391,8 +392,10 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			}
 		}
 		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
+		System.out.println("expendi:: "+saveBoqDetails.getExpHead_est());
 		BigDecimal bd=new BigDecimal(amount).setScale(2,BigDecimal.ROUND_HALF_UP);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
+		workOrderAgreement.setExpHead_est(saveBoqDetails.getExpHead_est());
 		workOrderAgreement.setWorkfrom("EstandDnit");
 		//workOrderAgreement.setSectorlist(getsectorlist());
 		//workOrderAgreement.setWardnumber(getwardlist());
@@ -464,16 +467,18 @@ public class WorkEstimateController extends GenericWorkFlowController{
 		}
 		
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchBoqData(request, id);
-
+		estimateDetails.setDesignatationlist(getdesignationlist());
+		estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
+		estimateDetails.setCreatedbyuser(estimatePreparationApprovalService.getUserName());
 		estimateDetails.setBoQDetailsList(responseList);
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
 		estimateDetails.setSubdivision(estimateDetails.getSubdivision());
-		estimateDetails.setWorkswings(estimatePreparationApprovalService.getworskwing());
-        estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
-        estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
+		estimateDetails.setWorkswings(workEstimateService.getworskwing());
+        estimateDetails.setSubdivisions(workEstimateService.getsubdivision(Long.valueOf(dept)));
+        estimateDetails.setNewdepartments(workEstimateService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
 		//estimateDetails.setDepartments(getDepartmentsFromMs());
 		estimateDetails.setEstimateAmount(BigDecimal.valueOf(amount).setScale(2, BigDecimal.ROUND_HALF_UP));
 		
@@ -621,7 +626,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
 			
 			List<String> sector1=new ArrayList<>();
 			for(AppConfigValues as:sector) {
-				System.out.println("::::sector:: "+as.getValue());
+				//System.out.println("::::sector:: "+as.getValue());
 				sector1.add(as.getValue());
 			}
 			return sector1;
@@ -631,9 +636,20 @@ public class WorkEstimateController extends GenericWorkFlowController{
 					"WardNumber");
 			List<String> wardnumber=new ArrayList<>();
 			for(AppConfigValues wa:wardNumber) {
-				System.out.println("::::ward:: "+wa.getValue());
+				//System.out.println("::::ward:: "+wa.getValue());
 				wardnumber.add(wa.getValue());
 			}
 			return wardnumber;
+	 }
+	 public List<String> getdesignationlist(){
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+					"Designation");
+			
+			List<String> designation=new ArrayList<>();
+			for(AppConfigValues as:sector) {
+				System.out.println("::::designation:: "+as.getValue());
+				designation.add(as.getValue());
+			}
+			return designation;
 	 }
 }

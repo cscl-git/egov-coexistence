@@ -61,8 +61,11 @@ import org.egov.collection.entity.ReceiptHeader;
 import org.egov.common.contstants.CommonConstants;
 import org.egov.commons.CVoucherHeader;
 import org.egov.commons.DocumentUploads;
+import org.egov.model.bills.DocumentUpload;
 import org.egov.commons.repository.CommonDocumentUploadRepository;
 import org.egov.commons.utils.DocumentUtils;
+import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.egf.utils.FinancialUtils;
 import org.egov.infra.microservice.models.Receipt;
 import org.egov.infra.utils.DateUtils;
 import org.egov.model.instrument.InstrumentHeader;
@@ -74,7 +77,9 @@ public abstract class RemittanceService implements Serializable {
     @Autowired
     private DocumentUtils docUtils; // added abhishek 24032021
     @Autowired
-    private static CommonDocumentUploadRepository documentUploadRepository;// added abhishek 24032021
+    private FinancialUtils financialUtils;
+    @Autowired
+	private DocumentUploadRepository documentUploadRepository;
     
     public abstract List<Receipt> createCashBankRemittance(List<ReceiptBean> receiptList, final String accountNumberId,
             final Date remittanceDate);
@@ -154,6 +159,7 @@ public abstract class RemittanceService implements Serializable {
             //collBankRemitReport.setReceiptDate(new Date(receiptHead.getReceiptDate()));
             //collBankRemitReport.setServiceType(receiptHead.getServiceName());
             collBankRemitReport.setVoucherNumber(receiptHeaders.getRemittanceVouherNumber());
+            collBankRemitReport.setVoucherId(receiptHeaders.getVoucherid());
             reportList.add(collBankRemitReport);
        // }
         return reportList;
@@ -161,22 +167,22 @@ public abstract class RemittanceService implements Serializable {
     
 
     //added by Abhishek on 24032021
+    
     @Transactional
     public void saveDocuments(ReceiptHeader receiptHeader)
     {
- 	   List<DocumentUploads> files = receiptHeader.getDocumentDetail() == null ? null : receiptHeader.getDocumentDetail();
-        final List<DocumentUploads> documentDetails;
-        documentDetails = docUtils.getDocumentDetails(files, receiptHeader,
-                CommonConstants.REMITTANCE_OBJECT);
+ 	   List<DocumentUpload> files = receiptHeader.getDocumentDetail() == null ? null : receiptHeader.getDocumentDetail();
+        final List<DocumentUpload> documentDetails;
+        documentDetails = financialUtils.getDocumentDetails(files, receiptHeader, CommonConstants.JOURNAL_VOUCHER_OBJECT);
         if (!documentDetails.isEmpty()) {
         	receiptHeader.setDocumentDetail(documentDetails);
-        	RemittanceService.persistDocuments(documentDetails);
+            persistDocuments(documentDetails);
         }
     }
     
-    public static void persistDocuments(final List<DocumentUploads> documentDetailsList) {
+    public void persistDocuments(final List<DocumentUpload> documentDetailsList) {
         if (documentDetailsList != null && !documentDetailsList.isEmpty())
-            for (final DocumentUploads doc : documentDetailsList)
+            for (final DocumentUpload doc : documentDetailsList)
                 documentUploadRepository.save(doc);
     }
     //end

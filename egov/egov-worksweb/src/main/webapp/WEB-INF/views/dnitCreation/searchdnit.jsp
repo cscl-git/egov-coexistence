@@ -254,6 +254,11 @@
 						<form:input type="number" class="form-control" id="estimatedCost" 
 									path="estimateAmount" />
 							</div>
+							<label class="col-sm-3 control-label text-left-audit">Created By </label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" id="createdbyuser" 
+									path="createdbyuser" />
+							</div>
 					
 							</div>
 						</div>

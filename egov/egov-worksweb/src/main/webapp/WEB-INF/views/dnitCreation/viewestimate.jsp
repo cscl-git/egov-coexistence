@@ -127,13 +127,14 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.designation" /></label>
 			<div class="col-sm-3 add-margin">
-				<form:select path="preparationDesignation"
-					id="preparationDesignation" readonly="true" class="form-control">
+						<form:select path="preparationDesignationNew"
+							id="preparationDesignation" class="form-control" readonly="true">
 					<form:option value="">
 						<spring:message code="lbl.select" />
 					</form:option>
-					<form:options items="${estimatePreparationApproval.designations}"
-						itemValue="code" itemLabel="name" />
+							<%-- <form:options items="${estimatePreparationApproval.designations}"
+								itemValue="code" itemLabel="name" /> --%>
+								<form:options items="${estimatePreparationApproval.designatationlist}"/>
 				</form:select>
 			</div>
 			 

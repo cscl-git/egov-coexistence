@@ -1972,8 +1972,9 @@ public class SearchReceiptAction extends SearchFormAction {
 						depcode = gllist.get(ob[1].toString()).getDepartment();
 					}
 				}
-				if (dep != null && !dep.isEmpty()) {
-					if (!dep.equals(depcode)) {
+				if(dept!=null)
+				if (dept[0] != null && !dept[0].isEmpty()) {
+					if (!dept[0].equals(depcode)) {
 						//receiptList.add(receiptHeader);
 						continue;
 					}

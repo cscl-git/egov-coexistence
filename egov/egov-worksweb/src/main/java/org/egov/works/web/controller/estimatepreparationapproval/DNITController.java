@@ -8,6 +8,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
@@ -74,6 +75,7 @@ import org.egov.works.estimatepreparationapproval.service.EstimatePreparationApp
 import org.egov.works.utils.ExcelGenerator;
 import org.egov.works.workestimate.service.WorkDnitService;
 import org.egov.works.workestimate.service.WorkEstimateService;
+import org.python.icu.text.RuleBasedBreakIterator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -157,10 +159,8 @@ private static Map<String, String> map;
 	public String showNewFormGet(
 			@ModelAttribute("dnitCreation") final DNITCreation dnitCreation,
 			final Model model, HttpServletRequest request) {
+		dnitCreation.setCreatedbyuser(estimatePreparationApprovalService.getUserName());
 		List<Workswing> worskwing = estimatePreparationApprovalService.getworskwing();
-		for(Workswing w:worskwing) {
-			System.out.println("::::: "+w.getWorkswingname());
-		}
 		dnitCreation.setDesignatationlist(getdesignationlist());
 		dnitCreation.setDepartments(getDepartmentsFromMs());
 		dnitCreation.setDesignations(getDesignationsFromMs());
@@ -2853,6 +2853,11 @@ estimateDetails.setBoQDetailsList(estimateDetails.getNewBoQDetailsList());
 			{
 				misQuery.append(" and es.subdivision=")
 				.append(estimate.getSubdivision());
+			}
+			if ( estimate.getCreatedbyuser() != null && !estimate.getCreatedbyuser().isEmpty())
+			{
+				misQuery.append(" and lower(es.createdbyuser) like lower('%")
+						.append(estimate.getCreatedbyuser()).append("%')");
 			}
 		}
 		return misQuery.toString();

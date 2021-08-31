@@ -160,7 +160,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 	private File[] file; // added abhishek
 	private String[] fileContentType; // added abhishek
 	private String[] fileFileName; // added abhishek
-	private List<DocumentUploads> documentDetail = new ArrayList<>(); // added abhishek
+	private List<DocumentUpload> documentDetail = new ArrayList<>(); // added abhishek
     @Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
@@ -482,21 +482,21 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		final long elapsedTimeMillis = System.currentTimeMillis() - startTimeMillis;
         LOGGER.info("$$$$$$ Time taken to persist the remittance list (ms) = " + elapsedTimeMillis);
         if(receipts!=null)
-        bankRemittanceList = remittanceService.prepareChequeRemittanceReport(receipts);
+        bankRemittanceList = remittanceService.prepareCashRemittanceReportNew(receipts);
 		
         File[] uploadedFiles = getFile();
 		String[] fileName = getFileFileName();
 		String[] contentType = getFileContentType();
-		System.out.println("files "+uploadedFiles[0]);
+		//System.out.println("files "+uploadedFiles[0]);
 		
-		if(uploadedFiles[0]!=null) { 
+		if(uploadedFiles!=null) { 
 			byte[] fileBytes; 
 			for (int i = 0; i <uploadedFiles.length; i++) {
 			  Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
 			  try { 
 				  fileBytes = Files.readAllBytes(path); 
 				  ByteArrayInputStream bios= new ByteArrayInputStream(fileBytes); 
-				  DocumentUploads upload = new DocumentUploads(); 
+				  DocumentUpload upload = new DocumentUpload(); 
 				  upload.setInputStream(bios);
 				  upload.setFileName(fileName[i]); 
 				  upload.setContentType(contentType[i]);
@@ -1031,11 +1031,11 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		this.fileFileName = fileFileName;
 	}
 
-	public List<DocumentUploads> getDocumentDetail() {
+	public List<DocumentUpload> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 

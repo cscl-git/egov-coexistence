@@ -824,7 +824,7 @@ public class RemittanceServiceImpl extends RemittanceService {
         headerdetails.put(VoucherConstant.FUNDCODE, fundCode);
         headerdetails.put(VoucherConstant.DEPARTMENTCODE, deptIdnew);
         headerdetails.put(VoucherConstant.FUNCTIONCODE, functionCode);
-        headerdetails.put("subdivison", subdivisonNew);
+        headerdetails.put(VoucherConstant.SUBDIVISION, subdivisonNew);
         return headerdetails;
     }
 
@@ -1193,20 +1193,20 @@ public class RemittanceServiceImpl extends RemittanceService {
     	List<Object[]> result= new ArrayList();
     	List<Object[]> misresult= new ArrayList();
     	SQLQuery misquery=null;
-    	StringBuffer query1=new StringBuffer("select v2.reciept_number,fnc.code,v2.departmentcode,ed.\"name\" as departmentname from eg_department ed,\"function\" fnc,vouchermis v2 where v2.reciept_number notnull and fnc.id =v2.functionid and ed.code =v2.departmentcode");
+    	StringBuffer query1=new StringBuffer("select v2.reciept_number,v2.departmentcode,ed.\"name\" as departmentname from eg_department ed,vouchermis v2 where v2.reciept_number notnull and ed.code =v2.departmentcode");
     	misquery=this.persistenceService.getSession().createSQLQuery(query1.toString());
     	misresult = misquery.list();
 	    	System.out.println(":::misresult size::::: "+misresult.size());
 	    	Map<String, String> deptMap = new HashMap<>();
-	    	Map<String,String> funcMap=new HashMap<>();
+	    	//Map<String,String> funcMap=new HashMap<>();
 	    	Map<String, String> deptNameMap = new HashMap<>();
 	    	if(misresult!=null)
 	    	{
 	    		for (final Object[] object : misresult)
 	    		{
-	    			funcMap.put(object[0].toString(), object[1].toString());
-	    			deptMap.put(object[0].toString(), object[2].toString());
-	    			deptNameMap.put(object[0].toString(), object[3].toString());
+	    			//funcMap.put(object[0].toString(), object[1].toString());
+	    			deptMap.put(object[0].toString(), object[1].toString());
+	    			deptNameMap.put(object[0].toString(), object[2].toString());
 	    		}
 	    	}
 	    	
@@ -1315,15 +1315,11 @@ public class RemittanceServiceImpl extends RemittanceService {
  	    		 	else {
  	    		 		receiptBean.setDepartmentName("");
  	    		 	}
- 	    		 	if(object[1]!=null)
- 	    		 	{
- 	    		 		if(funcMap.containsKey(object[1].toString())){
- 	    		 			receiptBean.setFunctionCode(funcMap.get(object[1].toString()));
- 	    		 		}
- 	    		 	}
- 	    		 	else {
- 	    		 		receiptBean.setFunctionCode("");
- 	    		 	}
+					/*
+					 * if(object[1]!=null) { if(funcMap.containsKey(object[1].toString())){
+					 * receiptBean.setFunctionCode(funcMap.get(object[1].toString())); } } else {
+					 * receiptBean.setFunctionCode(""); }
+					 */
  	    		 	receiptBean.setFund((object[6]!=null)?object[6].toString():"-1");
  	    		 	receiptBean.setFundName((object[7]!=null)?object[7].toString():"");
  	    		 	//receiptBean.setRemittanceReferenceNumber((object[11]!=null)?object[11].toString():"");

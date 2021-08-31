@@ -7,6 +7,8 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/fileupload.js'/>"></script>
+<script
+	src="<cdn:url value='/resources/js/estimatepreparationapproval/fileuploaddelete.js'/>"></script>
 <style>
     .file-ellipsis {
         width : auto !Important;
@@ -23,12 +25,29 @@
         </div> 
       </div>
    <c:if test="${estimatePreparationApproval.documentDetail != null &&  !estimatePreparationApproval.documentDetail.isEmpty()}">
+       <table id="uploader1" width="30%">
+       <tbody>
         <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
+        <c:if test="${documentDetials.objectType != 'roughWorkFile' }">
+        <tr>
+        
+        <td class="padding-9 ">
+            <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a>
+       </td>
+       <c:if test="${currentState!=null && currentState=='SaveAsDraft' && mode != 'view' }">
+        <td><input type="button" name="remove" id="remove" class="padding-4 " value ="Delete" onclick="deleteFileField(${estimatePreparationApproval.id},${documentDetials.id })"></td>
+       </c:if>
+        </tr>
+         </c:if>
+        </c:forEach>
+       </tbody>
+       </table>
+       <%--  <c:forEach items="${estimatePreparationApproval.documentDetail }" var="documentDetials">
         
         <c:if test="${documentDetials.objectType != 'roughWorkFile' }">
-            <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><br />
+            <a href="/services/works/estimatePreparation/downloadBillDoc?estDetailsId=${estimatePreparationApproval.id}&fileStoreId=${documentDetials.fileStore.fileStoreId }">${documentDetials.fileStore.fileName }</a><span ><input type="button" name="remove" id="remove" class="padding-4 " value ="Delete" onclick="deleteFileField(${estimatePreparationApproval.id},${documentDetials.id })"></span><br />
        </c:if>
-        </c:forEach>
+        </c:forEach> --%>
     </c:if>
    <br> 
    <c:if test="${mode != 'view' }">
@@ -37,10 +56,14 @@
                         <tbody>
                         <tr>
                             <td valign="top">
-                                <table id="uploadertbl" width="100%"><tbody>
+                                <table id="uploadertbl" width="16%"><tbody>
                                 <tr id="row1">
                                     <td>
-                                        <input type="file" name="file1" id="file1" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-10">
+                                    <input type="file" name="file1" id="file1" onchange="isValidFile(this.id)" style="color:#000000;" class="padding-4 upload-file">
+                                      
+                                    </td>
+                                    <td>
+                                    	<input type="button" name="remove" id="remove" class="padding-4 " value ="Remove" onclick="deleteFileInputField(this.row)">
                                     </td>
                                 </tr>
                                 </tbody></table>
@@ -48,6 +71,7 @@
                         </tr>
                         <tr>
                             <td align="center">
+                            
                                 <button id="attachNewFileBtn" type="button" class="btn btn-primary" onclick="addFileInputFieldUpload()"><spring:message code="lbl.addfile" text="Add File"/></button>
                             </td>
                         </tr>

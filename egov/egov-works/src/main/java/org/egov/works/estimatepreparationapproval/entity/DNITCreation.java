@@ -172,6 +172,9 @@ public class DNITCreation extends StateAware implements Serializable {
 	@Column(name="dnitfromestimate")
 	private String dnitfromestimate;
 
+	@Column(name="createdbyuser")
+	private String createdbyuser;
+
 	@Transient
 	private EstimatePreparationApproval estimatePreparationApproval;
 	@Transient
@@ -900,5 +903,15 @@ public class DNITCreation extends StateAware implements Serializable {
 	public void setPreparationDesignationNew(String preparationDesignationNew) {
 		this.preparationDesignationNew = preparationDesignationNew;
 	}
+
+	public String getCreatedbyuser() {
+		return createdbyuser;
+	}
+
+	public void setCreatedbyuser(String createdbyuser) {
+		this.createdbyuser = createdbyuser;
+	}
+
+	
 
 }

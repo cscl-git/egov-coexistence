@@ -5,7 +5,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%--<%@ include file="/includes/taglibs.jsp"%>--%>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<%-- <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %> --%>
 <%--<link rel="stylesheet" type="text/css"
 	href="/services/EGF/resources/css/jquery-ui/css/smoothness/jquery-ui-1.8.4.custom.css" />
 <link rel="stylesheet" type="text/css" media="screen"

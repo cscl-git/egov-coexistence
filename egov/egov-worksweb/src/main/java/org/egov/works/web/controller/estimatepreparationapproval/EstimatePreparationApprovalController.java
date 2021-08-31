@@ -103,6 +103,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	@Autowired
 	private AutonumberServiceBeanResolver beanResolver;
 
+
 	@Autowired
 	public MicroserviceUtils microserviceUtils;
 	@Autowired
@@ -112,10 +113,10 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 	private SudivisionRepository subdivision;
 	
 	@Autowired
+	WorkEstimateService workEstimateService;
+	@Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
 
-	@Autowired
-	WorkEstimateService workEstimateService;
 	
 	private static final String STATE_TYPE = "stateType";
 	private static final String APPROVAL_POSITION = "approvalPosition";
@@ -184,6 +185,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, HttpServletRequest request) {
 
+		estimatePreparationApproval.setCreatedbyuser(estimatePreparationApprovalService.getUserName());
 		estimatePreparationApproval.setDesignatationlist(getdesignationlist());
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
@@ -206,6 +208,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			final Model model, HttpServletRequest request) {
 		//estimatePreparationApproval.setSector(getsectorlist());
 		//estimatePreparationApproval.setWardnumber(getwardlist());
+		estimatePreparationApproval.setCreatedbyuser(estimatePreparationApprovalService.getUserName());
 		estimatePreparationApproval.setDesignatationlist(getdesignationlist());		
 		estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setDesignations(getDesignationsFromMs());
@@ -396,6 +399,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		if(estimatePreparationApproval.getState()==null) {
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Pending for Approval"));
 		}
+		
 		//start of workflow
 		Long approvalPosition = 0l;
         String approvalComment = "";
@@ -1968,6 +1972,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
         	 }
         	 
          }
+		estimatePreparationApproval.setComments(estimatePreparationApprovalService.getUserName());//only to check the current user
 		estimatePreparationApproval.setWorkswings(estimatePreparationApprovalService.getworskwing());
         estimatePreparationApproval.setDepartments(getDepartmentsFromMs());
 		estimatePreparationApproval.setEstimateList(approvalList);
@@ -3327,7 +3332,11 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 				misQuery.append(" and es.estimateAmount=")
 				.append(estimate.getEstimateAmount());
 			}
-			
+			if ( estimate.getCreatedbyuser() != null && !estimate.getCreatedbyuser().isEmpty())
+			{
+				misQuery.append(" and lower(es.createdbyuser) like lower('%")
+						.append(estimate.getCreatedbyuser()).append("%')");
+			}
 			
 			
 		}
@@ -3512,6 +3521,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
             System.out.println(":::::::  "+id);
             String status="";
             try {
+            	EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
+            	System.out.println("estimateDetails.getState().getValue() "+estimateDetails.getState().getValue()+" owner "+getEmployeeName(estimateDetails.getState().getOwnerPosition())+"owowo user "+estimatePreparationApprovalService.getUserName());
             	workEstimateService.deleteEstimateData(id);
             	status="success";
             }catch(Exception e){
@@ -3559,7 +3570,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 			
 	 }
 	 public List<String> getdesignationlist(){
-		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EstimatePreparationApproval",
+		 List<AppConfigValues> sector =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 					"Designation");
 			
 			List<String> designation=new ArrayList<>();

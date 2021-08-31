@@ -48,6 +48,7 @@
 package org.egov.egf.web.actions.report;
 
 import com.exilant.GLEngine.DayBook;
+import com.exilant.eGov.src.common.SubDivision;
 import com.exilant.eGov.src.reports.DayBookReportBean;
 import com.exilant.exility.common.TaskFailedException;
 import com.opensymphony.xwork2.validator.annotations.RequiredFieldValidator;
@@ -62,10 +63,13 @@ import org.egov.commons.CVoucherHeader;
 import org.egov.commons.Fund;
 import org.egov.commons.SubScheme;
 import org.egov.egf.model.VoucherDetailMiscMapping;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
@@ -97,6 +101,11 @@ public class DayBookReportAction extends BaseFormAction {
     @Autowired
     @Qualifier("persistenceService")
     private PersistenceService persistenceService;
+    @Autowired
+	private EgovMasterDataCaching masterDataCache;
+    
+    @Autowired
+	protected AppConfigValueService appConfigValuesService;
 
     /**
      *
@@ -128,7 +137,19 @@ public class DayBookReportAction extends BaseFormAction {
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
         addDropdownData("fundList",persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name"));
         addDropdownData("schemeList",persistenceService.findAllBy(" from Scheme where isactive=true order by name"));
-        
+        addDropdownData("departmentList", masterDataCache.get("egi-department"));
+        List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+				"receipt_sub_divison");
+        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
+        SubDivision subdivision=null;
+        for(AppConfigValues value:appConfigValuesList)
+        {
+        	subdivision = new SubDivision();
+        	subdivision.setSubdivisionCode(value.getValue());
+        	subdivision.setSubdivisionName(value.getValue());
+        	subdivisionList.add(subdivision);
+        }
+        addDropdownData("subdivisionList", subdivisionList);
         currentDate = formatter.format(todayDate);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside  Prepare ........");
@@ -180,6 +201,10 @@ public class DayBookReportAction extends BaseFormAction {
     	System.out.println("scheme id"+dayBookReport.getSchemeId());
     	String naration=dayBookReport.getNarration();
     	System.out.println("naration ::: "+dayBookReport.getNarration());
+    	String dept=dayBookReport.getDepartment();
+    	System.out.println("dept :::"+dayBookReport.getDepartment());
+    	String subdivison=dayBookReport.getSubdivision();
+    	System.out.println("subdivison :::"+dayBookReport.getSubdivision());
     	String oderBy=" ORDER BY vdate,vouchernumber";
         try {
             startDate = sdf.format(formatter.parse(dayBookReport.getStartDate()));
@@ -202,7 +227,7 @@ public class DayBookReportAction extends BaseFormAction {
         	{
         		query=query+" and vh.description like '%"+naration+"%' ";
         	}
-        	query=query+" and vmis.schemeid = "+schemeId+ oderBy;
+        	query=query+" and vmis.schemeid = "+schemeId;
         	
         }
         else
@@ -211,8 +236,16 @@ public class DayBookReportAction extends BaseFormAction {
         	{
         		query=query+" and vh.description like '%"+naration+"%' ";
         	}
-        	query=query+oderBy;
         }
+        if(dept != null && !dept.isEmpty())
+        {
+        	query=query+" and vmis.departmentcode ='"+dept+"'";
+        }
+        if(subdivison != null && !subdivison.isEmpty() && !subdivison.equalsIgnoreCase("-1"))
+        {
+        	query=query+" and vmis.subdivision ='"+subdivison+"'";
+        }
+        query=query+oderBy;
         return query;
     }
 

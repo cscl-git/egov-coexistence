@@ -182,8 +182,11 @@
 						<td class="greybox"><s:select name="fundId" id="fundId"
 								list="dropdownData.fundList" listKey="id" listValue="name"
 								headerKey="" headerValue="%{getText('lbl.choose.options')}" /></td>
-						<td class="greybox"></td>
-						<td class="greybox"></td>
+						<td class="greybox"><s:text name="generalLedger.department" /></td>
+						<td class="greybox"><s:select name="department"
+								id="departmentCode" list="dropdownData.departmentList"
+								listKey="code" listValue="name" headerKey=""   
+								headerValue="%{getText('lbl.choose.options')}" /></td>
 					</tr>
 
 					<tr>
@@ -202,8 +205,10 @@
 						<td class="greybox"><s:text name="daybook.naration" /></td>
 						<td class="greybox"><s:textfield id="narration"
 								name="narration" value="%{narration}"/></td>
-						<td class="greybox">&nbsp;</td>
-						<td class="greybox">&nbsp;</td>
+						<td class="greybox"><s:text name="voucher.subdivision" /></td>
+						<td class="greybox"><s:select name="subdivision" id="subdivision"
+		  list="dropdownData.subdivisionList" listKey="subdivisionCode" listValue="subdivisionName" 
+			headerKey="-1" headerValue="%{getText('lbl.choose.options')}"/></td>
 					</tr>
 					
 				</table>

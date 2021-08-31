@@ -171,6 +171,10 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name="subdivision")
 	private Long subdivision;
 	
+	@Column(name="createdbyuser")
+	private String createdbyuser;
+	
+	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE, mappedBy = "estimatePreparationApproval", targetEntity = BoQDetails.class)
 	private List<BoQDetails> newBoQDetailsList=new ArrayList<BoQDetails>(1000);
 
@@ -990,6 +994,16 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	public void setCurrentstate(String currentstate) {
 		this.currentstate = currentstate;
 	}
+
+	public String getCreatedbyuser() {
+		return createdbyuser;
+	}
+
+	public void setCreatedbyuser(String createdbyuser) {
+		this.createdbyuser = createdbyuser;
+	}
+
+	
 
 	
 	

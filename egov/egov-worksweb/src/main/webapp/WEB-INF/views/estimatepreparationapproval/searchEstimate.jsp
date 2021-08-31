@@ -18,7 +18,8 @@
 		<div class="tab-pane fade in active">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="form-group" style="padding: 50px 20px 0;">
-
+<form:input type="hidden" id="createdbyuser1" path="comments"
+				value="${workEstimateDetails.comments}"/>
 
 <label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.search.work.name" /></label>
@@ -268,6 +269,11 @@
 						<form:input type="number" class="form-control" id="estimatedCost" 
 									path="estimateAmount" />
 							</div>
+							<label class="col-sm-3 control-label text-left-audit">Created By </label>
+					<div class="col-sm-3 add-margin">
+						<form:input type="text" class="form-control" id="createdbyuser" 
+									path="createdbyuser" />
+							</div>
 					
 							</div>
 						</div>
@@ -300,6 +306,7 @@
 										code="lbl.estimate.preparation.work.status" /></th>
 								<th><spring:message
 										code="lbl.estimate.preparation.work.pending" /></th>
+										<th><spring:message code="lbl.action" /></th
 
 							</tr>
 						</thead>
@@ -335,6 +342,13 @@
 												path="estimateList[${status.index}].pendingWith"
 												id="estimateList[${status.index}].pendingWith" />
 											${result.pendingWith }</td>
+											<td class="text-center">
+											<c:if test="${result.currentstate!=null && !result.currentstate.isEmpty() && result.currentstate=='SaveAsDraft'}">
+											<span style=" cursor:pointer;  color: black;" class="add-padding subledge-delete-row" onClick=" return deleteestimate('${result.id}','${result.pendingWith }')"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span>
+											</c:if>
+				 				
+				 		
+								</td>
 									</tr>
 								</c:forEach>
 							<tbody>

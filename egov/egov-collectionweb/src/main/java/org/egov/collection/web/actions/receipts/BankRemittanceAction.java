@@ -185,7 +185,7 @@ public class BankRemittanceAction extends BaseFormAction {
 	private File[] file; // added abhishek
 	private String[] fileContentType; // added abhishek
 	private String[] fileFileName; // added abhishek
-	private List<DocumentUploads> documentDetail = new ArrayList<>(); // added abhishek
+	private List<DocumentUpload> documentDetail = new ArrayList<>(); // added abhishek
 	private String deptId = "-1";
 	private String collectedBy = "";
 	private String modeOfPayment = "";
@@ -268,11 +268,11 @@ public class BankRemittanceAction extends BaseFormAction {
 		this.deptId = deptId;
 	}
 
-	public List<DocumentUploads> getDocumentDetail() {
+	public List<DocumentUpload> getDocumentDetail() {
 		return documentDetail;
 	}
 
-	public void setDocumentDetail(List<DocumentUploads> documentDetail) {
+	public void setDocumentDetail(List<DocumentUpload> documentDetail) {
 		this.documentDetail = documentDetail;
 	}
 
@@ -559,16 +559,16 @@ public class BankRemittanceAction extends BaseFormAction {
 		File[] uploadedFiles = getFile();
 		String[] fileName = getFileFileName();
 		String[] contentType = getFileContentType();
-		System.out.println("files "+uploadedFiles[0]);
+				//System.out.println("files "+uploadedFiles[0]);
 
-		if(uploadedFiles[0]!=null) { 
+				if(uploadedFiles!=null) { 
 			byte[] fileBytes; 
 			for (int i = 0; i <uploadedFiles.length; i++) {
 			  Path path = Paths.get(uploadedFiles[i].getAbsolutePath());
 			  try { 
 				  fileBytes = Files.readAllBytes(path); 
 				  ByteArrayInputStream bios= new ByteArrayInputStream(fileBytes); 
-				  DocumentUploads upload = new DocumentUploads(); 
+						  DocumentUpload upload = new DocumentUpload(); 
 				  upload.setInputStream(bios);
 				  upload.setFileName(fileName[i]); 
 				  upload.setContentType(contentType[i]);

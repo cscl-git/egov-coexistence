@@ -58,6 +58,7 @@ import org.egov.egf.budget.service.BudgetControlTypeService;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.commons.VoucherSearchUtil;
 import org.egov.egf.commons.bank.service.CreateBankService;
+import org.egov.egf.contract.model.BankRefund;
 import org.egov.egf.contract.model.RefundLedger;
 import org.egov.egf.contract.model.RefundRequest;
 import org.egov.egf.contract.model.RefundResponse;
@@ -260,7 +261,30 @@ public class PaymentRefundController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+        model.addAttribute("bankList", getallBank());
+    }
+  
+    public List<BankRefund> getallBank(){
+    	final StringBuffer query1 = new StringBuffer(500);
+    	List<Object[]> list1= null;
+    	SQLQuery queryMain =  null;
+    	List<BankRefund> banklist=new ArrayList<BankRefund>();
        
+    	query1
+        .append("select distinct b2.bankid as id,b3.\"name\" as name from bankaccount b left join bankbranch b2 on b.branchid =b2.id left join bank b3 on b2.bankid =b3.id");
+    	queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+    	list1 = queryMain.list();
+    	System.out.println("::Size:: "+list1.size());
+    	if(list1.size()!=0) {
+    		for(Object[] e : list1)
+	    	{
+    			BankRefund bank=new BankRefund();
+    			bank.setId(Integer.valueOf(e[0].toString()));
+    			bank.setName(e[1].toString());
+    			banklist.add(bank);
+	    	}
+    	}
+    	return banklist;
     }
   
     
@@ -274,6 +298,7 @@ public class PaymentRefundController extends BaseBillController {
 		model.addAttribute("fundList",	paymentRefundUtils.getAllFunds());
 		model.addAttribute("serviceTypeList", microserviceUtils.getBusinessService(null));
 		model.addAttribute(VOUCHER_SEARCH, voucherSearch);
+		model.addAttribute("bankList", getallBank());
     }
 	
 	@RequestMapping(value = "/_searchForm", method = {RequestMethod.GET,RequestMethod.POST})
@@ -856,7 +881,7 @@ public class PaymentRefundController extends BaseBillController {
         model.addAttribute("subdivisionList", subdivisionList);
         model.addAttribute("cFunctions", functionDAO.getAllActiveFunctions());
         model.addAttribute("fundList",	paymentRefundUtils.getAllFunds());
-        
+        model.addAttribute("bankList", getallBank());
         model.addAttribute("subSchemeList",subSchemes);
         model.addAttribute("schemeList",schemeList);
         model.addAttribute("fundsourceList",fundSource);
@@ -1731,6 +1756,11 @@ public String createRefundBYBlank(@ModelAttribute("egBillregister") final EgBill
     
     egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
     populateBillDetails(egBillregister);
+    
+    if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT))
+	{ 
+    	  populateEgBillregistermisDetails(egBillregister);
+	}
     
     validateBillNumber(egBillregister, resultBinder);
     

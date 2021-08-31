@@ -243,7 +243,7 @@
 	  </c:otherwise>
 	</c:choose>
 	
-<c:choose>
+<%--<c:choose>
   <c:when test="${refundable != null && !refundable.isEmpty()}">
   <div class="form-group" style="display:none;">
 		<label class="col-sm-3 control-label text-right">
@@ -259,8 +259,8 @@
 			<form:input id="sanctiondate" path="sanctiondate" placeholder="DD/MM/YYYY" class="form-control datepicker" data-date-start-date="0d" />
 		</div>
 	</div>
-  </c:when>
-  <c:otherwise>
+  </c:when> --%>
+  <%-- <c:otherwise> --%>
 	<div class="form-group">
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.bill.sanction.number" text="Sanction Number"/>
@@ -313,8 +313,8 @@
 		</div>
 		</c:if>
 	</div>
-  </c:otherwise>
-</c:choose>	
+  <%-- </c:otherwise> 
+</c:choose>	--%>
 	
 <c:choose>
   <c:when test="${refundable != null && !refundable.isEmpty()}">

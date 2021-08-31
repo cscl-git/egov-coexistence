@@ -218,7 +218,42 @@ function setWorkflow(action)
 		}
 	
 }
-
+function deleteestimate(estId,pendingwith){
+	var curr=document.getElementById('createdbyuser1');
+	
+	if(curr!=null && curr!=='' && pendingwith !=null && pendingwith!=''){
+		var curr1=document.getElementById('createdbyuser1').value;
+		if(curr1===pendingwith){
+	$.ajax({
+		url: "/services/works/estimatePreparation/deleteestimate",     
+		type: "GET",
+		data: {
+			id : estId
+			
+		},
+		dataType: "json",
+		success: function (response) {
+			console.log("success  "+response);
+			if(response==='success'){
+				window.location.reload();
+			}
+			
+		}, 
+		error: function (response) {
+			//bootbox.alert('json fail');
+			console.log("failed");
+		}
+	});
+			return true;
+		}else{
+			bootbox.alert("Can be deleted by owner Only.")
+			return false;
+		}
+	}else{
+		return false;
+	}
+	
+}
 function openEstimate(estId)
 {
 	var url = "/services/works/estimatePreparation/view/"+ estId;

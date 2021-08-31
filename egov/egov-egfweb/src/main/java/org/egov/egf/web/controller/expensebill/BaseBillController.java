@@ -680,7 +680,7 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
             strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and  gl.glcodeid =:glCodeId");
             strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
-            strQuery.append(" and vh.voucherdate <=:strAODate");
+            strQuery.append(" and vmis.billnumber  notnull and vh.voucherdate <=:strAODate");
             strQuery.append(getFunctionQuery("gl.functionid",function));
             strQuery.append(getDepartmentQuery("vmis.departmentcode",department));
             strQuery.append(getFundQuery("vh.fundid",fund));

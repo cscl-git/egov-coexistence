@@ -5,23 +5,37 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.egov.infra.admin.master.entity.Department;
+import org.egov.infra.admin.master.repository.DepartmentRepository;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
+import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
+import org.egov.works.estimatepreparationapproval.repository.SudivisionRepository;
+import org.egov.works.estimatepreparationapproval.repository.WorkswingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
-@Transactional
+@Transactional(readOnly=true)
 public class WorkEstimateService {
 
 	@Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
 	@Autowired
 	DNITCreationRepository dNITCreationRepository;
+	@Autowired
+	private WorkswingRepository workswingrepository;
+	@Autowired
+	private SudivisionRepository sudivisionrepo;
+	@Autowired
+	private DepartmentRepository departmentrepository;
+
+	
 
 	@Transactional
 	public List<EstimatePreparationApproval> searchWorkEstimateData(HttpServletRequest request,
@@ -69,7 +83,7 @@ public class WorkEstimateService {
 	}
 
 	
-	@Transactional
+	@Transactional(readOnly=true)
 	public List<DNITCreation> searchWorkDnit(HttpServletRequest request,
 			DNITCreation dNITCreation) {
 		// TODO Auto-generated method stub
@@ -125,6 +139,31 @@ public class WorkEstimateService {
 		EstimatePreparationApproval saveBoqDetails = estimatePreparationApprovalRepository.save(boqList);
 
 		return saveBoqDetails;
+	}
+	@Transactional
+	public void deleteEstimateData(Long estimatePreparationId) {
+		// TODO Auto-generated method stub
+		try {
+		estimatePreparationApprovalRepository.deleteboqData(estimatePreparationId);
+		estimatePreparationApprovalRepository.deleteestimateById(estimatePreparationId);
+		
+		
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	public List<Subdivisionworks> getsubdivision(Long id) {
+		List<Subdivisionworks> subdivision = sudivisionrepo.findByDivisionid(id);
+	return subdivision;
+	}
+	public List<Department> getdepartment(Long id) {
+		List<Department> departments = departmentrepository.findByWorkswingid(id);
+	return departments;
+	}
+	public List<Workswing> getworskwing() {
+		List<Workswing> workwing = workswingrepository.findAll();
+	return workwing;
 	}
 
 }
