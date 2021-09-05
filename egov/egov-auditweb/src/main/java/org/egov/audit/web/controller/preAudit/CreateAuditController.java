@@ -53,9 +53,10 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -75,7 +76,6 @@ import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditEmployee;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.model.PostAuditResult;
-import org.egov.audit.repository.AuditCheckListRepository;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditCheckListHistoryService;
 import org.egov.audit.service.AuditCheckListService;
@@ -108,7 +108,6 @@ import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
 import org.egov.pims.commons.Position;
 import org.egov.services.payment.MiscbilldetailService;
-import org.egov.utils.FinancialConstants;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -1319,7 +1318,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		 List<Object[]> list =null;
         query
         .append(
-                "select ad.id,ad.auditno,ad.type,ad.audit_sch_date,ad.status.description from AuditDetails ad where ad.status.description not in ('Approved') and  ad.type = ? ")
+                "select ad.id,ad.auditno,ad.type,ad.audit_sch_date,ad.status.description,ad.egBillregister.billnumber from AuditDetails ad where ad.status.description not in ('Approved','Cancelled') and  ad.type = ? ")
                 .append(auditUtils
                                 .getAuditDateQuery(auditDetail.getBillFrom(), auditDetail.getBillTo()))
                                 .append(auditUtils.getAuditTaskMisQuery(auditDetail));
@@ -1389,6 +1388,25 @@ public class CreateAuditController extends GenericWorkFlowController {
             		result.setSchdDate(null);
             	}
             	result.setStatusDescription(object[4].toString());
+            	if(object[5] != null)
+            	{
+            		result.setBillNumber(object[5].toString());
+            	}
+            	else
+            	{
+            		result.setBillNumber("");
+            	}
+            	
+				result.setStateId(auditDetails.getState().getId().toString());
+				
+				auditDetails = auditService.findByid(Long.parseLong(object[0].toString()));
+				if (auditDetails != null) {
+					EmployeeInfo employeeInfo = microserviceUtils.getEmployeeById(auditDetails.getState().getOwnerPosition());
+					auditDetails.setEmployeeName(employeeInfo.getUser().getName());
+				}
+				
+				result.setLeadAuditorName(auditDetails.getEmployeeName());
+				result.setLeadAuditorEmpNo(auditDetails.getState().getOwnerPosition());
             	resultsDtlsList.add(result);
             	System.out.println("Added");
             }
@@ -1396,19 +1414,36 @@ public class CreateAuditController extends GenericWorkFlowController {
         auditDetail.setAuditSearchList(resultsDtlsList);
         System.out.println("resultsDtlsList :: "+resultsDtlsList.size());
         auditDetail.setDepartments(this.getDepartmentsFromMs());
+
+		List<EmployeeInfo> approvers = new ArrayList<>();
+
+		List<ManageAuditor> manageAuditorsSave = manageAuditorService.getAudiorsByType(auditDetail.getType());
+		List<Long> checkFOrDuplicates = new ArrayList<Long>();
+		for (ManageAuditor manageAuditor2 : manageAuditorsSave) {
+			Long checkId = Long.valueOf(manageAuditor2.getEmployeeid());
+			if (checkFOrDuplicates.contains(checkId)) {
+				continue;
+			} else {
+				checkFOrDuplicates.add(checkId);
+			}
+			EmployeeInfo employeeInfo = microserviceUtils.getEmployeeById(Long.valueOf(manageAuditor2.getEmployeeid()));
+			approvers.add(employeeInfo);
+		}
+
+		model.addAttribute("approverList", approvers);
 		AuditEmployee emp=null;
 		List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
 		List<ManageAuditor> auditorList=manageAuditorService.getAudiorsByType("Auditor");
-		List<Long> checkFOrDuplicates=new ArrayList<Long>();
+		List<Long> checkFOrDuplicates1=new ArrayList<Long>();
 		for (ManageAuditor value : auditorList) {
 			Long checkId=Long.valueOf(value.getEmployeeid());
-			 if(checkFOrDuplicates.contains(checkId))
+			 if(checkFOrDuplicates1.contains(checkId))
 			 {
 				 continue;
 			 }
 			 else
 			 {
-				 checkFOrDuplicates.add(checkId);
+				 checkFOrDuplicates1.add(checkId);
 			 }
 		 emp=new AuditEmployee();
 		 emp.setEmpCode(Long.valueOf(value.getEmployeeid()));
@@ -1528,19 +1563,55 @@ public class CreateAuditController extends GenericWorkFlowController {
 	 
 	 @RequestMapping(value="/updateauditorOwner",method = RequestMethod.POST)    
 	    public String updateAuditOwner(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
-				final BindingResult resultBinder, 
-				final HttpServletRequest request) throws IOException{
+			final BindingResult resultBinder, final HttpServletRequest request) throws IOException {
+
+		AuditDetails auditDetails = new AuditDetails();
+
+		persistenceService.getSession().createSQLQuery("update eg_wf_states set owner_pos = :empid where id =:stateid")
+				.setLong("empid", auditDetail.getLeadAuditorEmpNo()).setLong("stateid", auditDetail.getStateId())
+				.executeUpdate();
+		persistenceService.getSession().flush();
+
+		model.addAttribute("auditDetail", auditDetail);
+		model.addAttribute("message", "Updated Successfully");
+
+		return "audit-success";
+
+	}
+
+	@RequestMapping(value = "/post/searchStateResult", params = "save", method = RequestMethod.POST)
+	public String updateAuditOwnerNew(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+			final BindingResult resultBinder, final HttpServletRequest request) throws IOException {
 		 
 		// AuditDetails auditDetails = auditService.getById(auditId);
 		 AuditDetails auditDetails=new AuditDetails();
-		
+		Map<Long,String> employeeMap=new HashMap<Long,String>();
+		List<ManageAuditor> manageAuditors=manageAuditorService.getAudiorsByType("Auditor");
+		for(ManageAuditor auditor:manageAuditors)
+		{
+			Long checkId=Long.valueOf(auditor.getEmployeeid());
+			if(employeeMap.get(checkId)==null)
+			{
+				employeeMap.put(checkId, getEmployeeName(checkId));
+			}
+			
+		}
+		String[] leadAuditorEmpNo = request.getParameterValues("leadAuditorEmpNo");
+		String[] stateIdd = request.getParameterValues("stateId");
 		 
-		persistenceService
-      .getSession()
-      .createSQLQuery(
-              "update eg_wf_states set owner_pos = :empid where id =:stateid").setLong("empid", auditDetail.getLeadAuditorEmpNo()).setLong("stateid", auditDetail.getStateId()).executeUpdate();
-	persistenceService.getSession().flush();
-	
+		try {
+			for (int i = 0; i < leadAuditorEmpNo.length; i++) {
+				persistenceService.getSession()
+						.createSQLQuery("update eg_wf_states set owner_pos = :empid,owner_name=:empname where id =:stateid")
+						.setLong("empid", Integer.parseInt(leadAuditorEmpNo[i]))
+						.setString("empname", employeeMap.get(Long.valueOf(Integer.parseInt(leadAuditorEmpNo[i]))))
+						.setLong("stateid", Integer.parseInt(stateIdd[i])).executeUpdate();
+				persistenceService.getSession().flush();
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		model.addAttribute("auditDetail", auditDetail);
 	model.addAttribute("message", "Updated Successfully");
 

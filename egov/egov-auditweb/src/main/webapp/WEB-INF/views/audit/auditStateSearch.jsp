@@ -4,8 +4,10 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn" %>
 
-<form:form name="auditForm" role="form" method="post" action="searchStateResult" modelAttribute="auditDetail" id="auditDetail" 
-class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style="margin-top:-20px;">
+<form:form name="auditForm" role="form" method="post"
+	action="searchStateResult" modelAttribute="auditDetail"
+	id="auditDetail" class="form-horizontal form-groups-bordered"
+	enctype="multipart/form-data" style="margin-top:-20px;">
 	<spring:hasBindErrors name="auditDetail">
 	       <div class="alert alert-danger"
 	            style="margin-top: 20px; margin-bottom: 10px;">
@@ -22,48 +24,59 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     			<label class="col-sm-3 control-label text-left-audit">Type
 				</label>
 				 <div class="col-sm-3 add-margin">
-					<form:select path="type" id="type"  required="required"  class="form-control">
+						<form:select path="type" id="type" required="required"
+							class="form-control">
 						<form:option value="">-Select-</form:option>
 						<form:option value="Auditor" label="Auditor" ></form:option>
 						<form:option value="RSA" label="RSA"></form:option>
 					</form:select>
 				</div> 
 				
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.auditType" text="Audit Type"/>
-					<span class="mandatory"></span>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.auditType" text="Audit Type" /> <span
+						class="mandatory"></span> </label>
 					<div class="col-sm-3 add-margin">
-					<form:select path="auditType" id="auditType"  required="required" class="form-control">
+						<form:select path="auditType" id="auditType" required="required"
+							class="form-control">
 						<form:option value="">-Select-</form:option>
 						<form:option value="Pre-Audit">Pre-Audit</form:option>
 						<form:option value="Post-Audit">Post-Audit</form:option>
 					</form:select>
 				</div>
 				
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.auditor"  text="Auditor"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.auditor" text="Auditor" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:select path = "leadAuditorEmpNo" id="leadAuditorEmpNo" class="form-control">
+						<form:select path="leadAuditorEmpNo" id="leadAuditorEmpNo"
+							class="form-control">
                      
                   </form:select>
 				</div>
 				
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.audit.dateFrom"  text="Audit Date From"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.audit.dateFrom" text="Audit Date From" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billFrom" path="billFrom" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+						<form:input id="billFrom" path="billFrom"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
 				</div>
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.audit.dateTo"  text="Audit Date To"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.audit.dateTo" text="Audit Date To" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billTo" path="billTo" class="form-control datepicker" data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
+						<form:input id="billTo" path="billTo"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
 				</div>
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.department"  text="Department"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.department" text="Department" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:select path="department" id="department" class="form-control">
-							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${auditDetail.departments}" itemValue="code" itemLabel="name" />
+						<form:select path="department" id="department"
+							class="form-control">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${auditDetail.departments}" itemValue="code"
+								itemLabel="name" />
 						</form:select>
 				</div>
     	</div>
@@ -72,11 +85,10 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     	</div>
     	
         <div class="buttonbottom" align="center">
-        <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  value="Search"/>
+			<input type="submit" id="search"
+				class="btn btn-primary btn-wf-primary" name="search" value="Search" />
         </div>
-        <br>
-        <br>
-        <br>
+		<br> <br> <br>
         <div class="tab-pane fade in active" id="resultheader">
         <h3> Search Result</h3>
 	        <div class="panel panel-primary" data-collapsed="0">
@@ -87,47 +99,69 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 					<tr>
 						<th><spring:message code="lbl.serial" text="SL.No."/></th>
 						<th><spring:message code="lbl.auditType" text="Audit Type"/></th>
-						<th><spring:message code="lbl.auditnumber" text="Audit Number"/></th>
-						<th><spring:message code="lbl.schdauditdate" text="Audit Scheduled Date"/></th>
-						<th><spring:message code="lbl.checklist.status" text="Status"/></th>
-						<th><spring:message code="lbl.checklist.action" text="Action"/></th>
+								<th><spring:message code="lbl.auditnumber"
+										text="Audit Number" /></th>
+								<th><spring:message code="bill.search.billnumber"
+										text="Bill Number" /></th>		
+								<th><spring:message code="lbl.schdauditdate"
+										text="Audit Scheduled Date" /></th>
+								<th><spring:message code="lbl.checklist.status"
+										text="Status" /></th>
+
+								<th><spring:message code="lbl.checklist.action"
+										text="Action" /></th>
 					</tr>
 					</thead>
-`					 <c:if test="${auditDetail.auditSearchList != null &&  !auditDetail.auditSearchList.isEmpty()}">
+						`
+						<c:if
+							test="${auditDetail.auditSearchList != null &&  !auditDetail.auditSearchList.isEmpty()}">
 					<tbody>
-					<c:forEach items="${auditDetail.auditSearchList}" var="result" varStatus="status">
+								<c:forEach items="${auditDetail.auditSearchList}" var="result"
+									varStatus="status">
 						<tr>
-							<td>
-								${ status.index+1}
-						    </td>
-							<td>
-								${result.type }
-							</td>
-							<td>
-							<a href="#" onclick="openAudit('${result.id}')" >
-							${result.auditno }</a>
-							</td>
-							<td>
-							${result.schdDate }
-							</td>
-							<td>
-							${result.statusDescription }
-							</td>
-							
-							<td><a href='javascript:void(0)' onclick="updateAuditorsScreen(${result.id })">Change Owner</a>
-							
+										<td>${ status.index+1}</td>
+										<td>${result.type }</td>
+										<td><a href="#" onclick="openAudit('${result.id}')">
+												${result.auditno }</a></td>
+										<td>${result.billNumber}</td>		
+										<td>${result.schdDate }</td>
+										<td>${result.statusDescription }</td>
+
+										<%-- <td><a href='javascript:void(0)'
+											onclick="updateAuditorsScreen(${result.id })">Change
+												Owner</a></td> --%>
+
+										<td><form:select path="leadAuditorEmpNo"
+												id="leadAuditorEmpNo" class="form-control">
+												<%-- <form:option value="${auditDetail.leadAuditorEmpNo}" label="${auditDetail.leadAuditorName}"></form:option> --%>
+												<form:option value="${result.leadAuditorEmpNo}" label="${result.leadAuditorName}"></form:option>
+												<form:options items="${approverList}" itemValue="user.id" itemLabel="user.name" />
+										
+											</form:select></td>
+										<form:hidden path="stateId" id="stateId"
+											value="${result.stateId}" />
 							
 						</tr>
 						</c:forEach>
-					<tbody>
+
+							</tbody>
 					</c:if>	
-					<c:if test="${auditDetail.auditSearchList == null ||  auditDetail.auditSearchList.isEmpty()}">
+
+
+						<c:if
+							test="${auditDetail.auditSearchList == null ||  auditDetail.auditSearchList.isEmpty()}">
 					No records found
+					
 					</c:if>				
+
+
 				</table>
+					<div class="buttonbottom" align="center">
+						<input type="submit" id="search"
+							class="btn btn-primary btn-wf-primary" name="save" value="Update" />
 				</div>
-			<br>
-			<br>
+				</div>
+				<br> <br>
 	        </div>
         </div>
     </div>
@@ -136,5 +170,4 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 <script
         src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 <script
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-        
+	src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>

@@ -49,6 +49,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private String auditno;
 	private Long lead_auditor;
 	private String notes;
+
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
 	@ManyToOne
@@ -80,6 +81,8 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private String schdDate;
 	@Transient
 	private String statusDescription;
+	@Transient
+	private String stateId;
 	
 	@Transient
 	private String employeeName;
@@ -97,16 +100,40 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private String rsa_name;
 	
 	private Long rsa_id;
+////////////////////////////////////////////////
+	@Transient
+	private String leadAuditorName;
+
+	@Transient
+	private Long leadAuditorEmpNo;
 	
+	
+	
+	public String getLeadAuditorName() {
+		return leadAuditorName;
+	}
+
+	public void setLeadAuditorName(String leadAuditorName) {
+		this.leadAuditorName = leadAuditorName;
+	}
+
+	public Long getLeadAuditorEmpNo() {
+		return leadAuditorEmpNo;
+	}
+
+	public void setLeadAuditorEmpNo(Long leadAuditorEmpNo) {
+		this.leadAuditorEmpNo = leadAuditorEmpNo;
+	}
+///////////////////////////////////////////////
 	@Override
 	public String getStateDetails() {
 		String billNumber="";
-		if(egBillregister != null)
-		{
+		if (egBillregister != null) {
 			billNumber=egBillregister.getBillnumber();
 		}
 		
-		 return getState().getComments().isEmpty() ? auditno+" ("+billNumber+") " : auditno + "-" + getState().getComments()+" ("+billNumber+") ";
+		return getState().getComments().isEmpty() ? auditno + " (" + billNumber + ") "
+				: auditno + "-" + getState().getComments() + " (" + billNumber + ") ";
 	}
 
 	@Override
@@ -144,10 +171,6 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	public void setAudit_comp_date(Date audit_comp_date) {
 		this.audit_comp_date = audit_comp_date;
 	}
-
-	
-
-	
 
 	public String getNotes() {
 		return notes;
@@ -329,7 +352,12 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 		this.rsa_id = rsa_id;
 	}
 
+	public String getStateId() {
+		return stateId;
+	}
 
-	
+	public void setStateId(String stateId) {
+		this.stateId = stateId;
+	}
 
 }
