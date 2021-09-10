@@ -252,6 +252,15 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private String nodalOfficer;
     
+    
+    @Column(name = "nodalOfficername")
+    @Audited
+    private String nodalOfficername;
+    
+    @Column(name = "nodalOfficernumber")
+    @Audited
+    private String nodalOfficernumber;
+    
     @Length(max = 100)
     @Column(name = "nodalofficerdepartment")
     @Audited
@@ -1162,5 +1171,21 @@ public class LegalCase extends AbstractAuditable {
 
 	public void setCounselEmail(String counselEmail) {
 		this.counselEmail = counselEmail;
+	}
+
+	public String getNodalOfficername() {
+		return nodalOfficername;
+	}
+
+	public void setNodalOfficername(String nodalOfficername) {
+		this.nodalOfficername = nodalOfficername;
+	}
+
+	public String getNodalOfficernumber() {
+		return nodalOfficernumber;
+	}
+
+	public void setNodalOfficernumber(String nodalOfficernumber) {
+		this.nodalOfficernumber = nodalOfficernumber;
 	}
 }

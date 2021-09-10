@@ -246,6 +246,19 @@
 	</div>	
 </div>
 <div class="form-group">
+	<label class="col-sm-3 control-label text-right">Nodal Officer Name<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficername"
+			path="nodalOfficername" data-pattern="address" required="required"/>
+		<form:errors path="nodalOfficername" cssClass="add-margin error-msg" />
+	</div>
+	<label class="col-sm-2 control-label text-right" id="persons">Nodal Officer Phone No<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input type="number" class="form-control patternvalidation" maxlength="10" id="nodalofficernumber" path="nodalOfficernumber" data-pattern="address" required="required" onKeyPress="if(this.value.length==10) return false;"/>
+		<form:errors path="nodalOfficernumber" cssClass="add-margin error-msg" required="required" />
+	</div>	
+</div>
+<div class="form-group">
 	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.concerned.branch" />:</label>
 	<div class="col-sm-3 add-margin">

@@ -197,6 +197,20 @@
 						</div>
 						<div class="row add-border">
 							<div class="col-xs-3 add-margin">
+								Nodal Officer Name
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.nodalOfficername}" />
+							</div>
+							<div class="col-xs-3 add-margin">
+								Nodal Officer Phone No
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.nodalOfficernumber}" />
+							</div>							
+						</div>
+						<div class="row add-border">
+							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.concerned.branch" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">

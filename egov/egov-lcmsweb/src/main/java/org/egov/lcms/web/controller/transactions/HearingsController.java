@@ -64,6 +64,7 @@ import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.models.User;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.notification.service.NotificationService;
+import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
 import org.egov.lcms.transactions.entity.Hearings;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.HearingsService;
@@ -248,20 +249,27 @@ public class HearingsController {
                  .getConfigValuesByModuleAndKey("EGF",
                          "LEGAL_HEARING_TEMPLATE_ID");
          final String templateId = appList.get(0).getValue();
+         String name="";
+         String phone="";
+         for(BidefendingCounsilDetails row:legalCase.getBidefendingCounsilDetails())
+         {
+        	 if(row.getDefCounsilPrimary() != null && row.getDefCounsilPrimary().equalsIgnoreCase("YES"))
+        	 {
+        		 name=row.getOppPartyAdvocate();
+        		 phone=row.getCounselphoneNo();
+        	 }
+         }
+         
         if (smsEnabled) {
             try {
-	            List<User> listOfUsers = getUserListForAgendaInvitation();
-	            for (User user : listOfUsers) {
-	                if (user.getMobileNumber() != null) {
-	                	customMessage="Dear "+user.getName()+" , This is to inform you that hearing has been schedule for court type "+legalCase.getCourtMaster().getName()+" on "+legalCase.getNextDate()+" . Regards, Legal department. Chandigarh Smart City Ltd.";
-	                	buildSmsForAgendaInvitation(user.getUserName(), user.getMobileNumber(), customMessage,templateId);
-	                	if(legalCase.getCounselPhoneNo()!=null && legalCase.getCounselPhoneNo()!="0") {
-	                		customMessage="Dear "+legalCase.getOppPartyAdvocate()+" , This is to inform you that hearing has been schedule for court type "+legalCase.getCourtMaster().getName()+" on "+legalCase.getNextDate()+" . Regards, Legal department. Chandigarh Smart City Ltd.";
-	                		buildSmsForAgendaInvitation(legalCase.getOppPartyAdvocate(), legalCase.getCounselPhoneNo(), customMessage,templateId);
-	                	}
-	                }
-	                smsStatus=true;
-	            }
+            	if(legalCase.getNodalOfficername()!=null && !legalCase.getNodalOfficername().isEmpty() && legalCase.getNodalOfficernumber() != null && !legalCase.getNodalOfficernumber().isEmpty() && !legalCase.getNodalOfficernumber().equalsIgnoreCase("0")) {
+	            	customMessage="Hello "+legalCase.getNodalOfficername()+", Your case in Type of Court: "+legalCase.getCourtMaster().getCourtType().getCourtType()+", Petition Type: "+legalCase.getPetitionTypeMaster().getPetitionType()+", Case number: "+legalCase.getCaseNumber() +", For Concerned Branch: "+legalCase.getConcernedBranch().getConcernedBranch()+", Hearing scheduled on: "+legalCase.getNextDate()+". Regards, Chandigarh Smart City Ltd.";
+            		buildSmsForAgendaInvitation(legalCase.getNodalOfficername(), legalCase.getNodalOfficernumber(), customMessage,templateId);
+            	}
+	            if(name!=null && !name.isEmpty() && phone != null && !phone.isEmpty() && !phone.equalsIgnoreCase("0")) {
+	            	customMessage="Hello "+name+", Your case in Type of Court: "+legalCase.getCourtMaster().getCourtType().getCourtType()+", Petition Type: "+legalCase.getPetitionTypeMaster().getPetitionType()+", Case number: "+legalCase.getCaseNumber() +", For Concerned Branch: "+legalCase.getConcernedBranch().getConcernedBranch()+", Hearing scheduled on: "+legalCase.getNextDate()+". Regards, Chandigarh Smart City Ltd.";
+            		buildSmsForAgendaInvitation(name, phone, customMessage,templateId);
+            	}
             }catch(Exception e) {
             	System.out.println("Unable to send Legal");
             }
