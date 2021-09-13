@@ -271,6 +271,7 @@ public class HearingsController {
             		buildSmsForAgendaInvitation(name, phone, customMessage,templateId);
             	}
             }catch(Exception e) {
+            	e.printStackTrace();
             	System.out.println("Unable to send Legal");
             }
         }

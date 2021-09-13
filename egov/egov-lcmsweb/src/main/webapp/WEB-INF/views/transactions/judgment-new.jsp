@@ -77,3 +77,24 @@
 	src="<cdn:url value='/resources/js/app/judgmentHelper.js?rnd=${app_release_no}'/>"></script>
 	<script type="text/javascript"
 	src="<cdn:url value='/resources/js/app/legalcaseSearch.js?rnd=${app_release_no}'/>"></script>
+	<script type="text/javascript">
+	function checkjudgment(){
+		var jud=document.getElementById("judgmentType").value;
+		
+		
+		if(jud==11){
+			
+			$('#disposedoff1').css("display", "block");
+			$('#disposedoff2').css("display", "block");
+			$("#directiondis").attr('required', '');
+			$("#disposedate").attr('required', '');
+			$("#resolutiondate").attr('required', '');
+			
+			
+		}else{
+			
+			$('#disposedoff1').css("display", "none");
+			$('#disposedoff2').css("display", "none");
+		}
+	}
+	</script>

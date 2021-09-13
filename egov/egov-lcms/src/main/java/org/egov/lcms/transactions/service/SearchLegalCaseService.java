@@ -100,9 +100,11 @@ public class SearchLegalCaseService {
         final StringBuilder queryStr = new StringBuilder();
         queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,");
         queryStr.append(" egwStatus.code  as  caseStatus ,");
+        queryStr.append(" bidefcounsil.oppPartyAdvocate  as  standingCouncil ,");
         queryStr.append(" cb.concernedBranch  as  concernedBranch");
         queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
         queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
+        queryStr.append(" LEFT JOIN BidefendingCounsilDetails bidefcounsil ON legalObj.id =bidefcounsil.legalCase and bidefcounsil.defCounsilPrimary ='YES'");
         queryStr.append(" LEFT JOIN   legalObj.judgment jt");
         queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
         queryStr.append(
@@ -114,7 +116,11 @@ public class SearchLegalCaseService {
         getAppendQuery(legalCaseSearchResultObj, queryStr);
         Query queryResult = getCurrentSession().createQuery(queryStr.toString());
         queryResult = setParametersToQuery(legalCaseSearchResultObj, queryResult);
+        System.out.println("query:: "+queryResult.toString());
+        System.out.println("final quer "+queryStr);
         final List<LegalCaseSearchResult> legalcaseSearchList = queryResult.list();
+        System.out.println("sizeeee "+legalcaseSearchList.size());
+        
         if (loggedInUserViewAccess)
             for (final LegalCaseSearchResult searchResults : legalcaseSearchList)
                 searchResults.setLegalViewAccess(loggedInUserViewAccess);
@@ -135,7 +141,7 @@ public class SearchLegalCaseService {
         if (legalCaseSearchResultObj.getCourtType() != null)
             queryResult.setInteger("courttype", legalCaseSearchResultObj.getCourtType());
         if (StringUtils.isNotBlank(legalCaseSearchResultObj.getStandingCouncil()))
-            queryResult.setString("standingcoouncil", legalCaseSearchResultObj.getStandingCouncil() + "%");
+            queryResult.setString("standingcoouncil", legalCaseSearchResultObj.getStandingCouncil().toLowerCase() + "%");
         if (legalCaseSearchResultObj.getStatusId() != null)
             queryResult.setInteger("status", legalCaseSearchResultObj.getStatusId());
 
@@ -172,8 +178,10 @@ public class SearchLegalCaseService {
             queryStr.append(" and casetypemaster.id =:casetype");
         if (legalCaseSearchResultOblj.getCourtType() != null)
             queryStr.append(" and courtmaster.id =:courttype ");
+        /*if (StringUtils.isNotBlank(legalCaseSearchResultOblj.getStandingCouncil()))
+            queryStr.append(" and legalObj.oppPartyAdvocate like :standingcoouncil ");*/
         if (StringUtils.isNotBlank(legalCaseSearchResultOblj.getStandingCouncil()))
-            queryStr.append(" and legalObj.oppPartyAdvocate like :standingcoouncil ");
+            queryStr.append(" and lower(bidefcounsil.oppPartyAdvocate) like :standingcoouncil ");
         if (legalCaseSearchResultOblj.getStatusId() != null)
             queryStr.append(" and egwStatus.id =:status ");
         if (legalCaseSearchResultOblj.getCaseFromDate() != null)
@@ -197,6 +205,8 @@ public class SearchLegalCaseService {
 		
 		if(legalCaseSearchResultOblj.getIscaseImp()!=null)
 			queryStr.append("and legalObj.caseImportant='Yes'");
+		
+		
     }
 
     public List<ReportStatus> getReportStatus() {
@@ -299,8 +309,10 @@ public class SearchLegalCaseService {
 					if(s.getCourtName()!=null) {
 						courtname=s.getCourtName();
 					}
-					if(s.getLegalCase().getOppPartyAdvocate()!=null) {
-						standingcouncil=s.getLegalCase().getOppPartyAdvocate();
+					//if(s.getLegalCase().getOppPartyAdvocate()!=null) {
+						if(s.getStandingCouncil()!=null) {
+						//standingcouncil=s.getLegalCase().getOppPartyAdvocate();
+						standingcouncil=s.getStandingCouncil();
 					}
 					if(s.getLegalCase().getStatus().getDescription()!=null) {
 						statusDesc=s.getLegalCase().getStatus().getDescription();

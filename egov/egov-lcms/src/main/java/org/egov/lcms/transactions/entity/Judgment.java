@@ -178,6 +178,22 @@ public class Judgment extends AbstractAuditable {
     @Audited
     private boolean sapAccepted;
 
+    @Column(name = "directiondisposed")
+    @Audited
+    private String directiondisposed;
+    
+    @Temporal(TemporalType.DATE)
+    @ValidateDate(allowPast = true, dateFormat = LcmsConstants.DATE_FORMAT)
+    @Column(name = "disposedoffdate")
+    @Audited
+    private Date disposedoffdate;
+    
+    @Temporal(TemporalType.DATE)
+    @ValidateDate(allowPast = true, dateFormat = LcmsConstants.DATE_FORMAT)
+    @Column(name = "resolutiondate")
+    @Audited
+    private Date resolutiondate;
+
     @ManyToOne
     @JoinColumn(name = "parent")
     @Fetch(value = FetchMode.SELECT)
@@ -443,6 +459,30 @@ public class Judgment extends AbstractAuditable {
 
 	public void setDepartmentActionDetails(String departmentActionDetails) {
 		this.departmentActionDetails = departmentActionDetails;
+	}
+
+	public String getDirectiondisposed() {
+		return directiondisposed;
+	}
+
+	public void setDirectiondisposed(String directiondisposed) {
+		this.directiondisposed = directiondisposed;
+	}
+
+	public Date getDisposedoffdate() {
+		return disposedoffdate;
+	}
+
+	public void setDisposedoffdate(Date disposedoffdate) {
+		this.disposedoffdate = disposedoffdate;
+	}
+
+	public Date getResolutiondate() {
+		return resolutiondate;
+	}
+
+	public void setResolutiondate(Date resolutiondate) {
+		this.resolutiondate = resolutiondate;
 	}
 
 }

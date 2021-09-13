@@ -372,6 +372,10 @@
         <put-attribute name="page-title" value="title.closecase" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/transactions/update-Payment.jsp"/>
     </definition>
+    <definition name="updatePayment-success" extends="base_layout">
+        <put-attribute name="page-title" value="title.closecase" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/transactions/update-paymentsuccess.jsp"/>
+    </definition>
 
     <definition name="legalcaseDisposal-edit" extends="base_layout">
         <put-attribute name="page-title" value="title.editclosecase" cascade="true"/>

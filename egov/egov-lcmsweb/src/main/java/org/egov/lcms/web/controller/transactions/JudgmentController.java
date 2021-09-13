@@ -47,10 +47,36 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.infra.admin.master.entity.AppConfigValues;
+import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.User;
+import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.notification.service.NotificationService;
+import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
+import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.masters.service.JudgmentTypeService;
+import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
+import org.egov.lcms.transactions.entity.Hearings;
 import org.egov.lcms.transactions.entity.Judgment;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.JudgmentService;
@@ -64,26 +90,17 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping("/judgment")
 public class JudgmentController {
     
     private static final String JUDGMENT = "judgment";
+    private static final String MODULE_FULLNAME = "Council Management";
+    private static final String SENDSMSFORCOUNCIL = "SENDSMSFORCOUNCILMEMBER";
+    private static final String ROLE_MEETING_SENIOR_OFFICER = "AGENDA_MEETING_SENIOR_OFFICER";
+    private static final String SENDEMAILFORCOUNCIL = "SENDEMAILFORCOUNCILMEMBER";
 
     @Autowired
     private JudgmentTypeService judgmentTypeService;
@@ -94,6 +111,17 @@ public class JudgmentController {
     @Autowired
     private JudgmentService judgmentService;
 
+    @Autowired
+    MicroserviceUtils microserviceUtils;
+    
+    @Autowired
+    private AppConfigValueService appConfigValuesService;
+    
+    @Autowired
+    private NotificationService notificationService;
+    @Autowired
+    AdvocateMasterService advocateMasterService;
+
     private void prepareNewForm(final Model model) {
         model.addAttribute("judgmentTypes", judgmentTypeService.getActiveJudgementTypes());
     }
@@ -103,6 +131,8 @@ public class JudgmentController {
             @RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request, final Model model) {
         prepareNewForm(model);
         final LegalCase legalCase = getLegalCase(lcNumber, request);
+        List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
+        model.addAttribute("defendingDropdown",dropdownValue);
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
         model.addAttribute(JUDGMENT, judgment);
         model.addAttribute(LcmsConstants.MODE, "create");
@@ -145,11 +175,87 @@ public class JudgmentController {
             }
         }
         judgmentService.persist(judgment, attachedDocuments);
+        //sms and email 
+        if(judgment.getJudgmentType().getName().equalsIgnoreCase("Disposed Off"))
+        {
+        	sendSmsAndEmailDetailsForAgendaInvitation(judgment, lcNumber,request);
+        }
         model.addAttribute(LcmsConstants.MODE, "view");
         redirectAttrs.addFlashAttribute(JUDGMENT, judgment);
         model.addAttribute("message", "Judgment Created successfully.");
         return "judgment-success";
 
     }
+    //SMS and Email Service
+    public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Judgment judgment, final String lcNumber,final HttpServletRequest request) {
+    	final LegalCase legalCase = getLegalCase(lcNumber, request);
+          //mSG
+          Boolean smsEnabled = true;
+          Boolean smsStatus=false;
+          String customMessage="";
+          final List<AppConfigValues> appList = appConfigValuesService
+                  .getConfigValuesByModuleAndKey("EGF",
+                          "LEGAL_JUDGEMENT_TEMPLATE_ID");
+          final String templateId = appList.get(0).getValue();
+          String name="";
+          String phone="";
+          for(BidefendingCounsilDetails row:legalCase.getBidefendingCounsilDetails())
+          {
+         	 if(row.getDefCounsilPrimary() != null && row.getDefCounsilPrimary().equalsIgnoreCase("YES"))
+         	 {
+         		 name=row.getOppPartyAdvocate();
+         		 phone=row.getCounselphoneNo();
+         	 }
+          }
+          
+         if (smsEnabled) {
+             try {
+             	if(legalCase.getNodalOfficername()!=null && !legalCase.getNodalOfficername().isEmpty() && legalCase.getNodalOfficernumber() != null && !legalCase.getNodalOfficernumber().isEmpty() && !legalCase.getNodalOfficernumber().equalsIgnoreCase("0")) {
+ 	            	customMessage="Dear "+legalCase.getNodalOfficername()+", This is to inform you that the court type: "+legalCase.getCourtMaster().getCourtType().getCourtType()+", Case No: "+legalCase.getCaseNumber() +"has been disposed off and given time for Resolution is before "+judgment.getResolutiondate()+". Rgds, Chandigarh Smart City Ltd.";
+             		buildSmsForAgendaInvitation(legalCase.getNodalOfficername(), legalCase.getNodalOfficernumber(), customMessage,templateId);
+             	}
+ 	            if(name!=null && !name.isEmpty() && phone != null && !phone.isEmpty() && !phone.equalsIgnoreCase("0")) {
+ 	            	customMessage="Dear "+name+", This is to inform you that the court type: "+legalCase.getCourtMaster().getCourtType().getCourtType()+", Case No: "+legalCase.getCaseNumber() +"has been disposed off and given time for Resolution is before "+judgment.getResolutiondate()+". Rgds, Chandigarh Smart City Ltd.";
+             		buildSmsForAgendaInvitation(name, phone, customMessage,templateId);
+             	}
+             }catch(Exception e) {
+             	e.printStackTrace();
+             	System.out.println("Unable to send Legal");
+             }
+         }
+         return smsStatus;
+    }
+    
+ 
+    public List<User> getUserListForAgendaInvitation() {
+        Set<User> usersListResult = new HashSet<>();
+        List<String> roles = new ArrayList<String>();
+        roles.add(ROLE_MEETING_SENIOR_OFFICER);
+        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+    	if(!CollectionUtils.isEmpty(employees)) {
+    		for(EmployeeInfo info : employees) {
+    			usersListResult.add(info.getUser());
+    		}
+    	}
+        return new ArrayList<>(usersListResult);
+    }
+    private Boolean getAppConfigValueByPassingModuleAndType(String moduleName, String sendsmsoremail) {
+        final List<AppConfigValues> appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(moduleName,
+                sendsmsoremail);
 
+        return "YES".equalsIgnoreCase(
+                appConfigValue != null && !appConfigValue.isEmpty() ? appConfigValue.get(0).getValue() : "NO");
+    }
+    
+    public void buildSmsForAgendaInvitation(final String userName, final String mobileNumber,
+            final String customMessage,String templateId) {
+    	sendSMSOnSewerageForMeeting(mobileNumber, customMessage,templateId);            
+    }
+    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
+        notificationService.sendSMS(mobileNumber, smsBody,templateId);
+    }
+    public Boolean isSmsEnabled() {
+
+        return getAppConfigValueByPassingModuleAndType(MODULE_FULLNAME, SENDSMSFORCOUNCIL);
+    }
 }

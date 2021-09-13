@@ -55,7 +55,8 @@
 	enctype="multipart/form-data">
 
 	<jsp:include page="../transactions/view-summarizedcase.jsp" />
-	<%@ include file="judgment-form.jsp"%>
+	<%-- <%@ include file="judgment-form.jsp"%> --%>
+	<%@ include file="judgment-edit-form.jsp"%>
 	<input type="hidden" name="judgment" value="${judgment.id}" />
 	<input type="hidden" name="legalCase" value="${legalCase.id}" />
 	</div>
@@ -80,3 +81,26 @@
 	src="<cdn:url value='/resources/js/app/judgmentHelper.js?rnd=${app_release_no}'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/js/app/legalcaseSearch.js?rnd=${app_release_no}'/>"></script>
+	<script type="text/javascript">
+	
+	function checkjudgment(){
+		var jud=document.getElementById("judgmentType").value;
+		
+		
+		if(jud==11){
+			
+			$('#disposedoff1').css("display", "block");
+			$('#disposedoff2').css("display", "block");
+			$("#directiondis").attr('required', '');
+			$("#disposedate").attr('required', '');
+			$("#resolutiondate").attr('required', '');
+			
+			
+		}else{
+			
+			$('#disposedoff1').css("display", "none");
+			$('#disposedoff2').css("display", "none");
+		}
+	}
+
+	</script>

@@ -118,7 +118,9 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
     public String view(@RequestParam("lcNumber") final String lcNumber, final Model model) {
         final LegalCase legalCase = legalCaseService.findByLcNumber(lcNumber);
         final LegalCase newlegalCase = getLegalCaseDocuments(legalCase);
+        List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
         model.addAttribute(LcmsConstants.LEGALCASE, newlegalCase);
+        model.addAttribute("defendingDropdown",dropdownValue);
         model.addAttribute(LcmsConstants.MODE, "view");
         return "legalcasedetails-view";
     }
@@ -198,6 +200,24 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
                 attachedDocuments.add(attachedDocument);
             }
         }
+        //petetion files
+        String[] contentType1 = ((MultiPartRequestWrapper) request).getContentTypes("file1");
+        UploadedFile[] uploadedFiles1 = ((MultiPartRequestWrapper) request).getFiles("file1");
+        String[] fileName1 = ((MultiPartRequestWrapper) request).getFileNames("file1");
+        if(uploadedFiles1!=null) {
+            for (int i = 0; i < uploadedFiles1.length; i++) {
+                Path path = Paths.get(uploadedFiles1[i].getAbsolutePath());
+                byte[] fileBytes = Files.readAllBytes(path);
+                ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+                AttachedDocument attachedDocument = new AttachedDocument();
+                attachedDocument.setFileStream(bios);
+                attachedDocument.setFileName(fileName1[i]);
+                attachedDocument.setMimeType(contentType1[i]);
+                attachedDocument.setFiletype("PetetionLegal");
+                attachedDocuments.add(attachedDocument);
+            }
+        }
+        
         legalCase.setLcNumber(legalCase.getFileNumber());
         String checkedValue=request.getParameter("defCounsilPrimary");
         String ids=request.getParameter("id");

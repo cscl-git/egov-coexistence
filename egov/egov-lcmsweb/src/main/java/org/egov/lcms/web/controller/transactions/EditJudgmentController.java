@@ -61,7 +61,9 @@ import javax.validation.Valid;
 
 import org.apache.struts2.dispatcher.multipart.MultiPartRequestWrapper;
 import org.apache.struts2.dispatcher.multipart.UploadedFile;
+import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.vo.AttachedDocument;
+import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.masters.service.JudgmentTypeService;
 import org.egov.lcms.transactions.entity.Judgment;
 import org.egov.lcms.transactions.entity.JudgmentDocuments;
@@ -99,6 +101,9 @@ public class EditJudgmentController {
     @Autowired
     private LegalCaseUtil legalCaseUtil;
 
+    @Autowired
+    AdvocateMasterService advocateMasterService;
+
     @ModelAttribute
     private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
         return legalCaseService.findByLcNumber(lcNumber);
@@ -113,6 +118,8 @@ public class EditJudgmentController {
         final List<Judgment> judgementList = getLegalCase(lcNumber).getJudgment();
         final Judgment judgmentObj = judgementList.get(0);
         prepareNewForm(model);
+        List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
+        model.addAttribute("defendingDropdown",dropdownValue);
         model.addAttribute(JUDGMENT, judgmentObj);
         getJudgmentDocuments(judgmentObj);
         model.addAttribute(LcmsConstants.MODE, "edit");

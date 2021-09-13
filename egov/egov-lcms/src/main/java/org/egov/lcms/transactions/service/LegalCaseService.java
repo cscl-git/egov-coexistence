@@ -423,12 +423,21 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
         if (null != files) {
             for (AttachedDocument attachedDocument:files) {
                     final LegalCaseUploadDocuments applicationDocument = new LegalCaseUploadDocuments();
+            	if(null!=attachedDocument.getFiletype() && attachedDocument.getFiletype().equalsIgnoreCase("PetetionLegal")) {
+            		applicationDocument.setLegalCase(legalCase);
+                    applicationDocument.setDocumentName("PetetionLegal");
+                    applicationDocument.setSupportDocs(
+                            fileStoreService.store(attachedDocument.getFileStream(), attachedDocument.getFileName(),
+                            		attachedDocument.getMimeType(), LcmsConstants.MODULE_NAME));
+                    documentDetailsList.add(applicationDocument);
+            	}else {
                     applicationDocument.setLegalCase(legalCase);
                     applicationDocument.setDocumentName(LcmsConstants.LEGALCASE_DOCUMENTNAME);
                     applicationDocument.setSupportDocs(
                             fileStoreService.store(attachedDocument.getFileStream(), attachedDocument.getFileName(),
                             		attachedDocument.getMimeType(), LcmsConstants.MODULE_NAME));
                     documentDetailsList.add(applicationDocument);
+            	} 
             }
         }
         return documentDetailsList;

@@ -260,10 +260,10 @@
 </div>
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right"><spring:message
-			code="lbl.concerned.branch" />:</label>
+			code="lbl.concerned.branch" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
 		<form:select path="concernedBranch" data-first-option="false"
-			id="concernedBranch" cssClass="form-control">
+			id="concernedBranch" cssClass="form-control" required="required">
 			<form:option value="">
 				<spring:message code="lbls.select" />
 			</form:option>

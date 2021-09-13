@@ -2,6 +2,8 @@
  * 
  */
 $(document).ready(function(){
+	var count = $('#payDetails tr').length;
+	console.log("::::::::::::  "+count);
 $('#nameOfDefendingCounsil').val('');
 $('#caseFee').val('');
 $('#email').val('');
@@ -10,10 +12,33 @@ $('#phoneNo').val('');
 $('#status').val('');
 $('#modeOfPayment').val('');
 $('#amount').val('');
+	
+	if(count == 0){
+		console.log(":::::1st:::::::  "+(count -1));
 $('#paymentOfIssuance').val('');
+		$('#findingOfReplyCase').val(0.0);
+		$('#finalDisposal').val(0.0);
+		$('#findingOfReplyCase').attr('readonly', true);
+		$('#finalDisposal').attr('readonly', true);
+		$('#paymentOfIssuance').attr('readonly', true);
+	}else if((count -1) == 1){
+		console.log(":::::2st:::::::  "+(count -1));
+		$('#paymentOfIssuance').val(0.0);
 $('#findingOfReplyCase').val('');
+		$('#finalDisposal').val(0.0);
+		$('#paymentOfIssuance').attr('readonly', true);
+		$('#finalDisposal').attr('readonly', true);
+		$('#findingOfReplyCase').attr('readonly', true);
+	}else if((count -1) == 2){
+		console.log(":::::3st:::::::  "+(count -1));
+		$('#paymentOfIssuance').val(0.0);
+		$('#findingOfReplyCase').val(0.0);
 $('#finalDisposal').val('');
-var count = $('#payDetails tr').length;
+		$('#paymentOfIssuance').attr('readonly', true);
+		$('#findingOfReplyCase').attr('readonly', true);
+		$('#finalDisposal').attr('readonly', true);
+	}
+	
 
 if((count -1) >= 3){
 	bootbox.alert("Only three Payments are allowed");
@@ -94,10 +119,43 @@ function fillvalue(){
 					console.log(data[i].id+ '------KK----' + data[i].counselEmail +'--'+ data[i].counselphoneNo);
 					 $('#email').val(data[i].counselEmail);
 					 $('#phoneNo').val(data[i].counselphoneNo);
+					 $('#caseFee').val(data[i].fee);
+					 totalAmount();
 						
 			
 			}
 		 }
 	
 	 })
+}
+
+function fillamount(){
+	var fee=document.getElementById("caseFee").value;
+	var stat=document.getElementById("status").value;
+	//alert("::feee:: "+fee+"::::::stat:::: "+stat);
+	if(stat=='Instruction Issued'){
+		
+		var tot=fee/3;
+		var r=tot.toFixed(2);
+		$('#paymentOfIssuance').val(r);
+		$('#findingOfReplyCase').val(0.0);
+		$('#finalDisposal').val(0.0);
+		
+	}
+if(stat=='Reply/Writ Petition'){
+	
+	var tot=fee/3;
+	var r=tot.toFixed(2);
+	$('#paymentOfIssuance').val(r);
+	$('#findingOfReplyCase').val(r);
+	$('#finalDisposal').val(0.0);
+	}
+if(stat=='Final Order'){
+	
+	var tot=fee/3;
+	var r=tot.toFixed(2);
+	$('#paymentOfIssuance').val(r);
+	$('#findingOfReplyCase').val(r);
+	$('#finalDisposal').val(r);
+}
 }

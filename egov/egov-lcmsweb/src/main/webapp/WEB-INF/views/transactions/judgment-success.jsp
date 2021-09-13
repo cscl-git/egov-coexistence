@@ -96,6 +96,34 @@
 							<c:out value="${implby}" />
 						</div>
 					</div>
+					<c:if test="${judgment.judgmentType.name !=null && judgment.judgmentType.name=='Disposed-off'}">
+					<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+							Direction:
+						</div>
+						<div class="col-sm-3 add-margin view-content">
+							${judgment.directiondisposed}</div>
+						<div class="col-xs-3 add-margin">
+							Disposed Off Date:
+						</div>
+						<div class="col-sm-3 add-margin view-content">
+							<fmt:formatDate pattern="dd/MM/yyyy"
+								value="${judgment.disposedoffdate}" var="disposedoffdate" />
+							<c:out value="${disposedoffdate}" />
+						</div>
+					</div>
+					<div class="row add-border">
+						
+						<div class="col-xs-3 add-margin">
+							Resolution Date:
+						</div>
+						<div class="col-sm-3 add-margin view-content">
+							<fmt:formatDate pattern="dd/MM/yyyy"
+								value="${judgment.resolutiondate}" var="resolutiondate" />
+							<c:out value="${resolutiondate}" />
+						</div>
+					</div>
+					</c:if>
 					<div class="row add-border">
 						<div class="col-xs-3 add-margin">
 							<spring:message code="lbl.costawarded" />

@@ -95,7 +95,8 @@
 								code="lbl.judgmentype" /> :<span class="mandatory"></span> </label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="judgmentType" id="judgmentType"
-								name="judgmentType" cssClass="form-control" required="required"
+								onchange="checkjudgment();" name="judgmentType"
+								cssClass="form-control" required="required"
 								cssErrorClass="form-control error">
 								<form:option value="">
 									<spring:message code="lbl.select" />
@@ -112,6 +113,34 @@
 								class="form-control datepicker" data-date-end-date="0d"
 								data-inputmask="'mask': 'd/m/y'" />
 							<form:errors path="implementByDate" cssClass="error-msg" />
+						</div>
+					</div>
+					<div class="form-group" id="disposedoff1" style="display:none;">
+						<label class="col-sm-3 control-label text-right">Direction
+							:<span class="mandatory"></span>
+						</label>
+						<div class="col-sm-3 add-margin">
+
+							<form:input class="form-control patternvalidation" path="directiondisposed"
+								data-pattern="address" maxlength="50"  id="directiondis" />
+
+						</div>
+						<label class="col-sm-3 control-label text-right">Disposed
+							Off Date:<span class="mandatory"></span></label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="disposedoffdate" class="form-control datepicker"
+								data-date-end-date="0d" data-inputmask="'mask': 'd/m/y'"
+								id="disposedate" />
+
+						</div>
+					</div>
+					<div class="form-group" id="disposedoff2" style="display:none;">
+						<label class="col-sm-3 control-label text-right">Resolution
+							Date:<span class="mandatory"></span></label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="resolutiondate" class="form-control datepicker"
+								data-date-end-date="0d" data-inputmask="'mask': 'd/m/y'"
+								id="resolutiondate" />
 						</div>
 					</div>
 					<div class="form-group">
@@ -148,8 +177,8 @@
 								maxlength="1024" required="required" />
 							<form:errors path="judgmentDetails" cssClass="error-msg" />
 						</div>
-						<label class="col-sm-3 control-label text-right">
-							<spring:message code="lbl.is.department.acted" /> ?:
+						<label class="col-sm-3 control-label text-right"> <spring:message
+								code="lbl.is.department.acted" /> ?:
 						</label>
 						<div class="col-sm-3 add-margin">
 							<form:checkbox id="isDepartmentActed" path="isDepartmentActed"
@@ -159,8 +188,7 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message
-								code="lbl.action.details" />:
-						</label>
+								code="lbl.action.details" />: </label>
 						<div class="col-sm-3 add-margin">
 							<form:textarea class="form-control text-left patternvalidation"
 								path="departmentActionDetails" id="departmentActionDetails"

@@ -136,7 +136,7 @@ public class LegalCaseDisposalController {
     	List<PaymentUpadte> listPaymentUpadte = paymentUpdateService.getRecordsByLegalcase(legalCase.getId());
     	for(PaymentUpadte s1:listPaymentUpadte)
     	{
-    		System.out.println("name---defending----"+s1.getNameOfDefendingCounsil());
+    		//System.out.println("name---defending----"+s1.getNameOfDefendingCounsil());
     	}
     	
     	model.addAttribute("listPaymentUpadte",listPaymentUpadte);
@@ -165,7 +165,7 @@ public class LegalCaseDisposalController {
     	
     	model.addAttribute("listPaymentUpadte",listPaymentUpadte);
     	model.addAttribute("updatePayment",savepay);
-    	return "updatePayment-new"; 
+    	return "updatePayment-success"; 
     }
 
 }

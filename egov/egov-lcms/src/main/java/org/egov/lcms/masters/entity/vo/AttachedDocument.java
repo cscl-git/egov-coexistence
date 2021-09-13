@@ -2,10 +2,14 @@ package org.egov.lcms.masters.entity.vo;
 
 import java.io.InputStream;
 
+import javax.persistence.Transient;
+
 public class AttachedDocument {
 	private InputStream fileStream;
 	private String fileName;
 	private String mimeType;
+	
+	private String filetype;
 	public InputStream getFileStream() {
 		return fileStream;
 	}
@@ -23,5 +27,11 @@ public class AttachedDocument {
 	}
 	public void setMimeType(String mimeType) {
 		this.mimeType = mimeType;
+	}
+	public String getFiletype() {
+		return filetype;
+	}
+	public void setFiletype(String filetype) {
+		this.filetype = filetype;
 	}	
 }
