@@ -159,6 +159,15 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name = "aadate")
 	private Date aadate;
 	
+	@Column(name = "roughapprovedate")
+	private Date roughapprovedate;
+	
+	@Column(name = "adminapprovedate")
+	private Date adminapprovedate;
+	
+	@Column(name = "approvedate")
+	private Date approvedate;
+	
 	@Column(name = "meetNumber")
 	private String meetNumber;
 	
@@ -223,6 +232,12 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Transient
 	private String dnitfromestimate;
 
+	@Transient
+	private String subdivis;
+	
+	@Transient
+	private String statussearch;
+
 	public Double getContingentPercentage() {
 		return contingentPercentage;
 	}
@@ -266,6 +281,14 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Transient
 	private String createdDt;
+	
+	@Transient
+	private String roughapproveDt;
+	
+	@Transient
+	private String adminapproveDt;
+	@Transient
+	private String approveDt;
 	
 	@Transient
 	private String executeDiv;
@@ -1001,6 +1024,70 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	public void setCreatedbyuser(String createdbyuser) {
 		this.createdbyuser = createdbyuser;
+	}
+
+	public String getSubdivis() {
+		return subdivis;
+	}
+
+	public void setSubdivis(String subdivis) {
+		this.subdivis = subdivis;
+	}
+
+	public String getStatussearch() {
+		return statussearch;
+	}
+
+	public void setStatussearch(String statussearch) {
+		this.statussearch = statussearch;
+	}
+
+	public Date getRoughapprovedate() {
+		return roughapprovedate;
+	}
+
+	public void setRoughapprovedate(Date roughapprovedate) {
+		this.roughapprovedate = roughapprovedate;
+	}
+
+	public Date getAdminapprovedate() {
+		return adminapprovedate;
+	}
+
+	public void setAdminapprovedate(Date adminapprovedate) {
+		this.adminapprovedate = adminapprovedate;
+	}
+
+	public Date getApprovedate() {
+		return approvedate;
+	}
+
+	public void setApprovedate(Date approvedate) {
+		this.approvedate = approvedate;
+	}
+
+	public String getRoughapproveDt() {
+		return roughapproveDt;
+	}
+
+	public void setRoughapproveDt(String roughapproveDt) {
+		this.roughapproveDt = roughapproveDt;
+	}
+
+	public String getAdminapproveDt() {
+		return adminapproveDt;
+	}
+
+	public void setAdminapproveDt(String adminapproveDt) {
+		this.adminapproveDt = adminapproveDt;
+	}
+
+	public String getApproveDt() {
+		return approveDt;
+	}
+
+	public void setApproveDt(String approveDt) {
+		this.approveDt = approveDt;
 	}
 
 	

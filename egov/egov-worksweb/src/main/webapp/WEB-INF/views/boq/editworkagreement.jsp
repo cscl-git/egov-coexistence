@@ -447,7 +447,7 @@
 											 class="form-control amount" ></form:input>
 				</td> 
 				
-				<td><form:checkbox 	path="paymentDistribution[${status.index}].payment_completed"	id="paymentDistribution[${status.index}].payment_completed" />
+				<td><form:checkbox 	path="paymentDistribution[${status.index}].payment_completed"	id="paymentDistribution[${status.index}].payment_completed" class="payment_completed" value="true"/>
 												</td>
 				<td class="text-center"><span style="cursor:pointer;" onclick="addpaymentRow(this);" tabindex="0" id="temppayment[0].addButton" data-toggle="tooltip" title="" data-original-title="press ENTER to Add!" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 <span class="add-padding debit-delete-row" onClick="$(this).closest('tr').remove();"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>

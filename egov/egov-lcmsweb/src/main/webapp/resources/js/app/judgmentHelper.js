@@ -49,6 +49,7 @@
 $(document).ready(function(){
 
 	loadDateFields();
+	checkjudgment();
 	$('#judgmentType').change(function(){
 		loadDateFields();
 	});
@@ -76,6 +77,7 @@ function loadDateFields(){
 
 
 });
+
 
 $("#costAwarded").on("keyup", function(){  // validate 10 digits and two decimal points
     var valid = /^\d{0,10}?$/.test(this.value),
@@ -131,3 +133,22 @@ $('#btnclose').click(function(){
 	});
 	
 });
+function checkjudgment(){
+	var jud=document.getElementById("judgmentType").value;
+	
+	
+	if(jud==11){
+		
+		$('#disposedoff1').css("display", "block");
+		$('#disposedoff2').css("display", "block");
+		$("#directiondis").attr('required', '');
+		$("#disposedate").attr('required', '');
+		$("#resolutiondate").attr('required', '');
+		
+		
+	}else{
+		
+		$('#disposedoff1').css("display", "none");
+		$('#disposedoff2').css("display", "none");
+	}
+}

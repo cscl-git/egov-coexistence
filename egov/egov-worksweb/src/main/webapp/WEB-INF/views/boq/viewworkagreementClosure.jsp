@@ -299,7 +299,7 @@
 												class="form-control amount"></form:input></td>
 										<td><form:checkbox
 												path="paymentDistribution[${status.index}].payment_completed"
-												id="paymentDistribution[${status.index}].payment_completed" />
+												id="paymentDistribution[${status.index}].payment_completed" class="payment_completed" value="true" />
 												</td> 
 				
 			</tr>

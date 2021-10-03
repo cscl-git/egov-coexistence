@@ -82,6 +82,7 @@ public class EstimatePreparationApprovalService {
 			EstimatePreparationApproval estimatePreparationApproval,Long approvalPosition,String approvalComment,String approvalDesignation,String workFlowAction) {
 		// TODO Auto-generated method stub
 
+		
 		List<BoQDetails> list = new ArrayList<BoQDetails>();
 			for (BoQDetails boq : estimatePreparationApproval.getBoQDetailsList()) {
 				System.out.println("++++++++++++ "+boq.getItem_description()+"++++++++");
@@ -110,6 +111,7 @@ public class EstimatePreparationApprovalService {
 		else if((workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "AA Initiated"));
+			estimatePreparationApproval.setRoughapprovedate(new Date());
 		}
 		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Initiated"))
 		{
@@ -122,6 +124,7 @@ public class EstimatePreparationApprovalService {
 		else if((workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("AA Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "TS Initiated"));
+			estimatePreparationApproval.setAdminapprovedate(new Date());
 		}
 		else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") )&& estimatePreparationApproval.getStatus().getCode().equals("TS Initiated"))
 		{
@@ -134,6 +137,7 @@ public class EstimatePreparationApprovalService {
 		else if(( workFlowAction.equalsIgnoreCase("Approve"))&& estimatePreparationApproval.getStatus().getCode().equals("TS Pending for Approval"))
 		{
 			estimatePreparationApproval.setStatus(egwStatusDAO.getStatusByModuleAndCode("EstimatePreparationApproval", "Approved"));
+			estimatePreparationApproval.setApprovedate(new Date());
 		}
 		EstimatePreparationApproval savedEstimatePreparationApproval = estimatePreparationApprovalRepository
 				.save(estimatePreparationApproval);
@@ -251,7 +255,11 @@ public class EstimatePreparationApprovalService {
         	}
         	else if((workFlowAction.equalsIgnoreCase("Forward/Reassign") || workFlowAction.equalsIgnoreCase("Approve")) && !estimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("TS Initiated") && !estimatePreparationApproval.getStatus().getCode().equalsIgnoreCase("Approved"))
         	{
-        		String statetype="Pending With "+designation.getName().toUpperCase();
+        		String design="";
+        		if(designation!=null) {
+        			design=designation.getName().toUpperCase();
+        		}
+        		String statetype="Pending With "+design;
         		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
                 .withStateValue(statetype).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")

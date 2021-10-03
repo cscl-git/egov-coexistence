@@ -50,6 +50,7 @@ package org.egov.lcms.reports.entity;
 import java.util.Date;
 
 public class LegalCommonReportResult {
+	private String id;
     private String caseNumber;
     private String lcNumber;
     private String caseFromDate;
@@ -330,5 +331,19 @@ public class LegalCommonReportResult {
 	public void setConcernedBranch(String concernedBranch) {
 		this.concernedBranch = concernedBranch;
 	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	
+
+	
+
+	
 
 }

@@ -43,6 +43,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.web.contract.WorkflowContainer;
@@ -859,15 +860,13 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			@ModelAttribute("estimatePreparationApproval") final EstimatePreparationApproval estimatePreparationApproval,
 			final Model model, @RequestParam("file1") MultipartFile[] files, @RequestParam("fileRoughCost") MultipartFile[] fileRoughCost,final HttpServletRequest request)
 			throws Exception {
-		/*ServletRequestDataBinder binder = new ServletRequestDataBinder(estimatePreparationApproval);
-	    binder.setAutoGrowCollectionLimit(1000); // set limit to 3 items
-	    binder.bind(request);*/
 		
 		String workFlowAction=estimatePreparationApproval.getWorkFlowAction();
 		System.out.println("::::::::::: "+workFlowAction);
-		System.out.println("::::::::::: "+estimatePreparationApproval.getWorksWing());
+		//System.out.println("::::::::::: "+estimatePreparationApproval.getWorksWing());
 		
 		List<DocumentUpload> list = new ArrayList<>();
+		
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
@@ -1059,7 +1058,11 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 				//error=false;
 				Row row = firstSheet.getRow(0);
-				System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(row.getCell(0)==null || row.getCell(1)==null|| row.getCell(2)==null || row.getCell(3)==null|| row.getCell(4)==null || row.getCell(5)==null) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}else {
 				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
 						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
 						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
@@ -1067,6 +1070,8 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
 					break ;
 				}
+				}
+				
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
 						DocumentUpload upload = new DocumentUpload();
@@ -1098,6 +1103,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 				Iterator<Cell> cellIterator = nextRow.cellIterator();
 		
 				BoQDetails aBoQDetails = new BoQDetails();
+				
 				//BoqDetailsPop boqDetailsPop =new BoqDetailsPop();	
 
 				while (cellIterator.hasNext()) {
@@ -1115,6 +1121,15 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Blank Column in Row "+erow;
 						break first;
 					   }
+					if(Cell.CELL_TYPE_ERROR==cell.getCellType()) {
+						System.out.println("cell value Error  ");
+					}
+					if(Cell.CELL_TYPE_FORMULA==cell.getCellType()) {
+						System.out.println("cell value fromula  " +cell.getCellFormula());
+						error=true;
+						msg="Please check the uploaded document as there is an issue in AOR detail sheet.Check Row "+erow;
+						break first;
+					}
 					if (Cell.CELL_TYPE_STRING == cell.getCellType()) {
 
 						if (cell.getColumnIndex() == 0) {
@@ -1211,7 +1226,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 					}
 
 
-
+System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_description()+""+" "+aBoQDetails.getQuantity()+" "+aBoQDetails.getRef_dsr()+" "+aBoQDetails.getUnit()+" "+aBoQDetails.getRate()+" "+aBoQDetails.getAmount());
 					if (aBoQDetails.getMilestone()!=null && aBoQDetails.getItem_description() != null && aBoQDetails.getRef_dsr() != null
 							&& aBoQDetails.getUnit() != null && aBoQDetails.getRate() != null
 							&& aBoQDetails.getQuantity() != null && aBoQDetails.getAmount() != null) {
@@ -1237,7 +1252,11 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 		//}
   int nextcount=1;
 		System.out.println("::::ERROR::::: "+error);
+		System.out.println("Boq size  "+boQDetailsList.size());
+		if(boQDetailsList.size()==0) {
+			error=true;
 		
+		}
 		List<BoqUploadDocument> docUpload=new ArrayList<>();
 		if(estimatePreparationApproval.getDocUpload()!=null) {
 			for(BoqUploadDocument boq:estimatePreparationApproval.getDocUpload()) {
@@ -2273,13 +2292,18 @@ public String editEstimateData1(
 		if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 			error=false;
 				Row row = firstSheet.getRow(0);
-				System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(row.getCell(0)==null || row.getCell(1)==null|| row.getCell(2)==null || row.getCell(3)==null|| row.getCell(4)==null || row.getCell(5)==null) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}else {
 				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
 						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
 						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
 					error=true;
 					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
 					break ;
+				}
 				}
 			if (files != null)
 				for (int j = 0; j< files.length; j++) {
@@ -2810,13 +2834,18 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 			if(firstSheet.getSheetName().equalsIgnoreCase("Abst. with AOR")) {
 				//error=false;
 				Row row = firstSheet.getRow(0);
-				//System.out.println("00 "+row.getCell(0).getStringCellValue()+" 111  "+row.getCell(1).getStringCellValue()+"22 "+row.getCell(2).getStringCellValue()+" 33 "+row.getCell(3).getStringCellValue()+" 44: "+row.getCell(4).getStringCellValue()+" dd "+row.getCell(5).getStringCellValue());
+				if(row.getCell(0)==null || row.getCell(1)==null|| row.getCell(2)==null || row.getCell(3)==null|| row.getCell(4)==null || row.getCell(5)==null) {
+					error=true;
+					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
+					break ;
+				}else {
 				if(!row.getCell(0).getStringCellValue().equalsIgnoreCase("Scope/Milestone") || !row.getCell(1).getStringCellValue().equalsIgnoreCase("Item Description")
 						|| !row.getCell(2).getStringCellValue().equalsIgnoreCase("Ref DSR/NS") || !row.getCell(3).getStringCellValue().equalsIgnoreCase("Unit") 
 						|| !row.getCell(4).getStringCellValue().equalsIgnoreCase("Rate") || !row.getCell(5).getStringCellValue().equalsIgnoreCase("Quantity")) {
 					error=true;
 					msg="Please check the uploaded document as there is an issue in AOR detail sheet.Sequence of columns does not match.";
 					break ;
+				}
 				}
 				if (files != null)
 					for (int j = 0; j< files.length; j++) {
@@ -3337,6 +3366,11 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 				misQuery.append(" and lower(es.createdbyuser) like lower('%")
 						.append(estimate.getCreatedbyuser()).append("%')");
 			}
+			if(estimate.getSubdivision() != null)
+			{
+				misQuery.append(" and es.subdivision=")
+				.append(estimate.getSubdivision());
+			}
 			
 			
 		}
@@ -3393,31 +3427,53 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		outStream.close();
 	}
 	
-	// for Download estimate result written by sonu prajapati
-	@RequestMapping(value = "/workEstimateSearch",params="workEstimateSearchResult" ,method = RequestMethod.POST)
-	public @ResponseBody ResponseEntity<InputStreamResource> excelEstimateResult(@ModelAttribute("workEstimateDetails")
-	          final EstimatePreparationApproval estimatePreparationApproval,
+	
+	//@RequestMapping(value = "/workEstimateSearch",params="workEstimateSearchResult" ,method = RequestMethod.POST)
+	@RequestMapping(value = "/workEstimateSearchexcel",method = {RequestMethod.GET,RequestMethod.POST})
+	public @ResponseBody ResponseEntity<InputStreamResource> excelEstimateResult(@RequestParam("workName") String workName,
+			@RequestParam("workStatusSearch") String workStatusSearch,@RequestParam("worksWing") String worksWing,@RequestParam("department") Long department,@RequestParam("subdivision") Long subdivision,
+			@RequestParam("estimateNumber") String estimateNumber,@RequestParam("fromDt") Date fromDt,@RequestParam("toDt") Date toDt,@RequestParam("workLocation") String workLocation, @RequestParam("sectorNumber") String sectorNumber,   
+			@RequestParam("wardNumber") String wardNumber,@RequestParam("fundSource") String fundSource,@RequestParam("estimatedCost") BigDecimal estimatedCost,@RequestParam("createdbyuser") String createdbyuser,  
 	             final Model model, final HttpServletRequest request) throws Exception {
-		
+		EstimatePreparationApproval estimatePreparationApproval=new EstimatePreparationApproval();
              List<EstimatePreparationApproval> approvalList = new ArrayList<EstimatePreparationApproval>();
-
+             estimatePreparationApproval.setWorkName(workName);
+             estimatePreparationApproval.setWorkStatusSearch(workStatusSearch);
+             estimatePreparationApproval.setWorksWing(worksWing);
+             estimatePreparationApproval.setExecutingDivision(department);
+             estimatePreparationApproval.setSubdivision(subdivision);
+             estimatePreparationApproval.setEstimateNumber(estimateNumber);
+             estimatePreparationApproval.setFromDt(fromDt);
+             estimatePreparationApproval.setToDt(toDt);
+             estimatePreparationApproval.setWorkLocation(workLocation);
+             estimatePreparationApproval.setSectorNumber(sectorNumber);
+             estimatePreparationApproval.setWardNumber(wardNumber);
+             estimatePreparationApproval.setFundSource(fundSource);
+             estimatePreparationApproval.setEstimateAmount(estimatedCost);
+             estimatePreparationApproval.setCreatedbyuser(createdbyuser);
          // Convert input string into a date
-         if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
+        /* if (estimatePreparationApproval.getDepartment() != null && estimatePreparationApproval.getDepartment() != "" && !estimatePreparationApproval.getDepartment().isEmpty()) {
          long department = Long.parseLong(estimatePreparationApproval.getDepartment());
          estimatePreparationApproval.setExecutingDivision(department);
-         }
+         }*/
          EstimatePreparationApproval estimate=null;
 
         final StringBuffer query = new StringBuffer(500);
         List<Object[]> list =null;
         query
         .append(
-            "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es where es.executingDivision = ? ")
-        .append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()))
-        .append(getMisQuery(estimatePreparationApproval));
+            "select es.id,es.workName,es.workCategory,es.estimateNumber,es.estimateDate,es.estimateAmount,es.status.description from EstimatePreparationApproval es ");
+        query.append(" where es.id> ? ");
+		 if(estimatePreparationApproval.getExecutingDivision()!=null)
+	        	{
+	        	query.append("and es.executingDivision ='").append(estimatePreparationApproval.getExecutingDivision()).append("'");
+	        	}
+		 query.append(getDateQuery(estimatePreparationApproval.getFromDt(), estimatePreparationApproval.getToDt()));
+		 query.append(getMisQuery(estimatePreparationApproval));
+		 estimatePreparationApproval.setId(0l);
         System.out.println("Query :: "+query.toString());
         list = persistenceService.findAllBy(query.toString(),
-		 estimatePreparationApproval.getExecutingDivision());
+		 estimatePreparationApproval.getId());
  
        if (list.size() != 0) {
 	 

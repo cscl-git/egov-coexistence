@@ -55,6 +55,7 @@ import org.egov.lcms.entity.es.LegalCaseDocument;
 import org.egov.lcms.reports.entity.LegalCommonReportResult;
 import org.egov.lcms.repository.es.HearingsDocumentRepository;
 import org.egov.lcms.repository.es.LegalCaseDocumentRepository;
+import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.utils.LegalCaseUtil;
 import org.egov.lcms.utils.constants.LcmsConstants;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -62,14 +63,18 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.core.query.NativeSearchQueryBuilder;
 import org.springframework.data.elasticsearch.core.query.SearchQuery;
 import org.springframework.stereotype.Service;
 
+import net.sf.jasperreports.engine.part.FinalFillingPrintPart;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -97,6 +102,8 @@ public class LegalCommonReportService {
 
     @Autowired
     private HearingsDocumentRepository hearingsDocumentRepository;
+    @Autowired
+    private LegalCaseService legalCaseService;
 
     public List<LegalCommonReportResult> getLegalCommonReportsResults(final LegalCommonReportResult legalCommonReport,
             final String reportType) throws ParseException {
@@ -109,9 +116,15 @@ public class LegalCommonReportService {
 
     public List<LegalCommonReportResult> prepareLegalCaseDocumentList(final List<LegalCaseDocument> legalcaseDocumentList)
             throws ParseException {
+    	
         final List<LegalCommonReportResult> documentList = new ArrayList<>(0);
+        Map<String, Long> iddetail=new HashMap<String, Long>();
+        List<LegalCase> legal = legalCaseService.findAll();
+        for(LegalCase idmap:legal) {
+        	iddetail.put(idmap.getCaseNumber(), idmap.getId());
+        }
         for (final LegalCaseDocument legalcaseDocument : legalcaseDocumentList)
-            documentList.addAll(buildLegalReport(legalcaseDocument));
+            documentList.addAll(buildLegalReport(legalcaseDocument,iddetail));
         return documentList;
 
     }
@@ -134,16 +147,18 @@ public class LegalCommonReportService {
         final SearchQuery searchQuery = new NativeSearchQueryBuilder().withIndices(LcmsConstants.LEGALCASE_INDEX_NAME)
                 .withQuery(query).withPageable(new PageRequest(0, 250)).build();
 
+        
         return legalCaseDocumentRepository.search(searchQuery);
     }
 
-    public List<LegalCommonReportResult> buildLegalReport(final LegalCaseDocument legalcaseDocument)
+    public List<LegalCommonReportResult> buildLegalReport(final LegalCaseDocument legalcaseDocument,Map<String, Long> legal)
             throws ParseException {
         final List<LegalCommonReportResult> finalResult = new ArrayList<>();
 
         final SimpleDateFormat dateFormat = new SimpleDateFormat("E MMM dd HH:mm:ss Z yyyy");
         final SimpleDateFormat myFormat = new SimpleDateFormat(LcmsConstants.DATE_FORMAT_DDMMYYYY);
         final LegalCommonReportResult legalCommonResultObj = new LegalCommonReportResult();
+        legalCommonResultObj.setId((legalcaseDocument.getCaseNumber() != null && legal.get(legalcaseDocument.getCaseNumber())!=null)?legal.get(legalcaseDocument.getCaseNumber()).toString():"");
         legalCommonResultObj.setCaseNumber(legalcaseDocument.getCaseNumber() == null ? "" : legalcaseDocument.getCaseNumber());
         legalCommonResultObj.setLcNumber(legalcaseDocument.getLcNumber() == null ? "" : legalcaseDocument.getLcNumber());
         legalCommonResultObj.setCaseTitle(legalcaseDocument.getCaseTitle() == null ?  "" : legalcaseDocument.getCaseTitle());

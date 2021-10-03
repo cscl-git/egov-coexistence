@@ -124,14 +124,21 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
         UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
     	
+        //petetion files
+        String[] contentType1 = ((MultiPartRequestWrapper) request).getContentTypes("file1");
+        UploadedFile[] uploadedFiles1 = ((MultiPartRequestWrapper) request).getFiles("file1");
+        String[] fileName1 = ((MultiPartRequestWrapper) request).getFileNames("file1");
+    	
         final String caseNumber = legalCase.getCaseNumber() + "/" + legalCase.getWpYear();
         final LegalCase validateCasenumber = legalCaseService.getLegalCaseByCaseNumber(caseNumber);
         if (validateCasenumber != null)
             errors.reject("error.legalcase.casenumber");
-        final LegalCase validateFilenumber = legalCaseService.findByLcNumber(legalCase.getLcNumber());
+        /*final LegalCase validateFilenumber = legalCaseService.findByLcNumber(legalCase.getLcNumber());
         if (validateFilenumber != null)
-            errors.reject("error.legalcase.filenumber");
+            errors.reject("error.legalcase.filenumber");*/
         if (errors.hasErrors()) {
+        	List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
+        	model.addAttribute("defendingDropdown",dropdownValue);
         	model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());
             model.addAttribute(LcmsConstants.MODE, "create");
             model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, false);
@@ -150,6 +157,19 @@ public class CreateLegalCaseController extends GenericLegalCaseController {
                 attachedDocument.setFileStream(bios);
                 attachedDocument.setFileName(fileName[i]);
                 attachedDocument.setMimeType(contentType[i]);
+                attachedDocuments.add(attachedDocument);
+            }
+        }
+        if(uploadedFiles1!=null) {
+            for (int i = 0; i < uploadedFiles1.length; i++) {
+                Path path = Paths.get(uploadedFiles1[i].getAbsolutePath());
+                byte[] fileBytes = Files.readAllBytes(path);
+                ByteArrayInputStream bios = new ByteArrayInputStream(fileBytes);
+                AttachedDocument attachedDocument = new AttachedDocument();
+                attachedDocument.setFileStream(bios);
+                attachedDocument.setFileName(fileName1[i]);
+                attachedDocument.setMimeType(contentType1[i]);
+                attachedDocument.setFiletype("PetetionLegal");
                 attachedDocuments.add(attachedDocument);
             }
         }

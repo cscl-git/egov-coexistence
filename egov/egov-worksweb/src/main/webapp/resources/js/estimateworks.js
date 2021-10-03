@@ -348,3 +348,26 @@ $(document).ready(function(){
 	    parent.window.opener.inboxloadmethod();
 	});
 });
+function submitFormForexcel(){
+	var workName=document.getElementById('workName').value;
+	var workStatusSearch=document.getElementById('workStatusSearch').value;
+	var worksWing=document.getElementById('worksWing').value;
+	var department=document.getElementById('department').value;
+	var subdivision=document.getElementById('subdivision').value;
+	var estimateNumber=document.getElementById('estimateNumber').value;
+	var fromDt=document.getElementById('fromDt').value;
+	var toDt=document.getElementById('toDt').value;
+	var workLocation=document.getElementById('workLocation').value;
+	var sectorNumber=document.getElementById('sectorNumber').value;
+	var wardNumber=document.getElementById('wardNumber').value;
+	var fundSource=document.getElementById('fundSource').value;
+	var estimatedCost=document.getElementById('estimatedCost').value;
+	var createdbyuser=document.getElementById('createdbyuser').value;
+	
+	
+
+	var	url = "/services/works/estimatePreparation/workEstimateSearchexcel"+"?workName="+workName+"&workStatusSearch="+workStatusSearch+"&worksWing="+worksWing+"&department="+department+"&subdivision="+subdivision+"&estimateNumber="+estimateNumber+"&fromDt="+fromDt+"&toDt="+toDt+"&workLocation="+workLocation+"&sectorNumber="+sectorNumber+"&wardNumber="+wardNumber+"&fundSource="+fundSource+"&estimatedCost="+estimatedCost+"&createdbyuser="+createdbyuser;
+window.location.href =url;
+return true;
+		
+}

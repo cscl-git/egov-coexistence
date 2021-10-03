@@ -387,6 +387,163 @@
 						</c:forEach>
 					</tbody>
 				</table>
+				<div  id="mainContainerDiv" >
+
+<div class="panel-heading">
+	<div class="panel-title">
+		<spring:message code="lbl.defending.counsel" />
+	</div>
+</div>
+<table class="table table-striped table-bordered" id="defendingCounsilDetails">
+	<thead>
+		<tr>
+			<%-- <th class="text-center"><spring:message code="lbl.slno" /> --%>
+			<th class="text-center"><spring:message code="lbl.defCouncilCheck" /> 
+			<th class="text-center"><spring:message code="lbl.standingcounselname" /><span
+				class="mandatory"></span></th>
+			<th class="text-center"><spring:message code="lbl.defCounselEmial" /></th>
+			<th class="text-center"><spring:message code="lbl.defCounselPhone" /></th>
+			
+			<%-- <th class="text-center"><spring:message
+					code="lbl.add/Def_Counsel" /></th> --%>
+		</tr>
+	</thead>
+	<tbody>
+		
+		<c:forEach var="biDefendingCounsilDetailsList"
+			items="${legalCase.getDefendingCounsil()}" varStatus="status">
+			<tr>
+				
+				              
+
+				<td class="text-right">
+				
+				  <%-- <input id="biDefendingCounsilDetailsList[${status.index}].id"
+				                 name="biDefendingCounsilDetailsList[${status.index}].id"
+				                  value="${biDefendingCounsilDetailsList.id}"type="hidden" /> --%>
+				
+				                <input 
+				                id="biDefendingCounsilDetailsList[${status.index}].defCounsilPrimary"
+				                 name="biDefendingCounsilDetailsList[${status.index}].defCounsilPrimary"
+				                  value="YES" ${'YES'==biDefendingCounsilDetailsList.defCounsilPrimary? "checked" : ""} type="checkbox" />
+				</td>
+				<td>
+						 <div class="dropdown-content" id="autocomplete">
+									<select class="form-control table-input text-left patternvalidation"
+										required="required" id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"  readonly="readonly"  >
+										<option value="">
+											<spring:message code="lbls.select" />
+										</option>
+											<c:forEach items="${defendingDropdown}" var="category">
+							                   
+							                    <option value="${category.name}"  ${category.name ==biDefendingCounsilDetailsList.oppPartyAdvocate? "selected" : ""}>${category.name}</option>
+										       
+										  <%--   ${category.name ==biDefendingCounsilDetailsList.oppPartyAdvocate? "selected" : ""} --%>
+										</c:forEach> 
+									</select>
+								</div>
+							</td>
+				
+
+
+				<td class="text-right"><input type="text"
+					class="form-control table-input text-left"
+					id="biDefendingCounsilDetailsList[${status.index}].counselEmail"
+					name="biDefendingCounsilDetailsList[${status.index}].counselEmail"
+					value="${biDefendingCounsilDetailsList.counselEmail}" readonly="readonly"/></td>
+
+				<td class="text-right"><input type="text"
+					id="biDefendingCounsilDetailsList[${status.index}].counselphoneNo"
+					name="biDefendingCounsilDetailsList[${status.index}].counselphoneNo"
+					class="form-control table-input text-left patternvalidation"
+					onkeyup="decimalvalue(this);"
+					value="${biDefendingCounsilDetailsList.counselphoneNo}" maxlength="10" readonly="readonly"/></td>
+				<%-- <input type="hidden" id="activeid"
+					name="biDefendingCounsilDetailsList[${status.index}].id"
+					id="biDefendingCounsilDetailsList[${status.index}].id"
+					value="${bipartisanRespondentDetailsList.id}" /> --%>
+					<input id="biDefendingCounsilDetailsList[${status.index}].id"
+				                 name="biDefendingCounsilDetailsList[${status.index}].id"
+				                  value="${biDefendingCounsilDetailsList.id}"type="hidden" />
+				<input type="hidden"
+					id="biDefendingCounsilDetailsList[${status.index}].isRepondent"
+					name="biDefendingCounsilDetailsList[${status.index}].isRepondent"
+					class="form-control table-input text-right"
+					style="text-align: center" value="${true}" />
+				<!-- <td class="text-center"><a href="javascript:void(0);"
+							class="btn-sm btn-default" onclick="addDefendingCounsilRow();"><i
+								class="fa fa-plus"></i></a> <a href="javascript:void(0);"
+							class="btn-sm btn-default" id="counsil_delete_row"><i
+								class="fa fa-trash"></i></a></td> -->
+			</tr>
+		</c:forEach>
+		<c:if test="${empty legalCase.getDefendingCounsil()}">
+		<tr class="">
+					<%-- <td><span class="defendingCounsilDetails spansno">1</span> <form:hidden
+							path="biDefendingCounsilDetailsList[0].id"
+							name="biDefendingCounsilDetailsList[0].id"
+							value="${biDefendingCounsilDetailsList[0].id}"
+							class="form-control table-input hidden-input" /></td>--%>
+						<td> 
+				                <input 
+				                id="biDefendingCounsilDetailsList[0].defCounsilPrimary"
+				                 name="biDefendingCounsilDetailsList[0].defCounsilPrimary"
+				                  value="YES" type="checkbox" />
+				     			<!-- <input type="hidden" class="form-control table-input text-left"id="primaryCounsin" name="primaryCounsin" value="YES"> -->
+				     	</td>
+							
+						
+						<td>
+						 <div class="dropdown-content" id="autocomplete">
+						
+									<select class="form-control table-input text-left patternvalidation"
+										required="required" id="biDefendingCounsilDetailsList[0].oppPartyAdvocate"
+							name="biDefendingCounsilDetailsList[0].oppPartyAdvocate" readonly="readonly">
+										<option value="">
+											<spring:message code="lbls.select" />
+										</option>
+											<c:forEach items="${defendingDropdown}" var="category">
+										        <option value="${category.name}" >${category.name}</option>
+										    
+										<%-- <options items="${}" itemValue="id"
+											id="oppPartyAdvocate" itemLabel="name" /> --%>
+										</c:forEach> 
+									</select>
+								</div>
+							</td>	
+					
+					<td class="text-right"><input type="text"
+						class="form-control table-input"
+						name="biDefendingCounsilDetailsList[0].counselEmail"
+						id="biDefendingCounsilDetailsList[0].counselEmail" 
+						data-pattern="alphanumericwithspecialcharacters" 
+						maxlength="50" placeholder="abc@xyz.com" readonly="readonly" />
+						
+						</td>
+					<td class="text-right"><input type="text"
+						class="form-control table-input text-left patternvalidation"
+						name="biDefendingCounsilDetailsList[0].counselphoneNo"
+						id="biDefendingCounsilDetailsList[0].counselphoneNo"
+						onkeyup="decimalvalue(this);" maxlength="10" readonly="readonly"/></td>
+					<input type="hidden"
+						id="biDefendingCounsilDetailsList[0].isRepondent"
+						name="biDefendingCounsilDetailsList[0].isRepondent"
+						class="form-control table-input text-right"
+						style="text-align: center" value="${true}" />
+
+					<!-- <td class="text-center"><a href="javascript:void(0);"
+						class="btn-sm btn-default" onclick="addDefendingCounsilRow();"><span
+							style="cursor: pointer;"><i class="fa fa-plus"></i></span></a> <a
+						href="javascript:void(0);" class="btn-sm btn-default"
+						id="counsil_delete_row"><span style="cursor: pointer;"><i
+								class="fa fa-trash"></i></span></a></td> -->
+				</tr>
+		</c:if>
+		
+	</tbody>
+</table>
+</div>
 			</div>
 		</form:form>
 	</div>

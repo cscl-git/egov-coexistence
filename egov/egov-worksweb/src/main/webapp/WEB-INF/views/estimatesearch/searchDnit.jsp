@@ -9,8 +9,8 @@
         <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
 
-	<form:form name="estimate-detail-search-form" role="form" method="post"
-		action="estimateSearch" modelAttribute="workEstimateDetails"
+	<form:form name="search-dnit-form-mis" role="form" method="post"
+		action="workDnitSearchnew" modelAttribute="workdnitDetails"
 	id="workEstimateDetails" class="form-horizontal form-groups-bordered"
 	style="margin-top:-20px;">
 
@@ -38,10 +38,6 @@
 							</form:option>
 						<form:option value="Created">Created</form:option>
 							<form:option value="Pending for Approval">Pending for Approval</form:option>
-							<form:option value="AA Initiated">AA Initiated</form:option>
-							<form:option value="AA Pending for Approval">AA Pending for Approval</form:option>
-							<form:option value="TS Initiated">TS Initiated</form:option>
-							<form:option value="TS Pending for Approval">TS Pending for Approval</form:option>
 							<form:option value="Approved">Approved</form:option>
 						</form:select>
 					</div>			
@@ -53,8 +49,11 @@
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-									<form:options items="${workEstimateDetails.workswings}"
+									<form:options items="${workdnitDetails.workswings}"
 								itemValue="id" itemLabel="workswingname" />
+									<%-- <form:option value="Building & Roads">Building & Roads</form:option>
+									<form:option value="Public Health">Public Health</form:option>
+									<form:option value="Horticulture & Electrical">Horticulture & Electrical</form:option> --%>
 								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -65,7 +64,7 @@
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
-							<form:options items="${workEstimateDetails.departments}"
+							<form:options items="${workdnitDetails.departments}"
 								itemValue="code" itemLabel="name" />
 								</form:select>
 							</div>
@@ -77,7 +76,7 @@
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
-							<form:options items="${workEstimateDetails.subdivisions}"
+							<form:options items="${workdnitDetails.subdivisions}"
 								itemValue="id" itemLabel="subdivision" />
 							
 						</form:select>
@@ -85,7 +84,7 @@
 					
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-									code="lbl.work.estimate.from.date" /></label>
+									code="lbl.work.dnit.from.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="fromDt" path="fromDt"
 							class="form-control datepicker" data-date-end-date="0d"
@@ -93,7 +92,7 @@
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-									code="lbl.work.estimate.to.date" /></label>
+									code="lbl.work.dnit.to.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="toDt" path="toDt" class="form-control datepicker"
 							data-date-end-date="0d" placeholder="DD/MM/YYYY" />
@@ -117,18 +116,22 @@
 					
 					
 					
-					
-					
+							
 					
 							</div>
 						</div>
 					</div>
 
 		<div class="buttonbottom" align="center">
-			<input type="submit" id="estimateSearch" class="btn btn-primary"
-						name="estimateSearch" code="lbl.search.work.estimate"
+			<input type="submit" id="workDnitSearch" class="btn btn-primary"
+						name="workDnitSearch" code="lbl.search.work.estimate"
 						value="Search" />
 				</div>
+				<!-- <div class="buttonbottom" align="center">
+			<input type="submit" id="workEditDnit" class="btn btn-primary"
+						name="workEditDnit" code="lbl.search.work.estimate"
+						value="Edit DNIT Search" />
+				</div> -->
 
 		<br> <br> <br>
 		<div class="tab-pane fade in active" id="resultheader">
@@ -138,25 +141,25 @@
 					<table class="table table-bordered" id="table">
 						<thead>
 							<tr>
-								<th>Name of Work</th>
+								<th><spring:message
+										code="lbl.estimate.preparation.name.work" /></th>
+								
 								<th>Wing</th>
 								<th>Division</th>
 								<th>Sub-Division</th>
-								<th>Estimate Status</th>
+								<th>DNIT Status</th>
 								<th>Expenditure Head</th>
-								<th>Estimate Cost</th>
-								<th>Date of Estimate creation</th>
-								<th>Date of Rough cost Estimate approval</th>
-								<th>Date of Admin Estimate approval</th>
-								<th>Date of Technical Estimate approval</th>
+								<th>DNIT Cost</th>
+								<th>Date of DNIT creation</th>
+								<th>Date of DNIT approval</th>
 
 							</tr>
 						</thead>
 						`
 						<c:if
-							test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
+							test="${workdnitDetails.estimateList != null &&  !workdnitDetails.estimateList.isEmpty()}">
 							<tbody>
-								<c:forEach items="${workEstimateDetails.estimateList}"
+								<c:forEach items="${workdnitDetails.estimateList}"
 									var="result" varStatus="status">
 									<tr>
 										<td><form:hidden
@@ -193,29 +196,19 @@
 												id="estimateList[${status.index}].createdDt" />
 											${result.createdDt }</td>
 											<td><form:hidden
-												path="estimateList[${status.index}].roughapproveDt"
-												id="estimateList[${status.index}].roughapproveDt" />${result.roughapproveDt }
-											</td>
-											<td><form:hidden
-												path="estimateList[${status.index}].adminapproveDt"
-												id="estimateList[${status.index}].adminapproveDt" />${result.adminapproveDt }
-											</td>
-											<td><form:hidden
 												path="estimateList[${status.index}].approveDt"
-												id="estimateList[${status.index}].approveDt" />${result.approveDt }
-											</td>
-											
+												id="estimateList[${status.index}].approveDt" />
+											${result.approveDt }</td>
 									</tr>
 								</c:forEach>
 							<tbody>
 						</c:if>
 						<c:if
-							test="${workEstimateDetails.estimateList == null ||  workEstimateDetails.estimateList.isEmpty()}">
+							test="${workdnitDetails.estimateList == null ||  workdnitDetails.estimateList.isEmpty()}">
 					No records found
 					</c:if>
 					</table>
 				</div>
-				
 
 			</div>
 		</div>

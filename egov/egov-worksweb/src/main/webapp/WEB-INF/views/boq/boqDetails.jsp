@@ -474,7 +474,7 @@
 				
 								<td><form:checkbox
 										path="paymentDistribution[0].payment_completed"
-										id="paymentDistribution[0].payment_completed" /></td>
+										id="paymentDistribution[0].payment_completed" class="payment_completed" value="true"/></td>
 
 								<td class="text-center"><span style="cursor: pointer;"
 									onclick="addpaymentRow(this);" tabindex="0"

@@ -303,6 +303,19 @@
 	</div>
 </div>
 <div class="form-group">
+	<label class="col-sm-3 control-label text-right">Brief:</label>
+	<div class="col-sm-3 add-margin">
+		<form:textarea class="form-control" path="brief"
+							style="height: 100px;" maxlength="500" id="brief" />
+		
+	</div>
+	<label class="col-sm-2 control-label text-right" >Councel Engage:</label>
+	<div class="col-sm-3 add-margin">
+		<form:textarea class="form-control" path="councelengage"
+							style="height: 100px;" maxlength="500" id="councelengage" />
+	</div>
+</div>
+<div class="form-group">
 <label class="col-sm-3 control-label text-right">Is Case Important ?</label>
 <div class="col-sm-3 add-margin">
 

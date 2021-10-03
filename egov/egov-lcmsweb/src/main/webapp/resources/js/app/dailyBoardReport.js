@@ -157,7 +157,7 @@ function submitForm() {
 						  
 						  ],
 						  "fnRowCallback" : function(row, data, index) {
-								$('td:eq(3)',row).html('<a href="javascript:void(0);" onclick="openLegalCase(\''+ data.lcNumber +'\')">' + data.caseNumber + '</a>');
+								$('td:eq(3)',row).html('<a href="javascript:void(0);" onclick="openLegalCase(\''+ data.id +'\')">' + data.caseNumber + '</a>');
 							}
 				          
 				});
@@ -212,6 +212,6 @@ function getdate()
     return today;
 }
 
-function openLegalCase(lcNumber) {
-	window.open("/services/lcms/application/view/?lcNumber="+ lcNumber , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
+function openLegalCase(id) {
+	window.open("/services/lcms/application/view/?id="+ id , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
 }

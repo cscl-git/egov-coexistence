@@ -129,7 +129,14 @@ public class LegalCaseService extends PersistenceService<LegalCase, Long>{
     }
     
     public LegalCase findById(final Long Id) {
+    	
         return legalCaseRepository.findOne(Id);
+        
+    }
+public List<LegalCase> findAll() {
+    	
+        return legalCaseRepository.findAll();
+        
     }
 
     public LegalCase findByLcNumber(final String lcnumber) {

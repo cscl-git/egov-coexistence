@@ -47,6 +47,16 @@
  */
 package org.egov.lcms.transactions.service;
 
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.egov.commons.EgwStatus;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infstr.services.PersistenceService;
@@ -64,15 +74,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindingResult;
-
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -163,6 +164,9 @@ public class HearingsService extends PersistenceService<Hearings, Long>{
 
     public List<Hearings> findByLCNumber(final String lcNumber) {
         return hearingsRepository.findByLegalCaseLcNumber(lcNumber);
+    }
+    public List<Hearings> findBylegalcaseId(final Long id) {
+        return hearingsRepository.findByLegalCaseId(id);
     }
 
     public void updateNextDate(final Hearings hearings, final LegalCase legalCase) {

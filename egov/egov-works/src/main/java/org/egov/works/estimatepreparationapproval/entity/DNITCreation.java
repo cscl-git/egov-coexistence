@@ -214,6 +214,16 @@ public class DNITCreation extends StateAware implements Serializable {
 	@Transient
 	private List<String> designatationlist;
 
+
+	@Transient
+	private String createdDt;
+	
+	@Transient
+	private String approveDt;
+	
+	@Transient
+	private String executeDiv;
+
 	public Double getContingentPercentage() {
 		return contingentPercentage;
 	}
@@ -273,6 +283,11 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	@Transient
 	private Date toDt;
+	@Transient
+	private String subdivis;
+	
+	@Transient
+	private String statussearch;
 
 	@Transient
 	private List<BoQDetails> boQDetailsList;
@@ -910,6 +925,46 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	public void setCreatedbyuser(String createdbyuser) {
 		this.createdbyuser = createdbyuser;
+	}
+
+	public String getCreatedDt() {
+		return createdDt;
+	}
+
+	public void setCreatedDt(String createdDt) {
+		this.createdDt = createdDt;
+	}
+
+	public String getExecuteDiv() {
+		return executeDiv;
+	}
+
+	public void setExecuteDiv(String executeDiv) {
+		this.executeDiv = executeDiv;
+	}
+
+	public String getSubdivis() {
+		return subdivis;
+	}
+
+	public void setSubdivis(String subdivis) {
+		this.subdivis = subdivis;
+	}
+
+	public String getStatussearch() {
+		return statussearch;
+	}
+
+	public void setStatussearch(String statussearch) {
+		this.statussearch = statussearch;
+	}
+
+	public String getApproveDt() {
+		return approveDt;
+	}
+
+	public void setApproveDt(String approveDt) {
+		this.approveDt = approveDt;
 	}
 
 	

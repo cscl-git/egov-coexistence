@@ -128,9 +128,9 @@ public class JudgmentController {
 
     @RequestMapping(value = "/new/", method = RequestMethod.GET)
     public String viewForm(@ModelAttribute("judgment") final Judgment judgment,
-            @RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request, final Model model) {
+            @RequestParam("id") final Long id, final HttpServletRequest request, final Model model) {
         prepareNewForm(model);
-        final LegalCase legalCase = getLegalCase(lcNumber, request);
+        final LegalCase legalCase = getLegalCase(id, request);
         List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
         model.addAttribute("defendingDropdown",dropdownValue);
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
@@ -140,13 +140,13 @@ public class JudgmentController {
     }
 
     @ModelAttribute
-    private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request) {
-       return legalcaseService.findByLcNumber(lcNumber);
+    private LegalCase getLegalCase(@RequestParam("id") final Long id, final HttpServletRequest request) {
+       return legalcaseService.findById(id);
     }
 
     @RequestMapping(value = "/new/", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute("judgment") final Judgment judgment, final BindingResult errors,
-            final RedirectAttributes redirectAttrs, @RequestParam("lcNumber") final String lcNumber,
+            final RedirectAttributes redirectAttrs, @RequestParam("id") final Long id,
             final HttpServletRequest request, final Model model)
             throws IOException, ParseException {
     	List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();
@@ -154,7 +154,7 @@ public class JudgmentController {
         UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");
         String[] fileName = ((MultiPartRequestWrapper) request).getFileNames("file");
         
-        final LegalCase legalcase = getLegalCase(lcNumber, request);
+        final LegalCase legalcase = getLegalCase(id, request);
         if (errors.hasErrors()) {
             prepareNewForm(model);
             model.addAttribute(LcmsConstants.LEGALCASE, legalcase);
@@ -178,7 +178,7 @@ public class JudgmentController {
         //sms and email 
         if(judgment.getJudgmentType().getName().equalsIgnoreCase("Disposed Off"))
         {
-        	sendSmsAndEmailDetailsForAgendaInvitation(judgment, lcNumber,request);
+        	sendSmsAndEmailDetailsForAgendaInvitation(judgment, id,request);
         }
         model.addAttribute(LcmsConstants.MODE, "view");
         redirectAttrs.addFlashAttribute(JUDGMENT, judgment);
@@ -187,8 +187,8 @@ public class JudgmentController {
 
     }
     //SMS and Email Service
-    public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Judgment judgment, final String lcNumber,final HttpServletRequest request) {
-    	final LegalCase legalCase = getLegalCase(lcNumber, request);
+    public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Judgment judgment, final Long id,final HttpServletRequest request) {
+    	final LegalCase legalCase = getLegalCase(id, request);
           //mSG
           Boolean smsEnabled = true;
           Boolean smsStatus=false;

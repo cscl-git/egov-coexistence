@@ -280,7 +280,8 @@ function edit(hearingId){
 }
 $('#createnewhearings').click(function() {
 	var lcNumber = $('#lcNumber').val();
-	var url = '/services/lcms/hearing/new/?lcNumber='+lcNumber;
+	var id = $('#legalcaseid').val();
+	var url = '/services/lcms/hearing/new/?id='+id;
 	$('#hearingsform').attr('method', 'get');
 	$('#hearingsform').attr('action', url);
 	window.location = url;

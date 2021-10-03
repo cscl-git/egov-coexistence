@@ -526,8 +526,7 @@
 		<form:errors path="representedby" cssClass="add-margin error-msg" />
 	</div>
 
-	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
-			code="lbl.remarks" />:</label>
+	<label class="col-sm-3 control-label text-right" id="persons">Brief History:</label>
 	<div class="col-sm-3 add-margin">
 		<form:textarea class="form-control" path="remarks" id="remarks"
 			name="remarks" maxlength="256" />

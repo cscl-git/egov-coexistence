@@ -105,7 +105,7 @@
 					class="form-control table-input text-left"
 					id="bipartisanPetitionerDetailsList[${status.index}].name"
 					name="bipartisanPetitionerDetailsList[${status.index}].name"
-					value="${bipartisanPetitionerDetailsList.name}" maxlength="250"  <!-- (Edited By Me) -->
+					value="${bipartisanPetitionerDetailsList.name}" maxlength="250"  
 					required="required" /></td>
 
 				<td class="text-right"><input type="text"
@@ -441,8 +441,7 @@
 <!-- Ended By Kundan -->
 
 <div class="form-group">
-	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
-			code="lbl.remarks" />:</label>
+	<label class="col-sm-3 control-label text-right" id="persons">Brief History:</label>
 	<div class="col-sm-3 add-margin">
 		<form:textarea class="form-control" path="remarks" id="remarks"
 			name="remarks" maxlength="256" />

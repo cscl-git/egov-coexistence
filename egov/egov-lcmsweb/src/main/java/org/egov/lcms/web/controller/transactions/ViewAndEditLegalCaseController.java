@@ -110,13 +110,13 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
 //    }
     
     @ModelAttribute
-    private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
-        return legalCaseService.findByLcNumber(lcNumber);
+    private LegalCase getLegalCase(@RequestParam("id") final Long id) {
+        return legalCaseService.findById(id);
     }
 
     @RequestMapping(value = "/view/", method = RequestMethod.GET)
-    public String view(@RequestParam("lcNumber") final String lcNumber, final Model model) {
-        final LegalCase legalCase = legalCaseService.findByLcNumber(lcNumber);
+    public String view(@RequestParam("id") final Long id, final Model model) {
+        final LegalCase legalCase = legalCaseService.findById(id);
         final LegalCase newlegalCase = getLegalCaseDocuments(legalCase);
         List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
         model.addAttribute(LcmsConstants.LEGALCASE, newlegalCase);
@@ -126,8 +126,8 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
     }
 
     @RequestMapping(value = "/edit/", method = RequestMethod.GET)
-    public String edit(@RequestParam("lcNumber") final String lcNumber, final Model model) {
-        final LegalCase legalCase = legalCaseService.findByLcNumber(lcNumber);
+    public String edit(@RequestParam("id") final Long id, final Model model) {
+        final LegalCase legalCase = legalCaseService.findById(id);
         final LegalCase newlegalCase = getLegalCaseDocuments(legalCase);
         model.addAttribute(LcmsConstants.LEGALCASE, newlegalCase);
         setDropDownValues(model);
@@ -158,7 +158,7 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
     }
     
     @RequestMapping(value = "/edit/", method = RequestMethod.POST)
-    public String update(@ModelAttribute final LegalCase legalCase, @RequestParam("lcNumber") final String lcNumber,
+    public String update(@ModelAttribute final LegalCase legalCase, @RequestParam("id") final Long id,
             final BindingResult errors, final Model model,
             final RedirectAttributes redirectAttrs, final HttpServletRequest request) throws IOException, ParseException {
     	
@@ -170,14 +170,16 @@ public class ViewAndEditLegalCaseController extends GenericLegalCaseController {
         	}
         }
             
-        final LegalCase validateFilenumber = legalCaseService.findByLcNumber(legalCase.getFileNumber());
+        /*final LegalCase validateFilenumber = legalCaseService.findByLcNumber(legalCase.getFileNumber());
         if (validateFilenumber != null) {
         	if(legalCase.getId()!=validateFilenumber.getId()) {
         		errors.reject("error.legalcase.filenumber");
         	}
-        }            
+        }  */          
     	
         if (errors.hasErrors()) {
+        	List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
+        	model.addAttribute("defendingDropdown",dropdownValue);
         	model.addAttribute(LcmsConstants.MODE, "edit");
             model.addAttribute(LcmsConstants.IS_REAPPEAL_CASE, legalCase.getIsReappealOfCase());
             model.addAttribute(LcmsConstants.CONCERNEDBRANCHLIST, concernedBranchMasterService.getActiveConcernedBranchs());

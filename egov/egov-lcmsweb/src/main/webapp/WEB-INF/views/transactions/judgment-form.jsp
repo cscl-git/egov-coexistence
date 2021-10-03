@@ -129,7 +129,7 @@
 							Off Date:<span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="disposedoffdate" class="form-control datepicker"
-								data-date-end-date="0d" data-inputmask="'mask': 'd/m/y'"
+								 data-inputmask="'mask': 'd/m/y'"
 								id="disposedate" />
 
 						</div>
@@ -139,7 +139,7 @@
 							Date:<span class="mandatory"></span></label>
 						<div class="col-sm-3 add-margin">
 							<form:input path="resolutiondate" class="form-control datepicker"
-								data-date-end-date="0d" data-inputmask="'mask': 'd/m/y'"
+								 data-inputmask="'mask': 'd/m/y'"
 								id="resolutiondate" />
 						</div>
 					</div>

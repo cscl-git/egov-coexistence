@@ -235,6 +235,18 @@
 								<c:out value="${legalCase.estimatePreparedBy}" />
 							</div>
 						</div>
+						<div class="row add-border">
+							<div class="col-xs-3 add-margin">Brief</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.brief}" />
+							</div>
+							<div class="col-xs-3 add-margin">
+								Councel Engage
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.councelengage}" />
+							</div>
+						</div>
 					</div>
 
 				</div>
@@ -524,6 +536,7 @@
 				</div>
 			</div>
 			<jsp:include page="documentdetails-view.jsp"></jsp:include>
+			<jsp:include page="documentdetails-petetion-view.jsp"></jsp:include>
 		</div>
 	</div>
 </form:form>

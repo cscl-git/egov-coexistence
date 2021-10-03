@@ -106,8 +106,8 @@ public class HearingsController {
     
     @RequestMapping(value = "/new/", method = RequestMethod.GET)
     public String newForm(@ModelAttribute("hearings") final Hearings hearings, final Model model,
-            @RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request) {
-        final LegalCase legalCase = getLegalCase(lcNumber, request);
+            @RequestParam("id") final Long id, final HttpServletRequest request) {
+        final LegalCase legalCase = getLegalCase(id, request);
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
         model.addAttribute("positionTemplList", hearings.getPositionTemplList());
         model.addAttribute(HEARINGS, hearings);
@@ -116,15 +116,15 @@ public class HearingsController {
     }
 
     @ModelAttribute
-    private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request) {
-        return legalCaseService.findByLcNumber(lcNumber);
+    private LegalCase getLegalCase(@RequestParam("id") final Long id, final HttpServletRequest request) {
+        return legalCaseService.findById(id);
     }
 
     @RequestMapping(value = "/new/", method = RequestMethod.POST)
     public String create(@ModelAttribute final Hearings hearings, final BindingResult errors,
-            @RequestParam("lcNumber") final String lcNumber, final RedirectAttributes redirectAttrs, final Model model,
+            @RequestParam("id") final Long id, final RedirectAttributes redirectAttrs, final Model model,
             final HttpServletRequest request) throws ParseException {
-        final LegalCase legalCase = getLegalCase(lcNumber, request);
+        final LegalCase legalCase = getLegalCase(id, request);
         hearingsService.validateDate(hearings, legalCase, errors);
         if (errors.hasErrors()) {
             model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
@@ -133,7 +133,7 @@ public class HearingsController {
         hearings.setLegalCase(legalCase);
         hearingsService.persistHearings(hearings);
         
-        Boolean hearingsmsStatus=sendSmsAndEmailDetailsForAgendaInvitation(hearings, lcNumber);
+        Boolean hearingsmsStatus=sendSmsAndEmailDetailsForAgendaInvitation(hearings, id);
         if(hearingsmsStatus) {
         	System.out.println("+++++++++++++++++++++++++++Sms Sent Successfully..++++++++++++++++++++++++++++++++");
         }
@@ -144,10 +144,10 @@ public class HearingsController {
     }
 
     @RequestMapping(value = "/list/", method = RequestMethod.GET)
-    public String getHearingsList(final Model model, @RequestParam("lcNumber") final String lcNumber,
+    public String getHearingsList(final Model model, @RequestParam("id") final Long id,
             @Valid @ModelAttribute final Hearings hearings, final HttpServletRequest request) {
-        final LegalCase legalCase = getLegalCase(lcNumber, request);
-        final List<Hearings> hearingsList = hearingsService.findByLCNumber(lcNumber);
+        final LegalCase legalCase = getLegalCase(id, request);
+        final List<Hearings> hearingsList = hearingsService.findBylegalcaseId(id);
         
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
         model.addAttribute("lcNumber", legalCase.getLcNumber());
@@ -160,8 +160,8 @@ public class HearingsController {
     
     
     //SMS and Email Service
-    public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Hearings hearings, final String lcNumber) {
-    	final LegalCase legalCase =legalCaseService.findByLcNumber(lcNumber);
+    public Boolean sendSmsAndEmailDetailsForAgendaInvitation(final Hearings hearings, final Long id) {
+    	final LegalCase legalCase =legalCaseService.findById(id);
           boolean successStatus=false;
         try {
         	//System.out.println("+++++++++++"+msg+"+++++++++++++++++");

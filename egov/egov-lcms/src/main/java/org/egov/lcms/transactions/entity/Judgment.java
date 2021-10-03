@@ -183,13 +183,11 @@ public class Judgment extends AbstractAuditable {
     private String directiondisposed;
     
     @Temporal(TemporalType.DATE)
-    @ValidateDate(allowPast = true, dateFormat = LcmsConstants.DATE_FORMAT)
     @Column(name = "disposedoffdate")
     @Audited
     private Date disposedoffdate;
     
     @Temporal(TemporalType.DATE)
-    @ValidateDate(allowPast = true, dateFormat = LcmsConstants.DATE_FORMAT)
     @Column(name = "resolutiondate")
     @Audited
     private Date resolutiondate;

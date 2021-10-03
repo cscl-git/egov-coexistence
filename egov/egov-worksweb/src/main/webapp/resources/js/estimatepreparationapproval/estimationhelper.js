@@ -286,6 +286,7 @@ function addpaymentRow() {
 			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.payment_desc').val('');
 			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.payment_percent').val('');
 			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.amount').val('');
+			$('#tblchecklist tbody tr:eq('+rowcount+')').find('.payment_completed').val('true');
 			
 			++subledgerrowcount;
 			
@@ -350,7 +351,7 @@ function addRowPayment(tableName,rowName) {
 			}
 			
 			// Generate all textboxes Id and name with new index
-			$("#"+rowName+"").clone().find("input,select,errors,span").each(
+			$("#"+rowName+"").clone().find("input,select,errors,span,checkbox").each(
 			function() {	
 				if ($(this).data('server')) {
 					$(this).removeAttr('data-server');

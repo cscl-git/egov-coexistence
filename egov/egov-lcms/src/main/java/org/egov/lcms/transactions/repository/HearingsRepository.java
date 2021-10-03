@@ -57,5 +57,7 @@ import java.util.List;
 public interface HearingsRepository extends JpaRepository<Hearings, Long> {
 
     List<Hearings> findByLegalCaseLcNumber(String lcNumber);
+    List<Hearings> findByLegalCaseId(Long id);
+    
 
 }

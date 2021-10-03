@@ -54,9 +54,12 @@ import com.google.gson.JsonSerializer;
 import org.egov.lcms.reports.entity.LegalCaseSearchResult;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 
 public class LegalCaseSearchJsonAdaptor implements JsonSerializer<LegalCaseSearchResult> {
-
+	 public static final Locale LOCALE = new Locale("en", "IN");
+	    public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
     @Override
     public JsonElement serialize(final LegalCaseSearchResult legalcaseresult, final Type typeOfSrc,
             final JsonSerializationContext context) {
@@ -75,6 +78,13 @@ public class LegalCaseSearchJsonAdaptor implements JsonSerializer<LegalCaseSearc
                 ? legalcaseresult.getLegalCase().getStatus().getDescription() : null);
         jsonObject.addProperty("legalViewAccess", legalcaseresult.getLegalViewAccess());
         jsonObject.addProperty("concernedBranch", legalcaseresult.getConcernedBranch());
+        jsonObject.addProperty("id", legalcaseresult.getLegalCase().getId());
+        jsonObject.addProperty("hearingDate", legalcaseresult.getHearingDate()!=null? DDMMYYYYFORMAT1.format(legalcaseresult.getHearingDate()):"");
+        jsonObject.addProperty("hearingOutcome", legalcaseresult.getHearingOutcome());
+        jsonObject.addProperty("petetiontype", legalcaseresult.getLegalCase().getPetitionTypeMaster().getPetitionType());
+        jsonObject.addProperty("brief", legalcaseresult.getLegalCase().getBrief());
+        jsonObject.addProperty("councelengage", legalcaseresult.getLegalCase().getCouncelengage());
+        jsonObject.addProperty("nodalofficer", legalcaseresult.getLegalCase().getNodalOfficername());
 
         return jsonObject;
     }

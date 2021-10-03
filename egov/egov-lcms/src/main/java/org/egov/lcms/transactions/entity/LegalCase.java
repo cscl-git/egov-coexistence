@@ -216,6 +216,15 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private String stampNumber;
 
+    @Column(name = "brief")
+    @Audited
+    private String brief;
+    
+    @Column(name = "councelengage")
+    @Audited
+    private String councelengage;
+    
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "officerincharge")
     @Audited(targetAuditMode = RelationTargetAuditMode.NOT_AUDITED)
@@ -1187,5 +1196,21 @@ public class LegalCase extends AbstractAuditable {
 
 	public void setNodalOfficernumber(String nodalOfficernumber) {
 		this.nodalOfficernumber = nodalOfficernumber;
+	}
+
+	public String getBrief() {
+		return brief;
+	}
+
+	public void setBrief(String brief) {
+		this.brief = brief;
+	}
+
+	public String getCouncelengage() {
+		return councelengage;
+	}
+
+	public void setCouncelengage(String councelengage) {
+		this.councelengage = councelengage;
 	}
 }

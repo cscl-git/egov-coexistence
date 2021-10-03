@@ -47,8 +47,12 @@
  */
 package org.egov.lcms.web.controller.transactions;
 
-import org.egov.infra.aadhaar.webservice.contract.AadhaarInfo;
-import org.egov.lcms.masters.entity.AdvocateMaster;
+import java.text.ParseException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.egov.lcms.masters.service.AdvocateMasterService;
 import org.egov.lcms.transactions.entity.BidefendingCounsilDetails;
 import org.egov.lcms.transactions.entity.LegalCase;
@@ -66,15 +70,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import com.fasterxml.jackson.annotation.JsonCreator.Mode;
-import com.mchange.v2.cfg.PropertiesConfigSource.Parse;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Controller
 @RequestMapping(value = "/legalcasedisposal")
@@ -95,14 +90,14 @@ public class LegalCaseDisposalController {
     @Autowired
 	AdvocateMasterService advocateMasterService;
     @ModelAttribute
-    private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
-        return legalCaseService.findByLcNumber(lcNumber);
+    private LegalCase getLegalCase(@RequestParam("id") final Long id) {
+        return legalCaseService.findById(id);
     }
 
     @RequestMapping(value = "/new/", method = RequestMethod.GET)
     public String newForm(@ModelAttribute final LegalCaseDisposal legalCaseDisposal, final Model model,
-            @RequestParam("lcNumber") final String lcNumber, final HttpServletRequest request) {
-        final LegalCase legalCase = getLegalCase(lcNumber);
+            @RequestParam("id") final Long id, final HttpServletRequest request) {
+        final LegalCase legalCase = getLegalCase(id);
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
         model.addAttribute(LEGLCASEDISPOSAL, legalCaseDisposal);
         model.addAttribute(LcmsConstants.MODE, "create");
@@ -111,9 +106,9 @@ public class LegalCaseDisposalController {
 
     @RequestMapping(value = "/new/", method = RequestMethod.POST)
     public String create(@Valid @ModelAttribute final LegalCaseDisposal legalCaseDisposal, final BindingResult errors,
-            @RequestParam("lcNumber") final String lcNumber, final RedirectAttributes redirectAttrs, final Model model,
+            @RequestParam("id") final Long id, final RedirectAttributes redirectAttrs, final Model model,
             final HttpServletRequest request) throws ParseException {
-        final LegalCase legalCase = getLegalCase(lcNumber);
+        final LegalCase legalCase = getLegalCase(id);
         if (errors.hasErrors()) {
             model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
             return "legalcaseDisposal-new";
@@ -128,11 +123,11 @@ public class LegalCaseDisposalController {
     
     @RequestMapping(value="/updatePayment/new")
     public String updatePayment(@ModelAttribute("updatePayment")PaymentUpadte paymentUpadte, final BindingResult errors,
-            @RequestParam("lcNumber") final String lcNumber,final RedirectAttributes redirectAttrs, final Model model,
+            @RequestParam("id") final Long id,final RedirectAttributes redirectAttrs, final Model model,
             final HttpServletRequest request) throws ParseException
     {
-    	System.out.println(":::+"+lcNumber);
-    	final LegalCase legalCase = getLegalCase(lcNumber);
+    	System.out.println(":::+"+id);
+    	final LegalCase legalCase = getLegalCase(id);
     	List<PaymentUpadte> listPaymentUpadte = paymentUpdateService.getRecordsByLegalcase(legalCase.getId());
     	for(PaymentUpadte s1:listPaymentUpadte)
     	{

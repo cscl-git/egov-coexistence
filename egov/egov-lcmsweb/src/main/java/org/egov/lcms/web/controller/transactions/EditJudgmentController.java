@@ -105,8 +105,8 @@ public class EditJudgmentController {
     AdvocateMasterService advocateMasterService;
 
     @ModelAttribute
-    private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
-        return legalCaseService.findByLcNumber(lcNumber);
+    private LegalCase getLegalCase(@RequestParam("id") final Long id) {
+        return legalCaseService.findById(id);
     }
 
     private void prepareNewForm(final Model model) {
@@ -114,8 +114,8 @@ public class EditJudgmentController {
     }
 
     @RequestMapping(value = "/edit/", method = RequestMethod.GET)
-    public String edit(@RequestParam("lcNumber") final String lcNumber, final Model model) {
-        final List<Judgment> judgementList = getLegalCase(lcNumber).getJudgment();
+    public String edit(@RequestParam("id") final Long id, final Model model) {
+        final List<Judgment> judgementList = getLegalCase(id).getJudgment();
         final Judgment judgmentObj = judgementList.get(0);
         prepareNewForm(model);
         List<AdvocateMaster> dropdownValue=advocateMasterService.findAll();
@@ -127,8 +127,8 @@ public class EditJudgmentController {
     }
 
     @RequestMapping(value = "/edit/", method = RequestMethod.POST)
-    public String update(@Valid @ModelAttribute final Judgment judgment, final BindingResult errors,
-            @RequestParam("lcNumber") final String lcNumber,
+    public String update(@Valid @ModelAttribute("judgment") final Judgment judgment, final BindingResult errors,
+            @RequestParam("id") final Long id,
             final HttpServletRequest request, final Model model,
             final RedirectAttributes redirectAttrs) throws IOException, ParseException {
     	List<AttachedDocument> attachedDocuments = new ArrayList<AttachedDocument>();

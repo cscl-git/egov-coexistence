@@ -7,7 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 import org.egov.works.boq.entity.WorkOrderAgreement;
 import org.egov.works.boq.repository.WorkOrderAgreementRepository;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
+import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
+import org.egov.works.estimatepreparationapproval.repository.SudivisionRepository;
+import org.egov.works.estimatepreparationapproval.repository.WorkswingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +25,10 @@ public class SearchEstimateService {
 
 	@Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
+	@Autowired
+	private SudivisionRepository subdivision;
+	@Autowired
+	private WorkswingRepository workswingrepository;
 
 	@Transactional
 	public List<EstimatePreparationApproval> searchEstimateData(HttpServletRequest request,
@@ -54,4 +62,12 @@ public class SearchEstimateService {
 		return searchWorkDatas;
 	}
 
+	public List<Workswing> getworskwing() {
+		List<Workswing> workwing = workswingrepository.findAll();
+	return workwing;
+	}
+	public List<Subdivisionworks> getSubdivision() {
+		List<Subdivisionworks> workwing = subdivision.findAll();
+	return workwing;
+	}
 }

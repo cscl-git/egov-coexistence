@@ -207,6 +207,9 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	private String department = "";
 
 	@Transient
+	private String subdiv;
+
+	@Transient
 	private List<Department> departments = new ArrayList<Department>();
 
 	@Transient
@@ -237,6 +240,12 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	
 	@Column(name = "ward_number")
 	private String wardNumber;
+	@Transient
+	private Date createdfrom;
+	@Transient
+	private Date createdto;
+	@Transient
+	private String workStatusSearch;
 	
 	@Transient
 	private Double progressCompletion;
@@ -258,6 +267,8 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 	@Column(name = "work_agreement_number")
 	private String work_agreement_number;
 	
+	@Transient
+	private Long completionpercentage;
 	
 	//for search & modification
 	@Transient
@@ -910,6 +921,46 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	public void setExpHead_est(String expHead_est) {
 		this.expHead_est = expHead_est;
+	}
+
+	public Date getCreatedfrom() {
+		return createdfrom;
+	}
+
+	public void setCreatedfrom(Date createdfrom) {
+		this.createdfrom = createdfrom;
+	}
+
+	public Date getCreatedto() {
+		return createdto;
+	}
+
+	public void setCreatedto(Date createdto) {
+		this.createdto = createdto;
+	}
+
+	public String getWorkStatusSearch() {
+		return workStatusSearch;
+	}
+
+	public void setWorkStatusSearch(String workStatusSearch) {
+		this.workStatusSearch = workStatusSearch;
+	}
+
+	public Long getCompletionpercentage() {
+		return completionpercentage;
+	}
+
+	public void setCompletionpercentage(Long completionpercentage) {
+		this.completionpercentage = completionpercentage;
+	}
+
+	public String getSubdiv() {
+		return subdiv;
+	}
+
+	public void setSubdiv(String subdiv) {
+		this.subdiv = subdiv;
 	}
 
 	

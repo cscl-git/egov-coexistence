@@ -48,9 +48,11 @@
 package org.egov.lcms.transactions.service;
 
 import java.io.ByteArrayOutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.persistence.EntityManager;
@@ -90,6 +92,8 @@ public class SearchLegalCaseService {
 
     @PersistenceContext
     private EntityManager entityManager;
+    public static final Locale LOCALE = new Locale("en", "IN");
+    public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -101,10 +105,12 @@ public class SearchLegalCaseService {
         queryStr.append("select distinct legalObj  as  legalCase ,courtmaster.name  as  courtName ,");
         queryStr.append(" egwStatus.code  as  caseStatus ,");
         queryStr.append(" bidefcounsil.oppPartyAdvocate  as  standingCouncil ,");
+        queryStr.append(" hear.hearingDate  as  hearingDate , hear.hearingOutcome  as  hearingOutcome, ");
         queryStr.append(" cb.concernedBranch  as  concernedBranch");
         queryStr.append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster,");
         queryStr.append(" PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb");
         queryStr.append(" LEFT JOIN BidefendingCounsilDetails bidefcounsil ON legalObj.id =bidefcounsil.legalCase and bidefcounsil.defCounsilPrimary ='YES'");
+        queryStr.append(" LEFT JOIN Hearings hear on legalObj.id=hear.legalCase and hear.hearingDate =(select max(hear2.hearingDate) from Hearings hear2 where legalObj.id=hear2.legalCase) ");
         queryStr.append(" LEFT JOIN   legalObj.judgment jt");
         queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
         queryStr.append(
@@ -274,6 +280,29 @@ public class SearchLegalCaseService {
 			c9.setCellStyle(style);
 			c9.setCellValue(headerData.get("h9"));
 					
+			Cell c10=  row1.createCell(9);
+			c10.setCellStyle(style);
+			c10.setCellValue(headerData.get("h10"));
+			
+			Cell c11=  row1.createCell(10);
+			c11.setCellStyle(style);
+			c11.setCellValue(headerData.get("h11"));
+					
+			Cell c12=  row1.createCell(11);
+			c12.setCellStyle(style);
+			c12.setCellValue(headerData.get("h12"));
+			
+			Cell c13=  row1.createCell(12);
+			c13.setCellStyle(style);
+			c13.setCellValue(headerData.get("h13"));
+			
+			Cell c14=  row1.createCell(13);
+			c14.setCellStyle(style);
+			c14.setCellValue(headerData.get("h14"));
+			Cell c15=  row1.createCell(14);
+			c15.setCellStyle(style);
+			c15.setCellValue(headerData.get("h15"));
+					
 			for(LegalCaseSearchResult s : legalcaseSearchList) {
 				String casenumber="";
 				String casetitle="";
@@ -284,6 +313,14 @@ public class SearchLegalCaseService {
 				String petitioners="";
 				String respondants="";
 				String statusDesc="";
+				String hearingDate="";
+				String hearingOutcome="";
+				String petetiontype="";
+				String brief="";
+				String nodalofficer="";
+				String councelengage="";
+				
+				
 				
 				 Row row = sheet.createRow(i++);
 				 	Cell cell0 = row.createCell(0);
@@ -295,6 +332,12 @@ public class SearchLegalCaseService {
 					Cell cell6= row.createCell(6);
 					Cell cell7= row.createCell(7);
 					Cell cell8= row.createCell(8);
+					Cell cell9= row.createCell(9);
+					Cell cell10= row.createCell(10);
+					Cell cell11= row.createCell(11);
+					Cell cell12= row.createCell(12);
+					Cell cell13= row.createCell(13);
+					Cell cell14= row.createCell(14);
 						
 					if(s.getLegalCase().getLcNumber()!=null) {
 						legalcaseno = s.getLegalCase().getLcNumber();
@@ -327,7 +370,24 @@ public class SearchLegalCaseService {
 					if(s.getConcernedBranch()!=null) {
 						concernedBranch=s.getConcernedBranch();
 					}
-					
+					if(s.getHearingDate()!=null) {
+						hearingDate = DDMMYYYYFORMAT1.format(s.getHearingDate());
+					}
+					if(s.getHearingOutcome()!=null) {
+						hearingOutcome=s.getHearingOutcome();
+					}
+					if(s.getLegalCase().getPetitionTypeMaster()!=null) {
+						petetiontype=s.getLegalCase().getPetitionTypeMaster().getPetitionType();
+					}
+					if(s.getLegalCase().getBrief()!=null) {
+						brief=s.getLegalCase().getBrief();
+					}
+					if(s.getLegalCase().getCouncelengage()!=null) {
+						councelengage=s.getLegalCase().getCouncelengage();
+					}
+					if(s.getLegalCase().getNodalOfficername()!=null) {
+						nodalofficer=s.getLegalCase().getNodalOfficername();
+					}
 					cell0.setCellValue(legalcaseno);
 					cell1.setCellValue(casenumber);
 					cell2.setCellValue(casetitle);
@@ -337,6 +397,13 @@ public class SearchLegalCaseService {
 					cell6.setCellValue(petitioners);
 					cell7.setCellValue(respondants);
 					cell8.setCellValue(concernedBranch);
+					cell9.setCellValue(hearingDate);
+					cell10.setCellValue(hearingOutcome);
+					cell11.setCellValue(petetiontype);
+					cell12.setCellValue(brief);
+					cell13.setCellValue(nodalofficer);
+					cell14.setCellValue(councelengage);
+					
 		        } 
 			int numberOfSheets = wb.getNumberOfSheets();
 		    for (int x = 0; x < numberOfSheets; x++) {

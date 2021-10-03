@@ -14,8 +14,9 @@
 	id="workEstimateDetails" class="form-horizontal form-groups-bordered"
 	style="margin-top:-20px;">
 
-	<div class="tab-content">
-		<div class="tab-pane fade in active">
+	<div class="">
+		<!-- <div class="tab-pane fade in active"> -->
+		<div class="">
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="form-group" style="padding: 50px 20px 0;">
 <form:input type="hidden" id="createdbyuser1" path="comments"
@@ -24,7 +25,7 @@
 <label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.search.work.name" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:textarea class="form-control" path="workName"
+						<form:textarea class="form-control" path="workName" id="workName"
 							maxlength="2000" />
 							</div>
 							
@@ -106,7 +107,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.work.location" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="workLocation" />
+						<form:input type="text" class="form-control" path="workLocation" id="workLocation" />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
@@ -286,7 +287,8 @@
 				</div>
 
 		<br> <br> <br>
-		<div class="tab-pane fade in active" id="resultheader">
+		<!-- <div class="tab-pane fade in active" id="resultheader"> -->
+		<div class="" id="resultheader">
 			<h3>Search Result</h3>
 			<div class="panel panel-primary" data-collapsed="0">
 				<div style="padding: 0 15px;">
@@ -359,6 +361,15 @@
 					</c:if>
 					</table>
 				</div>
+				<c:if test="${workEstimateDetails.estimateList != null &&  !workEstimateDetails.estimateList.isEmpty()}">
+				 <div class="buttonbottom" align="center">
+			      
+						 <input type="button" id="workEstimateSearchResult" class="btn btn-primary" onclick="return submitFormForexcel();"
+						name="workEstimateSearchResult" code="lbl.search.work.estimate"
+						value="Export" /> 
+						
+				</div>
+				</c:if>
                
 			</div>
 		</div>

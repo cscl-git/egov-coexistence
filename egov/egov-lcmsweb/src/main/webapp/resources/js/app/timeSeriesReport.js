@@ -243,11 +243,11 @@ function callAjaxBydrillDownReport(aggregatedByValues,monthh,yearr) {
 				columns : [
 				           {"title" : "S.no","sClass" : "text-left"}, 
 						{
-							"data" : "lcNumber",
+							"data" :{lcNumber : "lcNumber", id : "id"},
 							"sTitle" : "File Number",
 							"className" : "text-left",
 							"render" : function(data, type, full, meta) {
-								return '<a href="javascript:void(0);" onclick="openLegalCase(\''+ data +'\')">' + data + '</a>';
+								return '<a href="javascript:void(0);" onclick="openLegalCase(\''+ data.id +'\')">' + data.lcNumber + '</a>';
 								
 							}
 						},
@@ -308,7 +308,7 @@ function callAjaxBydrillDownReport(aggregatedByValues,monthh,yearr) {
 }
 
 function openLegalCase(data) {
-	window.open("/services/lcms/application/view/?lcNumber="+ data , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
+	window.open("/services/lcms/application/view/?id="+ data , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
 }
 
 

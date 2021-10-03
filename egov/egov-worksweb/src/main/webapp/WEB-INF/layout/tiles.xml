@@ -318,7 +318,14 @@
         <put-attribute name="page-title" value="title.estimate.search.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatesearch/searchestimate.jsp"/>
     </definition>
-    
+    <definition name="search-dnit-form-mis" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatesearch/searchDnit.jsp"/>
+    </definition>
+    <definition name="search-mis-work-agreement-page-form-new" extends="base_layout">
+        <put-attribute name="page-title" value="title.estimate.search.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/estimatesearch/searchworkagreementmis.jsp"/>
+    </definition>
     <definition name="work-order-search-form" extends="base_layout">
         <put-attribute name="page-title" value="title.work.order.search.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/estimatesearch/workordersearch.jsp"/>

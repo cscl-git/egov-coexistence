@@ -57,7 +57,7 @@ public class ExcelGenerator {
 				row.createCell(0).setCellValue(estimate.getWorkName());
 				row.createCell(1).setCellValue(estimate.getEstimateNumber());
 				row.createCell(2).setCellValue(estimate.getEstimateDt());
-	            row.createCell(3).setCellValue(Double.parseDouble(estimate.getEstimateAmount().toString()));
+	            row.createCell(3).setCellValue(estimate.getEstimateAmount()!=null?Double.parseDouble(estimate.getEstimateAmount().toString()):0);
 	            row.createCell(4).setCellValue(estimate.getStatusDescription());
 	            row.createCell(5).setCellValue(estimate.getPendingWith());
 			}
@@ -125,7 +125,7 @@ public class ExcelGenerator {
 			CreationHelper createHelper = workbook.getCreationHelper();
 	 
 			Sheet sheet = workbook.createSheet("ABSTRACT OF WORK");
-	sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 9));
+	sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 8));
 	sheet.addMergedRegion(new CellRangeAddress(2, 5, 0, 0));
 	sheet.addMergedRegion(new CellRangeAddress(6, 9, 0, 0));
 	sheet.addMergedRegion(new CellRangeAddress(10, 13, 0, 0));
