@@ -1,0 +1,1 @@
+ALTER TABLE egcncl_meeting ADD COLUMN filestoreid bigint;

@@ -1,0 +1,1 @@
+alter table egcncl_agenda add column councilAgendaType bigint;

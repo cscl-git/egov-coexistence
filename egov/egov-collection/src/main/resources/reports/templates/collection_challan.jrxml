@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.12.2.final using JasperReports Library version 6.12.2-75c5e90a222ab406e416cbf590a5397028a52de3  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="collection_receipt" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" resourceBundle="custom" uuid="c7042a29-3f36-40e2-919c-c27ba8be7443">
+	<import value="org.egov.infra.reporting.util.*"/>
+	<import value="org.egov.infstr.utils.*"/>
+	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
+		<defaultValueExpression><![CDATA["/work/collections/reports/templates/"]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EGOV_CONNECTION" class="java.sql.Connection" isForPrompting="false">
+		<parameterDescription><![CDATA[SQL connection object]]></parameterDescription>
+		<defaultValueExpression><![CDATA[null]]></defaultValueExpression>
+	</parameter>
+	<parameter name="EGOV_COMMON" class="org.egov.egf.commons.EgovCommon" isForPrompting="false"/>
+	<parameter name="CITY_LOGO_PATH" class="java.io.InputStream"/>
+	<field name="accountDetails" class="java.util.Collection"/>
+	<field name="challanDetails" class="java.util.Collection"/>
+	<variable name="amountReceived" class="java.math.BigDecimal">
+		<initialValueExpression><![CDATA[new java.math.BigDecimal(0)]]></initialValueExpression>
+	</variable>
+	<group name="Receipt" isStartNewPage="true"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<detail>
+		<band height="81">
+			<image>
+				<reportElement x="10" y="10" width="60" height="60" uuid="27be65ee-bedb-4fee-91e7-a6ebc860d45c"/>
+				<imageExpression><![CDATA[$P{CITY_LOGO_PATH}]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="229" y="53" width="100" height="20" uuid="4282e1ec-0d68-4b5c-afe3-75596f017fd1"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[CHALLAN]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="139" y="11" width="291" height="43" uuid="7db1f6ed-007f-49ed-a216-208a32e0be11"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="SansSerif" size="10" isBold="true" pdfFontName="Times-Bold" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[ReportUtil.getCityName()]]></textFieldExpression>
+			</textField>
+		</band>
+		<band height="20">
+			<subreport>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="555" height="20" isRemoveLineWhenBlank="true" uuid="47a09833-6ddf-4f9e-a678-2484e4243a14"/>
+				<subreportParameter name="EGOV_COMMON">
+					<subreportParameterExpression><![CDATA[$P{EGOV_COMMON}]]></subreportParameterExpression>
+				</subreportParameter>
+				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{challanDetails}, false)]]></dataSourceExpression>
+				<subreportExpression><![CDATA[ReportUtil.getTemplateAsStream("challan.jasper")]]></subreportExpression>
+			</subreport>
+		</band>
+	</detail>
+</jasperReport>
