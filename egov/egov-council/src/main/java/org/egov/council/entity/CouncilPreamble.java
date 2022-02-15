@@ -75,7 +75,6 @@ import org.egov.commons.EgwStatus;
 import org.egov.council.entity.enums.PreambleType;
 import org.egov.council.enums.PreambleTypeEnum;
 import org.egov.infra.admin.master.entity.Boundary;
-import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.filestore.entity.FileStoreMapper;
 import org.egov.infra.workflow.entity.StateAware;
 import org.hibernate.validator.constraints.Length;
@@ -127,6 +126,16 @@ public class CouncilPreamble extends StateAware {
     @ManyToOne
     @JoinColumn(name = "ImplStatus")
     private EgwStatus implementationStatus;
+
+    private String outcome;
+
+    public String getOutcome() {
+		return outcome;
+	}
+
+	public void setOutcome(String outcome) {
+		this.outcome = outcome;
+	}
 
     @OneToMany(mappedBy = "preamble", cascade = CascadeType.ALL)
     private List<MeetingMOM> meetingMOMs = new ArrayList<>();

@@ -55,7 +55,7 @@
 		<s:text name="report.export.options" />
 		: <a
 			<%--href='/services/EGF/report/incomeExpenditureReport-generateDetailCodeXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.asOndate=<s:property value="model.asOndate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>--%>
-			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodeXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
+			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodeXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.code=<s:property value="model.department.code"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
 		| <a
 			href='/services/EGF/report/incomeExpenditureReport-generateDetailCodePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
 	</div>
@@ -64,7 +64,7 @@
 	<div class="buttonbottom">
 		<s:text name="report.export.options" />
 		: <a
-			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureScheduleXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.id=<s:property value="model.department.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
+			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureScheduleXls.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.department.code=<s:property value="model.department.code"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>Excel</a>
 		| <a
 			href='/services/EGF/report/incomeExpenditureReport-generateIncomeExpenditureSchedulePdf.action?showDropDown=false&model.period=<s:property value="model.period"/>&model.currency=<s:property value="model.currency"/>&model.financialYear.id=<s:property value="model.financialYear.id"/>&model.department.id=<s:property value="model.department.id"/>&model.fund.id=<s:property value="model.fund.id"/>&model.function.id=<s:property value="model.function.id"/>&model.functionary.id=<s:property value="model.functionary.id"/>&model.field.id=<s:property value="model.field.id"/>&model.fromDate=<s:property value="model.fromDate"/>&model.toDate=<s:property value="model.toDate"/>&majorCode=<s:property value="#parameters['majorCode']" />'>PDF</a>
 	</div>
@@ -74,9 +74,7 @@
 
 
 <script>
-
-function getTodayDate()
-{
+	function getTodayDate() {
 var date;
 var d = new Date();
 var curr_date = d.getDate();
@@ -89,15 +87,13 @@ return date;
 
 var todaysDate=getTodayDate();
 
-
 function showDetail(glcode1, fundId,toDate,stDate){
-var deptId = '<s:property value="model.department.id"/>';
+		var deptId = '<s:property value="model.department.code"/>';
 var scheduleNo = '<s:property value="scheduleNo"/>';
 var functionaryId = '<s:property value="model.functionary.id"/>';
 var functionName = '<s:property value="model.function.name"/>';
 var functionId = '<s:property value="model.function.id"/>';
 var fieldId = '<s:property value="model.field.id"/>';	
-
 
 var functionCode1=functionName+"~"+functionId;
 	if(deptId == ""){
@@ -123,15 +119,29 @@ var chkd2=todaysDate.split('/');
 var end1=new Date(chkd1[2],chkd1[1],chkd1[0]);
 var today1=new Date(chkd2[2],chkd2[1],chkd2[0]);
 
-
 if(end1>=today1){
 	endDate=todaysDate;                
 	}    
 	
-	
-	
-	
-window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode1+'&fund_id='+fundId+'&fundSource_id=&startDate='+startDate+'&endDate='+endDate+'&departmentId='+deptId+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+		window
+				.open(
+						'/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='
+								+ glcode1
+								+ '&fund_id='
+								+ fundId
+								+ '&fundSource_id=&startDate='
+								+ startDate
+								+ '&endDate='
+								+ endDate
+								+ '&departmentId='
+								+ deptId
+								+ '&functionaryId='
+								+ functionaryId
+								+ '&functionCodeId='
+								+ functionId
+								+ '&functionCode='
+								+ functionCode1
+								+ '&fieldId=' + fieldId, '',
+						'resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 }
-
 </script>

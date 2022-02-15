@@ -58,6 +58,7 @@ public class DayBookReportBean
     private String narration;
 	private String department;
     private String subdivision;
+    private String type;
 
     public String getDepartment() {
 		return department;
@@ -168,6 +169,14 @@ public class DayBookReportBean
 
 	public void setNarration(String narration) {
 		this.narration = narration;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
     
     

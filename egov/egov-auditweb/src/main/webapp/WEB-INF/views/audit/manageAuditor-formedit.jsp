@@ -49,9 +49,10 @@
 
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
-<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<form:form role="form" action="/services/audit/manageAuditor/updateAuditor"
+<form:form role="form"
+	action="/services/audit/manageAuditor/updateAuditor"
 	modelAttribute="manageAuditors" id="approvebudgetsearchform"
 	cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
@@ -60,7 +61,8 @@
 			<div class="col-md-12">
 				<div class="panel panel-primary" data-collapsed="0">
 					<c:if test="${not empty message}">
-						<div id="message" class="success" style="color: green;margin-top:15px;">
+						<div id="message" class="success"
+							style="color: green; margin-top: 15px;">
 							<spring:message code="${message}" />
 						</div>
 					</c:if>
@@ -69,12 +71,13 @@
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
-							<label class="col-sm-3 control-label text-right">Type <span class="mandatory1">*</span></label>
+							<label class="col-sm-3 control-label text-right">Employee Type <span
+								class="mandatory1">*</span></label>
 							<div class="col-sm-3 add-margin">
-								<form:select path="type" required="required"
-									id="auditorType" cssClass="form-control"
-									cssErrorClass="form-control error">
-									<form:option value="${manageAuditors.type }" label="${manageAuditors.type }">
+								<form:select path="type" required="required" id="auditorType"
+									cssClass="form-control" cssErrorClass="form-control error">
+									<form:option value="${manageAuditors.type }"
+										label="${manageAuditors.type }">
 										<spring:message code="lbl.select" />
 									</form:option>
 									<form:option value="Auditor" label="Auditor">
@@ -84,60 +87,93 @@
 								</form:select>
 								<form:errors path="" cssClass="error-msg" />
 							</div>
-							
+
 							<!-- EmployeeDropDown -->
-							<div class="show-row form-group" >
-						<label class="col-sm-3 control-label text-right">Department<span class="mandatory"></span></label>
-						<div class="col-sm-3 add-margin">
-							<form:select path="deptid" data-first-option="false" 
-								id="approvalDepartment" cssClass="form-control"
-								cssErrorClass="form-control error" required="required">
-								<form:option value="${manageAuditors.deptid}" label="${manageAuditors.deptName}">
-								</form:option>
-								<form:options items="${departments}" itemValue="code"
-									itemLabel="name" />     
-							</form:select>
+							<div class="show-row form-group">
+								<label class="col-sm-3 control-label text-right">Department<span
+									class="mandatory"></span></label>
+								<div class="col-sm-3 add-margin">
+									<form:select path="deptid" data-first-option="false"
+										id="approvalDepartment" cssClass="form-control"
+										cssErrorClass="form-control error" required="required">
+										<form:option value="${manageAuditors.deptid}"
+											label="${manageAuditors.deptName}">
+										</form:option>
+										<form:options items="${departments}" itemValue="code"
+											itemLabel="name" />
+									</form:select>
+								</div>
+
+							</div>
+
+							<!-- BillTypeDropdown -->
+
+							<div class="show-row form-group">
+								<label class="col-sm-3 control-label text-right"><spring:message
+										code="lbl.billsubtype" text="Bill Type" /> </label>
+								<div class="col-sm-3 add-margin">
+									<form:select path="billtype" data-first-option="false"
+										id="billSubType" class="form-control">
+										<form:option value="">
+											<spring:message code="lbl.select" text="Select" />
+										</form:option>
+										<form:options items="${billSubType}" itemValue="id"
+											itemLabel="name" />
+									</form:select>
+									<form:errors path="billtype" cssClass="add-margin error-msg" />
+								</div>
+								<label class="col-sm-3 control-label text-right"><spring:message
+										code="lbl.subdivision" text="Sub Division" /></label>
+								<div class="col-sm-3 add-margin">
+									<form:select path="subdivision" data-first-option="false"
+										id="subdivision" class="form-control">
+										<form:option value="">
+											<spring:message code="lbl.select" />
+										</form:option>
+										<form:options items="${subdivision}"
+											itemValue="subdivisionName" itemLabel="subdivisionName" />
+									</form:select>
+									<%-- <form:errors path="egBillregistermis.subdivision" cssClass="add-margin error-msg" /> --%>
+								</div>
+
+							</div>
+							
+							<div class="show-row form-group">
+								<label class="col-sm-3 control-label text-right">Employee<span
+									class="mandatory"></span></label>
+								<div class="col-sm-3 add-margin">
+									<%-- <input type="hidden" name="id" id="approvalDesignationValue" value="${manageAuditors.id }" />  --%>
+									<form:hidden path="id" id="auditorid" name="id"
+										value="${manageAuditors.id}" />
+
+									<form:select path="employeeid" data-first-option="false"
+										id="approvalPosition" cssClass="form-control"
+										cssErrorClass="form-control error">
+										<form:option value="${manageAuditors.employeeid}"
+											label="${manageAuditors.employeeName}">
+										</form:option>
+										<form:options items="${approverListEdit}" itemValue="user.id"
+											itemLabel="user.name" />
+									</form:select>
+								</div>
+							</div>
+
+
+
+
+
 						</div>
-						
-					</div>
-					<div class="show-row form-group">
-						<label class="col-sm-3 control-label text-right">Employee<span class="mandatory"></span></label>
-						<div class="col-sm-3 add-margin">
-						 <%-- <input type="hidden" name="id" id="approvalDesignationValue" value="${manageAuditors.id }" />  --%>
-						 <form:hidden path="id" id="auditorid"  name="id" value="${manageAuditors.id}"/>
-						
-						<form:select path="employeeid" data-first-option="false" 
-							id="approvalPosition"  cssClass="form-control"  
-							cssErrorClass="form-control error" >  
-							<form:option value="${manageAuditors.employeeid}" label="${manageAuditors.employeeName}" >
-								</form:option>
-								  <form:options items="${approverListEdit}" itemValue="user.id"
-									itemLabel="user.name" />  
-						</form:select>		
-						</div> 
-					</div>
-							
-							
-							
-							
-							 
-						</div>
-						<br>
-						<br>
-						<br>
-						
-						<br>
-						<br>
+						<br> <br> <br> <br> <br>
 						<div class="form-group">
 							<div class="text-center">
 								<button type='submit' class='btn btn-primary' id="btnsearch">
-									Update
-								</button>
-							
+									Update</button>
+
 								<a href='javascript:void(0)' class='btn btn-default'
 									onclick='self.close()'><spring:message code='lbl.close' /></a>
-									<form:hidden path="" id="workAction" name="workAction" value="${manageAuditors.id }"/>
-									
+								<form:hidden path="" id="workAction" name="workAction"
+									value="${manageAuditors.id }" />
+
 							</div>
 						</div>
 					</div>
@@ -153,48 +189,63 @@
 
 		} else {
 
-		e.preventDefault();
+			e.preventDefault();
 
-	}  
+		}
 
-});
-
-
-
-	$('#auditorType').change(function(){
-		
-		
-		var todayDate = new Date(Date.now()).toLocaleString();
-		
-		var type =$('#auditorType').val();
-
-	$.ajax({
-	url: "/services/audit/manageAuditor/employee/"+type,     
-	type: "GET",
-	contentType:'application/json',
-	//data: JSON.stringify(jsonData),
-	success: function (response) {
-		console.log("success"+response);
-		$('#approvalPosition').empty();
-		$('#approvalPosition').append($("<option value=''>Select from below</option>"));
-		$.each(response, function(index, value) {
-			//$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));  
-			$('#approvalPosition').append($('<option>').text(value.user.name).attr('value', value.assignments[0].position));  
-		});
-		//$('#approvalPosition').val($('#approvalPositionValue').val());
-	}, 
-	error: function (response) {
-		console.log("failed");
-	}
-	});
 	});
 
+	$('#auditorType')
+			.change(
+					function() {
 
+						var todayDate = new Date(Date.now()).toLocaleString();
+
+						var type = $('#auditorType').val();
+
+						$
+								.ajax({
+									url : "/services/audit/manageAuditor/employee/"
+											+ type,
+									type : "GET",
+									contentType : 'application/json',
+									//data: JSON.stringify(jsonData),
+									success : function(response) {
+										console.log("success" + response);
+										$('#approvalPosition').empty();
+										$('#approvalPosition')
+												.append(
+														$("<option value=''>Select from below</option>"));
+										$
+												.each(
+														response,
+														function(index, value) {
+															//$('#approvalPosition').append($('<option>').text(value.userName+'/'+value.positionName).attr('value', value.positionId));  
+															$(
+																	'#approvalPosition')
+																	.append(
+																			$(
+																					'<option>')
+																					.text(
+																							value.user.name)
+																					.attr(
+																							'value',
+																							value.assignments[0].position));
+														});
+										//$('#approvalPosition').val($('#approvalPositionValue').val());
+									},
+									error : function(response) {
+										console.log("failed");
+									}
+								});
+					});
 </script>
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/global/css/bootstrap/bootstrap-datepicker.css' context='/services/egi'/>" />
-<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>"/>
-<link rel="stylesheet" href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
+<link rel="stylesheet"
+	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/jquery.dataTables.min.css' context='/services/egi'/>" />
+<link rel="stylesheet"
+	href="<cdn:url value='/resources/global/css/jquery/plugins/datatables/dataTables.bootstrap.min.css' context='/services/egi'/>">
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/jquery.dataTables.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
@@ -209,7 +260,7 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.inputmask.bundle.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
-	
+
 <script
 	src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>"
 	type="text/javascript"></script>

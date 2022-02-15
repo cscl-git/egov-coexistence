@@ -49,7 +49,6 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private String auditno;
 	private Long lead_auditor;
 	private String notes;
-
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
 	@ManyToOne
@@ -61,6 +60,16 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	
 	private Integer passUnderobjection;
 	
+	private String passunderobjectioncomment;
+
+	public String getPassunderobjectioncomment() {
+		return passunderobjectioncomment;
+	}
+
+	public void setPassunderobjectioncomment(String passunderobjectioncomment) {
+		this.passunderobjectioncomment = passunderobjectioncomment;
+	}
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditCheckList.class)
 	private List<AuditCheckList> checkList=new ArrayList<AuditCheckList>();
 	
@@ -70,6 +79,27 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = AuditPostVoucherMpng.class)
 	private List<AuditPostVoucherMpng> postVoucherMpng=new ArrayList<AuditPostVoucherMpng>();
 	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "auditDetails", targetEntity = PassUnderObjection.class)
+	private List<PassUnderObjection> passUnderObjectionList = new ArrayList<PassUnderObjection>();
+
+	public List<PassUnderObjection> getPassUnderObjectionList() {
+		return passUnderObjectionList;
+	}
+
+	public void setPassUnderObjectionList(List<PassUnderObjection> passUnderObjectionList) {
+		this.passUnderObjectionList = passUnderObjectionList;
+	}
+
+	private Date passunderobjectiondate;
+
+	public Date getPassunderobjectiondate() {
+		return passunderobjectiondate;
+	}
+
+	public void setPassunderobjectiondate(Date passunderobjectiondate) {
+		this.passunderobjectiondate = passunderobjectiondate;
+	}
+
 	private String department;
 	@Transient
     private String approvalComent;
@@ -86,6 +116,39 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	
 	@Transient
 	private String employeeName;
+	
+	@Transient
+	private Date resolutionDate;
+
+	@Transient
+	private String resolutionComment;
+	
+	@Transient
+	private String paymentReqNumber ;
+
+	public String getPaymentReqNumber() {
+		return paymentReqNumber;
+	}
+
+	public void setPaymentReqNumber(String paymentReqNumber) {
+		this.paymentReqNumber = paymentReqNumber;
+	}
+
+	public Date getResolutionDate() {
+		return resolutionDate;
+	}
+
+	public void setResolutionDate(Date resolutionDate) {
+		this.resolutionDate = resolutionDate;
+	}
+
+	public String getResolutionComment() {
+		return resolutionComment;
+	}
+
+	public void setResolutionComment(String resolutionComment) {
+		this.resolutionComment = resolutionComment;
+	}
 	
 	@Transient
 	private String pendingWith;

@@ -114,14 +114,19 @@ function callAjaxSearch() {
 
 function validateReconcile() {
 
-	var toDate = document.getElementById("toDate").value;
+	var toDate = document.getElementById("toDate").value.split('/');
+	toDate = toDate[1]+"/"+toDate[0]+"/"+toDate[2];
+	toDate = new Date(toDate)
 	var len = jQuery('#resultTable tr').length;
 	var row = "line ";
 	var rows;
 	var numOfrows = '';
 	var value = false;
 	for (i = 0; i <= len - 2; i++) {
-		if (document.getElementById('reconDates' + i).value > toDate) {
+		var recon = document.getElementById('reconDates' + i).value.split('/');
+		recon = recon[1]+"/"+recon[0]+"/"+recon[2];
+		recon = new Date(recon)
+		if (recon > toDate) {
 			var a = i + 1;
 			rows = row.concat(a);
 			numOfrows = numOfrows + rows + ',';
@@ -279,3 +284,4 @@ function validate() {
 	}
 	return true;
 }
+

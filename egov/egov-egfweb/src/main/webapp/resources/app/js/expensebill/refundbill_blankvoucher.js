@@ -162,78 +162,6 @@ $('.btn-wf-primary').click(function(){
 	//return true;
 });
 
-/*$('.btn-wf-primary').click(function(){
-	var button = $(this).attr('id');
-	if (button != null && (button == 'Forward')) {
-		if(!validateWorkFlowApprover(button))
-			return true;
-		if(!$("form").valid())
-			return true;
-		if(validate()){
-			deleteHiddenSubledgerRow();
-			return true;
-		}else
-			return true;
-	 }
-	else if (button != null && (button == 'Reject')) {
-		if(!validateWorkFlowApprover(button))
-			return true;
-		if(!$("form").valid())
-			return true;
-		if(validate()){
-			deleteHiddenSubledgerRow();
-			return true;
-		}else
-			return true;
-	 }
-	   else if (button != null && (button == 'SaveAsDraft')) {
-	      
-	       if(!validateWorkFlowApprover(button))
-	           {
-	           
-	            return true;
-	           }
-	        if(true){
-	             
-	            deleteHiddenSubledgerRow();
-	            //$('approvalDesignation').attr('required', false);
-	            //$('approvalDepartment').attr('required', false);
-	            //$('approvalPosition').attr('required', false);
-	            return true;
-	        }else
-	            {
-	             //alert('button-----2.2------'+button);
-	            return true;
-	            
-	            }
-	        
-	    
-	}else if (button != null && (button == 'Create And Approve')) {
-		$('#approvalDepartment').removeAttr('required');
-		$('#approvalDesignation').removeAttr('required');
-		$('#approvalPosition').removeAttr('required');
-		$('#approvalComent').removeAttr('required');
-		if(!validateWorkFlowApprover(button))
-			return true;
-		if(!$("form").valid())
-			return true;
-		if(validate()){
-			deleteHiddenSubledgerRow();
-			return true;
-		}else
-			return true;
-	} else{
-		if(!validateWorkFlowApprover(button))
-			return true;
-		if($("form").valid()){
-			deleteHiddenSubledgerRow();
-			return true;
-		}else
-			return true;
-	}
-	return true;
-});
-*/
 function getCookie(name){
 	let cookies = document.cookie;
 	if(cookies.search(name) != -1){
@@ -459,7 +387,7 @@ $('.subLedgerCodeOT').typeahead({
 
 
 
-$('.subledgerGl_code').change(function () {
+/*$('.subledgerGl_code').change(function () {
 	
 
 	var index=dataId;
@@ -487,10 +415,10 @@ $('.subledgerGl_code').change(function () {
 		
 	}
 	
-	document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value="";
+	document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value="";
 	
 
-	var netPayableAccountCodeNode=document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
+	var netPayableAccountCodeNode=document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value;//document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
 	netPayableAccountCodeNode.options.length = 0;
 	netPayableAccountCodeNode.options[netPayableAccountCodeNode.options.length] = new Option('Select from below','')
 		
@@ -509,8 +437,19 @@ $('.subledgerGl_code').change(function () {
 		 }
 				});
 		
+});*/
+$('.subledgerGl_code').change(function () {	
+	var index=dataId;
+	$modal = $('#myModal');
+	var subLedgerType =document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
+	var sel=document.getElementById('tempSubLedger['+index+'].subLedgerType');
+	var subLedgerTypetext= sel.options[sel.selectedIndex].text;
+	    	 if(subLedgerTypetext=='OtherParty'){  
+	    	  var id = $(this).attr("id");
+	    	  $('#indexRef').val(id);
+	        $modal.modal('show');
+	    }
 });
-
 
 
 $('#billSubType').change(function () {
@@ -527,8 +466,8 @@ $('#billSubType').change(function () {
 $('.netPayableAccount_Code').change(function () {
 	var index=dataId;
 	
-	if (document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value != '') {
-		var sel=document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
+	if (document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value != '') {
+		var sel=document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value;//document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
 		var netpayGlcode=sel.options[sel.selectedIndex].text;
 		document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value=document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
 		document.getElementById('tempSubLedger['+index+'].netPayableIsSubLedger').value=netpayGlcode.split('~')[1];
@@ -666,8 +605,8 @@ function loadCheckListTable(){
 $('.netPayableAccount_Code').change(function () {
 	var index=0;
 	
-	if (document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value != '') {
-		var sel=document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
+	if (document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value != '') {
+		var sel=document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value;//document.getElementById('tempSubLedger['+index+'].netPayableAccountCode');
 		var netpayGlcode=sel.options[sel.selectedIndex].text;
 		
 		document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value=document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
@@ -1158,7 +1097,7 @@ $("#populateAccountDetails").click(function () {
 		 });
 		
 		$('#tblSubledgerAdd  > tbody > tr:visible[id="subledgerdetailsrow"]').each(function(index) {
-			if(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value!='' && document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value!='')
+			if(document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value!='' && document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value!='')
 			{
 				flag= false;
 			//	if(accountDetailsCount!=0){
@@ -1167,7 +1106,7 @@ $("#populateAccountDetails").click(function () {
 				netpayableamount =  parseFloat(Number(document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value)).toFixed(2);
 				$('#accountdetailsrow').removeAttr("hidden");
 				$('#accountdetailsrow').removeAttr('accountdetailsinvisible');
-				$('#accountDetailsGlCodeId_' + accountDetailsCount).val(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value);    
+				$('#accountDetailsGlCodeId_' + accountDetailsCount).val(document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value);    
 			    $('.accountDetailsGlCode_' + accountDetailsCount).html(document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value);
 				$('.accountDetailsAccountHead_' + accountDetailsCount).html(document.getElementById('tempSubLedger['+index+'].netPayableAccountHead').value.split("~")[0]);
 				$('.accountDetailsDebitAmount_' + accountDetailsCount).html('0.00');
@@ -1176,12 +1115,12 @@ $("#populateAccountDetails").click(function () {
 				$('#accountDetailsCreditAmount_' + accountDetailsCount).val(Number(document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value).toFixed(2));
 				$('.accountDetailsDebitDetailTypeId_' + accountDetailsCount).val(document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value);
 				$('.accountDetailsDebitDetailKeyId_' + accountDetailsCount).val(document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value);
-				$netPayableAccountCodeId =document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value;
+				$netPayableAccountCodeId =document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value;
 				//where this id
-				$("#netPayableId").val(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value);
+				$("#netPayableId").val(document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value);
 				accountDetailsCount++;
 				if(document.getElementById('tempSubLedger['+index+'].netPayableIsSubLedger').value!="false"  && document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value!="" && document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value!=""){
-					populateSubLedgerDetails(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value,document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value,
+					populateSubLedgerDetails(document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value,document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value,
 							document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value,
 									document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeName').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value,
 											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,false);
@@ -1239,26 +1178,26 @@ function addCustomEventListener(target,type,func){
 
 
 function validate(){
-	if(billamount == 0){
+	/*if(billamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.account.details'));
 		return true;
-	}
+	}*/
 	
 	/*if(debitamount != Number(Number(creditamount) + Number(netpayableamount))){
 		bootbox.alert($.i18n.prop('msg.debit.and.credit.amount.is.not.matching'));
 		return false;
 	}*/
 	
-	if(debitamount == 0){
+	/*if(debitamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
 		return true;
-	}
+	}*/
 	
-	if(!$netPayableAccountCodeId)
+	/*if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
 		return true;
-	}
+	}*/
 	return true;
 }
 
@@ -1385,12 +1324,14 @@ function validateWorkFlowApprover(name) {
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').removeAttr('required');
+		$('#billSubType').attr('required', 'required');
 	}
 	if (button != null && button == 'Reject') {
 		$('#approvalDepartment').attr('required', 'required');
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').attr('required', 'required');
+		$('#billSubType').attr('required', 'required');
 	}
 	 if (button != null && button == 'SaveAsDraft') {
 	        
@@ -1400,7 +1341,7 @@ function validateWorkFlowApprover(name) {
 	        $('#approvalComent').removeAttr('required');
 	     
 	        $('#narration').removeAttr('required');
-	          $('#billSubType').removeAttr('required');
+	          $('#billSubType').attr('required', 'required');
 	    }
 	if (button != null && button == 'Cancel') {
 		$('#approvalDepartment').removeAttr('required');
@@ -1413,9 +1354,12 @@ function validateWorkFlowApprover(name) {
 		$('#approvalDesignation').attr('required', 'required');
 		$('#approvalPosition').attr('required', 'required');
 		$('#approvalComent').attr('required', 'required');
+		$('#narration').removeAttr('required');
+        $('#billSubType').attr('required', 'required');
 	}
 	if (button != null && button == 'Verify') {
 		$('#approvalComent').removeAttr('required');
+		$('#billSubType').attr('required', 'required');
 	}
 	if (button != null && button == 'Create And Approve') {
 		return validateCutOff();
@@ -1693,10 +1637,123 @@ function creditGlcode_initialize() {
 		}
  });
 }
+$('.btn-wf-primary').click(function(){
+	var button = $(this).attr('id');
+	if (button != null && (button == 'Forward')) {
+		if(!validateWorkFlowApprover(button))
+			return false;
+		if(!$("form").valid())
+			return false;
+		if(validate()){
+			deleteHiddenSubledgerRow();
+			return true;
+		}else
+			return false;
+	 }
+	else if (button != null && (button == 'Reject')) {
+		
+		/*if(!validateWorkFlowApprover(button)){
+			alert("11");
+			return false;}*/
+		document.getElementById("workFlowAction").value = name;
+		var b= document.getElementById("workFlowAction").value;
+		
+		$('#approvalDepartment').removeAttr('required');
+        $('#approvalDesignation').removeAttr('required');
+        $('#approvalPosition').removeAttr('required');
+        $('#approvalComent').attr('required', 'required');
+		if(!$("form").valid()){
+			
+			return false;
+			}
+		if(validate()){
+			deleteHiddenSubledgerRow();
+			return true;
+		}else
+			return false;
+		return true;
+	 }
+	   else if (button != null && (button == 'SaveAsDraft')) {
+	      
+	       if(!validateWorkFlowApprover(button))
+	           {
+	           
+	            return false;
+	           }
+	        if(true){
+	             
+	            deleteHiddenSubledgerRow();
+	            //$('approvalDesignation').attr('required', false);
+	            //$('approvalDepartment').attr('required', false);
+	            //$('approvalPosition').attr('required', false);
+	            return true;
+	        }else
+	            {
+	             //alert('button-----2.2------'+button);
+	            return false;
+	            
+	            }
+	        
 	
+	}else if (button != null && (button == 'Create And Approve')) {
+		$('#approvalDepartment').removeAttr('required');
+		$('#approvalDesignation').removeAttr('required');
+		$('#approvalPosition').removeAttr('required');
+		$('#approvalComent').removeAttr('required');
+		if(!validateWorkFlowApprover(button))
+			return false;
+		if(!$("form").valid())
+			return false;
+		if(validate()){
+			deleteHiddenSubledgerRow();
+			return true;
+		}else
+			return false;
+	} else{
+		if(!validateWorkFlowApprover(button))
+			return false;
+		if($("form").valid()){
+			deleteHiddenSubledgerRow();
+			return true;
+		}else
+			return false;
+	}
+	return false;
+});
+function validateSubLedger(Curraction) {
+
+	if (Curraction.value == 'Forward') {
+		
+		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
+		var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
+		var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
+		var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
+		
+
+		if (subLedgerGlCode == null || subLedgerGlCode == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		}else if (subLedgerType == null || subLedgerType == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} else if (subLedgerName == null || subLedgerName == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} else if (subLedgerAmount == null || subLedgerAmount == '') {
+			bootbox.alert('Please select subLedger Detail');
+			return false;
+		} 	
+
+
+	}else{
+		
+		
+		return true;
+	}
+
+}	
 
 function validateFormGlcode(workFlowAction){
-	
 	var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
 			for(var i=0;i<creditDetailsCount;i++){
 				var total_to_check = document.getElementById('billDetails['+i+'].debitamount').value;
@@ -1714,54 +1771,102 @@ function validateFormGlcode(workFlowAction){
 						var amount = null
 						if(i<=creditDetailsCount){
                                amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_Amount').value;
-						}if(i>1){
+						}if(i>creditDetailsCount){
 							   amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_0mount').value;
 						}
 					  
 						if(amount ==null || amount==""){
+							if( workFlowAction=='Forward'){
 							alert("Amount is empty in Subledger for glocode "+glocode_alert);
 							return;
+							}
 						}else{
 							sum = parseInt(sum)+parseInt(amount);
-					
 						}	
 					}		
 				}
 				
 				if(sum!=total_to_check){
+					if( workFlowAction=='Forward'){
 					alert("Amount is invalid in Subledger for glocode "+glocode_alert);
 					return ;
 				}		 
 			}	 
+			}	 
 							
 		
 			document.getElementById("workFlowAction").value = workFlowAction;
-	             
-			//var dept=document.getElementById('department').value;
-			//var fund=document.getElementById('fund').value;
+			var billdate=document.getElementById('billdate').value;
+			var dept=document.getElementById('egBillregistermis.departmentcode').value;
+			var fund=document.getElementById('egBillregistermis.fund').value;
 			var func=document.getElementById('egBillregistermis.function').value;
 			var billtype = document.getElementById('billSubType').value;
-
+			var subdiv=document.getElementById('egBillregistermis.subdivision').value;
 			var accCode='';
 			var status = false;
 			
-
-					 
-	 
-			/* if(billtype == null || billtype == '' ||billtype=='-1')
+			if(billdate == null || billdate == '' ||billdate=='-1')
+			{
+				bootbox.alert('Please select bill date');
+				status = true;
+				return false
+			}
+			if(dept == null || dept == '' ||dept=='-1')
+			{
+				bootbox.alert('Please select department details');
+				status = true;
+				return false
+			}
+			if(fund == null || fund == '' ||fund=='-1')
+			{
+				bootbox.alert('Please select fund details');
+				status = true;
+				return false
+			}
+			if(billtype == null || billtype == '' ||billtype=='-1')
 				{
-					bootbox.alert('Please select Function to view budget details');
+				bootbox.alert('Please select bill type details');
 					status = true;
 					return false
 				}
 
 			 if(func == null || func == '' ||func=='-1')
 			{
-				bootbox.alert('Please select Function to view budget details');
+				bootbox.alert('Please select function details');
 				status = true;
 				return false
-			}*/
-		
+			}
+			if(subdiv == null || subdiv == '' ||subdiv=='-1')
+			{
+				bootbox.alert('Please select subdivision details');
+				status = true;
+				return false
+			}
+			var approvalDepartment=document.getElementById('approvalDepartment').value;
+			var approvalDesignation=document.getElementById('approvalDesignation').value;
+			var approvalPosition=document.getElementById('approvalPosition').value;
+			var approvalComent=document.getElementById('approvalComent').value;
+			if(workFlowAction=='Forward')
+			{
+				if(approvalDepartment == null || approvalDepartment == '' ||approvalDepartment=='-1')
+				{
+					bootbox.alert('Please select approval department details');
+					status = true;
+					return false
+				}
+				if(approvalDesignation == null || approvalDesignation == '' ||approvalDesignation=='-1')
+				{
+					bootbox.alert('Please select approval designation details');
+					status = true;
+					return false
+				}
+				if(approvalPosition == null || approvalPosition == '' ||approvalPosition=='-1')
+				{
+					bootbox.alert('Please select approver details');
+					status = true;
+					return false
+				}
+			}
 			
 		
 	
@@ -1770,3 +1875,8 @@ function validateFormGlcode(workFlowAction){
 	return true;
 	
 }
+
+
+
+
+

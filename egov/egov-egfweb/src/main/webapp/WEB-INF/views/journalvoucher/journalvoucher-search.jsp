@@ -4,8 +4,10 @@
 <%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn"%>
 
-<form:form name="VoucherSearchForm" role="form" method="post" action="searchVoucherResult" modelAttribute="voucherHeader" id="voucherHeader" 
-class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style="margin-top:-20px;">
+<form:form name="VoucherSearchForm" role="form" method="post"
+	action="searchVoucherResult" modelAttribute="voucherHeader"
+	id="voucherHeader" class="form-horizontal form-groups-bordered"
+	enctype="multipart/form-data" style="margin-top:-20px;">
 	<spring:hasBindErrors name="auditDetail">
 	       <div class="alert alert-danger"
 	            style="margin-top: 20px; margin-bottom: 10px;">
@@ -21,52 +23,66 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     		<div class="form-group" style="padding : 50px 20px 0;">
     			
 				
-				<label class="col-sm-3 control-label text-left-audit">From Date
-				<span class="mandatory"></span>
+					<label class="col-sm-3 control-label text-left-audit">From
+						Date <span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billFrom" required="required" path="billFrom" class="form-control datepicker"  data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
+						<form:input id="billFrom" required="required" path="billFrom"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
 				</div>
-				<label class="col-sm-3 control-label text-left-audit">To Date
-				<span class="mandatory"></span>
+					<label class="col-sm-3 control-label text-left-audit">To
+						Date <span class="mandatory"></span>
 				</label>
 				<div class="col-sm-3 add-margin">
-					<form:input id="billTo" path="billTo" required="required" class="form-control datepicker"  data-date-end-date="0d"  placeholder="DD/MM/YYYY"/>
+						<form:input id="billTo" path="billTo" required="required"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
 				</div>
 				
 				
-    			<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.fund" text="Fund"/>
-					<span class="mandatory"></span>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.fund" text="Fund" /> <span class="mandatory"></span> </label>
 				<div class="col-sm-3 add-margin">
-					<form:select path="fundId" id="fundId"  required="required" class="form-control">
+						<form:select path="fundId" id="fundId" required="required"
+							class="form-control">
 						<form:option value="">-Select-</form:option>
 						<form:option value="2">Earmarked Fund</form:option>
 						<form:option value="1">Municipal (General) Fund</form:option>
 					</form:select>
 				</div>
 				
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.department"  text="Department"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.department" text="Department" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:select path="vouchermis.departmentcode" id="department" class="form-control">
-							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${approverDepartmentList}" itemValue="name" itemLabel="name" />
+						<form:select path="vouchermis.departmentcode" id="department"
+							class="form-control">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${approverDepartmentList}" itemValue="name"
+								itemLabel="name" />
 						</form:select>
 				</div>
 				
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.vouchernumber" text="Voucher Number"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.vouchernumber" text="Voucher Number" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspecialcharacters" id="voucherNumber" path="voucherNumber" maxlength="50" />
+						<form:input class="form-control patternvalidation"
+							data-pattern="alphanumericwithspecialcharacters"
+							id="voucherNumber" path="voucherNumber" maxlength="50" />
 				</div>
 				
-				<label class="col-sm-3 control-label text-left-audit"><spring:message code="lbl.subdivision"  text="Sub Division"/>
-				</label>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.subdivision" text="Sub Division" /> </label>
 				<div class="col-sm-3 add-margin">
-					<form:select path="vouchermis.subdivision" id="subdivision" class="form-control">
-							<form:option value=""><spring:message code="lbl.select" /></form:option>
-							<form:options items="${subdivisionList}" itemValue="subdivisionCode" itemLabel="subdivisionName" />
+						<form:select path="vouchermis.subdivision" id="subdivision"
+							class="form-control">
+							<form:option value="">
+								<spring:message code="lbl.select" />
+							</form:option>
+							<form:options items="${subdivisionList}"
+								itemValue="subdivisionCode" itemLabel="subdivisionName" />
 						</form:select>
 				</div>
 				
@@ -83,18 +99,19 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
     	</div>
     	
         <div class="buttonbottom" align="center">
-        <input type="submit" id="search" class="btn btn-primary btn-wf-primary" name="search"  onclick="searchCheck()" value="Search"/>
+			<input type="submit" id="search"
+				class="btn btn-primary btn-wf-primary" name="search"
+				onclick="searchCheck()" value="Search" />
         </div>
         
          
         
-        <br>
-        <br>
-        <br>
+		<br> <br> <br>
         <div class="tab-pane fade in active" id="resultheader">
       
 	        
-	        	 <c:if test="${billRegReportList != null &&  !billRegReportList.isEmpty()}">
+			<c:if
+				test="${billRegReportList != null &&  !billRegReportList.isEmpty()}">
 	        	   <h3> Search Result</h3>
 				<table class="table table-bordered" id="searchResult">
 					<thead>
@@ -103,13 +120,33 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 						<th>Party Name</th>
 						<th>Division</th>
 						<th>Sub Division</th>
+							<th>Receipt No.</th>
 						<th>Budget Head</th>
 						<th>Scheme</th>
 						<th>Gross Amount</th>
 						<th>TDS/I. Tax</th>
-						<th>TDS ON IGST</th><th>TDS ON CGST/UTGST</th><th>Labour Cess</th>
-						<th>Collection charges</th><th>Water charges</th><th>Quality Cess</th>
-						<th>Penalty/Fine</th><th>Security/Amt withheld</th><th>GPF</th><th>NPS/CPF</th><th>GSLIC/GIS</th><th>House Building Advance</th><th>Licence Fees</th><th>LIC</th><th>Bank Loan</th><th>Court Attachment</th><th>Pension Fund</th><th>Electricity charges</th><th>Admin/Service Charges</th><th>Other Charges</th><th>Other Recoveries From Employees</th><th>Any other deduction</th>
+							<th>TDS ON IGST</th>
+							<th>TDS ON CGST/UTGST</th>
+							<th>Labour Cess</th>
+							<th>Collection charges</th>
+							<th>Water charges</th>
+							<th>Quality Cess</th>
+							<th>Penalty/Fine</th>
+							<th>Security/Amt withheld</th>
+							<th>GPF</th>
+							<th>NPS/CPF</th>
+							<th>GSLIC/GIS</th>
+							<th>House Building Advance</th>
+							<th>Licence Fees</th>
+							<th>LIC</th>
+							<th>Bank Loan</th>
+							<th>Court Attachment</th>
+							<th>Pension Fund</th>
+							<th>Electricity charges</th>
+							<th>Admin/Service Charges</th>
+							<th>Other Charges</th>
+							<th>Other Recoveries From Employees</th>
+							<th>Any other deduction</th>
 						<th>Net Amount</th>
 						<th>Paid Amount</th>
 						<th>Journal Voucher number </th>
@@ -126,144 +163,65 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 					</thead>
 `					
 					<tbody>
-					<c:forEach items="${billRegReportList}" var="result" varStatus="status">
+						<c:forEach items="${billRegReportList}" var="result"
+							varStatus="status">
 						<tr>
-							<td>
-								${ status.index+1}
-						    </td>
-						    <td>
-								${ result.partyName}
-						    </td>
-						    <td>
-								${ result.departmentCode}
-						    </td>
-						    <td>
-								${ result.subdivision}
-						    </td>
-						    <td>
-								${ result.budgetHead}
-						    </td>
-						    <td>
-								${ result.scheme}
-						    </td>
-						    <td>
-								${ result.grossAmount}
-						    </td>
-						    <td>
-								${ result.taxAmount}
-						    </td>
-						    <td>
-								${ result.igstAmount}
-						    </td>
-						    <td>
-								${ result.cgstAmount}
-						    </td>
-						    <td>
-								${ result.labourcessAmount}
-						    </td>
-						    <td>
-								${ result.collectionchargesAmount}
-						    </td>
-							<td>
-								${ result.waterChargesAmount}
-						    </td>
-							<td>
-								${ result.qualityAmount}
-						    </td>
-						    <td>
-								${ result.penaltyAmount}
-						    </td>
-						    <td>
-								${ result.securitAmount}
-						    </td>
-						     <td>
-								${ result.gpfAmount}
-						    </td>
-						     <td>
-								${ result.npsAmount}
-						    </td>
-						     <td>
-								${ result.gslicAmount}
-						    </td>
-						     <td>
-								${ result.hbaAmount}
-						    </td>
-						     <td>
-								${ result.licenseAmount}
-						    </td>
-						     <td>
-								${ result.licAmount}
-						    </td>
-						     <td>
-								${ result.bankAmount}
-						    </td>
-						     <td>
-								${ result.courtAmount}
-						    </td>
-						     <td>
-								${ result.pensionAmount}
-						    </td>
-						    <td>
-								${ result.electricityChargesAmount}
-						    </td>
-						    <td>
-								${ result.adminServiceChargesAmount}
-						    </td>
-						    <td>
-								${ result.otherChargesAmount}
-						    </td>
-						    <td>
-								${ result.otherRecovFromEmployeesAmount}
-						    </td>
-						    <td>
-								${ result.deductionAmount}
-						    </td>
-						    <td>
-								${ result.netAmount}
-						    </td>
-						    <td>
-								${ result.paidAmount}
-						    </td>
-						    <td>
-								${ result.voucherNumber}
-						    </td>
-						     <td>
-								${ result.voucherDate}
-						    </td>
-						    <td>
-								${ result.paymentVoucherNumber}
-						    </td>
-						    <td>
-								${ result.bpvDate}
-						    </td>
-						    <td>
-								${ result.pexNo}
-						    </td>
-						    <td>
-								${ result.pexNodate}
-						    </td>
-						    <td>
-								${ result.chqNo}
-						    </td>
-						    <td>
-								${ result.chqDate}
-						    </td>
-						     <td>
-								${ result.bankaccount}
-						    </td>
-						    <td>
-								${ result.status}
-						    </td>
+								<td>${ status.index+1}</td>
+								<td>${ result.partyName}</td>
+								<td>${ result.departmentCode}</td>
+								<td>${ result.subdivision}</td>
+								<td>${ result.receiptNo}</td>
+								<td>${ result.budgetHead}</td>
+								<td>${ result.scheme}</td>
+								<td>${ result.grossAmount}</td>
+								<td>${ result.taxAmount}</td>
+								<td>${ result.igstAmount}</td>
+								<td>${ result.cgstAmount}</td>
+								<td>${ result.labourcessAmount}</td>
+								<td>${ result.collectionchargesAmount}</td>
+								<td>${ result.waterChargesAmount}</td>
+								<td>${ result.qualityAmount}</td>
+								<td>${ result.penaltyAmount}</td>
+								<td>${ result.securitAmount}</td>
+								<td>${ result.gpfAmount}</td>
+								<td>${ result.npsAmount}</td>
+								<td>${ result.gslicAmount}</td>
+								<td>${ result.hbaAmount}</td>
+								<td>${ result.licenseAmount}</td>
+								<td>${ result.licAmount}</td>
+								<td>${ result.bankAmount}</td>
+								<td>${ result.courtAmount}</td>
+								<td>${ result.pensionAmount}</td>
+								<td>${ result.electricityChargesAmount}</td>
+								<td>${ result.adminServiceChargesAmount}</td>
+								<td>${ result.otherChargesAmount}</td>
+								<td>${ result.otherRecovFromEmployeesAmount}</td>
+								<td>${ result.deductionAmount}</td>
+								<td>${ result.netAmount}</td>
+								<td>${ result.paidAmount}</td>
+								<td>${ result.voucherNumber}</td>
+								<td>${ result.voucherDate}</td>
+								<td>${ result.paymentVoucherNumber}</td>
+								<td>${ result.bpvDate}</td>
+								<td>${ result.pexNo}</td>
+								<td>${ result.pexNodate}</td>
+								<td>${ result.chqNo}</td>
+								<td>${ result.chqDate}</td>
+								<td>${ result.bankaccount}</td>
+								<td>${ result.status}</td>
 						</tr>
 						</c:forEach>
 					<tbody>
 					
-					<c:if test="${billRegReportList == null || billRegReportList.isEmpty()}">
+						<c:if
+							test="${billRegReportList == null || billRegReportList.isEmpty()}">
 					No records found
 					</c:if>				
 				</table>
 				<div class="buttonbottom" align="center">
-        <input type="submit" id="export" class="btn btn-primary btn-wf-primary" name="export"  onclick="searchCheck()" value="Export"/>
+					<input type="submit" id="export"
+						class="btn btn-primary btn-wf-primary" name="export"
+						onclick="searchCheck()" value="Export" />
         </div>
 				</c:if>	
 				
@@ -300,5 +258,4 @@ class="form-horizontal form-groups-bordered" enctype="multipart/form-data" style
 <script
         src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 <script
-        src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
-        
+	src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>

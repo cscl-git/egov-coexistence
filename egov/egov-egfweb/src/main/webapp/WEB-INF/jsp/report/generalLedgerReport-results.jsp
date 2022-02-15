@@ -93,9 +93,12 @@
 		<display:column media="pdf" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Voucher Number"
 			style="width:8%;text-align:center" property="vouchernumber" />
+			
+			
 		<display:column media="excel" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Voucher Number"
 			style="width:8%;text-align:center" property="vouchernumber" />
+			
 		<display:column media="html" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Voucher Number"
 			style="width:8%;text-align:center">
@@ -104,6 +107,11 @@
 				<s:property value="#attr.currentRowObject.vouchernumber" />
 			</a>
 		</display:column>
+		
+		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="Receipt No." style="width:5%;text-align:center"
+			property="debit_receiptNo" />
+		
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Voucher Type Name" style="width:8%;text-align:center"
 			property="debitVoucherTypeName" />
@@ -124,6 +132,12 @@
 				<s:property value="#attr.currentRowObject.debitamount" />
 			</s:else>
 		</display:column>
+		
+		
+		
+		
+		
+		
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Voucher Date" style="width:5%;text-align:center"
 			property="creditdate" />
@@ -133,6 +147,8 @@
 		<display:column media="excel" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Voucher Number"
 			style="width:8%;text-align:center" property="creditvouchernumber" />
+			
+			
 		<display:column media="html" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Voucher Number"
 			style="width:8%;text-align:center">
@@ -142,14 +158,26 @@
 			</a>
 		</display:column>
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="Receipt No." style="width:5%;text-align:center"
+			property="credit_receiptNo" />
+		
+		
+		
+		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Voucher Type Name" style="width:8%;text-align:center"
 			property="creditVoucherTypeName" />
+			
+			
 		<display:column media="pdf" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Amount"
 			style="width:6%;text-align:right" property="creditamount" />
+			
+			
 		<display:column media="excel" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Amount"
 			style="width:6%;text-align:right" property="creditamount" />
+			
+			
 		<display:column media="html" headerClass="bluebgheadtd"
 			class="blueborderfortd" title="Amount"
 			style="width:6%;text-align:right">

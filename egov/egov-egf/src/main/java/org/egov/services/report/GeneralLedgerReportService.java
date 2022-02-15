@@ -558,68 +558,8 @@ public class GeneralLedgerReportService   {
 	
 	
 	
-	
-	
-	public byte[] CapitalRevenueExl(Map<String,String>headerData,List<ArrayList<String>>  exp,Set<String>depname) {
-		System.out.println("Dedicated");
-		
-		prepare();
-		byte[]fileContent=null;
-		try {
-			HSSFWorkbook wb = new HSSFWorkbook();
-			Sheet sheet = wb.createSheet("Capital- Revenue Expenditure Report");
-			HSSFCellStyle style = wb.createCellStyle();  
-			int i =0;
-			Row row1 = sheet.createRow(i++);	  
-			Cell c1=  row1.createCell(0);
-			c1.setCellStyle(style);
-			c1.setCellValue(headerData.get("h1"));
-			
-			
-			Row row2 = sheet.createRow(i++);
-			int j=1;
-			
-			for(ArrayList<String> s : exp) {
-				 	Row row = sheet.createRow(i++);
-				 	for(int z =0;z<s.size();z++) {
-				 		Cell cell0 = row.createCell(z);
-						cell0.setCellValue((null!=s.get(z))?s.get(z).toString():"0");
-				 	} 
-						
-		        } 
-			
-			int numberOfSheets = wb.getNumberOfSheets();
-			 for (int x = 0; x < numberOfSheets; x++) {
-			        Sheet sheet1 = wb.getSheetAt(x);
-			        int total_row=sheet1.getLastRowNum();
-			        if (sheet1.getPhysicalNumberOfRows() > 0) {
-			        	
-			        		Row row = sheet1.getRow(total_row);
-				            Iterator<Cell> cellIterator = row.cellIterator();
-				            while (cellIterator.hasNext()) {
-				                Cell cell = cellIterator.next();
-				                int columnIndex = cell.getColumnIndex();
-				               // System.out.println(columnIndex);
-				                sheet1.autoSizeColumn(columnIndex);
-				            }
-			        	
-			            
-			        }
-			    }
-			ByteArrayOutputStream os = new ByteArrayOutputStream();
-			wb.write(os);
-			fileContent = os.toByteArray();
-			
-			
-		}catch(Exception ex) {
-			ex.printStackTrace();
-		}
-		 return fileContent;
-	}
-	
-	
-	
 	public byte[] getRevenueCapitalDataExl(CapitalRevenueRequestPojo capital) {
+
 		ModelMap  m = new ModelMap();
 		finalList = null;
 		String startwithForglocode="";
@@ -745,6 +685,8 @@ public class GeneralLedgerReportService   {
 		
 	}
 	
+	
+	
 	public ArrayList<ArrayList<String>> getRevenueCapitalData(CapitalRevenueRequestPojo capital) {
 		finalList = null;
 		String startwithForglocode="";
@@ -859,6 +801,8 @@ public class GeneralLedgerReportService   {
 		  return getcaptitalRevenueFinalData(cleanList,functionname,deptname);	
 	}
 	
+	
+	
 	public ArrayList<ArrayList<String>>getcaptitalRevenueFinalData(List <CapitalRevenueDataPOJO>cleanList,Set<String> fncname,Set<String>depname){
 		ArrayList<String> toprow = new ArrayList<String>();
 		ArrayList<ArrayList<String>> finallist = new ArrayList<ArrayList<String>>();
@@ -954,6 +898,70 @@ public class GeneralLedgerReportService   {
 		return ultraFinal;
 	}
 	
+	public byte[] CapitalRevenueExl(Map<String,String>headerData,List<ArrayList<String>>  exp,Set<String>depname) {
+		System.out.println("Dedicated");
+		
+		prepare();
+		byte[]fileContent=null;
+		try {
+			HSSFWorkbook wb = new HSSFWorkbook();
+			Sheet sheet = wb.createSheet("Capital- Revenue Expenditure Report");
+			HSSFCellStyle style = wb.createCellStyle();  
+			int i =0;
+			Row row1 = sheet.createRow(i++);	  
+			Cell c1=  row1.createCell(0);
+			c1.setCellStyle(style);
+			c1.setCellValue(headerData.get("h1"));
+			
+			
+			Row row2 = sheet.createRow(i++);
+			int j=1;
+			
+			for(ArrayList<String> s : exp) {
+				 	Row row = sheet.createRow(i++);
+				 	for(int z =0;z<s.size();z++) {
+				 		Cell cell0 = row.createCell(z);
+				 		
+				 		Double dd = new Double(0);
+				 		try {
+				 		dd = new Double(s.get(z));
+				 		cell0.setCellValue(dd);
+				 		}
+				 		catch(Exception e) {
+						cell0.setCellValue((null!=s.get(z))?s.get(z).toString():"0");
+				 	} 
+				 	} 
+						
+		        } 
+			
+			int numberOfSheets = wb.getNumberOfSheets();
+			 for (int x = 0; x < numberOfSheets; x++) {
+			        Sheet sheet1 = wb.getSheetAt(x);
+			        int total_row=sheet1.getLastRowNum();
+			        if (sheet1.getPhysicalNumberOfRows() > 0) {
+			        	
+			        		Row row = sheet1.getRow(total_row);
+				            Iterator<Cell> cellIterator = row.cellIterator();
+				            while (cellIterator.hasNext()) {
+				                Cell cell = cellIterator.next();
+				                int columnIndex = cell.getColumnIndex();
+				               // System.out.println(columnIndex);
+				                sheet1.autoSizeColumn(columnIndex);
+				            }
+			        	
+			            
+			        }
+			    }
+			ByteArrayOutputStream os = new ByteArrayOutputStream();
+			wb.write(os);
+			fileContent = os.toByteArray();
+			
+			
+		}catch(Exception ex) {
+			ex.printStackTrace();
+		}
+		 return fileContent;
+	}
 	
 	
 	
@@ -1642,8 +1650,7 @@ public List<ReceiptReportPOJO> getReceiptReportList(StringBuilder qs) {
 					
 					
 					cell0.setCellValue(s.getName().toString());
-					cell1.setCellValue((null!=s.getAmount())?s.getAmount().toString():"");
-							
+					cell1.setCellValue((null!=s.getAmount())?s.getAmount().doubleValue():0.0);	
 		        } 
 			
 			int numberOfSheets = wb.getNumberOfSheets();

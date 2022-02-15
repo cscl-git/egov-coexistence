@@ -217,6 +217,9 @@
 							<display:column title="Pending With" style="text-align:center;">
 								<s:property value="%{#attr.currentRowObject.pendingWith}" />
 							</display:column>
+							<display:column title="Receipt No." style="text-align:center;">
+								<s:property value="%{#attr.currentRowObject.receiptNo}" />
+							</display:column>
 
 						</display:table></td>
 				<tr>

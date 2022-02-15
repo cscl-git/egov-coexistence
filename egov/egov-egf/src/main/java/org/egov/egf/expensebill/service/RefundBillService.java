@@ -243,11 +243,16 @@ public class RefundBillService {
         	glCodeList.add(v.getValue());
         }
         
+		/*
+		 * String glCode = ""; if(egBillregister.getBillDetails()!=null ) {
+		 * if(egBillregister.getBillDetails().get(0).getGlcodeid()!=null) { glCode =
+		 * egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode(); } }
+		 */
         String glCode = "";
-        if(egBillregister.getBillDetails().get(0).getGlcodeid()!=null) {
+        if(egBillregister.getBillDetails().get(0).getChartOfAccounts()!=null) {
         	 glCode =   egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode();
+        	 System.out.println("bill detail glcode "+glCode);
         }
-
         if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT) && glCodeList.contains(glCode))
     	{ 
         try {
@@ -264,7 +269,7 @@ public class RefundBillService {
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 
         final EgBillregister savedEgBillregister = expenseBillRepository.save(egBillregister);
-
+        System.out.println("repository saved");
         createCheckList(savedEgBillregister, checkLists);
 
         if (workFlowAction.equals(FinancialConstants.CREATEANDAPPROVE)) {
@@ -338,6 +343,11 @@ public class RefundBillService {
         else
             egBillregister.getEgBillregistermis().setSubScheme(null);
 
+        System.out.println("scheme----> "+egBillregister.getEgBillregistermis().getScheme());
+        System.out.println("schemeId----> "+egBillregister.getEgBillregistermis().getSchemeId());
+        System.out.println("subscheme----> "+egBillregister.getEgBillregistermis().getSubScheme());
+        System.out.println("subschemeId----> "+egBillregister.getEgBillregistermis().getSubSchemeId());
+
         if (isBillNumberGenerationAuto())
             egBillregister.setBillnumber(getNextBillNumber(egBillregister));        
         
@@ -349,7 +359,7 @@ public class RefundBillService {
         }
         
         String glCode = "";
-        if(egBillregister.getBillDetails().get(0).getGlcodeid()!=null) {
+        if(egBillregister.getBillDetails().get(0).getChartOfAccounts()!=null) {
         	 glCode =   egBillregister.getBillDetails().get(0).getChartOfAccounts().getGlcode();
         }
 
@@ -460,12 +470,14 @@ public class RefundBillService {
             else
                 egBillregister.getEgBillregistermis().setSubScheme(null);
 
+            egBillregister.getEgBillregistermis().setSubdivision(egBillregister.getEgBillregistermis().getSubdivision());
             final List<EgChecklists> checkLists = egBillregister.getCheckLists();
-
+            Long id=egBillregister.getId();
             updatedegBillregister = expenseBillRepository.save(egBillregister);
-
-            deleteCheckList(updatedegBillregister);
-            createCheckList(updatedegBillregister, checkLists);
+            egBillregister.setId(id);
+            updatedegBillregister.setId(id);
+            //deleteCheckList(updatedegBillregister);
+            //createCheckList(updatedegBillregister, checkLists);
             //egBillregister.getEgBillregistermis().setBudgetaryAppnumber(null);
       
 //            commented as budget check was disabled
@@ -506,7 +518,7 @@ public class RefundBillService {
                 expenseBillRegisterStatusChange(egBillregister, workFlowAction);
                 createExpenseBillRegisterWorkflowTransition(egBillregister, approvalPosition, approvalComent,
                         additionalRule,
-                        workFlowAction,"");
+                        workFlowAction,approverDesignation);
             }
             updatedegBillregister = expenseBillRepository.save(egBillregister);
             persistenceService.getSession().flush();
@@ -717,12 +729,27 @@ public class RefundBillService {
 
                 if (stateValue.isEmpty())
                     stateValue = wfmatrix.getNextState();
-
-                egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
-                        .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date())
-                        .withNextAction(wfmatrix.getNextAction())
-                        .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
+                if(egBillregister.getZone() != null && egBillregister.getZone().equalsIgnoreCase("Y"))
+                {
+                	egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date())
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
+                }
+                else
+                {
+                	 List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                            FinancialConstants.MODULE_NAME_APPCONFIG, "AUDIT_DEFAULT");
+                	owenrPos=new Position();
+                	owenrPos.setId(Long.valueOf(configValuesByModuleAndKey.get(0).getValue()));
+                	egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue("Pending With Audit").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME);
+                }
+                
             } else {
                 if (designation != null
                         && finalDesignationNames.get(designation.getName().toUpperCase()) != null)

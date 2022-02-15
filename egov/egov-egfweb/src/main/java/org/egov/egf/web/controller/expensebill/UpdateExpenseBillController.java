@@ -56,6 +56,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -71,11 +72,19 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.ManageAuditorService;
+import org.egov.commons.Accountdetailtype;
+import org.egov.commons.Bank;
 import org.egov.commons.CChartOfAccountDetail;
 import org.egov.commons.CChartOfAccounts;
+import org.egov.commons.CGeneralLedger;
+import org.egov.commons.CGeneralLedgerDetail;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
+import org.egov.commons.dao.FunctionDAO;
+import org.egov.commons.dao.FundHibernateDAO;
+import org.egov.commons.service.ChartOfAccountDetailService;
 import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
+import org.egov.egf.commons.bank.service.CreateBankService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.expensebill.service.RefundBillService;
@@ -102,8 +111,12 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.voucher.PreApprovedVoucher;
 import org.egov.pims.commons.Position;
+import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
+import org.egov.utils.PaymentRefundUtils;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -186,12 +199,18 @@ public class UpdateExpenseBillController extends BaseBillController {
     private RefundBillService refundBillService;
     @Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
-    
+    @Autowired
+	private FundHibernateDAO fundHibernateDAO;
     @Autowired
     protected AppConfigValueService appConfigValuesService;
-    
+    @Autowired
+    private CreateBankService createBankService;
     @Autowired
 	private AutonumberServiceBeanResolver beanResolver;
+    @Autowired
+	private PaymentRefundUtils paymentRefundUtils;
+    @Autowired
+    private ChartOfAccountDetailService chartOfAccountDetailService;
 
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
@@ -222,6 +241,13 @@ public class UpdateExpenseBillController extends BaseBillController {
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_PURCHASE)) {
             return "redirect:/supplierbill/update/" + billId;
         }
+		/*
+		 * if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.
+		 * STANDARD_EXPENDITURETYPE_REFUND)) { if (egBillregister.getState() != null &&
+		 * (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().
+		 * getValue()) )) { return "redirect:/refund/updateForm/" + billId; } }
+		 */
+        
         final List<DocumentUpload> documents = documentUploadRepository.findByObjectId(Long.valueOf(billId));
         egBillregister.setDocumentDetail(documents);
         List<Map<String, Object>> budgetDetails = null;
@@ -244,8 +270,14 @@ public class UpdateExpenseBillController extends BaseBillController {
         model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
         if (egBillregister.getState() != null)
             model.addAttribute("currentState", egBillregister.getState().getValue());
+        
+        	System.out.println("egBillregister.getState() "+egBillregister.getState());
+        	System.out.println("egBillregister.getStateHistory() "+egBillregister.getStateHistory());
+        
+        	if(egBillregister.getIsCitizenRefund()==null||egBillregister.getIsCitizenRefund()=="")
         model.addAttribute("workflowHistory",
                 financialUtils.getWorkflowHistory(egBillregister.getState(), egBillregister.getStateHistory()));
+        
         List<String>  validActions =null;
         if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
         {
@@ -253,8 +285,6 @@ public class UpdateExpenseBillController extends BaseBillController {
             prepareWorkflow(model, egBillregister, new WorkflowContainer());
         }
           
-       
-
         egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
         prepareBillDetailsForView(egBillregister);
         expenseBillService.validateSubledgeDetails(egBillregister);
@@ -281,7 +311,6 @@ public class UpdateExpenseBillController extends BaseBillController {
         	model.addAttribute("mode", "cancel");
         	prepareWorkflow(model, egBillregister, new WorkflowContainer());
         	return "expensebill-view";
-        	
         }
         model.addAttribute("paId",egBillregister.getId());
         if (egBillregister.getState() != null
@@ -296,9 +325,126 @@ public class UpdateExpenseBillController extends BaseBillController {
                 && (FinancialConstants.BUTTONSAVEASDRAFT.equals(egBillregister.getState().getValue()) )) {
             model.addAttribute("mode", "edit");
             model.addAttribute("egBillregister", egBillregister);
+            //model.addAttribute("accountDetails", egBillregister.getBillDetails());
             model.addAttribute("validActionList", validActions);
             model.addAttribute("viewBudget", "Y");
+			
+			  if(egBillregister.getRefundable() != null && !egBillregister.getRefundable().isEmpty()) 
+			  {
+				  Map<String, Object> payeeMap = null;
+				  BigDecimal dbAmount = BigDecimal.ZERO;
+				  BigDecimal crAmount = BigDecimal.ZERO;
+				  final List<Map<String, Object>> tempList = new ArrayList<Map<String, Object>>();
+			      final List<PreApprovedVoucher> payeeList = new ArrayList<PreApprovedVoucher>();
+			      Map<String, Object> temp = null;
+				  if(egBillregister.getIsCitizenRefund()!=null && egBillregister.getIsCitizenRefund().equalsIgnoreCase("Y")){
+				  PreApprovedVoucher subledger = null;
+				  CChartOfAccounts coa = null;	
+				  
+				  final List<Accountdetailtype> detailtypeIdList = new ArrayList<Accountdetailtype>();
+				  final List<Long> glcodeIdList = new ArrayList<Long>();
+				  List<Object[]> list1= null;
+	    			final StringBuffer query1 = new StringBuffer(500);
+	    			SQLQuery queryMain =  null;
+	    			query1
+	    		    .append("select eb2.glcodeid,eb3.accountdetailkeyid,eb3.accountdetailtypeid ,eb3.creditamount,eop.code, eop.\"name\" from eg_billregister eb ,eg_billdetails eb2, eg_billpayeedetails eb3,egf_other_party eop  " + 
+	    		    		" where eb3.billdetailid =eb2.id and eb2.billid =eb.id and eop.id=eb3.accountdetailkeyid and eb.id ="+egBillregister.getId());
+	    			System.out.println("Query 1 :: "+query1.toString());
+	    			queryMain=this.persistenceService.getSession().createSQLQuery(query1.toString());
+	    			list1 = queryMain.list();
+	    			int i=0;
+	    			System.out.println(":::list size::::: "+list1.size());
+	    			int detailkeyid=0,detailtypeid=0;
+	    			String code="",name="";
+	    			if(list1!=null)
+	    			{	
+	    				for (final Object[] object : list1)
+	    				{
+	    					System.out.println("i "+i);
+	    					detailkeyid=Integer.parseInt(object[1].toString());
+	    					detailtypeid=Integer.parseInt(object[2].toString());
+	    					code=object[4].toString();
+	    					name=object[5].toString();
+	    				}
+	    			}
+				  final List<CGeneralLedger> gllist = paymentRefundUtils.getAccountDetails(egBillregister.getEgBillregistermis().getPaymentvoucherheaderid());
+				  for (final CGeneralLedger gl : gllist) {
+					  System.out.println("i "+i);
+					  temp = new HashMap<String, Object>();
+		                if (gl.getFunctionId() != null) {
+		                    temp.put(Constants.FUNCTION, paymentRefundUtils.getFunction(Long.valueOf(gl.getFunctionId())).getName());
+		                    temp.put("functionid", gl.getFunctionId());
+		                }
+		                else if (egBillregister.getEgBillregistermis() != null && egBillregister.getEgBillregistermis().getFunction() !=null && egBillregister.getEgBillregistermis().getFunction().getName() != null)
+		                {
+		                	temp.put(Constants.FUNCTION, egBillregister.getEgBillregistermis().getFunction().getName());
+		                    temp.put("functionid", egBillregister.getEgBillregistermis().getFunction().getId());
+		                }
+		                coa = paymentRefundUtils.getChartOfAccount(gl.getGlcode());
+		                System.out.println("coa "+coa);
+		                temp.put("glcodeid", coa.getId());
+		                glcodeIdList.add(coa.getId());
+		                temp.put(Constants.GLCODE, coa.getGlcode());
+		                temp.put("accounthead", coa.getName());
+		                temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : gl.getDebitAmount());
+		                temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : gl.getCreditAmount());
+		                temp.put("billdetailid", gl.getId());
+		                tempList.add(temp);
+		                	    	
+		    			
+		    					//if (chartOfAccountDetailService.getByGlcodeIdAndDetailTypeId(gl.getGlcodeId().getId(), detailtypeid) != null) {
+			    					subledger = new PreApprovedVoucher();
+			    					subledger.setGlcode(coa);
+			    					final Accountdetailtype detailtype = paymentRefundUtils.getAccountdetailtype(detailtypeid);
+			                        detailtypeIdList.add(detailtype);
+			                        subledger.setDetailType(detailtype);
+			                        payeeMap = new HashMap<>();
+			                        //payeeMap = paymentRefundUtils.getAccountDetails(detailkeyid,detailtypeid, payeeMap);
+			                        subledger.setDetailKey(name);
+			                        subledger.setDetailCode(code);
+			                        subledger.setDetailKeyId(detailkeyid);
+			                        //subledger.setAmount(gldetail.getAmount());
+			                        subledger.setFunctionDetail(temp.get("function") != null ? temp.get("function").toString() : "");
+			                        payeeList.add(subledger);
+			                        i++;
+		    					//}
+		    				
+		    			final List<Bank> banks = createBankService.getAll();
+		    			model.addAttribute("banks", banks);
+		    			model.addAttribute("accountDetails", tempList);
+		    			model.addAttribute("subLedgerlist", payeeList);
+		    			model.addAttribute("dbAmount", dbAmount);
+		    			model.addAttribute("crAmount", crAmount);
+		    			if(egBillregister.getIsCitizenRefund()!=null && egBillregister.getIsCitizenRefund().equalsIgnoreCase("Y"))
+		    			{
+		    				model.addAttribute("citizen", egBillregister.getIsCitizenRefund());
+		    			}
+		    			else {
+		    				model.addAttribute("citizen", egBillregister.getIsCitizenRefund());
+		    			}
+				  }
+			  }else {
+				  final List<Bank> banks = createBankService.getAll();
+	    			model.addAttribute("banks", banks);
+	    			model.addAttribute("accountDetails", tempList);
+	    			model.addAttribute("subLedgerlist", payeeList);
+	    			model.addAttribute("dbAmount", dbAmount);
+	    			model.addAttribute("crAmount", crAmount);
+	    			if(egBillregister.getIsCitizenRefund()!=null && egBillregister.getIsCitizenRefund().equalsIgnoreCase("Y"))
+	    			{
+	    				model.addAttribute("citizen", egBillregister.getIsCitizenRefund());
+	    			}
+	    			else {
+	    				model.addAttribute("citizen", egBillregister.getIsCitizenRefund());
+	    			}
+			  }
+				//return "ol-payRefund-request-form-update";
+				  return "payRefund-request-form-update"; 
+			  }else {
             return "expensebill-update";
+        }
+			 
+            //return "expensebill-update";
         }
         else {
             model.addAttribute("mode", "edit");
@@ -324,7 +470,10 @@ public class UpdateExpenseBillController extends BaseBillController {
     	
         String mode = "";
         EgBillregister updatedEgBillregister = null;
-
+        System.out.println("scheme----> "+egBillregister.getEgBillregistermis().getScheme());
+        System.out.println("schemeId----> "+egBillregister.getEgBillregistermis().getSchemeId());
+        System.out.println("subscheme----> "+egBillregister.getEgBillregistermis().getSubScheme());
+        System.out.println("subschemeId----> "+egBillregister.getEgBillregistermis().getSubSchemeId());
         if (request.getParameter("mode") != null)
             mode = request.getParameter("mode");
         
@@ -399,12 +548,49 @@ public class UpdateExpenseBillController extends BaseBillController {
         validateLedgerAndSubledger(egBillregister, resultBinder);
     	}
     	}
+        List<EgBilldetails> detail=new ArrayList();
+        BigDecimal amount= new BigDecimal(0);
+        List<EgBilldetails> billDetails = new ArrayList<EgBilldetails>();
+        List<EgBillPayeedetails> billPayeeDetails = new ArrayList<EgBillPayeedetails>();
+        if(egBillregister.getIsCitizenRefund()!=null)
+        {	
+        	for (EgBilldetails details : egBillregister.getBillDetails()) {
+        		System.out.println("details.getDebitamount() "+details.getDebitamount());
+	        	if(details.getDebitamount()!=null)
+	        	{
+	        		EgBilldetails billdetail = new EgBilldetails();
+	        		billdetail.setFunctionid(new BigDecimal(egBillregister.getEgBillregistermis().getFunction().getId()));
+	        		billdetail.setGlcodeid(details.getGlcodeid());
+	        		billdetail.setDebitamount(details.getDebitamount());
+	        		billdetail.setEgBillregister(egBillregister);
+	        		billDetails.add(billdetail);
+	        		amount=amount.add(details.getDebitamount());
+	        		
+                    for (final EgBillPayeedetails payeeDetails : egBillregister.getBillPayeedetails()) {
+                		EgBillPayeedetails payeeDetail = new EgBillPayeedetails();
+                        payeeDetail.setEgBilldetailsId(billdetail);
+                        payeeDetail.setAccountDetailTypeId(payeeDetails.getAccountDetailTypeId());
+                        payeeDetail.setAccountDetailKeyId(payeeDetails.getAccountDetailKeyId());
+                        payeeDetail.setCreditAmount(details.getDebitamount());
+                        payeeDetail.setLastUpdatedTime(new Date());
+                        billdetail.getEgBillPaydetailes().add(payeeDetail);
+                        billPayeeDetails.add(payeeDetail);
+                	}
+	        	}
+        	}
         
+        	egBillregister.setBillamount(amount);
+        	egBillregister.setPassedamount(amount);
+        	egBillregister.getEgBilldetailes().addAll(billDetails);
+        	egBillregister.getBillPayeedetails().addAll(billPayeeDetails);
+        }
 		if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT) && !mode.equalsIgnoreCase("cancel"))
     	{ 
         	  populateEgBillregistermisDetails(egBillregister);
     	}
+		
         if (resultBinder.hasErrors()) {
+        	
             setDropDownValues(model);
             model.addAttribute("stateType", egBillregister.getClass().getSimpleName());
             prepareWorkflow(model, egBillregister, new WorkflowContainer());
@@ -439,7 +625,17 @@ public class UpdateExpenseBillController extends BaseBillController {
                     
                     if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
                     {
-                    	populateauditWorkFlow(updatedEgBillregister);
+                    	if(updatedEgBillregister.getZone() != null && updatedEgBillregister.getZone().equalsIgnoreCase("Y"))
+                    	{
+                    		populateauditWorkFlow(updatedEgBillregister);
+                    	}
+                    	else
+                    	{
+                    		updatedEgBillregister.setZone("Y");
+                    		expenseBillService.saveEgBillregister_afterStateNull(updatedEgBillregister);
+                            persistenceService.getSession().flush();
+                    	}
+                    	
                     }
                 }   
                 
@@ -504,14 +700,17 @@ public class UpdateExpenseBillController extends BaseBillController {
     	AuditDetails audit=new AuditDetails();
     	final User user = securityUtils.getCurrentUser();
     	Position owenrPos = new Position();
-    	List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(updatedEgBillregister.getEgBillregistermis().getDepartmentcode()), "Auditor");
-    	if(auditorList != null && !auditorList.isEmpty())
+    	//List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(updatedEgBillregister.getEgBillregistermis().getDepartmentcode()), "Auditor");
+    	Integer id = validateAuditor(updatedEgBillregister);
+    	if(id != null && id > 0)
     	{
-    		owenrPos.setId(Long.valueOf(auditorList.get(0).getEmployeeid()));
+    		owenrPos.setId(Long.valueOf(id));
     	}
     	else
     	{
-    		owenrPos.setId(null);
+    		List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                    FinancialConstants.MODULE_NAME_APPCONFIG, "AUDIT_TASK_DEFAULT");
+        	owenrPos.setId(Long.valueOf(configValuesByModuleAndKey.get(0).getValue()));
     	}
     	AuditNumberGenerator v = beanResolver.getAutoNumberServiceFor(AuditNumberGenerator.class);
 
@@ -587,6 +786,7 @@ public class UpdateExpenseBillController extends BaseBillController {
     @Override
     protected void setDropDownValues(final Model model) {
         super.setDropDownValues(model);
+        model.addAttribute("fundList", fundHibernateDAO.findAllActiveFunds());
     }
 
     private String getDepartmentName(String departmentCode) {
@@ -688,17 +888,22 @@ public class UpdateExpenseBillController extends BaseBillController {
                         && (details.getCreditamount() == null || (details.getCreditamount() != null
                                 && details.getCreditamount().compareTo(BigDecimal.ZERO) == 0));
                 if (isDebitCreditAmountEmpty) {
+                	if(egBillregister.getRefundable()!=null && !egBillregister.getRefundable().equalsIgnoreCase("Y")) {
                     resultBinder.reject("msg.expense.bill.accdetail.amountzero",
                             new String[] { details.getChartOfAccounts().getGlcode() }, null);
+                }
                 }
           
             
 
             if (details.getDebitamount() != null && details.getCreditamount() != null
                     && details.getDebitamount().compareTo(BigDecimal.ZERO) == 1
-                    && details.getCreditamount().compareTo(BigDecimal.ZERO) == 1)
+                    && details.getCreditamount().compareTo(BigDecimal.ZERO) == 1) {
+            	if(egBillregister.getRefundable()!=null && !egBillregister.getRefundable().equalsIgnoreCase("Y")) {
                 resultBinder.reject("msg.expense.bill.accdetail.amount",
                         new String[] { details.getChartOfAccounts().getGlcode() }, null);
+        }
+            }
         }
        // if (totalDrAmt.compareTo(totalCrAmt) != 0)
             //resultBinder.reject("msg.expense.bill.accdetail.drcrmatch", new String[] {}, null);
@@ -725,14 +930,21 @@ public class UpdateExpenseBillController extends BaseBillController {
                     if (payeeDetails.getDebitAmount() != null && payeeDetails.getCreditAmount() != null
                             && payeeDetails.getDebitAmount().equals(BigDecimal.ZERO)
                             && payeeDetails.getCreditAmount().equals(BigDecimal.ZERO))
+                    {
+                    	if(egBillregister.getRefundable()!=null && !egBillregister.getRefundable().equalsIgnoreCase("Y")) {
                         resultBinder.reject("msg.expense.bill.subledger.amountzero",
                                 new String[] { details.getChartOfAccounts().getGlcode() }, null);
+                    	}
+                    }
 
                     if (payeeDetails.getDebitAmount() != null && payeeDetails.getCreditAmount() != null
                             && payeeDetails.getDebitAmount().compareTo(BigDecimal.ZERO) == 1
-                            && payeeDetails.getCreditAmount().compareTo(BigDecimal.ZERO) == 1)
+                            && payeeDetails.getCreditAmount().compareTo(BigDecimal.ZERO) == 1) {
+                    	if(egBillregister.getRefundable()!=null && !egBillregister.getRefundable().equalsIgnoreCase("Y")) {
                         resultBinder.reject("msg.expense.bill.subledger.amount",
                                 new String[] { details.getChartOfAccounts().getGlcode() }, null);
+                    	}
+                    }
 
                     if (payeeDetails.getDebitAmount() != null && payeeDetails.getDebitAmount().compareTo(BigDecimal.ZERO) == 1)
                         payeeDetailAmt = payeeDetailAmt.add(payeeDetails.getDebitAmount());
@@ -758,5 +970,69 @@ public class UpdateExpenseBillController extends BaseBillController {
         }
     }
     
-    
+    public Integer validateAuditor(EgBillregister updatedEgBillregister) {
+
+		List<ManageAuditor> auditorList = manageAuditorService.getAudiorsDepartmentByType(
+				Integer.parseInt(updatedEgBillregister.getEgBillregistermis().getDepartmentcode()), "Auditor");
+
+		String billtype1 = updatedEgBillregister.getEgBillregistermis().getEgBillSubType().getName();
+		String subDivision1 = updatedEgBillregister.getEgBillregistermis().getSubdivision();
+		// String departmentName1 =
+		// updatedEgBillregister.getEgBillregistermis().getDepartmentName();
+
+		String pre_audit = "Pre Audit";
+		Integer id = 0;
+		if (auditorList != null && !auditorList.isEmpty()) {
+
+			for (ManageAuditor manageAuditor : auditorList) {
+				if (manageAuditor.getBilltype() != null && manageAuditor.getSubdivision() != null
+						&& manageAuditor.getAudittype().equalsIgnoreCase(pre_audit)) {
+					if (manageAuditor.getSubdivision().equalsIgnoreCase(subDivision1)
+							&& manageAuditor.getBilltype().equalsIgnoreCase(billtype1)) {
+						return (manageAuditor.getEmployeeid());
+					}
+				}
+			}
+
+			if (id == 0) {
+
+				for (ManageAuditor manageAuditor : auditorList) {
+					if (manageAuditor.getSubdivision() != null
+							&& manageAuditor.getAudittype().equalsIgnoreCase(pre_audit)
+							&& manageAuditor.getBilltype() == null) {
+						if (manageAuditor.getSubdivision().equalsIgnoreCase(subDivision1)) {
+							return (manageAuditor.getEmployeeid());
+
+						}
+					}
+				}
+			}
+
+			if (id == 0) {
+
+				for (ManageAuditor manageAuditor : auditorList) {
+					if (manageAuditor.getBilltype() != null) {
+						if (manageAuditor.getBilltype().equalsIgnoreCase(billtype1)
+								&& manageAuditor.getAudittype().equalsIgnoreCase(pre_audit)
+								&& manageAuditor.getSubdivision() == null) {
+							return (manageAuditor.getEmployeeid());
+						}
+					}
+				}
+			}
+
+			if (id == 0) {
+				for (ManageAuditor manageAuditor : auditorList) {
+					if (manageAuditor.getAudittype().equalsIgnoreCase(pre_audit)
+							&& manageAuditor.getSubdivision() == null && manageAuditor.getBilltype() == null) {
+						return (manageAuditor.getEmployeeid());
+					}
+				}
+			}
+
+		} else {
+			return id;
+		}
+		return id;
+	}
 }

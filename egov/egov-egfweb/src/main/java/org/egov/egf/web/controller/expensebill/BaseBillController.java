@@ -272,13 +272,31 @@ public abstract class BaseBillController extends BaseVoucherController {
 
     @SuppressWarnings("unchecked")
     protected void populateBillDetails(final EgBillregister egBillregister) {
+    	LOGGER.info("inside populateBillDetails ");
         egBillregister.getEgBilldetailes().clear();
 
         if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_CONTINGENT)) {
             egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
         } 
         else if (egBillregister.getExpendituretype().equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
+        	LOGGER.info("Expenditure type refund ");
+            List<EgBilldetails> detail=new ArrayList();
+            for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
+            	if(details.getCreditamount()!=null && details.getDebitamount()!=null)
+            	{
+            		LOGGER.info("EgBillDetails add new credit "+details.getCreditamount()+" & debit detail  "+details.getDebitamount());
+            		LOGGER.info("EgBillDetails add function detail "+details.getFunctionid());
+            		detail.add(details);
+            	}
+            }
+            if(egBillregister.getIsCitizenRefund()!=null)
+            {
+            	LOGGER.info("egBillregister.getIsCitizenRefund() "+egBillregister.getIsCitizenRefund());
+            	egBillregister.getEgBilldetailes().addAll(detail);
+            }
+            else{
             egBillregister.getEgBilldetailes().addAll(egBillregister.getBillDetails());
+            }
         }
         else {
             egBillregister.getEgBilldetailes().addAll(egBillregister.getDebitDetails());
@@ -288,14 +306,19 @@ public abstract class BaseBillController extends BaseVoucherController {
         
         for (final EgBilldetails details : egBillregister.getEgBilldetailes()) {
             if (details.getGlcodeid() != null) {
+            	LOGGER.info("details.getGlcodeid() "+details.getGlcodeid());
                 if (egBillregister.getEgBillregistermis().getFunction() != null){
+                	LOGGER.info("egBillregister.getEgBillregistermis().getFunction() "+egBillregister.getEgBillregistermis().getFunction());
                     details.setFunctionid(BigDecimal.valueOf(egBillregister.getEgBillregistermis().getFunction().getId()));
                     details.setFunction(egBillregister.getEgBillregistermis().getFunction());
                 }
                 details.setEgBillregister(egBillregister);
                 details.setLastupdatedtime(new Date());
                 details.setChartOfAccounts(chartOfAccountsService.findById(details.getGlcodeid().longValue(), false));
+                LOGGER.info("details egbillId "+details.getEgBillregister().getId());
+                LOGGER.info("details functionId "+details.getFunctionid());
             }
+            LOGGER.info("details.getGlcodeid() empty");
         }
         if (!egBillregister.getBillPayeedetails().isEmpty())
             populateBillPayeeDetails(egBillregister);

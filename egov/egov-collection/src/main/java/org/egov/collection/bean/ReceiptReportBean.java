@@ -9,6 +9,7 @@ public class ReceiptReportBean {
 	private String receiptNo;
 	private String collectedBy;
 	private String payeeName;
+	private String payeeAddress;
 	private String serviceType;
 	private String modeOfPayment;
 	private String particulars;
@@ -22,6 +23,36 @@ public class ReceiptReportBean {
 	private String gstNo;
 	private String status;
 	private String department;
+	private String serviceCategory;
+	private String chequeddno;
+	private String chequedddate;
+	private String bank;
+	
+	
+	public String getServiceCategory() {
+		return serviceCategory;
+	}
+	public void setServiceCategory(String serviceCategory) {
+		this.serviceCategory = serviceCategory;
+	}
+	public String getChequeddno() {
+		return chequeddno;
+	}
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+	public String getChequedddate() {
+		return chequedddate;
+	}
+	public void setChequedddate(String chequedddate) {
+		this.chequedddate = chequedddate;
+	}
+	public String getBank() {
+		return bank;
+	}
+	public void setBank(String bank) {
+		this.bank = bank;
+	}
 	public String getDepartment() {
 		return department;
 	}
@@ -130,6 +161,12 @@ public class ReceiptReportBean {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getPayeeAddress() {
+		return payeeAddress;
+	}
+	public void setPayeeAddress(String payeeAddress) {
+		this.payeeAddress = payeeAddress;
 	}
 	
 	

@@ -95,8 +95,7 @@
 								code="lbl.judgmentype" /> :<span class="mandatory"></span> </label>
 						<div class="col-sm-3 add-margin">
 							<form:select path="judgmentType" id="judgmentType"
-								onchange="checkjudgment();" name="judgmentType"
-								cssClass="form-control" required="required"
+								name="judgmentType" cssClass="form-control" required="required"
 								cssErrorClass="form-control error">
 								<form:option value="">
 									<spring:message code="lbl.select" />
@@ -165,6 +164,26 @@
 							<form:errors path="compensationAwarded" cssClass="error-msg" />
 						</div>
 					</div>
+					
+					<div class="form-group">
+						<label class="col-sm-3 control-label text-right"><spring:message
+								code="lbl.replysubmitted" /> :</label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="replySubmit" id="replySubmit"
+								class="form-control text-left patternvalidation"
+								 maxlength="500"
+								/>
+							<form:errors path="replySubmit" cssClass="error-msg" />
+						</div>
+						<label class="col-sm-3 control-label text-right"><spring:message
+								code="lbl.argument" />: </label>
+						<div class="col-sm-3 add-margin">
+							<form:input path="argument" id="argument"
+								class="form-control text-left patternvalidation"
+								maxlength="500" />
+							<form:errors path="argument" cssClass="error-msg" />
+						</div>
+					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message
 								code="lbl.judgmentdetails" />: <span class="mandatory"></span>
@@ -177,8 +196,8 @@
 								maxlength="1024" required="required" />
 							<form:errors path="judgmentDetails" cssClass="error-msg" />
 						</div>
-						<label class="col-sm-3 control-label text-right"> <spring:message
-								code="lbl.is.department.acted" /> ?:
+						<label class="col-sm-3 control-label text-right">
+							<spring:message code="lbl.is.department.acted" /> ?:
 						</label>
 						<div class="col-sm-3 add-margin">
 							<form:checkbox id="isDepartmentActed" path="isDepartmentActed"
@@ -188,7 +207,8 @@
 					</div>
 					<div class="form-group">
 						<label class="col-sm-3 control-label text-right"><spring:message
-								code="lbl.action.details" />: </label>
+								code="lbl.action.details" />:
+						</label>
 						<div class="col-sm-3 add-margin">
 							<form:textarea class="form-control text-left patternvalidation"
 								path="departmentActionDetails" id="departmentActionDetails"

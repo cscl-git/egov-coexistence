@@ -1,6 +1,7 @@
 package org.egov.works.boq.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -51,19 +52,43 @@ public class BoQDetails implements Serializable {
 	}
 
 	@Column(name = "rate")
-	private Double rate;
+	private BigDecimal rate;
+
+	public BigDecimal getRate() {
+		return rate;
+	}
+
+	public void setRate(BigDecimal rate) {
+		this.rate = rate;
+	}
 
 	@Column(name = "quantity")
-	private Double quantity;
+	private BigDecimal quantity;
+
+	public BigDecimal getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(BigDecimal quantity) {
+		this.quantity = quantity;
+	}
 
 	@Column(name = "amount")
-	private Double amount;
+	private BigDecimal amount;
 
 	@Column(name = "measured_quantity")
 	private Double measured_quantity;
 
 	@Column(name = "measured_amount")
-	private Double measured_amount;
+	private BigDecimal measured_amount;
+
+	public BigDecimal getMeasured_amount() {
+		return measured_amount;
+	}
+
+	public void setMeasured_amount(BigDecimal measured_amount) {
+		this.measured_amount = measured_amount;
+	}
 
 	@ManyToOne
 	@JoinColumn(name = "work_id")
@@ -108,29 +133,11 @@ public class BoQDetails implements Serializable {
 		this.ref_dsr = ref_dsr;
 	}
 
-	
-
-	public Double getRate() {
-		return rate;
-	}
-
-	public void setRate(Double rate) {
-		this.rate = rate;
-	}
-
-	public Double getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Double quantity) {
-		this.quantity = quantity;
-	}
-
-	public Double getAmount() {
+	public BigDecimal getAmount() {
 		return amount;
 	}
 
-	public void setAmount(Double amount) {
+	public void setAmount(BigDecimal amount) {
 		this.amount = amount;
 	}
 
@@ -170,13 +177,6 @@ public class BoQDetails implements Serializable {
 		this.measured_quantity = measured_quantity;
 	}
 
-	public Double getMeasured_amount() {
-		return measured_amount;
-	}
-	
-	public void setMeasured_amount(Double measured_amount) {
-		this.measured_amount = measured_amount;
-	}
 
 	public String getMilestone() {
 		return milestone;

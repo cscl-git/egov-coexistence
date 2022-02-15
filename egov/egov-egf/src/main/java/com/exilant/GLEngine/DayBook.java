@@ -75,6 +75,7 @@ public class DayBook
     private String chqNo;
     private String chqDate;
     		
+    private String receiptNo;
     
 
     public String getPexno() {
@@ -258,6 +259,14 @@ public class DayBook
 
 	public void setChqDate(String chqDate) {
 		this.chqDate = chqDate;
+	}
+
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
 	}
 
 }

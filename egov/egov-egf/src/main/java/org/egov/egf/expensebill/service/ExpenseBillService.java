@@ -597,12 +597,35 @@ public class ExpenseBillService {
 
                 if (stateValue.isEmpty())
                     stateValue = wfmatrix.getNextState();
-
-                egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
-                        .withComments(approvalComent)
-                        .withStateValue(stateValue).withDateInfo(new Date())
-                        .withNextAction(wfmatrix.getNextAction())
-                        .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+                if(egBillregister.getZone() != null && egBillregister.getZone().equalsIgnoreCase("Y"))
+                {
+                	egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue(stateValue).withDateInfo(new Date())
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+                }
+                else
+                {
+                	 List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+                            FinancialConstants.MODULE_NAME_APPCONFIG, "AUDIT_DEFAULT");
+                	owenrPos=new Position();
+                	owenrPos.setId(Long.valueOf(configValuesByModuleAndKey.get(0).getValue()));
+                	egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+                    .withComments(approvalComent)
+                    .withStateValue("Pending With Audit").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+                    .withNextAction(wfmatrix.getNextAction())
+                    .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+                	
+					/*
+					 * egBillregister.transition().end().withSenderName(user.getUsername() + "::" +
+					 * user.getName()) .withComments(approvalComent)
+					 * .withStateValue(stateValue).withDateInfo(new Date())
+					 * .withNextAction(wfmatrix.getNextAction())
+					 * .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+					 */
+                }
+                
             } else {
                 if (designation != null
                         && finalDesignationNames.get(designation.getName().toUpperCase()) != null)

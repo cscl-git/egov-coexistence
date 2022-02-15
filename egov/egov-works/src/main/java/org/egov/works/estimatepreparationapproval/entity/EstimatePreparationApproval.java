@@ -57,12 +57,35 @@ import org.springframework.web.bind.annotation.InitBinder;
 				@ColumnResult (name="contingent_percentage",type=String.class),@ColumnResult (name="contingent_amount",type=String.class),@ColumnResult (name="consultant_fee",type=String.class),
 				@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="expenditure_head",type=String.class),@ColumnResult (name="expenditure_sub_category",type=String.class),
 				@ColumnResult (name="expenditure_category",type=String.class),@ColumnResult (name="meetnumber",type=String.class),@ColumnResult (name="meetcategory",type=String.class),
-				@ColumnResult (name="meetdate",type=String.class),@ColumnResult (name="expenditure_head_est",type=String.class),@ColumnResult (name="status",type=String.class),@ColumnResult (name="subdivision",type=String.class) }
+				@ColumnResult (name="meetdate",type=String.class),@ColumnResult (name="expenditure_head_est",type=String.class),@ColumnResult (name="status",type=String.class),@ColumnResult (name="subdivision",type=String.class),
+				@ColumnResult (name="roughapprovedate",type=String.class),@ColumnResult (name="adminapprovedate",type=String.class),@ColumnResult (name="approvedate",type=String.class),
+				@ColumnResult (name="owner_name",type=String.class)}
 				)
 })
-@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query = " select tep.id, tep.agency_work_order ,tep.date, tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status,sub.subdivision from txn_estimate_preparation tep , egw_status es, eg_department dep,eg_subdivision sub where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id",
+/*
+ * @NamedNativeQuery(name=
+ * "EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query =
+ * " select tep.id, tep.agency_work_order ,tep.date, tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status,sub.subdivision,tep.roughapprovedate,tep.adminapprovedate,tep.approvedate from txn_estimate_preparation tep , egw_status es, eg_department dep,eg_subdivision sub where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id"
+ * , resultClass = EstimatePreparationApprovalRESTPOJO.class,resultSetMapping =
+ * "AllEstimatePreparationApprovalresultset")
+ */
+@NamedNativeQuery(name="EstimatePreparationApproval.getEstimatePreparationApprovalRESTPOJO", query ="select tep.id, tep.agency_work_order ,tep.date, tep.estimate_amount,tep.estimate_date,tep.estimate_number, \n" + 
+		"tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,\n" + 
+		"tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, \n" + 
+		"tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,\n" + 
+		"tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, \n" + 
+		"tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,\n" + 
+		"tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,\n" + 
+		"tep.expenditure_head, tep.expenditure_sub_category ,tep.expenditure_category,tep.meetnumber, \n" + 
+		"tep.meetcategory ,tep.meetdate ,tep.expenditure_head_est,es.code as status,sub.subdivision,\n" + 
+		"tep.roughapprovedate,tep.adminapprovedate,tep.approvedate , \n" + 
+		"CASE WHEN tep.statusid =625 THEN ''\n" + 
+		"ELSE ews.owner_name\n" + 
+		"END AS owner_name\n" + 
+		"from txn_estimate_preparation tep , egw_status es, eg_department dep,eg_subdivision sub, eg_wf_states ews\n" + 
+		"where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id\n" + 
+		"and tep.state_id=ews.id",
 			resultClass = EstimatePreparationApprovalRESTPOJO.class,resultSetMapping = "AllEstimatePreparationApprovalresultset")
-
 
 
 @Entity
@@ -180,6 +203,17 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	@Column(name="subdivision")
 	private Long subdivision;
 	
+	@Column(name="meetAgenda")
+	private String meetAgenda;
+	
+	public String getMeetAgenda() {
+		return meetAgenda;
+	}
+
+	public void setMeetAgenda(String meetAgenda) {
+		this.meetAgenda = meetAgenda;
+	}
+
 	@Column(name="createdbyuser")
 	private String createdbyuser;
 	
@@ -666,7 +700,17 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 
 	@Override
 	public String getStateDetails() {
-		return getState().getComments().isEmpty() ? estimateNumber : estimateNumber + "-" + getState().getComments();
+		
+		String project_amount="";
+		if(workName!=null && !workName.isEmpty()) {
+			
+		project_amount=workName+"-"+(estimateAmount!=null?estimateAmount.setScale(2, BigDecimal.ROUND_HALF_UP).toString():"");
+		}else {
+			
+			project_amount=estimateAmount!=null?estimateAmount.setScale(2, BigDecimal.ROUND_HALF_UP).toString():"";
+		}
+		
+		return getState().getComments().isEmpty() ? estimateNumber+" ("+project_amount.toString()+")" : estimateNumber + "-" + getState().getComments()+" ("+project_amount.toString()+")";
 	}
 
 	@Override
@@ -1091,9 +1135,26 @@ public class EstimatePreparationApproval extends StateAware implements Serializa
 	}
 
 	
+@Transient
+private List<ExpenditureHeadEntity> headList = new ArrayList<ExpenditureHeadEntity>();
 
+public List<ExpenditureHeadEntity> getHeadList() {
+	return headList;
+}
 	
+public void setHeadList(List<ExpenditureHeadEntity> headList) {
+	this.headList = headList;
+}
 	
+@Transient
+private List<ExpenditureSubHead> subHeadList = new ArrayList<ExpenditureSubHead>();
 
+public List<ExpenditureSubHead> getSubHeadList() {
+	return subHeadList;
+}
+
+public void setSubHeadList(List<ExpenditureSubHead> subHeadList) {
+	this.subHeadList = subHeadList;
+}
 
 }

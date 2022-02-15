@@ -79,19 +79,6 @@
 			 <td width="25%" class="greybox">${voucherDetails.deptName}</td>
 			</tr>
 			<tr>
-			 <td width="10%" class="greybox"><b>Narration :</b></td>
-			 <td width="25%" class="greybox">	 
-			 
-			 
-			 <textarea name="egBillregistermis.narration" id="narration"  class="form-control" maxlength="1024" >${voucherDetails.narration}</textarea>
-			 
-			 
-			 </td>
-			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
-			 <td width="25%" class="greybox">${voucherDetails.banNumber}</td>
-			</tr>
-			
-			<tr>
 			 <td width="10%" class="greybox"><b>Function :</b><span class="mandatory"></span></td>
 			 <td width="25%" class="greybox">
 			 <select name="egBillregistermis.function"
@@ -116,6 +103,14 @@
 				<%-- <options items="${billSubTypes}" itemValue="id" itemLabel="name" /> --%>
 			</select>
 			 </td>
+			</tr>
+			<tr>
+			 <td width="10%" class="greybox"><b>Narration :</b></td>
+			 <td width="25%" class="greybox">
+			 	<textarea name="egBillregistermis.narration" id="narration"  class="form-control" maxlength="1024" >${voucherDetails.narration}</textarea>
+			 </td>
+			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
+			 <td width="25%" class="greybox">${voucherDetails.banNumber}</td>
 			</tr>
 		</table>
 	 </div>
@@ -253,7 +248,7 @@
 				  </select>
 				  </td>
 				  <td>
-				   <select name="billPayeedetails[${count.index}].egBilldetailsId.id" data-first-option="false" id="tempSubLedger[${count.index}].subLedgerType" data-idx="0" class="form-control subledgerGlType" >
+				   <select name="billPayeedetails[${count.index}].egBilldetailsId.id" data-first-option="false" id="tempSubLedger[${count.index}].subLedgerType" data-idx="0" onchange="subledgerChange(this);" class="form-control subledgerGlType" >
 					<option value="${subLedger.detailType.id}">${subLedger.detailType.description}</option>
 					<c:forEach items="${subLedgerTypes}" var="subLedgerType">
 						<option value="${subLedgerType.id}">${subLedgerType.name}</option>
@@ -295,7 +290,7 @@
 				  </select>
 				  </td>
 				  <td>
-				   <select name="billPayeedetails[0].egBilldetailsId.id" data-first-option="false" id="tempSubLedger[0].subLedgerType" data-idx="0" class="form-control subledgerGlType subledgerGl_code" >
+				   <select name="billPayeedetails[0].egBilldetailsId.id" data-first-option="false" id="tempSubLedger[0].subLedgerType" data-idx="0" class="form-control subledgerGlType" >
 					<option value=""><spring:message code="lbl.select" text="Select"/></option>
 					<c:forEach items="${subLedgerTypes}" var="subLedgerType">
 						<option value="${subLedgerType.id}">${subLedgerType.name}</option>
@@ -472,7 +467,7 @@
 			<td id="actionButtons">
 				<c:if test="${mode != 'readOnly'}">
 					<c:forEach items="${validActionList}" var="validButtons">
-						<input type="submit" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"  onclick="return validateFormGlcode();"/>
+						<input type="submit" id="${validButtons}" class="btn btn-primary btn-wf-primary"  value="${validButtons}"  onclick="return validateFormGlcode(this.value);"/>
 					</c:forEach>
 				</c:if>
 				<input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />
@@ -540,7 +535,7 @@
 				<div class="col-sm-3 add-margin">
 				<select data-first-option="false" name="bank" id="bank" class="form-control">
 				  <option value="">select</option>
-				  <c:forEach var="banks" items="${banks}">
+				  <c:forEach var="banks" items="${bankList}">
 				    <option value="${banks.id}">${banks.name}</option>
                     </c:forEach>
 				  </select>
@@ -599,12 +594,24 @@
 	
 	
 	}); */ 
-	
-	
+	function subledgerChange(subledger){
+		$modal = $('#myModal');
+	      var subtype=$(".subledgerGlType option:selected").text();
+	      //alert(subtype);
+	      //if($(this).val() == '23'){
+	    	 if(subledger.value=='16'){ 
+	    	  var id = $(this).attr("id");
+	    	  $('#indexRef').val(id);
+	        $modal.modal('show');
+	    }
+	}
 	
 	 $(".subledgerGlType").on("change", function () {        
 	      $modal = $('#myModal');
-	      if($(this).val() == '23'){
+	      var subtype=$(".subledgerGlType option:selected").text();
+	      //alert(subtype);
+	      //if($(this).val() == '23'){
+	    	 if(subtype.includes('OtherParty')){ 
 	    	  var id = $(this).attr("id");
 	    	  $('#indexRef').val(id);
 	        $modal.modal('show');

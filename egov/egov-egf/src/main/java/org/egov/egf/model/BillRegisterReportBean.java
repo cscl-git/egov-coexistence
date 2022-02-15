@@ -119,6 +119,10 @@ public class BillRegisterReportBean {
     private BigDecimal otherChargesAmount;
     private BigDecimal otherRecovFromEmployeesAmount;
     
+    private String receiptNo;
+    
+    
+    
     public String getBillNumber() {
         return billNumber;
     }
@@ -550,6 +554,14 @@ public class BillRegisterReportBean {
 
 	public void setSubdivision(String subdivision) {
 		this.subdivision = subdivision;
+	}
+
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
 	}
 
 	

@@ -76,8 +76,8 @@ $(document).ready(function(){
 	worksDiv();
 	$netPayableAccountCodeId = $('#netPayableId').val();
 	patternvalidation(); 
-	//creditGlcode_initialize();
-	//debitGlcode_initialize();
+	creditGlcode_initialize();
+	debitGlcode_initialize();
 	//creditGlcode_initialize();
 	$('#fund').val($('#fund').val());
 	//loadCheckListTable();
@@ -106,6 +106,8 @@ $(document).ready(function(){
 			url : '/services/EGF/common/getentitesbyaccountdetailtype?name=',
 			replace: function (url, query) {
 				var subLedgerType = $('.subledgerGl_code').val();
+				if(subLedgerType == null || subLedgerType == "")
+					subLedgerType =document.getElementById('tempSubLedger[0].subLedgerType').value;
 				if(subLedgerType == null || subLedgerType == "")
 					bootbox.alert($.i18n.prop('msg.select.subledger.type'));
 				return url + query + '&accountDetailType=' + subLedgerType ;
@@ -148,6 +150,27 @@ $('.subLedgerCodeOT').typeahead({
 		$("#detailkeyId").val(data.id);*/
 	});
 });
+
+function changeGlCodeBlank(ele){
+	var creditDetailsCount = $("#tblcreditdetails > tbody > tr:visible[id='creditdetailsrow']").length;
+	$('#glcodeid').empty();
+	for(var i=0;i<=creditDetailsCount;++i){
+	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
+      var k= document.getElementById('billDetails['+i+'].debitamount').value;         
+      var j = document.getElementById('billDetails['+i+'].debitamount').value;
+     if(j!=null && j!="" && parseInt(k)<=parseInt(j)){
+        var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
+		var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
+		  var k ='<option value="'+glId_+'">'+glcode_+'</option>';
+		  $('#glcodeid').append(k); 
+      }else{
+      	document.getElementById('billDetails['+i+'].debitamount').value='';
+			bootbox.alert('Please fill valid debit amount for '+document.getElementById('billDetails['+i+'].glcode').value+' code.');	
+      }		 
+	}	 
+  }
+}
+ 
 
 $('.btn-wf-primary').click(function(){
 	var button = $(this).attr('id');
@@ -691,6 +714,7 @@ $('.netPayableAccount_Code').change(function () {
 
 
 function addSubledgerRow(x) { 
+	//alert("addSubledger");
 	var dataId = $(x).attr("data-idx");
 
 	
@@ -1558,8 +1582,8 @@ function changeGlCode(totalrow,cramt,l,preamt){
 	$('#glcodeid').empty();
 	for(var i=0;i<totalrow;++i){
 	  
-	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null){
-
+	if(document.getElementById('billDetails['+i+'].debitamount').value != "" && document.getElementById('billDetails['+i+'].debitamount').value !=null)
+	{
       var j = document.getElementById('billDetails['+i+'].debitamount').value;
 		if(((parseFloat(j) > parseFloat(cramt)-preamt)) && parseInt(l) == i ){
 			document.getElementById('billDetails['+i+'].debitamount').value='';
@@ -1567,11 +1591,23 @@ function changeGlCode(totalrow,cramt,l,preamt){
 			
 			continue;
 		}
-		//var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
-		//var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
-		  //var k ='<option value="'+glId_+'">'+glcode_+'</option>';
-		  //$('#glcodeid').append(k);  
+		///added abhishek on 2Dec2021 for Glcode not mapped and still have to refund the amount
+		var k= document.getElementById('billDetails['+i+'].debitamount').value;         
+		var j = document.getElementById('billDetails['+i+'].debitamount').value;
+
+		if(j!=null && j!="" && parseInt(k)<=parseInt(j)){
+			var glcode_= document.getElementById('billDetails['+i+'].glcode').value;
+			var glId_ = document.getElementById('billDetails['+i+'].glcodeid').value;
+			var k ='<option value="'+glId_+'">'+glcode_+'</option>';
+			$('#glcodeid').append(k); 
+		}else{
+			document.getElementById('billDetails['+i+'].debitamount').value='';
+			bootbox.alert('Please fill valid debit amount for '+document.getElementById('billDetails['+i+'].glcode').value+' code.');	
+		}
+		//////				 
+				 
 	}	
+		 
 		 
  }
 }
@@ -1581,7 +1617,7 @@ function viewVoucher(vhid){
 	window.open('/services/EGF/refund/_viewVoucher?vhid=' + vhid,'','width=1200, height=800');
 }
 
-function validateFormGlcode(){
+/*function validateFormGlcode(){
 	var status = false;
 	var glcodeArr =[];
 	
@@ -1634,7 +1670,7 @@ function validateFormGlcode(){
 	
 	
 	
-	/* if(billtype == null || billtype == '' ||billtype=='-1')
+	 if(billtype == null || billtype == '' ||billtype=='-1')
 		{
 			bootbox.alert('Please select Function to view budget details');
 			status = true;
@@ -1646,12 +1682,118 @@ function validateFormGlcode(){
 		bootbox.alert('Please select Function to view budget details');
 		status = true;
 		return false
-	}*/
+	}
 	 
 	 
 	 
 	
 	document.forms[0].action='/services/EGF/refund/refundCreate';
+	document.forms[0].submit();
+	return true;
+
+	}*/
+function validateFormGlcode(workFlowAction){
+	var creditDetailsCount = $("#tblaccountdetails > tbody > tr:visible[id='creditdetailsrow']").length;
+			for(var i=0;i<creditDetailsCount;i++){
+				var total_to_check = document.getElementById('billDetails['+i+'].debitamount').value;
+				var glcode_to_check = document.getElementById('billDetails['+i+'].glcodeid').value;
+				var glocode_alert =  document.getElementById('billDetails['+i+'].glcode').value;
+				var subledgerDetailsCount = $("#tblSubledgerAdd > tbody > tr:visible[id='subledgerdetailsrow']").length;
+				var sum= 0;
+				for(var j = 0;j<subledgerDetailsCount;j++){
+					var glname_now = "billPayeedetails["+j+"].egBilldetailsId.glcodeid";
+					$("billPayeedetails["+j+"].egBilldetailsId.glcodeid").val();
+					var subledgerglcode=  $("[name='"+glname_now+"']").val();
+
+					if(subledgerglcode!=null && glcode_to_check!=null && glcode_to_check==subledgerglcode){
+						var amount = null;
+						if(i<=creditDetailsCount){
+                               amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_0mount').value;
+						}if(i>1){
+							   amount = 	document.getElementById('tempSubLedger['+j+'].netPayable_0mount').value;
+						}
+					  
+						if(amount ==null || amount==""){
+							if( workFlowAction=='Forward'){
+								bootbox.alert("Amount is empty in Subledger for glocode "+glocode_alert);
+								return false;
+							}
+						}else{
+							sum = parseInt(sum)+parseInt(amount);
+	 
+						}	
+					}		
+				}
+				
+				if(sum!=total_to_check){
+					if( workFlowAction=='Forward'){
+						bootbox.alert("Amount is invalid in Subledger for glocode "+glocode_alert);
+					return false;
+				}		 
+			}	 
+			}	 
+							
+		
+			document.getElementById("workFlowAction").value = workFlowAction;
+			var func=document.getElementById('egBillregistermis.function').value;
+			var billtype = document.getElementById('billSubType').value;
+			var subdiv=document.getElementById('egBillregistermis.subdivision').value;
+			var accCode='';
+			var status = false;
+			
+			if(billtype == null || billtype == '' ||billtype=='-1')
+			{
+				bootbox.alert('Please select bill type details');
+				status = true;
+				return false
+			}
+
+			if(func == null || func == '' ||func=='-1')
+			{
+				bootbox.alert('Please select function details');
+				status = true;
+				return false
+			}
+			if(subdiv == null || subdiv == '' ||subdiv=='-1')
+			{
+				bootbox.alert('Please select subdivision details');
+				status = true;
+				return false
+			}
+			var approvalDepartment=document.getElementById('approvalDepartment').value;
+			var approvalDesignation=document.getElementById('approvalDesignation').value;
+			var approvalPosition=document.getElementById('approvalPosition').value;
+			var approvalComent=document.getElementById('approvalComent').value;
+			if(workFlowAction=='Forward')
+			{
+				if(approvalDepartment == null || approvalDepartment == '' ||approvalDepartment=='-1')
+				{
+					bootbox.alert('Please select approval department details');
+					status = true;
+					return false
+				}
+				if(approvalDesignation == null || approvalDesignation == '' ||approvalDesignation=='-1')
+				{
+					bootbox.alert('Please select approval designation details');
+					status = true;
+					return false
+				}
+				if(approvalPosition == null || approvalPosition == '' ||approvalPosition=='-1')
+				{
+					bootbox.alert('Please select approver details');
+					status = true;
+					return false
+				}
+			}
+	 
+	if(document.getElementById('citizen').value!=null)
+	{
+		if(document.getElementById('billSubType').value=="Y"){
+			//document.forms[0].action='${pageContext.request.contextPath}/expensebill/update/${egBillregister.id}";
+		}
+	}else{
+	document.forms[0].action='/services/EGF/refund/refundCreate';
+	}
 	document.forms[0].submit();
 	return true;
 

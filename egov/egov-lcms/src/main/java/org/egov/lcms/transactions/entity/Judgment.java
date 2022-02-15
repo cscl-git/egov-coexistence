@@ -228,6 +228,14 @@ public class Judgment extends AbstractAuditable {
     @Audited
     private String departmentActionDetails;
 
+    @Column(name = "replySubmit")
+    @Audited
+    private String replySubmit;
+    
+    @Column(name = "argument")
+    @Audited
+    private String argument;
+    
     @Override
     public Long getId() {
         return id;
@@ -481,6 +489,22 @@ public class Judgment extends AbstractAuditable {
 
 	public void setResolutiondate(Date resolutiondate) {
 		this.resolutiondate = resolutiondate;
+	}
+
+	public String getReplySubmit() {
+		return replySubmit;
+	}
+
+	public void setReplySubmit(String replySubmit) {
+		this.replySubmit = replySubmit;
+	}
+
+	public String getArgument() {
+		return argument;
+	}
+
+	public void setArgument(String argument) {
+		this.argument = argument;
 	}
 
 }

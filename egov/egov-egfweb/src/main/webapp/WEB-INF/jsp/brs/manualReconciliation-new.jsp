@@ -200,7 +200,20 @@
             class="greybox"></td>
           <td class="greybox"><input type="text"  name="reconcileBean.instrumentNo" id="instrumentNo" /></td>
 
+          
+          <!-- <td class="greybox"></td> -->
+           <td class="greybox" >Status Type <span
+            class="greybox"><span
+						class="greybox"><span class="mandatory1">*</span></span></td>
+          <td class="greybox">
+          <s:select name="reconcileBean.statusType" id="statusType" 
+							list="dropdownData.statusTypeList" listKey="code"
+							listValue="description" headerKey="-1" headerValue="Select from below"/>
           </td>
+          
+        </tr>
+        <tr>
+        	<td class="greybox"></td>
           <td class="greybox"><s:text name="limit" /> <span
             class="greybox"></td>
           <td class="greybox"><s:textfield name="reconcileBean.limit" id="limit"  /></td>

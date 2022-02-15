@@ -110,6 +110,7 @@ import org.egov.services.voucher.VoucherService;
 import org.egov.utils.Constants;
 import org.egov.utils.FinancialConstants;
 import org.hibernate.HibernateException;
+import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.context.WebApplicationContext;
@@ -211,7 +212,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
     private String secondsignatory="";
     private String backlogEntry="";
     private String subdivision;
-
+    private String budgetAppNo="";
     private EgBillregister egBillregister = new EgBillregister();
     private List<EgBillregister> refundpreApprovedVoucherList;
     private String type;
@@ -374,8 +375,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         	voucherHeader.getVouchermis().setDepartmentName(egBillregister.getEgBillregistermis().getDepartmentName());
         	voucherHeader.getVouchermis().setFunction(egBillregister.getEgBillregistermis().getFunction());
         	voucherHeader.getVouchermis().setFunctionary(egBillregister.getEgBillregistermis().getFunctionaryid());
-        	
-           
+        	voucherHeader.getVouchermis().setBudgetaryAppnumber(egBillregister.getEgBillregistermis().getBudgetaryAppnumber());
         }
         commonBean.setDocumentNumber(egBillregister.getBillnumber());
         Date docu_date=egBillregister.getBilldate();
@@ -384,7 +384,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
         commonBean.setPaidTo(egBillregister.getEgBillregistermis().getPayto());
         if(egBillregister.getRefundable() != null && egBillregister.getRefundable().equalsIgnoreCase("Y")) {
         	commonBean.setRefundable(egBillregister.getRefundable());
-        	commonBean.setNarrtion(egBillregister.getRefundnarration());
+        	commonBean.setNarrtion(egBillregister.getEgBillregistermis().getNarration());
         }
         else {
         	commonBean.setNarrtion(egBillregister.getEgBillregistermis().getNarration());
@@ -834,7 +834,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
 				commonBean.setFirstsignatory(arrOfStr1[0]);
 				commonBean.setSecondsignatory(arrOfStr2[0]);
 				commonBean.setBackdateentry(arrOfStr3[0]);
-				 
+				System.out.println("banno:- "+voucherHeader.getVouchermis().getBudgetaryAppnumber()); 
 				voucherHeader.setBackdateentry(arrOfStr3[0]);
 				firstsignatory=arrOfStr1[0];
 				secondsignatory=arrOfStr2[0];
@@ -844,7 +844,7 @@ public class DirectBankPaymentAction extends BasePaymentAction {
                 paymentheader = paymentActionHelper.createDirectBankPayment(paymentheader, voucherHeader, billVhId,
                         commonBean, billDetailslist, subLedgerlist, workflowBean,firstsignatory,secondsignatory);
                 showMode = "create";
-                
+                paymentheader.getVoucherheader().setBackdateentry(backlogEntry);
                 paymentheader.getVoucherheader().getVouchermis().setSubdivision(subdivision);
                 
                 if (!cutOffDate.isEmpty() && cutOffDate != null)

@@ -92,7 +92,7 @@ public class EstimateApprovalRestTestController {
 	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllWorkOrderAgreementRestByMileStone(){
 		ModelMap m = new ModelMap();
-		
+		m.put("allWorkAgreement", boQDetailsService.getAllWorkOrderAgreementRestByMileStone());
 		return new ResponseEntity<>(ResponseInfoWrapper.builder()
 				.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
 				.responseBody(boQDetailsService.getAllWorkOrderAgreementRestByMileStone()).build(),getHeaders(), HttpStatus.OK);

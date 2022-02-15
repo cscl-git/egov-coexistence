@@ -32,6 +32,29 @@
 			value="/WEB-INF/views/audit/createAudit.jsp" />
 
 	</definition>
+	
+	
+	<definition name="passUnderObjectionJsp" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+	cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/passUnderObjectionJsp.jsp" />
+
+	</definition>
+	
+	<definition name="passUnderObj-formedit" extends="base_layout">
+
+		<put-attribute name="page-title" value="Audit"
+	cascade="true" />
+
+		<put-attribute name="body"
+			value="/WEB-INF/views/audit/passUnderObj-formedit.jsp" />
+
+	</definition>
+	
+	
 	<definition name="audit-success" extends="base_layout">
 		<put-attribute name="page-title" value="Audit"
 			cascade="true" />

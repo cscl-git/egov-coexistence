@@ -74,7 +74,7 @@ public class BankAdviceReportInfo {
     private BigDecimal dtId;
     private BigDecimal dkId;
     private Long instType;
-
+    private String typeOfPayment;
     public BigDecimal getDtId() {
         return dtId;
     }
@@ -225,6 +225,14 @@ public class BankAdviceReportInfo {
 
 	public void setInstType(Long instType) {
 		this.instType = instType;
+	}
+
+	public String getTypeOfPayment() {
+		return typeOfPayment;
+}
+
+	public void setTypeOfPayment(String typeOfPayment) {
+		this.typeOfPayment = typeOfPayment;
 	}
 
 }

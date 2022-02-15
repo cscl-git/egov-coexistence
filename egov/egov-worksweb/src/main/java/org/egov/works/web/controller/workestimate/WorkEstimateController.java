@@ -316,7 +316,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
 
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 		BoQDetails boq = new BoQDetails();
-		Double amount = 0d;
+		BigDecimal amount = new BigDecimal(0);
 
 		for (int i = 0; i < estimatePreparationApproval.getNewBoQDetailsList().size(); i++) {
 			if (estimatePreparationApproval.getNewBoQDetailsList().get(i).isCheckboxChecked()) {
@@ -324,11 +324,11 @@ public class WorkEstimateController extends GenericWorkFlowController{
 				
 				boq.setSizeIndex(responseList.size());
 				responseList.add(boq);
-				amount += estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount();
+				amount = amount.add(estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount());
 			}
 		}
 		DNITCreation saveBoqDetails = workEstimateService.searchDnitBoqData(request, id);
-		BigDecimal bd=new BigDecimal(amount).setScale(2,BigDecimal.ROUND_HALF_UP);
+		BigDecimal bd=amount.setScale(2,BigDecimal.ROUND_HALF_UP);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
 		System.out.println("Expenditure head "+saveBoqDetails.getExpHead_est());
 		workOrderAgreement.setExpHead_est(saveBoqDetails.getExpHead_est());
@@ -381,19 +381,19 @@ public class WorkEstimateController extends GenericWorkFlowController{
 
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 		BoQDetails boq = new BoQDetails();
-		Double amount = 0d;
+		BigDecimal amount = new BigDecimal(0);
 
 		for (int i = 0; i < estimatePreparationApproval.getNewBoQDetailsList().size(); i++) {
 			if (estimatePreparationApproval.getNewBoQDetailsList().get(i).isCheckboxChecked()) {
 				boq = estimatePreparationApproval.getNewBoQDetailsList().get(i);
 				boq.setSizeIndex(responseList.size());
 				responseList.add(boq);
-				amount += estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount();
+				amount = amount.add(estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount());
 			}
 		}
 		EstimatePreparationApproval saveBoqDetails = workEstimateService.searchBoqData(request, id);
 		System.out.println("expendi:: "+saveBoqDetails.getExpHead_est());
-		BigDecimal bd=new BigDecimal(amount).setScale(2,BigDecimal.ROUND_HALF_UP);
+		BigDecimal bd=amount.setScale(2,BigDecimal.ROUND_HALF_UP);
 		WorkOrderAgreement workOrderAgreement = new WorkOrderAgreement();
 		workOrderAgreement.setExpHead_est(saveBoqDetails.getExpHead_est());
 		workOrderAgreement.setWorkfrom("EstandDnit");
@@ -449,7 +449,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
 
 		List<BoQDetails> responseList = new ArrayList<BoQDetails>();
 		BoQDetails boq = new BoQDetails();
-		Double amount=0.0;
+		BigDecimal amount=new BigDecimal(0);
 		//BigDecimal amount = new BigDecimal(0.0);
 		DNITCreation dnitCreation=new DNITCreation();
 
@@ -459,10 +459,10 @@ public class WorkEstimateController extends GenericWorkFlowController{
 				boq.setSizeIndex(responseList.size());
 				responseList.add(boq);
 				//BigDecimal decimal =new BigDecimal(estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount());
-				Double decimal=estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount();
+				BigDecimal decimal=estimatePreparationApproval.getNewBoQDetailsList().get(i).getAmount();
 				
 				//amount.add(decimal);
-				amount +=decimal ;
+				amount =amount.add(decimal) ;
 			}
 		}
 		
@@ -480,7 +480,7 @@ public class WorkEstimateController extends GenericWorkFlowController{
         estimateDetails.setSubdivisions(workEstimateService.getsubdivision(Long.valueOf(dept)));
         estimateDetails.setNewdepartments(workEstimateService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
 		//estimateDetails.setDepartments(getDepartmentsFromMs());
-		estimateDetails.setEstimateAmount(BigDecimal.valueOf(amount).setScale(2, BigDecimal.ROUND_HALF_UP));
+		estimateDetails.setEstimateAmount(amount.setScale(2, BigDecimal.ROUND_HALF_UP));
 		
 		//for Identification purpose
 		estimateDetails.setDnitfromestimate("fromEstimate");

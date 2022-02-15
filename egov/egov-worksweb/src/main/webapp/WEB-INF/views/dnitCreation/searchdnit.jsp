@@ -57,10 +57,11 @@
 								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.estimate.preparation.executing.division" /><span
-						class="mandatory"></span></label>
+							code="lbl.estimate.preparation.executing.division" /><!-- <span
+						class="mandatory"></span> --></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="department" id="department" required="true"
+						<%-- <form:select path="department" id="department" required="true" --%>
+						<form:select path="department" id="department"
 							class="form-control">
 									<form:option value="">
 										<spring:message code="lbl.select" />
@@ -72,8 +73,7 @@
 							<label class="col-sm-3 control-label text-left-audit">Sub-Division</label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="subdivision" id="subdivision"
-							cssClass="form-control"
-							cssErrorClass="form-control-works error" >
+							cssClass="form-control" cssErrorClass="form-control-works error">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
@@ -93,14 +93,14 @@
 					<div class="col-sm-3 add-margin">
 						<form:input id="fromDt" path="fromDt"
 							class="form-control datepicker" data-date-end-date="0d"
-							placeholder="DD/MM/YYYY" />
+							placeholder="DD/MM/YYYY" /><!-- required="true" -->
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.work.dnit.to.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="toDt" path="toDt" class="form-control datepicker"
-							data-date-end-date="0d" placeholder="DD/MM/YYYY" />
+							 data-date-end-date="0d" placeholder="DD/MM/YYYY" /><!-- required="true" -->
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.work.location" /></label>
@@ -110,8 +110,9 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:select path="sectorNumber" id="sectorNumber" multiple="multiple"
-									cssClass="form-control" cssErrorClass="form-control error">
+						<form:select path="sectorNumber" id="sectorNumber"
+							multiple="multiple" cssClass="form-control"
+							cssErrorClass="form-control error">
 									<form:option value="">
 										<spring:message code="lbl.select" />
 									</form:option>
@@ -266,8 +267,7 @@
 
 		<div class="buttonbottom" align="center">
 			<input type="submit" id="workDnitSearch" class="btn btn-primary"
-						name="workDnitSearch" code="lbl.search.work.estimate"
-						value="Search" />
+				name="workDnitSearch" code="lbl.search.work.estimate" value="Search" />
 				</div>
 				<!-- <div class="buttonbottom" align="center">
 			<input type="submit" id="workEditDnit" class="btn btn-primary"
@@ -303,8 +303,8 @@
 						<c:if
 							test="${workdnitDetails.estimateList != null &&  !workdnitDetails.estimateList.isEmpty()}">
 							<tbody>
-								<c:forEach items="${workdnitDetails.estimateList}"
-									var="result" varStatus="status">
+								<c:forEach items="${workdnitDetails.estimateList}" var="result"
+									varStatus="status">
 									<tr>
 										<td><form:hidden
 												path="estimateList[${status.index}].workName"
@@ -313,8 +313,8 @@
 										
 										<td><form:hidden
 												path="estimateList[${status.index}].estimateNumber"
-												id="estimateList[${status.index}].estimateNumber" />
-											<a href="#" onclick="openDNIT('${result.id}')">${result.estimateNumber }</a></td>
+												id="estimateList[${status.index}].estimateNumber" /> <a
+											href="#" onclick="openDNIT('${result.id}')">${result.estimateNumber }</a></td>
 										<td><form:hidden
 												path="estimateList[${status.index}].estimateDt"
 												id="estimateList[${status.index}].estimateDt" />
@@ -333,13 +333,27 @@
 											${result.pendingWith }</td>
 									</tr>
 								</c:forEach>
-							<tbody>
+
+
+							</tbody>
 						</c:if>
 						<c:if
 							test="${workdnitDetails.estimateList == null ||  workdnitDetails.estimateList.isEmpty()}">
 					No records found
 					</c:if>
+
 					</table>
+					<c:if test="${workdnitDetails.estimateList != null &&  !workdnitDetails.estimateList.isEmpty()}">
+
+						<center>
+							<!-- <input type="submit" id="exportToExcel"
+								class="btn btn-primary btn-wf-primary" name="exportToExcel"
+								onclick="searchCheck()" value="Export to Excel" /> -->
+								<input type="button" id="exportToExcel"
+								class="btn btn-primary btn-wf-primary" name="exportToExcel"
+								onclick="searchCheck()" value="Export to Excel" />
+						</center>
+					</c:if>
 				</div>
 
 			</div>

@@ -7,9 +7,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.repository.DepartmentRepository;
+import org.egov.infstr.services.PersistenceService;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.DNITCreation;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.ExpenditureHeadEntity;
 import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
 import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.DNITCreationRepository;
@@ -17,6 +19,7 @@ import org.egov.works.estimatepreparationapproval.repository.EstimatePreparation
 import org.egov.works.estimatepreparationapproval.repository.SudivisionRepository;
 import org.egov.works.estimatepreparationapproval.repository.WorkswingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,8 +37,9 @@ public class WorkEstimateService {
 	private SudivisionRepository sudivisionrepo;
 	@Autowired
 	private DepartmentRepository departmentrepository;
-
-	
+	@Autowired
+	@Qualifier("persistenceService")
+	private PersistenceService persistenceService;
 
 	@Transactional
 	public List<EstimatePreparationApproval> searchWorkEstimateData(HttpServletRequest request,
@@ -74,7 +78,13 @@ public class WorkEstimateService {
 				&& estimatePreparationApproval.getFromDt() == null && estimatePreparationApproval.getToDt() == null) {
 			workEstimateDetails = estimatePreparationApprovalRepository
 					.findByExecutingDivisionAndStatusId(estimatePreparationApproval.getExecutingDivision());
-		} else {
+		}
+		else if (estimatePreparationApproval.getFromDt() != null && estimatePreparationApproval.getToDt() != null) {
+			workEstimateDetails = estimatePreparationApprovalRepository
+					.findByEstimateDates(estimatePreparationApproval.getFromDt(),
+							estimatePreparationApproval.getToDt());
+		}
+		else {
 			workEstimateDetails = estimatePreparationApprovalRepository.findByParams(
 					estimatePreparationApproval.getExecutingDivision(), estimatePreparationApproval.getFromDt(),
 					estimatePreparationApproval.getToDt());
@@ -164,6 +174,66 @@ public class WorkEstimateService {
 	public List<Workswing> getworskwing() {
 		List<Workswing> workwing = workswingrepository.findAll();
 	return workwing;
+	}
+
+	public List<ExpenditureHeadEntity> fetchExpHeadList() {
+		List<ExpenditureHeadEntity> headLst = new ArrayList<ExpenditureHeadEntity>();
+		List<Object[]> list =null;
+		try {
+			String query = "select bq.headId, bq.expenditureHead from ExpenditureHeadEntity bq ";
+		
+			list = persistenceService.findAllBy(query);
+			if(list!= null && list.size()>0) {
+				for(Object[] object : list) {
+					ExpenditureHeadEntity expHeadObj = new ExpenditureHeadEntity();
+					expHeadObj.setHeadId(Long.parseLong(object[0].toString()));
+					expHeadObj.setExpenditureHead(object[1].toString());
+					headLst.add(expHeadObj);
+				}
+				
+			}
+			
+			System.out.println("###### head list size::"+headLst.size());
+			
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return headLst;
+	}
+
+	public long fetchHeadIdFromHead(String expHead) {
+		long headId = 0L;
+		List<Object[]> list = null;
+		try {
+			String query = "SELECT bq.headId from ExpenditureHeadEntity bq ";
+			list = persistenceService.findAllBy(query);
+			if(list != null && !list.isEmpty()) {
+				for(Object[] object : list) {
+					headId = Long.parseLong(object[0].toString());
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return headId;
+	}
+
+	public long fetchSubHeadIdFromSubHead(String expSubCategory) {
+		long subheadId = 0L;
+		List<Object[]> list = null;
+		try {
+			String query = "SELECT bq.subHeadId from ExpenditureSubHead bq ";
+			list = persistenceService.findAllBy(query);
+			if(list != null && !list.isEmpty()) {
+				for(Object[] object : list) {
+					subheadId = Long.parseLong(object[0].toString());
+				}
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		return subheadId;
 	}
 
 }

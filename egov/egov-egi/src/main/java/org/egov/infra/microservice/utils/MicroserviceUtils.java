@@ -1092,9 +1092,11 @@ public class MicroserviceUtils {
         if(insSearchContra.getTransactionType() != null){
             url.append("&transactionType=").append(insSearchContra.getTransactionType().name());
         }
-        if(StringUtils.isNotBlank(insSearchContra.getFinancialStatuses())){
-            url.append("&financialStatuses=").append(insSearchContra.getFinancialStatuses());
-        }
+		
+		  if(StringUtils.isNotBlank(insSearchContra.getFinancialStatuses())){
+		  url.append("&financialStatuses=").append(insSearchContra.getFinancialStatuses
+		  ()); }
+		 
         if(StringUtils.isNotBlank(insSearchContra.getTransactionNumber())){
             url.append("&transactionNumber=").append(insSearchContra.getTransactionNumber());
         }
@@ -1121,6 +1123,51 @@ public class MicroserviceUtils {
         return response.getInstruments();
     }
 
+    public List<Instrument> getInstrumentsBySearchCriteriaForReconciliation(InstrumentSearchContract insSearchContra) {
+        StringBuilder url = new StringBuilder().append(appConfigManager.getEgovEgfInstSerHost()).append(instrumentSearchUrl)
+                .append("?tenantId=").append(getTenentId());
+        if(StringUtils.isNotBlank(insSearchContra.getIds())){
+           url.append("&ids=").append(insSearchContra.getIds());
+        }
+        if(StringUtils.isNotBlank(insSearchContra.getBankAccountNumber())){
+            url.append("&bankAccount.accountNumber=").append(insSearchContra.getBankAccountNumber());
+        }
+        if(StringUtils.isNotBlank(insSearchContra.getInstrumentTypes())){
+            url.append("&instrumentTypes=").append(insSearchContra.getInstrumentTypes());
+        }
+        if(insSearchContra.getTransactionType() != null){
+            url.append("&transactionType=").append(insSearchContra.getTransactionType().name());
+        }
+		
+		  if(StringUtils.isNotBlank(insSearchContra.getFinancialStatuses()) && !insSearchContra.getFinancialStatuses().equalsIgnoreCase("All")){
+		  url.append("&financialStatuses=").append(insSearchContra.getFinancialStatuses
+		  ()); }
+		 
+        if(StringUtils.isNotBlank(insSearchContra.getTransactionNumber())){
+            url.append("&transactionNumber=").append(insSearchContra.getTransactionNumber());
+        }
+        if(insSearchContra.getPageSize() != null){
+            url.append("&pageSize=").append(insSearchContra.getPageSize());
+        }
+        if(StringUtils.isNotBlank(insSearchContra.getReceiptIds())){
+            url.append("&receiptIds=").append(insSearchContra.getReceiptIds());
+        }
+        if(insSearchContra.getTransactionFromDate() != null){
+            Date fromDate = insSearchContra.getTransactionFromDate();
+            url.append("&transactionFromDate=").append(ddMMMyyyyFormat.format(fromDate));
+        }
+        if(insSearchContra.getTransactionToDate() != null){
+            Date toDate = insSearchContra.getTransactionToDate();
+            url.append("&transactionToDate=").append(ddMMMyyyyFormat.format(toDate));
+        }
+        RequestInfo requestInfo = new RequestInfo();
+        RequestInfoWrapper reqWrapper = new RequestInfoWrapper();
+        requestInfo.setAuthToken(getUserToken());
+        reqWrapper.setRequestInfo(requestInfo);
+        LOGGER.info("call:" + url);
+        InstrumentResponse response = restTemplate.postForObject(url.toString(), reqWrapper, InstrumentResponse.class);
+        return response.getInstruments();
+    }
     public List<Instrument> getInstruments(String ids) {
         InstrumentSearchContract contract = new InstrumentSearchContract();
         contract.setIds(ids);

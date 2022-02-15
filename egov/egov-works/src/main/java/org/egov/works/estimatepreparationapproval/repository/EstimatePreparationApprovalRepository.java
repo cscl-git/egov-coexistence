@@ -33,6 +33,9 @@ public interface EstimatePreparationApprovalRepository extends JpaRepository<Est
 	List<EstimatePreparationApproval> findByParams(@Param("executingDivision") Long executingDivision,
 			@Param("fromDt") Date fromDt, @Param("toDt") Date toDt);
 
+	@Query(" from EstimatePreparationApproval tep where tep.estimateDate BETWEEN :fromDt AND :toDt and tep.status = (select es.id from EgwStatus es where es.code ='Approved' and es.moduletype ='EstimatePreparationApproval')")
+	List<EstimatePreparationApproval> findByEstimateDates(@Param("fromDt") Date fromDt, @Param("toDt") Date toDt);
+
 	@Query(" from EstimatePreparationApproval tep where tep.workStatus =:workStatus or tep.workCategory =:workCategory or tep.executingDivision =:executingDivision or tep.workName =:workName or tep.workLocation =:workLocation or tep.sectorNumber =:sectorNumber or tep.wardNumber =:wardNumber or tep.fundSource =:fundSource or tep.estimateAmount =:estimateAmount or tep.tenderCost =:tenderCost or tep.agencyWorkOrder =:agencyWorkOrder or tep.date =:date or tep.timeLimit =:timeLimit")
 	List<EstimatePreparationApproval> findByAllParameters(@Param("workStatus") Long workStatus,
 			@Param("workCategory") String workCategory, @Param("executingDivision") Long executingDivision,

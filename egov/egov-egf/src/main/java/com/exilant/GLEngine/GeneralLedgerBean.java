@@ -104,6 +104,11 @@ public class GeneralLedgerBean
     private String schemeId;
     private String narrationText;
 
+    private String receiptNo;
+    
+    private String credit_receiptNo;
+    private String debit_receiptNo;
+    
     public String getVoucherName() {
         return voucherName;
     }
@@ -860,5 +865,32 @@ public class GeneralLedgerBean
 	public void setNarrationText(String narrationText) {
 		this.narrationText = narrationText;
 	}
+
+	public String getCredit_receiptNo() {
+		return credit_receiptNo;
+	}
+
+	public void setCredit_receiptNo(String credit_receiptNo) {
+		this.credit_receiptNo = credit_receiptNo;
+	}
+
+	public String getDebit_receiptNo() {
+		return debit_receiptNo;
+	}
+
+	public void setDebit_receiptNo(String debit_receiptNo) {
+		this.debit_receiptNo = debit_receiptNo;
+	}
+
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
+	}
+
+
+
 
 }

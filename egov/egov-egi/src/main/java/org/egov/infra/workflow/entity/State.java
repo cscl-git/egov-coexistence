@@ -259,7 +259,7 @@ public class State/* <T extends OwnerGroup> */ extends AbstractAuditable {
 		return comments;
 	}
 
-	protected void setComments(final String comments) {
+	public void setComments(final String comments) {
 		this.comments = comments;
 	}
 

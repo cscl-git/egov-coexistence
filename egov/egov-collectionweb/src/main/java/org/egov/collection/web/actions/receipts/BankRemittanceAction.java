@@ -109,6 +109,7 @@ import org.egov.infra.persistence.utils.Page;
 import org.egov.infra.web.utils.EgovPaginatedList;
 
 @Results({ @Result(name = BankRemittanceAction.NEW, location = "bankRemittance-new.jsp"),
+		@Result(name = BankRemittanceAction.PEXNEW, location = "pexExpenditureReport-searchnew.jsp"),
         @Result(name = BankRemittanceAction.PRINT_BANK_CHALLAN, type = "redirectAction", location = "remittanceStatementReport-printCashBankChallan.action", params = {
                 "namespace", "/reports", "totalCashAmount", "${totalCashAmount}", "totalChequeAmount",
                 "${totalChequeAmount}", "bank", "${bank}", "bankAccount", "${bankAccount}", "remittanceDate",
@@ -116,7 +117,8 @@ import org.egov.infra.web.utils.EgovPaginatedList;
         @Result(name = BankRemittanceAction.INDEX, location = "bankRemittance-index.jsp") })
 @ParentPackage("egov")
 public class BankRemittanceAction extends BaseFormAction {
-    protected static final String PRINT_BANK_CHALLAN = "printBankChallan";
+    protected static final String PRINT_BANK_CHALLAN = "pexNew";
+    protected static final String PEXNEW = "pexExpenditure";
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = Logger.getLogger(BankRemittanceAction.class);
     private static final String BANK_ACCOUNT_NUMBER_QUERY = "select distinct ba.accountnumber from BANKACCOUNT ba where ba.accountnumber =:accountNumberId";
@@ -194,7 +196,7 @@ public class BankRemittanceAction extends BaseFormAction {
 	private String receiptNo;
 	private List<RemitancePOJO> remittance = new ArrayList<>();
 	private int pageNum = 1;
-	private int pageSize = 20;
+	private int pageSize = 40;
 	protected PaginatedList searchResult;
 	
 	public void setPage(final int pageNum) {
@@ -1107,6 +1109,67 @@ public class BankRemittanceAction extends BaseFormAction {
 		this.subdivisonNew = subdivisonNew;
 	}
 
+	@Action(value = "/receipts/pexExpenditure-newform")
+    @SkipValidation
+    public String newformPex() {
+        populateRemittanceList();
+        return PEXNEW;
+    }
+	
+	@Action(value = "/receipts/pexExpenditure-listDataPex")
+    @SkipValidation
+    public String listDataPex() {
+		String serviceTId = getServiceTypeId();
+		System.out.println("LIST DATA ACTION >>>>" + serviceTId);
+        isListData = true;
+        if (fromDate != null && toDate != null && toDate.before(fromDate))
+            addActionError(getText("bankremittance.before.fromdate"));	
+			try {
+			resultList = remittanceService.getData(fromDate, toDate);
+			/*
+			 * resultList=remittanceService.findCashRemittanceDetailsForServiceAndFundNew(
+			 * "MISCELLANEOUS", fromDate, toDate, getServiceTypeId(), receiptNo, deptId,
+			 * "search", searchAmount, subdivison, collectedBy,"Cash");
+			 */
+			}
+			catch(Exception e)
+			{
+				e.printStackTrace();
+			}
+			System.out.println("Result LIST>>>" + resultList);
+			if(resultList!=null)
+			{
+			if(getPage()>=1) {
+				int showlist=490*getPage();
+				int fromIndex=0;
+				int toIndex=0;
+				if(showlist>resultList.size()) {
+					fromIndex=(490*(getPage()-1));
+					toIndex=resultList.size();
+				}else {
+					if(resultList.size()<490) {
+						fromIndex=0;
+						toIndex=resultList.size();
+					}else {
+					fromIndex=showlist-490;
+					toIndex=showlist;
+					}
+				}
+				System.out.println("from::: "+fromIndex+"to:::: "+toIndex);
+				resultListFinal=resultList.subList(fromIndex, toIndex);
+			}
+			if (searchResult == null) {
+				Page page = new Page<List>(getPage(), 490, resultListFinal);
+				searchResult = new EgovPaginatedList(page, resultList.size());
+			} else {
+				searchResult.getList().clear();
+				searchResult.getList().addAll(resultList);
+		}
+
+			resultListNew = searchResult.getList();
+			}
+        return PEXNEW;
+    }
 	
 
 }

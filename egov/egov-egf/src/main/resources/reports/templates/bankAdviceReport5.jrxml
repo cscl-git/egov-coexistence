@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport" pageWidth="612" pageHeight="1008" columnWidth="512" leftMargin="50" rightMargin="50" topMargin="60" bottomMargin="60" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="e977129d-8063-4dc8-acc3-8e8fecf2dd1e">
-	<property name="ireport.zoom" value="1.1289478601075547"/>
+	<property name="ireport.zoom" value="1.0263162364614133"/>
 	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="48"/>
+	<property name="ireport.y" value="96"/>
 	<property name="com.jaspersoft.studio.unit." value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
 	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
@@ -72,6 +72,28 @@
 			<pen lineWidth="0.5" lineColor="#000000"/>
 		</box>
 	</style>
+	<subDataset name="Table Dataset 1" uuid="8e076bb7-fa96-491a-808c-acec7e8cd8bf">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="partyName" class="java.lang.String"/>
+		<field name="amount" class="java.math.BigDecimal"/>
+		<field name="department" class="java.lang.String"/>
+		<field name="typeOfPayment" class="java.lang.String"/>
+		<variable name="totalAmt" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<subDataset name="detail2DS" uuid="f775a2ae-8b94-4709-9f97-ed12fba0e4b7">
+		<field name="partyName" class="java.lang.String"/>
+		<field name="accountNumber" class="java.lang.String"/>
+		<field name="amount" class="java.math.BigDecimal"/>
+		<field name="ifscCode" class="java.lang.String"/>
+		<field name="bank" class="java.lang.String"/>
+		<variable name="totalAmt" class="java.lang.Integer" calculation="Sum">
+			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+		</variable>
+	</subDataset>
 	<parameter name="bankName" class="java.lang.String"/>
 	<parameter name="branchName" class="java.lang.String"/>
 	<parameter name="accountNumber" class="java.lang.String"/>
@@ -80,340 +102,404 @@
 	<parameter name="letterContext" class="java.lang.String"/>
 	<parameter name="totalAmount" class="java.math.BigDecimal"/>
 	<parameter name="instrumentType" class="java.lang.String"/>
+	<parameter name="PEXReportDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
 	<parameter name="totalAmountInWords" class="java.lang.String"/>
-	<parameter name="mainParameter" class="java.lang.String"/>
-	<parameter name="primarySignatory" class="java.lang.String"/>
 	<parameter name="secondarySignatory" class="java.lang.String"/>
+	<parameter name="primarySignatory" class="java.lang.String"/>
 	<parameter name="headerImagePath" class="java.lang.String"/>
 	<parameter name="footerImagePath" class="java.lang.String"/>
 	<parameter name="backgroundImgPath" class="java.lang.String"/>
+	<parameter name="subject" class="java.lang.String"/>
 	<parameter name="pexNo" class="java.lang.String"/>
 	<parameter name="deptCode" class="java.lang.String"/>
+	<parameter name="bpvNumber" class="java.lang.String"/>
 	<queryString>
-		<![CDATA[select 1 from dual]]>
+		<![CDATA[]]>
 	</queryString>
+	<field name="partyName" class="java.lang.String"/>
+	<field name="accountNumber" class="java.lang.String"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="ifscCode" class="java.lang.String"/>
+	<field name="bank" class="java.lang.String"/>
 	<background>
-		<band height="722">
+		<band height="842">
 			<property name="com.jaspersoft.studio.unit.height" value="px"/>
 			<image>
-				<reportElement x="0" y="116" width="512" height="490" uuid="c2218aaa-2a04-4b3a-9ac9-064f73a842f5"/>
+				<reportElement x="0" y="191" width="512" height="460" uuid="d12dc640-e744-46c9-ab71-a86bd0020690"/>
 				<imageExpression><![CDATA[$P{backgroundImgPath}]]></imageExpression>
 			</image>
 		</band>
 	</background>
 	<title>
-		<band height="261">
+		<band height="233">
 			<staticText>
-				<reportElement x="1" y="73" width="198" height="31" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
+				<reportElement x="1" y="59" width="198" height="31" uuid="5fadac95-5bd1-4189-9b19-b241adf70f50"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<text><![CDATA[To
-    The Manager,
+      The Manager,
 ]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="20" y="104" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
+				<reportElement x="20" y="90" width="198" height="17" uuid="284bd69b-eb27-4460-bfa3-8ac393d8f3d5"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="20" y="121" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
+				<reportElement x="20" y="107" width="198" height="21" uuid="4ef74e37-30d1-4dc5-99fc-6749540dd79a"/>
 				<textElement>
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="142" width="263" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
+				<reportElement x="20" y="128" width="247" height="16" uuid="9fd252ac-6668-437d-a6b7-d66ae1511cda"/>
 				<textElement textAlignment="Left" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{chequeNumber}]]></textFieldExpression>
 			</textField>
-			<staticText>
-				<reportElement x="334" y="132" width="63" height="27" uuid="823ad213-e4cb-4661-b404-bc18dcdec7a8"/>
-				<textElement textAlignment="Right" verticalAlignment="Middle">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Dated : ]]></text>
-			</staticText>
 			<textField isBlankWhenNull="true">
-				<reportElement x="40" y="196" width="467" height="64" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="51" y="198" width="451" height="35" uuid="c6427eb5-71f3-426b-bfc4-65ad65c9e907"/>
 				<textElement textAlignment="Justified" verticalAlignment="Top">
 					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="397" y="132" width="110" height="27" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
+				<reportElement positionType="Float" x="291" y="128" width="211" height="16" uuid="881a8b92-90ec-41ff-af26-e3b687f15015"/>
 				<box leftPadding="2"/>
-				<textElement textAlignment="Left" verticalAlignment="Middle">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{chequeDate}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="0" y="178" width="470" height="15" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
-				<textElement>
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA["SUB:   Issuance of Demand Draft from A/c No."+$P{accountNumber}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="-2" y="158" width="42" height="18" uuid="b948cd40-2d89-48bf-847c-c752efa3301e"/>
 				<textElement textAlignment="Right" verticalAlignment="Middle">
 					<font fontName="Verdana" size="12"/>
 				</textElement>
-				<text><![CDATA[Date : ]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA["Dated : "+$P{chequeDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="1" y="183" width="470" height="15" uuid="ffb4d490-8804-4d58-b91d-53855a199fd7"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SUB:   "+$P{subject}]]></textFieldExpression>
+			</textField>
 			<image>
-				<reportElement x="0" y="-20" width="512" height="70" uuid="62111010-ab4a-4ec7-84c1-5cc976000d8e"/>
+				<reportElement x="0" y="-20" width="510" height="77" uuid="a5b81982-690d-44d1-9898-d53cba8c6d1f"/>
 				<imageExpression><![CDATA[$P{headerImagePath}]]></imageExpression>
 			</image>
-			<staticText>
-				<reportElement x="0" y="50" width="512" height="23" uuid="6eed8537-3f92-401f-adc2-e8e3c3d47c7b"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="14" isBold="true"/>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToTallestObject" x="22" y="145" width="480" height="28" isPrintWhenDetailOverflows="true" uuid="dae46f16-99e5-4aca-8b1f-66059c9088dd"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
 				</textElement>
-				<text><![CDATA[(Accounts Branch)]]></text>
-			</staticText>
+				<textFieldExpression><![CDATA[$P{bpvNumber}]]></textFieldExpression>
+			</textField>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="70">
+		<band height="82">
 			<printWhenExpression><![CDATA[$V{PAGE_NUMBER}!=1]]></printWhenExpression>
 			<image>
-				<reportElement x="0" y="0" width="507" height="70" uuid="779dc82c-87c2-437d-b9eb-34cac8b9afe0"/>
+				<reportElement x="1" y="5" width="510" height="77" uuid="88e59f3d-fdbe-4c30-9260-1468b699a248"/>
 				<imageExpression><![CDATA[$P{headerImagePath}]]></imageExpression>
 			</image>
 		</band>
 	</pageHeader>
 	<pageFooter>
-		<band height="45">
+		<band height="50">
 			<textField>
-				<reportElement x="492" y="20" width="9" height="20" uuid="b437b46c-503d-48bb-b3a7-675d126670c7"/>
+				<reportElement x="490" y="25" width="12" height="20" uuid="18dbb2e4-1d24-4e38-b3c9-7b34ca8977ac"/>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"/"]]></textFieldExpression>
 			</textField>
 			<textField evaluationTime="Report" isBlankWhenNull="true">
-				<reportElement x="501" y="20" width="7" height="20" uuid="b8f22503-41d9-4e79-99eb-eac25be9fb4b"/>
+				<reportElement x="502" y="25" width="7" height="20" uuid="71bf00d6-56af-4857-9526-3f6ccc7bc8a2"/>
 				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
 			</textField>
 			<image>
-				<reportElement x="2" y="3" width="483" height="39" uuid="103feedd-b24b-4191-a9f3-c9a0d82e0746"/>
+				<reportElement x="0" y="0" width="480" height="50" uuid="86d803f3-02c5-4405-875e-2ef14ffd17d3"/>
 				<imageExpression><![CDATA[$P{footerImagePath}]]></imageExpression>
 			</image>
 		</band>
 	</pageFooter>
-	<lastPageFooter>
-		<band height="292">
+	<summary>
+		<band height="420">
+			<componentElement>
+				<reportElement key="table" style="table" positionType="Float" isPrintRepeatedValues="false" x="0" y="38" width="493" height="76" uuid="de00f23e-238d-4126-a9d1-363daf39378d"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Table Dataset 1" uuid="6e369e5d-f9f1-4f08-a7ac-8c8125443821">
+						<dataSourceExpression><![CDATA[$P{PEXReportDataSource}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="36" uuid="fe63f07e-4780-4f3e-871d-6832fb5b1266">
+						<jr:tableFooter height="18" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="36" height="30" uuid="ea240760-09c1-4644-9bf9-9836e93d6018"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Sno
+]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="43" isPrintWhenDetailOverflows="true" uuid="93520df1-df1b-4750-b5e5-e91852866cd7"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="124" uuid="74120a0a-62b2-44e1-bdeb-8313e2184600">
+						<jr:tableFooter height="18" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="124" height="30" isPrintWhenDetailOverflows="true" uuid="41e8fe56-b068-4a91-b08b-2dbc0ee51623"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[In Favour of]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="124" height="43" isPrintWhenDetailOverflows="true" uuid="e22ce98f-126f-413d-92da-4d3934c43848"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{partyName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="158" uuid="fe1b7eee-8265-4685-abe6-90055fde39db">
+						<jr:tableFooter height="18" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="158" height="30" uuid="0b914d6f-2c94-42b1-a418-bf5b0e3fcc65"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Type of payments]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement style="table_TD" stretchType="RelativeToTallestObject" x="0" y="0" width="158" height="43" isPrintWhenDetailOverflows="true" backcolor="rgba(255, 255, 255, 0.0)" uuid="bc25f7a0-82f5-4110-a84d-88d91fc9a43d"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{typeOfPayment}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="755d47a4-c9a8-4d4b-80d5-787c626c0800">
+						<jr:tableFooter height="18" rowSpan="1">
+							<staticText>
+								<reportElement style="table 1_CH" x="0" y="0" width="90" height="18" uuid="f7d4032e-a7ac-4861-ae49-ecc5df153a52"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:tableFooter>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement positionType="Float" x="0" y="0" width="90" height="30" uuid="2e7a7b59-e773-4802-9fd6-10909878262b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Name of Division]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="90" height="43" isPrintWhenDetailOverflows="true" uuid="572f2807-11b5-4673-9d8c-332b776121ca"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{department}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="92" uuid="ac0ed524-5ffc-4826-a767-f127b8458d77">
+						<jr:tableFooter height="18" rowSpan="1">
+							<textField pattern="###0.00;-###0.00">
+								<reportElement style="table 1_CH" x="0" y="0" width="92" height="18" uuid="aca291c2-610a-4ff3-8434-4d13c33416a4"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{totalAmt}]]></textFieldExpression>
+							</textField>
+						</jr:tableFooter>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="92" height="30" uuid="b20512a9-4a84-4ef6-88bd-89e6d1fa5dfd"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Amount of DD]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="43" rowSpan="1">
+							<textField pattern="###0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="43" isPrintWhenDetailOverflows="true" uuid="8879904a-72cd-4427-9301-83f617cbfc9b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField>
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="0" y="114" width="493" height="54" uuid="69482f61-eefb-429e-b26a-9afa59bf6646"/>
+				<textElement textAlignment="Right">
+					<font fontName="Verdana" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAmountInWords}]]></textFieldExpression>
+			</textField>
 			<staticText>
-				<reportElement positionType="Float" x="8" y="26" width="139" height="36" uuid="f8ee65f5-8611-4006-bd30-c46298dd83a5"/>
+				<reportElement positionType="Float" x="1" y="200" width="148" height="33" uuid="b689bd27-2faf-4a98-bb7a-45654a2c1553"/>
 				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
-					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
-				<text><![CDATA[Municipal Corporation, Chandigarh]]></text>
+				<text><![CDATA[Municipal Corporation,
+Chandigarh]]></text>
 			</staticText>
 			<staticText>
-				<reportElement positionType="Float" x="310" y="26" width="131" height="36" uuid="13a71011-c6e3-4d07-8b12-890a685381fe"/>
-				<textElement textAlignment="Left" verticalAlignment="Top" markup="styled">
-					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				<reportElement positionType="Float" x="319" y="200" width="136" height="34" uuid="59048ccb-c11f-4630-ac69-afaf1f0e467d"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
 				</textElement>
-				<text><![CDATA[Municipal Corporation, Chandigarh]]></text>
+				<text><![CDATA[Municipal Corporation,
+Chandigarh]]></text>
 			</staticText>
-			<textField>
-				<reportElement x="488" y="259" width="12" height="20" uuid="b2da2db7-6240-44f2-aee9-f422b53090ac"/>
-				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"/"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report" isBlankWhenNull="true">
-				<reportElement x="501" y="259" width="7" height="20" uuid="dc3cd0eb-5cb4-4a93-b99d-40ac876f67ab"/>
-				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<image>
-				<reportElement x="2" y="250" width="483" height="39" uuid="48920241-a39e-4e21-8289-197adc2e4725"/>
-				<imageExpression><![CDATA[$P{footerImagePath}]]></imageExpression>
-			</image>
-			<textField>
-				<reportElement x="8" y="0" width="255" height="26" uuid="201a98d9-d080-4a74-bf03-1fc7648ddbee"/>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="1" y="168" width="267" height="32" uuid="504cfe65-2000-40ec-9d07-2dffba38cffa"/>
 				<textElement verticalAlignment="Bottom">
-					<font fontName="Verdana"/>
+					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{secondarySignatory}]]></textFieldExpression>
 			</textField>
-			<textField>
-				<reportElement x="310" y="0" width="192" height="24" uuid="1e3ffc3c-1ac7-4654-abb9-ec451184cb4c"/>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="319" y="168" width="190" height="32" uuid="0049162e-c792-4988-ac32-550fd618cada"/>
 				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Verdana"/>
+					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{primarySignatory}]]></textFieldExpression>
 			</textField>
+			<frame>
+				<reportElement positionType="Float" x="1" y="235" width="508" height="185" uuid="5dbe892e-7887-40bb-84d4-80c9bd2cdaf1"/>
+				<staticText>
+					<reportElement positionType="Float" x="379" y="0" width="91" height="15" uuid="e98d8e90-05e6-4f5d-8d57-a86c858fcb8a"/>
+					<textElement>
+						<font fontName="Verdana" size="11"/>
+					</textElement>
+					<text><![CDATA[Dated :]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="12" y="15" width="477" height="20" uuid="834d9c2c-2658-4394-98ff-634177dfc350"/>
+					<textElement>
+						<font fontName="Verdana" size="11"/>
+					</textElement>
+					<text><![CDATA[Copy of the above is forwarded to the followiing for information & necessary action.]]></text>
+				</staticText>
+				<staticText>
+					<reportElement positionType="Float" x="330" y="124" width="157" height="59" uuid="bbc4ec0d-b3dd-45e9-8e46-d0b8bc8b8ee9"/>
+					<textElement textAlignment="Left" verticalAlignment="Bottom">
+						<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+					</textElement>
+					<text><![CDATA[Chief Accounts Officer,
+Municipal Corporation,
+Chandigarh]]></text>
+				</staticText>
+			</frame>
 			<staticText>
-				<reportElement positionType="Float" x="9" y="68" width="100" height="15" uuid="ade15d5f-457d-4688-b404-4771c84677a8"/>
+				<reportElement positionType="Float" x="13" y="234" width="100" height="15" uuid="9e5c041e-f4c4-4d79-b208-a2cd6913519d"/>
 				<textElement>
 					<font fontName="Verdana" size="11"/>
 				</textElement>
 				<text><![CDATA[Endst No : ]]></text>
 			</staticText>
-			<staticText>
-				<reportElement positionType="Float" x="9" y="84" width="500" height="20" uuid="9108f115-18e0-4dc4-875d-c324238dfad8"/>
+			<textField>
+				<reportElement positionType="Float" x="5" y="9" width="262" height="29" uuid="1439c054-ff7a-4abd-bf1a-41be55191dee"/>
 				<textElement>
-					<font fontName="Verdana" size="11"/>
-				</textElement>
-				<text><![CDATA[Copy of the above is forwarded to the followiing for information & necessary action.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" x="344" y="189" width="157" height="59" uuid="c3550982-5a56-4ab1-b3cd-888a8b5f8168"/>
-				<textElement textAlignment="Left" verticalAlignment="Bottom">
-					<font fontName="Verdana" size="11" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
-				</textElement>
-				<text><![CDATA[Chief Accounts Officer,
-Municipal Corporation,
-Chandigarh]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" x="9" y="161" width="502" height="28" uuid="b2a222ae-bec2-4059-bde7-2df8e9462d86"/>
-				<textElement>
-					<font fontName="Verdana" size="11"/>
-				</textElement>
-				<text><![CDATA[Copies of the bill deduction vouchers are attached herewith for depositing the statutory liabilities with the respective authorities.]]></text>
-			</staticText>
-			<staticText>
-				<reportElement positionType="Float" x="397" y="69" width="91" height="15" uuid="d66f05e8-7f8e-4dd0-8a37-ce561371141f"/>
-				<textElement>
-					<font fontName="Verdana" size="11"/>
-				</textElement>
-				<text><![CDATA[Dated :]]></text>
-			</staticText>
-		</band>
-	</lastPageFooter>
-	<summary>
-		<band height="171">
-			<rectangle>
-				<reportElement x="0" y="23" width="495" height="141" uuid="37cc37f0-45e7-4333-bda1-15fa5ca9f79a"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="0" y="23" width="495" height="44" uuid="d5327a22-d020-4c21-a058-c6b7cf5d2fd3"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="0" y="111" width="495" height="28" uuid="25d3369d-4560-4992-a89c-ebda5380aa28"/>
-			</rectangle>
-			<rectangle>
-				<reportElement x="0" y="139" width="495" height="32" uuid="ff3c3373-916f-4191-9718-10466627a4e0"/>
-			</rectangle>
-			<line>
-				<reportElement x="26" y="23" width="1" height="148" uuid="f4cce99b-9080-4233-ae6f-e82f1bddad88"/>
-			</line>
-			<staticText>
-				<reportElement x="1" y="23" width="24" height="44" uuid="f5654c8f-0ba3-4e61-a427-22f622e81a3f"/>
-				<textElement textAlignment="Center">
 					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Sl No]]></text>
-			</staticText>
-			<line>
-				<reportElement x="110" y="23" width="1" height="44" uuid="6b915026-68dd-4bf5-96f8-e224d52b0dd3"/>
-			</line>
-			<staticText>
-				<reportElement x="27" y="23" width="83" height="44" uuid="c5bda651-c237-478a-bd8d-03ae696d6fe4"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Party Name]]></text>
-			</staticText>
-			<line>
-				<reportElement x="204" y="23" width="1" height="44" uuid="24221b04-fa00-47a6-8694-a10fd90c77ff"/>
-			</line>
-			<staticText>
-				<reportElement x="111" y="23" width="93" height="44" uuid="97d13846-bb99-47a1-995c-35e73c94e86a"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Party Account No]]></text>
-			</staticText>
-			<line>
-				<reportElement x="299" y="23" width="1" height="44" uuid="f41c79e3-45da-48e9-9b26-35d032e3e157"/>
-			</line>
-			<line>
-				<reportElement x="380" y="23" width="1" height="116" uuid="614c407a-ca74-460d-8e4b-bb825dfd99e3"/>
-			</line>
-			<staticText>
-				<reportElement x="205" y="23" width="94" height="44" uuid="eafd1d83-48af-41e2-9979-dffd1e6b6a50"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Party Bank Name]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="300" y="23" width="80" height="44" uuid="9a52f000-2af6-46a1-b2d8-10d9f03b4446"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Party Bank IFSC Code]]></text>
-			</staticText>
-			<staticText>
-				<reportElement x="381" y="23" width="114" height="44" uuid="a0f58a11-4582-40bb-a52a-0abce1d861ed"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Party Amount]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="27" y="67" width="353" height="44" uuid="dd3abe42-f670-42f3-8c6e-564a14fd704f"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{mainParameter}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="1" y="67" width="24" height="44" uuid="ab203d73-b2e7-49f7-b72a-60869934989d"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[1]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="381" y="67" width="115" height="44" uuid="69bd2a9d-496b-414e-aa0e-cb364c7c0019"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="281" y="111" width="100" height="28" uuid="1dcf4d4a-29ee-4686-9d79-021c5fdb80f2"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<text><![CDATA[Total]]></text>
-			</staticText>
-			<textField>
-				<reportElement x="381" y="111" width="114" height="28" uuid="4c08d5ce-0715-48ff-be04-e8e214ab58c7"/>
-				<textElement textAlignment="Center">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{totalAmount}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement stretchType="RelativeToTallestObject" x="27" y="139" width="468" height="32" isPrintWhenDetailOverflows="true" uuid="1cf6286f-1e61-4833-ab60-b85bec112a2a"/>
-				<textElement textAlignment="Right">
-					<font fontName="Verdana" size="12"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{totalAmountInWords}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="5" y="2" width="100" height="20" uuid="13c60bd2-762c-4b8b-a72a-800074b77945"/>
-				<textElement>
-					<font size="12" isBold="true"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$P{pexNo}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="393" y="2" width="100" height="20" uuid="8592174b-d84e-43a6-af32-68897abbd91b"/>
-				<textElement textAlignment="Right">
-					<font size="12" isBold="true"/>
-				</textElement>
-				<textFieldExpression><![CDATA[$P{deptCode}]]></textFieldExpression>
 			</textField>
 		</band>
 	</summary>

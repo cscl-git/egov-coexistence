@@ -56,6 +56,10 @@ public class PaymentRefundUtils {
 	public List<Fund> getAllFunds(){
 		return persistenceService.findAllBy(" from Fund where isactive=true and isnotleaf=false order by name");
 	}
+	//added abhishek on 2Dec2021
+	public List<Accountdetailtype> getAllActiveAccounts(){
+		return persistenceService.findAllBy(" from Accountdetailtype where isactive=true order by name");
+	}
 	
 	public List<String> getVoucherNamesByType(String voucherType){
 	    Query query = this.persistenceService.getSession().createSQLQuery("select distinct(name) from voucherheader vh where vh.type = :type");

@@ -613,44 +613,8 @@ function onBodyLoad(){
 							id="receiptType" /></td>
 	    
 	    </tr>	    
-	 <%--    <tr>
-	      <td width="4%" class="bluebox">&nbsp;</td>
-	      <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.status"/></td>
-	      <td width="24%" class="bluebox"><s:select id="searchStatus" name="searchStatus" headerKey="-1" headerValue="%{getText('searchreceipts.status.select')}" cssClass="selectwk" list="%{receiptStatuses}" value="%{searchStatus}" listKey="id" listValue="description" /> </td>
-	      <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.paymenttype"/></td>
-	      <td width="30%" class="bluebox"><s:select headerKey="" headerValue="%{getText('searchreceipts.paymenttype.select')}" name="instrumentType" id="instrumentType" cssClass="selectwk" list="dropdownData.instrumentTypeList" listKey="type" listValue="type" value="%{instrumentType}" /> </td>	
-	    </tr>
-	    <tr>
-	      <td width="4%" class="bluebox">&nbsp;</td>
-	      <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.manual.receiptno"/></td>
-	      <td width="24%" class="bluebox"><s:textfield id="manualReceiptNumber" type="text" name="manualReceiptNumber"/></td>
-	      <td width="21%" class="bluebox"> &nbsp; </td>
-	      <td width="30%" class="bluebox"> &nbsp; </td>   
-	    </tr> --%>
-	   <%--  
-	    <tr>
-					<td>
-						<div class="subheadsmallnew"><span class="subheadnew">
-											<s:text name="bankcollection.title" />
-						</span>		
-						</div>
-					</td>
-		</tr>
-	     <tr>
-	      <td width="4%" class="bluebox">&nbsp;</td>
-	      <td width="21%" class="bluebox"><s:text name="searchreceipts.criteria.bankbranch"/></td>
-	      <td width="24%" class="bluebox"><s:select headerKey="-1"
-								headerValue="Select Bank Branch" name="branchId" id="branchId"
-								cssClass="selectwk" list="dropdownData.bankBranchList"
-								listKey="id" listValue="branchname"
-								value="%{branchId}" /> </td>
-	      <td width="21%" class="bluebox">&nbsp;</td>
-	      <td width="30%" class="bluebox">&nbsp;</td>
-	    </tr> --%>
 	    </table>
-		<%-- <div align="left" class="mandatory1">
-		              <s:text name="report.bankbranch.note"/>
-		</div> --%>
+		
 </div>
 
 <div id="loadingMask" style="display: none; overflow: hidden; text-align: center"><img src="/services/collection/resources/images/bar_loader.gif"/> <span style="color: red">Please wait....</span></div>
@@ -694,8 +658,14 @@ function onBodyLoad(){
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST No." style="width:8%;text-align:left" property="gstno" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Collected By" style="width:8%;text-align:right" property="createdUser"/> 
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Payee Name" style="width:8%;text-align:right" property="paidBy"/>
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Payee Address" style="width:8%;text-align:right" property="payeeAddress"/>
 
-<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service" style="width:12%;text-align:left" property="service" />
+
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Category" style="width:12%;text-align:left" property="service" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Service Type" style="width:12%;text-align:left" property="serviceType" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Cheque/DD No" style="width:12%;text-align:left" property="chequeddno" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Cheque/DD Date" style="width:12%;text-align:left" property="chequedddate" />
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bank" style="width:12%;text-align:left" property="bank" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Mode of payment" style="width:12%;text-align:left" property="modOfPayment" />
 
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Particulars" style="width:12%;text-align:left" property="referenceDesc" />

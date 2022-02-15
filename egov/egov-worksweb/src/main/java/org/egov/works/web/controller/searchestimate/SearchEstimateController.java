@@ -530,20 +530,20 @@ if (list.size() != 0) {
 
 		WorkOrderAgreement workOrderAgreement = boQDetailsService.viewWorkData(id);
 		DecimalFormat df = new DecimalFormat("0.00");
-		Double sumAmount = 0.0;
-		Double measuredSumAmount = 0.0;
-		Double completion=0.0;
+		BigDecimal sumAmount = new BigDecimal(0);
+		BigDecimal measuredSumAmount = new BigDecimal(0);
+		BigDecimal completion=new BigDecimal(0);
 			for (BoQDetails boq : workOrderAgreement.getNewBoQDetailsList()) {
 			if(boq.getAmount()!=null) {
-				sumAmount=sumAmount +boq.getAmount();
+				sumAmount=sumAmount.add(boq.getAmount());
 			}
 				if (boq.getMeasured_amount() != null) {
-					measuredSumAmount=measuredSumAmount+boq.getMeasured_amount();
+					measuredSumAmount=measuredSumAmount.add(boq.getMeasured_amount());
 				}
 				
 			}
-		if(sumAmount !=0.0 && measuredSumAmount !=0.0) {
-			 completion=(measuredSumAmount/sumAmount)*100;
+		if(sumAmount !=new BigDecimal(0) && measuredSumAmount !=new BigDecimal(0)) {
+			 completion=(measuredSumAmount.divide(sumAmount)).multiply(new BigDecimal(100));
 		}
 		return df.format(completion);
 	}

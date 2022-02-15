@@ -50,7 +50,7 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ page language="java"%>
 <div class="panel-heading custom_form_panel_heading">
-	<div class="panel-title"><s:text name="msg.unreconciled.items"/> </div>
+	<div class="panel-title">Reconciled/Unreconciled Items </div>
 </div>
 <div class="col-md-12 form-group report-table-container">
 	<table class="table table-bordered table-hover multiheadertbl"
@@ -80,10 +80,18 @@
 					<td><s:property value="type" /></td>
 					<td  style="text-align: center;"><s:property value="instrumentType" /></td>
 					<td style="text-align: right"><s:property value="chequeAmount" /></td>
-					<td><input type="text"
+					<td>
+					<%-- <input type="text" value="<s:property value="reconciledOn" />"/>
+					
+					<s:if test="#status.reconciledOn != null">
+					<s:property value="reconciledOn" />
+					</s:if>
+					<s:else> --%>
+					<input type="text"
 						id="reconDates<s:property value="#status.index"/>"
 						name="reconDates[<s:property value="#status.index"/>]"
-						class="form-control datepicker" data-inputmask="'mask': 'd/m/y'" />
+						class="form-control datepicker" data-inputmask="'mask': 'd/m/y'" value="<s:property value="reconciledOn" />"/>
+					<%-- </s:else> --%>
 					</td>
 				</tr>
 			</s:iterator>

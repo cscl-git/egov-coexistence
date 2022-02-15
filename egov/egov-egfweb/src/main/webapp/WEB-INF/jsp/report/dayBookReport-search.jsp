@@ -104,12 +104,18 @@
 	src="/services/EGF/resources/javascript/ajaxCommonFunctions.js?rnd=${app_release_no}">
 	function populatesubSchemes(scheme){
 		
-		populatesubschemeid({schemeId:scheme.options[scheme.selectedIndex].value});	
-		populatefundsourceId({subSchemeId:-1});
+		populatesubschemeid({
+			schemeId : scheme.options[scheme.selectedIndex].value
+		});
+		populatefundsourceId({
+			subSchemeId : -1
+		});
 	}
 	function populateFundSource(subSchemeId){
 		
-		populatefundsourceId({subSchemeId:subSchemeId.options[subSchemeId.selectedIndex].value});	
+		populatefundsourceId({
+			subSchemeId : subSchemeId.options[subSchemeId.selectedIndex].value
+		});
 	}
 	</script>
 <script type="text/javascript"
@@ -167,8 +173,8 @@
 								data-inputmask="'mask': 'd/m/y'" /></td>
 
 
-						<td class="bluebox"><s:text name="dayBook.endDate" />
-						<span class="mandatory"></span></td>
+						<td class="bluebox"><s:text name="dayBook.endDate" /> <span
+							class="mandatory"></span></td>
 						<td class="bluebox"><s:textfield id="endDate" name="endDate"
 								value="%{currentDate}"
 								onkeyup="DateFormat(this,this.value,event,false,'3')"
@@ -209,6 +215,18 @@
 						<td class="greybox"><s:select name="subdivision" id="subdivision"
 		  list="dropdownData.subdivisionList" listKey="subdivisionCode" listValue="subdivisionName" 
 			headerKey="-1" headerValue="%{getText('lbl.choose.options')}"/></td>
+					</tr>
+<tr>
+						<td style="width: 5%"></td>
+						<td class="bluebox"><s:text name="voucher.type" /><span
+							class="mandatory"></span></td>
+						</td>
+						<td class="bluebox"><s:select name="type" id="type"
+								list="dropdownData.typeList" headerKey="-1"
+								headerValue="%{getText('lbl.choose.options')}"
+								onchange="loadVoucherNames(this.value)" /></td>
+						<td class="greybox"></td>
+						<td class="greybox"></td>
 					</tr>
 					
 				</table>

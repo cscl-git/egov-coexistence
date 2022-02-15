@@ -98,6 +98,8 @@ import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.services.PersistenceService;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -111,6 +113,13 @@ import org.springframework.web.multipart.MultipartFile;
 public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Long> {
 
     private static final String STATUS_DOT_CODE = "status.code";
+	private static final String STATUS_DOT_DESCRIPTION = "status.description";
+
+	private static final String STATUS_DOT_MODULE = "status.moduletype";
+	public static final String AGENDA_STATUS_APPROVED1 = "Approved";
+	public static final String MEETING_STATUS_APPROVED = "MEETING_STATUS_APPROVED";
+
+	public static final String AGENDA_STATUS_APPROVED = "APPROVED";
     
     @Autowired
     private CouncilMeetingRepository councilMeetingRepository;
@@ -164,8 +173,8 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
     	 }
     	
     	if (approvalPosition != null && StringUtils.isNotEmpty(workFlowAction))
-    		 meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition, approvalComment,
-                     workFlowAction);
+			meetingMomWorkflowCustomImpl.createCommonWorkflowTransition(councilMeeting, approvalPosition,
+					approvalComment, workFlowAction);
     	
     	 applyAuditing(councilMeeting);
     	 applyAuditing(councilMeeting.getState());
@@ -228,27 +237,46 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
     @SuppressWarnings("unchecked")
     public List<CouncilMeeting> searchMeetingToCreateMOM(CouncilMeeting councilMeeting) {
         return buildSearchCriteria(councilMeeting)
-                .add(Restrictions.in(STATUS_DOT_CODE, MEETINGSTATUSAPPROVED,ATTENDANCEFINALIZED)).list();
+				.add(Restrictions.in(STATUS_DOT_CODE, MEETINGSTATUSAPPROVED, ATTENDANCEFINALIZED)).add(Restrictions.not(Restrictions.in(STATUS_DOT_DESCRIPTION,MEETING_STATUS_APPROVED))).list();
     }
 
     @SuppressWarnings("unchecked")
     public List<CouncilMeeting> searchMeeting(CouncilMeeting councilMeeting) {
-        return buildSearchCriteria(councilMeeting).add(Restrictions.ne(STATUS_DOT_CODE, MEETINGCANCELLED)).list();
+		final Criteria criteria = buildSearchCriteria(councilMeeting);
+		//criteria.add(Restrictions.ne(STATUS_DOT_CODE, MEETINGCANCELLED))
+			//	.add(Restrictions.and(Restrictions.in(STATUS_DOT_MODULE, AGENDA_MODULENAME)))
+				//.add(Restrictions.and(Restrictions.in(STATUS_DOT_CODE, AGENDA_STATUS_APPROVED)));
+
+		List<String> list = new ArrayList<>();
+		list.add(AGENDA_STATUS_APPROVED);
+		list.add(AGENDA_STATUS_APPROVED1);
+		
+		//criteria.add(Restrictions.ne(STATUS_DOT_CODE, MEETINGCANCELLED))
+		//.add(Restrictions.and(Restrictions.in(STATUS_DOT_CODE, list)));
+		
+		criteria.add(Restrictions.ilike(STATUS_DOT_CODE, "Approved%",MatchMode.ANYWHERE)).add(Restrictions.not(Restrictions.in(STATUS_DOT_DESCRIPTION,MEETING_STATUS_APPROVED)));
+		//criteria.add(Restrictions.ilike(STATUS_DOT_CODE, "Approved%",MatchMode.ANYWHERE));
+		//Criterion criterion =Restrictions. 
+		// return
+		// buildSearchCriteria(councilMeeting).add(Restrictions.ne(STATUS_DOT_CODE,
+		// MEETINGCANCELLED).list();
+		return criteria.list();
     }
     
     @SuppressWarnings("unchecked")
     public List<CouncilMeeting> searchMeetingForEdit(CouncilMeeting councilMeeting) {
-        return buildSearchCriteria(councilMeeting).add(Restrictions.in(STATUS_DOT_CODE, MEETINGSTATUSAPPROVED,ATTENDANCEFINALIZED)).list();
+		return buildSearchCriteria(councilMeeting)
+				.add(Restrictions.in(STATUS_DOT_CODE, MEETINGSTATUSAPPROVED, ATTENDANCEFINALIZED)).list();
     }
     
     @SuppressWarnings("unchecked")
     public List<CouncilMeeting> searchMeetingWithMomCreatedStatus(CouncilMeeting councilMeeting) {
-        return buildSearchCriteria(councilMeeting)
-                .add(Restrictions.in(STATUS_DOT_CODE, MEETINGUSEDINRMOM)).list();
+		return buildSearchCriteria(councilMeeting).add(Restrictions.in(STATUS_DOT_CODE, MEETINGUSEDINRMOM)).list();
     }
 
     public void sortMeetingMomByItemNumber(CouncilMeeting councilMeeting) {
-        councilMeeting.getMeetingMOMs().sort((MeetingMOM f1, MeetingMOM f2) -> Long.valueOf(f1.getItemNumber()).compareTo(Long.valueOf(f2.getItemNumber())));
+		councilMeeting.getMeetingMOMs().sort((MeetingMOM f1, MeetingMOM f2) -> Long.valueOf(f1.getItemNumber())
+				.compareTo(Long.valueOf(f2.getItemNumber())));
     }
     
     public Criteria buildSearchCriteria(CouncilMeeting councilMeeting) {
@@ -274,52 +302,52 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
         
         return criteria;
     }
+
     @Transactional
     public void deleteAttendance(final List<MeetingAttendence> meetingAttendences) {
         meetingAttendanceRepository.deleteInBatch(meetingAttendences);
     }
     
     /***
-     * Get the preambles creator and approver and meeting creator details
-     * to send ams and email.
+	 * Get the preambles creator and approver and meeting creator details to send
+	 * ams and email.
+	 * 
      * @param councilMeeting
      * @return
      */
-    /*public List<User> getUserListForMeeting(CouncilMeeting councilMeeting) {
-        Set<User> usersListResult = new HashSet<>();
-        List<String> agendaNumber = new ArrayList<>();
-        for (MeetingMOM mom : councilMeeting.getMeetingMOMs()) {
-            if (mom != null && mom.getAgenda() != null && !agendaNumber.contains(mom.getAgenda().getAgendaNumber())
-                    && mom.getAgenda().getAgendaDetails() != null) {
-                for (CouncilAgendaDetails agendaDetails : mom.getAgenda().getAgendaDetails()) {
-                    if (agendaDetails != null && agendaDetails.getPreamble() != null
-                            && agendaDetails.getPreamble().getState() != null
-                            && agendaDetails.getPreamble().getState().getOwnerPosition() != null) {
-                    	
-                    	//usersListResult.add(eisCommonService.getUserForPosition(agendaDetails.getPreamble().getState().getCreatedBy(),new Date()));
-                        //usersListResult.add(eisCommonService.getUserForPosition(agendaDetails.getPreamble().getState().getOwnerPosition(),new Date()));
-                    	EmployeeInfo agendaApproverinfo = microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().getOwnerPosition());
-                    	if(null != agendaApproverinfo) {
-                    		usersListResult.add(agendaApproverinfo.getUser());
-                    	}
-                    	EmployeeInfo agendaCreatorinfo = microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().getCreatedBy());
-                    	if(null != agendaCreatorinfo) {
-                    		usersListResult.add(agendaCreatorinfo.getUser());
-                    	}
-                    }
-                }
-                agendaNumber.add(mom.getAgenda().getAgendaNumber());
-            }
-        }
-        
-        EmployeeInfo meetingCreatorinfo = microserviceUtils.getEmployeeById(councilMeeting.getCreatedBy());
-    	if(null != meetingCreatorinfo) {
-    		usersListResult.add(meetingCreatorinfo.getUser());
-    	}
-    	
-        //usersListResult.add(userService.getUserById(councilMeeting.getCreatedBy()));
-        return new ArrayList<>(usersListResult);
-    }*/
+	/*
+	 * public List<User> getUserListForMeeting(CouncilMeeting councilMeeting) {
+	 * Set<User> usersListResult = new HashSet<>(); List<String> agendaNumber = new
+	 * ArrayList<>(); for (MeetingMOM mom : councilMeeting.getMeetingMOMs()) { if
+	 * (mom != null && mom.getAgenda() != null &&
+	 * !agendaNumber.contains(mom.getAgenda().getAgendaNumber()) &&
+	 * mom.getAgenda().getAgendaDetails() != null) { for (CouncilAgendaDetails
+	 * agendaDetails : mom.getAgenda().getAgendaDetails()) { if (agendaDetails !=
+	 * null && agendaDetails.getPreamble() != null &&
+	 * agendaDetails.getPreamble().getState() != null &&
+	 * agendaDetails.getPreamble().getState().getOwnerPosition() != null) {
+	 * 
+	 * //usersListResult.add(eisCommonService.getUserForPosition(agendaDetails.
+	 * getPreamble().getState().getCreatedBy(),new Date()));
+	 * //usersListResult.add(eisCommonService.getUserForPosition(agendaDetails.
+	 * getPreamble().getState().getOwnerPosition(),new Date())); EmployeeInfo
+	 * agendaApproverinfo =
+	 * microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().
+	 * getOwnerPosition()); if(null != agendaApproverinfo) {
+	 * usersListResult.add(agendaApproverinfo.getUser()); } EmployeeInfo
+	 * agendaCreatorinfo =
+	 * microserviceUtils.getEmployeeById(agendaDetails.getPreamble().getState().
+	 * getCreatedBy()); if(null != agendaCreatorinfo) {
+	 * usersListResult.add(agendaCreatorinfo.getUser()); } } }
+	 * agendaNumber.add(mom.getAgenda().getAgendaNumber()); } }
+	 * 
+	 * EmployeeInfo meetingCreatorinfo =
+	 * microserviceUtils.getEmployeeById(councilMeeting.getCreatedBy()); if(null !=
+	 * meetingCreatorinfo) { usersListResult.add(meetingCreatorinfo.getUser()); }
+	 * 
+	 * //usersListResult.add(userService.getUserById(councilMeeting.getCreatedBy()))
+	 * ; return new ArrayList<>(usersListResult); }
+	 */
     
     public List<User> getUserListForMeeting(CouncilMeeting councilMeeting) {
         Set<User> usersListResult = new HashSet<>();
@@ -379,20 +407,22 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
         else
             return Collections.emptySet();
 }
+
     public void prepareMeetingMomData(final MeetingMOM meetingMOM, List<MeetingMOM> meetingMOMList,
             List<CouncilAgendaDetails> preambleList,boolean autoPreambleNoGenEnabled) {
         for (MeetingMOM meetingMoMs : meetingMOM.getMeeting().getMeetingMOMs()) {
-            meetingMoMs.getPreamble().setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(
-                    PREAMBLE_MODULENAME, RESOLUTION_APPROVED_PREAMBLE));
+			meetingMoMs.getPreamble().setStatus(
+					egwStatusHibernateDAO.getStatusByModuleAndCode(PREAMBLE_MODULENAME, RESOLUTION_APPROVED_PREAMBLE));
             meetingMoMs.getPreamble().setType(PreambleType.GENERAL);
             meetingMoMs.setMeeting(meetingMOM.getMeeting());
             if (autoPreambleNoGenEnabled){
                 PreambleNumberGenerator preamblenumbergenerator = autonumberServiceBeanResolver
                         .getAutoNumberServiceFor(PreambleNumberGenerator.class);
-                meetingMoMs.getPreamble().setPreambleNumber(preamblenumbergenerator
-                        .getNextNumber(meetingMoMs.getPreamble()));
+				meetingMoMs.getPreamble()
+						.setPreambleNumber(preamblenumbergenerator.getNextNumber(meetingMoMs.getPreamble()));
                 }
-            meetingMoMs.getMeeting().setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(MEETING_MODULENAME, MOM_FINALISED));
+			meetingMoMs.getMeeting()
+					.setStatus(egwStatusHibernateDAO.getStatusByModuleAndCode(MEETING_MODULENAME, MOM_FINALISED));
             meetingMoMs.getMeeting().setCommitteeType(meetingMOM.getAgenda().getCommitteeType());
             meetingMoMs.setAgenda(meetingMOM.getAgenda());
             meetingMoMs.getAgenda()
@@ -406,6 +436,7 @@ public class CouncilMeetingService extends PersistenceService<CouncilMeeting, Lo
             meetingMOMList.add(meetingMoMs);
         }
     }
+
     //Added By Bikash
     public List<MeetingMOM> getAllMoM() {
         return councilMoMRepository.findAll();
