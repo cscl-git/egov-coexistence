@@ -32,6 +32,50 @@ public class ManageAuditor implements java.io.Serializable{
 	@Transient
 	private String employeeName;
 	
+	private String audittype;
+	
+	
+	public String getAudittype() {
+		return audittype;
+	}
+
+	public void setAudittype(String audittype) {
+		this.audittype = audittype;
+	}
+
+	private String subdivision;
+	
+	
+	public String getSubdivision() {
+		return subdivision;
+	}
+
+	public void setSubdivision(String subdivision) {
+		this.subdivision = subdivision;
+	}
+
+	private String billtype;
+	
+	public String getBilltype() {
+		return billtype;
+	}
+
+	public String getAudittypetable() {
+		return audittypetable;
+	}
+
+	public void setAudittypetable(String audittypetable) {
+		this.audittypetable = audittypetable;
+	}
+
+	public void setBilltype(String billtype) {
+		this.billtype = billtype;
+	}
+
+	@Transient
+	private String audittypetable;
+	
+
 	private Integer employeeid;
 	
 	private String type;

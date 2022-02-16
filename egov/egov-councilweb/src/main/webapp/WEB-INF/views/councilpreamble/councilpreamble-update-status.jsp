@@ -53,7 +53,9 @@
   ~
   --%>
 
-<form:form role="form" action="../updateimplimentaionstatus" modelAttribute="councilPreamble" id="councilPreambleform" cssClass="form-horizontal form-groups-bordered"
+<form:form role="form" action="../updateimplimentaionstatus"
+	modelAttribute="councilPreamble" id="councilPreambleform"
+	cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
 	
 	<%@ include file="councilpreamble-view.jsp"%>
@@ -66,18 +68,32 @@
 				<form:option value="">
 					<spring:message code="lbl.select" />
 				</form:option>
-				<form:options items="${implementationStatus}"
-				itemValue="id" itemLabel="code"  />
+				<form:options items="${implementationStatus}" itemValue="id"
+					itemLabel="code" />
 			</form:select>
 			<form:errors path="implementationStatus" cssClass="error-msg" />
 		</div>
+		<div class="form-group">
+			<label class="col-sm-3 control-label text-right"><spring:message
+					text=" Agenda outcome" /> </label>
+			<div class="col-sm-3 add-margin">
+				<form:input class="form-control"
+					data-pattern="alphanumericwithspecialcharacters"
+					id="outcome" path="outcome"
+					maxlength="2000" />
+			</div>
+		</div>
+
+
+
 		<div class="col-sm-3 add-margin">
 			<button type='submit' class='btn btn-primary' id="buttonSubmit">
 				<spring:message code='lbl.update' />
 			</button>
 		</div>
 	</div>	
-	<input type="hidden" name="councilPreamble" value="${councilPreamble.id}" />	
+	<input type="hidden" name="councilPreamble"
+		value="${councilPreamble.id}" />
 </form:form>
 <script
 	src="<cdn:url value='/resources/app/js/councilPreambleHelper.js?rnd=${app_release_no}'/>"></script>

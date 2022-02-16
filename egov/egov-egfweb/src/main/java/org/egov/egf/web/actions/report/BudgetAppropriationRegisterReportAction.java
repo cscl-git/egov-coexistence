@@ -260,15 +260,38 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
             strQuery.append(getDepartmentQuery("bmis.departmentcode"));
             strQuery.append(getFundQuery("bmis.fundid"));
             strQuery.append("  ");
-            strQuery.append(" union select distinct bmis1.budgetary_appnumber as bdgApprNumber, null as VoucherNumber,cast( null as date) voucherDate , ");
-            strQuery.append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br  ");
-            strQuery.append(" where br.id = bd1.billid and br.id = bmis1.billid and  bd1.glcodeid =:glCodeId ");
-            strQuery.append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) ");
-            strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate");
-            strQuery.append(" and br.billdate <=:strAODate");
-            strQuery.append(getFunctionQuery("bd1.functionid"));
-            strQuery.append(getDepartmentQuery("bmis1.departmentcode"));
-            strQuery.append(getFundQuery("bmis1.fundid"));
+            //modified by abhishek for watch register report
+			/*
+			 * strQuery.
+			 * append(" union select distinct bmis1.budgetary_appnumber as bdgApprNumber, vh2.vouchernumber as VoucherNumber, vh2.voucherdate as voucherDate, "
+			 * ); strQuery.
+			 * append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br, vouchermis vmis2, voucherheader vh2  "
+			 * ); strQuery.
+			 * append(" where br.id = bd1.billid and br.id = bmis1.billid and  bd1.glcodeid =:glCodeId and vh2.id = vmis2.voucherheaderid "
+			 * ); strQuery.
+			 * append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) and vmis2.budgetary_appnumber=bmis1.budgetary_appnumber "
+			 * ); strQuery.
+			 * append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate"
+			 * ); strQuery.append(" and br.billdate <=:strAODate");
+			 * strQuery.append(getFunctionQuery("bd1.functionid"));
+			 * strQuery.append(getDepartmentQuery("bmis1.departmentcode"));
+			 * strQuery.append(getFundQuery("bmis1.fundid"));
+			 */
+			  strQuery.
+			  append(" union select distinct bmis1.budgetary_appnumber as bdgApprNumber, null as VoucherNumber,cast( null as date) voucherDate , "
+			  ); strQuery.
+			  append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br  "
+			  ); strQuery.
+			  append(" where br.id = bd1.billid and br.id = bmis1.billid and  bd1.glcodeid =:glCodeId "
+			  ); strQuery.
+			  append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) "
+			  ); strQuery.
+			  append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate"
+			  ); strQuery.append(" and br.billdate <=:strAODate");
+			  strQuery.append(getFunctionQuery("bd1.functionid"));
+			  strQuery.append(getDepartmentQuery("bmis1.departmentcode"));
+			  strQuery.append(getFundQuery("bmis1.fundid"));
+			 
             strQuery.append("  order by bdgApprNumber ");
 
             if (LOGGER.isDebugEnabled())

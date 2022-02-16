@@ -57,7 +57,9 @@
 	<div class="col-md-12">
 		<div class="panel panel-primary" data-collapsed="0">
 			<div class="panel-heading">
-				<div class="panel-title"><spring:message code="title.agenda.view" /></div>
+				<div class="panel-title">
+					<spring:message code="title.agenda.view" />
+				</div>
 			</div>
 			<div class="panel-body custom">
 				<div class="row add-border">
@@ -85,8 +87,7 @@
 						<spring:message code="lbl.department" />
 					</div>
 					<div class="col-sm-3 add-margin view-content">
-						${councilPreamble.departmentName}
-					</div>
+						${councilPreamble.departmentName}</div>
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.committeetype" />
 					</div>
@@ -109,8 +110,7 @@
 					<div class="col-xs-3 add-margin">
 						<spring:message code="lbl.upload" />
 					</div>
-					<div class="col-sm-3 add-margin down-file"
-						id="links">
+					<div class="col-sm-3 add-margin down-file" id="links">
 						<c:choose>
 							<c:when test="${councilPreamble.filestoreid != null}">
 								<a
@@ -130,6 +130,11 @@
 					</div>
 					<div class="col-sm-8 add-margin">
 						${councilPreamble.gistOfPreamble}</div>
+					<div class="col-xs-3 add-margin">
+						<spring:message text="Agenda Outcome" />
+					</div>
+					<div class="col-sm-3 add-margin">${councilPreamble.outcome }
+					</div>
 				</div>
 				
 				<!-- <div class="row add-border">
@@ -188,8 +193,10 @@
 													value="${preamble.meeting.meetingDate}" /></td>
 											<td><c:out
 													value="${preamble.meeting.committeeType ne null?preamble.meeting.committeeType.name:'N/A'}" /></td>
-											<td><c:out value="${preamble.preamble.status ne null?preamble.preamble.status.code:'N/A'}" /></td>
-											<td><c:out value="${preamble.resolutionNumber ne null?preamble.resolutionNumber:'N/A'}" /></td>
+											<td><c:out
+													value="${preamble.preamble.status ne null?preamble.preamble.status.code:'N/A'}" /></td>
+											<td><c:out
+													value="${preamble.resolutionNumber ne null?preamble.resolutionNumber:'N/A'}" /></td>
 											<td><span class="more"><c:out
 														value="${preamble.resolutionDetail ne null?preamble.resolutionDetail:'N/A'}" /></span></td>
 											<td><button type="button"
@@ -212,7 +219,8 @@
 			</div>
 		</c:if>
 		
-		<c:if test="${councilPreamble.status.code!= 'null' && !'CREATED'.equalsIgnoreCase(councilPreamble.status.code)}">
+		<c:if
+			test="${councilPreamble.status.code!= 'null' && !'CREATED'.equalsIgnoreCase(councilPreamble.status.code)}">
 			<div class="text-center hide-close">
 				<div class="add-margin">
 					<a href="javascript:void(0)" class="btn btn-default"

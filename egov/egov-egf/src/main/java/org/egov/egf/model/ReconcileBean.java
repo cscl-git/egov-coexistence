@@ -61,6 +61,7 @@ public class ReconcileBean {
 	private Date toDate;
 	private String chequeNumber;
 	private String chequeDate;
+	private String reconciledOn;
 	private BigDecimal chequeAmount;
 	private String type;
 	private String txnType;
@@ -76,6 +77,7 @@ public class ReconcileBean {
 	private BigDecimal debitAmount;
 	private BigDecimal otherCreditAmount;
 	private BigDecimal otherDebitAmount;
+	private String statusType;
 	
 	
 	
@@ -211,6 +213,18 @@ public class ReconcileBean {
 	}
 	public void setVhId(String vhId) {
 		this.vhId = vhId;
+	}
+	public String getReconciledOn() {
+		return reconciledOn;
+	}
+	public void setReconciledOn(String reconciledOn) {
+		this.reconciledOn = reconciledOn;
+	}
+	public String getStatusType() {
+		return statusType;
+	}
+	public void setStatusType(String statusType) {
+		this.statusType = statusType;
 	}
 	
     

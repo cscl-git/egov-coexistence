@@ -30,6 +30,8 @@ import org.egov.pims.commons.Position;
 import org.egov.works.boq.entity.BoQDetails;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApprovalRESTPOJO;
+import org.egov.works.estimatepreparationapproval.entity.ExpenditureHeadEntity;
+import org.egov.works.estimatepreparationapproval.entity.ExpenditureSubHead;
 import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
 import org.egov.works.estimatepreparationapproval.entity.Workswing;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
@@ -60,6 +62,7 @@ public class EstimatePreparationApprovalService {
     private SimpleWorkflowService<EstimatePreparationApproval> estimateWorkflowService;
 	@Autowired
     private EgwStatusHibernateDAO egwStatusDAO;
+	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
 	@Autowired
@@ -467,8 +470,10 @@ public class EstimatePreparationApprovalService {
 	public List<EstimatePreparationApprovalRESTPOJO>getAllEstimationPreparationNative(){
 		System.out.println("HERE");
 		List<EstimatePreparationApprovalRESTPOJO> a=null;
+		
 		try {
 			a=estimatePreparationApprovalRepository.getEstimatePreparationApprovalRESTPOJO();
+			
 		}catch(Exception ex) {
 			ex.printStackTrace();
 		}
@@ -503,5 +508,30 @@ public class EstimatePreparationApprovalService {
 		}catch (Exception e) {
 			System.out.println("unable to delete document  "+e.getMessage());// TODO: handle exception
 		}
+	}
+
+	public List<ExpenditureSubHead> getSubHead(String id) {
+		List<ExpenditureSubHead> subheadList = new ArrayList<ExpenditureSubHead>();
+		List<Object[]> list = new ArrayList<Object[]>();
+		try {
+			String query = "SELECT es.subHeadId , es.subHead FROM ExpenditureSubHead es WHERE es.exp_head_id.headId IN (SELECT eh.headId FROM ExpenditureHeadEntity eh WHERE eh.expenditureHead ='"+id+"')";
+			list=null;
+			list = persistenceService.findAllBy(query);
+			System.out.println("#### list size ::"+list.size());
+			if(list!= null && !list.isEmpty()) {
+				for(Object[] object : list) {
+					ExpenditureSubHead expSubHeadObj = new ExpenditureSubHead();
+					expSubHeadObj.setSubHeadId(Long.parseLong(object[0].toString()));
+					expSubHeadObj.setSubHead(object[1].toString());
+					subheadList.add(expSubHeadObj);
+				}
+				
+			}
+			
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		
+		return subheadList;
 	}
 }

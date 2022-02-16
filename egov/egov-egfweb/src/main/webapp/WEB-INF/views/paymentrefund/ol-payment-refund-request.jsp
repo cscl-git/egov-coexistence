@@ -39,7 +39,7 @@
 			
 				<label class="col-sm-3 control-label text-right">Fund <span class="mandatory"></span>: </label>
 				<div class="col-sm-3 add-margin">
-			 <select name="egBillregistermis.fund" id="egBillregistermis.fund" required="required" class="form-control">
+			 <select name="egBillregistermis.fund" id="egBillregistermis.fund" required="required" class="form-control fundType">
 					<option value="">-Select-</option>
 					<c:forEach items="${fundList}" var="fund" varStatus="loop">
 						<option value="${fund.id}">${fund.name}</option>
@@ -61,7 +61,7 @@
 				
 				<label class="col-sm-3 control-label text-right">scheme: </label>
 				<div class="col-sm-3 add-margin">
-				<select name="egBillregistermis.schemeId" id="egBillregistermis.schemeId"  class="form-control">
+				<select name="egBillregistermis.schemeId" id="egBillregistermis.schemeId"  class="form-control schemeType">
 					<option value="">-Select-</option>
 					<c:forEach items="${schemeList}" var="scheme" varStatus="loop">
 						<option value="${scheme.id}">${scheme.name}</option>
@@ -73,7 +73,7 @@
 			<div class="form-group">
 			<label class="col-sm-3 control-label text-right">Sub Scheme :</b></label>
 				<div class="col-sm-3 add-margin">
-				<select name="egBillregistermis.subSchemeId" id="egBillregistermis.subSchemeId"  class="form-control">
+				<select name="egBillregistermis.subSchemeId" id="egBillregistermis.subSchemeId"  class="form-control subSchemeType">
 					<option value="">-Select-</option>
 					<c:forEach items="${SubSchemeList}" var="subScheme" varStatus="loop">
 						<option value="${subScheme.id}">${subScheme.name}</option>
@@ -563,32 +563,86 @@
 
 
 <script>
-/* 
- $("#refundCreate").submit(function(){
-	var rowCount = $("#tblaccountdetails > tbody").children().length-1;
-	for (i = 0; i < rowCount; i++) {
-		if ($('#billDetails['+i+'].debitamount').val() == null && $('#billDetails['+i+'].debitamount').val() == '') {
-			$('#billDetails['+i+'].debitamount').val('0.00')
+$(".fundType").on("change", function () {  
+	var fund=$(".fundType option:selected").val();
+	loadSchemeNew(fund);
+});
+function loadSchemeNew(fund){
+	if (!fund) {
+		$('.schemeType').empty();
+		$('.schemeType').append($('<option>').text('Select from below').attr('value', ''));
+		$('.subSchemeType').empty();
+		$('.subSchemeType').append($('<option>').text('Select from below').attr('value', ''));
+		return;
+	} else {
+		
+		$.ajax({
+			method : "GET",
+			url : "/services/EGF/common/getschemesbyfundid",
+			data : {
+				fundId : fund
+			},
+			async : true
+		}).done(
+				function(response) {
+					$('.schemeType').empty();
+					$('.schemeType').append($("<option value=''>Select from below</option>"));
+					$.each(response, function(index, value) {
+						var selected="";
+						if($schemeId && $schemeId==value.id)
+						{
+								selected="selected";
 			}
-		if ($('#billDetails['+i+'].creditamount').val() == null && $('#billDetails['+i+'].creditamount').val() == '') {
-			$('#billDetails['+i+'].creditamount').val('0.00')
+						$('.schemeType').append($('<option '+ selected +'>').text(value.name).attr('value', value.id));
+					});
+				});
+
 			}
 		} 
-	var rowCount2 = $("#tblSubledgerAdd > tbody").children().length-1;
-	for (i = 0; i < rowCount2; i++) {
-		if ($('#billPayeedetails['+i+'].debitAmount').val() == null && $('#billPayeedetails['+i+'].debitAmount').val() == '') {
-			$('#billPayeedetails['+i+'].debitAmount').val('0.00')
+$(".schemeType").on("change", function () {  
+	var scheme=$(".schemeType option:selected").val();
+	loadSubSchemeNew(scheme);
+});
+function loadSubSchemeNew(scheme){
+	if (!scheme) {
+		$('#subScheme').empty();
+		$('#subScheme').append($('<option>').text('Select from below').attr('value', ''));
+		return;
+	} else {
+		
+		$.ajax({
+			method : "GET",
+			url : "/services/EGF/common/getsubschemesbyschemeid",
+			data : {
+				schemeId : scheme
+			},
+			async : true
+		}).done(
+				function(response) {
+					$('#subScheme').empty();
+					$('#subScheme').append($("<option value=''>Select from below</option>"));
+					$.each(response, function(index, value) {
+						var selected="";
+						if($subSchemeId && $subSchemeId==value.id)
+						{
+								selected="selected";
 			}
-		if ($('#billPayeedetails['+i+'].creditAmount').val() == null && $('#billPayeedetails['+i+'].creditAmount').val() == '') {
-			$('#billPayeedetails['+i+'].creditAmount').val('0.00')
+						$('.subSchemeType').append($('<option '+ selected +'>').text(value.name).attr('value', value.id));
+					});
+				});
+		
 			}
 		} 
-	
-	
-	}); */ 
-	
-	
-	
+/* $('.subledgerGl_code').change(function () {	var index=dataId;
+	var subLedgerType =document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
+	var sel=document.getElementById('tempSubLedger['+index+'].subLedgerType');
+	var subLedgerTypetext= sel.options[sel.selectedIndex].text;
+	    	 if(subLedgerTypetext=='OtherParty'){  
+	    	  var id = $(this).attr("id");
+	    	  $('#indexRef').val(id);
+	        $modal.modal('show');
+	    }
+	 }); */
 	 $(".subledgerGlType").on("change", function () {        
 	      $modal = $('#myModal');
 	      var subtype=$(".subledgerGlType option:selected").text();
@@ -633,6 +687,7 @@
 	            success : function(data){
 	            	//alert(data.code+"  "+data.name+" "+data.id);
 	               $('#myModal').modal('hide');
+	               bootbox.alert("Other Party Details saved successfully, kindly enter Other Party Detail Code in Detailed Code Section");
 	            },
 	            error: function (e) {
 
@@ -659,6 +714,8 @@
         src="<cdn:url value='/resources/app/js/common/helper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script
         src="<cdn:url value='/resources/app/js/common/voucherBillHelper.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<%-- <script
+        src="<cdn:url value='/resources/app/js/common/voucherBillHelper_refund.js?rnd=${app_release_no}' context='/services/EGF'/>"></script> --%>        
 <script
         src="<cdn:url value='/resources/app/js/expensebill/refundbill_blankvoucher.js?rnd=${app_release_no}' context='/services/EGF'/>"></script> 
 <script

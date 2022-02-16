@@ -152,6 +152,44 @@ public class ReceiptHeader extends StateAware implements Auditable {
 	@Transient
     private List<DocumentUpload> documentDetail = new ArrayList<>();
     
+	private String serviceType;
+	private String chequeddno;
+	private String chequedddate;
+	private String bank;
+	
+	
+    public String getServiceType() {
+		return serviceType;
+	}
+
+	public void setServiceType(String serviceType) {
+		this.serviceType = serviceType;
+	}
+
+	public String getChequeddno() {
+		return chequeddno;
+	}
+
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+
+	public String getChequedddate() {
+		return chequedddate;
+	}
+
+	public void setChequedddate(String chequedddate) {
+		this.chequedddate = chequedddate;
+	}
+
+	public String getBank() {
+		return bank;
+	}
+
+	public void setBank(String bank) {
+		this.bank = bank;
+	}
+
     public String getRemittanceVoucherNumber() {
 		return remittanceVoucherNumber;
 	}

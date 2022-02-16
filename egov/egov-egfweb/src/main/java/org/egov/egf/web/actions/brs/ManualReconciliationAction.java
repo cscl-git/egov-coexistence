@@ -64,6 +64,7 @@ import org.egov.commons.Bank;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.Bankbranch;
 import org.egov.commons.Bankreconciliation;
+import org.egov.commons.EgwStatus;
 import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.egf.model.ReconcileBean;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -88,8 +89,17 @@ public class ManualReconciliationAction extends BaseFormAction {
 	private static final long serialVersionUID = -4207341983597707193L;
 	private List<Bankbranch> branchList = Collections.EMPTY_LIST;
 	private final List<Bankaccount> accountList = Collections.EMPTY_LIST;
+	private List<EgwStatus> statusTypeList = new ArrayList<EgwStatus>();
 	/* @Autowired
     private ReconcileService reconcileService;*/
+
+	public List<EgwStatus> getStatusTypeList() {
+		return statusTypeList;
+	}
+
+	public void setStatusTypeList(List<EgwStatus> statusTypeList) {
+		this.statusTypeList = statusTypeList;
+	}
 
 	@Autowired
 	private ManualReconcileHelper manualReconcileHelper;
@@ -115,10 +125,25 @@ public class ManualReconciliationAction extends BaseFormAction {
 		reconcileBean=new ReconcileBean();
 		reconcileBean.setLimit(DEFAULT_LIMIT );
 
+		
+		EgwStatus status2=new EgwStatus();
+		
+		status2.setCode("New");
+		status2.setDescription("Unreconciled");
+		EgwStatus status3=new EgwStatus();
+		
+		status3.setCode("Reconciled");
+		status3.setDescription("Reconciled");
+		statusTypeList.clear();
+		
+		statusTypeList.add(status2);
+		statusTypeList.add(status3);
+		
 		List<Bank> allBankHavingAccounts = bankHibernateDAO.getAllBankHavingBranchAndAccounts(); 
 		dropdownData.put("bankList", allBankHavingAccounts);  
 		dropdownData.put("branchList", branchList);
 		dropdownData.put("accountList", accountList);
+		dropdownData.put("statusTypeList", statusTypeList);
 		if (reconcileBean.getBranchId() != null)
 		{
 			branchList = persistenceService

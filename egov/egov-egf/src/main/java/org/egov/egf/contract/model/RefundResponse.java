@@ -9,6 +9,8 @@ public class RefundResponse {
 	 	@JsonProperty("Status")
 	    private String responseStatus;
 	 
+	 	private String billNumber;
+	 	
 	    @JsonProperty("ResponseInfo")
 	    private ResponseInfo responseInfo;
 
@@ -27,4 +29,13 @@ public class RefundResponse {
 		public void setResponseInfo(ResponseInfo responseInfo) {
 			this.responseInfo = responseInfo;
 		}
+
+		public String getBillNumber() {
+			return billNumber;
+		}
+
+		public void setBillNumber(String billNumber) {
+			this.billNumber = billNumber;
+		}
+		
 }

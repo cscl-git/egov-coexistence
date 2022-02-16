@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
@@ -623,12 +624,30 @@ public class ChartOfAccountsAction extends BaseFormAction {
     @Action(value = "/masters/chartOfAccounts-modifySearch")
     public String modifySearch() throws Exception {
         if (glCode != null) {
+           String glcodef=null;
             /*model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and glcode=?",
                     glCode.split("-")[0]);*/
-        	
+        	System.out.println("glcode  "+glCode);
+        	System.out.println("size of glcode "+glCode.split("-").length);
+        	String[] split = glCode.split("-");
+        	int length = split.length;
+        	for(int i=0;i<length;i++) {
+        		System.out.println("hello "+split[i]);
+        	}
+        	if(isNumeric(split[0])) {
+        		glcodef=split[0];
+        	}else {
+        		try {
+        		glcodef=split[(length-1)];
+        		}catch(Exception e) {
+        			e.printStackTrace();
+        		}
+        	}
+        	model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and glcode=?",
+            glcodef);
             //modified by Abhishek on 22032021
-        	model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)",
-                    glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);
+        	/*model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)",
+                    glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);*/
             
             if (model == null) {
                 addActionMessage(getText("charOfAccount.no.record"));
@@ -643,19 +662,42 @@ public class ChartOfAccountsAction extends BaseFormAction {
             return editDetailedCode();
         }
     }
-
+    public static boolean isNumeric(String str) { 
+    	  try {  
+    	    Double.parseDouble(str);  
+    	    return true;
+    	  } catch(NumberFormatException e){  
+    	    return false;  
+    	  }  
+    	}
     @SkipValidation
     @Action(value = "/masters/chartOfAccounts-viewSearch")
     public String viewSearch() throws Exception {
         if (glCode != null) {
-			/*
-			 * model = chartOfAccountsService.
-			 * find("from CChartOfAccounts where classification=4 and glcode=?",
-			 * glCode.split("-")[0]);
-			 */
+        	String glcodef=null;
+        	System.out.println("glcode  "+glCode);
+        	System.out.println("size of glcode "+glCode.split("-").length);
+        	String[] split = glCode.split("-");
+        	int length = split.length;
+        	for(int i=0;i<length;i++) {
+        		System.out.println("hello "+split[i]);
+        	}
+        	if(isNumeric(split[0])) {
+        		glcodef=split[0];
+        	}else {
+        		try {
+        		glcodef=split[(length-1)];
+        		}catch(Exception e) {
+        			e.printStackTrace();
+        		}
+        	}
+			
+			 model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and glcode=?",
+					 glcodef);
+			 
         	//modified by Abhishek on 22032021
-            model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)",
-                    glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);
+           /* model = chartOfAccountsService.find("from CChartOfAccounts where classification=4 and (glcode=? or glcode=? or glcode=?)",
+                    glCode.split("-")[0],glCode.split("-")[1],glCode.split("-")[2]);*/
             if (model == null) {
                 addActionMessage(getText("charOfAccount.no.record"));
                 return viewDetailedCode();

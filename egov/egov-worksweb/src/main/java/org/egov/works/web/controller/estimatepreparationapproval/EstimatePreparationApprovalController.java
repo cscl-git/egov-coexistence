@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,6 +70,8 @@ import org.egov.works.boq.entity.BoqUploadDocument;
 //import org.egov.works.estimatepreparationapproval.autonumber.AuditNumberGenerator;
 import org.egov.works.estimatepreparationapproval.autonumber.EstimateNoGenerator;
 import org.egov.works.estimatepreparationapproval.entity.EstimatePreparationApproval;
+import org.egov.works.estimatepreparationapproval.entity.ExpenditureHeadEntity;
+import org.egov.works.estimatepreparationapproval.entity.ExpenditureSubHead;
 import org.egov.works.estimatepreparationapproval.entity.Subdivisionworks;
 import org.egov.works.estimatepreparationapproval.repository.EstimatePreparationApprovalRepository;
 import org.egov.works.estimatepreparationapproval.repository.SudivisionRepository;
@@ -354,6 +357,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		System.out.println("::::::::::: "+estimatePreparationApproval.getWorksWing());
 		
 		List<DocumentUpload> list = new ArrayList<>();
+		
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
 				DocumentUpload upload = new DocumentUpload();
@@ -1007,7 +1011,7 @@ public class EstimatePreparationApprovalController extends GenericWorkFlowContro
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
-		Double estAmt= 0.0;
+		BigDecimal estAmt= new BigDecimal(0);
 		String comments =request.getParameter("comments");											
 		// String documentPath = "D://Upload/";
 
@@ -1179,13 +1183,22 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 							aBoQDetails.setRef_dsr(String.valueOf(cell.getNumericCellValue()));
 							//System.out.println(":::::Ref numeric No::: "+cell.getNumericCellValue());
 						}
+						if (cell.getColumnIndex() == 0) {
+							//aBoQDetails.setMilestone(String.valueOf(cell.getNumericCellValue()));
+							 
+	  System.out.println("mile numeric    ::  "+cell.getNumericCellValue());
 						
+						}
 						 if (cell.getColumnIndex() == 4) {
-		
-							aBoQDetails.setRate(cell.getNumericCellValue());
-	   						Double d = cell.getNumericCellValue();
+							 System.out.println("## Deep 1::"+cell.getNumericCellValue());
+							 long ld = Double.valueOf(String.valueOf(cell.getNumericCellValue())).longValue();
+							 System.out.println("### Deep 2 ::"+ld);
+							 BigDecimal bd = new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP);
+								long val = bd.longValue();
+								System.out.println("### deep 3::"+bd);
+							aBoQDetails.setRate(bd);
 	   
-							String[] splitter = d.toString().split("\\.");
+							String[] splitter = bd.toString().split("\\.");
 							
 							if(splitter[1].length()>4) {
 								error=true;
@@ -1194,7 +1207,7 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 							}
 						} else if (cell.getColumnIndex() == 5) {
 	   
-							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							aBoQDetails.setQuantity(new BigDecimal(String.valueOf(cell.getNumericCellValue())));
 	   Double d = cell.getNumericCellValue();
 							String[] splitter = d.toString().split("\\.");
 	   
@@ -1211,8 +1224,8 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 							}*/
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
 								
-							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
-							estAmt=estAmt+aBoQDetails.getAmount();
+							aBoQDetails.setAmount(aBoQDetails.getRate() .multiply(aBoQDetails.getQuantity()));
+							estAmt=estAmt.add(aBoQDetails.getAmount());
 							
 							}else {
 							rowerror.add(erow);	
@@ -1310,8 +1323,9 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 			
 			model.addAttribute("fileuploadAllowed","Y");
 			
-			BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-			if(estAmt >= 10000000){
+			//BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
+			BigDecimal  bgestAmt = estAmt;
+			if(estAmt.compareTo(new BigDecimal(10000000))>0){
 				BigDecimal  pct = new BigDecimal(3);
 				BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
 				estimatePreparationApproval.setContingentPercentage(3.0);
@@ -1404,7 +1418,7 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
-		Double estAmt= 0.0;
+		BigDecimal estAmt= new BigDecimal(0);
 		String comments =request.getParameter("comments");
 		// String documentPath = "D://Upload/";
 
@@ -1562,10 +1576,10 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 						
 						 if (cell.getColumnIndex() == 4) {
 		
-							aBoQDetails.setRate(cell.getNumericCellValue());
+							aBoQDetails.setRate(new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP));
 							Double d = cell.getNumericCellValue();
-							
-							String[] splitter = d.toString().split("\\.");
+							BigDecimal bd = new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP);
+							String[] splitter = bd.toString().split("\\.");
 							
 							if(splitter[1].length()>4) {
 								error=true;
@@ -1574,7 +1588,7 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 							}
 						} else if (cell.getColumnIndex() == 5) {
 							
-							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							aBoQDetails.setQuantity(new BigDecimal(String.valueOf(cell.getNumericCellValue())));
 							Double d = cell.getNumericCellValue();
 							String[] splitter = d.toString().split("\\.");
 							
@@ -1591,8 +1605,8 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 							}*/
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() !=null)  {
 								
-							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
-							estAmt=estAmt+aBoQDetails.getAmount();
+							aBoQDetails.setAmount(aBoQDetails.getRate() .multiply(aBoQDetails.getQuantity()));
+							estAmt=estAmt.add(aBoQDetails.getAmount());
 							
 							}else {
 							rowerror.add(erow);	
@@ -1689,8 +1703,8 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 			
 			model.addAttribute("fileuploadAllowed","Y");
 			
-			BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-			if(estAmt >= 10000000){
+			BigDecimal  bgestAmt = estAmt;
+			if(estAmt.compareTo(new BigDecimal(10000000))>0){
 				BigDecimal  pct = new BigDecimal(3);
 				BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
 				estimatePreparationApproval.setContingentPercentage(3.0);
@@ -2154,12 +2168,23 @@ System.out.println(" "+aBoQDetails.getMilestone()+" "+aBoQDetails.getItem_descri
 
 		List<BoQDetails> boQDetailsList = new ArrayList();
 		List<DocumentUpload> documentsall=new ArrayList<>();
-		
+		//Deep-Exp head and subhead
+		List<ExpenditureHeadEntity> headList = new ArrayList<ExpenditureHeadEntity>();
+		List<ExpenditureSubHead> subHeadList = new ArrayList<ExpenditureSubHead>();
+		headList = workEstimateService.fetchExpHeadList();
 		
 		EstimatePreparationApproval estimateDetails = workEstimateService.searchEstimateData(id);
 		final List<DocumentUpload> documents = documentUploadRepository.findByobjectTypeAndObjectId("Works_Est",estimateDetails.getId());
 		final List<DocumentUpload> roughCostEstmatedocuments = documentUploadRepository.findByobjectTypeAndObjectId("roughWorkFile",estimateDetails.getId());
+		System.out.println("### estimateDetails.getExpHead() ::"+estimateDetails.getExpHead());
+		estimateDetails.setExpHead(estimateDetails.getExpHead());
+		subHeadList = estimatePreparationApprovalService.getSubHead(estimateDetails.getExpCategory());
 
+		if(estimateDetails.getExpSubCategory()!= null && !estimateDetails.getExpSubCategory().isEmpty()) {
+			estimateDetails.setExpSubCategory(estimateDetails.getExpSubCategory());
+		}
+		estimateDetails.setHeadList(headList);
+		estimateDetails.setSubHeadList(subHeadList);
 		estimateDetails.setDesignatationlist(getdesignationlist());
 estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesignationNew());
 		estimateDetails.setWorksWing(estimateDetails.getWorksWing());
@@ -2171,12 +2196,16 @@ estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesig
 		String dept = estimateDetails.getExecutingDivision().toString();
 		estimateDetails.setDepartment(dept);
 		estimateDetails.setSubdivisions(estimatePreparationApprovalService.getsubdivision(Long.valueOf(dept)));
-
+		estimateDetails.setMeetAgenda(estimateDetails.getMeetAgenda());
 		
 		estimateDetails.setNewdepartments(estimatePreparationApprovalService.getdepartment(Long.valueOf(estimateDetails.getWorksWing())));
 		estimateDetails.setDesignations(getDesignationsFromMs());
 		estimateDetails.setTenderCost(String.valueOf(estimateDetails.getEstimateAmount()));
-		estimateDetails.setExpHead(estimateDetails.getExpHead_est());
+		//estimateDetails.setExpHead(estimateDetails.getExpHead_est());
+		///
+		estimateDetails.setExpHead(estimateDetails.getExpHead());
+		estimateDetails.setExpCategory(estimateDetails.getExpCategory());
+		///
 		estimateDetails.setEstimateNumber(estimateDetails.getEstimateNumber());
 		estimateDetails.setEstimateAmount(estimateDetails.getEstimateAmount().setScale(2,BigDecimal.ROUND_HALF_UP));
 		estimateDetails.setContingentAmount(estimateDetails.getContingentAmount().setScale(2,BigDecimal.ROUND_HALF_UP));
@@ -2204,6 +2233,7 @@ estimateDetails.setPreparationDesignationNew(estimateDetails.getPreparationDesig
 		model.addAttribute("workflowHistory",
 				getHistory(estimateDetails.getState(), estimateDetails.getStateHistory()));
 		model.addAttribute("prevState", populate(estimateDetails.getStateHistory()));
+		model.addAttribute("headList",headList);
 		return "create-estimate-form";
 	}
 private String populate(List<StateHistory> stateHistory) {
@@ -2245,7 +2275,7 @@ public String editEstimateData1(
 	String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 	String FILE_PATH_SEPERATOR = "\\";
 	file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
-	Double estAmt= 0.0;
+	BigDecimal estAmt= new BigDecimal(0);
 	String comments =request.getParameter("comments");
 	// String documentPath = "D://Upload/";
 
@@ -2394,10 +2424,10 @@ if(cell.getCellType()==cell.CELL_TYPE_BLANK) {
 					}
 					 if (cell.getColumnIndex() == 4) {
 	
-						aBoQDetails.setRate(cell.getNumericCellValue());
+						aBoQDetails.setRate(new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP));
 Double d = cell.getNumericCellValue();
-						
-						String[] splitter = d.toString().split("\\.");
+BigDecimal bd = new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP);
+						String[] splitter = bd.toString().split("\\.");
 						
 						if(splitter[1].length()>4) {
 							error=true;
@@ -2408,7 +2438,7 @@ Double d = cell.getNumericCellValue();
    
 					} else if (cell.getColumnIndex() == 5) {
    
-						aBoQDetails.setQuantity(cell.getNumericCellValue());
+						aBoQDetails.setQuantity(new BigDecimal(String.valueOf(cell.getNumericCellValue())));
    Double d = cell.getNumericCellValue();
 						
 						String[] splitter = d.toString().split("\\.");
@@ -2423,8 +2453,8 @@ Double d = cell.getNumericCellValue();
 							msg="Please check the uploaded document as there is an issue in AOR detail sheet.";	
 						}*/
 						if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
-						aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
-						estAmt=estAmt+aBoQDetails.getAmount();
+						aBoQDetails.setAmount(aBoQDetails.getRate().multiply(aBoQDetails.getQuantity()));
+						estAmt=estAmt.add(aBoQDetails.getAmount());
 						}else {
 							error=true;
 							msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check Row Number "+erow;
@@ -2544,8 +2574,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 	if(!error) {
 	estimateDetails.setDocUpload(docUpload);
 	estimateDetails.setBoQDetailsList(boQDetailsList);
-	BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-	if(estAmt >= 10000000){
+	BigDecimal  bgestAmt = estAmt;
+	if(estAmt.compareTo(new BigDecimal(10000000))>0){
 		BigDecimal  pct = new BigDecimal(3);
 		BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
 		estimateDetails.setContingentPercentage(3.0);
@@ -2648,6 +2678,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 //				estimatePreparationApprovalService.deleteBoq(slNo);
 //			}
 		}
+		
 		List<DocumentUpload> list = new ArrayList<>();
 		if (files != null)
 			for (int i = 0; i < files.length; i++) {
@@ -2774,6 +2805,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		String userName = estimatePreparationApprovalService.getUserName();
 		Long userId = estimatePreparationApprovalService.getUserId();
 		System.out.println(":::::User Name:::: "+userName+"::::UserID:::: "+userId);
+		
 		//New File UPload....
 		List<DocumentUpload> docup = new ArrayList<>();
 		String refNo=null;
@@ -2787,7 +2819,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		String FILE_PATH_PROPERTIES = "F:\\Upload\\";
 		String FILE_PATH_SEPERATOR = "\\";
 		file.getOriginalFilename().substring(0, file.getOriginalFilename().lastIndexOf("."));
-		Double estAmt= 0.0;
+		BigDecimal estAmt= new BigDecimal(0);
 		String comments =request.getParameter("comments");
 		// String documentPath = "D://Upload/";
 
@@ -2936,11 +2968,11 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 						}
 						 if (cell.getColumnIndex() == 4) {
 		
-							aBoQDetails.setRate(cell.getNumericCellValue());
+							aBoQDetails.setRate(new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP));
 							//boqDetailsPop.setRate((int) nextRow.getCell(4).getNumericCellValue());
 							Double d = cell.getNumericCellValue();
-							
-							String[] splitter = d.toString().split("\\.");
+							BigDecimal bd = new BigDecimal(String.valueOf(cell.getNumericCellValue())).setScale(4, RoundingMode.HALF_UP);
+							String[] splitter = bd.toString().split("\\.");
 	   
 							if(splitter[1].length()>4) {
 								error=true;
@@ -2949,7 +2981,7 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 							}
 						} else if (cell.getColumnIndex() == 5) {
 	   
-							aBoQDetails.setQuantity(cell.getNumericCellValue());
+							aBoQDetails.setQuantity(new BigDecimal(String.valueOf(cell.getNumericCellValue())));
 							Double d = cell.getNumericCellValue();
 							
 							String[] splitter = d.toString().split("\\.");
@@ -2964,8 +2996,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 								msg="Please check the uploaded document as there is an issue in AOR detail sheet.";	
 							}*/
 							if (aBoQDetails.getRate() != null && aBoQDetails.getQuantity() != null) {
-							aBoQDetails.setAmount(aBoQDetails.getRate() * aBoQDetails.getQuantity());
-							estAmt=estAmt+aBoQDetails.getAmount();
+							aBoQDetails.setAmount(aBoQDetails.getRate().multiply(aBoQDetails.getQuantity()));
+							estAmt=estAmt.add(aBoQDetails.getAmount());
 							}else {
 								error=true;
 								msg="Please check the uploaded document as there is an issue in AOR detail sheet. Rate and Quantity should be numeric.Check Row number "+erow;
@@ -3063,8 +3095,8 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
 		if(!error) {
 		estimateDetails.setDocUpload(docUpload);
 		estimateDetails.setBoQDetailsList(boQDetailsList);
-		BigDecimal  bgestAmt = BigDecimal.valueOf(estAmt);
-		if(estAmt >= 10000000){
+		BigDecimal  bgestAmt = estAmt;
+		if(estAmt.compareTo(new BigDecimal(10000000))>0){
 			BigDecimal  pct = new BigDecimal(3);
 			BigDecimal  ContingentAmt=percentage(bgestAmt,pct);
 			estimateDetails.setContingentPercentage(3.0);
@@ -3536,6 +3568,18 @@ List<BoQDetails> boQDetailsList1 = new ArrayList();
                 .body(new InputStreamResource(in));
 		
 	    }
+	@RequestMapping(value = "/ajaxexpenditureSubHead", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    @ResponseBody
+    public List<ExpenditureSubHead> ajaxexpenditureSubHead(@RequestParam final String id,HttpServletRequest request, HttpServletResponse response) {
+
+	 List<ExpenditureSubHead> subHead=null;
+    	System.out.println(":::::::  "+id);
+    	if(id!=null) {
+    		subHead = estimatePreparationApprovalService.getSubHead(id);
+    	}
+        return subHead;
+
+    }
 		@RequestMapping(value = "/ajaxexecutivedivision", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_VALUE)
 	    @ResponseBody
 	    public List<org.egov.infra.admin.master.entity.Department> ajaxexecutivedivision(@RequestParam final Long id) {

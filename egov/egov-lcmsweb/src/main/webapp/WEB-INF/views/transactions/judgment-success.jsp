@@ -132,7 +132,8 @@
 							<fmt:formatNumber var="formattedRate" type="number"
 							minFractionDigits="2" maxFractionDigits="2"
 							value="${judgment.costAwarded}" />
-						<c:out value="${formattedRate}" /></div>
+							<c:out value="${formattedRate}" />
+						</div>
 						<div class="col-xs-3 add-margin">
 							<spring:message code="lbl.compensationawarded" />
 						</div>
@@ -140,7 +141,23 @@
 							<fmt:formatNumber var="formattedRate" type="number"
 							minFractionDigits="2" maxFractionDigits="2"
 							value="${judgment.compensationAwarded}" />
-						<c:out value="${formattedRate}" /></div>
+							<c:out value="${formattedRate}" />
+						</div>
+					</div>
+
+					<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+							<spring:message code="lbl.replysubmitted" />
+						</div>
+						<div class="col-sm-9 add-margin view-content">
+							${judgment.replySubmit}</div>
+					</div>
+					<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+							<spring:message code="lbl.argument" />
+						</div>
+						<div class="col-sm-9 add-margin view-content">
+							${judgment.argument}</div>
 					</div>
 
 					<div class="row add-border">

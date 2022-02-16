@@ -71,6 +71,7 @@ import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.egov.utils.FinancialConstants;
+import org.egov.utils.VoucherHelper;
 import org.hibernate.FlushMode;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -150,6 +151,7 @@ public class DayBookReportAction extends BaseFormAction {
         	subdivisionList.add(subdivision);
         }
         addDropdownData("subdivisionList", subdivisionList);
+		addDropdownData("typeList",VoucherHelper.VOUCHER_TYPES);
         currentDate = formatter.format(todayDate);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Inside  Prepare ........");
@@ -167,7 +169,8 @@ public class DayBookReportAction extends BaseFormAction {
     @Validations(requiredFields = {
             @RequiredFieldValidator(fieldName = "startDate", message = "", key = FinancialConstants.REQUIRED),
             @RequiredFieldValidator(fieldName = "endDate", message = "", key = FinancialConstants.REQUIRED),
-            @RequiredFieldValidator(fieldName = "fundId", message = "", key = FinancialConstants.REQUIRED), })
+            @RequiredFieldValidator(fieldName = "fundId", message = "", key = FinancialConstants.REQUIRED),
+            @RequiredFieldValidator(fieldName = "type", message = "", key = FinancialConstants.REQUIRED),})
     @ValidationErrorPage(value = FinancialConstants.STRUTS_RESULT_PAGE_SEARCH)
     @ReadOnly
     @Action(value = "/report/dayBookReport-ajaxSearch")
@@ -206,6 +209,7 @@ public class DayBookReportAction extends BaseFormAction {
     	String subdivison=dayBookReport.getSubdivision();
     	System.out.println("subdivison :::"+dayBookReport.getSubdivision());
     	String oderBy=" ORDER BY vdate,vouchernumber";
+    	String otype = dayBookReport.getType();
         try {
             startDate = sdf.format(formatter.parse(dayBookReport.getStartDate()));
             endDate = sdf.format(formatter.parse(dayBookReport.getEndDate()));
@@ -214,11 +218,11 @@ public class DayBookReportAction extends BaseFormAction {
         }
         String query = "SELECT voucherdate as vdate, TO_CHAR(voucherdate, 'dd-Mon-yyyy')  AS  voucherdate, vouchernumber as vouchernumber , gd.glcode AS glcode,ca.name AS particulars ,vh.name ||' - '|| vh.TYPE AS type"
                 + ", CASE WHEN vh.description is null THEN ' ' ELSE vh.description END AS narration, CASE  WHEN status=0 THEN ( 'Approved') ELSE ( case WHEN status=1 THEN 'Reversed' else (case WHEN status=2 THEN 'Reversal' else ' ' END) END ) END as status , debitamount  , "
-                + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId,(select dep.name from eg_department dep where dep.code=vmis.departmentcode) as dept,(select fun.name from function fun where fun.id=vmis.functionid) as func FROM voucherheader vh,vouchermis vmis, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID AND vh.id=vmis.voucherheaderid"
+                + " creditamount,vh.CGVN ,vh.isconfirmed as \"isconfirmed\",vh.id as vhId,vmis.reciept_number as receiptNo,(select dep.name from eg_department dep where dep.code=vmis.departmentcode) as dept,(select fun.name from function fun where fun.id=vmis.functionid) as func FROM voucherheader vh,vouchermis vmis, generalledger gd, chartofaccounts ca WHERE vh.ID=gd.VOUCHERHEADERID AND vh.id=vmis.voucherheaderid"
                 + " AND ca.GLCODE=gd.GLCODE AND voucherdate >= '"
                 + startDate
                 + "' and voucherdate <= '"
-                + endDate
+                + endDate +"' and vh.type = '" +otype
                 + "' and vh.status not in (4,5)  and vh.fundid = " + fundId ;
         
         if(schemeId != null && !schemeId.isEmpty())
@@ -276,6 +280,7 @@ public class DayBookReportAction extends BaseFormAction {
                 .addScalar("vhId", StringType.INSTANCE)
                 .addScalar("dept", StringType.INSTANCE)
                 .addScalar("func", StringType.INSTANCE)
+                .addScalar("receiptNo", StringType.INSTANCE)
                 .setResultTransformer(Transformers.aliasToBean(DayBook.class));
         dayBookDisplayList = query.list();
         for (DayBook bean : dayBookDisplayList) {

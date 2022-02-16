@@ -47,6 +47,19 @@
  *
  */
 /*Added By Kundan For Solved Date Picker Issue*/
+function searchCheck(){
+	var url = "/services/works/dnit//workDnitSearchExcel";
+	window.location.href=url;
+	//document.rtgsIssueRegisterReport.submit();
+	return true;
+}
+
+function searchCheckboq(){
+	var url = "/services/works/boq//workOrderAgreementSearchExcel";
+	window.location.href=url;
+	//document.rtgsIssueRegisterReport.submit();
+	return true;
+}
 
 function ConfirmDelete()
 {

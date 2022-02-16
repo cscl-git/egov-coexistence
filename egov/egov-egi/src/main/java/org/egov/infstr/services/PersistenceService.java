@@ -151,9 +151,18 @@ public class PersistenceService<T, ID extends Serializable> {
 		return (T) q.uniqueResult();
 	}
 
-	protected T findById(final ID id) {
+	public T finds(final String query) {
+		final Query q = getSession().createQuery(query);
+		return (T) q.list();
+	}
+
+	public T findById(final ID id) {
 		return id == null ? null : getSession().get(this.type, id);
 	}
+	
+//	public T findByRealizationDate(final String transactionNumber) {
+//		return transactionNumber == null ? null : getSession().get(transactionNumber);
+//	}
 
 	public List<T> findAllBy(final String query, final Object... params) {
 		final Query q = getQueryWithParams(query, params);

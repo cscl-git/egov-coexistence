@@ -58,7 +58,8 @@
 			name="searchlegalcaseForm" id="searchlegalcaseForm"
 			class="form-horizontal form-groups-bordered">
 			<div class="panel panel-primary" data-collapsed="0">
-		<input type="hidden" value="${loggedInUserViewAccess}" id="loggedInUserViewAccess" />
+				<input type="hidden" value="${loggedInUserViewAccess}"
+					id="loggedInUserViewAccess" />
 			
 				<div class="panel-heading">
 					<div class="panel-title">Search Legal Case</div>
@@ -192,7 +193,8 @@
 				</div>
 				<!-- Newly Added For Judgement By Bikash Dhal-->
 				<div class="form-group" id="reportstatus">
-					<label class="col-sm-3 control-label text-right">Judgment Type:</label>
+					<label class="col-sm-3 control-label text-right">Judgment
+						Type:</label>
 					<div class="col-sm-3 add-margin">
 						<form:select name="judgmentTypeId" path=""
 							data-first-option="false" id="judgmentTypeId"
@@ -209,10 +211,10 @@
 				<div class="form-group">
 					<label class="col-sm-3 control-label text-right"></label>
 						<div class="col-sm-3 add-margin"></div>
-						<label class="col-sm-5 control-label text-right">Include Important Cases Only :</label>
+					<label class="col-sm-5 control-label text-right">Include
+						Important Cases Only :</label>
 						<div class="col-sm-1 add-margin">
-							<input type="checkbox" name="iscaseImp"
-								value="iscaseImp" />
+						<input type="checkbox" name="iscaseImp" value="iscaseImp" />
 						</div>
 						
 					<label class="col-sm-3 control-label text-right"></label>
@@ -223,6 +225,23 @@
 						<input type="checkbox" name="isStatusExcluded"
 							value="isStatusExcluded" />
 					</div>
+					<label class="col-sm-3 control-label text-right"></label>
+						<div class="col-sm-3 add-margin"></div>
+					<label class="col-sm-5 control-label text-right">Judgement
+						Pending :</label>
+						<div class="col-sm-1 add-margin">
+							<input type="checkbox" name="isJudgementPending"
+								value="isJudgementPending" />
+						</div>
+					
+					<label class="col-sm-3 control-label text-right"></label>
+						<div class="col-sm-3 add-margin"></div>
+					<label class="col-sm-5 control-label text-right">Judgement
+						Done :</label>
+						<div class="col-sm-1 add-margin">
+							<input type="checkbox" name="isJudgementDone"
+								value="isJudgementDone" />
+						</div>
 				</div>
 				<div class="row">
 					<div class="text-center">
@@ -253,9 +272,13 @@
 		<div class="row" id="downloadexcel">
 					<div class="text-center">
 						<a href="javascript:void(0);" id="legalcaseReportSearchExcel"
-							class="btn btn-primary">Download Excel</a>
+					class="btn btn-primary">Download Excel</a> <a
+					href="javascript:void(0);" id="legalcaseReportSearchPdf"
+							class="btn btn-primary">Download Pdf</a>
 					</div>
 		</div>
+		
+		
 	</div>
 </div>
 

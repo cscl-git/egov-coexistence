@@ -45,6 +45,15 @@ public class AuditDetail {
     private List<AuditEmployee> auditEmployees= new ArrayList<AuditEmployee>();
 	private String notes;
 	private Integer passUnderobjection=0;
+	private String passunderobjectioncomment ;
+	
+	public String getPassunderobjectioncomment() {
+		return passunderobjectioncomment;
+	}
+	public void setPassunderobjectioncomment(String passunderobjectioncomment) {
+		this.passunderobjectioncomment = passunderobjectioncomment;
+	}
+	
 	private String type;
 	
 	public Date getAuditScheduledDate() {

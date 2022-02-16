@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report1" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d7a995f8-59bc-4d51-8360-7df6b4a5c45e">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="auditReportDS" uuid="61af6617-377c-4736-9e53-643e490f0664">
+		<field name="slNo" class="java.lang.Integer"/>
+		<field name="auditType" class="java.lang.String"/>
+		<field name="auditNumber" class="java.lang.String"/>
+		<field name="billNumber" class="java.lang.String"/>
+		<field name="auditScheduleDate" class="java.lang.String"/>
+		<field name="status" class="java.lang.String"/>
+		<field name="pendingWith" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="auditReportDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="24" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="23" uuid="2a9bd527-2535-4bb6-bce5-611e60e857dc"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true" pdfFontName="Times-Bold"/>
+				</textElement>
+				<text><![CDATA[Audit Report]]></text>
+			</staticText>
+		</band>
+	</title>
+	<summary>
+		<band height="148" splitType="Stretch">
+			<componentElement>
+				<reportElement key="table" style="table" x="0" y="0" width="802" height="105" uuid="1677458d-9eb0-435c-9f95-9941e8ceefcb"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="auditReportDS" uuid="596784e2-7430-45cd-af67-11b988eaf221">
+						<dataSourceExpression><![CDATA[$P{auditReportDataSource}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="48" uuid="b7fcda3a-c9ed-45af-97e4-3c2b539503b5">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="48" height="30" uuid="0ba5b6b6-f62c-4052-8245-d4d16020f1f5"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Sl No.]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField>
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="48" height="20" uuid="445cb253-c37a-43a5-9107-9e7735decc9a"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{slNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="108" uuid="bdf6a359-14ed-488a-8737-2c19e00c386a">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="108" height="30" uuid="990b606e-c087-41f4-970e-bcc32deb7201"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Audit Type]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="108" height="20" isPrintWhenDetailOverflows="true" uuid="fc785161-3639-44d4-865d-b60c707488a4"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{auditType}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="144" uuid="dd60c459-9cde-410a-a8e2-8c63d9194e94">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="144" height="30" uuid="b5ad90f2-e2f2-46ff-aab7-fd9d5c8385db"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Audit Number]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="144" height="20" isPrintWhenDetailOverflows="true" uuid="ffee18d3-f112-409c-b5bc-e3fcbb13f837"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{auditNumber}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="140" uuid="cd0237cf-17ab-4f3c-baa5-35aff1a1b2e6">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="140" height="30" uuid="da359c81-f1bd-4617-bfe7-3d0d9e0b1093"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Bill Number]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="140" height="20" isPrintWhenDetailOverflows="true" uuid="1e0e0201-2e13-43ae-9404-450cffb95fc7"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{billNumber}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="120" uuid="f018b6f1-7070-4760-8fe1-f9b9941cd242">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="120" height="30" uuid="5d9b9af4-2ea1-47fc-83c9-72113b805414"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Audit Schedule Date]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="120" height="20" isPrintWhenDetailOverflows="true" uuid="84ee5ef8-72c7-465d-94d8-46405989b362"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{auditScheduleDate}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="100" uuid="4031ae02-1e01-4d2b-9df7-be1064c26450">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="100" height="30" uuid="a481683e-0bca-49a9-a138-c196018b3f8b"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Status]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="20" isPrintWhenDetailOverflows="true" uuid="199119dd-0172-4412-8f43-d2797ab19fa3"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{status}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="120" uuid="b4242914-d27c-480a-8884-87a7f19c42bc">
+						<jr:tableHeader style="table_TH" height="30" rowSpan="1"/>
+						<jr:columnHeader style="table_CH" height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="120" height="30" uuid="26c186e9-ff1c-43d9-a952-03f8fca5762e"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<text><![CDATA[Pending With]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="120" height="20" isPrintWhenDetailOverflows="true" uuid="ebbfc645-cdc8-434e-b3e4-e5e7df3c9208"/>
+								<textElement textAlignment="Center">
+									<font size="11" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{pendingWith}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>

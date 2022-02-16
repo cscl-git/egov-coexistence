@@ -86,6 +86,7 @@ public class BillRegisterReportBean {
     private String deducPexNo;
     private String departmentCode;
     private String pexNodate;
+    private String pexRelDate;
     private String chqNo;
     private String chqDate;
     private List<ChartOfAccounts> chartOfAccounts;
@@ -118,6 +119,10 @@ public class BillRegisterReportBean {
     private BigDecimal adminServiceChargesAmount;
     private BigDecimal otherChargesAmount;
     private BigDecimal otherRecovFromEmployeesAmount;
+    
+    private String receiptNo;
+    
+    
     
     public String getBillNumber() {
         return billNumber;
@@ -550,6 +555,22 @@ public class BillRegisterReportBean {
 
 	public void setSubdivision(String subdivision) {
 		this.subdivision = subdivision;
+	}
+
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
+	}
+
+	public String getPexRelDate() {
+		return pexRelDate;
+	}
+
+	public void setPexRelDate(String pexRelDate) {
+		this.pexRelDate = pexRelDate;
 	}
 
 	

@@ -14,6 +14,11 @@
 			dateFormat: 'dd/mm/yy'
 		});
 	});
+	function ismaxlength(obj){
+    	var mlength=obj.getAttribute? parseInt(obj.getAttribute("maxlength")) : ""
+    	if (obj.getAttribute && obj.value.length>mlength)
+    	obj.value=obj.value.substring(0,mlength)
+    }
 </script>
 
 <spring:hasBindErrors name="estimatePreparationApproval">
@@ -112,11 +117,6 @@
 								<form:option value="Revenue">Revenue</form:option>
 								<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
 								<form:option value="Ward Development Funds">Ward Development Funds</form:option>
-								<form:option value="Mayor Dev Fund">Mayor Dev Fund</form:option>
-								<form:option value="SR.DY.DEV Fund">SR.DY.DEV Fund</form:option>
-								<form:option value="DY.MAYOR DEV Fund">DY.MAYOR DEV Fund</form:option>
-								<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
-								<form:option value="CARPETTING WORK">CARPETTING WORK</form:option>
 							</form:select>
 						</div>
 				<label
@@ -129,12 +129,10 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:option value="Public Health">Public Health</form:option>
-								<form:option value="Roads and Bridges">Roads and Bridges</form:option>
-								<form:option value="Electrical & Horticulture">Electrical & Horticulture</form:option>
-								<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
-								<form:option value="Ward Development Funds">Ward Development Funds</form:option>
+								<form:options items="${estimatePreparationApproval.headList}"
+								itemValue="expenditureHead" itemLabel="expenditureHead" />
 							</form:select>
+							
 						</div>
 				<label
 				class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -146,7 +144,9 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:option value="Augmentation of Water Supply">Augmentation of Water Supply</form:option>
+								<form:options items="${estimatePreparationApproval.subHeadList}"
+								itemValue="subHead" itemLabel="subHead" /> 
+								<%-- <form:option value="Augmentation of Water Supply">Augmentation of Water Supply</form:option>
 <form:option value="Sewerage Treatment Plant (STP)">Sewerage Treatment Plant (STP)</form:option>
 <form:option value="Storm Water Drainage (SWD)">Storm Water Drainage (SWD)</form:option>
 <form:option value="Civic Works/Public Toilets">Civic Works/Public Toilets</form:option>
@@ -217,7 +217,7 @@
 <form:option value="DY.MAYOR DEV FUND">DY.MAYOR DEV FUND</form:option>
 <form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
 <form:option value="CARPETTING WORKs">CARPETTING WORK</form:option>
-<form:option value="Deposit Works">Deposit Works</form:option>
+<form:option value="Deposit Works">Deposit Works</form:option> --%>
 							</form:select>
 						</div>
 		</div>
@@ -228,7 +228,7 @@
 					<spring:message code="lbl.aa.meeting" text="Meeting Details" />
 		</div>
 		</div>
-		<div class="form-group" style="padding: 50px 20px 100px;">
+		<div class="form-group" style="padding: 50px 20px 175px;">
 		<label
 				class="col-sm-3 control-label text-left-audit1"><spring:message
 					code="lbl.estimate.preparation.aa.meeting.cat" /><span
@@ -243,8 +243,10 @@
 								<form:option value="Meeting Category 2">Meeting Category 2</form:option>
 							</form:select>
 						</div>
+			
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
-					code="lbl.estimate.preparation.aa.meeting.date" /></label>
+					code="lbl.estimate.preparation.aa.meeting.date" /><span
+				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input type="text" id="meetDate" path="meetDate"
 									class="form-control"  
@@ -256,8 +258,14 @@
 				<form:input type="text" class="form-control" path="meetNumber" 
 					 />
 				</div>
+			<label class="col-sm-3 control-label text-left-audit1"><spring:message
+					code="lbl.estimate.preparation.aa.meeting.agenda" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+				<form:textarea class="form-control" path="meetAgenda" 
+					 maxlength="1000"  onkeyup="return ismaxlength(this)" rows = "5" cols = "30"/>
+				</div>
 		</div>	
 				</div>	
 				</div>
 				
-

@@ -171,6 +171,10 @@ function callAjaxSearch() {
 				"className" : "text-left"
 			},
 			{
+				"data" : "payeeAddress",
+				"className" : "text-left"
+			},
+			{
 				"data" : "amount",
 				"className" : "text-left"
 			},

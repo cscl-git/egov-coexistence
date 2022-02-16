@@ -47,6 +47,7 @@
  */
 package org.egov.lcms.reports.entity;
 
+import org.egov.lcms.transactions.entity.Judgment;
 import org.egov.lcms.transactions.entity.LegalCase;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -75,6 +76,8 @@ public class LegalCaseSearchResult {
     private String petName;
     private String resName;
     private String isStatusExcluded;
+	private String isJudgementDone;
+	private String isJudgementPending;
     private String caseStatus;
     private Integer statusId;
     private String assignDept;
@@ -90,9 +93,10 @@ public class LegalCaseSearchResult {
     private Integer judgmentTypeId;
     private String iscaseImp;
     private Date hearingDate;
+    private String replySubmit;
+    private String argument;
     private String hearingOutcome;
    
-
     public String getFromDate() {
         return fromDate;
     }
@@ -350,6 +354,8 @@ public class LegalCaseSearchResult {
 		this.hearingDate = hearingDate;
 	}
 
+
+
 	public String getHearingOutcome() {
 		return hearingOutcome;
 	}
@@ -358,8 +364,40 @@ public class LegalCaseSearchResult {
 		this.hearingOutcome = hearingOutcome;
 	}
 
+	public String getReplySubmit() {
+		return replySubmit;
+	}
+
+	public void setReplySubmit(String replySubmit) {
+		this.replySubmit = replySubmit;
+	}
+
+	public String getArgument() {
+		return argument;
+	}
+
+	public void setArgument(String argument) {
+		this.argument = argument;
+	}
+
+	public String getIsJudgementDone() {
+		return isJudgementDone;
+	}
+
+	public void setIsJudgementDone(String isJudgementDone) {
+		this.isJudgementDone = isJudgementDone;
+	}
+
+	public String getIsJudgementPending() {
+		return isJudgementPending;
+	}
+
+	public void setIsJudgementPending(String isJudgementPending) {
+		this.isJudgementPending = isJudgementPending;
+	}
+
 	
-	
+
 
 	
 	

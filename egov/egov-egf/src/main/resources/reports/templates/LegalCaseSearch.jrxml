@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="LegalCaseSearch" language="groovy" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5f1eae64-bf7f-48e8-b4fd-bce7436899a6">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TH" mode="Opaque" backcolor="#F0F8FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_CH" mode="Opaque" backcolor="#BFE1FF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<style name="table 1_TD" mode="Opaque" backcolor="#FFFFFF">
+		<box>
+			<pen lineWidth="0.5" lineColor="#000000"/>
+		</box>
+	</style>
+	<subDataset name="legalCaseDS" uuid="82d3f33a-9c4b-4d54-a0d7-bc3719536379">
+		<field name="legalCaseNo" class="java.lang.String"/>
+		<field name="caseNumber" class="java.lang.String"/>
+		<field name="caseTitle" class="java.lang.String"/>
+		<field name="courtName" class="java.lang.String"/>
+		<field name="standingCouncil" class="java.lang.String"/>
+		<field name="statusDesc" class="java.lang.String"/>
+		<field name="petitioners" class="java.lang.String"/>
+		<field name="respondants" class="java.lang.String"/>
+		<field name="concernedBranch" class="java.lang.String"/>
+		<field name="hearingDate" class="java.lang.String"/>
+		<field name="hearingOutcome" class="java.lang.String"/>
+		<field name="petetionType" class="java.lang.String"/>
+		<field name="brief" class="java.lang.String"/>
+		<field name="nodalOfficer" class="java.lang.String"/>
+		<field name="councelEngage" class="java.lang.String"/>
+		<field name="replySubmit" class="java.lang.String"/>
+		<field name="argument" class="java.lang.String"/>
+	</subDataset>
+	<parameter name="legalCaseDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="802" height="34" uuid="1cc64fbf-6444-4ff5-8807-17302bc5e64d"/>
+				<textElement textAlignment="Center">
+					<font fontName="Times New Roman" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Legal Case Search]]></text>
+			</staticText>
+		</band>
+	</title>
+	<summary>
+		<band height="73" splitType="Stretch">
+			<componentElement>
+				<reportElement key="table 1" style="table 1" x="0" y="15" width="706" height="50" uuid="6e2fd8f1-9012-42c7-9695-e863bf857711"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="legalCaseDS" uuid="8402b688-6250-4d9a-bd06-1da9f5f161b3">
+						<dataSourceExpression><![CDATA[$P{legalCaseDataSource}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="49" uuid="6804480a-f8b3-45b8-91b8-8b8e10824efe">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="49" height="30" uuid="a7a07ba9-a80d-482a-b1b5-5322b9473756"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[File Number]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="49" height="20" isPrintWhenDetailOverflows="true" uuid="f6d494d1-509b-4b90-9a52-031704158354"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{legalCaseNo}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="53" uuid="72a25215-e6cf-40e9-8e2a-a8bb4e13a644">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="53" height="30" uuid="12ab9653-ed87-4520-b234-e346f16a7242"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Case Number]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="53" height="20" isPrintWhenDetailOverflows="true" uuid="5b5fa371-6a51-4f94-9561-e81d5e015dbe"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{caseNumber}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="ce4b4cb7-90e0-4deb-b756-b1c4b26c781f">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="44" height="30" uuid="e9a7ad29-a513-4bfd-807b-758a1c2c4606"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Case Title]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="44" height="20" isPrintWhenDetailOverflows="true" uuid="ab1d41e8-4fc5-4f22-93b5-3bd7674f0b0f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{caseTitle}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="959a9689-6ac1-4f4f-ab93-367ba065d112">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="45" height="30" uuid="2eee444d-441d-472a-b4e0-e456f1fc2143"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Court Name]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="45" height="20" isPrintWhenDetailOverflows="true" uuid="f21a0b7a-cbd5-4ee6-86b2-aa77dc43a7ec"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{courtName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="56" uuid="a0a874d6-1ed9-422d-a7b2-f71e7862a734">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="55" height="30" uuid="71a3203d-ae98-4b5d-a66a-81eafb932b26"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Defending Council]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="55" height="20" isPrintWhenDetailOverflows="true" uuid="47a377cb-36a2-483a-bd48-adf8f8ce67e1"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{standingCouncil}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="37" uuid="9a68a718-8028-4736-852b-4aba524e8cb2">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="36" height="30" uuid="0f5a33de-7b11-4258-b615-f02e379728e1"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Case Status]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="20" isPrintWhenDetailOverflows="true" uuid="1e8fc7cc-8a32-46b4-8623-bf795147087f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{statusDesc}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="53" uuid="2a70f155-e433-42c7-84f2-48578759087e">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="52" height="30" uuid="cea2f2d1-2463-480f-86f8-ab368501f7b5"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Petitioners]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="52" height="20" isPrintWhenDetailOverflows="true" uuid="a0fc0cc4-c715-4b04-a4cb-231ae982411f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{petitioners}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="59" uuid="a6dde4f5-7ab8-4c83-8831-cb204be272cc">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="58" height="30" uuid="1c16a11f-44c3-4282-8167-fe09821b6aeb"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Respondants]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="58" height="20" isPrintWhenDetailOverflows="true" uuid="75796bd3-427b-421e-80bf-b6563ab2016e"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{respondants}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="48" uuid="23ff881d-1bef-41cf-b0bb-80b9cf02a046">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="47" height="30" uuid="c4a0ce37-1951-42c5-856f-07e2edebc26f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Concerned Branch]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="47" height="20" isPrintWhenDetailOverflows="true" uuid="598b268b-5024-449e-9320-ef1ed694d55f"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{concernedBranch}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="55" uuid="f0b80307-bf8d-4b3d-990e-5e1d425c1a82">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="55" height="38" uuid="aa6bcba2-5297-47ee-bb0e-bc27ab88fd7a"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Next Hearing Date]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="55" height="20" isPrintWhenDetailOverflows="true" uuid="82b620bb-bed2-4c40-8036-d85c3da53af2"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{hearingDate}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="49" uuid="bc0f0919-f47d-4f89-a40c-3eb6d4694018">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="49" height="30" uuid="8638c646-c5f6-483d-8e03-f491c0633080"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Hearing Outcome]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="49" height="20" isPrintWhenDetailOverflows="true" uuid="2cc5368f-b927-4012-b3c4-c1bc9ad677ba"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{hearingOutcome}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="45" uuid="3b4019d2-9e89-4e74-9690-56b889a06c97">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="44" height="30" uuid="0a2eb7c8-4514-48bd-b6d1-45b876709e2d"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Petetion Type]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="44" height="20" isPrintWhenDetailOverflows="true" uuid="e614b883-27f4-4f61-8ece-464c509ec7fe"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{petetionType}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="31" uuid="51529b0b-eb8b-425b-961d-a03819720e1f">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="30" height="30" uuid="d44018a2-19eb-4333-985e-a038b3169164"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Brief]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="30" height="20" isPrintWhenDetailOverflows="true" uuid="b5e347f3-5826-4524-a160-2e7a347cde34"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{brief}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="41" uuid="a3f2486a-a15c-4af2-b19f-0f8488a81543">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="40" height="30" uuid="618ff5c4-42b1-4f2d-bcdf-ce1f74567a38"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Nodal Officer]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="20" isPrintWhenDetailOverflows="true" uuid="a6b0668a-f340-4b26-9b42-e84d707de54d"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{nodalOfficer}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="46" uuid="6528a507-e927-426d-afae-59489559d1dd">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="45" height="30" uuid="dcde84f4-c92b-4098-a8be-4aa66fa15ef7"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Councel Engage]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="45" height="20" isPrintWhenDetailOverflows="true" uuid="6f64fc2f-53c3-4876-908a-654854e08dcd"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{councelEngage}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="41" uuid="b599ffcb-4697-43ba-b2ab-acab697248f3">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="40" height="30" uuid="1ddba253-8489-4b43-9ae3-351538afad59"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Reply Submit]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="40" height="20" isPrintWhenDetailOverflows="true" uuid="c25f9fa1-16bb-4d5b-9485-2990ad6e86af"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{replySubmit}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="48" uuid="5a5c5e74-2c75-4f80-aef8-4af822ba4af5">
+						<jr:columnHeader style="table 1_CH" height="38" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="46" height="30" uuid="28f0bb85-3825-41d0-a267-4423e55900d5"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" isBold="true" pdfFontName="Times-Bold"/>
+								</textElement>
+								<text><![CDATA[Argument]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell style="table 1_TD" height="20" rowSpan="1">
+							<textField isStretchWithOverflow="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="46" height="20" isPrintWhenDetailOverflows="true" uuid="2ad4713a-397d-4263-85a5-dc09c4b8232d"/>
+								<textElement textAlignment="Center">
+									<font fontName="Times New Roman" pdfFontName="Times-Roman"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{argument}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+		</band>
+	</summary>
+</jasperReport>

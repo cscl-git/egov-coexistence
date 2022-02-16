@@ -1253,6 +1253,12 @@ function validate(){
 		return false;
 	}*/
 	
+	if(validateFormGlcode()){
+		bootbox.alert("Please fill Subledger details Correctly.");
+		
+		return false;
+	}
+	
 	if(debitamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
 		return false;
@@ -1674,3 +1680,39 @@ function validateSubLedger(Curraction) {
 	}
 
 }
+
+
+function validateFormGlcode(){
+	
+	var codes=[];
+	var options = document.getElementById('tempSubLedger[0].netPayableAccountCode'). options;
+	for (let i = 0; i < options. length; i++) {
+		
+		if(i>0){
+		codes.push(options[i].value);
+		}
+	}
+	
+	var table = document.getElementById("tblsubledgerdetails");
+    var rows = table.getElementsByTagName("tr")
+    var codessu=[];
+    for (var i = 0; i < rows.length-1; i++) {
+       
+        	var code = document.getElementById('subLedgerGlCodeId_'+i).value;
+        	
+        	codessu.push(code);
+        
+        }
+    var b=false;
+    for (let j = 0; j < codes.length; j++) {
+    	var a=codes[j];
+    	if(!codessu.includes(a)){
+    		b=true;
+    		
+    	}
+    }
+		
+  
+    return b;
+    }
+	

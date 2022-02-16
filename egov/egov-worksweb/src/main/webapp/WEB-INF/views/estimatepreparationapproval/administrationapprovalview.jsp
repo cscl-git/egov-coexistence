@@ -115,16 +115,9 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:option value="Public Health">Public Health</form:option>
-								<form:option value="Roads and Bridges">Roads and Bridges</form:option>
-								<form:option value="Electrical & Horticulture">Electrical & Horticulture</form:option>
-								<form:option value="Deposit Estimate works">Deposit Estimate works</form:option>
-								<form:option value="Ward Development Funds">Ward Development Funds</form:option>
-								<form:option value="Mayor Dev Fund">Mayor Dev Fund</form:option>
-								<form:option value="SR.DY.DEV Fund">SR.DY.DEV Fund</form:option>
-								<form:option value="DY.MAYOR DEV Fund">DY.MAYOR DEV Fund</form:option>
-								<form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
-								<form:option value="CARPETTING WORK">CARPETTING WORK</form:option>
+								<form:options items="${estimatePreparationApproval.headList}"
+								itemValue="expenditureHead" itemLabel="expenditureHead" />
+								
 							</form:select>
 						</div>
 				<label
@@ -137,7 +130,9 @@
 								<form:option value="">
 									<spring:message code="lbl.select" />
 								</form:option>
-								<form:option value="Augmentation of Water Supply">Augmentation of Water Supply</form:option>
+								<form:options items="${estimatePreparationApproval.subHeadList}"
+								itemValue="subHead" itemLabel="subHead" /> 
+								<%-- <form:option value="Augmentation of Water Supply">Augmentation of Water Supply</form:option>
 <form:option value="Sewerage Treatment Plant (STP)">Sewerage Treatment Plant (STP)</form:option>
 <form:option value="Storm Water Drainage (SWD)">Storm Water Drainage (SWD)</form:option>
 <form:option value="Civic Works/Public Toilets">Civic Works/Public Toilets</form:option>
@@ -208,7 +203,7 @@
 <form:option value="DY.MAYOR DEV FUND">DY.MAYOR DEV FUND</form:option>
 <form:option value="VILLAGE DEV. WORK">VILLAGE DEV. WORK</form:option>
 <form:option value="CARPETTING WORKs">CARPETTING WORK</form:option>
-<form:option value="Deposit Works">Deposit Works</form:option>
+<form:option value="Deposit Works">Deposit Works</form:option> --%>
 							</form:select>
 						</div>
 		</div>
@@ -235,7 +230,8 @@
 							</form:select>
 						</div>
 				<label class="col-sm-3 control-label text-left-audit1"><spring:message
-					code="lbl.estimate.preparation.aa.meeting.date" /></label>
+					code="lbl.estimate.preparation.aa.meeting.date" /><span
+				class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input id="meetDate" path="meetDate" readonly="true"
 									class="form-control datepicker" data-date-end-date="0d"
@@ -247,7 +243,14 @@
 				<form:input type="text" class="form-control" path="meetNumber"  readonly="true"
 					 />
 				</div>
+			<label class="col-sm-3 control-label text-left-audit1"><spring:message
+					code="lbl.estimate.preparation.aa.meeting.agenda" /><span
+				class="mandatory"></span></label>
+			<div class="col-sm-3 add-margin">
+			<form:textarea class="form-control" path="meetAgenda" 
+					 maxlength="1000"  onkeyup="return ismaxlength(this)" rows = "5" cols = "30" readonly="true"/>
+				
+				</div>
 		</div>	
 				</div>	
 				</div>
-

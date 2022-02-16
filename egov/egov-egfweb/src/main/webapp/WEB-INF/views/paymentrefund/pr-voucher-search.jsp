@@ -21,7 +21,7 @@
 						</div>
 						 <label class="col-sm-3 control-label text-right"></label>
 						<div class="col-sm-3 add-margin">
-							<a href="/services/EGF/refund/_paymentRequestblankvoucherForm">Create Blank Refund</a>
+							<a href="/services/EGF/refund/_paymentRequestblankvoucherForm">Refund request for amount collected before 01/06/2020</a>
 						</div>
 					</div>
 					<div class="form-group">
@@ -112,6 +112,7 @@
 					<th>Department Name</th>
 					<th>Service</th>
 					<th>Payee Name</th>
+					<th>Payee Address</th>
 					<th>Total Amount</th>
 					<th>Status</th>
 					<th>Pending With</th>

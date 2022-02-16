@@ -43,7 +43,8 @@ public class DNITCreationRESTPOJO {
 	private String unforseen_charges;
 	private String status;
 	private String subdivision;
-	
+	private String dnitApprovedDate;
+	private String pendingWith;
 	
 	public DNITCreationRESTPOJO() {}
 	public DNITCreationRESTPOJO(String id, String agency_work_order, String date, String estimate_amount,
@@ -54,7 +55,7 @@ public class DNITCreationRESTPOJO {
 			String work_scope, String work_status, String work_type, String works_wing, String state_id, String version,
 			String statusid, String createdby, String createddate, String lastmodifiedby, String lastmodifieddate,
 			String aanumber, String aadate, String contingent_percentage, String contingent_amount,
-			String consultant_fee, String unforseen_charges, String status,String subdivision) {
+			String consultant_fee, String unforseen_charges, String status,String subdivision,String dnitApprovedDate,String pendingWith) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -96,8 +97,17 @@ public class DNITCreationRESTPOJO {
 		this.unforseen_charges = unforseen_charges;
 		this.status = status;
 		this.subdivision=subdivision;
+		this.dnitApprovedDate=dnitApprovedDate;
+		this.pendingWith=pendingWith;
 	}
 	
+	
+	public String getPendingWith() {
+		return pendingWith;
+	}
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
+	}
 	
 	
 	
@@ -340,6 +350,12 @@ public class DNITCreationRESTPOJO {
 	}
 	public void setStatus(String status) {
 		this.status = status;
+	}
+	public String getDnitApprovedDate() {
+		return dnitApprovedDate;
+	}
+	public void setDnitApprovedDate(String dnitApprovedDate) {
+		this.dnitApprovedDate = dnitApprovedDate;
 	}
 	
 	

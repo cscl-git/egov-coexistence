@@ -466,6 +466,12 @@ function onSubmit()
 	{
 		secondsignatory=document.getElementById('secondsignatory').value;
 	}
+	if(document.getElementById('subdivision') == null || document.getElementById('subdivision').value == '-1')
+	{
+		bootbox.alert("Please select subdivision .");
+		undoLoadingMask();
+		return false;
+	}
 	if(document.getElementById('backlogEntry') == null || document.getElementById('backlogEntry').value == '-1')
 	{
 		bootbox.alert("Please select whether it is backdated entry");

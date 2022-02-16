@@ -65,6 +65,7 @@ public interface ManageAuditorsRepository extends JpaRepository<ManageAuditor, L
 	List <ManageAuditor> findByEmployeeid(Integer employeeid);
 	List <ManageAuditor> findByType(String type);
 	List <ManageAuditor> findByDeptidAndType(Integer deptId,String type);
+	List <ManageAuditor> findByDeptid(Integer deptId);
 	
 	@Modifying
 	@Query(value = "delete from ManageAuditor where id=:id",nativeQuery = true)

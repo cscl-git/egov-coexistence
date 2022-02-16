@@ -115,7 +115,7 @@ public class DefaultInboxRenderServiceImpl<T extends StateAware> implements Inbo
               .add(Restrictions.eq("state.type", this.stateAwareType.getSimpleName()))
               .add(Restrictions.in("state.ownerPosition", owners))
               .add(Restrictions.in("state.status", Arrays.asList(INPROGRESS, STARTED)))
-              .addOrder(Order.desc("state.createdDate"));
+              .addOrder(Order.desc("state.lastModifiedDate"));
     	
     	List list = criteria.list();
     	System.out.println("#################### inbox list size"+list.size());

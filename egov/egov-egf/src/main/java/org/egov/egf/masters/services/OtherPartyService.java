@@ -61,6 +61,15 @@ public class OtherPartyService implements EntityTypeService {
     }
 
     @Transactional
+    public OtherParty create1(OtherParty otherParty, Long approver) {
+
+        setAuditDetails1(otherParty,approver);
+        otherParty = otherpartyRepository.save(otherParty);
+        //saveAccountDetailKey(otherParty);
+        return otherParty;
+    }
+
+    @Transactional
     public void saveAccountDetailKey(OtherParty otherparty) {
 
         Accountdetailkey accountdetailkey = new Accountdetailkey();
@@ -84,6 +93,15 @@ public class OtherPartyService implements EntityTypeService {
         }
         otherparty.setLastModifiedDate(new Date());
         otherparty.setLastModifiedBy(ApplicationThreadLocals.getUserId());
+    }
+
+    private void setAuditDetails1(OtherParty otherparty,Long approver) {
+        if (otherparty.getId() == null) {
+            otherparty.setCreatedDate(new Date());
+            otherparty.setCreatedBy(approver);
+        }
+        otherparty.setLastModifiedDate(new Date());
+        otherparty.setLastModifiedBy(approver);
     }
 
     public List<OtherParty> search(final OtherParty otherparty) {
@@ -158,4 +176,8 @@ public class OtherPartyService implements EntityTypeService {
 		return otherpartyRepository.getByNameOrAccount(name,bankAccount);
 	}
 
+	//public OtherParty getByBankAccount( String bankAccount) {
+		
+		//return otherpartyRepository.getByBankAccount(bankAccount);
+	//}
 }

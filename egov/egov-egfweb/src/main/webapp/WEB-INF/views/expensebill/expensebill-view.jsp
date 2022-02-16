@@ -121,41 +121,32 @@
     <input type="hidden" id="id" value="${egBillregister.id }"/>
     <input type="hidden" name="mode" id="mode" value="${mode }"/>
     <input type="hidden" name="budgetDetails" id="budgetDetails" value="${budgetDetails}" />
-    <%--<form:hidden path="budgetDetails" id="budgetDetails" class="budgetDetail" value="${budgetDetails}"/>--%>
     <form:hidden path="billamount" id="billamount" class="billamount" value="${egBillregister.billamount }"/>
     <form:hidden path="" name="netPayableAmount" id="netPayableAmount" value="${netPayableAmount}"/>
 	<form:hidden path="refundable"  id="refundable" value="${egBillregister.refundable}" />
     <div class="panel-title text-center" style="color: green;">
         <c:out value="${message}"/><br/>
     </div>
-    <!--<ul class="nav nav-tabs" id="settingstab">
-        <li class="active"><a data-toggle="tab" href="#expensebillheader"
-                              data-tabidx=0><spring:message code="lbl.header" text="Header"/></a></li>
-        <li><a data-toggle="tab" href="#checklist" data-tabidx=1><spring:message
-                code="lbl.checklist" text="CheckList"/> </a></li>
-                      <!-- <li><a data-toggle="tab" href="#supportingDocuments" data-tabidx=1><spring:message
-                code="lbl.sdocuments"/> </a></li>
-              
-    </ul>-->
-
     <div class="tab-content">
+
         <div class="tab-pane fade in active" id="expensebillheader">
             <jsp:include page="expensebill-view-header.jsp"/>
-         <!--  <jsp:include page="expensebill-view-subledgerdetails.jsp"/> -->
             <jsp:include page="expensebill-view-accountdetails.jsp"/>
             <jsp:include page="expensebill-view-subledgeraccountdetails.jsp"/>
-            <!--  <c:if test="${egBillregister.documentDetail != null &&  !egBillregister.documentDetail.isEmpty()}">
                 <jsp:include page="billdocument-upload.jsp"/>
-            </c:if> -->
-                <jsp:include page="billdocument-upload.jsp"/>
-           <!-- <jsp:include page="expensebill-budgetdetails.jsp"/> -->
+            <c:if test="${mode == 'readOnly'}">
+            <div class="buttonbottom" align="center">
+				<input name="button" type="button" class="buttonsubmit" id="button1" value="Print" onclick="window.print()">&nbsp;
+		    	<input type="button" name="button2" id="button2" value="Close" class="button" onclick="window.parent.postMessage('close','*');window.close();">
+			</div>
+       		</c:if>
         </div>
+        
+        
+       	
         <div class="tab-pane fade" id="checklist">
             <jsp:include page="expensebill-view-checklist.jsp"/>
         </div>
-         <!-- <div class="tab-pane fade" id="supportingDocuments">
-            <jsp:include page="expensebill-view-supporingDocs.jsp"/>
-        </div>-->
         <c:if test="${!workflowHistory.isEmpty() && mode != 'readOnly'}">
         <div style="margin-top :1050px;">
             <jsp:include page="../common/commonworkflowhistory-view.jsp"></jsp:include>
@@ -167,15 +158,7 @@
                 <jsp:include page="../common/commonworkflowmatrix-button.jsp"/>
             </div>
         </c:if>
-        <c:if test="${mode == 'readOnly'}">
-            <div class="row">
-                <div class="col-sm-12 text-center" style="padding-top:1250px;">
-                <input name="button" type="button" class="buttonsubmit" id="button1" value="Print" onclick="window.print()">&nbsp;
-                    <input type="submit" name="closeButton" id="closeButton" value='<spring:message code="lbl.close" text="Close"/>' Class="btn btn-default"
-                           onclick="window.close();"/>
-                </div>
-            </div>
-        </c:if>
+        
     </div>
 
 </form:form>

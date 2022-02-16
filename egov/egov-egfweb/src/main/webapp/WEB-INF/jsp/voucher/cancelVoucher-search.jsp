@@ -125,7 +125,7 @@ function loadNamesForSelectedType()
 					<td class="greybox"><s:text name="voucher.type" /><span	class="mandatory1">*</span></td>
 					<td class="greybox"><s:select name="type" id="type"	list="dropdownData.typeList" headerKey="-1" headerValue="%{getText('lbl.choose.options')}"
 							onchange="loadVoucherNames(this.value)" /></td>
-					<td class="greybox"><s:text name="voucher.name" /><span	class="mandatory1">*</span></td>
+					<td class="greybox"><s:text name="voucher.name" /></td>
 					<td class="greybox"><s:select name="name" id="name"	list="%{nameMap}"  headerKey="-1" headerValue="%{getText('lbl.choose.options')}" /></td>
 				</tr>
 				<tr>

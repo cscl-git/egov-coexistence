@@ -232,8 +232,11 @@ public class AjaxCommonController {
             String simpleName = service.getSimpleName();
             simpleName = simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1) + "Service";
 
+String cap = name.substring(0, 1).toUpperCase() + name.substring(1);
+
+String namenew="%"+cap;
             final EntityTypeService entityService = (EntityTypeService) applicationContext.getBean(simpleName);
-            entitiesList = (List<EntityType>) entityService.filterActiveEntities(name, 20, detailType.getId());
+            entitiesList = (List<EntityType>) entityService.filterActiveEntities(namenew, 20, detailType.getId());
         } catch (final Exception e) {
             e.printStackTrace();
             entitiesList = new ArrayList<>();

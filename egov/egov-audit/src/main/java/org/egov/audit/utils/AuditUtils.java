@@ -205,10 +205,10 @@ public class AuditUtils {
 				misQuery.append(" and billmis.fund.id=")
 						.append(auditDetail.getFund());
 			}		
-			if (null != department.getCode() && !department.getCode().equals("-1")) {
+			/*if (null != department.getCode() && !department.getCode().equals("-1")) {
 				misQuery.append(" and billmis.departmentcode='");
 				misQuery.append(department.getCode()+"'");
-			}
+			}*/
 		}
 		return misQuery.toString();
 

@@ -632,23 +632,6 @@
 				 return false;
 				 
 			 }
-			// debugger;
-			  /* bootbox.confirm("Are you sure you want to upload file again previous file will be deleted. !",
-			 
-    				function (result) { 
-				 alert("Check"+result);
-     			   if(!result) 
-     				   return false
-     				   //alert(":::Result:::")
-        			
-     			return true;
-      			
-     			  else
-     				   {
-     				   alert("::::aelse::::")
-     				   return false;
-     				   }
-     				    }); */
 					 var x = confirm("Are you sure you want to upload file again previous file will be deleted. !")
 			
 			if (x == true) {

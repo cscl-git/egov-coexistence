@@ -35,6 +35,8 @@ public class MisReceiptDetail {
 	private String collectedbyname ;
 	private String gstno ;
 	private String payment_mode ;
+	private String chequeddno;
+	private Date chequedddate;
 	public Long getId() {
 		return id;
 	}
@@ -134,6 +136,28 @@ public class MisReceiptDetail {
 	}
 	public void setReceipt_date(Date receipt_date) {
 		this.receipt_date = receipt_date;
+	}
+	public String getChequeddno() {
+		return chequeddno;
+	}
+	public void setChequeddno(String chequeddno) {
+		this.chequeddno = chequeddno;
+	}
+	public Date getChequedddate() {
+		return chequedddate;
+	}
+	public void setChequedddate(Date chequedddate) {
+		this.chequedddate = chequedddate;
+	}
+	@Override
+	public String toString() {
+		return "MisReceiptDetail [id=" + id + ", payments_id=" + payments_id + ", total_amt_paid=" + total_amt_paid
+				+ ", receipt_number=" + receipt_number + ", receipt_date=" + receipt_date + ", paid_by=" + paid_by
+				+ ", payer_address=" + payer_address + ", narration=" + narration + ", payment_status=" + payment_status
+				+ ", bank_name=" + bank_name + ", bank_branch=" + bank_branch + ", subdivison=" + subdivison
+				+ ", servicename=" + servicename + ", collectedbyname=" + collectedbyname + ", gstno=" + gstno
+				+ ", payment_mode=" + payment_mode + ", chequeddno=" + chequeddno + ", chequedddate=" + chequedddate
+				+ "]";
 	}
 
 }

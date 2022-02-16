@@ -47,7 +47,7 @@
  */
 var maxSize = 26214400;
 var inMB = maxSize/1024/1024;
-var fileformatsinclude = ['doc','docx','xls','xlsx','rtf','pdf','jpeg','jpg','png','txt','zip','dxf'];
+var fileformatsinclude = ['doc','docx','xls','xlsx','rtf','pdf','jpeg','jpg','png','txt','zip','dxf','svg'];
 
 function addFileInputField() {
     var uploaderTbl = document.getElementById("uploadertbl");

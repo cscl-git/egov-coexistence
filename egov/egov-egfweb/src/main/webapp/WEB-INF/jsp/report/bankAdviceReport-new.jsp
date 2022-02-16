@@ -247,6 +247,8 @@ table.its th {
 									id="exportpdf3" name="exportpdf3" onclick="exportPDF3();" /> <input
 									type="button" class="buttonsubmit" value="EXPORT PAGE 4"
 									id="exportpdf4" name="exportpdf4	" onclick="exportPDF4();" />
+									<input type="button" class="buttonsubmit" value="EXPORT PAGE 5"
+									id="exportpdf5" name="exportpdf5" onclick="exportPDF5();" />
 									<input type="button" class="buttonsubmit" value="EXPORT EXCEL"
 									id="exportpdf" name="exportpdf" onclick="exportExcel();" /> <!-- 	<input type="button" class="buttonsubmit" value="EXPORT HTM" id="exporthtml" name="exportpdf" onclick="exportHtml();"/>-->
 								</td>
@@ -302,6 +304,34 @@ table.its th {
 			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
 			window.location.href = url;
 		}
+		function exportPDF5(){
+			var bank = document.getElementById("bank.id").value;
+			var bankbranch = document.getElementById("bankbranch").value;
+			var bankaccount = document.getElementById("bankaccount").value;
+			var instrumentnumber = document.getElementById("instrumentnumber").value;
+			var url ="";
+			if (document.getElementById("instrumentType").value == 'pex') {
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex5.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+			} else {
+				url = "${pageContext.request.contextPath}/report/bankAdviceReport-exportPDF.action?bank.id="
+					+ bank
+					+ "&bankbranch.id="
+					+ bankbranch
+					+ "&bankaccount.id="
+					+ bankaccount
+					+ "&instrumentnumber.id=" + instrumentnumber;
+				}
+			
+			//window.open(url, '','height=650,width=980,scrollbars=yes,left=0,top=0,status=yes');
+			window.location.href = url;
+		}
+		
 		function exportPDF1() {
 			var bank = document.getElementById("bank.id").value;
 			var bankbranch = document.getElementById("bankbranch").value;

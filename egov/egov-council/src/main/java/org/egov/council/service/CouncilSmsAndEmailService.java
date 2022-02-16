@@ -195,11 +195,13 @@ public class CouncilSmsAndEmailService {
     public void sendEmail(CouncilMeeting councilMeeting, String customMessage, final byte[] attachment, String fileType, String fileName) {
     	String emailId;
         Boolean emailEnabled = isEmailEnabled();
+        System.out.println("emailEnabled  ::::::"+emailEnabled+"::::"+councilMeeting.getCommitteeType());
         if (emailEnabled) {
         	try {
 	            for (CommitteeMembers committeeMembers : committeeMemberService
 	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
 	                emailId = committeeMembers.getCouncilMember().getEmailId();
+	                System.out.println("emailId ::::"+emailId);
 	                if (emailId != null) {
 	                    buildEmailForMeeting(emailId, councilMeeting.getCommitteeType().getName(), councilMeeting, customMessage,
 	                            attachment, fileType, fileName);
@@ -318,6 +320,8 @@ public class CouncilSmsAndEmailService {
         	}
         	
         }
+        System.out.println("body :::"+body);
+        System.out.println("subject :::"+subject);
         if (email != null && body != null)
             sendEmailOnSewerageForMeetingWithAttachment(email, body, subject, attachment,fileType,fileName);
     }
@@ -495,10 +499,10 @@ public class CouncilSmsAndEmailService {
 		 */
         if(!StringUtils.isBlank(fileType) && !StringUtils.isBlank(fileName)) {
         	try {
+        		System.out.println("OOOOO");
 				notificationService.sendEmailWithAttachmentNew(email, emailSubject, emailBody, fileType, fileName,
                     attachment);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
         }else {
@@ -506,7 +510,6 @@ public class CouncilSmsAndEmailService {
 				notificationService.sendEmailWithAttachmentNew(email, emailSubject, emailBody, "application/rtf", AGENDAATTACHFILENAME,
                     attachment);
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}	
         }

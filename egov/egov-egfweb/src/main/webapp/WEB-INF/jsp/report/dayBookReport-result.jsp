@@ -131,6 +131,9 @@
 			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="CHEQUE DATE" style="width:5%;text-align:right"
 			property="chqDate" />
+			<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="Receipt No." style="width:5%;text-align:right"
+			property="receiptNo" />
 			
 			<!--  -->
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
@@ -146,6 +149,8 @@
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Credit Amount(Rs.)" style="width:5%;text-align:right"
 			property="creditamount" />
+			
+		
 		   <display:caption media="pdf">
 		   <s:property value="%{titleName}" />
 		   <s:property value="%{heading}" />

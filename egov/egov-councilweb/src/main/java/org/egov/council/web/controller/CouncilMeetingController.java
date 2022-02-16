@@ -309,6 +309,7 @@ public class CouncilMeetingController {
         }
         try {
         	//Sent mail with of uploaded Meeting document
+        	System.out.println("Mail starts :::: "+councilMeeting.getFilestoreid());
             if(null != councilMeeting.getFilestoreid()) {
             	Path file = fileStoreService.fetchAsPath(councilMeeting.getFilestoreid().getFileStoreId(), CouncilConstants.MODULE_NAME);
         		try {
@@ -316,6 +317,7 @@ public class CouncilMeetingController {
     				String fileType = isBlank(councilMeeting.getFilestoreid().getContentType()) ? Files.probeContentType(file)
                             : councilMeeting.getFilestoreid().getContentType();
             		String fileName = councilMeeting.getFilestoreid().getFileName();
+            		System.out.println("KKKKKK::::"+fileName);
             		councilSmsAndEmailService.sendEmail(councilMeeting, null, data,fileType, fileName);
     			} catch (IOException e) {
     				LOGGER.error("Error in sending email",e);

@@ -89,6 +89,9 @@
 			title="Voucher Name" style="width:6%;text-align:center"
 			property="voucherName" />
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
+			title="Receipt No." style="width:6%;text-align:center"
+			property="receiptNo" />
+		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
 			title="Account Code" style="width:4%;text-align:center"
 			property="code" />
 		<display:column headerClass="bluebgheadtd" class="blueborderfortd"
@@ -105,11 +108,10 @@
 			property="creditamount" />
 		<display:caption media="pdf">
 			<div align="left" style="text-align: left;">
-			<b><s:property value="%{titleName}" /><s:property value="%{heading}" />
-				(<s:property
+				<b><s:property value="%{titleName}" />
+					<s:property value="%{heading}" /> (<s:property
 						value="%{journalBookReport.isConfirmedCount}" /> in <s:property
-						value="%{journalBookReport.totalCount}" /> are unconfirmed)
-				</b>
+						value="%{journalBookReport.totalCount}" /> are unconfirmed) </b>
 			</div>
 		</display:caption>
 		<display:caption media="excel">

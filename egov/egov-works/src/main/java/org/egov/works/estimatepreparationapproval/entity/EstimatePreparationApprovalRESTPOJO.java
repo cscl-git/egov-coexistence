@@ -48,6 +48,11 @@ public class EstimatePreparationApprovalRESTPOJO {
 	private String expenditure_head_est;
 	private String status;
 	private String  subdivision;
+	private String roughapprovedate;
+	private String adminapprovedate;
+	private String approvedate;
+	private String pendingWith;
+	
 	
 	
 	public EstimatePreparationApprovalRESTPOJO() {}
@@ -66,7 +71,7 @@ public class EstimatePreparationApprovalRESTPOJO {
 			String aanumber, String aadate, String contingent_percentage, String contingent_amount,
 			String consultant_fee, String unforseen_charges, String expenditure_head, String expenditure_sub_category,
 			String expenditure_category, String meetnumber, String meetcategory, String meetdate,
-			String expenditure_head_est, String status,String subdivision) {
+			String expenditure_head_est, String status,String subdivision,String approvedate,String adminapprovedate,String roughapprovedate,String pendingWith) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -115,10 +120,67 @@ public class EstimatePreparationApprovalRESTPOJO {
 		this.expenditure_head_est = expenditure_head_est;
 		this.status = status;
 		this.subdivision=subdivision;
+		this.approvedate=approvedate;
+		this.adminapprovedate=adminapprovedate;
+		this.roughapprovedate=roughapprovedate;
+		this.pendingWith = pendingWith;
+	}
+
+	public String getPendingWith() {
+		return pendingWith;
 	}
 
 
 
+
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
+	}
+	
+	public String getApprovedate() {
+		return approvedate;
+	}
+
+
+
+
+
+	public void setApprovedate(String approvedate) {
+		this.approvedate = approvedate;
+	}
+
+
+
+
+
+	public String getAdminapprovedate() {
+		return adminapprovedate;
+	}
+
+
+
+
+
+	public void setAdminapprovedate(String adminapprovedate) {
+		this.adminapprovedate = adminapprovedate;
+	}
+
+
+
+
+
+	public String getRoughapprovedate() {
+		return roughapprovedate;
+	}
+
+
+
+
+
+	public void setRoughapprovedate(String roughapprovedate) {
+		this.roughapprovedate = roughapprovedate;
+	}
 
 
 	public String getSubdivision() {

@@ -1,6 +1,7 @@
 package org.egov.works.boq.entity;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -52,15 +53,38 @@ import org.egov.works.estimatepreparationapproval.entity.Workswing;
 				@ColumnResult(name="createddate",type=String.class),@ColumnResult(name="lastmodifiedby",type=String.class),@ColumnResult(name="lastmodifieddate",type=String.class),
 				@ColumnResult(name="state_id",type=String.class),@ColumnResult(name="work_agreement_number",type=String.class),@ColumnResult(name="project_closure_comments",type=String.class),
 				@ColumnResult(name="contractor_performance_comments",type=String.class),@ColumnResult(name="actual_start_date",type=String.class),@ColumnResult(name="actual_end_date",type=String.class),
-				@ColumnResult(name="approval_competent_authority",type=String.class),@ColumnResult(name="status",type=String.class),@ColumnResult(name="percentage_completion",type=String.class),@ColumnResult(name="subdivision",type=String.class)}
+				@ColumnResult(name="approval_competent_authority",type=String.class),@ColumnResult(name="status",type=String.class),@ColumnResult(name="percentage_completion",type=String.class),@ColumnResult(name="subdivision",type=String.class),
+				@ColumnResult (name="workAgreementApprovedDate",type=String.class),@ColumnResult (name="owner_name",type=String.class)}
 				)
 	})
+
 
 	@NamedNativeQueries({
 		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreement", query = "select aw.id,aw.agency_work_order,aw.agreement_details,aw.category,aw.contractor_address, aw.contractor_code,aw.contractor_email,aw.contractor_name, aw.contractor_phone,aw.date,aw.estimated_cost,dep.name as executing_department,aw.fund,aw.name_work_order,aw.sector, aw.tender_cost,aw.time_limit,aw.work_location,aw.work_type, aw.work_agreement_status,aw.work_amount,aw.work_details,aw.work_end_date, aw.work_intended_date,aw.work_number,aw.work_start_date,aw.work_status, aw.ward_number,aw.statusid,aw.version,aw.createdby,aw.createddate, aw.lastmodifiedby,aw.lastmodifieddate,aw.state_id,aw.work_agreement_number, aw.project_closure_comments,aw.contractor_performance_comments,aw.actual_start_date, aw.actual_end_date,aw.approval_competent_authority, es.code as status, ceil (sum(tb.measured_amount)/(sum(tep.estimate_amount)/count(tep.estimate_amount))*100) as percentage_completion from txn_work_agreement aw, eg_department dep,egw_status es , txn_boqdetails tb,txn_estimate_preparation tep where aw.statusid =es.id and cast (aw.executing_department as Integer) = dep.id and aw.id=tb.work_id and tep.id = tb.work_id group by aw.id,dep.name ,es.code",
 				resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset"),
 
-		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreementByMileStone", query ="select aw.id, aw.agency_work_order, aw.agreement_details, aw.category, aw.contractor_address, aw.contractor_code, aw.contractor_email, aw.contractor_name, aw.contractor_phone, aw.date, aw.estimated_cost, dep.name as executing_department , aw.fund, aw.name_work_order, aw.sector, aw.tender_cost, aw.time_limit, aw.work_location, aw.work_type, aw.work_agreement_status, aw.work_amount, aw.work_details, aw.work_end_date, aw.work_intended_date, aw.work_number, aw.work_start_date, aw.work_status, aw.ward_number, aw.statusid, aw.version, aw.createdby, aw.createddate, aw.lastmodifiedby, aw.lastmodifieddate, aw.state_id, aw.work_agreement_number, aw.project_closure_comments, aw.contractor_performance_comments, aw.actual_start_date, aw.actual_end_date, aw.approval_competent_authority, es.code as status, case lower(aw.milestonestatus) when 'no' then round(sum(tb.measured_amount)/(sum(tb.amount))* 100) when 'yes' then ( select sum(pd.payment_percent)*(sum(pd.completion_percent)/(count(pd.completion_percent)* 100.0)) from txn_work_agreement bw, txn_paymentdistribution pd where bw.id = pd.work_id and bw.id = aw.id ) end percentage_completion, sub.subdivision from txn_work_agreement aw, eg_department dep, egw_status es , txn_boqdetails tb, eg_subdivision sub where aw.statusid = es.id and cast(aw.executing_department as Integer) = dep.id and aw.id = tb.work_id and aw.subdivision = sub.id group by aw.id, dep.name , es.code, lower(aw.milestonestatus), sub.subdivision",
+		@NamedNativeQuery(name="WorkOrderAgreement.getAllWorkOrderAgreementByMileStone", query ="select aw.id , aw.agency_work_order, aw.agreement_details, aw.category, aw.contractor_address, aw.contractor_code, aw.contractor_email, \n" + 
+				"aw.contractor_name, aw.contractor_phone, aw.date, aw.estimated_cost, dep.name as executing_department , aw.fund, aw.name_work_order, aw.sector, \n" + 
+				"aw.tender_cost, aw.time_limit, aw.work_location, aw.work_type, aw.work_agreement_status, aw.work_amount, aw.work_details, aw.work_end_date, \n" + 
+				"aw.work_intended_date, aw.work_number, aw.work_start_date, aw.work_status, aw.ward_number, aw.statusid, aw.version, aw.createdby, aw.createddate, \n" + 
+				"aw.lastmodifiedby, aw.lastmodifieddate, aw.state_id, aw.work_agreement_number, aw.project_closure_comments, aw.contractor_performance_comments, \n" + 
+				"aw.actual_start_date, aw.actual_end_date, aw.approval_competent_authority, es.code as status, \n" + 
+				"case lower(aw.milestonestatus) when 'no' then round(sum(tb.measured_amount)/(sum(tb.amount))* 100) \n" + 
+				"when 'yes' then ( select sum(pd.payment_percent)*(sum(pd.completion_percent)/(count(pd.completion_percent)* 100.0)) \n" + 
+				"from \"ch.chandigarh\".txn_work_agreement bw, \"ch.chandigarh\".txn_paymentdistribution pd \n" + 
+				"where bw.id = pd.work_id and bw.id = aw.id ) end percentage_completion, sub.subdivision,\n" + 
+				"CASE WHEN aw.statusid =532 THEN aw.lastmodifieddate \n" + 
+				"ELSE null \n" + 
+				"END AS workAgreementApprovedDate , \n" + 
+				"CASE WHEN aw.statusid =532 THEN '' \n" + 
+				"ELSE ews.owner_name \n" + 
+				"END AS owner_name \n" + 
+				"from \"ch.chandigarh\".txn_work_agreement aw, \"ch.chandigarh\".eg_department dep, \"ch.chandigarh\".egw_status es ,\n" + 
+				"\"ch.chandigarh\".txn_boqdetails tb, \"ch.chandigarh\".eg_subdivision sub ,\"ch.chandigarh\".eg_wf_states ews\n" + 
+				"where aw.statusid = es.id and aw.state_id = ews.id and\n" + 
+				"cast(aw.executing_department as Integer) = dep.id and aw.id = tb.work_id \n" + 
+				"and aw.subdivision = sub.id group by aw.id, dep.name , es.code, \n" + 
+				"lower(aw.milestonestatus), sub.subdivision,ews.owner_name",
 		resultClass = WorkOrderAgreementRESTPOJO.class,resultSetMapping = "AllWorkOrderAgreementresultset")
 	})
 
@@ -568,7 +592,17 @@ public class WorkOrderAgreement extends StateAware implements Serializable {
 
 	@Override
 	public String getStateDetails() {
-		return getState().getComments().isEmpty() ? work_agreement_number : work_agreement_number + "-" + getState().getComments();
+		
+		String project_name="";
+		if(name_work_order!=null && !name_work_order.isEmpty()) {
+			
+			project_name=name_work_order+"-"+(work_amount!=null?work_amount.toString():"");
+		}else {
+			
+			project_name=work_amount!=null?work_amount.toString():"";
+		}
+		
+		return getState().getComments().isEmpty() ? work_agreement_number+" ("+project_name.toString()+")" : work_agreement_number + "-" + getState().getComments()+" ("+project_name.toString()+")";
 	}
 
 	public EgwStatus getStatus() {

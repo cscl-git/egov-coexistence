@@ -64,6 +64,7 @@ import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.EntityTypeService;
 import org.egov.commons.utils.EntityType;
 import org.egov.egf.model.BankAdviceReportInfo;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.models.Department;
@@ -71,6 +72,7 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.reporting.util.ReportUtil;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.expenditurePex.ExpenditurePex;
 import org.egov.utils.Constants;
 import org.egov.utils.ReportHelper;
 import org.hibernate.FlushMode;
@@ -99,6 +101,7 @@ import java.util.stream.Collectors;
 
 @Results(value = { @Result(name = "search", location = "rtgsIssueRegisterReport-search.jsp"),
         @Result(name = "searchPex", location = "pexIssueRegisterReport-search.jsp"),
+        @Result(name = "expenditurePex", location = "pexExpenditureReport-search.jsp"),
 		@Result(name = "PDF", type = "stream", location = "inputStream", params = { "inputName", "inputStream",
 				"contentType", "application/pdf", "contentDisposition",
 				"no-cache;filename=RtgsIssueRegisterReport.pdf" }),
@@ -119,6 +122,8 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
+	@Autowired
+	private AppConfigValueService appConfigValueService;
 
 	private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = Logger.getLogger(RtgsIssueRegisterReportAction.class);
@@ -132,7 +137,22 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 	String jasperpathPEX = "/reports/templates/rtgsIssueRegisterReportActionPEX.jasper";
 	private StringBuffer header = new StringBuffer();
 	List<BankAdviceReportInfo> rtgsDisplayList = new ArrayList<BankAdviceReportInfo>();
+	List<ExpenditurePex> expenditurePexList = new ArrayList<ExpenditurePex>();
+	ExpenditurePex expenditurePex =null;
+
 	List<Object> rtgsReportList = new ArrayList<Object>();
+	List<Object> finalList = new ArrayList<Object>();
+	
+	public List<Object> getFinalList() {
+		return finalList;
+	}
+
+	public void setFinalList(List<Object> finalList) {
+		this.finalList = finalList;
+	}
+
+
+
 	Map<String, Object> paramMap = new HashMap<String, Object>();
 	Boolean searchResult = Boolean.FALSE;
 	@Autowired
@@ -152,6 +172,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 
 	@Override
 	public void prepare() {
+		System.out.println("prepare");
 		persistenceService.getSession().setDefaultReadOnly(true);
 		persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
 		super.prepare();
@@ -383,7 +404,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				.addScalar("ihId", BigDecimalType.INSTANCE).addScalar("rtgsNumber").addScalar("rtgsDate")
 				.addScalar("vhId", BigDecimalType.INSTANCE).addScalar("paymentNumber").addScalar("paymentDate")
 				.addScalar("paymentAmount").addScalar("department").addScalar("status").addScalar("bank")
-				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE)
+				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE).addScalar("realizationDate")
 				.addScalar("dkId", BigDecimalType.INSTANCE).addScalar("accountNumber");
 		System.out.println("SEARCH PEX 2");
 		if (null == parameters.get("rtgsAssignedFromDate")[0]
@@ -395,9 +416,12 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
 		System.out.println("List size : "+rtgsDisplayList.size());
+
+		
 		//populateSubLedgerDetails();
 		LOGGER.info("start party number");
 		populatePartyNames(rtgsDisplayList);
+		
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
@@ -474,7 +498,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
 
 			queryString = queryString
-					.append(" SELECT ih.id as ihId,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
+					.append(" SELECT ih.id as ihId, ih.realizationDate as realizationDate,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
 							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
 							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat WHERE "
@@ -535,7 +559,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
 
 			queryString = queryString
-					.append(" SELECT ih.id as ihId,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
+					.append(" SELECT ih.id as ihId, ih.realizationDate as realizationDate, ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
 							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
 							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat WHERE "
@@ -731,6 +755,13 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
         return "searchPex";
     }
 	
+	 @Action(value = "/report/pexExpenditureReport-newForm")
+	    public String newFormExpPex() {
+		 System.out.println("new form ::::");
+	        return "expenditurePex";
+	    }
+		
+	 
     @SkipValidation
     @Action(value = "/report/pexIssueRegisterReport-exportPdf")
     public String exportPdfPex() throws JRException, IOException {
@@ -762,23 +793,36 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
         System.out.println("HTML 3");
         return "searchPex";
     }
-
+    
     @SkipValidation
     @Action(value = "/report/pexIssueRegisterReport-exportXls")
     public String exportXlsPex() throws JRException, IOException {
     	System.out.println("XLS 1");
+    	try {
     	searchPex();
     	System.out.println("XLS 2");
         if (rtgsDisplayList.size() > 0) {
+        	try {
             inputStream = reportHelper.exportXls(inputStream, jasperpath, getParamMapPex(), rtgsReportList);
+                
+        	}
+        	catch(Exception e) {
+        		System.out.println(e);
+        		e.printStackTrace();
+        	}
             return "XLS_PEX";
         }
         prepare();
         System.out.println("XLS 3");
+        
+    	}
+    	catch(Exception e) {
+    		System.out.println(e);
+    		e.printStackTrace();
+    	}
         return newFormPex();
-
     }
 
-        
 
+        
 }

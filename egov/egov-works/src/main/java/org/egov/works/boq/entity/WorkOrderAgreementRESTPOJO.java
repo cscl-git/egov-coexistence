@@ -45,7 +45,8 @@ public class WorkOrderAgreementRESTPOJO {
 	private String status;
 	private String percentage_completion;
 	private String subdivision;
-	
+	private String workAgreementApprovedDate;
+	private String pendingWith;
 	
 	public WorkOrderAgreementRESTPOJO() {}
 	
@@ -62,7 +63,7 @@ public class WorkOrderAgreementRESTPOJO {
 			String createddate, String lastmodifiedby, String lastmodifieddate, String state_id,
 			String work_agreement_number, String project_closure_comments, String contractor_performance_comments,
 			String actual_start_date, String actual_end_date, String approval_competent_authority, String status,
-			String percentage_completion,String subdivision) {
+			String percentage_completion,String subdivision,String workAgreementApprovedDate,String pendingWith) {
 		super();
 		this.id = id;
 		this.agency_work_order = agency_work_order;
@@ -108,6 +109,8 @@ public class WorkOrderAgreementRESTPOJO {
 		this.status = status;
 		this.percentage_completion = percentage_completion;
 		this.subdivision=subdivision;
+		this.workAgreementApprovedDate = workAgreementApprovedDate;
+		this.pendingWith=pendingWith;
 	}
 
 
@@ -392,6 +395,34 @@ public class WorkOrderAgreementRESTPOJO {
 
 	public void setPercentage_completion(String percentage_completion) {
 		this.percentage_completion = percentage_completion;
+	}
+
+
+
+
+	public String getWorkAgreementApprovedDate() {
+		return workAgreementApprovedDate;
+	}
+
+
+
+
+	public void setWorkAgreementApprovedDate(String workAgreementApprovedDate) {
+		this.workAgreementApprovedDate = workAgreementApprovedDate;
+	}
+
+
+
+
+	public String getPendingWith() {
+		return pendingWith;
+	}
+
+
+
+
+	public void setPendingWith(String pendingWith) {
+		this.pendingWith = pendingWith;
 	}
 	
 	

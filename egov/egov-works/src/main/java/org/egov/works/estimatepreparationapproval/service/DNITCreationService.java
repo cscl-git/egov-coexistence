@@ -2,22 +2,31 @@ package org.egov.works.estimatepreparationapproval.service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.eis.service.DesignationService;
+import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.filestore.service.FileStoreService;
+import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.notification.service.NotificationService;
 import org.egov.infra.persistence.entity.AbstractAuditable;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -43,7 +52,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class DNITCreationService {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(DNITCreationService.class);
-
+	public static final String MODULE_FULLNAME = "Council Management";
+	 public static final String SENDSMSFORCOUNCIL = "SENDSMSFORCOUNCILMEMBER";
+	 private static final String DATE_FORMAT = "yyyy-MM-dd";
+	 private static final String ROLE_MEETING_SENIOR_OFFICER = "LEGAL_NODAL_OFFICER";
+	 public static final Locale LOCALE = new Locale("en", "IN");
+	    public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
 	@Autowired
 	private EstimatePreparationApprovalRepository estimatePreparationApprovalRepository;
 	
@@ -67,7 +81,11 @@ public class DNITCreationService {
 	private DocumentUploadRepository documentUploadRepository;
 	@Autowired
     private DesignationService designationService;
+	@Autowired
+    private AppConfigValueService appConfigValuesService;
 	
+	 @Autowired
+	    private NotificationService notificationService;
 
 	@Transactional
 	public DNITCreation saveEstimatePreparationData(HttpServletRequest request,
@@ -234,7 +252,7 @@ public class DNITCreationService {
         {
         	owenrPos.setId(approvalPosition);
         }
-        
+        System.out.println("<<<<<before work flow <<<<<"+owenrPos.getId()+"<<>>>>>>>>>>>Current user   >>>>>>>>>>"+user.getName()+" <<ID>> "+user.getId());
         if (null == estimatePreparationApproval.getState() && workFlowAction.equals("Save As Draft")) {
         	wfmatrix = estimateWorkflowService.getWfMatrix(estimatePreparationApproval.getStateType(), null,
                     null, additionalRule, "NEW", null);
@@ -250,6 +268,7 @@ public class DNITCreationService {
         
         else if (null == estimatePreparationApproval.getState() && !workFlowAction.equals("Save As Draft"))
         {
+        	System.out.println("<<<<<State null forward/reasign <<<<<"+owenrPos.getId()+"<<>>>>>>>>>>>Current user   >>>>>>>>>>"+user.getName()+" <<ID>> "+user.getId());
         	wfmatrix = estimateWorkflowService.getWfMatrix(estimatePreparationApproval.getStateType(), null,
                     null, additionalRule, "NEW", null);
         	String statetype="Pending With "+designation.getName().toUpperCase();
@@ -277,6 +296,7 @@ public class DNITCreationService {
         	}
         	else if(workFlowAction.equalsIgnoreCase("Forward/Reassign"))
         	{
+        		System.out.println("<<<<<Forward/Reassign<<<<<"+owenrPos.getId()+"<<>>>>>>>>>>>Current user   >>>>>>>>>>"+user.getName()+" <<ID>> "+user.getId());
         		String statetype="Pending With "+designation.getName().toUpperCase();
         		estimatePreparationApproval.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                 .withComments(approvalComent)
@@ -493,4 +513,68 @@ public class DNITCreationService {
 			// TODO Auto-generated method stub
 			documentUploadRepository.deleteDataDnit(id);
 		}
+		
+		 public void sendSmsNotice(DNITCreation dnitCreation, String customMessage) {
+		    	LOG.info("A");
+		        
+		        String smsMsg="";
+		        String templateId="1007761530335615496";
+		        String date =DDMMYYYYFORMAT1.format(new Date());
+		        Boolean smsEnabled = isSmsEnabled();
+		     final List<AppConfigValues> appList = appConfigValuesService
+		                .getConfigValuesByModuleAndKey("EGF",
+		                        "LEGAL_HEARING_TEMPLATE_ID");
+		        if(appList.size()!=0)
+		        templateId = appList.get(0).getValue();
+		        
+		        smsMsg="Dear,"+dnitCreation.getCreatedbyuser()+" Your DNIT Number "+dnitCreation.getEstimateNumber()+" has been approved by "+securityUtils.getCurrentUser().getName()+" on "+date+". Chandigarh Smart City Ltd";
+		        if (smsEnabled) {
+		        	try {
+			             List<org.egov.infra.microservice.models.User> userListForDnit = getUserListForDnit();
+			             for(org.egov.infra.microservice.models.User user:userListForDnit)
+			             {
+			            	 if(null!=user.getMobileNumber() && !user.getMobileNumber().isEmpty()) {
+			            		 sendSMSOnSewerageForMeeting(user.getMobileNumber(), smsMsg, templateId);
+			            	 }
+			            	 
+			            	 
+			             }
+			            
+		        	}catch(Exception e) {
+		            	LOG.error("Unable to send SMS to council members of meeting number "+dnitCreation.getEstimateNumber());
+		            }
+					
+		            
+		        }
+		    }
+		    
+		 public Boolean isSmsEnabled() {
+
+		        return getAppConfigValueByPassingModuleAndType(MODULE_FULLNAME, SENDSMSFORCOUNCIL);
+		    }
+		 private Boolean getAppConfigValueByPassingModuleAndType(String moduleName, String sendsmsoremail) {
+		        final List<AppConfigValues> appConfigValue = appConfigValuesService.getConfigValuesByModuleAndKey(moduleName,
+		                sendsmsoremail);
+
+		        return "YES".equalsIgnoreCase(
+		                appConfigValue != null && !appConfigValue.isEmpty() ? appConfigValue.get(0).getValue() : "NO");
+		    }
+		 
+		 
+		 public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
+		    	LOG.info("C");
+		        notificationService.sendSMS(mobileNumber, smsBody,templateId);
+		    } 
+		 public List<org.egov.infra.microservice.models.User> getUserListForDnit() {
+		        Set<org.egov.infra.microservice.models.User> usersListResult = new HashSet<>();
+		        List<String> roles = new ArrayList<String>();
+		        roles.add(ROLE_MEETING_SENIOR_OFFICER);
+		        List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+		    	if(!CollectionUtils.isEmpty(employees)) {
+		    		for(EmployeeInfo info : employees) {
+		    			usersListResult.add(info.getUser());
+		    		}
+		    	}
+		        return new ArrayList<>(usersListResult);
+		    }
 }

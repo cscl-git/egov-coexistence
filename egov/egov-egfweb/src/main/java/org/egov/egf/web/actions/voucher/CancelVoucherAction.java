@@ -110,11 +110,11 @@ public class CancelVoucherAction extends BaseFormAction {
 	@Autowired
 	@Qualifier("persistenceService")
 	private PersistenceService persistenceService;
-	
+
 	@Autowired
-        @Qualifier("voucherHelper")
-        private VoucherHelper voucherHelpers;
-	
+	@Qualifier("voucherHelper")
+	private VoucherHelper voucherHelpers;
+
 	private static final long serialVersionUID = -8065315728701853083L;
 	private static final Logger LOGGER = Logger.getLogger(CancelVoucherAction.class);
 	public static final Locale LOCALE = new Locale("en", "IN");
@@ -143,8 +143,8 @@ public class CancelVoucherAction extends BaseFormAction {
 	List<String> voucherTypes = VoucherHelper.VOUCHER_TYPES;
 	Map<String, List<String>> voucherNames;
 	private FinancialYearDAO financialYearDAO;
-	 @Autowired
-	 @Qualifier("chartOfAccounts")
+	@Autowired
+	@Qualifier("chartOfAccounts")
 	private ChartOfAccounts chartOfAccounts;
 
 	@Autowired
@@ -154,7 +154,7 @@ public class CancelVoucherAction extends BaseFormAction {
 	@Autowired
 	private EgovMasterDataCaching masterDataCache;
 	private Department deptImpl = new Department();
-	
+
 	@Autowired
 	FinanceDashboardService finDashboardService;
 
@@ -195,8 +195,10 @@ public class CancelVoucherAction extends BaseFormAction {
 	@ValidationErrorPage(value = SEARCH)
 	@Action(value = "/voucher/cancelVoucher-search")
 	public String search() {
-		if (LOGGER.isDebugEnabled())
+		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("...Searching for voucher of type " + voucherHeader.getType());
+			LOGGER.debug("...Searching for voucher of name " + voucherHeader.getName());
+		}
 		voucherHeader.getVouchermis().setDepartmentcode(deptImpl.getCode());
 		voucherSearchList = getVouchersForCancellation();
 		List<org.egov.infra.microservice.models.Department> departments = masterDataCache.get("egi-department");
@@ -206,7 +208,7 @@ public class CancelVoucherAction extends BaseFormAction {
 		}
 		if (voucherSearchList != null && !voucherSearchList.isEmpty())
 			for (CVoucherHeader voucher : voucherSearchList) {
-				if (voucher.getVouchermis()!=null && voucher.getVouchermis().getDepartmentcode() != null)
+				if (voucher.getVouchermis() != null && voucher.getVouchermis().getDepartmentcode() != null)
 					voucher.setDepartmentName(depMap.get(voucher.getVouchermis().getDepartmentcode()));
 			}
 		return SEARCH;
@@ -229,21 +231,21 @@ public class CancelVoucherAction extends BaseFormAction {
 		String voucheerWithNoPayment, allPayment, noChequePaymentQry;
 		String contraVoucherQry;
 		String filterQry = "";
-		if(!voucherNumber.isEmpty()&&voucherNumber!=null ) {
-		    CVoucherHeader vocuHeaders = (CVoucherHeader) persistenceService.find(" from CVoucherHeader vh where vh.voucherNumber = ? and vh.status = 0", voucherNumber);
-		   if(vocuHeaders!=null && vocuHeaders.getVoucherDate()!=null) {
-		    validateBeforeCancel(vocuHeaders);
-		   }
+		if (!voucherNumber.isEmpty() && voucherNumber != null) {
+			CVoucherHeader vocuHeaders = (CVoucherHeader) persistenceService
+					.find(" from CVoucherHeader vh where vh.voucherNumber = ? and vh.status = 0", voucherNumber);
+			if (vocuHeaders != null && vocuHeaders.getVoucherDate() != null) {
+				validateBeforeCancel(vocuHeaders);
+			}
 		} else {
-		final boolean validateFinancialYearForPosting = voucherSearchUtil.validateFinancialYearForPosting(fromDate,
-				toDate);
-		
-		final boolean validateClosedPeriod = voucherSearchUtil.validateClosedPeriod(fromDate,
-                        toDate);
-		if ((!validateFinancialYearForPosting) || (!validateClosedPeriod) )
-			throw new ValidationException(Arrays.asList(new ValidationError(
-					"Financial Year  Not active for Posting(either year or date within selected date range)",
-					"Financial Year  Not active for Posting(either year or date within selected date range)")));
+			final boolean validateFinancialYearForPosting = voucherSearchUtil.validateFinancialYearForPosting(fromDate,
+					toDate);
+
+			final boolean validateClosedPeriod = voucherSearchUtil.validateClosedPeriod(fromDate, toDate);
+			if ((!validateFinancialYearForPosting) || (!validateClosedPeriod))
+				throw new ValidationException(Arrays.asList(new ValidationError(
+						"Financial Year  Not active for Posting(either year or date within selected date range)",
+						"Financial Year  Not active for Posting(either year or date within selected date range)")));
 		}
 
 		final String filter = voucherSearchUtil.voucherFilterQuery(voucherHeader, fromDate, toDate, "");
@@ -255,55 +257,62 @@ public class CancelVoucherAction extends BaseFormAction {
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug("......Searching voucher for cancelllation...");
 		if (voucherHeader.getVoucherNumber() != null && !voucherHeader.getVoucherNumber().isEmpty()) {
-		        
-		        CVoucherHeader cVoucherByVoucherNumber = this.getCVoucherByVoucherNumber(voucherHeader.getVoucherNumber());
-		        if(cVoucherByVoucherNumber != null && cVoucherByVoucherNumber.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT))
-		        {
-		            //Checking the searched BPV whether cheque is issued or not
-		            String voucherNumberQry = "from CVoucherHeader vh where vh.status not in ("
-		                    + FinancialConstants.PREAPPROVEDVOUCHERSTATUS + "," + FinancialConstants.CANCELLEDVOUCHERSTATUS
-		                    + ") and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
-		            voucherNumberQry += filter;
-		            voucherNumberQry += " and not Exists(select 'true' from InstrumentVoucher iv where iv.voucherHeaderId=vh.id) order by vh.voucherNumber";
-		            //persistenceService.findAllBy(voucherNumberQry + filterQry);
-		            voucherList.addAll(persistenceService.findAllBy(voucherNumberQry));
-		            
-		            // If cheque is assigned to BPV then cheque is surrendered or not
-		            List<Object[]> listOfIdsOfSurrenderedCheques = this.getListOfIdsOfSurrenderedCheques(filter);
-		            if(!listOfIdsOfSurrenderedCheques.isEmpty()){
-		                for(Object[] obj : listOfIdsOfSurrenderedCheques){
-		                    if(voucherHeader.getVoucherNumber().equalsIgnoreCase(obj[1].toString())){
-		                        voucherList.add(
-		                                (CVoucherHeader) persistenceService.find("from CVoucherHeader vh where vh.id=? and vh.status = 0", Long.parseLong(obj[0].toString())));
-		                    break;
-		                    }
-		                }
-		                
-		            }
-		        }else if(cVoucherByVoucherNumber != null && cVoucherByVoucherNumber.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL))
-                        {
-                            // Checking Voucher for which paymet is generated or not
-                            voucheerWithNoPayment = "from CVoucherHeader vh where vh not in ( select billVoucherHeader from Miscbilldetail) and vh.status in ("
-                                            + FinancialConstants.CREATEDVOUCHERSTATUS
-                                            + ")  and (vh.isConfirmed != 1 or vh.isConfirmed is null) and vh.voucherNumber = ?";
-                            
-                            CVoucherHeader jVoucher = (CVoucherHeader)persistenceService.find(voucheerWithNoPayment, voucherHeader.getVoucherNumber());
-                            if(jVoucher != null){
-                                voucherList.add(jVoucher);
-                            }else{
-                                // Filters vouchers for which payments are generated and are in
-                                // cancelled state
-                                allPayment = "select count(vh) from Miscbilldetail misc, CVoucherHeader vh where misc.billVoucherHeader.id = ? "
-                                             + "and misc.payVoucherHeader = vh.id  "
-                                             + "and (vh.isConfirmed != 1  or  vh.isConfirmed  is null) " 
-                                             + "and vh.status in ("+FinancialConstants.CREATEDVOUCHERSTATUS+")";  
-                                
-                                long count = (long)persistenceService.find(allPayment, cVoucherByVoucherNumber.getId());
-                                if(count == 0){
-                                    voucherList.add(cVoucherByVoucherNumber);
-                                }
-                            }
-                    }
+
+			CVoucherHeader cVoucherByVoucherNumber = this.getCVoucherByVoucherNumber(voucherHeader.getVoucherNumber());
+			if (cVoucherByVoucherNumber != null && cVoucherByVoucherNumber.getType()
+					.equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_PAYMENT)) {
+				// Checking the searched BPV whether cheque is issued or not
+				String voucherNumberQry = "from CVoucherHeader vh where vh.status not in ("
+						+ FinancialConstants.PREAPPROVEDVOUCHERSTATUS + "," + FinancialConstants.CANCELLEDVOUCHERSTATUS
+						+ ") and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
+				voucherNumberQry += filter;
+				voucherNumberQry += " and not Exists(select 'true' from InstrumentVoucher iv where iv.voucherHeaderId=vh.id) order by vh.voucherNumber";
+				// persistenceService.findAllBy(voucherNumberQry + filterQry);
+				voucherList.addAll(persistenceService.findAllBy(voucherNumberQry));
+
+				// If cheque is assigned to BPV then cheque is surrendered or not
+				List<Object[]> listOfIdsOfSurrenderedCheques = this.getListOfIdsOfSurrenderedCheques(filter);
+				if (!listOfIdsOfSurrenderedCheques.isEmpty()) {
+					for (Object[] obj : listOfIdsOfSurrenderedCheques) {
+						if (voucherHeader.getVoucherNumber().equalsIgnoreCase(obj[1].toString())) {
+							voucherList.add((CVoucherHeader) persistenceService.find(
+									"from CVoucherHeader vh where vh.id=? and vh.status = 0",
+									Long.parseLong(obj[0].toString())));
+							break;
+						}
+					}
+
+				}
+			} else if (cVoucherByVoucherNumber != null && cVoucherByVoucherNumber.getType()
+					.equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL)) {
+				// Checking Voucher for which paymet is generated or not
+				voucheerWithNoPayment = "from CVoucherHeader vh where vh not in ( select billVoucherHeader from Miscbilldetail) and vh.status in ("
+						+ FinancialConstants.CREATEDVOUCHERSTATUS
+						+ ")  and (vh.isConfirmed != 1 or vh.isConfirmed is null) and vh.voucherNumber = ?";
+
+				CVoucherHeader jVoucher = (CVoucherHeader) persistenceService.find(voucheerWithNoPayment,
+						voucherHeader.getVoucherNumber());
+				if (jVoucher != null) {
+					voucherList.add(jVoucher);
+				} else {
+					// Filters vouchers for which payments are generated and are in
+					// cancelled state
+					allPayment = "select count(vh) from Miscbilldetail misc, CVoucherHeader vh where misc.billVoucherHeader.id = ? "
+							+ "and misc.payVoucherHeader = vh.id  "
+							+ "and (vh.isConfirmed != 1  or  vh.isConfirmed  is null) " + "and vh.status in ("
+							+ FinancialConstants.CREATEDVOUCHERSTATUS + ")";
+
+					long count = (long) persistenceService.find(allPayment, cVoucherByVoucherNumber.getId());
+					if (count == 0) {
+						voucherList.add(cVoucherByVoucherNumber);
+					}
+				}
+			} else if (cVoucherByVoucherNumber != null && cVoucherByVoucherNumber.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA)) {
+				contraVoucherQry = "from CVoucherHeader vh where vh.status =" + FinancialConstants.CREATEDVOUCHERSTATUS
+						+ " and ( vh.isConfirmed != 1 or vh.isConfirmed is null) ";
+				persistenceService.findAllBy(contraVoucherQry + filterQry);
+				voucherList.addAll(persistenceService.findAllBy(contraVoucherQry + filterQry));
+			}
 			return voucherList;
 		}
 		if (voucherHeader.getType().equalsIgnoreCase(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL)) {
@@ -400,18 +409,18 @@ public class CancelVoucherAction extends BaseFormAction {
 
 	@SkipValidation
 	public void validateBeforeCancel(final CVoucherHeader voucherObj) {
-	    final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
-	    try {
-            if (chartOfAccounts.isClosedForPosting(formatter.format(voucherObj.getVoucherDate()))) {
-                throw new ValidationException(Arrays.asList(new ValidationError(
-                        "Financial Year  Not active for Posting(either year or date within selected date range)",
-                        "Financial Year  Not active for Posting(either year or date within selected date range)")));
-            }
-        } catch (ValidationException e) {
-            final List<ValidationError> errors = new ArrayList<ValidationError>();
-            errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
-            throw new ValidationException(errors);
-        }
+		final SimpleDateFormat formatter = new SimpleDateFormat(DD_MMM_YYYY);
+		try {
+			if (chartOfAccounts.isClosedForPosting(formatter.format(voucherObj.getVoucherDate()))) {
+				throw new ValidationException(Arrays.asList(new ValidationError(
+						"Financial Year  Not active for Posting(either year or date within selected date range)",
+						"Financial Year  Not active for Posting(either year or date within selected date range)")));
+			}
+		} catch (ValidationException e) {
+			final List<ValidationError> errors = new ArrayList<ValidationError>();
+			errors.add(new ValidationError("exp", e.getErrors().get(0).getMessage()));
+			throw new ValidationException(errors);
+		}
 	}
 
 	@ValidationErrorPage(value = SEARCH)
@@ -441,11 +450,10 @@ public class CancelVoucherAction extends BaseFormAction {
 			ids.add(selectedVhs[i]);
 			// Need to do this change as configurable
 			/*
-			 * final boolean value =
-			 * cancelBillAndVoucher.canCancelVoucher(voucherObj);
+			 * final boolean value = cancelBillAndVoucher.canCancelVoucher(voucherObj);
 			 * 
-			 * if (!value) { addActionMessage(getText(
-			 * "Vouchers Cancelled Failure")); continue; }
+			 * if (!value) { addActionMessage(getText( "Vouchers Cancelled Failure"));
+			 * continue; }
 			 */
 			voucherId = voucherObj.getId().toString();
 			switch (voucherObj.getType()) {
@@ -457,11 +465,12 @@ public class CancelVoucherAction extends BaseFormAction {
 				query.setTimestamp("modifiedDate", modifiedDate);
 				query.setLong("vhId", selectedVhs[i]);
 				query.executeUpdate();
-				
-				
-				//Cancelling the bill which is generated by System while Creation of Journal Voucher Directly.
-				if(this.isBillGeneratedBySystemForVocuher(voucherObj) && !voucherObj.getName().equals(FinancialConstants.JOURNALVOUCHER_NAME_GENERAL)){
-				    cancelBill(selectedVhs[i]);
+
+				// Cancelling the bill which is generated by System while Creation of Journal
+				// Voucher Directly.
+				if (this.isBillGeneratedBySystemForVocuher(voucherObj)
+						&& !voucherObj.getName().equals(FinancialConstants.JOURNALVOUCHER_NAME_GENERAL)) {
+					cancelBill(selectedVhs[i]);
 				}
 				break;
 			}
@@ -503,15 +512,15 @@ public class CancelVoucherAction extends BaseFormAction {
 			}
 			}
 		}
-		if(!ids.isEmpty()){
-		    finDashboardService.publishEvent(FinanceEventType.voucherUpdateById, ids);
+		if (!ids.isEmpty()) {
+			finDashboardService.publishEvent(FinanceEventType.voucherUpdateById, ids);
 		}
 		if (LOGGER.isDebugEnabled())
 			LOGGER.debug(" Cancel Voucher | CancelVoucher | Vouchers Cancelled ");
 		if (voucherId != "")
 			addActionMessage(getText("Vouchers Cancelled Succesfully"));
 		return SEARCH;
-                
+
 	}
 
 	private void cancelBill(final Long vhId) {
@@ -526,8 +535,8 @@ public class CancelVoucherAction extends BaseFormAction {
 		if (billMis != null && billMis.getEgBillregister().getState() == null) {
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("....Cancelling Bill Associated with the Voucher....");
-			billQuery
-					.append("select bill.expendituretype,bill.id,bill.state.id from CVoucherHeader vh,EgBillregister bill ,EgBillregistermis mis")
+			billQuery.append(
+					"select bill.expendituretype,bill.id,bill.state.id from CVoucherHeader vh,EgBillregister bill ,EgBillregistermis mis")
 					.append(" where vh.id=mis.voucherHeader and bill.id=mis.egBillregister and vh.id=" + vhId);
 			final Object[] bill = (Object[]) persistenceService.find(billQuery.toString()); // bill[0]
 																							// contains
@@ -576,8 +585,8 @@ public class CancelVoucherAction extends BaseFormAction {
 			billQry.executeUpdate();
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Bill Cancelled Successfully" + bill[1]);
-			
-			//Updating dasboard
+
+			// Updating dasboard
 			finDashboardService.publishEvent(FinanceEventType.billUpdateByIds, new HashSet<>(Arrays.asList(bill[1])));
 		}
 	}
@@ -611,18 +620,17 @@ public class CancelVoucherAction extends BaseFormAction {
 		addDropdownData("typeList", VoucherHelper.VOUCHER_TYPES);
 		voucherNames = voucherHelpers.getVoucherNamesAndTypes();
 		nameMap = new LinkedHashMap<String, String>();
-		List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+		List<AppConfigValues> appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
 				"receipt_sub_divison");
-        List<SubDivision> subdivisionList=new ArrayList<SubDivision>();
-        SubDivision subdivision=null;
-        for(AppConfigValues value:appConfigValuesList)
-        {
-        	subdivision = new SubDivision();
-        	subdivision.setSubdivisionCode(value.getValue());
-        	subdivision.setSubdivisionName(value.getValue());
-        	subdivisionList.add(subdivision);
-        }
-        addDropdownData("subdivisionList", subdivisionList);
+		List<SubDivision> subdivisionList = new ArrayList<SubDivision>();
+		SubDivision subdivision = null;
+		for (AppConfigValues value : appConfigValuesList) {
+			subdivision = new SubDivision();
+			subdivision.setSubdivisionCode(value.getValue());
+			subdivision.setSubdivisionName(value.getValue());
+			subdivisionList.add(subdivision);
+		}
+		addDropdownData("subdivisionList", subdivisionList);
 		System.out.println("Y2");
 	}
 
@@ -636,8 +644,10 @@ public class CancelVoucherAction extends BaseFormAction {
 			if (voucherHeader.getType() == null || voucherHeader.getType().equals("-1"))
 				addFieldError("Voucher Type", getText("Please Select Voucher Type"));
 			if (voucherHeader.getName() == null || voucherHeader.getName().equals("-1")
-					|| voucherHeader.getName().equals("0"))
-				addFieldError("Voucher Type", getText("Please Select Voucher Name"));
+					|| voucherHeader.getName().equals("0")) {
+
+			}
+			// addFieldError("Voucher Type", getText("Please Select Voucher Name"));
 			int checKDate = 0;
 			if (fromDate != null && toDate != null)
 				checKDate = fromDate.compareTo(toDate);
@@ -679,48 +689,51 @@ public class CancelVoucherAction extends BaseFormAction {
 		if (mandatoryFields.contains(fieldName) && (value == null || value.equals(-1)))
 			addFieldError(objectName, getText(errorKey));
 	}
-	
-	public List<Object[]> getListOfIdsOfSurrenderedCheques(String filter){
-	    final String qryStr = filter;
-            String filterQuerySql = "";
-            String misTab = "";
-            String VoucherMisJoin = "";
-            if (qryStr.contains(" and vh.vouchermis")) {
-                misTab = ", vouchermis mis ";
-                VoucherMisJoin = " and vh.id=mis.voucherheaderid";
-                filterQuerySql = qryStr.replace("and vh.vouchermis.", " and mis.");
-            } else
-                filterQuerySql = filter;
-	    final Query query1 = persistenceService.getSession()
-                    .createSQLQuery("SELECT distinct vh.id, vh.voucherNumber FROM egw_status status" + misTab + ", voucherheader vh   "
-                                    + " LEFT JOIN EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID"
-                                    + "     LEFT JOIN EGF_INSTRUMENTHEADER IH ON IV.INSTRUMENTHEADERID=IH.ID INNER JOIN (SELECT MAX(iv1.instrumentheaderid) AS maxihid,"
-                                    + " iv1.voucherheaderid               AS iv1vhid   FROM egf_instrumentvoucher iv1 GROUP BY iv1.voucherheaderid)as INST ON maxihid=IH.ID "
-                                    + " WHERE       IV.VOUCHERHEADERID  IS NOT NULL AND status.description   IN ('"
-                                    + FinancialConstants.INSTRUMENT_CANCELLED_STATUS + "','"
-                                    + FinancialConstants.INSTRUMENT_SURRENDERED_STATUS + "','"
-                                    + FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS + "')"
-                                    + " and status.id=ih.id_status and vh.status not in ("
-                                    + FinancialConstants.PREAPPROVEDVOUCHERSTATUS + ","
-                                    + FinancialConstants.CANCELLEDVOUCHERSTATUS + ") " + VoucherMisJoin + filterQuerySql);
-	            return (List<Object[]>)query1.list();
+
+	public List<Object[]> getListOfIdsOfSurrenderedCheques(String filter) {
+		final String qryStr = filter;
+		String filterQuerySql = "";
+		String misTab = "";
+		String VoucherMisJoin = "";
+		if (qryStr.contains(" and vh.vouchermis")) {
+			misTab = ", vouchermis mis ";
+			VoucherMisJoin = " and vh.id=mis.voucherheaderid";
+			filterQuerySql = qryStr.replace("and vh.vouchermis.", " and mis.");
+		} else
+			filterQuerySql = filter;
+		final Query query1 = persistenceService.getSession()
+				.createSQLQuery("SELECT distinct vh.id, vh.voucherNumber FROM egw_status status" + misTab
+						+ ", voucherheader vh   " + " LEFT JOIN EGF_INSTRUMENTVOUCHER IV ON VH.ID=IV.VOUCHERHEADERID"
+						+ "     LEFT JOIN EGF_INSTRUMENTHEADER IH ON IV.INSTRUMENTHEADERID=IH.ID INNER JOIN (SELECT MAX(iv1.instrumentheaderid) AS maxihid,"
+						+ " iv1.voucherheaderid               AS iv1vhid   FROM egf_instrumentvoucher iv1 GROUP BY iv1.voucherheaderid)as INST ON maxihid=IH.ID "
+						+ " WHERE       IV.VOUCHERHEADERID  IS NOT NULL AND status.description   IN ('"
+						+ FinancialConstants.INSTRUMENT_CANCELLED_STATUS + "','"
+						+ FinancialConstants.INSTRUMENT_SURRENDERED_STATUS + "','"
+						+ FinancialConstants.INSTRUMENT_SURRENDERED_FOR_REASSIGN_STATUS + "')"
+						+ " and status.id=ih.id_status and vh.status not in ("
+						+ FinancialConstants.PREAPPROVEDVOUCHERSTATUS + "," + FinancialConstants.CANCELLEDVOUCHERSTATUS
+						+ ") " + VoucherMisJoin + filterQuerySql);
+		return (List<Object[]>) query1.list();
 	}
-	
+
 	@SuppressWarnings("deprecation")
-        public CVoucherHeader getCVoucherByVoucherNumber(String voucherNumber){
-	    List<CVoucherHeader> vocuHeaders = persistenceService.findAllBy(" from CVoucherHeader vh where vh.voucherNumber = ? and vh.status = 0", voucherNumber);
-	    if(!vocuHeaders.isEmpty()){
-	        return vocuHeaders.get(0);
-	    }
-	    return null;
+	public CVoucherHeader getCVoucherByVoucherNumber(String voucherNumber) {
+		List<CVoucherHeader> vocuHeaders = persistenceService
+				.findAllBy(" from CVoucherHeader vh where vh.voucherNumber = ? and vh.status = 0", voucherNumber);
+		if (!vocuHeaders.isEmpty()) {
+			return vocuHeaders.get(0);
+		}
+		return null;
 	}
-	
-	//this method differentiating between internal/external bill by sourcepath column
-	//as sourcepath column is not updating/inserting the data while generation of bill by system(internal)
-	public boolean isBillGeneratedBySystemForVocuher(CVoucherHeader voucher){
-	    String query = "select billmis.sourcePath from EgBillregistermis billmis where billmis.voucherHeader.id = ?";
-	    Object sourcePath = persistenceService.find(query, voucher.getId());
-	    return sourcePath == null ? true : false;
+
+	// this method differentiating between internal/external bill by sourcepath
+	// column
+	// as sourcepath column is not updating/inserting the data while generation of
+	// bill by system(internal)
+	public boolean isBillGeneratedBySystemForVocuher(CVoucherHeader voucher) {
+		String query = "select billmis.sourcePath from EgBillregistermis billmis where billmis.voucherHeader.id = ?";
+		Object sourcePath = persistenceService.find(query, voucher.getId());
+		return sourcePath == null ? true : false;
 	}
 
 	public boolean isFieldMandatory(final String field) {
@@ -830,12 +843,13 @@ public class CancelVoucherAction extends BaseFormAction {
 	public void setDeptImpl(final Department deptImpl) {
 		this.deptImpl = deptImpl;
 	}
+
 	public String getVoucherNumber() {
-	        return voucherNumber;
-	 }
+		return voucherNumber;
+	}
 
 	public void setVoucherNumber(String voucherNumber) {
-	        this.voucherNumber = voucherNumber;
-	  }
+		this.voucherNumber = voucherNumber;
+	}
 
 }

@@ -178,6 +178,7 @@ public class JournalBookReportAction extends BaseFormAction {
                 .addScalar("creditamount", StringType.INSTANCE)
                 .addScalar("voucherName", StringType.INSTANCE)
                 .addScalar("vhId", StringType.INSTANCE)
+                .addScalar("receiptNo", StringType.INSTANCE)
                 .setParameterList("voucherName", VoucherHelper.VOUCHER_TYPE_NAMES.get(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL))
                 .setResultTransformer(Transformers.aliasToBean(GeneralLedgerBean.class));
         journalBookDisplayList = query.list();
@@ -208,6 +209,8 @@ public class JournalBookReportAction extends BaseFormAction {
             } else {
                 narration = bean.getNarration();
             }
+
+           
 
         }
     }
@@ -241,7 +244,7 @@ public class JournalBookReportAction extends BaseFormAction {
         	subQuery = subQuery + " and vh.description like '%"+journalBookReport.getNarrationText()+"%' ";
         }
         query = "SELECT TO_CHAR(vh.voucherdate,'dd-Mon-yyyy') AS voucherdate,vh.vouchernumber AS vouchernumber,f.name AS fund,gl.glcode AS code,coa.name AS accName,"
-                + "vh.description AS narration,vh.isconfirmed AS isconfirmed,gl.debitamount AS debitamount, gl.creditamount AS creditamount,vh.name AS voucherName,vh.id AS vhId "
+                + "vh.description AS narration,vh.isconfirmed AS isconfirmed,gl.debitamount AS debitamount, gl.creditamount AS creditamount,vh.name AS voucherName,vh.id AS vhId,vmis.reciept_number as receiptNo"
                 + " FROM voucherheader vh, generalledger gl,fund f,function fn ,vouchermis vmis,chartofaccounts coa WHERE vh.id = gl.voucherheaderid AND gl.glcodeid = coa.id AND vh.fundid = f.id"
                 + " AND vmis.functionid = fn.id AND vmis.voucherheaderid=vh.id AND vh.status NOT IN (4,5)"
                 + subQuery

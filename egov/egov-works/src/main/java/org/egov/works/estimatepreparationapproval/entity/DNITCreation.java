@@ -51,13 +51,31 @@ import org.egov.works.boq.entity.BoqUploadDocument;
 		@ColumnResult (name="createdby",type=String.class),@ColumnResult (name="createddate",type=String.class),@ColumnResult (name="lastmodifiedby",type=String.class),
 		@ColumnResult (name="lastmodifieddate",type=String.class),@ColumnResult (name="aanumber",type=String.class),@ColumnResult (name="aadate",type=String.class),
 		@ColumnResult (name="contingent_percentage",type=String.class),@ColumnResult (name="contingent_amount",type=String.class),
-		@ColumnResult (name="consultant_fee",type=String.class),@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="status",type=String.class),@ColumnResult (name="subdivision",type=String.class) }
+		@ColumnResult (name="consultant_fee",type=String.class),@ColumnResult (name="unforseen_charges",type=String.class),@ColumnResult (name="status",type=String.class),@ColumnResult (name="subdivision",type=String.class),
+		@ColumnResult (name="dnitApprovedDate",type=String.class),@ColumnResult (name="owner_name",type=String.class)}
 				)
 })
 
 
 
-@NamedNativeQuery(name="DNITCreation.getAllDNITCreation", query = "select tep.id, tep.agency_work_order ,tep.date , tep.estimate_amount,tep.estimate_date,tep.estimate_number, tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,es.code as status,sub.subdivision from txn_dnit_creation tep, eg_department dep,egw_status es,eg_subdivision sub where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id",
+@NamedNativeQuery(name="DNITCreation.getAllDNITCreation", query = "select tep.id, tep.agency_work_order ,tep.date , tep.estimate_amount,tep.estimate_date,tep.estimate_number, \r\n" + 
+		"tep.estimate_percentage ,tep.estimate_prepared_by, dep.name as executing_division,tep.financial_year ,\r\n" + 
+		"tep.financing_details, tep.fund_source ,tep.necessity,tep.preparation_designation ,tep.sector_number, \r\n" + 
+		"tep.tender_cost ,tep.time_limit ,tep.ward_number ,tep.work_category , tep.work_location ,tep.work_name,\r\n" + 
+		"tep.work_scope ,tep.work_status , tep.work_type ,tep.works_wing ,tep.state_id,tep.version ,tep.statusid, \r\n" + 
+		"tep.createdby ,tep.createddate ,tep.lastmodifiedby ,tep.lastmodifieddate, tep.aanumber,tep.aadate ,\r\n" + 
+		"tep.contingent_percentage ,tep.contingent_amount, tep.consultant_fee ,tep.unforseen_charges ,es.code as status,\r\n" + 
+		"sub.subdivision, \r\n" + 
+		"CASE WHEN tep.statusid =686 THEN tep.lastmodifieddate\r\n" + 
+		"ELSE null\r\n" + 
+		"END AS dnitApprovedDate ,\r\n" + 
+		"CASE WHEN tep.statusid =686 THEN ''\r\n" + 
+		"ELSE ews.owner_name\r\n" + 
+		"END AS owner_name \r\n" + 
+		"from  eg_department dep,egw_status es,eg_subdivision sub, \r\n" + 
+		"txn_dnit_creation tep,eg_wf_states ews\r\n" + 
+		"where tep.statusid =es.id and tep.executing_division = dep.id and tep.subdivision=sub.id\r\n" + 
+		"and tep.state_id=ews.id",
 		resultClass = DNITCreationRESTPOJO.class,resultSetMapping = "AllDNITCreationresultset")
 
 
@@ -174,6 +192,9 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	@Column(name="createdbyuser")
 	private String createdbyuser;
+
+	@Transient
+	private String currentstate;
 
 	@Transient
 	private EstimatePreparationApproval estimatePreparationApproval;
@@ -593,7 +614,17 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	@Override
 	public String getStateDetails() {
-		return getState().getComments().isEmpty() ? estimateNumber : estimateNumber + "-" + getState().getComments();
+		
+		String project_amount="";
+		if(workName!=null && !workName.isEmpty()) {
+			
+		project_amount=workName+"-"+(estimateAmount!=null?estimateAmount.setScale(2, BigDecimal.ROUND_HALF_UP).toString():"");
+		}else {
+			
+			project_amount=estimateAmount!=null?estimateAmount.setScale(2, BigDecimal.ROUND_HALF_UP).toString():"";
+		}
+		
+		return getState().getComments().isEmpty() ? estimateNumber+" ("+project_amount.toString()+")" : estimateNumber + "-" + getState().getComments()+" ("+project_amount.toString()+")";
 	}
 
 	@Override
@@ -965,6 +996,14 @@ public class DNITCreation extends StateAware implements Serializable {
 
 	public void setApproveDt(String approveDt) {
 		this.approveDt = approveDt;
+	}
+
+	public String getCurrentstate() {
+		return currentstate;
+	}
+
+	public void setCurrentstate(String currentstate) {
+		this.currentstate = currentstate;
 	}
 
 	

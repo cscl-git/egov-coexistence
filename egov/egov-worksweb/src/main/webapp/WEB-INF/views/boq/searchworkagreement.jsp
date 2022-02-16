@@ -43,14 +43,14 @@
 					<div class="col-sm-3 add-margin">
 						<form:input id="fromDate" path="fromDate"
 							class="form-control datepicker" data-date-end-date="0d"
-							placeholder="DD/MM/YYYY" />
+							placeholder="DD/MM/YYYY" /><!-- required="true" -->
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.intended.date" /></label>
 					<div class="col-sm-3 add-margin">
 						<form:input id="toDate" path="toDate"
 							class="form-control datepicker" data-date-end-date="0d"
-							placeholder="DD/MM/YYYY" />
+							placeholder="DD/MM/YYYY" /><!-- required="true" -->
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.works.wing" /></label>
@@ -65,10 +65,11 @@
 								</form:select>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit" ><spring:message
-							code="lbl.executing.department" /><span class="mandatory"></span></label>
+							code="lbl.executing.department" />
+						<!-- <span class="mandatory"></span> --></label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="department" id="department"
-							class="form-control" required="required">
+							class="form-control"> <%-- required="required" --%>
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
@@ -79,8 +80,7 @@
 					<label class="col-sm-3 control-label text-left-audit">Sub-Division</label>
 					<div class="col-sm-3 add-margin">
 						<form:select path="subdivision" id="subdivision"
-							cssClass="form-control"
-							cssErrorClass="form-control-works error" >
+							cssClass="form-control" cssErrorClass="form-control-works error">
 							<form:option value="">
 								<spring:message code="lbl.select" />
 							</form:option>
@@ -181,6 +181,16 @@
 					No records found
 					</c:if>
 						</table>
+					<c:if
+						test="${workOrderAgreement.workOrderList != null &&  !workOrderAgreement.workOrderList.isEmpty()}">
+						        
+
+						<center>
+							<input type="button" id="exportToExcel"
+								class="btn btn-primary btn-wf-primary" name="exportToExcel"
+								onclick="searchCheckboq()" value="Export to Excel" />
+						</center>
+					</c:if>
 				</div>
 
 			</div>

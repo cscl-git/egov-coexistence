@@ -112,6 +112,7 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infstr.models.ServiceDetails;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.expenditurePex.ExpenditurePex;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.services.voucher.VoucherService;
 import org.hibernate.Query;
@@ -1193,20 +1194,20 @@ public class RemittanceServiceImpl extends RemittanceService {
     	List<Object[]> result= new ArrayList();
     	List<Object[]> misresult= new ArrayList();
     	SQLQuery misquery=null;
-    	StringBuffer query1=new StringBuffer("select v2.reciept_number,v2.departmentcode,ed.\"name\" as departmentname from eg_department ed,vouchermis v2 where v2.reciept_number notnull and ed.code =v2.departmentcode");
+    	StringBuffer query1=new StringBuffer("select v2.reciept_number,fnc.code,v2.departmentcode,ed.\"name\" as departmentname from eg_department ed,\"function\" fnc,vouchermis v2 where v2.reciept_number notnull and fnc.id =v2.functionid and ed.code =v2.departmentcode");
     	misquery=this.persistenceService.getSession().createSQLQuery(query1.toString());
     	misresult = misquery.list();
 	    	System.out.println(":::misresult size::::: "+misresult.size());
 	    	Map<String, String> deptMap = new HashMap<>();
-	    	//Map<String,String> funcMap=new HashMap<>();
+	    	Map<String,String> funcMap=new HashMap<>();
 	    	Map<String, String> deptNameMap = new HashMap<>();
 	    	if(misresult!=null)
 	    	{
 	    		for (final Object[] object : misresult)
 	    		{
-	    			//funcMap.put(object[0].toString(), object[1].toString());
-	    			deptMap.put(object[0].toString(), object[1].toString());
-	    			deptNameMap.put(object[0].toString(), object[2].toString());
+	    			funcMap.put(object[0].toString(), object[1].toString());
+	    			deptMap.put(object[0].toString(), object[2].toString());
+	    			deptNameMap.put(object[0].toString(), object[3].toString());
 	    		}
 	    	}
 	    	
@@ -1315,11 +1316,15 @@ public class RemittanceServiceImpl extends RemittanceService {
  	    		 	else {
  	    		 		receiptBean.setDepartmentName("");
  	    		 	}
-					/*
-					 * if(object[1]!=null) { if(funcMap.containsKey(object[1].toString())){
-					 * receiptBean.setFunctionCode(funcMap.get(object[1].toString())); } } else {
-					 * receiptBean.setFunctionCode(""); }
-					 */
+ 	    		 	if(object[1]!=null)
+ 	    		 	{
+ 	    		 		if(funcMap.containsKey(object[1].toString())){
+ 	    		 			receiptBean.setFunctionCode(funcMap.get(object[1].toString()));
+ 	    		 		}
+ 	    		 	}
+ 	    		 	else {
+ 	    		 		receiptBean.setFunctionCode("");
+ 	    		 	}
  	    		 	receiptBean.setFund((object[6]!=null)?object[6].toString():"-1");
  	    		 	receiptBean.setFundName((object[7]!=null)?object[7].toString():"");
  	    		 	//receiptBean.setRemittanceReferenceNumber((object[11]!=null)?object[11].toString():"");
@@ -2323,4 +2328,213 @@ public class RemittanceServiceImpl extends RemittanceService {
 			}
 		}
 	}
+    
+    public List<ExpenditurePex> getData(Date fromDate1, Date toDate1) {
+		List details= new ArrayList<>();
+		List<ExpenditurePex> detailList=new ArrayList();
+		SQLQuery query = null;
+		List<Object[]> rows = null;
+		List<Object[]> rows1 = null;
+		System.out.println("fromDate:::: "+fromDate1+" toDate:::: "+toDate1);
+		String fromDate=DDMMYYYYFORMAT1.format(fromDate1);
+		String toDate=DDMMYYYYFORMAT1.format(toDate1);
+		ExpenditurePex r = null;
+		Map<String,List<ExpenditurePex> > result =new HashMap();
+		Map<String,String> map1 =new HashMap();
+		Map<String,String> partyMap =new HashMap();
+		Map<String,List<String>> dedPexMap=new HashMap();
+		try {
+			//tds
+			List<Object[]> list= null;
+		  	SQLQuery querytds =  null;
+		   	final StringBuffer query10 = new StringBuffer(500);
+		  	query10
+		      .append("select ch.glcode,t.id from tds t, chartofaccounts ch where t.glcodeid = ch.id and isactive =true");
+		  	querytds=this.persistenceService.getSession().createSQLQuery(query10.toString());
+		   	list = querytds.list();
+		  	List<String> tds=new ArrayList<String>();
+		  	if (list.size() != 0) {
+		  		for (final Object[] object : list)
+		  		{
+		  			tds.add(object[0].toString());
+		  		}
+		  	}
+		  //for partyname
+		  	SQLQuery queryparty =  null;
+		  	list.clear();
+		  	final StringBuffer query2 = new StringBuffer(500);
+		  	query2
+		      .append("select distinct vdp.id,vdp.detailname from voucher_detail_party vdp ");
+		  	queryparty=this.persistenceService.getSession().createSQLQuery(query2.toString());
+		   	list = queryparty.list();
+		  	if (list.size() != 0) {
+		  		for (final Object[] object : list)
+		  		{
+		  			partyMap.put(object[0].toString(),object[1].toString());
+		  		}
+		  	}
+		  	
+		  	//for deduction pex
+		
+		  SQLQuery querydedpex = null; 
+		  list.clear(); 
+		  final StringBuffer querypex = new StringBuffer(500); 
+		  querypex
+		  .append("select distinct v1.id,ei.transactionnumber as pex,to_char(ei.transactiondate, 'dd-Mon-yyyy') as pexdate, "
+		  +" ei.instrumentnumber as cheque,to_char(ei.instrumentdate , 'dd-Mon-yyyy') as chequedate,b2.accountnumber "
+		  +" from voucherheader v1,generalledger g2,miscbilldetail m,egf_instrumentheader ei,egf_instrumentvoucher ei2,bankaccount b2 "
+		  +" where g2.voucherheaderid = v1.id and b2.id = ei.bankaccountid and ei2.voucherheaderid =v1.id and ei2.instrumentheaderid = ei.id "
+		  + " and ei2.voucherheaderid = m.payvhid order by v1.id");
+		  querydedpex=this.persistenceService.getSession().createSQLQuery(querypex.toString()); 
+		  list = querydedpex.list(); 
+		  List dedPex=new ArrayList(); 
+		  if(list.size() != 0) 
+		  { 
+			  for (final Object[] e : list) 
+			  { 
+				  dedPex.add((null != e[1] ? e[1].toString() : "")); 
+				  dedPex.add((null != e[2] ? e[2].toString() : ""));
+				  dedPex.add((null != e[3] ? e[3].toString() : "")); 
+				  dedPex.add((null != e[4] ? e[4].toString() : "")); 
+				  dedPex.add((null != e[5] ? e[5].toString() : ""));
+				  dedPexMap.put(e[0].toString(),dedPex); 
+			  } 
+		  }
+		 
+		
+			String voucherid="";
+			String glcode="";
+			String conString="";
+			SQLQuery query1 = null;
+			query1 = this.persistenceService.getSession().createSQLQuery(
+					"select distinct vouchernumber,g2.glcode,dvm.vh_id from voucherheader v1,generalledger g2,deduc_voucher_mpng dvm where g2.voucherheaderid = v1.id and v1.id = dvm.ph_id");
+			rows1 = query1.list();
+			if (rows1.size() != 0) {
+				for (Object[] e1 : rows1) {
+						voucherid=e1[2].toString();
+						glcode=e1[1].toString();
+						conString=voucherid+"#"+glcode;
+						map1.put(conString,e1[0].toString());
+				}
+			}
+			query = this.persistenceService.getSession().createSQLQuery("select vh.vouchernumber as vouchernumber, " + 
+			" to_char(voucherdate, 'dd-Mon-yyyy')as voucherdate,vh.description as partyName,(select vouchernumber from voucherheader where id = ei2.voucherheaderid) as bvpno," + 
+			" ei.transactionnumber as pex, to_char(ei.transactiondate, 'dd-Mon-yyyy') as pexdate,concat(vh.name, '-', vh.type) as vouchertype," + 
+			" f.name as functionName,vh.description as naration,c2.name as glcode,g2.glcodeid as glcodeid ,debitamount as debitamount,g2.creditamount as creditamount,g2.glcode as code,vh.id as id,b2.accountnumber " + 
+			" from voucherheader vh,vouchermis v,function f,egf_instrumentheader ei,egf_instrumentvoucher ei2,miscbilldetail m,chartofaccounts c2,generalledger g2,bankaccount b2 " + 
+			" where f.id = v.functionid and b2.id = ei.bankaccountid and c2.id = g2.glcodeid and v.voucherheaderid = m.billvhid and ei2.instrumentheaderid = ei.id " + 
+			" and vh.id = m.billvhid and ei2.voucherheaderid = m.payvhid and m.billvhid = g2.voucherheaderid " + 
+			" and ei.transactiondate >= to_date('"+fromDate+"','dd/Mon/yyyy') and ei.transactiondate <= to_date('"+toDate+"','dd/Mon/yyyy') " + 
+			" and ei.id_status not in (1) order by ei.transactiondate asc,vh.vouchernumber,debitamount desc,creditamount desc") ;
+			
+			System.out.println("::::::>>>>>" + query);
+			rows = query.list();
+
+			System.out.println("row size " + rows.size());
+			List finalList=new ArrayList();
+			String vid="";
+			if (rows.size() != 0) {
+				for (Object[] e : rows) {
+					r = new ExpenditurePex();
+					if(result.get(e[4].toString())==null) {
+						r.setPex((null != e[4] ? e[4].toString() : null));
+						r.setPexDate((null != e[5] ? e[5].toString() : null));
+						r.setBvp((null != e[3] ? e[3].toString() : null));
+						r.setBvpDate((null != e[1] ? e[1].toString() : null));
+						r.setvNo((null != e[0] ? e[0].toString() : null));
+						r.setvDate((null != e[1] ? e[1].toString() : null));
+						r.setVoucherType((null != e[6] ? e[6].toString() : null));
+						if(partyMap.containsKey(e[14].toString()))
+						{
+							r.setPartyName(partyMap.get(e[14].toString()));
+						}
+						else
+						{
+							r.setPartyName("");
+						}
+						r.setBudgetHead((null != e[7] ? e[7].toString() : ""));
+						r.setNarration((null != e[8] ? e[8].toString() : ""));
+						r.setParticulars((null != e[9] ? e[9].toString() : ""));
+						//vid=e[14].toString();
+						r.setDebitamt((null != e[11] ? e[11].toString() : null));
+						r.setCreditamt((null != e[12] ? e[12].toString() : null));
+						r.setGlcodeId((null != e[13] ? e[13].toString() : null));
+						r.setAccNum((null != e[15] ? e[15].toString() : null));
+						//if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
+						//{}
+						//else {
+							details.add(r);
+							result.put(r.getPex(),details);
+						//}
+					}
+					else
+					{
+						//code form dedpexmap
+						if(dedPexMap.containsKey(e[14].toString()))
+						{
+							String transactionno="";
+							String transactiondate="";
+							String instrumentno="";
+							String instrumentdate="";
+							String accNum="";
+							List<String> dedPexList=dedPexMap.get(e[14].toString());
+							for(int i=0;i<dedPexList.size();i+=4) {
+								transactionno=dedPexList.get(i);
+								transactiondate=dedPexList.get(i+1);
+								instrumentno=dedPexList.get(i+2);
+								instrumentdate=dedPexList.get(i+3);
+								accNum=dedPexList.get(i+4);
+								if(transactionno=="")
+								{
+									r.setPex(instrumentno);
+									r.setPexDate(instrumentdate);
+								}
+								else
+								{
+									r.setPex(transactionno);
+									r.setPexDate(transactiondate);
+								}
+								r.setAccNum(accNum);
+							}
+						}
+						r.setBvp("");
+						r.setBvpDate("");
+						r.setvNo("");
+						r.setvDate("");
+						r.setVoucherType("");
+						r.setPartyName("");
+						r.setBudgetHead("");
+						r.setNarration("");
+						r.setParticulars((null != e[9] ? e[9].toString() : null));
+						///code from map
+						voucherid=e[14].toString();
+						glcode=e[13].toString();
+						conString=voucherid+"#"+glcode;
+						if(map1.containsKey(conString))
+						{
+							r.setBvp(map1.get(conString));
+						}
+						////
+						r.setDebitamt((null != e[11] ? e[11].toString() : null));
+						r.setCreditamt((null != e[12] ? e[12].toString() : null));
+						r.setGlcodeId((null != e[13] ? e[13].toString() : null));
+						if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
+						{}
+						else {
+							details.add(r);
+							result.put(r.getPex(),details);
+						}
+					}
+				}
+			}
+			for(Map.Entry<String, List<ExpenditurePex>>	a:result.entrySet()) {
+				detailList.addAll(a.getValue());
+			}
+		return details;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return detailList;
+	}
+    
 }

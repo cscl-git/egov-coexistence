@@ -71,7 +71,7 @@ jQuery(document).ready(
 			$('#legalcaseReportSearchExcel').click(function() {
 					submitFormForExcel();
 		});
-			$('#legalcaseReportSearchpdf').click(function() {
+			$('#legalcaseReportSearchPdf').click(function() {
 				submitFormForPdf();
 	});
 			
@@ -92,15 +92,16 @@ function submitFormForExcel(){
 			  }
 			});
 }
+
 function submitFormForPdf(){
-	url : "/services/lcms/search/legalsearchResultpdf?"+$('#searchlegalcaseForm').serialize();
+	url : "/services/lcms/search/legalcaseReportSearchPdf?"+$('#searchlegalcaseForm').serialize();
 	
 		$.ajax({
 			 type: "GET",
-			  url: "/services/lcms/search/legalsearchResultpdf?"+$('#searchlegalcaseForm').serialize(),
+			  url: "/services/lcms/search/legalcaseReportSearchPdf?"+$('#searchlegalcaseForm').serialize(),
 			  cache: false,
 			  success: function(){
-				  window.location ="/services/lcms/search/legalsearchResultpdf?"+$('#searchlegalcaseForm').serialize();
+				  window.location ="/services/lcms/search/legalcaseReportSearchPdf?"+$('#searchlegalcaseForm').serialize();
 			  }
 			});
 }
@@ -215,6 +216,17 @@ function submitForm() {
 						{
 							"data" : "councelengage",
 							"sTitle" : "Councel Engage",
+							"className" : "text-left"
+						},
+						
+						{
+							"data" : "replySubmit",
+							"sTitle" : "Reply Submit",
+							"className" : "text-left"
+						},
+						{
+							"data" : "argument",
+							"sTitle" : "Argument",
 							"className" : "text-left"
 						},
 						{

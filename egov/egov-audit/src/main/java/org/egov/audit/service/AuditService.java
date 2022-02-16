@@ -122,7 +122,7 @@ public class AuditService {
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_PENDING_WITH_SECTION_OFFICER));
 		}
-		else if(workFlowAction.equalsIgnoreCase("auditor") || workFlowAction.equals("Approve"))
+		else if(workFlowAction.equalsIgnoreCase("auditor") || workFlowAction.equals("Approve") || workFlowAction.equalsIgnoreCase("saveAsDraft"))
 		{
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_PENDING_WITH_AUDITOR));
@@ -259,7 +259,8 @@ public class AuditService {
 			 Map<String, String> finalDesignationNames = new HashMap<>();
 	           Designation designation = this.getDesignationDetails(apporverDesignation);
 	           Position owenrPos = new Position();
-	           owenrPos.setId(approvalPosition);
+	        	   owenrPos.setId(approvalPosition);
+	           
 	           wfmatrix = auditRegisterWorkflowService.getWfMatrix(auditDetails.getStateType(), null,
 	                    null, null, FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING, null);
 	           if (wfmatrix != null && wfmatrix.getCurrentDesignation() != null) {
@@ -334,12 +335,18 @@ public class AuditService {
 	        .withCreatedBy(user.getId())
 	        .withtLastModifiedBy(user.getId());
 		}
-		else if(workFlowAction.equalsIgnoreCase("sectionOfficer"))
+		else if(workFlowAction.equalsIgnoreCase("sectionOfficer") || workFlowAction.equalsIgnoreCase("saveAsDraft"))
 		{
 			
 			List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(auditDetails.getDepartment()), "RSA");
 	    	Position owenrPos = new Position();
-	    	if(leadEmpNo != null)
+	    	String state="Pending with Section Officer";
+	    	if(workFlowAction.equalsIgnoreCase("saveAsDraft"))
+	    	{
+	    		owenrPos.setId(user.getId());
+	    		state="Created";
+	    	}
+	    	else if(leadEmpNo != null)
 	    	{
 	    		owenrPos.setId(leadEmpNo);
 	    	}
@@ -355,7 +362,7 @@ public class AuditService {
 	    	auditDetails.setRsa_name(getEmployeeName(owenrPos.getId()));
 			auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + ":" + user.getName())
 	        .withComments(comment)
-	        .withStateValue("Pending with Section Officer").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+	        .withStateValue(state).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
 	        .withNextAction(actionName)
 	        .withNatureOfTask(natureOfTask)
 	        .withCreatedBy(user.getId())
