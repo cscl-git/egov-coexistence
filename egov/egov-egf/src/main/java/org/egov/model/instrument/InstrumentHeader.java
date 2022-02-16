@@ -92,6 +92,11 @@ public class InstrumentHeader extends BaseModel {
     private String voucherNumber;
     private String bankName;
     private String branchName;
+    private Date realizationDate;
+    
+    private Date fromDate;
+    private Date toDate;
+    private String accountNumber;
 
     private Set<InstrumentVoucher> instrumentVouchers = new HashSet<InstrumentVoucher>(0);
 
@@ -481,5 +486,39 @@ public class InstrumentHeader extends BaseModel {
 	public void setBranchName(String branchName) {
 		this.branchName = branchName;
 	}
+
+	public Date getRealizationDate() {
+		return realizationDate;
+	}
+
+	public void setRealizationDate(Date realizationDate) {
+		this.realizationDate = realizationDate;
+	}
+
+	public Date getFromDate() {
+		return fromDate;
+	}
+
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+
+	public Date getToDate() {
+		return toDate;
+	}
+
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
+	
 
 }

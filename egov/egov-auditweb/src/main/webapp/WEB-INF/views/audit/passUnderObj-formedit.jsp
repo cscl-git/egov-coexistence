@@ -2,6 +2,13 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+
+<style>
+textarea {
+	border: 1px solid;
+}
+</style>
+
 <form:form role="form"
 	action="/services/audit/createAudit/passUnderObjedit" method="post"
 	modelAttribute="passUnderObjection" id="approvebudgetsearchform"
@@ -22,17 +29,19 @@
 					</div>
 					<div class="panel-body">
 						<div class="form-group">
+							<div>
 							<label class="col-sm-3 control-label text-left-audit"><spring:message
 									text="Resolution Comment" /> </label>
 							<div class="col-sm-3 add-margin">
-								<form:input class="form-control"
-									data-pattern="alphanumericwithspecialcharacters"
-									id="resolutioncomment" path="resolutioncomment" maxlength="500" />
+									<form:textarea rows="5" cols="70" id="resolutioncomment"
+										background="grey" path="resolutioncomment" />
 							</div>
+							</div>
+							<br> <br> <br> <br> <br>
 
 							<form:hidden id="temp_id" path="temp_id"
 								value="${passUnderObjection.temp_id}" />
-							<br> <br> <br> <br> <br>
+
 								<div class="panel-heading slide-history-menu">
 
 									<div class="panel-title">

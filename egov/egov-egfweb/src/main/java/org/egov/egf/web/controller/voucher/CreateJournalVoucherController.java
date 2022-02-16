@@ -466,7 +466,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 		final StringBuffer query5 = new StringBuffer(500);
 		list = null;
 		query5.append(
-				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
+				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate,vdi.realizationdate from voucher_detail_instrument vdi   ");
 		LOGGER.info("Query 5 :: " + query5.toString());
 		queryInstru = this.persistenceService.getSession().createSQLQuery(query5.toString());
 		list = queryInstru.list();
@@ -494,6 +494,9 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 				}
 				if (object[6] != null) {
 					pexDetail.setSecondsignatory(object[6].toString());
+				}
+				if (object[7] != null) {
+					pexDetail.setBackdateentry(object[7].toString());
 				}
 				voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
 			}
@@ -554,6 +557,12 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 								&& !voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent().isEmpty()) {
 							resultset.setPexNodate(
 									voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
+						}
+						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
+								&& voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry() != null
+								&& !voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry().isEmpty()) {
+							resultset.setPexRelDate(
+									voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry());
 						}
 						// cheque
 						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
@@ -616,6 +625,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 						&& voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent() != null
 						&& !voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent().isEmpty()) {
 					resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
+				}
+				if (voucherDetailIntrumentMapping.get(result.getId()) != null
+						&& voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry() != null
+						&& !voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry().isEmpty()) {
+					resultset.setPexRelDate(voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry());
 				}
 				// checque
 				if (voucherDetailIntrumentMapping.get(result.getId()) != null
@@ -966,7 +980,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 		final StringBuffer query5 = new StringBuffer(500);
 		list = null;
 		query5.append(
-				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
+				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate,vdi.realizationdate from voucher_detail_instrument vdi   ");
 		LOGGER.info("Query 5 :: " + query5.toString());
 		queryInstru = this.persistenceService.getSession().createSQLQuery(query5.toString());
 		list = queryInstru.list();
@@ -994,6 +1008,9 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 				}
 				if (object[6] != null) {
 					pexDetail.setSecondsignatory(object[6].toString());
+				}
+				if (object[7] != null) {
+					pexDetail.setBackdateentry(object[7].toString());
 				}
 				voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
 			}
@@ -1054,6 +1071,13 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 							resultset.setPexNodate(
 									voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
 						}
+						
+						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
+								&& voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry() != null
+								&& !voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry().isEmpty()) {
+							resultset.setPexRelDate(
+									voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry());
+						}
 						// cheque
 						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
 								&& voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory() != null
@@ -1108,6 +1132,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 						&& voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent() != null
 						&& !voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent().isEmpty()) {
 					resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
+				}
+				if (voucherDetailIntrumentMapping.get(result.getId()) != null
+						&& voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry() != null
+						&& !voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry().isEmpty()) {
+					resultset.setPexRelDate(voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry());
 				}
 				// cheque
 				if (voucherDetailIntrumentMapping.get(result.getId()) != null

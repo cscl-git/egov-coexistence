@@ -440,13 +440,13 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		if (auditDetail.getDepartment() != null) {
 			query.append(
-					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?)");
+					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?) AND ad.passunderobjectiondate IS NOT NULL");
 			list = persistenceService.findAllBy(query.toString(), auditDetail.getBillFrom(), auditDetail.getBillTo(), 1,
 					auditDetail.getDepartment());
 
 		} else {
 			query.append(
-					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?)");
+					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND ad.passunderobjectiondate IS NOT NULL");
 			list = persistenceService.findAllBy(query.toString(), auditDetail.getBillFrom(), auditDetail.getBillTo(),
 					1);
 
@@ -515,7 +515,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		if (auditDetail.getDepartment() != null) {
 			query.append(
-					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?)");
+					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?) AND ad.passunderobjectiondate IS NOT NULL");
 			list = persistenceService.findAllBy(query.toString(), auditDetail.getBillFrom(), auditDetail.getBillTo(), 1,
 					auditDetail.getDepartment());
 
@@ -550,7 +550,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 				List<PassUnderObjection> passUnderObjections = new ArrayList<>();
 
 				temp = auditRepository.findById(result.getId());
-				result.setPaymentReqNumber(temp.getBillNumber());
+				result.setPaymentReqNumber(temp.getEgBillregister().getBillnumber());
 
 				passUnderObjections = temp.getPassUnderObjectionList();
 

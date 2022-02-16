@@ -127,6 +127,11 @@
 			 <column name="ECSTYPE" precision="22" scale="0" />
 		</many-to-one>
 		 
+		  <property name="realizationDate" type="java.util.Date">
+            <column name="REALIZATIONDATE"  />
+        </property>
+		 
+		 
       <set name="instrumentVouchers" cascade="save-update,delete,delete-orphan" inverse="true">
             <key>
                 <column name="instrumentHeaderId" precision="22" scale="0"/>

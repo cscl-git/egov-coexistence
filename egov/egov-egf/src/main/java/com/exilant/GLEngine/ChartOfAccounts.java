@@ -463,10 +463,9 @@ public class ChartOfAccounts {
 		CVoucherHeader voucherHeader = null;
 		for (final Transaxtion element : txnList) {
 			txnObj = element;
-			System.out.println("start ;;;;"+txnObj.getGlCode());
 			voucherHeader = (CVoucherHeader) voucherService.getSession().get(CVoucherHeader.class,
 					Long.valueOf(txnObj.voucherHeaderId));
-				
+
 			// this code is not working in JPA so added above line
 			// voucherHeader =
 			// voucherService.find("from CVoucherHeader where id = ?",

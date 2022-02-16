@@ -404,7 +404,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				.addScalar("ihId", BigDecimalType.INSTANCE).addScalar("rtgsNumber").addScalar("rtgsDate")
 				.addScalar("vhId", BigDecimalType.INSTANCE).addScalar("paymentNumber").addScalar("paymentDate")
 				.addScalar("paymentAmount").addScalar("department").addScalar("status").addScalar("bank")
-				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE)
+				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE).addScalar("realizationDate")
 				.addScalar("dkId", BigDecimalType.INSTANCE).addScalar("accountNumber");
 		System.out.println("SEARCH PEX 2");
 		if (null == parameters.get("rtgsAssignedFromDate")[0]
@@ -416,15 +416,16 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
 		System.out.println("List size : "+rtgsDisplayList.size());
+
+		
 		//populateSubLedgerDetails();
 		LOGGER.info("start party number");
 		populatePartyNames(rtgsDisplayList);
+		
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
 	}
-
-	
 
     private void populateDepartmentsName() {
         Set<String> deptCodes = null;
@@ -497,7 +498,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
 
 			queryString = queryString
-					.append(" SELECT ih.id as ihId,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
+					.append(" SELECT ih.id as ihId, ih.realizationDate as realizationDate,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
 							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
 							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat WHERE "
@@ -558,7 +559,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
 
 			queryString = queryString
-					.append(" SELECT ih.id as ihId,ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
+					.append(" SELECT ih.id as ihId, ih.realizationDate as realizationDate, ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
 							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
 							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat WHERE "
@@ -821,6 +822,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
     	}
         return newFormPex();
     }
+
 
         
 }
