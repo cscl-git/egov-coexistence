@@ -416,12 +416,9 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		query.setResultTransformer(Transformers.aliasToBean(BankAdviceReportInfo.class));
 		rtgsDisplayList = query.list();
 		System.out.println("List size : "+rtgsDisplayList.size());
-
-		
 		//populateSubLedgerDetails();
 		LOGGER.info("start party number");
 		populatePartyNames(rtgsDisplayList);
-		
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
@@ -783,12 +780,12 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
     	System.out.println("HTML 1");
         searchPex();
         System.out.println("HTML 2");
-        if (rtgsDisplayList.size() > 0) {
+       /* if (rtgsDisplayList.size() > 0) {
             inputStream = reportHelper.exportHtml(inputStream, jasperpathPEX, getParamMapPex(), rtgsReportList,
                     JRHtmlExporterParameter.SIZE_UNIT_POINT);
             return "HTML_PEX";
         }
-        addActionMessage("No data found ");
+        addActionMessage("No data found ");*/
         prepare();
         System.out.println("HTML 3");
         return "searchPex";

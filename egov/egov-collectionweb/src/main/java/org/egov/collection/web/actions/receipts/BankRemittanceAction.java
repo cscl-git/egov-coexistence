@@ -84,6 +84,7 @@ import org.egov.collection.entity.ReceiptHeader;
 import org.egov.collection.service.RemittanceServiceImpl;
 import org.egov.collection.utils.CollectionsUtil;
 import org.egov.infra.microservice.models.RemitancePOJO;
+import org.egov.infra.persistence.utils.Page;
 import org.egov.commons.Bankaccount;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.DocumentUploads;
@@ -108,7 +109,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.egov.infra.persistence.utils.Page;
 import org.egov.infra.web.utils.EgovPaginatedList;
 
-@Results({ @Result(name = BankRemittanceAction.NEW, location = "bankRemittance-new.jsp"),
+@Results({
+        @Result(name = BankRemittanceAction.NEW, location = "bankRemittance-new.jsp"),
 		@Result(name = BankRemittanceAction.PEXNEW, location = "pexExpenditureReport-searchnew.jsp"),
         @Result(name = BankRemittanceAction.PRINT_BANK_CHALLAN, type = "redirectAction", location = "remittanceStatementReport-printCashBankChallan.action", params = {
                 "namespace", "/reports", "totalCashAmount", "${totalCashAmount}", "totalChequeAmount",
@@ -157,6 +159,8 @@ public class BankRemittanceAction extends BaseFormAction {
     @Autowired
     private transient BankaccountHibernateDAO bankaccountHibernateDAO;
 
+
+    
 	@Autowired
 	private DepartmentService departmentService;
 	@Autowired
@@ -221,7 +225,6 @@ public class BankRemittanceAction extends BaseFormAction {
 	public void setPageSize(int pageSize) {
 		this.pageSize = pageSize;
 	}
-
 	public String getReceiptNo() {
 		return receiptNo;
 	}
@@ -305,7 +308,6 @@ public class BankRemittanceAction extends BaseFormAction {
 	Map<String, String> serviceCategoryNames = new HashMap<String, String>();
 	Map<String, Map<String, String>> serviceTypeMap = new HashMap<>();
 	private String serviceTypeId = null;
-
     /**
      * @param collectionsUtil the collectionsUtil to set
      */
@@ -333,7 +335,8 @@ public class BankRemittanceAction extends BaseFormAction {
 		// addDropdownData("bankBranchList", Collections.emptyList());
 		// addDropdownData(ACCOUNT_NUMBER_LIST, Collections.emptyList());
 		Map<String, BankAccountServiceMapping> accountNumberMap = new HashMap<>();
-		for (BankAccountServiceMapping basm : microserviceUtils.getBankAcntServiceMappings()) {
+		  for (BankAccountServiceMapping basm :microserviceUtils.getBankAcntServiceMappings()) 
+		  {
 			accountNumberMap.put(basm.getBankAccount(), basm);
 		}
 		List bank=remittanceService.getallBank();
@@ -342,14 +345,13 @@ public class BankRemittanceAction extends BaseFormAction {
 		addDropdownData("departmentList", masterDataCache.get("egi-department"));
 		addDropdownData("functionList", masterDataCache.get("egi-function"));
 		addDropdownData("bankaccountNumberList", remittanceService.getallBank());
-		// addDropdownData("bankBranchList",
-		// collectionsUtil.getBankCollectionBankBranchList());
+        // addDropdownData("bankBranchList", collectionsUtil.getBankCollectionBankBranchList());
 
-		List<AppConfigValues> appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"receipt_sub_divison");
+		  List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "receipt_sub_divison"); 
 		List<SubDivison> subdivisonList = new ArrayList<SubDivison>();
 		SubDivison subdivison = null;
-		for (AppConfigValues value : appConfigValuesList) {
+		  for(AppConfigValues value:appConfigValuesList) 
+		  { 
 			subdivison = new SubDivison();
 			subdivison.setSubdivisonCode(value.getValue());
 			subdivison.setSubdivisonName(value.getValue());
@@ -359,6 +361,7 @@ public class BankRemittanceAction extends BaseFormAction {
 
 	}
 
+    
 	private void getServiceCategoryList() {
 		List<BusinessService> businessService = microserviceUtils.getBusinessService(null);
 		for (BusinessService bs : businessService) {
@@ -383,6 +386,7 @@ public class BankRemittanceAction extends BaseFormAction {
 		}
     }
 
+
     @Action(value = "/receipts/bankRemittance-newform")
     @SkipValidation
     public String newform() {
@@ -395,7 +399,8 @@ public class BankRemittanceAction extends BaseFormAction {
 		setupDropdownDataExcluding();
 
         Map<String, BankAccountServiceMapping> accountNumberMap = new HashMap<>();
-        for (BankAccountServiceMapping basm : microserviceUtils.getBankAcntServiceMappings()) {
+		  for (BankAccountServiceMapping basm :microserviceUtils.getBankAcntServiceMappings()) 
+		  {
             accountNumberMap.put(basm.getBankAccount(), basm);
         }
         addDropdownData("accountNumberList", new ArrayList<>(accountNumberMap.values()));
@@ -403,14 +408,13 @@ public class BankRemittanceAction extends BaseFormAction {
 		addDropdownData("serviceTypeList", microserviceUtils.getBusinessService(null));
 		addDropdownData("departmentList", masterDataCache.get("egi-department"));
 
-		List<AppConfigValues> appConfigValuesList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-				"receipt_sub_divison");
+		  List<AppConfigValues> appConfigValuesList =appConfigValuesService.getConfigValuesByModuleAndKey("EGF", "receipt_sub_divison");
 
 		List<SubDivison> subdivisonList = new ArrayList<SubDivison>();
 		SubDivison subdivison = null;
-		for (AppConfigValues value : appConfigValuesList) {
-			subdivison = new SubDivison();
-			subdivison.setSubdivisonCode(value.getValue());
+		  for(AppConfigValues value:appConfigValuesList) 
+		  { 
+			  subdivison = new SubDivison(); subdivison.setSubdivisonCode(value.getValue());
 			subdivison.setSubdivisonName(value.getValue());
 			subdivisonList.add(subdivison);
 		}

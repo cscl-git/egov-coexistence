@@ -62,6 +62,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -135,6 +138,10 @@ public class BillRegisterReportAction extends SearchFormAction {
  @Autowired
  @Qualifier("persistenceService")
  private PersistenceService persistenceService;
+ 
+ @PersistenceContext
+ protected EntityManager entityManager;
+ 
  @Autowired	
     private  AppConfigValueService appConfigValueService;
     
@@ -153,6 +160,8 @@ public class BillRegisterReportAction extends SearchFormAction {
     StringBuffer getRemiitPaymentVoucherQry = new StringBuffer("");
     List<Integer> cancelledChequeStatus = new ArrayList<Integer>();
     List<AppConfigValues> appConfigValuesList=new ArrayList<AppConfigValues>();
+    private List<BillRegisterReportBean> searchResultList;
+    private List<Object[]> searchResultList2;
 
     private static boolean errorState = false;
 
@@ -192,13 +201,25 @@ public class BillRegisterReportAction extends SearchFormAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | prepare | start");
         String query = getQuery();
+        LOGGER.info("Final Query for Report...> "+query);
         if (null != sortField)
             query = query + " order by " + sortField + " " + sortOrder;
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | prepare | query >> " + query);
+        LOGGER.info("Final Query for Report After Sorting enabled...> "+query);
         return new SearchQuerySQL(query, "select count(*) from ( " + query + " ) as count", null);
     }
 
+    public void filterSearchResult() {
+        if (LOGGER.isDebugEnabled())
+            LOGGER.debug("filterSearchResult | prepare | start");
+       try {
+           String query = getQuery();
+    	   searchResultList2 =  entityManager.createNativeQuery(query).getResultList();
+       }catch(Exception e) {
+    	   e.printStackTrace();
+       }
+    }
     @Override
     public Object getModel() {
 
@@ -266,8 +287,15 @@ public class BillRegisterReportAction extends SearchFormAction {
         setPageSize(50);
         loadDropdownData();
         validateBeforeSearch();
-        search();
+        //search();
+        filterSearchResult();
         formatSearchResult();
+        
+        
+        // Query : to fetch all data w/o pagination
+        // Store to an object, which we will iterate to display in jsp as well as for export
+        // Single call to DB 
+        
         titleName = microserviceUtils.getHeaderNameForTenant().toUpperCase()+" \\n";
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | list | End");
@@ -304,14 +332,14 @@ public class BillRegisterReportAction extends SearchFormAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | formatSearchResult | start");
         billRegReportList = new ArrayList<BillRegisterReportBean>();
-        final EgovPaginatedList egovPaginatedList = (EgovPaginatedList) searchResult;
-        final List<Object[]> list = egovPaginatedList.getList();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("BillRegisterReportAction | formatSearchResult | list size : " + list.size());
-
-        for (final Object[] object : list)
+       // final EgovPaginatedList egovPaginatedList = (EgovPaginatedList) searchResult;//searchResult;//searchResultList
+        //final List<Object[]> list = egovPaginatedList.getList();//(Object[])searchResultList ;//
+        //if (LOGGER.isDebugEnabled())
+         //   LOGGER.debug("BillRegisterReportAction | formatSearchResult | list size : " + list.size());
+//searchResultList
+       for (final Object[] object : searchResultList2)
+        //for(Object object : searchResultList)
             try {
-
                 final BillRegisterReportBean billRegReport = new BillRegisterReportBean();
                 billRegReport.setBillNumber(object[0].toString());
                 billRegReport.setVoucherNumber(object[1] != null ? object[1].toString() : "");
@@ -528,7 +556,7 @@ public class BillRegisterReportAction extends SearchFormAction {
                     LOGGER.debug("Failed while processing bill number :" + object[0].toString());
                 throw e;
             }
-        egovPaginatedList.setList(billRegReportList);
+        //egovPaginatedList.setList(billRegReportList);
     }
 
     private String getPexNumber(Long deducVhId) {
@@ -850,11 +878,6 @@ public class BillRegisterReportAction extends SearchFormAction {
         final StringBuffer whereQuery = new StringBuffer(200);
         new StringBuffer(50);
 
-        /*
-         * if(null != voucherHeader.getVoucherNumber() && !StringUtils.isEmpty(voucherHeader.getVoucherNumber())){
-         * whereQuery.append(" and vh.vouchernumber like '%"+voucherHeader.getVoucherNumber()+"%'"); }
-         */
-
         if (null != voucherHeader.getFundId())
             whereQuery.append(" and mis.fundid=" + voucherHeader.getFundId().getId());
         if (null != voucherHeader.getVouchermis().getDepartmentcode() && !voucherHeader.getVouchermis().getDepartmentcode().equals("-1"))
@@ -882,24 +905,39 @@ public class BillRegisterReportAction extends SearchFormAction {
         if (null != billNumber && !StringUtils.isEmpty(billNumber))
             whereQuery.append(" and b.billnumber like '%" + billNumber + "%'");
 
+        boolean isExpSelected = true;
+        List<String> expndtrList = new ArrayList<String>();
         if (StringUtils.isEmpty(exptype)) {
-            final List<String> expndtrList = dropdownData.get("expenditureList");
-            for (final String expenditure : expndtrList) {
-                if (!StringUtils.isEmpty(query.toString()))
-                    query.append(" UNION ");
-                query.append(getQueryByExpndType(expenditure, whereQuery.toString()));
-
+        	isExpSelected = false;
+            expndtrList = dropdownData.get("expenditureList");
+        }  else {
+        	expndtrList.add(exptype);
             }
-        } else
-            query.append(getQueryByExpndType(exptype, whereQuery.toString()));
+        query.append(getQueryByExpndType(isExpSelected, expndtrList, whereQuery.toString()));
 
         return query.toString();
     }
 
-    protected String getQueryByExpndType(final String expndType, final String whereQuery) {
-
+    protected String getQueryByExpndType(Boolean isExpSelected, List<String> expndtrList, final String whereQuery) {
+    	String expndType = "";
     	netAccountCodeValue();
-        final List<String> listOfNetPayGlIds = netAccountCode.get(expndType);
+    	List<String> listOfNetPayGlIds = new ArrayList<String>();
+        if(isExpSelected) {
+        	expndType = expndtrList.get(0);
+        	listOfNetPayGlIds = netAccountCode.get(expndType);
+        }else {
+        	String expTypeLst = "";
+        	for(String item: expndtrList){
+        		expTypeLst += "'"+item+"',"; 
+        		try {
+        			List<String> listOfNetPayGlId = netAccountCode.get(item);
+            		listOfNetPayGlIds.addAll(listOfNetPayGlId);
+        		}catch(Exception e) {
+        			e.getMessage();
+        		}
+        	}
+        	expndType = expTypeLst.substring(0, expTypeLst.length()-1);
+        }
         final StringBuffer netPayCodes = new StringBuffer(30);
         String voucherQry = "";
         for (final String netCode : listOfNetPayGlIds)
@@ -913,50 +951,43 @@ public class BillRegisterReportAction extends SearchFormAction {
         final StringBuffer query = new StringBuffer(500);
         // query to get bills for which vouchers are approved.
         query.append(
-                " select b.billnumber ,vh.vouchernumber as vouchernumber, mis.payto,b.passedamount, sum(bd.creditamount) as netpay, s.description,b.billdate as billdate")
-                .
-                append(" from eg_billregister b, eg_billdetails bd, voucherheader vh,eg_billregistermis mis , egw_status s ")
-                .
-                append(" where b.id= bd.billid and b.id=mis.billid and mis.voucherheaderid =vh.id  and s.id= b.statusid and bd.creditamount > 0")
-                .
-                append(voucherQry).
-                append("  and bd.glcodeid in(").append(netPayCodes.toString()).append(")").append(" and b.expendituretype='")
-                .append(expndType).append("'").
-                append("  and vh.status IN (0,5) ").append(whereQuery)
+	            " select b.billnumber ,vh.vouchernumber as vouchernumber, mis.payto,b.passedamount, sum(bd.creditamount) as netpay,"
+	            + " s.description,b.billdate as billdate")
+		        .append(" from eg_billregistermis mis ")
+		        .append(" inner join voucherheader vh on mis.voucherheaderid =vh.id ")
+	            .append(" inner join eg_billregister b on b.id=mis.billid ")
+	            .append(" inner join eg_billdetails bd on b.id= bd.billid ")
+	            .append(" inner join egw_status s on s.id= b.statusid ")
+	            .append(" where bd.creditamount > 0 ")
+	            .append(voucherQry)
+	            .append(" and bd.glcodeid in(").append(netPayCodes.toString()).append(")");
+		        if(isExpSelected) {
+		        	query.append(" and b.expendituretype='"+expndType+"'");
+		        }else {
+		        	query.append(" and b.expendituretype in ("+expndType+")");
+		        }
+	            query.append("  and vh.status IN (0,4,5) ").append(whereQuery)
                 .append(" group by b.billnumber, vh.vouchernumber,mis.payto, b.passedamount, s.description,b.billdate");
-
-        query.append(" UNION ");
-
-        // query to get bills for which vouchers are Cancelled.
-        query.append(
-                " select b.billnumber ,'' as vouchernumber, mis.payto,b.passedamount, sum(bd.creditamount) as netpay, s.description,b.billdate as billdate")
-                .
-                append(" from eg_billregister b, eg_billdetails bd, voucherheader vh,eg_billregistermis mis , egw_status s ")
-                .
-                append(" where b.id= bd.billid and b.id=mis.billid and mis.voucherheaderid =vh.id  and s.id= b.statusid and bd.creditamount > 0")
-                .
-                append(voucherQry).
-                append("  and bd.glcodeid in(").append(netPayCodes.toString()).append(")").append(" and b.expendituretype='")
-                .append(expndType).append("'").
-                append("  and vh.status = 4").append(whereQuery)
-                .append(" group by b.billnumber,vouchernumber, mis.payto, b.passedamount, s.description,b.billdate");
-
         if (voucherHeader.getVoucherNumber() == null || StringUtils.isEmpty(voucherHeader.getVoucherNumber())) {
             query.append(" UNION ");
-
             // query to get bills for voucher is not created
             query.append(
-                    " select b.billnumber ,'' as vouchernumber, mis.payto,b.passedamount, sum(bd.creditamount) as netpay, s.description,b.billdate as billdate")
-                    .
-                    append(" from eg_billregister b, eg_billdetails bd,eg_billregistermis mis , egw_status s ")
-                    .
-                    append(" where b.id= bd.billid and b.id=mis.billid  and s.id= b.statusid and  mis.voucherheaderid is null and bd.creditamount > 0")
-                    .
-                    append("  and bd.glcodeid in(").append(netPayCodes.toString()).append(")").append(" and b.expendituretype='")
-                    .append(expndType).append("'").
-                    append(whereQuery).append(" group by b.billnumber, vouchernumber,mis.payto, b.passedamount, s.description,b.billdate");
+	            " select b.billnumber ,'' as vouchernumber, mis.payto,b.passedamount, sum(bd.creditamount) as netpay, "
+	            + "s.description,b.billdate as billdate")
+	            .append(" from eg_billregistermis mis ")
+	            .append(" inner join eg_billregister b on b.id=mis.billid ")
+	            .append(" inner join eg_billdetails bd on b.id= bd.billid ")
+	            .append(" inner join egw_status s on s.id= b.statusid ")
+	            .append(" where bd.creditamount > 0 ")
+	            .append(" and bd.glcodeid in(").append(netPayCodes.toString()).append(")");
+	            if(isExpSelected) {
+		        	query.append(" and b.expendituretype='"+expndType+"'");
+		        }else {
+		        	query.append(" and b.expendituretype in ("+expndType+")");
+		        }
+	            query.append(" and mis.voucherheaderid is null")
+	            .append(whereQuery).append(" group by b.billnumber, vouchernumber,mis.payto, b.passedamount, s.description,b.billdate");
         }
-
         return query.toString();
     }
 

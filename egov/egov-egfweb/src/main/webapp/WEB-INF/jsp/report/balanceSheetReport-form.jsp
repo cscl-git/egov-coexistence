@@ -79,7 +79,7 @@ function showDetails(glcode){
 			functionId="";
 			}                   
 		
-		window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode+'&fund_id='+fundId+'&startDate='+startDate+'&endDate='+endDate+'&departmentId='+deptId+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+		window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode+'&fund_id='+fundId+'&startDate='+startDate+'&endDate='+endDate+'&departmentCode='+deptId+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 	}
 	
 function showPreviousYearDetails(glcode)
@@ -109,7 +109,7 @@ function showPreviousYearDetails(glcode)
 			functionCode1="";
 			functionId="";
 			}                   
-		window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode+'&fund_id='+fundId+'&startDate='+startDate+'&endDate='+endDate+'&departmentId='+deptId+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
+		window.open('/services/EGF/report/generalLedgerReport-searchDrilldown.action?fromBean=1&glCode1='+glcode+'&fund_id='+fundId+'&startDate='+startDate+'&endDate='+endDate+'&departmentCode='+deptId+'&functionaryId='+functionaryId+'&functionCodeId='+functionId+'&functionCode='+functionCode1+'&fieldId='+fieldId,'','resizable=yes,height=650,width=900,scrollbars=yes,left=30,top=30,status=no');
 
 }
 	
