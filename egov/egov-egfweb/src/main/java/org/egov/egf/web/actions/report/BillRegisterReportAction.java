@@ -171,10 +171,15 @@ public class BillRegisterReportAction extends SearchFormAction {
 	private AppConfigValueService appConfigValuesService;
     
     private Department deptImpl = new Department();
-    
+    Map<String,Long> PhIdMap = new HashMap(); 
+    Map<String,Long> VhIdMap = new HashMap();
+    Map<Long,Long> DeducVhIdMap = new HashMap();
+    Map<Long,String> DeducVoucherMap = new HashMap();
+    Map<Long,String> PexNumMap = new HashMap();
+    Map<String, Miscbilldetail> miscBillMap= new HashMap();
     public BillRegisterReportAction() {
-        voucherHeader.setVouchermis(new Vouchermis());
         addRelatedEntity("vouchermis.departmentcode", String.class);
+        voucherHeader.setVouchermis(new Vouchermis());
         addRelatedEntity("fundId", Fund.class);
         addRelatedEntity("vouchermis.schemeid", Scheme.class);
         addRelatedEntity("vouchermis.subschemeid", SubScheme.class);
@@ -337,19 +342,38 @@ public class BillRegisterReportAction extends SearchFormAction {
         //if (LOGGER.isDebugEnabled())
          //   LOGGER.debug("BillRegisterReportAction | formatSearchResult | list size : " + list.size());
 //searchResultList
+        try {
+        	getVoucIdNew();
+        	getDeducVoucIdNew();
+        	getPayIdNew();
+        	getPexNumberNew();
+	       final List<Miscbilldetail> miscBillList = persistenceService.findAllBy(" from Miscbilldetail mis where mis.billnumber is not null");
+	       
+	       List<Miscbilldetail> miscBillListNew=new ArrayList();
+	       for (final Miscbilldetail m : miscBillList) {
+	    	   if(!m.getBillnumber().isEmpty()) {
+		    	   miscBillListNew.add(m);
+		    	   miscBillMap.put(m.getBillnumber(),m);
+	    	   }
+	    	   
+	       }
+        }catch(Exception e)
+        {
+        	e.printStackTrace();
+        }
        for (final Object[] object : searchResultList2)
         //for(Object object : searchResultList)
             try {
                 final BillRegisterReportBean billRegReport = new BillRegisterReportBean();
                 billRegReport.setBillNumber(object[0].toString());
                 billRegReport.setVoucherNumber(object[1] != null ? object[1].toString() : "");
-                billRegReport.setDeducVoucherNumber(getDeducVoucherNumber(billRegReport.getVoucherNumber()));
-                billRegReport.setDeducVhId(getDeducVoucId(billRegReport.getVoucherNumber()));
-                billRegReport.setVhId(getVoucId(billRegReport.getVoucherNumber()));
-                billRegReport.setPhId(getPayId(billRegReport.getVoucherNumber()));
-                billRegReport.setPexNo(getPexNumber(billRegReport.getPhId()));
-                billRegReport.setDeducPexNo(getPexNumber(billRegReport.getDeducVhId()));
-                
+                billRegReport.setVhId(VhIdMap.get(billRegReport.getVoucherNumber()));//(getVoucId(billRegReport.getVoucherNumber()));
+                billRegReport.setDeducVhId(DeducVhIdMap.get(billRegReport.getVhId()));
+                billRegReport.setDeducVoucherNumber(DeducVoucherMap.get(billRegReport.getDeducVhId()));//(getDeducVoucherNumber(billRegReport.getVoucherNumber()));
+                //billRegReport.setVhId(VhIdMap.get(billRegReport.getVoucherNumber()));//(getVoucId(billRegReport.getVoucherNumber()));
+                billRegReport.setPhId(PhIdMap.get(billRegReport.getVoucherNumber()));//(getPayId(billRegReport.getVoucherNumber()));
+                billRegReport.setPexNo(PexNumMap.get(billRegReport.getPhId()));//(getPexNumber(billRegReport.getPhId()));
+                billRegReport.setDeducPexNo(PexNumMap.get(billRegReport.getDeducVhId()));//(getPexNumber(billRegReport.getDeducVhId()));
                 billRegReport.setPartyName(object[2] != null ? object[2].toString() : "");
                 billRegReport.setGrossAmount(null != object[3] ? new BigDecimal(object[3].toString()).setScale(2,BigDecimal.ROUND_HALF_EVEN)
                         : BigDecimal.ZERO.setScale(2,BigDecimal.ROUND_HALF_EVEN));
@@ -359,188 +383,144 @@ public class BillRegisterReportAction extends SearchFormAction {
                 billRegReport.setStatus(null != object[5] ? object[5].toString().toUpperCase() : "");
                 billRegReport.setBillDate(DDMMYYYYFORMATS.format((Date) object[6]));
                 if (!StringUtils.isEmpty(billRegReport.getVoucherNumber())) {
-                    final List<Miscbilldetail> miscBillList = persistenceService.findAllBy(
-                            " from Miscbilldetail mis where mis.billnumber=? " +
-                                    " and mis.billVoucherHeader.voucherNumber=?", billRegReport.getBillNumber(),
-                                    billRegReport.getVoucherNumber());
-                    if (null != miscBillList && miscBillList.size() > 0) {
+                	Miscbilldetail misc=miscBillMap.get(billRegReport.getBillNumber());
+					/*
+					 * final List<Miscbilldetail> miscBillList = persistenceService.findAllBy(
+					 * " from Miscbilldetail mis where mis.billnumber=? " +
+					 * " and mis.billVoucherHeader.voucherNumber=?", billRegReport.getBillNumber(),
+					 * billRegReport.getVoucherNumber());
+					 */
+                    
+                    if (null != misc) {
                         BigDecimal paidAmount = null;
                         final StringBuffer payMentVoucherNumber = new StringBuffer("");
                         final StringBuffer chequeNoAndDate = new StringBuffer("");
-                        preVoucherId = miscBillList.get(0).getPayVoucherHeader().getId();
-                        for (final Miscbilldetail miscbilldetail : miscBillList) {
-                            if (null != miscbilldetail.getPayVoucherHeader()
-                                    && (miscbilldetail.getPayVoucherHeader().getStatus().
-                                            equals(Integer.valueOf(FinancialConstants.CREATEDVOUCHERSTATUS)) || miscbilldetail
+                        preVoucherId = misc.getPayVoucherHeader().getId();
+                        //for (final Miscbilldetail miscbilldetail : miscBillList) {
+                            if (null != misc.getPayVoucherHeader()
+                                    && (misc.getPayVoucherHeader().getStatus().
+                                            equals(Integer.valueOf(FinancialConstants.CREATEDVOUCHERSTATUS)) || misc
                                             .getPayVoucherHeader().getStatus().
                                             equals(Integer.valueOf(FinancialConstants.PREAPPROVEDVOUCHERSTATUS))))
                                 if (!StringUtils.isEmpty(payMentVoucherNumber.toString())) {
                                     payMentVoucherNumber.append("|").append(
-                                            miscbilldetail.getPayVoucherHeader().getVoucherNumber());
-                                    paidAmount = paidAmount.add(miscbilldetail.getPaidamount()).setScale(2,BigDecimal.ROUND_HALF_EVEN);
-                                    final Paymentheader paymentMode = (Paymentheader) persistenceService.find(
-                                            "from Paymentheader where voucherheader=?", miscbilldetail.getPayVoucherHeader());
-                                    if (!paymentMode.getType().equals(FinancialConstants.MODEOFPAYMENT_RTGS)) {
-                                        final Query qry = persistenceService.getSession().createQuery(
-                                                "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
-                                                " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
-                                        qry.setLong("vhId", miscbilldetail.getPayVoucherHeader().getId());
-                                        qry.setParameterList("cancelledChequeList", cancelledChequeStatus);
-                                        final List<InstrumentVoucher> instrumentVoucherList = qry.list();
-                                        if (instrumentVoucherList.size() > 0)
-                                            for (final InstrumentVoucher inst : instrumentVoucherList)
-                                                // chequeStatus=inst.getInstrumentHeaderId().getStatusId().getId();
-                                                // if(!cancelledChequeStatus.contains(chequeStatus)){
-                                                if (!StringUtils.isEmpty(chequeNoAndDate.toString())) {
-                                                    if (preVoucherId.equals(inst.getVoucherHeaderId().getId()))
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitSP)
-                                                        .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                                        .append(" ")
-                                                        .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
-                                                                .getInstrumentDate()));
-                                                    else
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitDP)
-                                                        .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                                        .append(" ")
-                                                        .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
-                                                                .getInstrumentDate()));
-                                                }
-                                                else
-                                                    chequeNoAndDate
-                                                .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                                .append(" ")
-                                                .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
-                                                        .getInstrumentDate()));
-                                    } else {
-                                        final Query qry = persistenceService.getSession().createQuery(
-                                                "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
-                                                " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
-                                        qry.setLong("vhId", miscbilldetail.getPayVoucherHeader().getId());
-                                        qry.setParameterList("cancelledChequeList", cancelledChequeStatus);
-                                        final List<InstrumentVoucher> instrumentVoucherList = qry.list();
-                                        if (instrumentVoucherList.size() > 0)
-                                            for (final InstrumentVoucher inst : instrumentVoucherList)
-                                                if (!StringUtils.isEmpty(chequeNoAndDate.toString())) {
-                                                    if (preVoucherId.equals(inst.getVoucherHeaderId().getId()))
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitSP)
-                                                        .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
-                                                                .getInstrumentHeaderId().getTransactionNumber()
-                                                                        : "")
-                                                                .append(" ")
-                                                                .append(inst.getInstrumentHeaderId().getTransactionDate() != null ? DDMMYYYYFORMATS
-                                                                        .format(inst.getInstrumentHeaderId().getTransactionDate())
-                                                                        : "");
-                                                    else
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitDP)
-                                                        .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
-                                                                .getInstrumentHeaderId().getTransactionNumber()
-                                                                        : "")
-                                                                .append(" ")
-                                                                .append(inst.getInstrumentHeaderId().getTransactionDate() != null ? DDMMYYYYFORMATS
-                                                                        .format(inst.getInstrumentHeaderId().getTransactionDate())
-                                                                        : "");
-                                                } else
-                                                    chequeNoAndDate
-                                                    .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
-                                                            .getInstrumentHeaderId().getTransactionNumber()
-                                                                    : "")
-                                                            .append(" ")
-                                                            .append(inst.getInstrumentHeaderId().getTransactionDate() != null ? DDMMYYYYFORMATS
-                                                                    .format(inst.getInstrumentHeaderId().getTransactionDate())
-                                                                    : "");
-                                    }
+                                            misc.getPayVoucherHeader().getVoucherNumber());
+                                    paidAmount = paidAmount.add(misc.getPaidamount()).setScale(2,BigDecimal.ROUND_HALF_EVEN);
+								/*
+								 * final Paymentheader paymentMode = (Paymentheader) persistenceService.find(
+								 * "from Paymentheader where voucherheader=?", misc.getPayVoucherHeader()); if
+								 * (!paymentMode.getType().equals(FinancialConstants.MODEOFPAYMENT_RTGS)) {
+								 * final Query qry = persistenceService.getSession().createQuery(
+								 * "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
+								 * " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
+								 * qry.setLong("vhId", misc.getPayVoucherHeader().getId());
+								 * qry.setParameterList("cancelledChequeList", cancelledChequeStatus); final
+								 * List<InstrumentVoucher> instrumentVoucherList = qry.list(); if
+								 * (instrumentVoucherList.size() > 0) for (final InstrumentVoucher inst :
+								 * instrumentVoucherList) //
+								 * chequeStatus=inst.getInstrumentHeaderId().getStatusId().getId(); //
+								 * if(!cancelledChequeStatus.contains(chequeStatus)){ if
+								 * (!StringUtils.isEmpty(chequeNoAndDate.toString())) { if
+								 * (preVoucherId.equals(inst.getVoucherHeaderId().getId())) chequeNoAndDate
+								 * .append(chqdelimitSP)
+								 * .append(inst.getInstrumentHeaderId().getInstrumentNumber()) .append(" ")
+								 * .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
+								 * .getInstrumentDate())); else chequeNoAndDate .append(chqdelimitDP)
+								 * .append(inst.getInstrumentHeaderId().getInstrumentNumber()) .append(" ")
+								 * .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
+								 * .getInstrumentDate())); } else chequeNoAndDate
+								 * .append(inst.getInstrumentHeaderId().getInstrumentNumber()) .append(" ")
+								 * .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
+								 * .getInstrumentDate())); } else { final Query qry =
+								 * persistenceService.getSession().createQuery(
+								 * "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
+								 * " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
+								 * qry.setLong("vhId", misc.getPayVoucherHeader().getId());
+								 * qry.setParameterList("cancelledChequeList", cancelledChequeStatus); final
+								 * List<InstrumentVoucher> instrumentVoucherList = qry.list(); if
+								 * (instrumentVoucherList.size() > 0) for (final InstrumentVoucher inst :
+								 * instrumentVoucherList) if (!StringUtils.isEmpty(chequeNoAndDate.toString()))
+								 * { if (preVoucherId.equals(inst.getVoucherHeaderId().getId())) chequeNoAndDate
+								 * .append(chqdelimitSP)
+								 * .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
+								 * .getInstrumentHeaderId().getTransactionNumber() : "") .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getTransactionDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getTransactionDate()) :
+								 * ""); else chequeNoAndDate .append(chqdelimitDP)
+								 * .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
+								 * .getInstrumentHeaderId().getTransactionNumber() : "") .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getTransactionDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getTransactionDate()) :
+								 * ""); } else chequeNoAndDate
+								 * .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
+								 * .getInstrumentHeaderId().getTransactionNumber() : "") .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getTransactionDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getTransactionDate()) :
+								 * ""); }
+								 */
                                 } else {
-                                    paidAmount = miscbilldetail.getPaidamount().setScale(2,BigDecimal.ROUND_HALF_EVEN);
-                                    payMentVoucherNumber.append(miscbilldetail.getPayVoucherHeader().getVoucherNumber());
-                                    final Paymentheader paymentMode = (Paymentheader) persistenceService.find(
-                                            "from Paymentheader where voucherheader=?", miscbilldetail.getPayVoucherHeader());
-                                    if (!paymentMode.getType().equals(FinancialConstants.MODEOFPAYMENT_RTGS)) {
-                                        // List<InstrumentVoucher>
-                                        // instrumentVoucherList=(List<InstrumentVoucher>)persistenceService.findAllBy(" from InstrumentVoucher where voucherHeaderId=?",
-                                        // miscbilldetail.getPayVoucherHeader());
-                                        final Query qry = persistenceService.getSession().createQuery(
-                                                "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
-                                                " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
-                                        qry.setLong("vhId", miscbilldetail.getPayVoucherHeader().getId());
-                                        qry.setParameterList("cancelledChequeList", cancelledChequeStatus);
-                                        final List<InstrumentVoucher> instrumentVoucherList = qry.list();
-                                        if (instrumentVoucherList.size() > 0)
-                                            for (final InstrumentVoucher inst : instrumentVoucherList)
-                                                if (!StringUtils.isEmpty(chequeNoAndDate.toString())) {
-                                                    if (preVoucherId.equals(inst.getVoucherHeaderId().getId()))
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitSP)
-                                                        .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                                        .append(" ")
-                                                        .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
-                                                                .getInstrumentDate()));
-                                                    else
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitDP)
-                                                        .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                                        .append(" ")
-                                                        .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ? DDMMYYYYFORMATS
-                                                                .format(inst.getInstrumentHeaderId().getInstrumentDate())
-                                                                : "");
-                                                } else
-                                                    chequeNoAndDate
-                                                    .append(inst.getInstrumentHeaderId().getInstrumentNumber())
-                                                    .append(" ")
-                                                    .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ? DDMMYYYYFORMATS
-                                                            .format(inst.getInstrumentHeaderId().getInstrumentDate())
-                                                            : "");
-                                    } else {
-                                        final Query qry = persistenceService.getSession().createQuery(
-                                                "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
-                                                " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
-                                        qry.setLong("vhId", miscbilldetail.getPayVoucherHeader().getId());
-                                        qry.setParameterList("cancelledChequeList", cancelledChequeStatus);
-                                        final List<InstrumentVoucher> instrumentVoucherList = qry.list();
-                                        if (instrumentVoucherList.size() > 0)
-                                            for (final InstrumentVoucher inst : instrumentVoucherList)
-                                                if (!StringUtils.isEmpty(chequeNoAndDate.toString())) {
-                                                    if (preVoucherId.equals(inst.getVoucherHeaderId().getId()))
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitSP)
-                                                        .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
-                                                                .getInstrumentHeaderId().getTransactionNumber()
-                                                                        : ""
-                                                                )
-                                                                .append(" ")
-                                                                .append(inst.getInstrumentHeaderId().getTransactionDate() != null ? DDMMYYYYFORMATS
-                                                                        .format
-                                                                        (inst.getInstrumentHeaderId().getTransactionDate())
-                                                                        : "");
-                                                    else
-                                                        chequeNoAndDate
-                                                        .append(chqdelimitDP)
-                                                        .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
-                                                                .getInstrumentHeaderId().getTransactionNumber()
-                                                                        : "")
-                                                                .append(" ")
-                                                                .append(inst.getInstrumentHeaderId().getTransactionDate() != null ? DDMMYYYYFORMATS
-                                                                        .format(inst.getInstrumentHeaderId().getTransactionDate())
-                                                                        : "");
-                                                } else
-                                                    chequeNoAndDate
-                                                    .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
-                                                            .getInstrumentHeaderId().getTransactionNumber()
-                                                                    : "")
-                                                            .append(" ")
-                                                            .append(inst.getInstrumentHeaderId().getTransactionDate() != null ? DDMMYYYYFORMATS
-                                                                    .format(inst.getInstrumentHeaderId().getTransactionDate())
-                                                                    : "");
-                                    }
+                                    paidAmount = misc.getPaidamount().setScale(2,BigDecimal.ROUND_HALF_EVEN);
+                                    payMentVoucherNumber.append(misc.getPayVoucherHeader().getVoucherNumber());
+								/*
+								 * final Paymentheader paymentMode = (Paymentheader) persistenceService.find(
+								 * "from Paymentheader where voucherheader=?", misc.getPayVoucherHeader()); if
+								 * (!paymentMode.getType().equals(FinancialConstants.MODEOFPAYMENT_RTGS)) { //
+								 * List<InstrumentVoucher> //
+								 * instrumentVoucherList=(List<InstrumentVoucher>)persistenceService.
+								 * findAllBy(" from InstrumentVoucher where voucherHeaderId=?", //
+								 * miscbilldetail.getPayVoucherHeader()); final Query qry =
+								 * persistenceService.getSession().createQuery(
+								 * "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
+								 * " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
+								 * qry.setLong("vhId", misc.getPayVoucherHeader().getId());
+								 * qry.setParameterList("cancelledChequeList", cancelledChequeStatus); final
+								 * List<InstrumentVoucher> instrumentVoucherList = qry.list(); if
+								 * (instrumentVoucherList.size() > 0) for (final InstrumentVoucher inst :
+								 * instrumentVoucherList) if (!StringUtils.isEmpty(chequeNoAndDate.toString()))
+								 * { if (preVoucherId.equals(inst.getVoucherHeaderId().getId())) chequeNoAndDate
+								 * .append(chqdelimitSP)
+								 * .append(inst.getInstrumentHeaderId().getInstrumentNumber()) .append(" ")
+								 * .append(DDMMYYYYFORMATS.format(inst.getInstrumentHeaderId()
+								 * .getInstrumentDate())); else chequeNoAndDate .append(chqdelimitDP)
+								 * .append(inst.getInstrumentHeaderId().getInstrumentNumber()) .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getInstrumentDate()) :
+								 * ""); } else chequeNoAndDate
+								 * .append(inst.getInstrumentHeaderId().getInstrumentNumber()) .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getInstrumentDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getInstrumentDate()) :
+								 * ""); } else { final Query qry = persistenceService.getSession().createQuery(
+								 * "from InstrumentVoucher iv where iv.voucherHeaderId.id=:vhId and" +
+								 * " iv.instrumentHeaderId.statusId.id not in(:cancelledChequeList)");
+								 * qry.setLong("vhId", misc.getPayVoucherHeader().getId());
+								 * qry.setParameterList("cancelledChequeList", cancelledChequeStatus); final
+								 * List<InstrumentVoucher> instrumentVoucherList = qry.list(); if
+								 * (instrumentVoucherList.size() > 0) for (final InstrumentVoucher inst :
+								 * instrumentVoucherList) if (!StringUtils.isEmpty(chequeNoAndDate.toString()))
+								 * { if (preVoucherId.equals(inst.getVoucherHeaderId().getId())) chequeNoAndDate
+								 * .append(chqdelimitSP)
+								 * .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
+								 * .getInstrumentHeaderId().getTransactionNumber() : "" ) .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getTransactionDate() != null ?
+								 * DDMMYYYYFORMATS .format (inst.getInstrumentHeaderId().getTransactionDate()) :
+								 * ""); else chequeNoAndDate .append(chqdelimitDP)
+								 * .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
+								 * .getInstrumentHeaderId().getTransactionNumber() : "") .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getTransactionDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getTransactionDate()) :
+								 * ""); } else chequeNoAndDate
+								 * .append(inst.getInstrumentHeaderId().getTransactionNumber() != null ? inst
+								 * .getInstrumentHeaderId().getTransactionNumber() : "") .append(" ")
+								 * .append(inst.getInstrumentHeaderId().getTransactionDate() != null ?
+								 * DDMMYYYYFORMATS .format(inst.getInstrumentHeaderId().getTransactionDate()) :
+								 * ""); }
+								 */
                                 }
 
-                            preVoucherId = miscbilldetail.getPayVoucherHeader().getId();
+                            preVoucherId = misc.getPayVoucherHeader().getId();
                             if (isCompleteBillRegisterReport)
                                 getRemittancePaymentDetail(billRegReport);
-                        }
+                        //}
                         billRegReport.setPaidAmount(paidAmount);
                         billRegReport.setPaymentVoucherNumber(payMentVoucherNumber.toString());
                         billRegReport.setChequeNumAndDate(chequeNoAndDate.toString());
@@ -565,7 +545,7 @@ public class BillRegisterReportAction extends SearchFormAction {
     	String deducvh="";
     	try
     	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select ei.id,ei.transactionnumber from egf_instrumentheader ei where ei.id_status =2 and ei.id in (select ei2.instrumentheaderid from egf_instrumentvoucher ei2  where ei2.voucherheaderid =:deducVhId)");
+    		 query = this.persistenceService.getSession().createSQLQuery("select ei.id,ei.transactionnumber,ei2.voucherheaderid from egf_instrumentheader ei,egf_instrumentvoucher ei2 where ei.id=ei2.instrumentheaderid and ei.id_status = 2");
     	    query.setLong("deducVhId", deducVhId);
     	    rows = query.list();
     	    
@@ -582,6 +562,37 @@ public class BillRegisterReportAction extends SearchFormAction {
     	    			deducvh= "";
     	    		}
     	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+    
+    private String getPexNumberNew() {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	String deducvh="";
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select ei.id,ei.transactionnumber,ei2.voucherheaderid from egf_instrumentheader ei,egf_instrumentvoucher ei2 where ei.id=ei2.instrumentheaderid and ei.id_status = 2");
+    	    //query.setLong("deducVhId", deducVhId);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] !=null)
+    	    		{
+    	    			deducvh= element[1].toString();
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= "";
+    	    		}
+    	    		PexNumMap.put(Long.parseLong(element[2].toString()),deducvh);
     	    	}
     	    }
     	}catch (Exception e) {
@@ -620,6 +631,37 @@ public class BillRegisterReportAction extends SearchFormAction {
 		}
 	    return deducvh;
     }
+	
+	private Long getPayIdNew() {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	Long deducvh=0L;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select m.id,m.payvhid,v.vouchernumber from miscbilldetail as m inner join voucherheader as v on m.billvhid=v.id");
+    	   // query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[1] !=null)
+    	    		{
+    	    			deducvh= Long.parseLong(element[1].toString());
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= 0L;
+    	    		}
+    	    		PhIdMap.put(element[2].toString(), deducvh);
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
 
 	private Long getVoucId(String voucherNumber) {
     	SQLQuery query =  null;
@@ -651,6 +693,38 @@ public class BillRegisterReportAction extends SearchFormAction {
 		}
 	    return deducvh;
     }
+	
+	private Long getVoucIdNew() {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	Long deducvh=0L;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select vh.id,vh.vouchernumber from voucherheader vh");
+    	    //query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[0] !=null)
+    	    		{
+    	    			deducvh= Long.parseLong(element[0].toString());
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= 0L;
+    	    		}
+    	    		VhIdMap.put(element[1].toString(),deducvh);
+    	    		DeducVoucherMap.put(Long.parseLong(element[0].toString()),element[1].toString());
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
 
 	private Long getDeducVoucId(String voucherNumber) {
     	SQLQuery query =  null;
@@ -675,6 +749,37 @@ public class BillRegisterReportAction extends SearchFormAction {
     	    			deducvh= 0L;
     	    		}
     	    		
+    	    	}
+    	    }
+    	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return deducvh;
+    }
+	
+	private Long getDeducVoucIdNew() {
+    	SQLQuery query =  null;
+    	List<Object[]> rows = null;
+    	Long deducvh=0L;
+    	try
+    	{
+    		 query = this.persistenceService.getSession().createSQLQuery("select distinct dvm.id,dvm.ph_id,dvm.vh_id from voucherheader v1, deduc_voucher_mpng dvm where v1.id = dvm.ph_id");
+    	    //query.setString("vouchernumber", voucherNumber);
+    	    rows = query.list();
+    	    
+    	    if(rows != null && !rows.isEmpty())
+    	    {
+    	    	for(Object[] element : rows)
+    	    	{
+    	    		if(element[0] !=null)
+    	    		{
+    	    			deducvh= Long.parseLong(element[1].toString());
+    	    		}
+    	    		else
+    	    		{
+    	    			deducvh= 0L;
+    	    		}
+    	    		DeducVhIdMap.put(Long.parseLong(element[2].toString()), deducvh);
     	    	}
     	    }
     	}catch (Exception e) {
@@ -714,6 +819,8 @@ public class BillRegisterReportAction extends SearchFormAction {
 	    return deducvh;
     }
 
+	
+	
 	/*
      * Get remittance payment detail for the voucher Below lines to get the cheque and cheque date for the voucher /* In case
      * where for single payment multiple cheque are assigned we use chqdelimitSP / single slash separate cheque nos In case where
