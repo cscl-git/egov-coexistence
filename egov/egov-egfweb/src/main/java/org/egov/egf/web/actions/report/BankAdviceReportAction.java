@@ -106,49 +106,50 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @ParentPackage("egov")
 @Results({
-        @Result(name = BankAdviceReportAction.NEW, location = "bankAdviceReport-" + BankAdviceReportAction.NEW + ".jsp"),
-        @Result(name = "downloadText", location = "bankAdviceReport-downloadText.jsp"),
-        @Result(name = "reportview", type = "stream", location = "inputStream", params = { "contentType", "${contentType}",
-                "contentDisposition", "attachment; filename=${fileName}" }),
-        @Result(name = "txtresult", type = "stream", location = "inStream", params = { "contentType", "${contentType}",
-                "contentDisposition", "attachment; filename=${textFileName}" })
-})
+		@Result(name = BankAdviceReportAction.NEW, location = "bankAdviceReport-"
+				+ BankAdviceReportAction.NEW + ".jsp"),
+		@Result(name = "downloadText", location = "bankAdviceReport-downloadText.jsp"),
+		@Result(name = "reportview", type = "stream", location = "inputStream", params = { "contentType",
+				"${contentType}", "contentDisposition", "attachment; filename=${fileName}" }),
+		@Result(name = "txtresult", type = "stream", location = "inStream", params = { "contentType", "${contentType}",
+				"contentDisposition", "attachment; filename=${textFileName}" }) })
 public class BankAdviceReportAction extends BaseFormAction {
 
-    @Autowired
-    @Qualifier("persistenceService")
-    private PersistenceService persistenceService;
-    private static final String RTGSPEXNUMBERSQUERY = "SELECT ih.id, ih.transactionNumber FROM InstrumentHeader ih, InstrumentVoucher iv, "
-            + "Paymentheader ph WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')" +
-            " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null " +
-            "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type IN ( '"
-            + FinancialConstants.MODEOFPAYMENT_RTGS + "' , '"+FinancialConstants.MODEOFPAYMENT_PEX +"') " + "GROUP BY ih.transactionNumber,ih.id order by ih.id desc";
+	@Autowired
+	@Qualifier("persistenceService")
+	private PersistenceService persistenceService;
+	private static final String RTGSPEXNUMBERSQUERY = "SELECT ih.id, ih.transactionNumber FROM InstrumentHeader ih, InstrumentVoucher iv, "
+			+ "Paymentheader ph WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
+			+ " AND ih.statusId.moduletype='IngetBankAdviceReportListstrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
+			+ "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type IN ( '"
+			+ FinancialConstants.MODEOFPAYMENT_RTGS + "' , '" + FinancialConstants.MODEOFPAYMENT_PEX + "') "
+			+ "GROUP BY ih.transactionNumber,ih.id order by ih.id desc";
 
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = Logger.getLogger(BankAdviceReportAction.class);
-    private Bank bank;
-    private Bankbranch bankbranch;
-    private String bankName;
-    private String branchName;
-    private String accountNumber;
-    private String instrumentNumber;
-    private String instrumentDate;
-    private Bankaccount bankaccount;
-    private InstrumentHeader instrumentnumber;
-    private InputStream inputStream;
-    private InputStream inStream;
-    private Map<Integer, String> monthMap = new LinkedHashMap<Integer, String>();
-    public List<InstrumentHeader> instrumentHeaderList = new ArrayList<InstrumentHeader>();
-    private Map<Integer, String> fullNameMonthMap = new TreeMap<Integer, String>();
-    private FinancialYearHibernateDAO financialYearDAO;
-    private Integer month;
-    private Long financialYearId;
-    private String mode;
-    private String heading;
-    private String instrumentType;
-    private Long instruId;
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = Logger.getLogger(BankAdviceReportAction.class);
+	private Bank bank;
+	private Bankbranch bankbranch;
+	private String bankName;
+	private String branchName;
+	private String accountNumber;
+	private String instrumentNumber;
+	private String instrumentDate;
+	private Bankaccount bankaccount;
+	private InstrumentHeader instrumentnumber;
+	private InputStream inputStream;
+	private InputStream inStream;
+	private Map<Integer, String> monthMap = new LinkedHashMap<Integer, String>();
+	public List<InstrumentHeader> instrumentHeaderList = new ArrayList<InstrumentHeader>();
+	private Map<Integer, String> fullNameMonthMap = new TreeMap<Integer, String>();
+	private FinancialYearHibernateDAO financialYearDAO;
+	private Integer month;
+	private Long financialYearId;
+	private String mode;
+	private String heading;
+	private String instrumentType;
+	private Long instruId;
 
-    public Long getInstruId() {
+	public Long getInstruId() {
 		return instruId;
 	}
 
@@ -157,1160 +158,1225 @@ public class BankAdviceReportAction extends BaseFormAction {
 	}
 
 	public InputStream getInStream() {
-        return inStream;
-    }
+		return inStream;
+	}
 
-    public void setInStream(final InputStream inStream) {
-        this.inStream = inStream;
-    }
+	public void setInStream(final InputStream inStream) {
+		this.inStream = inStream;
+	}
 
-    private String contentType;
-    private String fileName;
-    private String textFileName;
-    private ReportService reportService;
-    private BigDecimal totalAmount = BigDecimal.ZERO;
-    String countQuery = null;
-    public List<BankAdviceReportInfo> bankAdviseResultList = new ArrayList<BankAdviceReportInfo>();
-    @Autowired
-    private AppConfigValueService appConfigValuesService;
-    @Override
-    public void prepare() {
-        persistenceService.getSession().setDefaultReadOnly(true);
-        persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
-        super.prepare();
-        addDropdownData(
-                "bankList",
-                persistenceService
-                        .findAllBy("select distinct b from Bank b , Bankbranch bb , Bankaccount ba WHERE bb.bank=b and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and b.isactive=true order by b.name"));
-        if (bankbranch == null)
-            addDropdownData("bankBranchList", Collections.EMPTY_LIST);
-        else
-            addDropdownData(
-                    "bankBranchList",
-                    persistenceService
-                            .findAllBy(
-                                    "select distinct bb from Bankbranch bb,Bankaccount ba where bb.bank.id=? and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and bb.isactive=true",
-                                    bank.getId()));
-        if (bankaccount == null)
-            addDropdownData("bankAccountList", Collections.EMPTY_LIST);
-        else
-            addDropdownData("bankAccountList",
-                    persistenceService.findAllBy("from Bankaccount where bankbranch.id=? and isactive=true", bankbranch.getId()));
-        if (instrumentnumber == null)
-            addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
-        else {
-			
-			  List<Object[]> resultList = new ArrayList<Object[]>(); final
-			  List<InstrumentHeader> instrumentHeaderList = new
-			  ArrayList<InstrumentHeader>(); 
-			  //resultList = getPersistenceService()
-			  //.findAllBy(RTGSPEXNUMBERSQUERY, bankaccount.getId()); for (final Object[] obj
-			  //: resultList) { 
-				  InstrumentHeader ih = new InstrumentHeader(); ih =
-			  (InstrumentHeader)
-			  persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
-			  
-			  instrumentHeaderList.add(ih); 
-			 // } 
-        addDropdownData("chequeNumberList",
-			  instrumentHeaderList);
-			 
-        }
-        fullNameMonthMap = DateUtils.getAllMonthsWithFullNames();
-        final List<CFinancialYear> financialYears = financialYearDAO.getAllActiveFinancialYearList();
-        addDropdownData("financialYearsList", financialYears);
-    }
-    
-    
-    public void preparePex() {
-        persistenceService.getSession().setDefaultReadOnly(true);
-        persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
-        super.prepare();
-        addDropdownData(
-                "bankList",
-                persistenceService
-                        .findAllBy("select distinct b from Bank b , Bankbranch bb , Bankaccount ba WHERE bb.bank=b and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and b.isactive=true order by b.name"));
-        if (bankbranch == null)
-            addDropdownData("bankBranchList", Collections.EMPTY_LIST);
-        else
-            addDropdownData(
-                    "bankBranchList",
-                    persistenceService
-                            .findAllBy(
-                                    "select distinct bb from Bankbranch bb,Bankaccount ba where bb.bank.id=? and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and bb.isactive=true",
-                                    bank.getId()));
-        if (bankaccount == null)
-            addDropdownData("bankAccountList", Collections.EMPTY_LIST);
-        else
-            addDropdownData("bankAccountList",
-                    persistenceService.findAllBy("from Bankaccount where bankbranch.id=? and isactive=true", bankbranch.getId()));
-        if (instrumentnumber == null)
-            addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
-        else {
-			
-			  List<Object[]> resultList = new ArrayList<Object[]>(); final
-			  List<InstrumentHeader> instrumentHeaderList = new
-			ArrayList<InstrumentHeader>(); /*
-											 * resultList = getPersistenceService() .findAllBy( "" +
-											 * "SELECT ih.id, ih.instrumentNumber FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "
-											 * +
-											 * "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
-											 * +
-											 * " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
-											 * +
-											 * "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
-											 * + FinancialConstants.MODEOFPAYMENT_PEX + "' " +
-											 * "GROUP BY ih.instrumentNumber,ih.id", bankaccount.getId()); for (final
-											 * Object[] obj : resultList) {
-											 */
-				  InstrumentHeader ih = new InstrumentHeader(); ih
-			  = (InstrumentHeader)
-			  persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
-			  
-			  instrumentHeaderList.add(ih);
-		//	  }
-        addDropdownData("chequeNumberList",
-			  instrumentHeaderList);
-			 
-        }
-        fullNameMonthMap = DateUtils.getAllMonthsWithFullNames();
-        final List<CFinancialYear> financialYears = financialYearDAO.getAllActiveFinancialYearList();
-        addDropdownData("financialYearsList", financialYears);
-    }
+	private String contentType;
+	private String fileName;
+	private String textFileName;
+	private ReportService reportService;
+	private BigDecimal totalAmount = BigDecimal.ZERO;
+	String countQuery = null;
+	public List<BankAdviceReportInfo> bankAdviseResultList = new ArrayList<BankAdviceReportInfo>();
+	@Autowired
+	private AppConfigValueService appConfigValuesService;
 
+	@Override
+	public void prepare() {
+		persistenceService.getSession().setDefaultReadOnly(true);
+		persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
+		super.prepare();
+		addDropdownData("bankList", persistenceService.findAllBy(
+				"select distinct b from Bank b , Bankbranch bb , Bankaccount ba WHERE bb.bank=b and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and b.isactive=true order by b.name"));
+		if (bankbranch == null)
+			addDropdownData("bankBranchList", Collections.EMPTY_LIST);
+		else
+			addDropdownData("bankBranchList", persistenceService.findAllBy(
+					"select distinct bb from Bankbranch bb,Bankaccount ba where bb.bank.id=? and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and bb.isactive=true",
+					bank.getId()));
+		if (bankaccount == null)
+			addDropdownData("bankAccountList", Collections.EMPTY_LIST);
+		else
+			addDropdownData("bankAccountList", persistenceService
+					.findAllBy("from Bankaccount where bankbranch.id=? and isactive=true", bankbranch.getId()));
+		if (instrumentnumber == null)
+			addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
+		else {
 
-    @Action(value = "/report/bankAdviceReport-newForm")
-    public String newForm() {
-        return NEW;
-    }
+			List<Object[]> resultList = new ArrayList<Object[]>();
+			final List<InstrumentHeader> instrumentHeaderList = new ArrayList<InstrumentHeader>();
+			// resultList = getPersistenceService()
+			// .findAllBy(RTGSPEXNUMBERSQUERY, bankaccount.getId()); for (final Object[] obj
+			// : resultList) {
+			InstrumentHeader ih = new InstrumentHeader();
+			ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
+					instrumentnumber.getId());
 
-    @Action(value = "/report/bankAdviceReport-tnebnewForm")
-    public String tnebnewForm() {
-        return "downloadText";
-    }
+			instrumentHeaderList.add(ih);
+			// }
+			addDropdownData("chequeNumberList", instrumentHeaderList);
 
-    public List getSubLedgerDetailQueryAndParams(final InstrumentHeader instrumentHeader) {
-    	System.out.println("entery method");
-        final HashMap<Object, Map<Object, BigDecimal>> detailTypeMap = new HashMap<Object, Map<Object, BigDecimal>>();
-        HashMap<Object, BigDecimal> detailKeyMap = new HashMap<Object, BigDecimal>();
-        Map<Object, BigDecimal> tempMap = new HashMap<Object, BigDecimal>();
-        BigDecimal detailKeyAmt = BigDecimal.ZERO;
-        // Getting net payable
-        final String query = " SELECT gld.detailtypeid, gld.detailkeyid, sum(gld.amount) " +
-                " FROM egf_instrumentvoucher ivh, generalledger gl, generalledgerdetail gld " +
-                " WHERE ivh.instrumentheaderid = ? AND ivh.voucherheaderid = gl.voucherheaderid " +
-                " AND gl.debitamount != 0 AND gl.id = gld.generalledgerid " +
-                " group by gld.detailkeyid, gld.detailtypeid ";
+		}
+		fullNameMonthMap = DateUtils.getAllMonthsWithFullNames();
+		final List<CFinancialYear> financialYears = financialYearDAO.getAllActiveFinancialYearList();
+		addDropdownData("financialYearsList", financialYears);
+	}
 
-        // Get without subledger one
-        final String withNoSubledgerQry = " SELECT gld.DETAILTYPEID,gld.DETAILKEYID , sum(gld.amount) FROM   ( (SELECT voucherheaderid "
-                +
-                "  FROM egf_instrumentvoucher   WHERE instrumentheaderid =?   ) except   (SELECT DISTINCT payvhid  FROM miscbilldetail mb,"
-                +
-                " voucherheader vh ,    generalledger gl  LEFT JOIN chartofaccountdetail dtl  ON gl.glcodeid    =dtl.glcodeid  "
-                +
-                " WHERE mb.payvhid  =vh.id "
-                +
-                " AND vh.id =gl.voucherheaderid  AND dtl.glcodeid IS NOT NULL  AND vh.id  IN (SELECT voucherheaderid FROM egf_instrumentvoucher "
-                +
-                " WHERE instrumentheaderid =? ))) p ,  miscbilldetail m, generalledger gl, generalledgerdetail gld WHERE p.voucherheaderid=m.payvhid "
-                +
-                " AND gl.voucherheaderid =m.billvhid AND gl.id=gld.generalledgerid AND gl.debitamount!=0 " +
-                " group by gld.detailtypeid ,gld.detailkeyid  ";
+	public void preparePex() {
+		persistenceService.getSession().setDefaultReadOnly(true);
+		persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
+		super.prepare();
+		addDropdownData("bankList", persistenceService.findAllBy(
+				"select distinct b from Bank b , Bankbranch bb , Bankaccount ba WHERE bb.bank=b and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and b.isactive=true order by b.name"));
+		if (bankbranch == null)
+			addDropdownData("bankBranchList", Collections.EMPTY_LIST);
+		else
+			addDropdownData("bankBranchList", persistenceService.findAllBy(
+					"select distinct bb from Bankbranch bb,Bankaccount ba where bb.bank.id=? and ba.bankbranch=bb and ba.type in ('RECEIPTS_PAYMENTS','PAYMENTS') and bb.isactive=true",
+					bank.getId()));
+		if (bankaccount == null)
+			addDropdownData("bankAccountList", Collections.EMPTY_LIST);
+		else
+			addDropdownData("bankAccountList", persistenceService
+					.findAllBy("from Bankaccount where bankbranch.id=? and isactive=true", bankbranch.getId()));
+		if (instrumentnumber == null)
+			addDropdownData("chequeNumberList", Collections.EMPTY_LIST);
+		else {
 
-        final Query WithNetPayableSubledgerQuery = persistenceService.getSession().createSQLQuery(query);
-        WithNetPayableSubledgerQuery.setParameter(0, instrumentHeader.getId());
-        System.out.println("1");
-        // Get without subledger one
-        final Query getDebitsideSubledgerQuery = persistenceService.getSession().createSQLQuery(withNoSubledgerQry);
-        getDebitsideSubledgerQuery.setParameter(0, instrumentHeader.getId());
-        getDebitsideSubledgerQuery.setParameter(1, instrumentHeader.getId());
-        System.out.println("2");
-        final List<Object[]> retList = WithNetPayableSubledgerQuery.list();
-        retList.addAll(getDebitsideSubledgerQuery.list());
-        System.out.println("3");
-        for (final Object[] obj : retList)
-            if (detailTypeMap.isEmpty()) {
-                detailKeyMap = new HashMap<Object, BigDecimal>();
-                detailKeyMap.put(obj[1], ((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN));
-                detailTypeMap.put(obj[0], detailKeyMap);
-            }
-            else {
-                tempMap = new HashMap<Object, BigDecimal>();
-                detailKeyAmt = BigDecimal.ZERO;
-                if (null != detailTypeMap.get(obj[0])) {
-                    tempMap = detailTypeMap.get(obj[0]);
-                    // detailKey=tempMap.get((Integer)obj[1]);
-                    if (null != tempMap && tempMap.containsKey(obj[1])) {
-                        detailKeyAmt = tempMap.get(obj[1]).add(
-                                (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
-                        tempMap.put(obj[1], detailKeyAmt);
-                    } else
-                        tempMap.put(obj[1], (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
-                } else {
-                    detailKeyMap = new HashMap<Object, BigDecimal>();
-                    detailKeyMap.put(obj[1], (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
-                    detailTypeMap.put(obj[0], detailKeyMap);
-                }
-            }
-        System.out.println("End");
+			List<Object[]> resultList = new ArrayList<Object[]>();
+			final List<InstrumentHeader> instrumentHeaderList = new ArrayList<InstrumentHeader>(); /*
+																									 * resultList =
+																									 * getPersistenceService
+																									 * () .findAllBy( ""
+																									 * +
+																									 * "SELECT ih.id, ih.instrumentNumber FROM InstrumentHeader ih, InstrumentVoucher iv, Paymentheader ph "
+																									 * +
+																									 * "WHERE ih.isPayCheque ='1' AND ih.bankAccountId.id = ? AND ih.statusId.description in ('New')"
+																									 * +
+																									 * " AND ih.statusId.moduletype='Instrument' AND iv.instrumentHeaderId = ih.id and ih.bankAccountId is not null "
+																									 * +
+																									 * "AND iv.voucherHeaderId     = ph.voucherheader AND ph.bankaccount = ih.bankAccountId AND ph.type = '"
+																									 * +
+																									 * FinancialConstants
+																									 * .
+																									 * MODEOFPAYMENT_PEX
+																									 * + "' " +
+																									 * "GROUP BY ih.instrumentNumber,ih.id"
+																									 * ,
+																									 * bankaccount.getId
+																									 * ()); for (final
+																									 * Object[] obj :
+																									 * resultList) {
+																									 */
+			InstrumentHeader ih = new InstrumentHeader();
+			ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
+					instrumentnumber.getId());
 
-        return retList;
-    }
+			instrumentHeaderList.add(ih);
+			// }
+			addDropdownData("chequeNumberList", instrumentHeaderList);
 
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-search")
-    public String search() {
+		}
+		fullNameMonthMap = DateUtils.getAllMonthsWithFullNames();
+		final List<CFinancialYear> financialYears = financialYearDAO.getAllActiveFinancialYearList();
+		addDropdownData("financialYearsList", financialYears);
+	}
 
-        if (instrumentnumber.getId() == -1) {
-            addFieldError("searchCriteria", "Please select all search criteria");
-            return NEW;
-        }
-        InstrumentHeader ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?", instrumentnumber.getId());
-        instrumentType = ih.getInstrumentType().getType();
-        instruId=ih.getId();
-        bankAdviseResultList = getBankAdviceReportList();
-        return NEW;
-    }
+	@Action(value = "/report/bankAdviceReport-newForm")
+	public String newForm() {
+		return NEW;
+	}
 
-    @SkipValidation
-    public String TNEBsearch() {
+	@Action(value = "/report/bankAdviceReport-tnebnewForm")
+	public String tnebnewForm() {
+		return "downloadText";
+	}
 
-        final String query = "select distinct ih " +
-                "from EBDetails d, EgBillregister br, Miscbilldetail mbd, " +
-                "InstrumentVoucher iv inner join iv.instrumentHeaderId ih " +
-                "where d.receiptNo is null " +
-                "and d.egBillregister = br " +
-                "and br.billnumber = mbd.billnumber " +
-                "and mbd.payVoucherHeader = iv.voucherHeaderId " +
-                "and ih.statusId.code in ('"
-                + FinancialConstants.INSTRUMENT_CREATED_STATUS + "', '"
-                + FinancialConstants.INSTRUMENT_RECONCILED_STATUS + "') " +
-                "and month(ih.transactionDate) = ? " +
-                "and year(ih.transactionDate) between  ? and ?";
+	public List getSubLedgerDetailQueryAndParams(final InstrumentHeader instrumentHeader) {
+		System.out.println("entery method");
+		final HashMap<Object, Map<Object, BigDecimal>> detailTypeMap = new HashMap<Object, Map<Object, BigDecimal>>();
+		HashMap<Object, BigDecimal> detailKeyMap = new HashMap<Object, BigDecimal>();
+		Map<Object, BigDecimal> tempMap = new HashMap<Object, BigDecimal>();
+		BigDecimal detailKeyAmt = BigDecimal.ZERO;
+		// Getting net payable
+		final String query = " SELECT gld.detailtypeid, gld.detailkeyid, sum(gld.amount) "
+				+ " FROM egf_instrumentvoucher ivh, generalledger gl, generalledgerdetail gld "
+				+ " WHERE ivh.instrumentheaderid = ? AND ivh.voucherheaderid = gl.voucherheaderid "
+				+ " AND gl.debitamount != 0 AND gl.id = gld.generalledgerid "
+				+ " group by gld.detailkeyid, gld.detailtypeid ";
 
-        final CFinancialYear financialYear = (CFinancialYear) persistenceService.find("from CFinancialYear where id = ?",
-                financialYearId);
+		// Get without subledger one
+		final String withNoSubledgerQry = " SELECT gld.DETAILTYPEID,gld.DETAILKEYID , sum(gld.amount) FROM   ( (SELECT voucherheaderid "
+				+ "  FROM egf_instrumentvoucher   WHERE instrumentheaderid =?   ) except   (SELECT DISTINCT payvhid  FROM miscbilldetail mb,"
+				+ " voucherheader vh ,    generalledger gl  LEFT JOIN chartofaccountdetail dtl  ON gl.glcodeid    =dtl.glcodeid  "
+				+ " WHERE mb.payvhid  =vh.id "
+				+ " AND vh.id =gl.voucherheaderid  AND dtl.glcodeid IS NOT NULL  AND vh.id  IN (SELECT voucherheaderid FROM egf_instrumentvoucher "
+				+ " WHERE instrumentheaderid =? ))) p ,  miscbilldetail m, generalledger gl, generalledgerdetail gld WHERE p.voucherheaderid=m.payvhid "
+				+ " AND gl.voucherheaderid =m.billvhid AND gl.id=gld.generalledgerid AND gl.debitamount!=0 "
+				+ " group by gld.detailtypeid ,gld.detailkeyid  ";
 
-        final Calendar calendar = Calendar.getInstance();
-
-        calendar.setTime(financialYear.getStartingDate());
-        final Integer startingYear = calendar.get(Calendar.YEAR);
-
-        calendar.setTime(financialYear.getEndingDate());
-        final Integer endingYear = calendar.get(Calendar.YEAR);
-
-        instrumentHeaderList = persistenceService.findAllBy(query, month, startingYear, endingYear);
-        mode = "search";
-        monthMap = DateUtils.getAllMonths();
-        heading = "List of RTGS Bank advice generated for ";
-        heading = heading + monthMap.get(month) + "-" + financialYear.getFinYearRange();
-        return "downloadText";
-    }
-
-    @ReadOnly
-    private List populateSubLedgerDetails(final List subList) {
-
-        final List<Object[]> retList = subList;
-        final List<BankAdviceReportInfo> subLedgerList = new ArrayList<BankAdviceReportInfo>();
-
-        for (final Object[] obj : retList) {
-            final Accountdetailtype adt = (Accountdetailtype) persistenceService.find("from Accountdetailtype where id=?",
-                    ((BigInteger) obj[0]).intValue());
-
-            EntityType subDetail = null;
-            try
-            {
-                final Class aClass = Class.forName(adt.getFullQualifiedName());
-                final java.lang.reflect.Method method = aClass.getMethod("getId");
-                final String dataType = method.getReturnType().getSimpleName();
-                if (LOGGER.isDebugEnabled())
-                    LOGGER.debug("data Type = " + dataType);
-                if (dataType.equals("Long"))
-                    subDetail = (EntityType) persistenceService.find("from " + adt.getFullQualifiedName() + " where id=?",
-                            ((BigInteger) obj[1]).longValue());
-                else
-                    subDetail = (EntityType) persistenceService.find("from " + adt.getFullQualifiedName() + " where id=?",
-                            ((BigInteger) obj[1]).intValue());
-
-            } catch (final ClassCastException e) {
-                LOGGER.error(e);
-            } catch (final Exception e)
-            {
-                LOGGER.error("Exception to get EntityType=" + e.getMessage());
-            }
-            final BankAdviceReportInfo bankAdviceReportInfo = new BankAdviceReportInfo();
-            bankAdviceReportInfo.setPartyName(subDetail.getName().toUpperCase());
-            bankAdviceReportInfo.setAccountNumber(subDetail.getBankaccount());
-            bankAdviceReportInfo.setBank(subDetail.getBankname());
-            // bankAdviceReportInfo.setBankBranch(subDetail.getBankaccount());
-            bankAdviceReportInfo.setIfscCode(subDetail.getIfsccode());
-            bankAdviceReportInfo.setAmount(((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN));
-            totalAmount = totalAmount.add(bankAdviceReportInfo.getAmount());
-            subLedgerList.add(bankAdviceReportInfo);
-        }
-
-        return subLedgerList;
-    }
-
-    /*
-     * @ValidationErrorPage(NEW)
-     * @Action(value = "/report/bankAdviceReport-exportExcel") public String exportExcel() { final Map<String, Object>
-     * reportParams = new HashMap<String, Object>(); final StringBuffer letterContext = new StringBuffer(); letterContext
-     * .append("             I request you to transfer the amount indicated below through RTGS duly debiting from the")
-     * .append("  Current Account No: ") .append(getBankAccountNumber(bankaccount.getId()) != null ?
-     * getBankAccountNumber(bankaccount.getId()) : "") .append("  under your bank to the following bank accounts:");
-     * reportParams.put("bankName", getBankName(bank.getId())); reportParams.put("letterContext", letterContext.toString());
-     * reportParams.put("branchName", getBankBranchName(bankbranch.getId())); reportParams.put("accountNumber",
-     * getBankAccountNumber(bankaccount.getId())); reportParams.put("chequeNumber", "RTGS Ref. No: " +
-     * getInstrumentNumber(instrumentnumber.getId())); reportParams.put("chequeDate",
-     * getInstrumentDate(instrumentnumber.getId())); final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-     * final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
-     * reportInput.setReportFormat(FileFormat.XLS); contentType = ReportViewerUtil.getContentType(FileFormat.XLS); fileName =
-     * "BankAdviceReport." + FileFormat.XLS.toString().toLowerCase(); final ReportOutput reportOutput =
-     * reportService.createReport(reportInput); if (reportOutput != null && reportOutput.getReportOutputData() != null)
-     * inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData()); return "reportview"; }
-     */
-
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportExcel")
-    public String exportExcel() {
-    	System.out.println("Enter excel");
-    	System.out.println("bank.getId()"+bank.getId());
-    	System.out.println("bankbranch.getId()"+bankbranch.getId());
-    	System.out.println("bankaccount.getId()"+bankaccount.getId());
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        reportParams.put("bankName", getBankName(bank.getId()));
-        System.out.println("getBankName(bank.getId())"+getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        System.out.println("XXCXC");
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        System.out.println("After subledger report");
-        final ReportRequest reportInput = new ReportRequest("bankAdviceExcelReport", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.XLS);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.XLS);
-        fileName = "BankAdviceReport." + ReportFormat.XLS.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-        System.out.println("Processed");
-
-        return "reportview";
-    }
-    
-    @Action(value = "/report/bankAdviceReport-exportExcelPex")
-    public String exportExcelPex() {
-    	preparePex();
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        final ReportRequest reportInput = new ReportRequest("bankAdviceExcelReport", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.XLS);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.XLS);
-        fileName = "BankAdviceReport." + ReportFormat.XLS.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-        System.out.println("Processed PEX");
-
-        return "reportview";
-    }
-
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportHtml")
-    public String exportHtml() {
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        letterContext
-                .append("             I request you to transfer the amount indicated below through RTGS duly debiting from the")
-                .append("  Current Account No: ")
-                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : "")
-                .append("  under your bank to the following bank accounts:");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.HTM);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.HTM);
-        fileName = "BankAdviceReport." + ReportFormat.HTM.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-
-        return "reportview";
-    }
-
-    private String getBankName(final Integer bankId) {
-        final Bank bank = (Bank) persistenceService.find("from Bank where id=?", bankId);
-        return bank.getName();
-    }
-
-    private String getBankBranchName(final Integer bankBranchId) {
-        final Bankbranch bankBranch = (Bankbranch) persistenceService.find("from Bankbranch where id=?", bankBranchId);
-        return bankBranch.getBranchname();
-    }
-
-    private String getBankAccountNumber(final Long bankAccountId) {
-        final Bankaccount bankAccount = (Bankaccount) persistenceService.find("from Bankaccount where id=?", bankAccountId);
-        return bankAccount.getAccountnumber();
-    }
-
-    private String getInstrumentNumber(final Long instrumentHeaderId) {
-        final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
-                instrumentHeaderId);
-        return instrumentHeader.getTransactionNumber();
-    }
-
-    private String getInstrumentDate(final Long instrumentHeaderId) {
-        final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
-                instrumentHeaderId);
-        return Constants.DDMMYYYYFORMAT2.format(instrumentHeader.getTransactionDate());
-    }
-
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportPDF")
-    public String exportPDF() {
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        letterContext
-                .append("             I request you to transfer the amount indicated below through RTGS duly debiting from the")
-                .append("  Current Account No: ")
-                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-                .append("  under your bank to the following bank accounts:");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        reportParams.put("instrumentType", "RTGS");
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        reportParams.put("totalAmount", totalAmount);
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.PDF);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
-        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-
-        return "reportview";
-    }
-	@ValidationErrorPage(NEW)
-    @Action(value="/report/bankAdviceReport-exportPDFPex5")
-    public String exportPDFPex5() {
-
-    	try {
-    	preparePex();
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        final StringBuffer subject = new StringBuffer();
-        subject.append(" Issuance of Demand Draft from A/c No. ")
-        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ");
-        letterContext
-                .append("             Please transfer the funds as per following details by debiting the Current Bank A/c No.")
-                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-                .append("  without any bank charges and prepare DD as per details given below:-");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("subject", subject.toString());
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("pexNo","PEX-"+getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("instrumentType", "PEX");
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        final List<BankAdviceReportInfo> subLedgerListForReport = new ArrayList<BankAdviceReportInfo>();
-        totalAmount= new BigDecimal(0.0);
-        for(BankAdviceReportInfo obj : subLedgerList) {
-        	       	
-        	BankAdviceReportInfo bankAdviceReportInfo = new BankAdviceReportInfo();
-        	bankAdviceReportInfo.setPartyName(obj.getPartyName().toUpperCase());
-            bankAdviceReportInfo.setAccountNumber(obj.getAccountNumber());
-            bankAdviceReportInfo.setBank(obj.getBank());
-            // bankAdviceReportInfo.setBankBranch(subDetail.getBankaccount());
-            bankAdviceReportInfo.setIfscCode(obj.getIfscCode());
-            bankAdviceReportInfo.setAmount(obj.getAmount());
-            totalAmount = totalAmount.add(obj.getAmount());
-            bankAdviceReportInfo.setTypeOfPayment(getInstrumentTypeOfPayment(instrumentnumber.getId()));
-            bankAdviceReportInfo.setDepartment(getInstrumentDepartment(instrumentnumber.getId()));
-            subLedgerListForReport.add(bankAdviceReportInfo);
-        }
-        LOGGER.info("Datasource Added");
-        //reportParams.put("bpvNumber","fggggggggdgggsggggdggggg,fafdsfsff,afafaffafafafa,affdfsfsffsfsdfsff");
-        reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
-        reportParams.put("PEXReportDataSource",getDataSource(subLedgerListForReport));
-        reportParams.put("totalAmount", totalAmount);
-        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
-        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
-        String firstsignatory="";
-        String secondsignatory="";
-        List<Object[]> list  =getSignatory(instrumentnumber.getId());
-        
-		  if(list != null && !list.isEmpty())
-		  {
-			  for(Object[] element : list) 
-			  {
-				  if(element[0] != null && !element[0].toString().isEmpty())
-				  {
-					  firstsignatory=(element[0].toString()).split(",")[0];
-				  }
-				  else
-				  {
-					  firstsignatory="Joint Commissioner";
-				  }
-				  if(element[1] != null && !element[1].toString().isEmpty())
-				  {
-					  secondsignatory=(element[1].toString()).split(",")[0];  
-				  }
-				  else
-				  {
-					  
-					  secondsignatory="Chief Accounts Officer";
-				  }
-			  }
-		  }
-		  else
-		  {
-			  firstsignatory="Joint Commissioner";
-			  secondsignatory="Chief Accounts Officer";
-		  }
-		  reportParams.put("primarySignatory",firstsignatory);
-		  reportParams.put("secondarySignatory",secondsignatory);
-		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-	                "pexImagePath");
-	        final String imgPath = appList.get(0).getValue();
-		  reportParams.put("headerImagePath",imgPath+"header.JPG");
-		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
-		  reportParams.put("backgroundImgPath",imgPath+"background.png");
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport5", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.PDF);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
-        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    	}
-
-        return "reportview";
-    
-    }
-    private String getInstrumentDepartment(Long instrumentHeaderId) {
-    	String department=null;
-    	List<Object> list =null;
-		try {
-			Query query=persistenceService.getSession()
-                    .createSQLQuery("select d.name from vouchermis v ,eg_department d where v.voucherheaderid in " + 
-					"(select voucherheaderid from egf_instrumentvoucher iv where iv.instrumentheaderid = "+instrumentHeaderId+" ) " + 
-					"and v.departmentcode = d.code");
-			list = query.list();
-			
-			if(list!= null && !list.isEmpty()) {
-				
-				  department = list.get(0).toString();
-				  
-				 
+		final Query WithNetPayableSubledgerQuery = persistenceService.getSession().createSQLQuery(query);
+		WithNetPayableSubledgerQuery.setParameter(0, instrumentHeader.getId());
+		System.out.println("1");
+		// Get without subledger one
+		final Query getDebitsideSubledgerQuery = persistenceService.getSession().createSQLQuery(withNoSubledgerQry);
+		getDebitsideSubledgerQuery.setParameter(0, instrumentHeader.getId());
+		getDebitsideSubledgerQuery.setParameter(1, instrumentHeader.getId());
+		System.out.println("2");
+		final List<Object[]> retList = WithNetPayableSubledgerQuery.list();
+		retList.addAll(getDebitsideSubledgerQuery.list());
+		System.out.println("3");
+		for (final Object[] obj : retList)
+			if (detailTypeMap.isEmpty()) {
+				detailKeyMap = new HashMap<Object, BigDecimal>();
+				detailKeyMap.put(obj[1], ((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+				detailTypeMap.put(obj[0], detailKeyMap);
+			} else {
+				tempMap = new HashMap<Object, BigDecimal>();
+				detailKeyAmt = BigDecimal.ZERO;
+				if (null != detailTypeMap.get(obj[0])) {
+					tempMap = detailTypeMap.get(obj[0]);
+					// detailKey=tempMap.get((Integer)obj[1]);
+					if (null != tempMap && tempMap.containsKey(obj[1])) {
+						detailKeyAmt = tempMap.get(obj[1])
+								.add((((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
+						tempMap.put(obj[1], detailKeyAmt);
+					} else
+						tempMap.put(obj[1], (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
+				} else {
+					detailKeyMap = new HashMap<Object, BigDecimal>();
+					detailKeyMap.put(obj[1], (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
+					detailTypeMap.put(obj[0], detailKeyMap);
 				}
-		}catch(Exception e) {
+			}
+		System.out.println("End");
+
+		return retList;
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-search")
+	public String search() {
+
+		if (instrumentnumber.getId() == -1) {
+			addFieldError("searchCriteria", "Please select all search criteria");
+			return NEW;
+		}
+		InstrumentHeader ih = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
+				instrumentnumber.getId());
+		instrumentType = ih.getInstrumentType().getType();
+		instruId = ih.getId();
+		bankAdviseResultList = getBankAdviceReportList();
+		return NEW;
+	}
+
+	@SkipValidation
+	public String TNEBsearch() {
+
+		final String query = "select distinct ih " + "from EBDetails d, EgBillregister br, Miscbilldetail mbd, "
+				+ "InstrumentVoucher iv inner join iv.instrumentHeaderId ih " + "where d.receiptNo is null "
+				+ "and d.egBillregister = br " + "and br.billnumber = mbd.billnumber "
+				+ "and mbd.payVoucherHeader = iv.voucherHeaderId " + "and ih.statusId.code in ('"
+				+ FinancialConstants.INSTRUMENT_CREATED_STATUS + "', '"
+				+ FinancialConstants.INSTRUMENT_RECONCILED_STATUS + "') " + "and month(ih.transactionDate) = ? "
+				+ "and year(ih.transactionDate) between  ? and ?";
+
+		final CFinancialYear financialYear = (CFinancialYear) persistenceService
+				.find("from CFinancialYear where id = ?", financialYearId);
+
+		final Calendar calendar = Calendar.getInstance();
+
+		calendar.setTime(financialYear.getStartingDate());
+		final Integer startingYear = calendar.get(Calendar.YEAR);
+
+		calendar.setTime(financialYear.getEndingDate());
+		final Integer endingYear = calendar.get(Calendar.YEAR);
+
+		instrumentHeaderList = persistenceService.findAllBy(query, month, startingYear, endingYear);
+		mode = "search";
+		monthMap = DateUtils.getAllMonths();
+		heading = "List of RTGS Bank advice generated for ";
+		heading = heading + monthMap.get(month) + "-" + financialYear.getFinYearRange();
+		return "downloadText";
+	}
+
+	@ReadOnly
+	private List populateSubLedgerDetails(final List subList) {
+
+		final List<Object[]> retList = subList;
+		final List<BankAdviceReportInfo> subLedgerList = new ArrayList<BankAdviceReportInfo>();
+
+		for (final Object[] obj : retList) {
+			final Accountdetailtype adt = (Accountdetailtype) persistenceService
+					.find("from Accountdetailtype where id=?", ((BigInteger) obj[0]).intValue());
+
+			EntityType subDetail = null;
+			try {
+				final Class aClass = Class.forName(adt.getFullQualifiedName());
+				final java.lang.reflect.Method method = aClass.getMethod("getId");
+				final String dataType = method.getReturnType().getSimpleName();
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("data Type = " + dataType);
+				if (dataType.equals("Long"))
+					subDetail = (EntityType) persistenceService.find(
+							"from " + adt.getFullQualifiedName() + " where id=?", ((BigInteger) obj[1]).longValue());
+				else
+					subDetail = (EntityType) persistenceService.find(
+							"from " + adt.getFullQualifiedName() + " where id=?", ((BigInteger) obj[1]).intValue());
+
+			} catch (final ClassCastException e) {
+				LOGGER.error(e);
+			} catch (final Exception e) {
+				LOGGER.error("Exception to get EntityType=" + e.getMessage());
+			}
+			final BankAdviceReportInfo bankAdviceReportInfo = new BankAdviceReportInfo();
+			bankAdviceReportInfo.setPartyName(subDetail.getName().toUpperCase());
+			bankAdviceReportInfo.setAccountNumber(subDetail.getBankaccount());
+			bankAdviceReportInfo.setBank(subDetail.getBankname());
+			// bankAdviceReportInfo.setBankBranch(subDetail.getBankaccount());
+			bankAdviceReportInfo.setIfscCode(subDetail.getIfsccode());
+			bankAdviceReportInfo.setAmount(((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+			totalAmount = totalAmount.add(bankAdviceReportInfo.getAmount());
+			subLedgerList.add(bankAdviceReportInfo);
+		}
+
+		return subLedgerList;
+	}
+
+	/*
+	 * @ValidationErrorPage(NEW)
+	 * 
+	 * @Action(value = "/report/bankAdviceReport-exportExcel") public String
+	 * exportExcel() { final Map<String, Object> reportParams = new HashMap<String,
+	 * Object>(); final StringBuffer letterContext = new StringBuffer();
+	 * letterContext
+	 * .append("             I request you to transfer the amount indicated below through RTGS duly debiting from the"
+	 * ) .append("  Current Account No: ")
+	 * .append(getBankAccountNumber(bankaccount.getId()) != null ?
+	 * getBankAccountNumber(bankaccount.getId()) : "")
+	 * .append("  under your bank to the following bank accounts:");
+	 * reportParams.put("bankName", getBankName(bank.getId()));
+	 * reportParams.put("letterContext", letterContext.toString());
+	 * reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+	 * reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+	 * reportParams.put("chequeNumber", "RTGS Ref. No: " +
+	 * getInstrumentNumber(instrumentnumber.getId()));
+	 * reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+	 * final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+	 * final ReportRequest reportInput = new ReportRequest("bankAdviceReport",
+	 * subLedgerList, reportParams); reportInput.setReportFormat(FileFormat.XLS);
+	 * contentType = ReportViewerUtil.getContentType(FileFormat.XLS); fileName =
+	 * "BankAdviceReport." + FileFormat.XLS.toString().toLowerCase(); final
+	 * ReportOutput reportOutput = reportService.createReport(reportInput); if
+	 * (reportOutput != null && reportOutput.getReportOutputData() != null)
+	 * inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+	 * return "reportview"; }
+	 */
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportExcel")
+	public String exportExcel() {
+		System.out.println("Enter excel");
+		System.out.println("bank.getId()" + bank.getId());
+		System.out.println("bankbranch.getId()" + bankbranch.getId());
+		System.out.println("bankaccount.getId()" + bankaccount.getId());
+		final Map<String, Object> reportParams = new HashMap<String, Object>();
+		reportParams.put("bankName", getBankName(bank.getId()));
+		System.out.println("getBankName(bank.getId())" + getBankName(bank.getId()));
+		reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+		reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+		System.out.println("XXCXC");
+		final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+		System.out.println("After subledger report");
+		final ReportRequest reportInput = new ReportRequest("bankAdviceExcelReport", subLedgerList, reportParams);
+		reportInput.setReportFormat(ReportFormat.XLS);
+		contentType = ReportViewerUtil.getContentType(ReportFormat.XLS);
+		fileName = "BankAdviceReport." + ReportFormat.XLS.toString().toLowerCase();
+		final ReportOutput reportOutput = reportService.createReport(reportInput);
+		if (reportOutput != null && reportOutput.getReportOutputData() != null)
+			inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		System.out.println("Processed");
+
+		return "reportview";
+	}
+
+	@Action(value = "/report/bankAdviceReport-exportExcelPex")
+	public String exportExcelPex() {
+		preparePex();
+		final Map<String, Object> reportParams = new HashMap<String, Object>();
+		reportParams.put("bankName", getBankName(bank.getId()));
+		reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+		reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+		final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+		final ReportRequest reportInput = new ReportRequest("bankAdviceExcelReport", subLedgerList, reportParams);
+		reportInput.setReportFormat(ReportFormat.XLS);
+		contentType = ReportViewerUtil.getContentType(ReportFormat.XLS);
+		fileName = "BankAdviceReport." + ReportFormat.XLS.toString().toLowerCase();
+		final ReportOutput reportOutput = reportService.createReport(reportInput);
+		if (reportOutput != null && reportOutput.getReportOutputData() != null)
+			inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		System.out.println("Processed PEX");
+
+		return "reportview";
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportHtml")
+	public String exportHtml() {
+		final Map<String, Object> reportParams = new HashMap<String, Object>();
+		final StringBuffer letterContext = new StringBuffer();
+		letterContext.append(
+				"             I request you to transfer the amount indicated below through RTGS duly debiting from the")
+				.append("  Current Account No: ")
+				.append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId())
+						: "")
+				.append("  under your bank to the following bank accounts:");
+		reportParams.put("bankName", getBankName(bank.getId()));
+		reportParams.put("letterContext", letterContext.toString());
+		reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+		reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+		reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+		reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+		final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+		final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
+		reportInput.setReportFormat(ReportFormat.HTM);
+		contentType = ReportViewerUtil.getContentType(ReportFormat.HTM);
+		fileName = "BankAdviceReport." + ReportFormat.HTM.toString().toLowerCase();
+		final ReportOutput reportOutput = reportService.createReport(reportInput);
+		if (reportOutput != null && reportOutput.getReportOutputData() != null)
+			inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+
+		return "reportview";
+	}
+
+	private String getBankName(final Integer bankId) {
+		final Bank bank = (Bank) persistenceService.find("from Bank where id=?", bankId);
+		return bank.getName();
+	}
+
+	private String getBankBranchName(final Integer bankBranchId) {
+		final Bankbranch bankBranch = (Bankbranch) persistenceService.find("from Bankbranch where id=?", bankBranchId);
+		return bankBranch.getBranchname();
+	}
+
+	private String getBankAccountNumber(final Long bankAccountId) {
+		final Bankaccount bankAccount = (Bankaccount) persistenceService.find("from Bankaccount where id=?",
+				bankAccountId);
+		return bankAccount.getAccountnumber();
+	}
+
+	private String getInstrumentNumber(final Long instrumentHeaderId) {
+		final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService
+				.find("from InstrumentHeader where id=?", instrumentHeaderId);
+		return instrumentHeader.getTransactionNumber();
+	}
+
+	private String getInstrumentDate(final Long instrumentHeaderId) {
+		final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService
+				.find("from InstrumentHeader where id=?", instrumentHeaderId);
+		return Constants.DDMMYYYYFORMAT2.format(instrumentHeader.getTransactionDate());
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportPDF")
+	public String exportPDF() {
+		final Map<String, Object> reportParams = new HashMap<String, Object>();
+		final StringBuffer letterContext = new StringBuffer();
+		letterContext.append(
+				"             I request you to transfer the amount indicated below through RTGS duly debiting from the")
+				.append("  Current Account No: ")
+				.append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId())
+						: " ")
+				.append("  under your bank to the following bank accounts:");
+		reportParams.put("bankName", getBankName(bank.getId()));
+		reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+		reportParams.put("letterContext", letterContext.toString());
+		reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+		reportParams.put("chequeNumber", "RTGS Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+		reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+		reportParams.put("instrumentType", "RTGS");
+		final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+		reportParams.put("totalAmount", totalAmount);
+		final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
+		reportInput.setReportFormat(ReportFormat.PDF);
+		contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+		fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+		final ReportOutput reportOutput = reportService.createReport(reportInput);
+		if (reportOutput != null && reportOutput.getReportOutputData() != null)
+			inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+
+		return "reportview";
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportPDFPex5")
+	public String exportPDFPex5() {
+
+		try {
+			preparePex();
+			final Map<String, Object> reportParams = new HashMap<String, Object>();
+			final StringBuffer letterContext = new StringBuffer();
+			final StringBuffer subject = new StringBuffer();
+			subject.append(" Issuance of Demand Draft from A/c No. ")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ");
+			letterContext.append(
+					"             Please transfer the funds as per following details by debiting the Current Bank A/c No.")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ")
+					.append("  without any bank charges and prepare DD as per details given below:-");
+			reportParams.put("bankName", getBankName(bank.getId()));
+			reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+			reportParams.put("letterContext", letterContext.toString());
+			reportParams.put("subject", subject.toString());
+			reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+			reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("pexNo", "PEX-" + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("instrumentType", "PEX");
+			reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+			final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+			final List<BankAdviceReportInfo> subLedgerListForReport = new ArrayList<BankAdviceReportInfo>();
+			totalAmount = new BigDecimal(0.0);
+			for (BankAdviceReportInfo obj : subLedgerList) {
+
+				BankAdviceReportInfo bankAdviceReportInfo = new BankAdviceReportInfo();
+				bankAdviceReportInfo.setPartyName(obj.getPartyName().toUpperCase());
+				bankAdviceReportInfo.setAccountNumber(obj.getAccountNumber());
+				bankAdviceReportInfo.setBank(obj.getBank());
+				// bankAdviceReportInfo.setBankBranch(subDetail.getBankaccount());
+				bankAdviceReportInfo.setIfscCode(obj.getIfscCode());
+				bankAdviceReportInfo.setAmount(obj.getAmount());
+				totalAmount = totalAmount.add(obj.getAmount());
+				bankAdviceReportInfo.setTypeOfPayment(getInstrumentTypeOfPayment(instrumentnumber.getId()));
+				bankAdviceReportInfo.setDepartment(getInstrumentDepartment(instrumentnumber.getId()));
+				subLedgerListForReport.add(bankAdviceReportInfo);
+			}
+			LOGGER.info("Datasource Added");
+			// reportParams.put("bpvNumber","fggggggggdgggsggggdggggg,fafdsfsff,afafaffafafafa,affdfsfsffsfsdfsff");
+			reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
+			reportParams.put("PEXReportDataSource", getDataSource(subLedgerListForReport));
+			reportParams.put("totalAmount", totalAmount);
+			reportParams.put("totalAmountInWords",
+					"Rupees " + EnglishNumberToWords.convertNumberToWords(totalAmount) + " Only");
+			reportParams.put("mainParameter",
+					"It is requested to transfer the amount as per details attached herewith");
+			String firstsignatory = "";
+			String secondsignatory = "";
+			List<Object[]> list = getSignatory(instrumentnumber.getId());
+
+			if (list != null && !list.isEmpty()) {
+				for (Object[] element : list) {
+					if (element[0] != null && !element[0].toString().isEmpty()) {
+						firstsignatory = (element[0].toString()).split(",")[0];
+					} else {
+						firstsignatory = "Joint Commissioner";
+					}
+					if (element[1] != null && !element[1].toString().isEmpty()) {
+						secondsignatory = (element[1].toString()).split(",")[0];
+					} else {
+
+						secondsignatory = "Chief Accounts Officer";
+					}
+				}
+			} else {
+				firstsignatory = "Joint Commissioner";
+				secondsignatory = "Chief Accounts Officer";
+			}
+			reportParams.put("primarySignatory", firstsignatory);
+			reportParams.put("secondarySignatory", secondsignatory);
+			final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"pexImagePath");
+			final String imgPath = appList.get(0).getValue();
+			reportParams.put("headerImagePath", imgPath + "header.JPG");
+			reportParams.put("footerImagePath", imgPath + "footer.JPG");
+			reportParams.put("backgroundImgPath", imgPath + "background.png");
+			final ReportRequest reportInput = new ReportRequest("bankAdviceReport5", subLedgerList, reportParams);
+			reportInput.setReportFormat(ReportFormat.PDF);
+			contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+			fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+			final ReportOutput reportOutput = reportService.createReport(reportInput);
+			if (reportOutput != null && reportOutput.getReportOutputData() != null)
+				inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "reportview";
+
+	}
+
+	private String getInstrumentDepartment(Long instrumentHeaderId) {
+		String department = null;
+		List<Object> list = null;
+		try {
+			Query query = persistenceService.getSession()
+					.createSQLQuery("select d.name from vouchermis v ,eg_department d where v.voucherheaderid in "
+							+ "(select voucherheaderid from egf_instrumentvoucher iv where iv.instrumentheaderid = "
+							+ instrumentHeaderId + " ) " + "and v.departmentcode = d.code");
+			list = query.list();
+
+			if (list != null && !list.isEmpty()) {
+
+				department = list.get(0).toString();
+
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return department;
 	}
 
 	private String getInstrumentTypeOfPayment(Long instrumentHeaderId) {
-    	final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService.find("from InstrumentHeader where id=?",
-                instrumentHeaderId);
-    	Set<InstrumentVoucher> instruset=instrumentHeader.getInstrumentVouchers();
-    	List<InstrumentVoucher> ainstruList=new ArrayList<InstrumentVoucher>();
-    	ainstruList.addAll(instruset);
-        return  ainstruList.get(0).getVoucherHeaderId().getDescription();
-	}
-    
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportPDFPex")
-    public String exportPDFPex() {
-    	try {
-    	preparePex();
-    	
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        letterContext
-                .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
-                .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-                .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("instrumentType", "PEX");
-        reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        LOGGER.info("Datasource Added");
-        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
-        reportParams.put("totalAmount", totalAmount);
-        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
-        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
-        String firstsignatory="";
-        String secondsignatory="";
-        List<Object[]> list  =getSignatory(instrumentnumber.getId());
-        
-		  if(list != null && !list.isEmpty())
-		  {
-			  for(Object[] element : list) 
-			  {
-				  if(element[0] != null && !element[0].toString().isEmpty())
-				  {
-					  firstsignatory=(element[0].toString()).split(",")[0];
-				  }
-				  else
-				  {
-					  firstsignatory="Joint Commissioner";
-				  }
-				  if(element[1] != null && !element[1].toString().isEmpty())
-				  {
-					  secondsignatory=(element[1].toString()).split(",")[0];  
-				  }
-				  else
-				  {
-					  
-					  secondsignatory="Chief Accounts Officer";
-				  }
-			  }
-		  }
-		  else
-		  {
-			  firstsignatory="Joint Commissioner";
-			  secondsignatory="Chief Accounts Officer";
-		  }
-		  reportParams.put("primarySignatory",firstsignatory);
-		  reportParams.put("secondarySignatory",secondsignatory);
-		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-	                "pexImagePath");
-	        final String imgPath = appList.get(0).getValue();
-		  reportParams.put("headerImagePath",imgPath+"header.JPG");
-		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
-		  reportParams.put("backgroundImgPath",imgPath+"background.png");
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.PDF);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
-        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    	}
-
-        return "reportview";
-    }
-    
-    private String populateBPV(String instrumentNumber2) {
-    	SQLQuery query =  null;
-    	List<Object[]> rows = null;
-    	String partyName="BPV No. : ";
-    	try
-    	{
-    		 query = this.persistenceService.getSession().createSQLQuery("select vh.id,vh.vouchernumber from voucherheader vh where vh.id in (select ei2.voucherheaderid from egf_instrumentvoucher ei2 where ei2.instrumentheaderid in(select ei.id from egf_instrumentheader ei where ei.transactionnumber=:transactionnumber))");
-    	    query.setString("transactionnumber", instrumentNumber2);
-    	    rows = query.list();
-    	    
-    	    if(rows != null && !rows.isEmpty())
-    	    {
-    	    	System.out.println("size :::"+rows.size());
-    	    	for(Object[] element : rows)
-    	    	{
-    	    		System.out.println("-->"+element[1].toString());
-    	    		partyName= partyName+element[1].toString()+"  ";
-    	    	}
-    	    }
-    	}catch (Exception e) {
-			e.printStackTrace();
-		}
-    	System.out.println("partyName :::"+partyName);
-	    return partyName;
+		final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService
+				.find("from InstrumentHeader where id=?", instrumentHeaderId);
+		Set<InstrumentVoucher> instruset = instrumentHeader.getInstrumentVouchers();
+		List<InstrumentVoucher> ainstruList = new ArrayList<InstrumentVoucher>();
+		ainstruList.addAll(instruset);
+		return ainstruList.get(0).getVoucherHeaderId().getDescription();
 	}
 
 	@ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportPDFPex1")
-    public String exportPDFPex1() {
-    	try {
-    	preparePex();
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        letterContext
-        .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
-        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-        .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("instrumentType", "PEX");
-        reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        LOGGER.info("Datasource Added");
-        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
-        reportParams.put("totalAmount", totalAmount);
-        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
-        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
-        String firstsignatory="";
-        String secondsignatory="";
-        List<Object[]> list  =getSignatory(instrumentnumber.getId());
-        
-		  if(list != null && !list.isEmpty())
-		  {
-			  for(Object[] element : list) 
-			  {
-				  if(element[0] != null && !element[0].toString().isEmpty())
-				  {
-					  firstsignatory=(element[0].toString()).split(",")[0];
-				  }
-				  else
-				  {
-					  firstsignatory="Joint Commissioner";
-				  }
-				  if(element[1] != null && !element[1].toString().isEmpty())
-				  {
-					  secondsignatory=(element[1].toString()).split(",")[0];  
-				  }
-				  else
-				  {
-					  
-					  secondsignatory="Chief Accounts Officer";
-				  }
-				  
-			  }
-		  }
-		  else
-		  {
-			  firstsignatory="Joint Commissioner";
-			  secondsignatory="Chief Accounts Officer";
-		  }
-		  reportParams.put("primarySignatory",firstsignatory);
-		  reportParams.put("secondarySignatory",secondsignatory);
-		  
-		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-	                "pexImagePath");
-	        final String imgPath = appList.get(0).getValue();
-		  reportParams.put("headerImagePath",imgPath+"header.JPG");
-		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
-		  reportParams.put("backgroundImgPath",imgPath+"background.png");
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.PDF);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
-        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    	}
+	@Action(value = "/report/bankAdviceReport-exportPDFPex")
+	public String exportPDFPex() {
+		try {
+			preparePex();
 
-        return "reportview";
-    }
-    
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportPDFPex3")
-    public String exportPDFPex3() {
-    	try {
-    	preparePex();
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        letterContext
-        .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
-        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-        .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("instrumentType", "PEX");
-        reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        LOGGER.info("Datasource Added");
-        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
-        reportParams.put("totalAmount", totalAmount);
-        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
-        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
-        String firstsignatory="";
-        String secondsignatory="";
-        List<Object[]> list  =getSignatory(instrumentnumber.getId());
-        
-		  if(list != null && !list.isEmpty())
-		  {
-			  for(Object[] element : list) 
-			  {
-				  if(element[0] != null && !element[0].toString().isEmpty())
-				  {
-					  firstsignatory=(element[0].toString()).split(",")[0];
-				  }
-				  else
-				  {
-					  firstsignatory="Joint Commissioner";
-				  }
-				  if(element[1] != null && !element[1].toString().isEmpty())
-				  {
-					  secondsignatory=(element[1].toString()).split(",")[0];  
-				  }
-				  else
-				  {
-					  
-					  secondsignatory="Chief Accounts Officer";
-				  }
-			  }
-		  }
-		  else
-		  {
-			  firstsignatory="Joint Commissioner";
-			  secondsignatory="Chief Accounts Officer";
-		  }
-		  reportParams.put("primarySignatory",firstsignatory);
-		  reportParams.put("secondarySignatory",secondsignatory);
-		  
-		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-	                "pexImagePath");
-	        final String imgPath = appList.get(0).getValue();
-		  reportParams.put("headerImagePath",imgPath+"header.JPG");
-		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
-		  reportParams.put("backgroundImgPath",imgPath+"background.png");
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport3", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.PDF);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
-        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    	}
+			final Map<String, Object> reportParams = new HashMap<String, Object>();
+			final StringBuffer letterContext = new StringBuffer();
+			letterContext.append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ")
+					.append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
+			reportParams.put("bankName", getBankName(bank.getId()));
+			reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+			reportParams.put("letterContext", letterContext.toString());
+			reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+			reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("instrumentType", "PEX");
+			reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
+			reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+			final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+			LOGGER.info("Datasource Added");
+			reportParams.put("PEXReportDataSource", getDataSource(subLedgerList));
+			reportParams.put("totalAmount", totalAmount);
+			reportParams.put("totalAmountInWords",
+					"Rupees " + EnglishNumberToWords.convertNumberToWords(totalAmount) + " Only");
+			reportParams.put("mainParameter",
+					"It is requested to transfer the amount as per details attached herewith");
+			String firstsignatory = "";
+			String secondsignatory = "";
+			List<Object[]> list = getSignatory(instrumentnumber.getId());
 
-        return "reportview";
-    }
-    
-    @ValidationErrorPage(NEW)
-    @Action(value = "/report/bankAdviceReport-exportPDFPex4")
-    public String exportPDFPex4() {
-    	try {
-    	preparePex();
-        final Map<String, Object> reportParams = new HashMap<String, Object>();
-        final StringBuffer letterContext = new StringBuffer();
-        letterContext
-        .append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
-        .append(getBankAccountNumber(bankaccount.getId()) != null ? getBankAccountNumber(bankaccount.getId()) : " ")
-        .append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
-        reportParams.put("bankName", getBankName(bank.getId()));
-        reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
-        reportParams.put("letterContext", letterContext.toString());
-        reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
-        reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
-        reportParams.put("instrumentType", "PEX");
-        reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
-        reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
-        final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
-        LOGGER.info("Datasource Added");
-        reportParams.put("PEXReportDataSource",getDataSource(subLedgerList));
-        reportParams.put("totalAmount", totalAmount);
-        reportParams.put("totalAmountInWords", "Rupees "+EnglishNumberToWords.convertNumberToWords(totalAmount)+" Only");
-        reportParams.put("mainParameter", "It is requested to transfer the amount as per details attached herewith");
-        String firstsignatory="";
-        String secondsignatory="";
-        List<Object[]> list  =getSignatory(instrumentnumber.getId());
-        
-		  if(list != null && !list.isEmpty())
-		  {
-			  for(Object[] element : list) 
-			  {
-				  if(element[0] != null && !element[0].toString().isEmpty())
-				  {
-					  firstsignatory=(element[0].toString()).split(",")[0];
-				  }
-				  else
-				  {
-					  firstsignatory="Joint Commissioner";
-				  }
-				  if(element[1] != null && !element[1].toString().isEmpty())
-				  {
-					  secondsignatory=(element[1].toString()).split(",")[0];  
-				  }
-				  else
-				  {
-					  
-					  secondsignatory="Chief Accounts Officer";
-				  }
-				  
-				  
-			  }
-		  }
-		  else
-		  {
-			  firstsignatory="Joint Commissioner";
-			  secondsignatory="Chief Accounts Officer";
-		  }
-		  reportParams.put("primarySignatory",firstsignatory);
-		  reportParams.put("secondarySignatory",secondsignatory);
-		  
-		  final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
-	                "pexImagePath");
-	        final String imgPath = appList.get(0).getValue();
-		  reportParams.put("headerImagePath",imgPath+"header.JPG");
-		  reportParams.put("footerImagePath",imgPath+"footer.JPG");
-		  reportParams.put("backgroundImgPath",imgPath+"background.png");
-        final ReportRequest reportInput = new ReportRequest("bankAdviceReport4", subLedgerList, reportParams);
-        reportInput.setReportFormat(ReportFormat.PDF);
-        contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
-        fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
-        final ReportOutput reportOutput = reportService.createReport(reportInput);
-        if (reportOutput != null && reportOutput.getReportOutputData() != null)
-            inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
-    	}
-    	catch(Exception e) {
-    		e.printStackTrace();
-    	}
+			if (list != null && !list.isEmpty()) {
+				for (Object[] element : list) {
+					if (element[0] != null && !element[0].toString().isEmpty()) {
+						firstsignatory = (element[0].toString()).split(",")[0];
+					} else {
+						firstsignatory = "Joint Commissioner";
+					}
+					if (element[1] != null && !element[1].toString().isEmpty()) {
+						secondsignatory = (element[1].toString()).split(",")[0];
+					} else {
 
-        return "reportview";
-    }
+						secondsignatory = "Chief Accounts Officer";
+					}
+				}
+			} else {
+				firstsignatory = "Joint Commissioner";
+				secondsignatory = "Chief Accounts Officer";
+			}
+			reportParams.put("primarySignatory", firstsignatory);
+			reportParams.put("secondarySignatory", secondsignatory);
+			final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"pexImagePath");
+			final String imgPath = appList.get(0).getValue();
+			reportParams.put("headerImagePath", imgPath + "header.JPG");
+			reportParams.put("footerImagePath", imgPath + "footer.JPG");
+			reportParams.put("backgroundImgPath", imgPath + "background.png");
+			final ReportRequest reportInput = new ReportRequest("bankAdviceReport", subLedgerList, reportParams);
+			reportInput.setReportFormat(ReportFormat.PDF);
+			contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+			fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+			final ReportOutput reportOutput = reportService.createReport(reportInput);
+			if (reportOutput != null && reportOutput.getReportOutputData() != null)
+				inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "reportview";
+	}
+
+	private String populateBPV(String instrumentNumber2) {
+		SQLQuery query = null;
+		List<Object[]> rows = null;
+		String partyName = "BPV No. : ";
+		try {
+			query = this.persistenceService.getSession().createSQLQuery(
+					"select vh.id,vh.vouchernumber from voucherheader vh where vh.id in (select ei2.voucherheaderid from egf_instrumentvoucher ei2 where ei2.instrumentheaderid in(select ei.id from egf_instrumentheader ei where ei.transactionnumber=:transactionnumber))");
+			query.setString("transactionnumber", instrumentNumber2);
+			rows = query.list();
+
+			if (rows != null && !rows.isEmpty()) {
+				System.out.println("size :::" + rows.size());
+				for (Object[] element : rows) {
+					System.out.println("-->" + element[1].toString());
+					partyName = partyName + element[1].toString() + "  ";
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("partyName :::" + partyName);
+		return partyName;
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportPDFPex1")
+	public String exportPDFPex1() {
+		try {
+			preparePex();
+			final Map<String, Object> reportParams = new HashMap<String, Object>();
+			final StringBuffer letterContext = new StringBuffer();
+			letterContext.append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ")
+					.append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
+			reportParams.put("bankName", getBankName(bank.getId()));
+			reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+			reportParams.put("letterContext", letterContext.toString());
+			reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+			reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("instrumentType", "PEX");
+			reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
+			reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+			final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+			LOGGER.info("Datasource Added");
+			reportParams.put("PEXReportDataSource", getDataSource(subLedgerList));
+			reportParams.put("totalAmount", totalAmount);
+			reportParams.put("totalAmountInWords",
+					"Rupees " + EnglishNumberToWords.convertNumberToWords(totalAmount) + " Only");
+			reportParams.put("mainParameter",
+					"It is requested to transfer the amount as per details attached herewith");
+			String firstsignatory = "";
+			String secondsignatory = "";
+			List<Object[]> list = getSignatory(instrumentnumber.getId());
+
+			if (list != null && !list.isEmpty()) {
+				for (Object[] element : list) {
+					if (element[0] != null && !element[0].toString().isEmpty()) {
+						firstsignatory = (element[0].toString()).split(",")[0];
+					} else {
+						firstsignatory = "Joint Commissioner";
+					}
+					if (element[1] != null && !element[1].toString().isEmpty()) {
+						secondsignatory = (element[1].toString()).split(",")[0];
+					} else {
+
+						secondsignatory = "Chief Accounts Officer";
+					}
+
+				}
+			} else {
+				firstsignatory = "Joint Commissioner";
+				secondsignatory = "Chief Accounts Officer";
+			}
+			reportParams.put("primarySignatory", firstsignatory);
+			reportParams.put("secondarySignatory", secondsignatory);
+
+			final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"pexImagePath");
+			final String imgPath = appList.get(0).getValue();
+			reportParams.put("headerImagePath", imgPath + "header.JPG");
+			reportParams.put("footerImagePath", imgPath + "footer.JPG");
+			reportParams.put("backgroundImgPath", imgPath + "background.png");
+			final ReportRequest reportInput = new ReportRequest("bankAdviceReport1", subLedgerList, reportParams);
+			reportInput.setReportFormat(ReportFormat.PDF);
+			contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+			fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+			final ReportOutput reportOutput = reportService.createReport(reportInput);
+			if (reportOutput != null && reportOutput.getReportOutputData() != null)
+				inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "reportview";
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportPDFPex3")
+	public String exportPDFPex3() {
+		try {
+			preparePex();
+			final Map<String, Object> reportParams = new HashMap<String, Object>();
+			final StringBuffer letterContext = new StringBuffer();
+			letterContext.append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ")
+					.append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
+			reportParams.put("bankName", getBankName(bank.getId()));
+			reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+			reportParams.put("letterContext", letterContext.toString());
+			reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+			reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("instrumentType", "PEX");
+			reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
+			reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+			final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+			LOGGER.info("Datasource Added");
+			reportParams.put("PEXReportDataSource", getDataSource(subLedgerList));
+			reportParams.put("totalAmount", totalAmount);
+			reportParams.put("totalAmountInWords",
+					"Rupees " + EnglishNumberToWords.convertNumberToWords(totalAmount) + " Only");
+			reportParams.put("mainParameter",
+					"It is requested to transfer the amount as per details attached herewith");
+			String firstsignatory = "";
+			String secondsignatory = "";
+			List<Object[]> list = getSignatory(instrumentnumber.getId());
+
+			if (list != null && !list.isEmpty()) {
+				for (Object[] element : list) {
+					if (element[0] != null && !element[0].toString().isEmpty()) {
+						firstsignatory = (element[0].toString()).split(",")[0];
+					} else {
+						firstsignatory = "Joint Commissioner";
+					}
+					if (element[1] != null && !element[1].toString().isEmpty()) {
+						secondsignatory = (element[1].toString()).split(",")[0];
+					} else {
+
+						secondsignatory = "Chief Accounts Officer";
+					}
+				}
+			} else {
+				firstsignatory = "Joint Commissioner";
+				secondsignatory = "Chief Accounts Officer";
+			}
+			reportParams.put("primarySignatory", firstsignatory);
+			reportParams.put("secondarySignatory", secondsignatory);
+
+			final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"pexImagePath");
+			final String imgPath = appList.get(0).getValue();
+			reportParams.put("headerImagePath", imgPath + "header.JPG");
+			reportParams.put("footerImagePath", imgPath + "footer.JPG");
+			reportParams.put("backgroundImgPath", imgPath + "background.png");
+			final ReportRequest reportInput = new ReportRequest("bankAdviceReport3", subLedgerList, reportParams);
+			reportInput.setReportFormat(ReportFormat.PDF);
+			contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+			fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+			final ReportOutput reportOutput = reportService.createReport(reportInput);
+			if (reportOutput != null && reportOutput.getReportOutputData() != null)
+				inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "reportview";
+	}
+
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportPDFPex4")
+	public String exportPDFPex4() {
+		try {
+			preparePex();
+			final Map<String, Object> reportParams = new HashMap<String, Object>();
+			final StringBuffer letterContext = new StringBuffer();
+			letterContext.append("             It is requested to transfer the amount(s) by debiting Bank Account No.")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ")
+					.append("  in the Bank account(s) of below mentioned beneficiaries (without any bank charges):-");
+			reportParams.put("bankName", getBankName(bank.getId()));
+			reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+			reportParams.put("letterContext", letterContext.toString());
+			reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+			reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("instrumentType", "PEX");
+			reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
+			reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+			final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+			LOGGER.info("Datasource Added");
+			reportParams.put("PEXReportDataSource", getDataSource(subLedgerList));
+			reportParams.put("totalAmount", totalAmount);
+			reportParams.put("totalAmountInWords",
+					"Rupees " + EnglishNumberToWords.convertNumberToWords(totalAmount) + " Only");
+			reportParams.put("mainParameter",
+					"It is requested to transfer the amount as per details attached herewith");
+			String firstsignatory = "";
+			String secondsignatory = "";
+			List<Object[]> list = getSignatory(instrumentnumber.getId());
+
+			if (list != null && !list.isEmpty()) {
+				for (Object[] element : list) {
+					if (element[0] != null && !element[0].toString().isEmpty()) {
+						firstsignatory = (element[0].toString()).split(",")[0];
+					} else {
+						firstsignatory = "Joint Commissioner";
+					}
+					if (element[1] != null && !element[1].toString().isEmpty()) {
+						secondsignatory = (element[1].toString()).split(",")[0];
+					} else {
+
+						secondsignatory = "Chief Accounts Officer";
+					}
+
+				}
+			} else {
+				firstsignatory = "Joint Commissioner";
+				secondsignatory = "Chief Accounts Officer";
+			}
+			reportParams.put("primarySignatory", firstsignatory);
+			reportParams.put("secondarySignatory", secondsignatory);
+
+			final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"pexImagePath");
+			final String imgPath = appList.get(0).getValue();
+			reportParams.put("headerImagePath", imgPath + "header.JPG");
+			reportParams.put("footerImagePath", imgPath + "footer.JPG");
+			reportParams.put("backgroundImgPath", imgPath + "background.png");
+			final ReportRequest reportInput = new ReportRequest("bankAdviceReport4", subLedgerList, reportParams);
+			reportInput.setReportFormat(ReportFormat.PDF);
+			contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+			fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+			final ReportOutput reportOutput = reportService.createReport(reportInput);
+			if (reportOutput != null && reportOutput.getReportOutputData() != null)
+				inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return "reportview";
+	}
+	
+	@ValidationErrorPage(NEW)
+	@Action(value = "/report/bankAdviceReport-exportPDFPex6")
+	public String exportPDFPex6() {
+
+		try {
+			preparePex();
+			final Map<String, Object> reportParams = new HashMap<String, Object>();
+			final StringBuffer letterContext = new StringBuffer();
+			final StringBuffer subject = new StringBuffer();
+			subject.append(" Issuance of Demand Draft from A/c No. ")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ");
+			letterContext.append(
+					"             Please transfer the funds as per following details by debiting the Current Bank A/c No.")
+					.append(getBankAccountNumber(bankaccount.getId()) != null
+							? getBankAccountNumber(bankaccount.getId())
+							: " ")
+					.append("  without any bank charges and prepare DD as per details given below:-");
+			reportParams.put("bankName", getBankName(bank.getId()));
+			reportParams.put("branchName", getBankBranchName(bankbranch.getId()));
+			reportParams.put("letterContext", letterContext.toString());
+			reportParams.put("subject", subject.toString());
+			reportParams.put("accountNumber", getBankAccountNumber(bankaccount.getId()));
+			reportParams.put("chequeNumber", "PEX Ref. No: " + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("pexNo", "PEX-" + getInstrumentNumber(instrumentnumber.getId()));
+			reportParams.put("instrumentType", "PEX");
+			reportParams.put("chequeDate", getInstrumentDate(instrumentnumber.getId()));
+			final List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList();
+			final List<BankAdviceReportInfo> subLedgerListForReport = new ArrayList<BankAdviceReportInfo>();
+			totalAmount = new BigDecimal(0.0);
+			for (BankAdviceReportInfo obj : subLedgerList) {
+
+				BankAdviceReportInfo bankAdviceReportInfo = new BankAdviceReportInfo();
+				bankAdviceReportInfo.setPartyName(obj.getPartyName().toUpperCase());
+				bankAdviceReportInfo.setAccountNumber(obj.getAccountNumber());
+				bankAdviceReportInfo.setBank(obj.getBank());
+				// bankAdviceReportInfo.setBankBranch(subDetail.getBankaccount());
+				bankAdviceReportInfo.setIfscCode(obj.getIfscCode());
+				bankAdviceReportInfo.setAmount(obj.getAmount());
+				totalAmount = totalAmount.add(obj.getAmount());
+				bankAdviceReportInfo.setTypeOfPayment(getInstrumentTypeOfPayment(instrumentnumber.getId()));
+				bankAdviceReportInfo.setDepartment(getInstrumentDepartment(instrumentnumber.getId()));
+				subLedgerListForReport.add(bankAdviceReportInfo);
+			}
+			LOGGER.info("Datasource Added");
+			// reportParams.put("bpvNumber","fggggggggdgggsggggdggggg,fafdsfsff,afafaffafafafa,affdfsfsffsfsdfsff");
+			reportParams.put("bpvNumber", populateBPV(getInstrumentNumber(instrumentnumber.getId())));
+			reportParams.put("PEXReportDataSource", getDataSource(subLedgerListForReport));
+			reportParams.put("totalAmount", totalAmount);
+			reportParams.put("totalAmountInWords",
+					"Rupees " + EnglishNumberToWords.convertNumberToWords(totalAmount) + " Only");
+			reportParams.put("mainParameter",
+					"It is requested to transfer the amount as per details attached herewith");
+			String firstsignatory = "";
+			String secondsignatory = "";
+			List<Object[]> list = getSignatory(instrumentnumber.getId());
+
+			if (list != null && !list.isEmpty()) {
+				for (Object[] element : list) {
+					if (element[0] != null && !element[0].toString().isEmpty()) {
+						firstsignatory = (element[0].toString()).split(",")[0];
+					} else {
+						firstsignatory = "Joint Commissioner";
+					}
+					if (element[1] != null && !element[1].toString().isEmpty()) {
+						secondsignatory = (element[1].toString()).split(",")[0];
+					} else {
+
+						secondsignatory = "Chief Accounts Officer";
+					}
+				}
+			} else {
+				firstsignatory = "Joint Commissioner";
+				secondsignatory = "Chief Accounts Officer";
+			}
+			reportParams.put("primarySignatory", firstsignatory);
+			reportParams.put("secondarySignatory", secondsignatory);
+
+			final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
+					"pexImagePath");
+			final String imgPath = appList.get(0).getValue();
+			reportParams.put("headerImagePath", imgPath + "header.JPG");
+			reportParams.put("footerImagePath", imgPath + "footer.JPG");
+			reportParams.put("backgroundImgPath", imgPath + "background.png");
+			
+			final ReportRequest reportInput = new ReportRequest("bankAdviceReport6", subLedgerList, reportParams);
+			reportInput.setReportFormat(ReportFormat.PDF);
+			contentType = ReportViewerUtil.getContentType(ReportFormat.PDF);
+			fileName = "BankAdviceReport." + ReportFormat.PDF.toString().toLowerCase();
+			final ReportOutput reportOutput = reportService.createReport(reportInput);
+			if (reportOutput != null && reportOutput.getReportOutputData() != null)
+				inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
 
 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 
-    /*
-     * @ValidationErrorPage(NEW)
-     * @Action(value="/report/bankAdviceReport-exportText") public String exportText() { try { String
-     * rtgsNumber=getInstrumentNumber(instrumentnumber.getId()); String rtgsDate=getInstrumentDate(instrumentnumber.getId());
-     * rtgsDate = rtgsDate.replace("/",""); textFileName =rtgsNumber+".txt"; FileOutputStream fos=new FileOutputStream
-     * (textFileName,false); List<BankAdviceReportInfo> subLedgerList =(List<BankAdviceReportInfo>) getBankAdviceReportList();
-     * StringBuffer fb; monthMap = DateUtils.getAllMonths(); this.contentType = ReportViewerUtil.getContentType(FileFormat.TXT);
-     * for (BankAdviceReportInfo bankAdviceReportInfo :subLedgerList ) { fb=new StringBuffer(300); if(rtgsNumber!=null &&
-     * rtgsDate!=null) { EBDetails ebDetails = (EBDetails) persistenceService.find(
-     * "select ebd from EBDetails ebd,InstrumentHeader ih ,InstrumentVoucher iv ,Miscbilldetail miscBill where ih.id=? and ih.id = iv.instrumentHeaderId.id and iv.voucherHeaderId.id = miscBill.payVoucherHeader.id and miscBill.billnumber = ebd.egBillregister.billnumber and ebd.ebConsumer.name = ? "
-     * ,instrumentnumber.getId(),bankAdviceReportInfo.getPartyName()); fb.append(rtgsNumber) .append(seperatorForIOB)
-     * .append(rtgsDate) .append(seperatorForIOB) .append(bankAdviceReportInfo.getPartyName()) .append(seperatorForIOB)
-     * .append(monthMap.get(ebDetails.getMonth())+" "+EBUtils.getYear(ebDetails.getDueDate())) .append(seperatorForIOB)
-     * .append(bankAdviceReportInfo.getAmount()) .append("\n"); fos.write (fb.toString().getBytes()); } } fos.flush();
-     * fos.close(); inStream=new FileInputStream(textFileName); }catch (FileNotFoundException e) {  }catch
-     * (IOException ioe){  } return "txtresult"; }
-     */
+		return "reportview";
 
-    private List getBankAdviceReportList() {
+	}
 
-        final List retList = getSubLedgerDetailQueryAndParams(instrumentnumber);
-        if (retList != null && !retList.isEmpty())
-        {
-        	System.out.println("NOT NULL");
-            return populateSubLedgerDetails(retList);
-        }
-        else
-        {
-        	System.out.println("NULL");
-            return Collections.EMPTY_LIST;
-        }
-    }
+	/*
+	 * @ValidationErrorPage(NEW)
+	 * 
+	 * @Action(value="/report/bankAdviceReport-exportText") public String
+	 * exportText() { try { String
+	 * rtgsNumber=getInstrumentNumber(instrumentnumber.getId()); String
+	 * rtgsDate=getInstrumentDate(instrumentnumber.getId()); rtgsDate =
+	 * rtgsDate.replace("/",""); textFileName =rtgsNumber+".txt"; FileOutputStream
+	 * fos=new FileOutputStream (textFileName,false); List<BankAdviceReportInfo>
+	 * subLedgerList =(List<BankAdviceReportInfo>) getBankAdviceReportList();
+	 * StringBuffer fb; monthMap = DateUtils.getAllMonths(); this.contentType =
+	 * ReportViewerUtil.getContentType(FileFormat.TXT); for (BankAdviceReportInfo
+	 * bankAdviceReportInfo :subLedgerList ) { fb=new StringBuffer(300);
+	 * if(rtgsNumber!=null && rtgsDate!=null) { EBDetails ebDetails = (EBDetails)
+	 * persistenceService.find(
+	 * "select ebd from EBDetails ebd,InstrumentHeader ih ,InstrumentVoucher iv ,Miscbilldetail miscBill where ih.id=? and ih.id = iv.instrumentHeaderId.id and iv.voucherHeaderId.id = miscBill.payVoucherHeader.id and miscBill.billnumber = ebd.egBillregister.billnumber and ebd.ebConsumer.name = ? "
+	 * ,instrumentnumber.getId(),bankAdviceReportInfo.getPartyName());
+	 * fb.append(rtgsNumber) .append(seperatorForIOB) .append(rtgsDate)
+	 * .append(seperatorForIOB) .append(bankAdviceReportInfo.getPartyName())
+	 * .append(seperatorForIOB)
+	 * .append(monthMap.get(ebDetails.getMonth())+" "+EBUtils.getYear(ebDetails.
+	 * getDueDate())) .append(seperatorForIOB)
+	 * .append(bankAdviceReportInfo.getAmount()) .append("\n"); fos.write
+	 * (fb.toString().getBytes()); } } fos.flush(); fos.close(); inStream=new
+	 * FileInputStream(textFileName); }catch (FileNotFoundException e) { }catch
+	 * (IOException ioe){ } return "txtresult"; }
+	 */
 
-    @Override
-    public Object getModel() {
+	private List getBankAdviceReportList() {
 
-        return null;
-    }
+		final List retList = getSubLedgerDetailQueryAndParams(instrumentnumber);
+		if (retList != null && !retList.isEmpty()) {
+			System.out.println("NOT NULL");
+			return populateSubLedgerDetails(retList);
+		} else {
+			System.out.println("NULL");
+			return Collections.EMPTY_LIST;
+		}
+	}
 
-    public Bank getBank() {
-        return bank;
-    }
+	@Override
+	public Object getModel() {
 
-    public void setBank(final Bank bank) {
-        this.bank = bank;
-    }
+		return null;
+	}
 
-    public InputStream getInputStream() {
-        return inputStream;
-    }
+	public Bank getBank() {
+		return bank;
+	}
 
-    public void setInputStream(final InputStream inputStream) {
-        this.inputStream = inputStream;
-    }
+	public void setBank(final Bank bank) {
+		this.bank = bank;
+	}
 
-    public String getContentType() {
-        return contentType;
-    }
+	public InputStream getInputStream() {
+		return inputStream;
+	}
 
-    public void setContentType(final String contentType) {
-        this.contentType = contentType;
-    }
+	public void setInputStream(final InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
 
-    public String getFileName() {
-        return fileName;
-    }
+	public String getContentType() {
+		return contentType;
+	}
 
-    public void setFileName(final String fileName) {
-        this.fileName = fileName;
-    }
+	public void setContentType(final String contentType) {
+		this.contentType = contentType;
+	}
 
-    public void setReportService(final ReportService reportService) {
-        this.reportService = reportService;
-    }
+	public String getFileName() {
+		return fileName;
+	}
 
-    public Bankbranch getBankbranch() {
-        return bankbranch;
-    }
+	public void setFileName(final String fileName) {
+		this.fileName = fileName;
+	}
 
-    public void setBankbranch(final Bankbranch bankbranch) {
-        this.bankbranch = bankbranch;
-    }
+	public void setReportService(final ReportService reportService) {
+		this.reportService = reportService;
+	}
 
-    public Bankaccount getBankaccount() {
-        return bankaccount;
-    }
+	public Bankbranch getBankbranch() {
+		return bankbranch;
+	}
 
-    public void setBankaccount(final Bankaccount bankaccount) {
-        this.bankaccount = bankaccount;
-    }
+	public void setBankbranch(final Bankbranch bankbranch) {
+		this.bankbranch = bankbranch;
+	}
 
-    public InstrumentHeader getInstrumentnumber() {
-        return instrumentnumber;
-    }
+	public Bankaccount getBankaccount() {
+		return bankaccount;
+	}
 
-    public void setInstrumentnumber(final InstrumentHeader instrumentnumber) {
-        this.instrumentnumber = instrumentnumber;
-    }
+	public void setBankaccount(final Bankaccount bankaccount) {
+		this.bankaccount = bankaccount;
+	}
 
-    public String getBankName() {
-        return bankName;
-    }
+	public InstrumentHeader getInstrumentnumber() {
+		return instrumentnumber;
+	}
 
-    public void setBankName(final String bankName) {
-        this.bankName = bankName;
-    }
+	public void setInstrumentnumber(final InstrumentHeader instrumentnumber) {
+		this.instrumentnumber = instrumentnumber;
+	}
 
-    public String getBranchName() {
-        return branchName;
-    }
+	public String getBankName() {
+		return bankName;
+	}
 
-    public void setBranchName(final String branchName) {
-        this.branchName = branchName;
-    }
+	public void setBankName(final String bankName) {
+		this.bankName = bankName;
+	}
 
-    public String getAccountNumber() {
-        return accountNumber;
-    }
+	public String getBranchName() {
+		return branchName;
+	}
 
-    public void setAccountNumber(final String accountNumber) {
-        this.accountNumber = accountNumber;
-    }
+	public void setBranchName(final String branchName) {
+		this.branchName = branchName;
+	}
 
-    public String getInstrumentNumber() {
-        return instrumentNumber;
-    }
+	public String getAccountNumber() {
+		return accountNumber;
+	}
 
-    public void setInstrumentNumber(final String instrumentNumber) {
-        this.instrumentNumber = instrumentNumber;
-    }
+	public void setAccountNumber(final String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
 
-    public String getInstrumentDate() {
-        return instrumentDate;
-    }
+	public String getInstrumentNumber() {
+		return instrumentNumber;
+	}
 
-    public void setInstrumentDate(final String instrumentDate) {
-        this.instrumentDate = instrumentDate;
-    }
+	public void setInstrumentNumber(final String instrumentNumber) {
+		this.instrumentNumber = instrumentNumber;
+	}
 
-    public void setBankAdviseResultList(
-            final List<BankAdviceReportInfo> bankAdviseResultList) {
-        this.bankAdviseResultList = bankAdviseResultList;
-    }
+	public String getInstrumentDate() {
+		return instrumentDate;
+	}
 
-    public List<BankAdviceReportInfo> getBankAdviseResultList() {
-        return bankAdviseResultList;
-    }
+	public void setInstrumentDate(final String instrumentDate) {
+		this.instrumentDate = instrumentDate;
+	}
 
-    public BigDecimal getTotalAmount() {
-        return totalAmount;
-    }
+	public void setBankAdviseResultList(final List<BankAdviceReportInfo> bankAdviseResultList) {
+		this.bankAdviseResultList = bankAdviseResultList;
+	}
 
-    public void setTotalAmount(final BigDecimal totalAmount) {
-        this.totalAmount = totalAmount;
-    }
+	public List<BankAdviceReportInfo> getBankAdviseResultList() {
+		return bankAdviseResultList;
+	}
 
-    public String getTextFileName() {
-        return textFileName;
-    }
+	public BigDecimal getTotalAmount() {
+		return totalAmount;
+	}
 
-    public void setTextFileName(final String textFileName) {
-        this.textFileName = textFileName;
-    }
+	public void setTotalAmount(final BigDecimal totalAmount) {
+		this.totalAmount = totalAmount;
+	}
 
-    public Map<Integer, String> getMonthMap() {
-        return monthMap;
-    }
+	public String getTextFileName() {
+		return textFileName;
+	}
 
-    public void setMonthMap(final Map<Integer, String> monthMap) {
-        this.monthMap = monthMap;
-    }
+	public void setTextFileName(final String textFileName) {
+		this.textFileName = textFileName;
+	}
 
-    public Map<Integer, String> getFullNameMonthMap() {
-        return fullNameMonthMap;
-    }
+	public Map<Integer, String> getMonthMap() {
+		return monthMap;
+	}
 
-    public void setFullNameMonthMap(final Map<Integer, String> fullNameMonthMap) {
-        this.fullNameMonthMap = fullNameMonthMap;
-    }
+	public void setMonthMap(final Map<Integer, String> monthMap) {
+		this.monthMap = monthMap;
+	}
 
-    public FinancialYearHibernateDAO getFinancialYearDAO() {
-        return financialYearDAO;
-    }
+	public Map<Integer, String> getFullNameMonthMap() {
+		return fullNameMonthMap;
+	}
 
-    public void setFinancialYearDAO(final FinancialYearHibernateDAO financialYearDAO) {
-        this.financialYearDAO = financialYearDAO;
-    }
+	public void setFullNameMonthMap(final Map<Integer, String> fullNameMonthMap) {
+		this.fullNameMonthMap = fullNameMonthMap;
+	}
 
-    public Integer getMonth() {
-        return month;
-    }
+	public FinancialYearHibernateDAO getFinancialYearDAO() {
+		return financialYearDAO;
+	}
 
-    public void setMonth(final Integer month) {
-        this.month = month;
-    }
+	public void setFinancialYearDAO(final FinancialYearHibernateDAO financialYearDAO) {
+		this.financialYearDAO = financialYearDAO;
+	}
 
-    public Long getFinancialYearId() {
-        return financialYearId;
-    }
+	public Integer getMonth() {
+		return month;
+	}
 
-    public void setFinancialYearId(final Long financialYearId) {
-        this.financialYearId = financialYearId;
-    }
+	public void setMonth(final Integer month) {
+		this.month = month;
+	}
 
-    public String getMode() {
-        return mode;
-    }
+	public Long getFinancialYearId() {
+		return financialYearId;
+	}
 
-    public void setMode(final String mode) {
-        this.mode = mode;
-    }
+	public void setFinancialYearId(final Long financialYearId) {
+		this.financialYearId = financialYearId;
+	}
 
-    public String getHeading() {
-        return heading;
-    }
+	public String getMode() {
+		return mode;
+	}
 
-    public void setHeading(final String heading) {
-        this.heading = heading;
-    }
+	public void setMode(final String mode) {
+		this.mode = mode;
+	}
+
+	public String getHeading() {
+		return heading;
+	}
+
+	public void setHeading(final String heading) {
+		this.heading = heading;
+	}
 
 	public String getInstrumentType() {
 		return instrumentType;
@@ -1319,25 +1385,24 @@ public class BankAdviceReportAction extends BaseFormAction {
 	public void setInstrumentType(String instrumentType) {
 		this.instrumentType = instrumentType;
 	}
+
 	private static JRBeanCollectionDataSource getDataSource(List<BankAdviceReportInfo> subLedgerList) {
-        return new JRBeanCollectionDataSource(subLedgerList); 
-    }
-	
+		return new JRBeanCollectionDataSource(subLedgerList);
+	}
+
 	private List<Object[]> getSignatory(Long insId) {
-    	SQLQuery query =  null;
-    	List<Object[]> rows = null;
-    	try
-    	{
-    		query = this.persistenceService.getSession().createSQLQuery("select vh.firstsignatory,vh.secondsignatory from voucherheader vh where vh.id in (select voucherheaderid from egf_instrumentvoucher egf where egf.instrumentheaderid =:instId)");
-    	    query.setLong("instId", insId);
-    	    rows = query.list();
-    	    
-    	}catch (Exception e) {
+		SQLQuery query = null;
+		List<Object[]> rows = null;
+		try {
+			query = this.persistenceService.getSession().createSQLQuery(
+					"select vh.firstsignatory,vh.secondsignatory from voucherheader vh where vh.id in (select voucherheaderid from egf_instrumentvoucher egf where egf.instrumentheaderid =:instId)");
+			query.setLong("instId", insId);
+			rows = query.list();
+
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	    return rows;
-    }
-
-	
+		return rows;
+	}
 
 }

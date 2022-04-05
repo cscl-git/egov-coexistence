@@ -319,10 +319,10 @@ public class BillRegisterSearchAction extends BaseFormAction {
 				// If bill is created from create bill screen
 				if (object[11] != null) {
 
-					if (!(getStringValue(object[10])
-							.equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS)
-							|| getStringValue(object[10])
-									.equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS))) {
+					if (!(getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_APPROVED_STATUS)
+							|| getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS)
+							|| (getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.REFUNDBILL_APPROVED_STATUS)
+							|| getStringValue(object[10]).equalsIgnoreCase(FinancialConstants.REFUNDBILL_CANCELLED_STATUS)))) {
 						if (object[6].toString().equals("Pending with Audit")) {
 							billMap.put("ownerName",
 									map.get(getLongValue(object[8])) != null ? map.get(getLongValue(object[8])) : "-");

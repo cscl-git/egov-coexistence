@@ -2477,7 +2477,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 						budgetHeadNew=r.getBudgetHead();
 						narrationNew="";
 						r.setNarration((null != e[8] ? e[8].toString() : ""));
-						r.getNarration();
+						narrationNew=r.getNarration();
 						r.setParticulars((null != e[9] ? e[9].toString() : ""));
 						//vid=e[14].toString();
 						r.setDebitamt((null != e[11] ? e[11].toString() : null));
@@ -2562,7 +2562,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 						
 						if(null != e[8]) {
 							if(narrationNew.equalsIgnoreCase(e[8].toString())) {
-						r.setNarration("");
+								r.setNarration("");
 							}
 							else {
 								r.setNarration((null != e[8] ? e[8].toString() : ""));

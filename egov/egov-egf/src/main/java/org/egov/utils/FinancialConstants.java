@@ -120,6 +120,10 @@ public interface FinancialConstants {
 	public static final String CONTRACTORBILL_PASSED_STATUS = "Passed";
 	public static final String CONTRACTORBILL_PAID_STATUS = "Paid";
 
+	// Status for Refund Bills
+		public static final String REFUNDBILL_APPROVED_STATUS = "Bill Payment Approved";
+		public static final String REFUNDBILL_CANCELLED_STATUS = "Bill Payment Cancelled";
+		
 	// Status for Pension Bills
 	public static final String PENSIONBILL_CANCELLED_STATUS = "Cancelled";
 

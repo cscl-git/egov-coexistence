@@ -317,7 +317,7 @@ public class AjaxControllerBankRemittance {
     	System.out.println("XLS 1");
     	
     	String[] COLUMNS = { "SlNo", " Pex Date", "Pex/Cheque no.", "Bpv No",
-					"Bpv Date", "Voucher NO.", "Voucher Date", "Voucher Type","Party Name","Budget Head","Narration","GlCode","Particulars"," Debit Amount(Rs.)"," Credit Amount(Rs.)","Account Number" };
+					"Bpv Date", "Voucher NO.", "Voucher Date", "Voucher Type","Party Name","Budget Head","Narration","GlCode","Account Number","Particulars"," Debit Amount(Rs.)"," Credit Amount(Rs.)"};
 		
 		List details= new ArrayList<>();
 		List<ExpenditurePex> detailList=new ArrayList();
@@ -329,26 +329,26 @@ public class AjaxControllerBankRemittance {
 		System.out.println("fromDate:::: "+fromDate+" toDate:::: "+toDate);
 		ExpenditurePex r = null;
 		Map<String,List<ExpenditurePex> > result =new HashMap();
-			Map<String,String > map1 =new HashMap();
-			Map<String,String> partyMap=new HashMap();
-Map<String,String> accMap =new HashMap();
-			Map<String,List<String>> dedPexMap=new HashMap();
-			try {
-		//tds
-		List<Object[]> list= null;
-	  	SQLQuery querytds =  null;
-	   	final StringBuffer query10 = new StringBuffer(500);
-	  	query10
-	      .append("select ch.glcode,t.id from tds t, chartofaccounts ch where t.glcodeid = ch.id and isactive =true");
-	  	querytds=this.persistenceService.getSession().createSQLQuery(query10.toString());
-	   	list = querytds.list();
-	  	List<String> tds=new ArrayList<String>();
-	  	if (list.size() != 0) {
-	  		for (final Object[] object : list)
-	  		{
-	  			tds.add(object[0].toString());
-	  		}
-	  	}
+		Map<String,String > map1 =new HashMap();
+		Map<String,String> partyMap=new HashMap();
+		Map<String,String> accMap =new HashMap();
+		Map<String,List<String>> dedPexMap=new HashMap();
+		try {
+			//tds
+			List<Object[]> list= null;
+		  	SQLQuery querytds =  null;
+		   	final StringBuffer query10 = new StringBuffer(500);
+		  	query10
+		      .append("select ch.glcode,t.id from tds t, chartofaccounts ch where t.glcodeid = ch.id and isactive =true");
+		  	querytds=this.persistenceService.getSession().createSQLQuery(query10.toString());
+		   	list = querytds.list();
+		  	List<String> tds=new ArrayList<String>();
+		  	if (list.size() != 0) {
+		  		for (final Object[] object : list)
+		  		{
+		  			tds.add(object[0].toString());
+		  		}
+		  	}
 			  	//for partyname
 			  	SQLQuery queryparty =  null;
 			  	list.clear();
@@ -438,166 +438,165 @@ String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 					if(result.get(e[4].toString())==null) {
 					r.setPex((null != e[4] ? e[4].toString() : null));
 					r.setPexDate((null != e[5] ? e[5].toString() : null));
-								bvpNew="";
-								
+					bvpNew="";
 					r.setBvp((null != e[3] ? e[3].toString() : null));
-								bvpNew=r.getBvp();
+					bvpNew=r.getBvp();
 					r.setBvpDate((null != e[1] ? e[1].toString() : null));
-								vNew="";
+					vNew="";
 					r.setvNo((null != e[0] ? e[0].toString() : null));
-								vNew=r.getvNo();
+					vNew=r.getvNo();
 					r.setvDate((null != e[1] ? e[1].toString() : null));
 					r.setVoucherType((null != e[6] ? e[6].toString() : null));
 								
+					if(partyMap.containsKey(e[14].toString()))
+					{
+						r.setPartyName(partyMap.get(e[14].toString()));
+					}
+					else
+					{
+						r.setPartyName("");
+					}
+					budgetHeadNew="";
+					r.setBudgetHead((null != e[7] ? e[7].toString() : ""));
+					budgetHeadNew=r.getBudgetHead();
+					narrationNew="";
+					r.setNarration((null != e[8] ? e[8].toString() : ""));
+					narrationNew=r.getNarration();
+					r.setParticulars((null != e[9] ? e[9].toString() : ""));
+					//vid=e[14].toString();
+					r.setDebitamt((null != e[11] ? e[11].toString() : null));
+					r.setCreditamt((null != e[12] ? e[12].toString() : null));
+					r.setGlcodeId((null != e[13] ? e[13].toString() : null));
+					r.setAccNum((null != e[15] ? e[15].toString() : null));
+					//if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
+					//{}
+					//else {
+					details.add(r);
+					detailExp.add(r);
+					result.put(r.getPex(),details);
+					//}
+				}
+				else
+				{
+					//code form dedpexmap
+					if(dedPexMap.containsKey(e[14].toString()))
+					{
+						String transactionno="";
+						String transactiondate="";
+						String instrumentno="";
+						String instrumentdate="";
+						List<String> dedPexList=dedPexMap.get(e[14].toString());
+						for(int i=0;i<dedPexList.size();i+=3) {
+							transactionno=dedPexList.get(i);
+							transactiondate=dedPexList.get(i+1);
+							instrumentno=dedPexList.get(i+2);
+							instrumentdate=dedPexList.get(i+3);
+							if(transactionno=="")
+							{
+								r.setPex(instrumentno);
+								r.setPexDate(instrumentdate);
+							}
+							else
+							{
+								r.setPex(transactionno);
+								r.setPexDate(transactiondate);
+							}
+						}
+					}
+					if(null != e[3]) {
+						if(bvpNew.equalsIgnoreCase(e[3].toString())) {
+							r.setBvp("");
+							r.setBvpDate("");
+							r.setPartyName("");
+							r.setVoucherType("");
+						}
+						else {
+							r.setBvp((null != e[3] ? e[3].toString() : null));
+							bvpNew=r.getBvp();
+							r.setBvpDate((null != e[1] ? e[1].toString() : null));
+							r.setAccNum((null != e[15] ? e[15].toString() : null));
 							if(partyMap.containsKey(e[14].toString()))
 							{
 								r.setPartyName(partyMap.get(e[14].toString()));
 							}
-							else
-							{
-								r.setPartyName("");
-							}
-								budgetHeadNew="";
+							r.setVoucherType((null != e[6] ? e[6].toString() : null));
+						}
+					}
+					if(null != e[0]) {
+						if(vNew.equalsIgnoreCase(e[0].toString())) {
+							r.setvNo("");
+							r.setvDate("");
+						}
+						else {
+							r.setvNo((null != e[0] ? e[0].toString() : null));
+							vNew=r.getvNo();
+							r.setvDate((null != e[1] ? e[1].toString() : null));
+						}
+					}
+								
+					if(null != e[7]) {
+						if(budgetHeadNew.equalsIgnoreCase(e[7].toString())) {
+							r.setBudgetHead("");
+						}
+						else {
 							r.setBudgetHead((null != e[7] ? e[7].toString() : ""));
-								budgetHeadNew=r.getBudgetHead();
-								narrationNew="";
+							budgetHeadNew=r.getBudgetHead();
+						}
+					}
+								
+					if(null != e[8]) {
+						if(narrationNew.equalsIgnoreCase(e[8].toString())) {
+							r.setNarration("");
+						}
+						else {
 							r.setNarration((null != e[8] ? e[8].toString() : ""));
-								r.getNarration();
-							r.setParticulars((null != e[9] ? e[9].toString() : ""));
-							//vid=e[14].toString();
+							narrationNew=r.getNarration();
+						}
+					}
+					r.setParticulars((null != e[9] ? e[9].toString() : null));
+					///code from map
+					voucherid=e[14].toString();
+					glcode=e[13].toString();
+					conString=voucherid+"#"+glcode;
+					if(map1.containsKey(conString))
+					{
+						r.setBvp(map1.get(conString));
+						if(accMap.containsKey(r.getBvp()))
+						{
+							r.setAccNum(accMap.get(r.getBvp()));
+						}
+					}
+					////
 					r.setDebitamt((null != e[11] ? e[11].toString() : null));
 					r.setCreditamt((null != e[12] ? e[12].toString() : null));
-							r.setGlcodeId((null != e[13] ? e[13].toString() : null));
-									r.setAccNum((null != e[15] ? e[15].toString() : null));
-							//if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
-							//{}
-							//else {
-					details.add(r);
-					detailExp.add(r);
-					result.put(r.getPex(),details);
-							//}
-						}
-						else
-						{
-							//code form dedpexmap
-							if(dedPexMap.containsKey(e[14].toString()))
-							{
-								String transactionno="";
-								String transactiondate="";
-								String instrumentno="";
-								String instrumentdate="";
-								List<String> dedPexList=dedPexMap.get(e[14].toString());
-									for(int i=0;i<dedPexList.size();i+=3) {
-									transactionno=dedPexList.get(i);
-									transactiondate=dedPexList.get(i+1);
-									instrumentno=dedPexList.get(i+2);
-									instrumentdate=dedPexList.get(i+3);
-									if(transactionno=="")
-									{
-										r.setPex(instrumentno);
-										r.setPexDate(instrumentdate);
-					}
-					else
-					{
-										r.setPex(transactionno);
-										r.setPexDate(transactiondate);
-									}
-								}
-							}
-								if(null != e[3]) {
-									if(bvpNew.equalsIgnoreCase(e[3].toString())) {
-						r.setBvp("");
-						r.setBvpDate("");
-										r.setPartyName("");
-										r.setVoucherType("");
-									}
-									else {
-										r.setBvp((null != e[3] ? e[3].toString() : null));
-										bvpNew=r.getBvp();
-										r.setBvpDate((null != e[1] ? e[1].toString() : null));
-										r.setAccNum((null != e[15] ? e[15].toString() : null));
-										if(partyMap.containsKey(e[14].toString()))
-										{
-											r.setPartyName(partyMap.get(e[14].toString()));
-										}
-										r.setVoucherType((null != e[6] ? e[6].toString() : null));
-									}
-								}
-								if(null != e[0]) {
-									if(vNew.equalsIgnoreCase(e[0].toString())) {
-						r.setvNo("");
-						r.setvDate("");
-									}
-									else {
-										r.setvNo((null != e[0] ? e[0].toString() : null));
-										vNew=r.getvNo();
-										r.setvDate((null != e[1] ? e[1].toString() : null));
-									}
-								}
-								
-								if(null != e[7]) {
-									if(budgetHeadNew.equalsIgnoreCase(e[7].toString())) {
-						r.setBudgetHead("");
-									}
-									else {
-										r.setBudgetHead((null != e[7] ? e[7].toString() : ""));
-										budgetHeadNew=r.getBudgetHead();
-									}
-								}
-								
-								if(null != e[8]) {
-									if(narrationNew.equalsIgnoreCase(e[8].toString())) {
-						r.setNarration("");
-									}
-									else {
-										r.setNarration((null != e[8] ? e[8].toString() : ""));
-										narrationNew=r.getNarration();
-									}
-								}
-						r.setParticulars((null != e[9] ? e[9].toString() : null));
-							///code from map
-							voucherid=e[14].toString();
-							glcode=e[13].toString();
-							conString=voucherid+"#"+glcode;
-							if(map1.containsKey(conString))
-							{
-								r.setBvp(map1.get(conString));
-									if(accMap.containsKey(r.getBvp()))
-									{
-										r.setAccNum(accMap.get(r.getBvp()));
-									}
-						}
-							////
-						r.setDebitamt((null != e[11] ? e[11].toString() : null));
-						r.setCreditamt((null != e[12] ? e[12].toString() : null));
-							r.setGlcodeId((null != e[13] ? e[13].toString() : null));
-							if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
-							{}
-							else {
+					r.setGlcodeId((null != e[13] ? e[13].toString() : null));
+					if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
+					{}
+					else {
 						details.add(r);
 						detailExp.add(r);
 						result.put(r.getPex(),details);
 					}
 				}
 			}
-	}
-				
-	in = resultToExcel(detailExp, COLUMNS);
-	HttpHeaders headers = new HttpHeaders();
-	headers.add("Content-Disposition", "attachment; filename=PexExp.xls");
-	return ResponseEntity.ok().headers(headers).body(new InputStreamResource(in));
-
-			//return details;
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		//return detailList;
-
+				
+		in = resultToExcel(detailExp, COLUMNS);
 		HttpHeaders headers = new HttpHeaders();
 		headers.add("Content-Disposition", "attachment; filename=PexExp.xls");
 		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(in));
 
-    }
+			//return details;
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+		//return detailList;
+
+	HttpHeaders headers = new HttpHeaders();
+	headers.add("Content-Disposition", "attachment; filename=PexExp.xls");
+	return ResponseEntity.ok().headers(headers).body(new InputStreamResource(in));
+
+   }
     
     public static ByteArrayInputStream resultToExcel(List<ExpenditurePex> RetrachmentReport, String[] COLUMNS)
 			throws IOException {
