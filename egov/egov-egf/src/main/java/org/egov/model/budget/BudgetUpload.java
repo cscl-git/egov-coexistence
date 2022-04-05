@@ -193,7 +193,20 @@ public class BudgetUpload  {
         return narration;
     }
 
-    public void setNarration(String narration) {
+    @Override
+	public String toString() {
+		return "BudgetUpload [id=" + id + ", reFinYear=" + reFinYear + ", beFinYear=" + beFinYear + ", fundCode="
+				+ fundCode + ", deptCode=" + deptCode + ", functionCode=" + functionCode + ", budgetHead=" + budgetHead
+				+ ", narration=" + narration + ", oldACCode=" + oldACCode + ", errorReason=" + errorReason
+				+ ", finalStatus=" + finalStatus + ", refBudId=" + refBudId + ", planningPercentage="
+				+ planningPercentage + ", quarterpercent=" + quarterpercent + ", quarterOnepercent=" + quarterOnepercent
+				+ ", quarterTwopercent=" + quarterTwopercent + ", quarterThreepercent=" + quarterThreepercent
+				+ ", quarterFourpercent=" + quarterFourpercent + ", beAmount=" + beAmount + ", reAmount=" + reAmount
+				+ ", fund=" + fund + ", function=" + function + ", dept=" + dept + ", coa=" + coa + ", budgetInXls="
+				+ budgetInXls + "]";
+	}
+
+	public void setNarration(String narration) {
         this.narration = narration;
     }
 
