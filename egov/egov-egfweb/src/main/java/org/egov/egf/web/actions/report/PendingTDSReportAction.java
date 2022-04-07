@@ -1004,8 +1004,8 @@ public class PendingTDSReportAction extends BaseFormAction {
         Map<Long,CVoucherHeader> voucherDetailBpvMapping=new HashMap<Long,CVoucherHeader>();
         Map<Long,CVoucherHeader> voucherDetailIntrumentMapping=new HashMap<Long,CVoucherHeader>();
         populateVoucherDetailMain(voucherDetailMainMapping);
-        populateMisMapping(voucherDetailMiscMapping);
         populateBpvMapping(voucherDetailBpvMapping);
+        populateMisMapping(voucherDetailMiscMapping,voucherDetailBpvMapping);
         populateDetailInstrument(voucherDetailIntrumentMapping);
         List<DeductionReportBean> reportList=new ArrayList<DeductionReportBean>();
         DeductionReportBean bean=null;
@@ -1102,7 +1102,7 @@ public class PendingTDSReportAction extends BaseFormAction {
     	final StringBuffer query2 = new StringBuffer(500);
     	List<Object[]> list= null;
     	query2
-        .append("select vdb.id,vdb.vouchernumber,vdb.voucherdate from voucher_detail_bpvmapping vdb");
+        .append("select vdb.id,vdb.vouchernumber,vdb.voucherdate from recovery_detail_bpvmapping vdb");
     	LOGGER.info("Query 2 :: "+query2.toString());
     	queryBpv=this.persistenceService.getSession().createSQLQuery(query2.toString());
     	list = queryBpv.list();
@@ -1121,7 +1121,7 @@ public class PendingTDSReportAction extends BaseFormAction {
 		
 	}
 
-	private void populateMisMapping(Map<Long, List<VoucherDetailMiscMapping>> voucherDetailMiscMapping) {
+	private void populateMisMapping(Map<Long, List<VoucherDetailMiscMapping>> voucherDetailMiscMapping, Map<Long, CVoucherHeader> voucherDetailBpvMapping) {
 		
     	SQLQuery queryMisc =  null;
     	final StringBuffer query3 = new StringBuffer(500);
@@ -1147,6 +1147,10 @@ public class PendingTDSReportAction extends BaseFormAction {
    			if(object[2] != null)
    			{
    				voucherDetailMisc.setBpvId(Long.parseLong(object[2].toString()));
+   				if(voucherDetailBpvMapping.get(voucherDetailMisc.getBpvId()) == null)
+   				{
+   					continue;
+   				}
    			}
    			if(object[3] != null )
    			{

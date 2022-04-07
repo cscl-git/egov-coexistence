@@ -142,7 +142,15 @@ public class AuditRestDataController {
     	   a.setAudit_schedule_date(audit.getAudit_sch_date());
     	   a.setAudit_type(audit.getType());
     	   a.setAudit_comp_date(audit.getAudit_comp_date());
-    	   a.setState(audit.getState().getValue());
+    	   if(audit.getState() != null)
+    	   {
+    		   a.setState(audit.getState().getValue());
+    	   }
+    	   else
+    	   {
+    		   a.setState("");
+    	   }
+    	   
     	   a.setAudit_no(audit.getAuditno());
     	   a.setPassUnderobjection(audit.getPassUnderobjection());
     	   a.setBillid((null!=audit.getEgBillregister())?audit.getEgBillregister().getId().toString():null);
