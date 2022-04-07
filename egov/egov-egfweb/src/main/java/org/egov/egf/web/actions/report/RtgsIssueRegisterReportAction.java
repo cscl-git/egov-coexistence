@@ -405,7 +405,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 				.addScalar("vhId", BigDecimalType.INSTANCE).addScalar("paymentNumber").addScalar("paymentDate")
 				.addScalar("paymentAmount").addScalar("department").addScalar("status").addScalar("bank")
 				.addScalar("bankBranch").addScalar("dtId", BigDecimalType.INSTANCE).addScalar("realizationDate")
-				.addScalar("dkId", BigDecimalType.INSTANCE).addScalar("accountNumber");
+				.addScalar("dkId", BigDecimalType.INSTANCE).addScalar("accountNumber").addScalar("partyName");
 		System.out.println("SEARCH PEX 2");
 		if (null == parameters.get("rtgsAssignedFromDate")[0]
 				|| parameters.get("rtgsAssignedFromDate")[0].isEmpty())
@@ -418,7 +418,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		System.out.println("List size : "+rtgsDisplayList.size());
 		//populateSubLedgerDetails();
 		LOGGER.info("start party number");
-		populatePartyNames(rtgsDisplayList);
+		//populatePartyNames(rtgsDisplayList);
 		this.populateDepartmentsName();
 		rtgsReportList.addAll(rtgsDisplayList);
 		return "search";
@@ -554,8 +554,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 						.append(" and   ih.transactionnumber ='" + parameters.get("instrumentnumber")[0] + "'");
 			if (null != parameters.get("fundId") && null != parameters.get("fundId")[0] && !parameters.get("fundId")[0].isEmpty())
 				fundQry = " AND vh.fundId =" + parameters.get("fundId")[0];
-
-			queryString = queryString
+			/*queryString = queryString
 					.append(" SELECT ih.id as ihId, ih.realizationDate as realizationDate, ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
 							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
@@ -567,7 +566,21 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 							+ " AND IV.VOUCHERHEADERID IS NOT NULL AND iv.voucherheaderid = vh.id AND ih.instrumentnumber IS NULL "
 							+ " AND ih.id = iv.instrumentheaderid "
 							+ " AND vh.type IN ('Payment','Contra') and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id,ih.transactionnumber,"
-							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");
+							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");*/
+		
+			queryString = queryString
+					.append(" SELECT a.detailname as partyName, ih.id as ihId, ih.realizationDate as realizationDate, ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
+							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
+							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
+							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat, accountdetailkey a WHERE "
+							+ " ph.voucherheaderid = vh.id AND vmis.voucherheaderid = vh.id " + bankQry.toString()
+							+ " AND gld.detailkeyid=a.detailkey AND gld.detailtypeid=a.detailtypeid AND ih.bankaccountid = ba.id and branch.id = ba.branchid and branch.bankid = b.id and vh.status = 0 "
+							+ fundQry + phQry + " and stat.id= ih.id_status " + deptQry
+							+ "  and lower(ph.type)=lower('pex') " + instrumentHeaderQry.toString()
+							+ " AND IV.VOUCHERHEADERID IS NOT NULL AND iv.voucherheaderid = vh.id AND ih.instrumentnumber IS NULL "
+							+ " AND ih.id = iv.instrumentheaderid "
+							+ " AND vh.type IN ('Payment','Contra') and gl.voucherheaderid = vh.id and gld.generalledgerid = gl.id GROUP BY ih.id,ih.transactionnumber,"
+							+ " ih.transactiondate, vh.id, vh.vouchernumber,vh.voucherDate, vmis.departmentcode, b.name,branch.branchname,ba.accountnumber,stat.description,gld.detailtypeid,gld.detailkeyid,gld.amount,a.detailname ORDER BY b.name,branch.branchname,ba.accountnumber,ih.transactiondate,ih.transactionnumber");
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}catch (Exception e) {

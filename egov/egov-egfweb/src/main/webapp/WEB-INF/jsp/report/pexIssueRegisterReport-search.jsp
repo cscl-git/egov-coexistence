@@ -131,7 +131,16 @@ $(document).ready(function() {
         dom: 'Bfrtip',
         aaSorting : [],
         buttons: [
-            'copy', 'csv', 'excel', 'pdf', 'print'
+        	{ extend: 'excelHtml5'},
+        	{
+                extend: 'pdfHtml5',
+                orientation: 'landscape',
+                pageSize: 'LEGAL'
+            },
+        	{ extend: 'copyHtml5'},
+        	
+        	{ extend: 'csvHtml5'}
+        	
         ]
     } );
    /*var sum = $('#resultHeader').DataTable().column(8).data().sum();
@@ -229,22 +238,40 @@ $(document).ready(function() {
 				</tr>
 				<tr>
 					<td class="bluebox"></td>
-					<td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
+					<%-- <td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
 					<td class="greybox"><s:date name="fromDate" var="fromDateId"
 							format="dd/MM/yyyy" /> <s:textfield id="rtgsAssignedFromDate"
 							name="rtgsAssignedFromDate" value="%{fromDateId}"
 							data-date-end-date="0d"
 							onkeyup="DateFormat(this,this.value,event,false,'3')"
 							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-							data-inputmask="'mask': 'd/m/y'" /></td>
-					<td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
+							data-inputmask="'mask': 'd/m/y'" /></td> --%>
+					<td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
+					<s:date name="fromDate" format="dd/MM/yyyy" var="fromDateId" />
+					<td class="greybox"><s:textfield name="rtgsAssignedFromDate" id="rtgsAssignedFromDate"
+					maxlength="20"
+					onkeyup="DateFormat(this,this.value,event,false,'3')"
+					value="%{fromDateId}" autocomplete="off"/><a
+					href="javascript:show_calendar('forms[0].rtgsAssignedFromDate');"
+					style="text-decoration: none">&nbsp;<img
+					src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
+					<%-- <td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
 					<td class="greybox"><s:date name="toDate" var="toDateId"
 							format="dd/MM/yyyy" /> <s:textfield id="rtgsAssignedToDate"
 							name="rtgsAssignedToDate" value="%{toDateId}"
 							data-date-end-date="0d"
 							onkeyup="DateFormat(this,this.value,event,false,'3')"
 							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-							data-inputmask="'mask': 'd/m/y'" /></td>
+							data-inputmask="'mask': 'd/m/y'" /></td> --%>
+						<td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
+						<s:date name="toDate" format="dd/MM/yyyy" var="toDateId" />
+						<td class="greybox"><s:textfield name="rtgsAssignedToDate" id="rtgsAssignedToDate"
+						maxlength="20"
+						onkeyup="DateFormat(this,this.value,event,false,'3')"
+						value="%{toDateId}" autocomplete="off"/><a
+						href="javascript:show_calendar('forms[0].rtgsAssignedToDate');"
+						style="text-decoration: none">&nbsp;<img
+						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
 				</tr>
 				<tr>
 					<td class="bluebox"></td>
@@ -286,10 +313,10 @@ $(document).ready(function() {
 			<div class="buttonbottom">
 				<s:submit method="exportHtml" value="Search" cssClass="buttonsubmit"
 					onclick="return submitForm('exportHtml')" />
-				<s:submit method="exportPdf" value="Save As Pdf"
+				<%-- <s:submit method="exportPdf" value="Save As Pdf"
 					cssClass="buttonsubmit" onclick="return submitForm('exportPdf')" />
 				<s:submit method="exportXls" value="Save As Xls"
-					cssClass="buttonsubmit" onclick="return submitForm('exportXls')" />
+					cssClass="buttonsubmit" onclick="return submitForm('exportXls')" /> --%>
 				<input type="button" value="Close"
 					onclick="javascript:window.close()" class="button" />
 
@@ -324,9 +351,10 @@ $(document).ready(function() {
 				<tr>
 					<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
 					<th><spring:message code="lbl.bank" text="Bank Name" /></th>
+					<th><spring:message code="lbl.account.number" text="Account Number" /></th>
 					<th><spring:message code="lbl.bank.branch" text="Branch" /></th>
-					<th><spring:message code="lbl.rtgs.date" text="RTGS Date" /></th>
-					<th><spring:message code="lbl.rtgs.number" text="RTGS Number" /></th>
+					<th><spring:message code="lbl.pex.date" text="PEX Date" /></th>
+					<th><spring:message code="lbl.pex.number" text="PEX Number" /></th>
 					<th><spring:message code="lbl.department" text="Department" /></th>
 					<th><spring:message code="lbl.party.name" text="Party Name" /></th>
 					<th><spring:message code="lbl.bpv.number" text="BPV Number And Date" /></th>
@@ -344,12 +372,13 @@ $(document).ready(function() {
 							<tr id="rtgsView">
 								<td>${item.index + 1}</td>
 								<td>${rtgsResultObj.bank}</td>
+								<td>${rtgsResultObj.accountNumber}</td>
 								<td>${rtgsResultObj.bankBranch}</td>
 								<td>${rtgsResultObj.rtgsDate}</td>
 								<td>${rtgsResultObj.rtgsNumber}</td>
 								<td>${rtgsResultObj.department}</td>
 								<td>${rtgsResultObj.partyName}</td>
-								<td>${rtgsResultObj.paymentNumber}</td>
+								<td>${rtgsResultObj.paymentNumber},${rtgsResultObj.paymentDate}</td>
 								<td>${rtgsResultObj.paymentAmount}</td>
 								<td>${rtgsResultObj.status}</td>
 							</tr>
