@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="bankAdviceReport6" language="groovy" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isSummaryWithPageHeaderAndFooter="true" isFloatColumnFooter="true" uuid="b990656c-581e-446b-a6af-9645609a4f59">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<subDataset name="Table Dataset" uuid="005257e1-4646-4a57-b2f7-ba8e759342b8">
+		<queryString>
+			<![CDATA[]]>
+		</queryString>
+		<field name="partyName" class="java.lang.String"/>
+		<field name="amount" class="java.math.BigDecimal"/>
+		<field name="department" class="java.lang.String"/>
+		<field name="typeOfPayment" class="java.lang.String"/>
+		<variable name="totalAmt" class="java.math.BigDecimal" calculation="Sum">
+			<variableExpression><![CDATA[$F{amount}]]></variableExpression>
+		</variable>
+	</subDataset>
+	<parameter name="bankName" class="java.lang.String"/>
+	<parameter name="branchName" class="java.lang.String"/>
+	<parameter name="accountNumber" class="java.lang.String"/>
+	<parameter name="chequeNumber" class="java.lang.String"/>
+	<parameter name="chequeDate" class="java.lang.String"/>
+	<parameter name="letterContext" class="java.lang.String"/>
+	<parameter name="totalAmount" class="java.math.BigDecimal"/>
+	<parameter name="instrumentType" class="java.lang.String"/>
+	<parameter name="PEXReportDataSource" class="net.sf.jasperreports.engine.data.JRBeanCollectionDataSource"/>
+	<parameter name="totalAmountInWords" class="java.lang.String"/>
+	<parameter name="secondarySignatory" class="java.lang.String"/>
+	<parameter name="primarySignatory" class="java.lang.String"/>
+	<parameter name="headerImagePath" class="java.lang.String"/>
+	<parameter name="footerImagePath" class="java.lang.String"/>
+	<parameter name="backgroundImgPath" class="java.lang.String"/>
+	<parameter name="subject" class="java.lang.String"/>
+	<parameter name="pexNo" class="java.lang.String"/>
+	<parameter name="deptCode" class="java.lang.String"/>
+	<parameter name="bpvNumber" class="java.lang.String"/>
+	<field name="partyName" class="java.lang.String"/>
+	<field name="accountNumber" class="java.lang.String"/>
+	<field name="amount" class="java.math.BigDecimal"/>
+	<field name="ifscCode" class="java.lang.String"/>
+	<field name="bank" class="java.lang.String"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="233" splitType="Stretch">
+			<staticText>
+				<reportElement x="11" y="59" width="198" height="31" uuid="0fb81010-3097-440c-b740-842e1a2cbe14"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<text><![CDATA[To
+      The Manager,
+]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="30" y="90" width="198" height="17" uuid="299d5cdc-a489-4129-afc3-f757c6209eaf"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bankName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="30" y="107" width="198" height="21" uuid="6a9aee92-8931-44fa-aee1-dcbffc32c45e"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{branchName}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="30" y="128" width="247" height="16" uuid="1b660be3-bd79-4652-8ce2-33c5425e5582"/>
+				<textElement textAlignment="Left" verticalAlignment="Middle">
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{chequeNumber}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" stretchType="RelativeToTallestObject" x="61" y="198" width="451" height="35" uuid="3f9d994a-1079-4bde-a12c-3a07524a7d38"/>
+				<textElement textAlignment="Justified" verticalAlignment="Top">
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{letterContext}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="301" y="128" width="211" height="16" uuid="17df2b31-a540-4d02-913a-28367f8a8aa4"/>
+				<box leftPadding="2"/>
+				<textElement textAlignment="Right" verticalAlignment="Middle">
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Dated : "+$P{chequeDate}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement positionType="Float" x="11" y="183" width="470" height="15" uuid="b53aad69-bda8-42e4-badc-9e8e1d225982"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA["SUB:   "+$P{subject}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="10" y="-20" width="510" height="77" uuid="b7cf5734-82c8-4d13-9910-2f976b74f46c"/>
+				<imageExpression><![CDATA[$P{headerImagePath}]]></imageExpression>
+			</image>
+			<textField isStretchWithOverflow="true">
+				<reportElement stretchType="RelativeToTallestObject" x="32" y="145" width="480" height="28" isPrintWhenDetailOverflows="true" uuid="0a5f0275-36e1-43e8-a37f-e251f9cd6f0b"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{bpvNumber}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="80" splitType="Stretch">
+			<image>
+				<reportElement x="32" y="3" width="510" height="77" uuid="cfe18cae-c738-4299-bd1b-e7c67a050d9c"/>
+				<imageExpression><![CDATA[$P{headerImagePath}]]></imageExpression>
+			</image>
+		</band>
+	</pageHeader>
+	<columnFooter>
+		<band height="50">
+			<textField evaluationTime="Report" isBlankWhenNull="true">
+				<reportElement x="534" y="25" width="7" height="20" uuid="9c9642cc-2fa0-488f-ab77-9b6128fde191"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<image>
+				<reportElement x="32" y="0" width="480" height="50" uuid="1f29f88a-60d5-4a78-bfc4-4f8a42973f63"/>
+				<imageExpression><![CDATA[$P{footerImagePath}]]></imageExpression>
+			</image>
+			<textField>
+				<reportElement x="522" y="25" width="12" height="20" uuid="4cdc5f72-1f61-42cb-903c-ab58cc973637"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}+"/"]]></textFieldExpression>
+			</textField>
+		</band>
+	</columnFooter>
+	<summary>
+		<band height="257" splitType="Stretch">
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="351" y="171" width="190" height="32" uuid="88928bab-d1e6-4859-b85b-ade4f7d0045b"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{primarySignatory}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="33" y="171" width="267" height="32" uuid="cdaa511d-a8a3-4052-9c64-ba9f17db73ec"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{secondarySignatory}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="33" y="203" width="148" height="33" uuid="b3fafe55-21ec-4d1c-8ff9-cf3093aa823c"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Municipal Corporation,
+Chandigarh]]></text>
+			</staticText>
+			<componentElement>
+				<reportElement key="table" positionType="Float" isPrintRepeatedValues="false" x="32" y="41" width="493" height="76" uuid="4377e6c3-4f77-41c0-b669-d6460fa3be17"/>
+				<jr:table xmlns:jr="http://jasperreports.sourceforge.net/jasperreports/components" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports/components http://jasperreports.sourceforge.net/xsd/components.xsd">
+					<datasetRun subDataset="Table Dataset" uuid="d7e9a751-14fe-469f-9e95-7185aea91580">
+						<dataSourceExpression><![CDATA[$P{PEXReportDataSource}]]></dataSourceExpression>
+					</datasetRun>
+					<jr:column width="36" uuid="c1f91e1b-3503-47f5-a678-eb9b25aec924">
+						<jr:tableFooter height="18" rowSpan="1"/>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="36" height="30" uuid="59b27dbb-46b5-4c09-afd4-92a62796a43f"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Sno
+]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="43" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="36" height="43" isPrintWhenDetailOverflows="true" uuid="c757f962-946e-4b69-b5ae-a71382439d35"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{REPORT_COUNT}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="124" uuid="e771b02b-f8aa-46bf-9f4a-93dcb55108b8">
+						<jr:tableFooter height="18" rowSpan="1"/>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement stretchType="RelativeToBandHeight" x="0" y="0" width="124" height="30" isPrintWhenDetailOverflows="true" uuid="8b18fc0d-d2c8-43a1-b641-9a047020a9ec"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[In Favour of]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="43" rowSpan="1">
+							<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="124" height="43" isPrintWhenDetailOverflows="true" uuid="04558152-e7e4-401f-b2d2-2c1dd437c5d0"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{partyName}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="158" uuid="1d508e00-050f-493d-89aa-b3afc9b66121">
+						<jr:tableFooter height="18" rowSpan="1"/>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="158" height="30" uuid="1ce5b439-1c0d-4160-a596-8563780d442c"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Type of payments]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="43" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="158" height="43" isPrintWhenDetailOverflows="true" backcolor="rgba(255, 255, 255, 0.0)" uuid="bc0b3258-2200-4573-8409-d1c2a7f6172b"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{typeOfPayment}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="90" uuid="648245c9-b448-4b25-8128-c75340b50817">
+						<jr:tableFooter height="18" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="90" height="18" uuid="a0152615-c2ff-47fd-894f-f85268e5d1f5"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<text><![CDATA[Total]]></text>
+							</staticText>
+						</jr:tableFooter>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement positionType="Float" x="0" y="0" width="90" height="30" uuid="16b37184-79f5-445f-a350-6c8c9524a47d"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Name of Division]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="43" rowSpan="1">
+							<textField isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="90" height="43" isPrintWhenDetailOverflows="true" uuid="9d1aaec5-b2dc-4a16-a24b-282b3e71a0b8"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{department}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+					<jr:column width="92" uuid="89e7db68-34d5-4f48-ac74-2b629dacd953">
+						<jr:tableFooter height="18" rowSpan="1">
+							<textField pattern="###0.00;-###0.00">
+								<reportElement x="0" y="0" width="92" height="18" uuid="8071c361-26a3-4020-9430-fef0d321c2a0"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$V{totalAmt}]]></textFieldExpression>
+							</textField>
+						</jr:tableFooter>
+						<jr:columnHeader height="30" rowSpan="1">
+							<staticText>
+								<reportElement x="0" y="0" width="92" height="30" uuid="9d231cff-08fc-4776-84bd-79c106432d7f"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="12" isBold="false"/>
+								</textElement>
+								<text><![CDATA[Amount of DD]]></text>
+							</staticText>
+						</jr:columnHeader>
+						<jr:detailCell height="43" rowSpan="1">
+							<textField pattern="###0.00" isBlankWhenNull="true">
+								<reportElement stretchType="RelativeToTallestObject" x="0" y="0" width="92" height="43" isPrintWhenDetailOverflows="true" uuid="6a9df0aa-a79f-4bea-9bb1-2dde3f06ada7"/>
+								<box>
+									<pen lineWidth="0.5"/>
+									<topPen lineWidth="0.5"/>
+									<leftPen lineWidth="0.5"/>
+									<bottomPen lineWidth="0.5"/>
+									<rightPen lineWidth="0.5"/>
+								</box>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font fontName="Verdana" size="11"/>
+								</textElement>
+								<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
+							</textField>
+						</jr:detailCell>
+					</jr:column>
+				</jr:table>
+			</componentElement>
+			<textField>
+				<reportElement positionType="Float" isPrintRepeatedValues="false" x="32" y="117" width="493" height="54" uuid="6341c09b-91d1-4ded-8772-fded195e39e4"/>
+				<textElement textAlignment="Right">
+					<font fontName="Verdana" size="11" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{totalAmountInWords}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="33" y="171" width="267" height="32" uuid="a23f72f2-cc68-430a-9d68-f2f3d0576bd1"/>
+				<textElement verticalAlignment="Bottom">
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{secondarySignatory}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement positionType="Float" x="351" y="171" width="190" height="32" uuid="be607db5-dd17-4694-830b-a15aafedd51d"/>
+				<textElement textAlignment="Left" verticalAlignment="Bottom">
+					<font fontName="Verdana" size="11"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{primarySignatory}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement positionType="Float" x="33" y="203" width="148" height="33" uuid="dcc73e37-1632-4da7-8655-fd4b9d82c1b9"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Municipal Corporation,
+Chandigarh]]></text>
+			</staticText>
+			<staticText>
+				<reportElement positionType="Float" x="351" y="203" width="136" height="34" uuid="11cd53b1-e3b8-499f-a955-5ec2064892a3"/>
+				<textElement textAlignment="Left" verticalAlignment="Top" markup="none">
+					<font fontName="Verdana" size="12" isBold="false" isStrikeThrough="false" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Municipal Corporation,
+Chandigarh]]></text>
+			</staticText>
+			<textField>
+				<reportElement positionType="Float" x="37" y="12" width="262" height="29" uuid="aab62691-b377-4c81-b0b7-2e324c4e3b98"/>
+				<textElement>
+					<font fontName="Verdana" size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$P{pexNo}]]></textFieldExpression>
+			</textField>
+		</band>
+	</summary>
+</jasperReport>
