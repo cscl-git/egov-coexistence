@@ -250,7 +250,7 @@ public class BillRegisterReportAction extends SearchFormAction {
     public String searchform() {
         persistenceService.getSession().setDefaultReadOnly(true);
         persistenceService.getSession().setFlushMode(FlushMode.MANUAL);
-        isCompleteBillRegisterReport = true;
+        isCompleteBillRegisterReport = false;//true;
         loadDropdownData();
         mandatoryFields.remove("subdivision");
         toDate = fromDate = null;
@@ -288,7 +288,7 @@ public class BillRegisterReportAction extends SearchFormAction {
         voucherHeader.getVouchermis().setDepartmentcode(deptImpl.getCode());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("BillRegisterReportAction | completeBill | start");
-        isCompleteBillRegisterReport = true;
+        isCompleteBillRegisterReport = false;//true;
         setPageSize(50);
         loadDropdownData();
         validateBeforeSearch();
@@ -518,15 +518,20 @@ public class BillRegisterReportAction extends SearchFormAction {
                                 }
 
                             preVoucherId = misc.getPayVoucherHeader().getId();
-                            if (isCompleteBillRegisterReport)
-                                getRemittancePaymentDetail(billRegReport);
+						
+						/*
+						 * if (isCompleteBillRegisterReport) getRemittancePaymentDetail(billRegReport);
+						 */
+						 
                         //}
                         billRegReport.setPaidAmount(paidAmount);
                         billRegReport.setPaymentVoucherNumber(payMentVoucherNumber.toString());
                         billRegReport.setChequeNumAndDate(chequeNoAndDate.toString());
 
-                    } else if (isCompleteBillRegisterReport)
-                        getRemittancePaymentDetail(billRegReport);
+					} /*
+						 * else if (isCompleteBillRegisterReport)
+						 * getRemittancePaymentDetail(billRegReport);
+						 */
 
                 }
 
