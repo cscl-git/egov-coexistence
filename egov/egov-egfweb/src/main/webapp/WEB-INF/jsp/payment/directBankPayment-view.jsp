@@ -58,13 +58,17 @@
 	src="${pageContext.request.contextPath}/resources/javascript/voucherHelper.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/javascript/directBankPaymentHelper.js"></script>
-<link href="/services/EGF/resources/css/budget.css?rnd=${app_release_no}" rel="stylesheet"
-	type="text/css" />
-<link href="/services/EGF/resources/css/commonegovnew.css?rnd=${app_release_no}" rel="stylesheet"
-	type="text/css" />
-<link rel="stylesheet" href="/services/EGF/resources/css/tabber.css?rnd=${app_release_no}"
+<link
+	href="/services/EGF/resources/css/budget.css?rnd=${app_release_no}"
+	rel="stylesheet" type="text/css" />
+<link
+	href="/services/EGF/resources/css/commonegovnew.css?rnd=${app_release_no}"
+	rel="stylesheet" type="text/css" />
+<link rel="stylesheet"
+	href="/services/EGF/resources/css/tabber.css?rnd=${app_release_no}"
 	TYPE="text/css">
-<script type="text/javascript" src="/services/EGF/resources/javascript/tabber.js?rnd=${app_release_no}"></script>
+<script type="text/javascript"
+	src="/services/EGF/resources/javascript/tabber.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="/services/EGF/resources/javascript/tabber2.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
@@ -400,6 +404,7 @@ function printVoucher(){
 							</table>
 						</div>
 					</div>
+						<%@ include file='../workflow/commonworkflowhistory.jsp'%>
 
 					<!-- <div class="tabbertab" id="chequetab"> -->
 						<h2>Cheque Details</h2>
@@ -575,6 +580,9 @@ function printVoucher(){
 	</s:if>	
 	
 </script>
+				<s:hidden id="size" name="size" value="%{workflowHistory.size}" />
+				<s:hidden id="list" name="list" value="%{workflowHistory}" />
+				<s:hidden id="sizeWork" name="sizeWork" value="%{sizeWork}" />
 
 				<s:if test="%{showApprove}">
 					<s:if test="%{showMode!='create' && showMode!='view' }">
@@ -595,6 +603,7 @@ function printVoucher(){
 					</s:else>
 					<s:hidden id="paymentid" name="paymentid"
 						value="%{paymentheader.id}" />
+
 					<s:hidden name="actionname" id="actionName" value="%{action}" />
 					<script>
 if(document.getElementById('actionName').value!='')
