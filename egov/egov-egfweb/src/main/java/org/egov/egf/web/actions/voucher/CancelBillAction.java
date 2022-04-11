@@ -374,19 +374,43 @@ public class CancelBillAction extends BaseFormAction {
     	{
     		owenrPos.setId(null);
     	}
-		 
+		 try
+		 {
+			 
+		
 		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
 	                FinancialConstants.CONTINGENCYBILL_PENDING_CANCEL));
-		 egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
-         .withComments("Send to Audit")
-         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-         .withNextAction("")
-         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
-         .withCreatedBy(user.getId())
-         .withtLastModifiedBy(user.getId());
+		 if(egBillregister.getState().getValue().equalsIgnoreCase("END"))
+		 {
+			 egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
+	         .withComments("Send to Audit")
+	         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+	         .withNextAction("")
+	         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
+	         .withCreatedBy(user.getId())
+	         .withtLastModifiedBy(user.getId());
+		 }
+		 else
+		 {
+			 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+	         .withComments("Send to Audit")
+	         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+	         .withNextAction("")
+	         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
+	         .withCreatedBy(user.getId())
+	         .withtLastModifiedBy(user.getId());
+		 }
+		 
+		 System.out.println("end end");
 		 applyAuditing(egBillregister,user.getId());
+		 System.out.println("end end 1");
 		 expenseBillRepository.save(egBillregister);
+		 System.out.println("end end 2");
 		 persistenceService.getSession().flush();
+		 System.out.println("end end 3");
+		 }catch (Exception e) {
+			e.printStackTrace();
+		}
 		 //egBillregister
 		 System.out.println("end");
 		addActionMessage(getText("cacncel.bill.success.msg"));
