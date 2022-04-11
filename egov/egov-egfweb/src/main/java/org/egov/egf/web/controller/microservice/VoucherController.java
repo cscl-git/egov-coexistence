@@ -479,7 +479,7 @@ public class VoucherController extends BaseBillController{
     }
     
 	//@PostMapping(value = "/rest/voucher/refundBill")//, consumes = "application/json", produces = "application/json")
-	@RequestMapping(value = "/rest/voucher/refundBill", method = {RequestMethod.GET})
+	@RequestMapping(value = "/rest/voucher/refundBill", method = {RequestMethod.POST})
 	public RefundResponse refundBill(@RequestBody RefundRequest refundRequest, final Model model,
 			final BindingResult resultBinder, final HttpServletRequest request) throws IOException {
 	
@@ -532,7 +532,7 @@ public class VoucherController extends BaseBillController{
 		
 		totalCrAmt = new BigDecimal(0); 
 	 	egBillregister.setBillamount(totalCrAmt);
-	 	final Long OtherCount=(Long) persistenceService.find("select count(*) from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"'");	
+	 	final Long OtherCount=(Long) persistenceService.find("select count(*) from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"' and name='"+refundRequest.getReceipt().getCitizenName()+"'");	
 		if(OtherCount==0)
 		{
 			System.out.println("inside no otherparty found"); 
@@ -550,6 +550,7 @@ public class VoucherController extends BaseBillController{
 				otherParty.setBankAccount(refundRequest.getReceipt().getBankAccount());
 				otherParty.setIfscCode(refundRequest.getReceipt().getIfscCode());
 				otherParty.setCode(refundRequest.getReceipt().getCitizenName());
+				otherParty.setName(refundRequest.getReceipt().getCitizenName());
 				otherPartyService.create1(otherParty,approver);
 			}
 			catch(Exception e)
@@ -560,7 +561,7 @@ public class VoucherController extends BaseBillController{
 		final List<CGeneralLedger> gllist = paymentRefundUtils
 				.getAccountDetails(Long.valueOf(vouchermis.getVoucherheaderid().getId()));
 		try {
-			final Long otherpartyid=(Long) persistenceService.find("select id from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"'");
+			final Long otherpartyid=(Long) persistenceService.find("select id from OtherParty where bankaccount='"+refundRequest.getReceipt().getBankAccount()+"' and name='"+refundRequest.getReceipt().getCitizenName()+"'");
 	    	List<GeneralLedger> ledger=new ArrayList();
 			List<Object[]> list1= null;
 			final StringBuffer query1 = new StringBuffer(500);

@@ -47,6 +47,8 @@
  */
 package org.egov.egf.web.actions.report;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
@@ -61,7 +63,23 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.log4j.Logger;
+import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+import org.apache.poi.hssf.usermodel.HSSFFont;
+import org.apache.poi.hssf.usermodel.HSSFRichTextString;
+import org.apache.poi.hssf.usermodel.HSSFRow;
+import org.apache.poi.hssf.usermodel.HSSFSheet;
+import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
@@ -77,7 +95,12 @@ import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.admin.master.service.CityService;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.reporting.engine.ReportFormat;
+import org.egov.infra.reporting.engine.ReportOutput;
+import org.egov.infra.reporting.engine.ReportRequest;
+import org.egov.infra.reporting.engine.ReportService;
 import org.egov.infra.reporting.util.ReportUtil;
+import org.egov.infra.reporting.viewer.ReportViewerUtil;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -94,6 +117,14 @@ import org.hibernate.type.BigDecimalType;
 import org.hibernate.type.LongType;
 import org.hibernate.type.StandardBasicTypes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import net.sf.jasperreports.engine.JRException;
 
@@ -105,13 +136,14 @@ import net.sf.jasperreports.engine.JRException;
 				Constants.INPUT_STREAM, Constants.CONTENT_TYPE, "application/xls", Constants.CONTENT_DISPOSITION,
 				"no-cache;filename=ChequeIssueRegister.xls" }) })
 @ParentPackage("egov")
-public class ChequeIssueRegisterReportAction extends BaseFormAction {
+public class ChequeIssueRegisterReportAction<ActionForward, ActionForm> extends BaseFormAction {
 	/**
 	 *
 	 */
 	private static final long serialVersionUID = -5452940328051657821L;
 	private static final String MULTIPLE = "Multiple";
 	String jasperpath = "/reports/templates/chequeIssueRegisterReport.jasper";
+	String jasperForExcel = "/reports/templates/chequeIssueRegisterReport";
 	String bankAdviceJasperPath = "/reports/templates/bankAdviceExcelReport.jasper";
 	private List<ChequeIssueRegisterDisplay> chequeIssueRegisterList = new ArrayList<ChequeIssueRegisterDisplay>();
 	private Date fromDate;
@@ -119,6 +151,7 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 	private String chequeFromNumber;
 	private String chequeToNumber;
 	private Bankaccount accountNumber;
+	ByteArrayInputStream arrayInputStream ;
 	ReportHelper reportHelper;
 	private InputStream inputStream;
 	private EgovCommon egovCommon;
@@ -135,6 +168,11 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 	private Long instrumentHeaderId;
 	private Map<BigDecimal,String> voucherIdNumMap = new HashMap<>();
 	
+	private String contentType;
+	private String fileName;
+
+	private ReportService reportService;
+
 	@Autowired
 	private CityService cityService;
 	
@@ -323,13 +361,172 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 		return "PDF";
 	}
 
+	/*
+	 * @Action(value = "/report/chequeIssueRegisterReport-generateXls") public
+	 * String generateXls() throws JRException, IOException { generateReport();
+	 * final List<ChequeIssueRegisterDisplay> data = new
+	 * ArrayList<ChequeIssueRegisterDisplay>();
+	 * data.addAll(getChequeIssueRegisterList()); // inputStream =
+	 * reportHelper.exportXls(getInputStream(), jasperpath, // getParamMap(), data);
+	 * final ReportRequest reportInput = new
+	 * ReportRequest("chequeIssueRegisterReport", data, getParamMap());
+	 * reportInput.setReportFormat(ReportFormat.XLS);
+	 * 
+	 * contentType = ReportViewerUtil.getContentType(ReportFormat.XLS); fileName =
+	 * "CheckIssueRegisterReport." + ReportFormat.XLS.toString().toLowerCase(); try
+	 * { final ReportOutput reportOutput = reportService.createReport(reportInput);
+	 * if (reportOutput != null && reportOutput.getReportOutputData() != null)
+	 * inputStream = new ByteArrayInputStream(reportOutput.getReportOutputData());
+	 * System.out.println("Processed");
+	 * 
+	 * } catch (Exception e) { System.out.println(e.getCause().toString());
+	 * e.printStackTrace(); }
+	 * 
+	 * return "XLS"; }
+	 */
 	@Action(value = "/report/chequeIssueRegisterReport-generateXls")
-	public String generateXls() throws JRException, IOException {
+	public String exportExcel()
+			throws Exception {
 		generateReport();
-		final List<Object> data = new ArrayList<Object>();
-		data.addAll(getChequeIssueRegisterList());
-		inputStream = reportHelper.exportXls(getInputStream(), jasperpath, getParamMap(), data);
+		HSSFWorkbook workbook = createWorkbook(chequeIssueRegisterList);
+		try {
+			ByteArrayOutputStream boas = new ByteArrayOutputStream();
+			workbook.write(boas);
+			setInputStream(new ByteArrayInputStream(boas.toByteArray()));
+			//setArrayInputStream(new ByteArrayInputStream(boas.toByteArray()));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 		return "XLS";
+	}
+
+	public HSSFWorkbook createWorkbook(List<ChequeIssueRegisterDisplay> chequeIssueRegisterList2) throws Exception {
+
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("Cheque Issue Register Report");
+
+		/**
+		 * Setting the width of the first three columns.
+		 */
+		sheet.setColumnWidth(0, 3500);
+		sheet.setColumnWidth(1, 7500);
+		sheet.setColumnWidth(2, 5000);
+
+		/**
+		 * Style for the header cells.
+		 */
+		HSSFCellStyle headerCellStyle = wb.createCellStyle();
+		HSSFFont boldFont = wb.createFont();
+		//boldFont.setBoldweight(HSSFFont.BOLDWEIGHT_BOLD);
+		//headerCellStyle.setFont(boldFont);
+		CreationHelper createHelper = wb.getCreationHelper();
+
+		CellStyle cellStyle = wb.createCellStyle();
+		cellStyle.setDataFormat(createHelper.createDataFormat().getFormat("d/m/yy"));
+
+		HSSFRow row = sheet.createRow(0);
+		HSSFCell cell = row.createCell(0);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Sl No."));
+		
+		cell = row.createCell(1);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Cheque Number"));
+
+		cell = row.createCell(2);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Cheque Date"));
+		
+		cell = row.createCell(3);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Name of the Payee"));
+		
+		cell = row.createCell(4);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Cheque Amount(Rs)"));
+		
+		cell = row.createCell(5);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Nature of Payment"));
+
+		cell = row.createCell(6);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Cheque Status"));
+		
+		cell = row.createCell(7);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Payment Order Number"));
+
+		cell = row.createCell(8);
+		cell.setCellStyle(headerCellStyle);
+		cell.setCellValue(new HSSFRichTextString("Bank Payment Voucher Number & Date"));
+
+		String sl = "";
+		for (int index = 1; index <= chequeIssueRegisterList2.size(); index++) {
+			row = sheet.createRow(index);
+			
+			cell = row.createCell(0);
+			sl = Integer.toString(index);
+
+			ChequeIssueRegisterDisplay chequeIssueRegisterDisplay = chequeIssueRegisterList2.get(index-1);
+			HSSFRichTextString ssl = new HSSFRichTextString(sl);
+			cell.setCellValue(ssl);
+			
+			if(chequeIssueRegisterDisplay.getChequeNumber() != null) {
+				cell = row.createCell(1);
+				HSSFRichTextString chequeNumber = new HSSFRichTextString(chequeIssueRegisterDisplay.getChequeNumber());
+				cell.setCellValue(chequeNumber);	
+			}
+			
+			if(chequeIssueRegisterDisplay.getChequeDate() != null) {
+				cell = row.createCell(2);
+				HSSFRichTextString chequeDate = new HSSFRichTextString(chequeIssueRegisterDisplay.getChequeDate());
+				cell.setCellValue(chequeDate);	
+			}
+			
+			
+			if(chequeIssueRegisterDisplay.getPayTo() != null) {
+				cell = row.createCell(3);
+				HSSFRichTextString payeeName = new HSSFRichTextString(chequeIssueRegisterDisplay.getPayTo());
+				cell.setCellValue(payeeName);	
+			}
+			
+			if(chequeIssueRegisterDisplay.getChequeAmount() !=null) {
+				cell = row.createCell(4);
+				HSSFRichTextString chequeAmt = new HSSFRichTextString(chequeIssueRegisterDisplay.getChequeAmount().toString());
+				cell.setCellValue(chequeAmt);	
+			}
+			
+			if(chequeIssueRegisterDisplay.getType() != null) {
+				cell = row.createCell(5);
+				HSSFRichTextString paymentNature = new HSSFRichTextString(chequeIssueRegisterDisplay.getType());
+				cell.setCellValue(paymentNature);	
+			}
+			
+			if(chequeIssueRegisterDisplay.getChequeStatus() != null) {
+				cell = row.createCell(6);
+				HSSFRichTextString chequeStatus = new HSSFRichTextString(chequeIssueRegisterDisplay.getChequeStatus());
+				cell.setCellValue(chequeStatus);	
+			}
+			SimpleDateFormat formatter = new SimpleDateFormat("dd-MMM-yyyy");
+			if(chequeIssueRegisterDisplay.getBillNumber() != null && chequeIssueRegisterDisplay.getBillDate() != null) {
+				cell = row.createCell(7);
+				String strDate= formatter.format(chequeIssueRegisterDisplay.getBillDate());
+				HSSFRichTextString orderNumber = new HSSFRichTextString(chequeIssueRegisterDisplay.getBillNumber()+" , " +strDate);
+				cell.setCellValue(orderNumber);
+			}
+			
+			if(chequeIssueRegisterDisplay.getVoucherNumber() != null && chequeIssueRegisterDisplay.getVoucherDate() != null) {
+				cell = row.createCell(8);
+				String strDate= formatter.format(chequeIssueRegisterDisplay.getVoucherDate());
+
+				HSSFRichTextString numberAndDate = new HSSFRichTextString(chequeIssueRegisterDisplay.getVoucherNumber() +" , "+ strDate);
+				cell.setCellValue(numberAndDate);
+			}
+					
+		}
+		return wb;
 	}
 
 	@Action(value = "/report/chequeIssueRegisterReport-bankAdviceExcel")
@@ -444,7 +641,8 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
 
 	private void populateUlbName() {
 
-		setUlbName(ReportUtil.getCityName() +" "+(cityService.getCityGrade()==null ? "" :cityService.getCityGrade()));
+		setUlbName(ReportUtil.getCityName() + " "
+				+ (cityService.getCityGrade() == null ? "" : cityService.getCityGrade()));
 	}
 
 	public void setUlbName(final String ulbName) {
@@ -543,6 +741,40 @@ public class ChequeIssueRegisterReportAction extends BaseFormAction {
         this.voucherIdNumMap = voucherIdNumMap;
     }
 	
+	public String getContentType() {
+		return contentType;
+	}
 	
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public ReportService getReportService() {
+		return reportService;
+	}
+
+	public void setReportService(ReportService reportService) {
+		this.reportService = reportService;
+	}
+
+	public ByteArrayInputStream getArrayInputStream() {
+		return arrayInputStream;
+	}
+
+	public void setArrayInputStream(ByteArrayInputStream arrayInputStream) {
+		this.arrayInputStream = arrayInputStream;
+	}
+
+	public void setInputStream(InputStream inputStream) {
+		this.inputStream = inputStream;
+	}
 
 }

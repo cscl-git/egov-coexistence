@@ -2342,6 +2342,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 		Map<String,List<ExpenditurePex> > result =new HashMap();
 		Map<String,String> map1 =new HashMap();
 		Map<String,String> partyMap =new HashMap();
+		Map<String,String> accMap =new HashMap();
 		Map<String,List<String>> dedPexMap=new HashMap();
 		try {
 			//tds
@@ -2374,16 +2375,30 @@ public class RemittanceServiceImpl extends RemittanceService {
 		  		}
 		  	}
 		  	
+		  //for account number
+		  	SQLQuery queryAcc =  null;
+		  	list.clear();
+		  	final StringBuffer query3 = new StringBuffer(500);
+		  	query3
+		      .append("select distinct ei2.voucherheaderid ,v1.vouchernumber ,b2.accountnumber from egf_instrumentheader ei,egf_instrumentvoucher ei2,bankaccount b2,voucherheader v1 where b2.id = ei.bankaccountid and ei2.voucherheaderid = v1.id and ei2.instrumentheaderid = ei.id ");
+		  	queryparty=this.persistenceService.getSession().createSQLQuery(query3.toString());
+		   	list = queryparty.list();
+		  	if (list.size() != 0) {
+		  		for (final Object[] object : list)
+		  		{
+		  			accMap.put(object[1].toString(),object[2].toString());
+		  		}
+		  	}
+		  	
 		  	//for deduction pex
-		
 		  SQLQuery querydedpex = null; 
 		  list.clear(); 
 		  final StringBuffer querypex = new StringBuffer(500); 
 		  querypex
 		  .append("select distinct v1.id,ei.transactionnumber as pex,to_char(ei.transactiondate, 'dd-Mon-yyyy') as pexdate, "
-		  +" ei.instrumentnumber as cheque,to_char(ei.instrumentdate , 'dd-Mon-yyyy') as chequedate,b2.accountnumber "
-		  +" from voucherheader v1,generalledger g2,miscbilldetail m,egf_instrumentheader ei,egf_instrumentvoucher ei2,bankaccount b2 "
-		  +" where g2.voucherheaderid = v1.id and b2.id = ei.bankaccountid and ei2.voucherheaderid =v1.id and ei2.instrumentheaderid = ei.id "
+		  +" ei.instrumentnumber as cheque,to_char(ei.instrumentdate , 'dd-Mon-yyyy') as chequedate "
+		  +" from voucherheader v1,generalledger g2,miscbilldetail m,egf_instrumentheader ei,egf_instrumentvoucher ei2 "
+		  +" where g2.voucherheaderid = v1.id and ei2.voucherheaderid =v1.id and ei2.instrumentheaderid = ei.id "
 		  + " and ei2.voucherheaderid = m.payvhid order by v1.id");
 		  querydedpex=this.persistenceService.getSession().createSQLQuery(querypex.toString()); 
 		  list = querydedpex.list(); 
@@ -2396,7 +2411,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 				  dedPex.add((null != e[2] ? e[2].toString() : ""));
 				  dedPex.add((null != e[3] ? e[3].toString() : "")); 
 				  dedPex.add((null != e[4] ? e[4].toString() : "")); 
-				  dedPex.add((null != e[5] ? e[5].toString() : ""));
+				  //dedPex.add((null != e[5] ? e[5].toString() : ""));
 				  dedPexMap.put(e[0].toString(),dedPex); 
 			  } 
 		  }
@@ -2425,7 +2440,7 @@ public class RemittanceServiceImpl extends RemittanceService {
 			" where f.id = v.functionid and b2.id = ei.bankaccountid and c2.id = g2.glcodeid and v.voucherheaderid = m.billvhid and ei2.instrumentheaderid = ei.id " + 
 			" and vh.id = m.billvhid and ei2.voucherheaderid = m.payvhid and m.billvhid = g2.voucherheaderid " + 
 			" and ei.transactiondate >= to_date('"+fromDate+"','dd/Mon/yyyy') and ei.transactiondate <= to_date('"+toDate+"','dd/Mon/yyyy') " + 
-			" and ei.id_status not in (1) order by ei.transactiondate asc,vh.vouchernumber,debitamount desc,creditamount desc") ;
+			" and ei.id_status not in (1) order by ei.transactionnumber asc,ei.transactiondate asc,vh.vouchernumber,debitamount desc,creditamount desc") ;
 			
 			System.out.println("::::::>>>>>" + query);
 			rows = query.list();
@@ -2433,15 +2448,20 @@ public class RemittanceServiceImpl extends RemittanceService {
 			System.out.println("row size " + rows.size());
 			List finalList=new ArrayList();
 			String vid="";
+			String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 			if (rows.size() != 0) {
 				for (Object[] e : rows) {
 					r = new ExpenditurePex();
 					if(result.get(e[4].toString())==null) {
 						r.setPex((null != e[4] ? e[4].toString() : null));
 						r.setPexDate((null != e[5] ? e[5].toString() : null));
+						bvpNew="";
 						r.setBvp((null != e[3] ? e[3].toString() : null));
+						bvpNew=r.getBvp();
 						r.setBvpDate((null != e[1] ? e[1].toString() : null));
+						vNew="";
 						r.setvNo((null != e[0] ? e[0].toString() : null));
+						vNew=r.getvNo();
 						r.setvDate((null != e[1] ? e[1].toString() : null));
 						r.setVoucherType((null != e[6] ? e[6].toString() : null));
 						if(partyMap.containsKey(e[14].toString()))
@@ -2452,8 +2472,12 @@ public class RemittanceServiceImpl extends RemittanceService {
 						{
 							r.setPartyName("");
 						}
+						budgetHeadNew="";
 						r.setBudgetHead((null != e[7] ? e[7].toString() : ""));
+						budgetHeadNew=r.getBudgetHead();
+						narrationNew="";
 						r.setNarration((null != e[8] ? e[8].toString() : ""));
+						narrationNew=r.getNarration();
 						r.setParticulars((null != e[9] ? e[9].toString() : ""));
 						//vid=e[14].toString();
 						r.setDebitamt((null != e[11] ? e[11].toString() : null));
@@ -2476,14 +2500,12 @@ public class RemittanceServiceImpl extends RemittanceService {
 							String transactiondate="";
 							String instrumentno="";
 							String instrumentdate="";
-							String accNum="";
 							List<String> dedPexList=dedPexMap.get(e[14].toString());
-							for(int i=0;i<dedPexList.size();i+=4) {
+							for(int i=0;i<dedPexList.size();i+=3) {
 								transactionno=dedPexList.get(i);
 								transactiondate=dedPexList.get(i+1);
 								instrumentno=dedPexList.get(i+2);
 								instrumentdate=dedPexList.get(i+3);
-								accNum=dedPexList.get(i+4);
 								if(transactionno=="")
 								{
 									r.setPex(instrumentno);
@@ -2494,17 +2516,59 @@ public class RemittanceServiceImpl extends RemittanceService {
 									r.setPex(transactionno);
 									r.setPexDate(transactiondate);
 								}
-								r.setAccNum(accNum);
 							}
 						}
+						if(null != e[3]) {
+							if(bvpNew.equalsIgnoreCase(e[3].toString())) {
 						r.setBvp("");
 						r.setBvpDate("");
+								r.setPartyName("");
+								r.setVoucherType("");
+							}
+							else {
+								r.setBvp((null != e[3] ? e[3].toString() : null));
+								bvpNew=r.getBvp();
+								r.setBvpDate((null != e[1] ? e[1].toString() : null));
+								r.setAccNum((null != e[15] ? e[15].toString() : null));
+								if(partyMap.containsKey(e[14].toString()))
+								{
+									r.setPartyName(partyMap.get(e[14].toString()));
+								}
+								r.setVoucherType((null != e[6] ? e[6].toString() : null));
+							}
+						}
+						if(null != e[0]) {
+							if(vNew.equalsIgnoreCase(e[0].toString())) {
 						r.setvNo("");
 						r.setvDate("");
-						r.setVoucherType("");
-						r.setPartyName("");
+							}
+							else {
+								r.setvNo((null != e[0] ? e[0].toString() : null));
+								vNew=r.getvNo();
+								r.setvDate((null != e[1] ? e[1].toString() : null));
+							}
+						}
+						
+						
+						if(null != e[7]) {
+							if(budgetHeadNew.equalsIgnoreCase(e[7].toString())) {
 						r.setBudgetHead("");
-						r.setNarration("");
+							}
+							else {
+								r.setBudgetHead((null != e[7] ? e[7].toString() : ""));
+								budgetHeadNew=r.getBudgetHead();
+							}
+						}
+						
+						if(null != e[8]) {
+							if(narrationNew.equalsIgnoreCase(e[8].toString())) {
+								r.setNarration("");
+							}
+							else {
+								r.setNarration((null != e[8] ? e[8].toString() : ""));
+								narrationNew=r.getNarration();
+							}
+						}
 						r.setParticulars((null != e[9] ? e[9].toString() : null));
 						///code from map
 						voucherid=e[14].toString();
@@ -2513,6 +2577,10 @@ public class RemittanceServiceImpl extends RemittanceService {
 						if(map1.containsKey(conString))
 						{
 							r.setBvp(map1.get(conString));
+							if(accMap.containsKey(r.getBvp()))
+							{
+								r.setAccNum(accMap.get(r.getBvp()));
+							}
 						}
 						////
 						r.setDebitamt((null != e[11] ? e[11].toString() : null));
@@ -2536,5 +2604,4 @@ public class RemittanceServiceImpl extends RemittanceService {
 		}
 		return detailList;
 	}
-    
 }

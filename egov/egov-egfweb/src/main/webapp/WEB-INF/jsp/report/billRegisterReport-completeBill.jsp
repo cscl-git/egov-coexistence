@@ -47,17 +47,56 @@
   --%>
 
 
-<%@page contentType="text/html"%>
-<%@page pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn"%>
 <%@ taglib prefix="s" uri="/WEB-INF/tags/struts-tags.tld"%>
 <%@ taglib prefix="egov" tagdir="/WEB-INF/tags"%>
 <%@ page language="java"%>
 
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@taglib uri="http://displaytag.sf.net" prefix="display"%>
 <%@ include file="/includes/taglibs.jsp"%>
-<link href="<egov:url path='/resources/css/displaytagFormatted.css?rnd=${app_release_no}'/>"
+<link
+	href="<egov:url path='/resources/css/displaytagFormatted.css?rnd=${app_release_no}'/>"
 	rel="stylesheet" type="text/css" />
+
+<link type="text/css" rel="stylesheet"
+	href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet"
+	href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
+
+
+<script>
+$(document).ready(function() {
+	console.log("data table calling");
+	   $('#resultHeader').DataTable( {
+		   //"aLengthMenu": [ [2, 4, 8, -1], [2, 4, 8, "All"] ],
+		   //"iDisplayLength": 4,
+		   aaSorting : [],
+	       dom: 'Bfrtip',
+	       buttons: [
+	           'copy', 'csv', 'excel', 'pdf', 'print'
+	       ]
+	   } );
+	} );
+</script>
 <html>
 <head>
 <title><s:text name="bill.register.report" /></title>
@@ -66,7 +105,8 @@
 <body>
 	<s:form action="billRegisterReport" name="billRegisterReport"
 		theme="simple" method="post" onsubmit="javascript:doAfterSubmit()">
-		<span class="mandatory1"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
+		<span class="mandatory1"> <s:actionerror /> <s:fielderror />
+			<s:actionmessage />
 		</span>
 		<font style='color: red; font-weight: bold'>
 			<p class="error-block" id="lblError"></p>
@@ -86,13 +126,13 @@
 			<td style="width: 5%"></td>
 				<td class="greybox"><s:text name="voucher.fromdate" /></td>
 				<td class="greybox"><s:date name="fromDate" var="fromDateId"
-						format="dd/MM/yyyy" /> <s:textfield name="fromDate" id="fromDate"
-						value="%{fromDateId}" maxlength="10"
+							format="dd/MM/yyyy" /> <s:textfield name="fromDate"
+							id="fromDate" value="%{fromDateId}" maxlength="10"
 						onkeyup="DateFormat(this,this.value,event,false,'3')" /> <a
 					href="javascript:show_calendar('billRegisterReport.fromDate',null,null,'DD/MM/YYYY');"
 					style="text-decoration: none">&nbsp;<img
-						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)
-				</td>
+							src="/services/egi/resources/erp2/images/calendaricon.gif"
+							border="0" /></a>(dd/mm/yyyy)</td>
 				<td class="greybox"><s:text name="voucher.todate" /></td>
 				<td class="greybox"><s:date name="toDate" var="toDateId"
 						format="dd/MM/yyyy" /> <s:textfield name="toDate" id="toDate"
@@ -100,7 +140,8 @@
 						onkeyup="DateFormat(this,this.value,event,false,'3')" /> <a
 					href="javascript:show_calendar('billRegisterReport.toDate',null,null,'DD/MM/YYYY');"
 					style="text-decoration: none">&nbsp;<img
-						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>(dd/mm/yyyy)</td>
+							src="/services/egi/resources/erp2/images/calendaricon.gif"
+							border="0" /></a>(dd/mm/yyyy)</td>
 			</tr>
 			<tr>
 			<td style="width: 5%"></td>
@@ -130,121 +171,87 @@
 		<div class="buttonbottom">
 			<s:submit method="billSearch" value="Search" cssClass="buttonsubmit"
 				onclick="return validate();" />
-			<s:submit method="searchform" value="Reset" cssClass="button" onclick="return resetAndSubmit();"/>
+			<s:submit method="searchform" value="Reset" cssClass="button"
+				onclick="return resetAndSubmit();" />
 			<input type="button" value="Close"
-				onclick="javascript:window.parent.postMessage('close','*');" class="button" />
+				onclick="javascript:window.parent.postMessage('close','*');"
+				class="button" />
 
 		</div>
 		<br>
-		<table width="100%" border="0" cellspacing="0" cellpadding="0">
-
-			<s:if test="%{searchResult.fullListSize != 0}">
-				<tr align="right">
-					<td colspan="8">
-						<div align="right" style="text-align: right">
-							<strong><s:text name="report.amount.in.rupees" />&nbsp;&nbsp;&nbsp;</strong>
-						</div>
-					</td>
+<c:if test="${not empty billRegReportList}">
+		<table class="table table-bordered" id="resultHeader" width="100%"
+			border="0" cellspacing="0" cellpadding="0" style="font-size:1rem;">
+			<thead>
+				<tr style="font-size:1rem;">
+					<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
+					<th><spring:message code="billnumber" text="Bill Number" /></th>
+					<th><spring:message code="blldate" text="Bill Date" /></th>
+					<th><spring:message code="vouchernumber" text="Voucher Number" /></th>
+					<th><spring:message code="partyname" text="Party Name" /></th>
+					<th><spring:message code="grossamount"
+							text="Gross Amount(&#8377;)" /></th>
+					<th><spring:message code="deduction" text="Deduction(&#8377;)" /></th>
+					<th><spring:message code="netamount"
+							text="Net Amount(&#8377;)" /></th>
+					<th><spring:message code="paidamount"
+							text="Paid Amount(&#8377;)" /></th>
+					<th><spring:message code="paymentvouchernumber"
+							text="Payment Voucher Number" /></th>
+					<th><spring:message code="paymentpexnumber"
+							text="Payment Pex number" /></th>
+					<th><spring:message code="deductionvouchernumber"
+							text="Deduction Voucher Number" /></th>
+					<th><spring:message code="deductionpexnumber"
+							text="Deduction Pex number" /></th>
+					<th><spring:message code="status" text="Status" /></th>
 				</tr>
-				<tr align="center">
-					<td>
-											
-					<display:table name="searchResult" export="true"
-							id="searchResultid" uid="currentRowObject" cellpadding="0"
-							cellspacing="0" requestURI="" sort="external" class="its"
-							style="border:1px;width:100%;empty-cells:show;border-collapse:collapse;">
+			</thead>
+			<tbody>
+				<c:choose>
+					<c:when
+						test="${billRegReportList!=null && billRegReportList.size() > 0}">
+						<c:forEach items="${billRegReportList}" var="billRegReport"
+							varStatus="item">
 
-							<display:column title="Sl.No" style="width:4%;text-align:center">
-								<s:property
-									value="%{#attr.currentRowObject_rowNum+ (page-1)*pageSize}" />
-							</display:column>
+							<tr id="assetView" style="font-size:1rem;">
 
-							<display:column title="Bill Number" 
-								style="width:10%;text-align:center" property="billNumber" />
-							<display:column title="Bill Date"
-								style="width:8%;text-align:center" property="billDate"
-								sortProperty="billdate" sortable="true" />
-								<!-- ${currentRowObject.vhId}-->
-							<%-- <display:column title="Voucher number" href="javascript:openVoucher('${currentRowObject.vhId}');"
-								style="width:11%;text-align:center" property="voucherNumber" sortProperty="vouchernumber" sortable="true"/> --%>
-							<display:column title="Voucher Number" style="width:4%;text-align:center" sortProperty="vouchernumber" sortable="true">
-								<a href="#"	onclick="return openVoucher('<s:property value="#attr.currentRowObject.vhId"/>')"> 
-								<s:property value="#attr.currentRowObject.vouchernumber"/></a>
-							</display:column>
-						
-							<display:column title="Party Name"
-								style="width:5%;text-align:center" property="partyName" />
-							<display:column title="  Gross Amount"
-								style="width:7%;text-align:right" property="grossAmount" />
-							<display:column title="   Deduction"
-								style="width:7%;text-align:right" property="deductionAmount" />
-							<display:column title="Net Amount"
-								style="width:7%;text-align:right" property="netAmount" />
-							<display:column title="Paid Amount"
-								style="width:7%;text-align:right" property="paidAmount" />
-							<%-- <display:column title="Payment voucher number " href="javascript:openVoucher('${currentRowObject.phId}');"
-								style="width:11%;text-align:center"
-								property="paymentVoucherNumber" sortProperty="vouchernumber" sortable="true"/> --%>
-							<display:column  title="Payment voucher number " style="width:4%;text-align:center" sortProperty="paymentVoucherNumber" sortable="true">
-								<a href="#"	onclick="return openVoucher('<s:property value="#attr.currentRowObject.phId"/>')"> 
-								<s:property value="#attr.currentRowObject.paymentVoucherNumber"/></a>
-							</display:column>
-							
-							<display:column title="Payment Pex number " 
-								style="width:11%;text-align:center"
-								property="pexNo" />
-							<%-- <display:column title="Deduction voucher number " href="javascript:openVoucher('${currentRowObject.deducVhId}');"
-								style="width:11%;text-align:center"
-								property="deducVoucherNumber" /> --%>
-							<display:column title="Deduction voucher number "	style="width:4%;text-align:center" sortProperty="deducVoucherNumber" sortable="true">
-								<a href="#"	onclick="return openVoucher('<s:property value="#attr.currentRowObject.deducVhId"/>')"> 
-								<s:property value="#attr.currentRowObject.deducVoucherNumber"/></a>
-							</display:column>
-							<display:column title="Deduction Pex number "
-								style="width:11%;text-align:center"
-								property="deducPexNo" />
-							<display:column title="Status"
-								style="width:10%;text-align:center" property="status" />
-							<display:caption media="pdf">
-						  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<s:property value="%{titleName}" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-			   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complete Bill Register Report  
-						   
-						   
-				   </display:caption>
-							<display:caption media="excel">
-						   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-						   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Complete Bill Register Report  
-						   
-						   
-				   </display:caption>
+								<td>${item.index + 1}</td>
+								<td>${billRegReport.billNumber}</td>
+								<td>${billRegReport.billDate}</td>
+								<td><a href="#"
+									onclick="return openVoucher('${billRegReport.vhId}')">
+										${billRegReport.voucherNumber } </a></td>
+								<td>${billRegReport.partyName}</td>
+								<td>${billRegReport.grossAmount}</td>
+								<td>${billRegReport.deductionAmount}</td>
+								<td>${billRegReport.netAmount}</td>
+								<td>${billRegReport.paidAmount}</td>
+								<td><a href="#"
+									onclick="return openVoucher('${billRegReport.phId}')">
+										${billRegReport.paymentVoucherNumber} </a></td>
+								<td>${billRegReport.pexNo}</td>
+								<td><a href="#"
+									onclick="return openVoucher('${billRegReport.deducVhId}')">
+										${billRegReport.deducVoucherNumber} </a></td>
+								<td>${billRegReport.deducPexNo}</td>
+								<td>${billRegReport.status}</td>
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<td colspan="6">No Records Found..</td>
 
-							<display:setProperty name="export.pdf" value="true" />
-							<display:setProperty name="export.pdf.filename"
-								value="BillRegister-Report.pdf" />
-							<display:setProperty name="export.excel" value="true" />
-							<display:setProperty name="export.excel.filename"
-								value="BillRegister-Report.xls" />
-							<display:setProperty name="export.csv" value="false" />
-							<display:setProperty name="export.xml" value="false" />
-						</display:table></td>
-				</tr>
+					</c:otherwise>
+				</c:choose>
+			</tbody>
 
-			</s:if>
-			<s:elseif test="%{searchResult.fullListSize == 0}">
-				<tr>
-					<td colspan="7" align="center"><font color="red">No
-							record Found.</font></td>
-
-				</tr>
-			</s:elseif>
 		</table>
+</c:if>
+											
 
+
+		<!--  -->
 	</s:form>
 
 	<script>
@@ -328,3 +335,5 @@
 	</script>
 </body>
 </html>
+
+

@@ -48,13 +48,13 @@ public class AuditRestDataController {
 	private   List<String> allowheaderList= new ArrayList<String>(); 
 	private HttpHeaders headers = new HttpHeaders();
 	private final String headername="Content-Security-Policy";
-	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	private final String headervalue="default-src 'self' http://localhost:3006 https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
 	
 	
 	@SuppressWarnings("deprecation")
 	@ResponseBody
 	@RequestMapping(value = "getAllAuditByType", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllAuditByType(@ModelAttribute("auditDetail") final AuditDetail auditDetail){
 	
 		final StringBuffer query = new StringBuffer(500);
@@ -77,7 +77,14 @@ public class AuditRestDataController {
     	   a.setAudit_schedule_date(audit.getAudit_sch_date());
     	   a.setAudit_type(audit.getType());
     	   a.setAudit_comp_date(audit.getAudit_comp_date());
-    	   a.setState(audit.getState().getValue());
+    	   if(audit.getState() != null)
+    	   {
+    		   a.setState(audit.getState().getValue());
+    	   }else
+    	   {
+    		   a.setState("");
+    	   }
+    	   
     	   a.setAudit_no(audit.getAuditno());
     	   a.setPassUnderobjection(audit.getPassUnderobjection());
     	   a.setBillid(audit.getEgBillregister().getId().toString());
@@ -111,7 +118,7 @@ public class AuditRestDataController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllAudit", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllAudit(){
 	
 	
@@ -135,7 +142,15 @@ public class AuditRestDataController {
     	   a.setAudit_schedule_date(audit.getAudit_sch_date());
     	   a.setAudit_type(audit.getType());
     	   a.setAudit_comp_date(audit.getAudit_comp_date());
-    	   a.setState(audit.getState().getValue());
+    	   if(audit.getState() != null)
+    	   {
+    		   a.setState(audit.getState().getValue());
+    	   }
+    	   else
+    	   {
+    		   a.setState("");
+    	   }
+    	   
     	   a.setAudit_no(audit.getAuditno());
     	   a.setPassUnderobjection(audit.getPassUnderobjection());
     	   a.setBillid((null!=audit.getEgBillregister())?audit.getEgBillregister().getId().toString():null);
@@ -188,6 +203,7 @@ public HttpHeaders getHeaders() {
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");
+		allowheaderList.add("http://localhost:3006");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);
 		return headers;

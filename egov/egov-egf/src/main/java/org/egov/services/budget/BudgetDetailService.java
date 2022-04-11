@@ -1849,9 +1849,10 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
             final CFinancialYear beFYear) {
 
         try {
-
+        	System.out.println("search name : "+"RE-" + reFYear.getFinYearRange());
             final Budget budget = budgetService.getByName("RE-" + reFYear.getFinYearRange());
             if (budget == null) {
+            	System.out.println("budget 11");
                 final Set<String> deptSet = new TreeSet<String>();
                 final List<String> deptList = new ArrayList<String>();
                 final List<Department> departments =   masterDataCache.get("egi-department");
@@ -1968,10 +1969,12 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
                 }
             }
         } catch (final ValidationException e) {
+        	e.printStackTrace();
         	System.out.println("issue V8 :"+e.getMessage());
             throw new ValidationException(Arrays
                     .asList(new ValidationError(e.getErrors().get(0).getMessage(), e.getErrors().get(0).getMessage())));
         } catch (final Exception e) {
+        	e.printStackTrace();
         	System.out.println("issue E8 :"+e.getMessage());
             throw new ValidationException(Arrays.asList(new ValidationError(e.getMessage(), e.getMessage())));
         }
@@ -1996,7 +1999,14 @@ public class BudgetDetailService extends PersistenceService<BudgetDetail, Long> 
     }
 
     private String getmaterializedpathforbudget(final Budget budget) {
-
+    	if(budget !=null && budget.getMaterializedPath() != null)
+    	{
+    		System.out.println("budget.getMaterializedPath() ::"+budget.getMaterializedPath() );
+    	}
+    	if(budget !=null && budget.getMaterializedPath() != null)
+    	{
+    		System.out.println("budget.getId() ::"+budget.getId() );
+    	}
         return budget.getMaterializedPath() + "." + (getCountByBudget(budget.getId()) + 1);
     }
 

@@ -63,7 +63,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureYearly", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiure( @RequestParam(name = "org_id") Long o,@RequestParam(name = "fin_id") Long fin,HttpServletRequest req ){
 		
 			
@@ -128,7 +128,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureHalfYearly", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureHalf( @RequestParam(name = "org_id") Long o,@RequestParam(name = "fin_id") Long fin,HttpServletRequest req ){
 	
 			Department d = new Department();
@@ -180,7 +180,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureMinorSchedules", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureMinorSchedules(@RequestParam(name = "fin_id") Long fin,HttpServletRequest req ){
 	
 			Department d = null;
@@ -237,7 +237,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureSchedules", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureSchedules(@RequestParam(name = "fin_id") Long fin,HttpServletRequest req ){
 	
 			
@@ -308,7 +308,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureSchedulesByFromToDate", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureSchedules(@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req){
 			
@@ -377,7 +377,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllBudgetVarianceReportRest", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllBudgetVarianceReportRest(HttpServletRequest req ){
 	
 			Department d = null;
@@ -425,7 +425,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureByDeptAndDate", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByDate( @RequestParam(name = "org_id") Long o,
 			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req ){
@@ -495,7 +495,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllIncomeExpentiureByFromToDate", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllIncomeExpentiureByFromToDate( 
 			@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate,
 			HttpServletRequest req ){
@@ -594,7 +594,7 @@ public class IncomeExpenditureRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllBudgetWatchReportRestData", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllBudgetWatchReportRest(ModelMap m ,HttpServletRequest req ){
 		
 			boolean datafound = false;
@@ -737,6 +737,7 @@ private List<ScheduleReportRestData>segregateIncomeExpendIElist(List<IEStatement
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");
+		allowheaderList.add("http://localhost:3006");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);
 		return headers;

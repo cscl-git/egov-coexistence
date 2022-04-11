@@ -1125,7 +1125,8 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             if (paramMap.get(Constants.ASONDATE) != null)
                 asondate = (java.util.Date) paramMap.get(Constants.ASONDATE);
 
-                LOGGER.info("deptCode=" + deptCode + ",functionid=" + functionid + ",functionaryid=" + functionaryid
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("deptCode=" + deptCode + ",functionid=" + functionid + ",functionaryid=" + functionaryid
                         + ",schemeid=" + schemeid + ",subschemeid=" + subschemeid + ",boundaryid=" + boundaryid
                         + ",budgetheadid=" + budgetheadid + ",asondate=" + asondate);
 
@@ -2000,26 +2001,18 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
         try {
 
             String budgetCheckConfig = budgetCheckConfigService.getConfigValue();
-            System.out.println("budgetCheckConfig ::::"+budgetCheckConfig);
+
             if (budgetCheckConfig.equals("NONE"))
-            {
                 return true;
-            }
-            System.out.println("OOOO");
+
             if (paramMap.get("mis.budgetcheckreq") != null
                     && ((Boolean) paramMap.get("mis.budgetcheckreq")).equals(false))
-            {
                 return true;
-            }
-            System.out.println("11111");
+
             if (paramMap.get("debitAmt") != null)
                 debitAmt = (BigDecimal) paramMap.get("debitAmt");
-            
-            System.out.println("debitAmt  ::::"+debitAmt);
             if (paramMap.get("creditAmt") != null)
                 creditAmt = (BigDecimal) paramMap.get("creditAmt");
-            
-            System.out.println("creditAmt  ::::"+creditAmt);
 
             if (debitAmt == null && creditAmt == null)
                 throw new ValidationException(EMPTY_STRING, "Both Debit and Credit amount is null");
@@ -2031,14 +2024,14 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             if (debitAmt != null && debitAmt.compareTo(BigDecimal.ZERO) > 0 && creditAmt != null
                     && creditAmt.compareTo(BigDecimal.ZERO) > 0)
                 throw new ValidationException(EMPTY_STRING, "Both Debit and Credit amount is greater than zero");
-            System.out.println("33333");
+
             // get the type of budget from appconfig .
             List<AppConfigValues> list;
             list = appConfigValuesService.getConfigValuesByModuleAndKey(EGF, "budgetaryCheck_budgettype_cashbased");
             if (list.isEmpty())
                 throw new ValidationException(EMPTY_STRING,
                         "budgetaryCheck_budgettype_cashbased is not defined in AppConfig");
-            System.out.println("44444");
+
             cashbasedbudgetType = list.get(0).getValue();
             if (cashbasedbudgetType.equalsIgnoreCase("Y")) // cash based budget
             {
@@ -2046,7 +2039,6 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                     LOGGER.debug("cashbasedbudgetType==" + cashbasedbudgetType);
             } else // Accural based budgeting
             {
-            	System.out.println("5555");
                 if (debitAmt != null && debitAmt.compareTo(BigDecimal.ZERO) > 0) {
                     txnType = "debit";
                     txnAmt = debitAmt;
@@ -2054,8 +2046,6 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                     txnType = "credit";
                     txnAmt = creditAmt;
                 }
-                System.out.println("txnAmt :::"+txnAmt);
-                System.out.println("txnType ::::"+txnType);
                 paramMap.put("txnAmt", txnAmt);
                 paramMap.put("txnType", txnType);
                 return checkCondition(paramMap);
@@ -2081,7 +2071,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
         BigDecimal txnAmt = null;
         java.util.Date asondate = null;
         java.util.Date fromdate = null;
-        System.out.println("66666");
+
         try {
             if (paramMap.get("txnAmt") != null)
                 txnAmt = (BigDecimal) paramMap.get("txnAmt");
@@ -2091,7 +2081,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                 glCode = paramMap.get("glcode").toString();
             if (paramMap.get(Constants.ASONDATE) != null)
                 asondate = (Date) paramMap.get(Constants.ASONDATE);
-            System.out.println("7777");
+
             if (glCode == null)
                 throw new ValidationException(EMPTY_STRING, "glcode is null");
             if (txnAmt == null)
@@ -2100,27 +2090,26 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                 throw new ValidationException(EMPTY_STRING, "txnType is null");
             if (asondate == null)
                 throw new ValidationException(EMPTY_STRING, "As On Date is null");
-            System.out.println("8888 :::::"+glCode);
+
             // check the account code needs budget checking
 
             final CChartOfAccounts coa = chartOfAccountsHibernateDAO.getCChartOfAccountsByGlCode(glCode);
             if (coa.getBudgetCheckReq() != null && coa.getBudgetCheckReq()) {
-            	
                 // get budgethead for the glcode
                 // BudgetGroup bg = getBudgetHeadByGlcode(coa,paramMap);
                 final List<BudgetGroup> budgetHeadListByGlcode = getBudgetHeadByGlcode(coa);
                 if (budgetHeadListByGlcode == null || budgetHeadListByGlcode.size() == 0)
                     throw new ValidationException(EMPTY_STRING,
                             "Budget Check failed: Budget not defined for the given combination.");
-                System.out.println("AAAAA");
                 // get budgettinh type for first BG object
                 if (!isBudgetCheckingRequiredForType(txnType,
                         budgetHeadListByGlcode.get(0).getBudgetingType().toString())) {
-                        LOGGER.info(
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug(
                                 "No need to check budget for :" + glCode + " as the transaction type is " + txnType);
                     return true;
                 }
-                System.out.println("BBBB");
+
                 paramMap.put("glcodeid", coa.getId());
                 // get the financialyear from asondate
 
@@ -2129,7 +2118,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                     throw new ValidationException(EMPTY_STRING, "Financial Year is not defined for-" + asondate);
                 new SimpleDateFormat("dd-MMM-yyyy", Constants.LOCALE);
                 fromdate = finyear.getStartingDate();
-                System.out.println("CCCCC");
+
                 paramMap.put("fromdate", fromdate);
                 // Here as on date is overridden by Financialyear ending date to
                 // check all budget appropriation irrespective of
@@ -2139,13 +2128,14 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 
                 paramMap.put(BUDGETHEADID, budgetHeadListByGlcode);
 
-                    LOGGER.info("************ BudgetCheck Details *********************");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("************ BudgetCheck Details *********************");
                 // pass the list of bg to getBudgetedAmtForYear
                 final BigDecimal budgetedAmt = getBudgetedAmtForYear(paramMap); // get
-                System.out.println("budgetedAmt :::"+budgetedAmt);
                 // the
                 // budgetedamount
-                    LOGGER.info(".............Budgeted Amount For the year............" + budgetedAmt);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(".............Budgeted Amount For the year............" + budgetedAmt);
 
                 if (budgetCheckConfigService.getConfigValue()
                         .equalsIgnoreCase(BudgetControlType.BudgetCheckOption.MANDATORY.toString()))
@@ -2155,35 +2145,39 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                 final BigDecimal actualAmt = getActualBudgetUtilizedForBudgetaryCheck(paramMap); // get
                 // actual
                 // amount
-                    LOGGER.info(".............Voucher Actual amount............" + actualAmt);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(".............Voucher Actual amount............" + actualAmt);
 
                 BigDecimal billAmt = getBillAmountForBudgetCheck(paramMap); // get
                 // actual
                 // amount
-                    LOGGER.info(".............Bill Actual amount............" + billAmt);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(".............Bill Actual amount............" + billAmt);
                 EgBillregister bill = null;
 
                 if (paramMap.get("bill") != null)
                     bill = (EgBillregister) persistenceService.find("from EgBillregister where id=? ",
                             (Long) paramMap.get("bill"));
                 if (bill != null && bill.getEgBillregistermis().getBudgetaryAppnumber() != null) {
-                        LOGGER.info(
+                    if (LOGGER.isDebugEnabled())
+                        LOGGER.debug(
                                 ".............Found BillId so subtracting txn amount......................" + txnAmt);
                     billAmt = billAmt.subtract(txnAmt);
                 }
-                    LOGGER.info(".......Recalculated Bill Actual amount............" + billAmt);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(".......Recalculated Bill Actual amount............" + billAmt);
                 final BigDecimal diff = budgetedAmt.subtract(actualAmt).subtract(billAmt); // get
                 // bill
                 // amt
-                    LOGGER.info(".................diff amount..........................." + diff);
-                    LOGGER.info(".................txn..........................." + txnAmt);
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug(".................diff amount..........................." + diff);
 
-                    LOGGER.info("************ BudgetCheck Details End****************");
+                if (LOGGER.isDebugEnabled())
+                    LOGGER.debug("************ BudgetCheck Details End****************");
                 // BigDecimal diff = budgetedAmt.subtract(actualAmt);
 
                 if (budgetCheckConfigService.getConfigValue()
                         .equalsIgnoreCase(BudgetControlType.BudgetCheckOption.MANDATORY.toString())) {
-                	System.out.println("MMMM");
                     if (txnAmt.compareTo(diff) <= 0) {
 
                         generateBanNumber(paramMap, bill);
@@ -2643,7 +2637,8 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             paramMap.put("fromdate", fromdate);
             paramMap.put(Constants.ASONDATE, finyear.getEndingDate());
 
-                LOGGER.info("deptCode=" + deptCode + ",functionid=" + functionid + ",functionaryid=" + functionaryid
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("deptCode=" + deptCode + ",functionid=" + functionid + ",functionaryid=" + functionaryid
                         + ",schemeid=" + schemeid + ",subschemeid=" + subschemeid + ",boundaryid=" + boundaryid
                         + ",glcodeid=" + glcodeid + ",asondate=" + asondate);
 
@@ -2709,7 +2704,8 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
                     + " where br.id=bd.egBillregister.id and br.id=bmis.egBillregister.id and (bmis.budgetCheckReq is null or bmis.budgetCheckReq=true)  and bmis.voucherHeader is null and upper(br.status.description) not in ('CANCELLED') "
                     + "    " + query;
 
-                LOGGER.info("getBillAmountForBudgetCheck query============" + query1);
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("getBillAmountForBudgetCheck query============" + query1);
             Object ob = null;
             if (fromdate != null)
                 ob = persistenceService.find(query1, asondate, fromdate);
@@ -2718,14 +2714,13 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
 
             final BigDecimal billAmountWhereCancelledVouchers = getBillAmountWhereCancelledVouchers(query, fromdate,
                     asondate);
-                LOGGER.info("Total Amount from all bills where vouchers are cancelled is : "
+            if (LOGGER.isDebugEnabled())
+                LOGGER.debug("Total Amount from all bills where vouchers are cancelled is : "
                         + billAmountWhereCancelledVouchers);
             if (ob == null)
                 totalBillUtilized = billAmountWhereCancelledVouchers;
             else
                 totalBillUtilized = new BigDecimal(ob.toString()).add(billAmountWhereCancelledVouchers);
-            
-            System.out.println("totalBillUtilized ::::"+totalBillUtilized);
             return totalBillUtilized;
 
         } catch (final ValidationException v) {

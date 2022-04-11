@@ -605,8 +605,8 @@ public class BaseVoucherAction extends GenericWorkFlowAction {
 				if (null == subLedgerMap.get(subledgerDetailRow.toString()))
 					subLedgerMap.put(subledgerDetailRow.toString(), subledgerDetailRow.toString());
 				else {
-					addActionError(getText("journalvoucher.samesubledger.repeated"));
-					return true;
+					//addActionError(getText("journalvoucher.samesubledger.repeated"));
+					//return false;
 				}
 
 			}
