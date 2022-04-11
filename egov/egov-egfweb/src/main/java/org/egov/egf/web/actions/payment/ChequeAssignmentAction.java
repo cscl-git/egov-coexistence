@@ -47,6 +47,8 @@
  */
 package org.egov.egf.web.actions.payment;
 
+import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -91,6 +93,8 @@ import org.egov.commons.dao.BankBranchHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.BankAccountService;
 import org.egov.commons.utils.EntityType;
+import org.egov.council.entity.CommitteeMembers;
+import org.egov.council.entity.CouncilMeeting;
 import org.egov.egf.autonumber.PexNumberGenerator;
 import org.egov.egf.autonumber.RtgsNumberGenerator;
 import org.egov.egf.commons.EgovCommon;
@@ -102,6 +106,7 @@ import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.notification.service.NotificationService;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.script.entity.Script;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -333,6 +338,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private String selectedRowsId;
     @Autowired
     private InstrumentVoucherService instrumentVoucherService;
+    @Autowired
+    private NotificationService notificationService;
 
     public List<String> getChequeSlNoList() {
         return chequeSlNoList;
@@ -3151,11 +3158,52 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed createInstrument.");
-
+        //
+        sendMsgAfterPex();
         return "viewPex";
     }
     
-    private void createPexAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
+   private void sendMsgAfterPex() {
+		System.out.println("Start msg after pex");
+
+    	LOGGER.info("A");
+        String mobileNo;
+        String bpvNumber;
+        String pexNumber;
+        String pexDate;
+        final List<AppConfigValues> appList = appConfigValuesService
+                .getConfigValuesByModuleAndKey("EGF",
+                        "PEX_MSG_TEMPLATE_ID");
+        final String templateId = appList.get(0).getValue();
+        /* try {
+	            for (CommitteeMembers committeeMembers : committeeMemberService
+	                    .findAllByCommitteTypeMemberIsActive(councilMeeting.getCommitteeType())) {
+	                mobileNo = committeeMembers.getCouncilMember().getMobileNumber();
+	                if (mobileNo != null) {
+	                    buildSmsForMeeting(mobileNo, bpvNumber, pexDate, pexNumber,templateId);
+	                }
+	            }
+        	}catch(Exception e) {
+        		e.printStackTrace();
+            }
+    
+	*/
+		System.out.println("End msg after pex");
+		
+	}
+   public void buildSmsForMeeting(final String mobileNumber, final String bpvNumber,final String pexDate, final String pexNumber,
+           String templateId) {
+       String smsMsg = null;
+       
+       if (mobileNumber != null && smsMsg != null)
+           sendSMSOnSewerageForMeeting(mobileNumber, smsMsg,templateId);
+   }
+
+   public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
+   	LOGGER.info("C");
+       notificationService.sendSMS(mobileNumber, smsBody,templateId);
+   }
+ private void createPexAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
         instVoucherList = new ArrayList<>();
         instVoucherDisplayList = new ArrayList<>();
         for (final Entry<String, List<ChequeAssignment>> row : resultMap.entrySet())
