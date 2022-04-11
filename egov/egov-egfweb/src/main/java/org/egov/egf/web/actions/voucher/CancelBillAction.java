@@ -388,8 +388,11 @@ public class CancelBillAction extends BaseFormAction {
 		 expenseBillRepository.save(egBillregister);
 		 persistenceService.getSession().flush();
 		 //egBillregister
-		addActionMessage(getText("Bill to be Cancelled has been sent to Audit Department"));
+		 System.out.println("end");
+		addActionMessage(getText("cacncel.bill.success.msg"));
+		System.out.println("end 1");
 		prepareBeforeSearch();
+		System.out.println("end 2");
 		return "search";
 	}
 
