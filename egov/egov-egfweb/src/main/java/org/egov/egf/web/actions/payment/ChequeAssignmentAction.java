@@ -47,8 +47,6 @@
  */
 package org.egov.egf.web.actions.payment;
 
-import static org.egov.council.utils.constants.CouncilConstants.MOM_FINALISED;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -75,6 +73,7 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -84,7 +83,6 @@ import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Bankaccount;
-import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.EgwStatus;
@@ -93,19 +91,19 @@ import org.egov.commons.dao.BankBranchHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.BankAccountService;
 import org.egov.commons.utils.EntityType;
-import org.egov.council.entity.CommitteeMembers;
-import org.egov.council.entity.CouncilMeeting;
+import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.egf.autonumber.PexNumberGenerator;
 import org.egov.egf.autonumber.RtgsNumberGenerator;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.BankAdviceReportInfo;
 import org.egov.egf.web.actions.voucher.BaseVoucherAction;
-import org.egov.eis.entity.DrawingOfficer;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.User;
 import org.egov.infra.notification.service.NotificationService;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.script.entity.Script;
@@ -3167,6 +3165,16 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 		System.out.println("Start msg after pex");
 
     	LOGGER.info("A");
+    	Set<String> mobileNos=new HashSet<String>();
+    	List<User> mobileRoleList=new ArrayList<User>();
+    	mobileRoleList=getUserListForPexAssignment();
+    	for(User u:mobileRoleList)
+    	{
+    		if(u.getMobileNumber() != null && !u.getMobileNumber().isEmpty())
+    		{
+    			mobileNos.add(u.getMobileNumber());
+    		}
+    	}
         String mobileNo;
         String bpvNumber;
         String pexNumber;
@@ -3202,6 +3210,20 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
    public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
    	LOGGER.info("C");
        notificationService.sendSMS(mobileNumber, smsBody,templateId);
+   }
+   
+   public List<User> getUserListForPexAssignment() {
+       Set<User> usersListResult = new HashSet<>();
+       List<String> roles = new ArrayList<String>();
+		/* Agenda notification only sent to dept users */
+       roles.add("PEX_MSG_DEPT_USERS");
+       List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+   	if(!CollectionUtils.isEmpty(employees)) {
+   		for(EmployeeInfo info : employees) {
+   			usersListResult.add(info.getUser());
+   		}
+   	}
+       return new ArrayList<>(usersListResult);
    }
  private void createPexAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
         instVoucherList = new ArrayList<>();
