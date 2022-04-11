@@ -695,7 +695,7 @@ public class RefundBillService {
                         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_REFUND_BILL_DISPLAYNAME)
                         .withCreatedBy(user.getId())
                         .withtLastModifiedBy(user.getId());
-            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)) {
+            } else if (FinancialConstants.BUTTONCANCEL.equalsIgnoreCase(workFlowAction)|| "Approve".equalsIgnoreCase(workFlowAction)) {
                 stateValue = FinancialConstants.WORKFLOW_STATE_CANCELLED;
                 egBillregister.transition().end().withSenderName(user.getUsername() + "::" + user.getName())
                         .withComments(approvalComent)

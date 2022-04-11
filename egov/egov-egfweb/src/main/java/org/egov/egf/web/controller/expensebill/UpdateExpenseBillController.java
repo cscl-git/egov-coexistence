@@ -662,10 +662,16 @@ public class UpdateExpenseBillController extends BaseBillController {
 
             redirectAttributes.addFlashAttribute(EG_BILLREGISTER, updatedEgBillregister);
 
-            // For Get Configured ApprovalPosition from workflow history
-            if (approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
-                approvalPosition = expenseBillService.getApprovalPositionByMatrixDesignation(
-                        egBillregister, null, mode, workFlowAction);
+            try
+            {
+            	// For Get Configured ApprovalPosition from workflow history
+                if (approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
+                    approvalPosition = expenseBillService.getApprovalPositionByMatrixDesignation(
+                    		updatedEgBillregister, null, mode, workFlowAction);
+            }catch (Exception e) {
+				e.printStackTrace();
+			}
+            
 
            // final String approverName = String.valueOf(request.getParameter("approverName"));
             String approverName = String.valueOf(request.getParameter("approverName"));
