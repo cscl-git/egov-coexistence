@@ -3221,13 +3221,12 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 	}
    private Set<String> populatePexDetails(InstrumentHeader instrument) {
 	   Set<String> mnos = new HashSet<String>();
-	   String mos="";
 	   List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList(instrument);
 	   for(BankAdviceReportInfo info:subLedgerList)
 	   {
 		   if(info.getMobNo() != null && !info.getMobNo().isEmpty())
 		   {
-			   mnos.add(mos);
+			   mnos.add(info.getMobNo());
 		   }
 	   }
 	   
