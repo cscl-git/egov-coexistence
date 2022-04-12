@@ -3220,7 +3220,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 		
 	}
    private Set<String> populatePexDetails(InstrumentHeader instrument) {
-	   Set<String> mnos = null;
+	   Set<String> mnos = new HashSet<String>();
 	   String mos="";
 	   List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList(instrument);
 	   for(BankAdviceReportInfo info:subLedgerList)
