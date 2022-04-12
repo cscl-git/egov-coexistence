@@ -1249,7 +1249,7 @@ public class PaymentRefundController extends BaseBillController {
                     new String[]{expenseBill.getBillnumber()}, null);
         }
             
-        else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue())) {
+        else if (expenseBill.getState()!=null && FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue())) {
             message = messageSource.getMessage("msg.expense.refund.bill.reject",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
         }
@@ -2025,39 +2025,6 @@ public String update(@ModelAttribute(EG_BILLREGISTER)  EgBillregister egBillregi
    System.out.println("subscheme----> "+egBillregister.getEgBillregistermis().getSubScheme());
    System.out.println("subschemeId----> "+egBillregister.getEgBillregistermis().getSubSchemeId());
    
-		/*
-		 * egBillregister.setRefundable("Y"); egBillregister.setBilldate(new Date());
-		 * BigDecimal totalCrAmt = BigDecimal.ZERO;
-		 * 
-		 * for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) {
-		 * totalCrAmt=totalCrAmt.add(checknull(egbilldetail.getDebitamount())); }
-		 * 
-		 * Long bg1 = egBillregister.getEgBillregistermis().getFunction().getId();
-		 * 
-		 * List<EgBilldetails> egbilldetailCusList=new ArrayList<EgBilldetails>();
-		 * for(EgBilldetails egbilldetail:egBillregister.getBillDetails()) {
-		 * if(checknullBigDecimal(egbilldetail.getDebitamount())==true ||
-		 * checknullBigDecimal(egbilldetail.getCreditamount())==true) {
-		 * egbilldetailCusList.add(egbilldetail); } }
-		 * 
-		 * egBillregister.setBillamount(totalCrAmt);
-		 * egBillregister.setBillDetails(egbilldetailCusList);
-		 * System.out.println(totalCrAmt);
-		 * 
-		 * EgBillSubType egbillSubtype=null; if
-		 * (egBillregister.getEgBillregistermis().getSubType() != null) {
-		 * egbillSubtype=egBillSubTypeService.getById(Long.valueOf(egBillregister.
-		 * getEgBillregistermis().getSubType())); }
-		 * egBillregister.getEgBillregistermis().setEgBillSubType(egbillSubtype);
-		 * egBillregister.setCreatedBy(ApplicationThreadLocals.getUserId());
-		 * 
-		 * CFunction function= paymentRefundUtils.getFunction(bg1.longValue());
-		 * egBillregister.getEgBillregistermis().setFunction(function);
-		 * 
-		 * if (StringUtils.isEmpty(egBillregister.getExpendituretype()))
-		 * egBillregister.setExpendituretype(FinancialConstants.
-		 * STANDARD_EXPENDITURETYPE_REFUND);
-		 */
    String[] contentType = ((MultiPartRequestWrapper) request).getContentTypes("file");
    List<DocumentUpload> list = new ArrayList<>();
    UploadedFile[] uploadedFiles = ((MultiPartRequestWrapper) request).getFiles("file");

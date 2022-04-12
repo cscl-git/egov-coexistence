@@ -665,9 +665,12 @@ public class UpdateExpenseBillController extends BaseBillController {
             try
             {
             	// For Get Configured ApprovalPosition from workflow history
-                if (approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
-                    approvalPosition = expenseBillService.getApprovalPositionByMatrixDesignation(
-                    		updatedEgBillregister, null, mode, workFlowAction);
+            	if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONCANCEL))
+            	{
+	                if (approvalPosition == null || approvalPosition.equals(Long.valueOf(0)))
+	                    approvalPosition = expenseBillService.getApprovalPositionByMatrixDesignation(
+	                    		updatedEgBillregister, null, mode, workFlowAction);
+            	}
             }catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -680,6 +683,10 @@ public class UpdateExpenseBillController extends BaseBillController {
         		
         		approverName =populateEmpName();
         		
+        	}
+            if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT) && approverName.equalsIgnoreCase(""))
+        	{	
+        		approverName =getEmployeeName(approvalPosition);
         	}
             model.addAttribute(BILL_TYPES, BillType.values());
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,
