@@ -236,4 +236,10 @@ public class Employee extends User implements EntityType {
         return null;
     }
 
+	@Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

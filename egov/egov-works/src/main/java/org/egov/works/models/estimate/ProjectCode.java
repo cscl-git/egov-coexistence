@@ -202,4 +202,10 @@ public class ProjectCode extends BaseModel implements EntityType {
         this.completionDate = completionDate;
     }
 
+	@Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

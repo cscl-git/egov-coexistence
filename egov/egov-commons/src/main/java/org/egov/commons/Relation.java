@@ -299,4 +299,11 @@ public class Relation extends AbstractPersistable<Integer> implements java.io.Se
         this.lastmodifieddate = lastmodifieddate;
     }
 
+	@Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+
 }

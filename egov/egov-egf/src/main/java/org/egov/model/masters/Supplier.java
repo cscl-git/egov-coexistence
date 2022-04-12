@@ -307,6 +307,7 @@ public class Supplier extends AbstractAuditable implements EntityType {
         return status;
     }
 
+    @Override
     public String getMobileNumber() {
         return mobileNumber;
     }

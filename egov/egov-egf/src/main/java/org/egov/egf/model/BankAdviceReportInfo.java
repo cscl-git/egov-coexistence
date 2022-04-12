@@ -75,6 +75,7 @@ public class BankAdviceReportInfo {
     private BigDecimal dkId;
 	private Date realizationDate;
 	private String typeOfPayment;
+	private String mobNo;
 	
 
     public BigDecimal getDtId() {
@@ -236,6 +237,14 @@ public class BankAdviceReportInfo {
 
 	public void setTypeOfPayment(String typeOfPayment) {
 		this.typeOfPayment = typeOfPayment;
+	}
+
+	public String getMobNo() {
+		return mobNo;
+	}
+
+	public void setMobNo(String mobNo) {
+		this.mobNo = mobNo;
 	}
 
 }

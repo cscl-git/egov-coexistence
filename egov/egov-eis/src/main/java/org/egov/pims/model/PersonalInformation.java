@@ -627,4 +627,9 @@ public void setEmployeeTypeMaster(EmployeeType employeeTypeMaster) {
 
 		return null;
 	}
+	@Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }
