@@ -710,7 +710,7 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             strQuery.append(" ");
             strQuery.append(" union select distinct bmis.budgetary_appnumber as bdgApprNumber, vh1.vouchernumber as VoucherNumber, vh1.voucherdate as  voucherDate , br.narration as description,vh1.createddate as createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,  bd.debitamount as debitAmount, bd.creditamount as creditAmount  ");
             strQuery.append(" from eg_billdetails bd, eg_billregistermis bmis, eg_billregister br, voucherHeader vh1 where br.id = bd.billid and br.id = bmis.billid and  bd.glcodeid =:glCodeId ");
-            strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid )  and br.billdate  >=:strStDate");
+            strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL','SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid )  and br.billdate  >=:strStDate");
             strQuery.append(" and CAST(br.billdate AS DATE)  <=TO_DATE(:strAODate,'dd-Mon-yyyy') ");
             strQuery.append(getFunctionQuery("bd.functionid",function));
             strQuery.append(getDepartmentQuery("bmis.departmentcode",department));
@@ -720,7 +720,7 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             strQuery.append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br  ");
             strQuery.append(" where br.id = bd1.billid and br.id = bmis1.billid and  bd1.glcodeid =:glCodeId ");
             strQuery.append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) ");
-            strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate");
+            strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate");
             strQuery.append(" and CAST(br.billdate AS DATE) <=TO_DATE(:strAODate,'dd-Mon-yyyy')");
             strQuery.append(getFunctionQuery("bd1.functionid",function));
             strQuery.append(getDepartmentQuery("bmis1.departmentcode",department));

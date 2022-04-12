@@ -392,7 +392,7 @@ public class CreateExpenseBillController extends BaseBillController {
         } else if (FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT.equals(expenseBill.getStatus().getCode()))
             message = messageSource.getMessage("msg.expense.bill.approved.success",
                     new String[]{expenseBill.getBillnumber()}, null);
-        else if (FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue()))
+        else if (expenseBill.getState().getValue()!=null && FinancialConstants.WORKFLOW_STATE_REJECTED.equals(expenseBill.getState().getValue()))
             message = messageSource.getMessage("msg.expense.bill.reject",
                     new String[]{expenseBill.getBillnumber(), approverName, nextDesign}, null);
         else if (FinancialConstants.WORKFLOW_STATE_CANCELLED.equals(expenseBill.getStatus().getCode()))

@@ -824,6 +824,8 @@ public class RefundBillService {
 						egBillregister.getState().setOwnerPosition(own_pos);
 						owenrPos.setId(own_pos);
 					}
+					egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                            FinancialConstants.WORKFLOW_STATE_REJECTED));
 		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
 		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
