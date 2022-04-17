@@ -243,4 +243,10 @@ public class AccountEntity extends AbstractPersistable<Integer> implements java.
 		this.createdDate = createdDate;
 	}
 
+	@Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 }

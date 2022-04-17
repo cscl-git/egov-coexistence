@@ -288,4 +288,10 @@ public class DepositCode extends BaseModel implements EntityType {
 
         return null;
     }
+
+	@Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

@@ -51,6 +51,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -73,6 +74,7 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.struts2.convention.annotation.Action;
@@ -81,8 +83,8 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.billsaccounting.services.VoucherConstant;
+import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bankaccount;
-import org.egov.commons.CChartOfAccounts;
 import org.egov.commons.CFinancialYear;
 import org.egov.commons.CFunction;
 import org.egov.commons.EgwStatus;
@@ -91,17 +93,20 @@ import org.egov.commons.dao.BankBranchHibernateDAO;
 import org.egov.commons.dao.FinancialYearDAO;
 import org.egov.commons.service.BankAccountService;
 import org.egov.commons.utils.EntityType;
+import org.egov.council.utils.constants.CouncilConstants;
 import org.egov.egf.autonumber.PexNumberGenerator;
 import org.egov.egf.autonumber.RtgsNumberGenerator;
 import org.egov.egf.commons.EgovCommon;
 import org.egov.egf.model.BankAdviceReportInfo;
 import org.egov.egf.web.actions.voucher.BaseVoucherAction;
-import org.egov.eis.entity.DrawingOfficer;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.User;
+import org.egov.infra.notification.service.NotificationService;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.script.entity.Script;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
@@ -109,6 +114,7 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.instrument.BillData;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.instrument.InstrumentVoucher;
 import org.egov.model.payment.ChequeAssignment;
@@ -130,6 +136,7 @@ import org.egov.utils.ReportHelper;
 import org.egov.utils.VoucherHelper;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -333,6 +340,9 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private String selectedRowsId;
     @Autowired
     private InstrumentVoucherService instrumentVoucherService;
+    @Autowired
+    private NotificationService notificationService;
+    private BigDecimal totalAmount = BigDecimal.ZERO;
 
     public List<String> getChequeSlNoList() {
         return chequeSlNoList;
@@ -3151,11 +3161,137 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed createInstrument.");
-
+        //
+        sendMsgAfterPex();
         return "viewPex";
     }
     
-    private void createPexAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
+   private void sendMsgAfterPex() {
+		System.out.println("Start msg after pex");
+    	LOGGER.info("A");
+    	Set<String> mobileNos=new HashSet<String>();
+    	Set<String> mobileNosIteration=new HashSet<String>();
+        Set<BillData> billNoList=new HashSet<BillData>();
+        Set<BillData> billNoListIteration;
+        String pexNumber = null;
+        String pexDate = null;
+        BigDecimal pexAmount = null;
+    	List<User> mobileRoleList=new ArrayList<User>();
+    	mobileRoleList=getUserListForPexAssignment();
+    	for(User u:mobileRoleList)
+    	{
+    		if(u.getMobileNumber() != null && !u.getMobileNumber().isEmpty())
+    		{
+    			mobileNos.add(u.getMobileNumber());
+    		}
+    	}
+    	for(InstrumentVoucher v:instVoucherList)
+    	{
+    		billNoListIteration=new HashSet<BillData>();
+    		billNoListIteration=getBillNumber(v.getVoucherHeaderId().getId());
+    		billNoList.addAll(billNoListIteration);
+    	}
+    	if(instVoucherList!=null && !instVoucherList.isEmpty())
+    	{
+    		pexNumber=getInstNumber(instVoucherList.get(0).getInstrumentHeaderId().getId());
+    		pexDate=getInstDate(instVoucherList.get(0).getInstrumentHeaderId().getId());
+    		pexAmount=getInstAmount(instVoucherList.get(0).getInstrumentHeaderId().getId());
+    		mobileNosIteration=populatePexDetails(instVoucherList.get(0).getInstrumentHeaderId());
+    		mobileNos.addAll(mobileNosIteration);
+    	}
+        final List<AppConfigValues> appList = appConfigValuesService
+                .getConfigValuesByModuleAndKey("EGF",
+                        "PEX_MSG_TEMPLATE_ID");
+        final String templateId = appList.get(0).getValue();
+         try {
+	            for (BillData bill : billNoList) {
+	                for(String mobileNo:mobileNos)
+	                {
+	                	if (mobileNo != null && !mobileNo.isEmpty()) {
+		                    buildSmsForMeeting(mobileNo, bill.getBillNumber(), pexDate, pexNumber,new BigDecimal(bill.getBillAmount()),templateId);
+		                }
+	                }
+	            }
+        	}catch(Exception e) {
+        		e.printStackTrace();
+            }
+    
+	
+		System.out.println("End msg after pex");
+		
+	}
+   private Set<String> populatePexDetails(InstrumentHeader instrument) {
+	   Set<String> mnos = new HashSet<String>();
+	   List<BankAdviceReportInfo> subLedgerList = getBankAdviceReportList(instrument);
+	   for(BankAdviceReportInfo info:subLedgerList)
+	   {
+		   if(info.getMobNo() != null && !info.getMobNo().isEmpty())
+		   {
+			   mnos.add(info.getMobNo());
+		   }
+	   }
+	   
+	   return mnos;
+}
+
+
+private Set<BillData> getBillNumber(Long bpvId) {
+   	SQLQuery query =  null;
+   	List<Object[]> rows = null;
+   	Set<BillData> billNoList=new HashSet<BillData>();
+   	String bilNo;
+   	BillData bill;
+   	try
+   	{
+   		 query = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber,m.paidamount from miscbilldetail m where m.payvhid=:bpvId ");
+   	    query.setLong("bpvId", bpvId);
+   	    rows = query.list();
+   	    
+   	    if(rows != null && !rows.isEmpty())
+   	    {
+   	    	System.out.println("list :"+rows.get(0));
+   	    	for(Object[] element : rows)
+   	    	{
+   	    		bill=new BillData();
+   	    		bilNo= element[1].toString();
+   	    		bill.setBillNumber(bilNo);
+   	    		bill.setBillAmount(element[2].toString());
+   	    		billNoList.add(bill);
+   	    	}
+   	    }
+   	}catch (Exception e) {
+			e.printStackTrace();
+		}
+	    return billNoList;
+   }
+
+public void buildSmsForMeeting(final String mobileNumber, final String bpvNumber,final String pexDate, final String pexNumber,
+           BigDecimal pexAmount, String templateId) {
+       String smsMsg = "PEX no. "+pexNumber+", Dated "+pexDate+" generated for amounting Rs. "+pexAmount+" in respect of Bill no. "+bpvNumber+" . Payment will be made shortly. For your kind information please. Regards MCC Accounts Branch and Chandigarh Smart City Ltd.";
+       
+       if (mobileNumber != null && smsMsg != null)
+           sendSMSOnSewerageForMeeting(mobileNumber, smsMsg,templateId);
+   }
+
+   public void sendSMSOnSewerageForMeeting(final String mobileNumber, final String smsBody,String templateId) {
+   	LOGGER.info("C");
+       notificationService.sendSMS(mobileNumber, smsBody,templateId);
+   }
+   
+   public List<User> getUserListForPexAssignment() {
+       Set<User> usersListResult = new HashSet<>();
+       List<String> roles = new ArrayList<String>();
+		/* Agenda notification only sent to dept users */
+       roles.add("PEX_MSG_DEPT_USERS");
+       List<EmployeeInfo> employees = microserviceUtils.getEmployeesByRoles(roles);
+   	if(!CollectionUtils.isEmpty(employees)) {
+   		for(EmployeeInfo info : employees) {
+   			usersListResult.add(info.getUser());
+   		}
+   	}
+       return new ArrayList<>(usersListResult);
+   }
+ private void createPexAssignment(final Map<String, List<ChequeAssignment>> resultMap) throws Exception {
         instVoucherList = new ArrayList<>();
         instVoucherDisplayList = new ArrayList<>();
         for (final Entry<String, List<ChequeAssignment>> row : resultMap.entrySet())
@@ -3433,5 +3569,140 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 	public void setSubdivision(String subdivision) {
 		this.subdivision = subdivision;
 	}
+	
+	private String getInstNumber(final Long instrumentHeaderId) {
+		final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService
+				.find("from InstrumentHeader where id=?", instrumentHeaderId);
+		return instrumentHeader.getTransactionNumber();
+	}
+	private String getInstDate(final Long instrumentHeaderId) {
+		final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService
+				.find("from InstrumentHeader where id=?", instrumentHeaderId);
+		return Constants.DDMMYYYYFORMAT2.format(instrumentHeader.getTransactionDate());
+	}
+	private BigDecimal getInstAmount(final Long instrumentHeaderId) {
+		final InstrumentHeader instrumentHeader = (InstrumentHeader) persistenceService
+				.find("from InstrumentHeader where id=?", instrumentHeaderId);
+		return instrumentHeader.getInstrumentAmount();
+	}
+	
+	private List getBankAdviceReportList(InstrumentHeader instrument) {
+
+		final List retList = getSubLedgerDetailQueryAndParams(instrument);
+		if (retList != null && !retList.isEmpty()) {
+			System.out.println("NOT NULL");
+			return populateSubLedgerDetails(retList);
+		} else {
+			System.out.println("NULL");
+			return Collections.EMPTY_LIST;
+		}
+	}
+	
+	public List getSubLedgerDetailQueryAndParams(final InstrumentHeader instrumentHeader) {
+		System.out.println("entery method");
+		final HashMap<Object, Map<Object, BigDecimal>> detailTypeMap = new HashMap<Object, Map<Object, BigDecimal>>();
+		HashMap<Object, BigDecimal> detailKeyMap = new HashMap<Object, BigDecimal>();
+		Map<Object, BigDecimal> tempMap = new HashMap<Object, BigDecimal>();
+		BigDecimal detailKeyAmt = BigDecimal.ZERO;
+		// Getting net payable
+		final String query = " SELECT gld.detailtypeid, gld.detailkeyid, sum(gld.amount) "
+				+ " FROM egf_instrumentvoucher ivh, generalledger gl, generalledgerdetail gld "
+				+ " WHERE ivh.instrumentheaderid = ? AND ivh.voucherheaderid = gl.voucherheaderid "
+				+ " AND gl.debitamount != 0 AND gl.id = gld.generalledgerid "
+				+ " group by gld.detailkeyid, gld.detailtypeid ";
+
+		// Get without subledger one
+		final String withNoSubledgerQry = " SELECT gld.DETAILTYPEID,gld.DETAILKEYID , sum(gld.amount) FROM   ( (SELECT voucherheaderid "
+				+ "  FROM egf_instrumentvoucher   WHERE instrumentheaderid =?   ) except   (SELECT DISTINCT payvhid  FROM miscbilldetail mb,"
+				+ " voucherheader vh ,    generalledger gl  LEFT JOIN chartofaccountdetail dtl  ON gl.glcodeid    =dtl.glcodeid  "
+				+ " WHERE mb.payvhid  =vh.id "
+				+ " AND vh.id =gl.voucherheaderid  AND dtl.glcodeid IS NOT NULL  AND vh.id  IN (SELECT voucherheaderid FROM egf_instrumentvoucher "
+				+ " WHERE instrumentheaderid =? ))) p ,  miscbilldetail m, generalledger gl, generalledgerdetail gld WHERE p.voucherheaderid=m.payvhid "
+				+ " AND gl.voucherheaderid =m.billvhid AND gl.id=gld.generalledgerid AND gl.debitamount!=0 "
+				+ " group by gld.detailtypeid ,gld.detailkeyid  ";
+
+		final Query WithNetPayableSubledgerQuery = persistenceService.getSession().createSQLQuery(query);
+		WithNetPayableSubledgerQuery.setParameter(0, instrumentHeader.getId());
+		System.out.println("1");
+		// Get without subledger one
+		final Query getDebitsideSubledgerQuery = persistenceService.getSession().createSQLQuery(withNoSubledgerQry);
+		getDebitsideSubledgerQuery.setParameter(0, instrumentHeader.getId());
+		getDebitsideSubledgerQuery.setParameter(1, instrumentHeader.getId());
+		System.out.println("2");
+		final List<Object[]> retList = WithNetPayableSubledgerQuery.list();
+		retList.addAll(getDebitsideSubledgerQuery.list());
+		System.out.println("3");
+		for (final Object[] obj : retList)
+			if (detailTypeMap.isEmpty()) {
+				detailKeyMap = new HashMap<Object, BigDecimal>();
+				detailKeyMap.put(obj[1], ((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+				detailTypeMap.put(obj[0], detailKeyMap);
+			} else {
+				tempMap = new HashMap<Object, BigDecimal>();
+				detailKeyAmt = BigDecimal.ZERO;
+				if (null != detailTypeMap.get(obj[0])) {
+					tempMap = detailTypeMap.get(obj[0]);
+					// detailKey=tempMap.get((Integer)obj[1]);
+					if (null != tempMap && tempMap.containsKey(obj[1])) {
+						detailKeyAmt = tempMap.get(obj[1])
+								.add((((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
+						tempMap.put(obj[1], detailKeyAmt);
+					} else
+						tempMap.put(obj[1], (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
+				} else {
+					detailKeyMap = new HashMap<Object, BigDecimal>();
+					detailKeyMap.put(obj[1], (((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN)));
+					detailTypeMap.put(obj[0], detailKeyMap);
+				}
+			}
+		System.out.println("End");
+
+		return retList;
+	}
+	
+	private List populateSubLedgerDetails(final List subList) {
+
+		final List<Object[]> retList = subList;
+		final List<BankAdviceReportInfo> subLedgerList = new ArrayList<BankAdviceReportInfo>();
+
+		for (final Object[] obj : retList) {
+			final Accountdetailtype adt = (Accountdetailtype) persistenceService
+					.find("from Accountdetailtype where id=?", ((BigInteger) obj[0]).intValue());
+
+			EntityType subDetail = null;
+			try {
+				final Class aClass = Class.forName(adt.getFullQualifiedName());
+				final java.lang.reflect.Method method = aClass.getMethod("getId");
+				final String dataType = method.getReturnType().getSimpleName();
+				if (LOGGER.isDebugEnabled())
+					LOGGER.debug("data Type = " + dataType);
+				if (dataType.equals("Long"))
+					subDetail = (EntityType) persistenceService.find(
+							"from " + adt.getFullQualifiedName() + " where id=?", ((BigInteger) obj[1]).longValue());
+				else
+					subDetail = (EntityType) persistenceService.find(
+							"from " + adt.getFullQualifiedName() + " where id=?", ((BigInteger) obj[1]).intValue());
+
+			} catch (final ClassCastException e) {
+				LOGGER.error(e);
+			} catch (final Exception e) {
+				LOGGER.error("Exception to get EntityType=" + e.getMessage());
+			}
+			final BankAdviceReportInfo bankAdviceReportInfo = new BankAdviceReportInfo();
+			bankAdviceReportInfo.setPartyName(subDetail.getName().toUpperCase());
+			bankAdviceReportInfo.setMobNo(subDetail.getMobileNumber());
+			bankAdviceReportInfo.setAccountNumber(subDetail.getBankaccount());
+			bankAdviceReportInfo.setBank(subDetail.getBankname());
+			// bankAdviceReportInfo.setBankBranch(subDetail.getBankaccount());
+			bankAdviceReportInfo.setIfscCode(subDetail.getIfsccode());
+			bankAdviceReportInfo.setAmount(((BigDecimal) obj[2]).setScale(2, BigDecimal.ROUND_HALF_EVEN));
+			totalAmount = totalAmount.add(bankAdviceReportInfo.getAmount());
+			subLedgerList.add(bankAdviceReportInfo);
+		}
+
+		return subLedgerList;
+	}
+
+
 
 }

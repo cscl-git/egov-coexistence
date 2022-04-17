@@ -400,8 +400,7 @@ public class ExpenseBillService {
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode())
-            if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
-                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
+            if (egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
             {
             	egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
                 FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT));
@@ -557,8 +556,8 @@ public class ExpenseBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 	}
                     
@@ -654,8 +653,8 @@ public class ExpenseBillService {
                 		stateValue = wfmatrix.getNextState();
                 		if(!egBillregister.getStatus().getDescription().equals("Pending for Cancellation"))
                 		{
-                			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                                    FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                			//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                              //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		}
                 		
                 	}

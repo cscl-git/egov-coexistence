@@ -379,13 +379,17 @@ public class BudgetService extends PersistenceService<Budget, Long> {
     }
 
     public Budget getBudget(String budgetHead, String deptCode, String budgetType, String fyear) {
+    	System.out.println("budgetHead :::"+budgetHead);
+    	System.out.println("deptCode :::"+deptCode);
+    	System.out.println("budgetType :::"+budgetType);
+    	System.out.println("fyear :::"+fyear);
         String budgetName;
         if (budgetHead.substring(0, 1).equalsIgnoreCase("1")
                 || budgetHead.substring(0, 1).equalsIgnoreCase("2"))
             budgetName = deptCode + "-" + budgetType + "-Rev-" + fyear;
         else
             budgetName = deptCode + "-" + budgetType + "-Cap-" + fyear;
-
+        System.out.println("budgetName :::"+budgetName);
         return getByName(budgetName);
     }
 

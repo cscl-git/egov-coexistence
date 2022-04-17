@@ -133,7 +133,7 @@ if(end1>=today1){
 								+ startDate
 								+ '&endDate='
 								+ endDate
-								+ '&departmentId='
+								+ '&departmentCode='
 								+ deptId
 								+ '&functionaryId='
 								+ functionaryId

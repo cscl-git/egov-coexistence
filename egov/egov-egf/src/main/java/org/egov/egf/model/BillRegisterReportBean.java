@@ -86,6 +86,7 @@ public class BillRegisterReportBean {
     private String deducPexNo;
     private String departmentCode;
     private String pexNodate;
+    private String pexRelDate;
     private String chqNo;
     private String chqDate;
     private List<ChartOfAccounts> chartOfAccounts;
@@ -562,6 +563,14 @@ public class BillRegisterReportBean {
 
 	public void setReceiptNo(String receiptNo) {
 		this.receiptNo = receiptNo;
+	}
+
+	public String getPexRelDate() {
+		return pexRelDate;
+	}
+
+	public void setPexRelDate(String pexRelDate) {
+		this.pexRelDate = pexRelDate;
 	}
 
 	

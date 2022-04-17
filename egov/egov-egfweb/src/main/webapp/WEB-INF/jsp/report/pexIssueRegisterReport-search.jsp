@@ -46,7 +46,8 @@
   ~
   --%>
 
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
+<%@ taglib uri="http://www.springframework.org/tags" prefix="spring"%>
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ page language="java"%>
 
@@ -101,6 +102,52 @@
 <title><s:text name="pex.issueregister.report" /></title>
 
 </head>
+<link type="text/css" rel="stylesheet"
+	href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet"
+	href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
+<!-- <script type="text/javascript" src="https://cdn.datatables.net/searchpanes/1.4.0/js/dataTables.searchPanes.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/select/1.3.4/js/dataTables.select.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/searchpanes/1.4.0/css/searchPanes.dataTables.min.css"></script> 
+<script src="https://cdn.datatables.net/plug-ins/1.10.19/api/sum().js"></script>-->
+<script>
+$(document).ready(function() {
+    $('#resultHeader').DataTable( {
+        dom: 'Bfrtip',
+        aaSorting : [],
+        buttons: [
+        	{ extend: 'excelHtml5'},
+        	{
+                extend: 'pdfHtml5',
+                orientation: 'landscape',
+                pageSize: 'LEGAL'
+            },
+        	{ extend: 'copyHtml5'},
+        	
+        	{ extend: 'csvHtml5'}
+        	
+        ]
+    } );
+   /*var sum = $('#resultHeader').DataTable().column(8).data().sum();
+   console.log(sum);
+   $('#totalVal').html(sum);*/
+} ); 
+</script>
 <script>
 	function populateBankBranch(bank) {
 		var bankId = bank.options[bank.selectedIndex].value;
@@ -155,9 +202,9 @@
 		}
 	}
 </script>
-<script type="text/javascript"
-	src="/services/EGF/resources/javascript/autocomplete-debug.js"></script>
+<script type="text/javascript" src="/services/EGF/resources/javascript/autocomplete-debug.js"></script>
 <body>
+<div class="container">
 	<s:form action="rtgsIssueRegisterReport" name="rtgsIssueRegisterReport"
 		theme="simple" method="post">
 		<span class="mandatory1"> <s:actionerror /> <s:fielderror />
@@ -166,11 +213,14 @@
 		<font style='color: red; font-weight: bold'>
 			<p class="error-block" id="lblError"></p>
 		</font>
-		<div class="formmainbox">
-			<div class="subheadnew">
-				<s:text name="pex.issue.report" />
+		<div class="panel panel-primary" data-collapsed="0">
+			<div class="panel-heading">
+				<div class="panel-title">
+					<spring:message code="pex.issue.report" text="PEX Issue Report" />
+				</div>
 			</div>
 
+			<div class="panel-body">
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
 					<td class="bluebox"></td>
@@ -188,22 +238,40 @@
 				</tr>
 				<tr>
 					<td class="bluebox"></td>
-					<td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
+					<%-- <td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
 					<td class="greybox"><s:date name="fromDate" var="fromDateId"
 							format="dd/MM/yyyy" /> <s:textfield id="rtgsAssignedFromDate"
 							name="rtgsAssignedFromDate" value="%{fromDateId}"
 							data-date-end-date="0d"
 							onkeyup="DateFormat(this,this.value,event,false,'3')"
 							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-							data-inputmask="'mask': 'd/m/y'" /></td>
-					<td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
+							data-inputmask="'mask': 'd/m/y'" /></td> --%>
+					<td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
+					<s:date name="fromDate" format="dd/MM/yyyy" var="fromDateId" />
+					<td class="greybox"><s:textfield name="rtgsAssignedFromDate" id="rtgsAssignedFromDate"
+					maxlength="20"
+					onkeyup="DateFormat(this,this.value,event,false,'3')"
+					value="%{fromDateId}" autocomplete="off"/><a
+					href="javascript:show_calendar('forms[0].rtgsAssignedFromDate');"
+					style="text-decoration: none">&nbsp;<img
+					src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
+					<%-- <td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
 					<td class="greybox"><s:date name="toDate" var="toDateId"
 							format="dd/MM/yyyy" /> <s:textfield id="rtgsAssignedToDate"
 							name="rtgsAssignedToDate" value="%{toDateId}"
 							data-date-end-date="0d"
 							onkeyup="DateFormat(this,this.value,event,false,'3')"
 							placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-							data-inputmask="'mask': 'd/m/y'" /></td>
+							data-inputmask="'mask': 'd/m/y'" /></td> --%>
+						<td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
+						<s:date name="toDate" format="dd/MM/yyyy" var="toDateId" />
+						<td class="greybox"><s:textfield name="rtgsAssignedToDate" id="rtgsAssignedToDate"
+						maxlength="20"
+						onkeyup="DateFormat(this,this.value,event,false,'3')"
+						value="%{toDateId}" autocomplete="off"/><a
+						href="javascript:show_calendar('forms[0].rtgsAssignedToDate');"
+						style="text-decoration: none">&nbsp;<img
+						src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
 				</tr>
 				<tr>
 					<td class="bluebox"></td>
@@ -245,23 +313,90 @@
 			<div class="buttonbottom">
 				<s:submit method="exportHtml" value="Search" cssClass="buttonsubmit"
 					onclick="return submitForm('exportHtml')" />
-				<s:submit method="exportPdf" value="Save As Pdf"
+				<%-- <s:submit method="exportPdf" value="Save As Pdf"
 					cssClass="buttonsubmit" onclick="return submitForm('exportPdf')" />
 				<s:submit method="exportXls" value="Save As Xls"
-					cssClass="buttonsubmit" onclick="return submitForm('exportXls')" />
+					cssClass="buttonsubmit" onclick="return submitForm('exportXls')" /> --%>
 				<input type="button" value="Close"
 					onclick="javascript:window.close()" class="button" />
 
 			</div>
-			<br>
-			<s:if test="%{searchResult}">
+			
+			<%-- <s:if test="%{searchResult}">
 				<logic:empty name="rtgsDisplayList">
 					<blink>Nothing found to display.</blink>
 				</logic:empty>
 			</s:if>
-			<div id="codescontainer" />
+			<div id="codescontainer" /> --%>
+			
+			</div>
 		</div>
+		
+	<c:if test="${not empty rtgsDisplayList}">
+	<div class="panel panel-primary" data-collapsed="0">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<spring:message code="asset-search-result" text="Search Result" />
+			</div>
+		</div>
+		
+		<div class="panel-body">
+		<table class="table table-bordered" id="resultHeader">
+			<thead>
+				<%-- <tr> 
+					<td colspan="8"></td>
+					<td><spring:message code="lbl.total.amount" text="Total Amount" /></td>
+					<td><span id="totalVal"/></td>
+				</tr> --%>
+				<tr>
+					<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
+					<th><spring:message code="lbl.bank" text="Bank Name" /></th>
+					<th><spring:message code="lbl.account.number" text="Account Number" /></th>
+					<th><spring:message code="lbl.bank.branch" text="Branch" /></th>
+					<th><spring:message code="lbl.pex.date" text="PEX Date" /></th>
+					<th><spring:message code="lbl.pex.number" text="PEX Number" /></th>
+					<th><spring:message code="lbl.department" text="Department" /></th>
+					<th><spring:message code="lbl.party.name" text="Party Name" /></th>
+					<th><spring:message code="lbl.bpv.number" text="BPV Number And Date" /></th>
+					<th><spring:message code="lbl.amount" text="Amount(&#8377;)" /></th>
+					<th><spring:message code="lbl.status" text="Status" /></th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:choose>
+					<c:when
+						test="${rtgsDisplayList!=null && rtgsDisplayList.size() > 0}">
+						<c:forEach items="${rtgsDisplayList}" var="rtgsResultObj"
+							varStatus="item">
+
+							<tr id="rtgsView">
+								<td>${item.index + 1}</td>
+								<td>${rtgsResultObj.bank}</td>
+								<td>${rtgsResultObj.accountNumber}</td>
+								<td>${rtgsResultObj.bankBranch}</td>
+								<td>${rtgsResultObj.rtgsDate}</td>
+								<td>${rtgsResultObj.rtgsNumber}</td>
+								<td>${rtgsResultObj.department}</td>
+								<td>${rtgsResultObj.partyName}</td>
+								<td>${rtgsResultObj.paymentNumber},${rtgsResultObj.paymentDate}</td>
+								<td>${rtgsResultObj.paymentAmount}</td>
+								<td>${rtgsResultObj.status}</td>
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+						<td colspan="10">No Records Found..</td>
+					</c:otherwise>
+				</c:choose>
+			</tbody>
+
+		</table>
+		</div>
+		</div>
+</c:if>
 	</s:form>
+
+</div>
 
 	<script>
 		function validateFund() {

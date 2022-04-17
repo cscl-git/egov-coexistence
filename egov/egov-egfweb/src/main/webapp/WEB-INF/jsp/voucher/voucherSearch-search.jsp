@@ -294,6 +294,7 @@
 			 //document.body.removeChild(form);
 		}
 		function validateAndSubmit(){
+			
 			if(document.getElementById('voucherNumber')!=null && document.getElementById('voucherNumber').value!="")
 				{
 				document.voucherSearch.action='${pageContext.request.contextPath}/voucher/voucherSearch-search.action';
@@ -301,11 +302,14 @@
 	    		return true;
 				}
 			else{
+				
 			if(!validate()){
+				
 				return false;
 			}
 			else
 				{
+				
 				document.voucherSearch.action='${pageContext.request.contextPath}/voucher/voucherSearch-search.action';
 	    		document.voucherSearch.submit();
 				return true;

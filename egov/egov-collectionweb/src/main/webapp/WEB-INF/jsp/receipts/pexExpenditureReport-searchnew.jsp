@@ -190,10 +190,11 @@ function submitForm1() {
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Budget Head" style="width:10%;text-align: center" value="${currentRow.budgetHead}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Narration" style="width:10%;text-align: center" value="${currentRow.narration}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GlCode" style="width:10%;text-align: center" value="${currentRow.glcodeId}" />
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Account Number" style="width:10%;text-align: center" value="${currentRow.accNum}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Particulars" style="width:10%;text-align: center" value="${currentRow.particulars}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Debit Amount" style="width:10%;text-align: center" value="${currentRow.debitamt}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Credit Amount" style="width:10%;text-align: center" value="${currentRow.creditamt}" />
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Account Number" style="width:10%;text-align: center" value="${currentRow.accNum}" />
+							
 							
 						</display:table>
 						<div class="center">

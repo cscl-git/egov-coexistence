@@ -73,8 +73,11 @@ public class BankAdviceReportInfo {
     private String paymentDate;
     private BigDecimal dtId;
     private BigDecimal dkId;
-    private Long instType;
-    private String typeOfPayment;
+	private Date realizationDate;
+	private String typeOfPayment;
+	private String mobNo;
+	
+
     public BigDecimal getDtId() {
         return dtId;
     }
@@ -219,20 +222,29 @@ public class BankAdviceReportInfo {
         this.vhId = vhId;
     }
 
-	public Long getInstType() {
-		return instType;
-	}
 
-	public void setInstType(Long instType) {
-		this.instType = instType;
+	public Date getRealizationDate() {
+		return realizationDate;
+}
+
+	public void setRealizationDate(Date realizationDate) {
+		this.realizationDate = realizationDate;
 	}
 
 	public String getTypeOfPayment() {
 		return typeOfPayment;
-}
+	}
 
 	public void setTypeOfPayment(String typeOfPayment) {
 		this.typeOfPayment = typeOfPayment;
+	}
+
+	public String getMobNo() {
+		return mobNo;
+	}
+
+	public void setMobNo(String mobNo) {
+		this.mobNo = mobNo;
 	}
 
 }

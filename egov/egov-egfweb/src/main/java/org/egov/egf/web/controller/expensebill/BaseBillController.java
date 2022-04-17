@@ -690,7 +690,7 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
         financialYear = financialYearDAO.getFinancialYearById(Long.valueOf(financialYr.getId()));
         String finYearRange = financialYear.getFinYearRange();
         final Date dStartDate = financialYear.getStartingDate();
-        final String strAODate = Constants.DDMMYYYYFORMAT1.format(dtAsOnDate);
+        final String strAODate = Constants.DDMMYYYYFORMAT3.format(dtAsOnDate);
         final String strStDate = Constants.DDMMYYYYFORMAT1.format(dStartDate);
         String  budgetHead;
         Query query = null;
@@ -703,15 +703,15 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
             strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and  gl.glcodeid =:glCodeId");
             strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
-            strQuery.append(" and vmis.billnumber  notnull and vh.voucherdate <=:strAODate");
+            strQuery.append(" and vmis.billnumber  notnull and CAST(vh.voucherdate AS DATE) <=TO_DATE(:strAODate,'dd-Mon-yyyy')");
             strQuery.append(getFunctionQuery("gl.functionid",function));
             strQuery.append(getDepartmentQuery("vmis.departmentcode",department));
             strQuery.append(getFundQuery("vh.fundid",fund));
             strQuery.append(" ");
             strQuery.append(" union select distinct bmis.budgetary_appnumber as bdgApprNumber, vh1.vouchernumber as VoucherNumber, vh1.voucherdate as  voucherDate , br.narration as description,vh1.createddate as createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,  bd.debitamount as debitAmount, bd.creditamount as creditAmount  ");
             strQuery.append(" from eg_billdetails bd, eg_billregistermis bmis, eg_billregister br, voucherHeader vh1 where br.id = bd.billid and br.id = bmis.billid and  bd.glcodeid =:glCodeId ");
-            strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid )  and br.billdate  >=:strStDate");
-            strQuery.append(" and br.billdate  <=:strAODate");
+            strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL','SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid )  and br.billdate  >=:strStDate");
+            strQuery.append(" and CAST(br.billdate AS DATE)  <=TO_DATE(:strAODate,'dd-Mon-yyyy') ");
             strQuery.append(getFunctionQuery("bd.functionid",function));
             strQuery.append(getDepartmentQuery("bmis.departmentcode",department));
             strQuery.append(getFundQuery("bmis.fundid",fund));
@@ -720,8 +720,8 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             strQuery.append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br  ");
             strQuery.append(" where br.id = bd1.billid and br.id = bmis1.billid and  bd1.glcodeid =:glCodeId ");
             strQuery.append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) ");
-            strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate");
-            strQuery.append(" and br.billdate <=:strAODate");
+            strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate   >=:strStDate");
+            strQuery.append(" and CAST(br.billdate AS DATE) <=TO_DATE(:strAODate,'dd-Mon-yyyy')");
             strQuery.append(getFunctionQuery("bd1.functionid",function));
             strQuery.append(getDepartmentQuery("bmis1.departmentcode",department));
             strQuery.append(getFundQuery("bmis1.fundid",fund));
@@ -741,7 +741,9 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
                     .addScalar("debitAmount", BigDecimalType.INSTANCE)
                     .addScalar("creditAmount", BigDecimalType.INSTANCE)
                     .setResultTransformer(Transformers.aliasToBean(BudgetAppDisplay.class));
-            query=setParameterForBudgetAppDisplay(query,dtAsOnDate,dStartDate,department, function,fund,budgetGroup);
+            query=setParameterForBudgetAppDisplay(query,strAODate,dStartDate,department, function,fund,budgetGroup);
+            
+            
         }
         budgetAppropriationRegisterList = query.list();
 
@@ -841,6 +843,39 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
         if (asOnDate != null )
         {
             query.setDate("strAODate", asOnDate) ;
+        }
+       
+        if (startDate != null )
+        {
+            query.setDate("strStDate", startDate) ;
+        }
+       
+       
+        return query;
+    }
+    
+    private Query setParameterForBudgetAppDisplay(Query query ,String asOnDate,Date startDate,final Department department,final CFunction function,final Fund fund,final BudgetGroup budgetGroup)
+    {
+        if (function.getId() != null && function.getId() != -1)
+        {
+            query.setLong("functionId", function.getId()) ;
+        }
+        System.out.println("dept :"+department.getCode());
+        if (department.getCode() != null )
+        {
+            query.setString("departmentcode", department.getCode()) ;
+        }
+        if (fund.getId() != null && fund.getId() != -1)
+        {
+            query.setLong("fundId", fund.getId()) ;
+        }
+        if (budgetGroup.getMinCode().getId() != null )
+        {
+            query.setLong("glCodeId", budgetGroup.getMinCode().getId()) ;
+        }
+        if (asOnDate != null )
+        {
+            query.setString("strAODate", asOnDate) ;
         }
        
         if (startDate != null )

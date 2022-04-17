@@ -343,5 +343,11 @@ public class PurchaseOrder extends AbstractAuditable implements EntityType {
     public void setEditAllFields(Boolean editAllFields) {
         this.editAllFields = editAllFields;
     }
+    
+    @Override
+	public String getMobileNumber() {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }

@@ -257,6 +257,15 @@ public class BudgetLoadAction extends BaseFormAction {
             System.out.println("10");
             if (errorInMasterData) {
             	System.out.println("11");
+            if(budgetUploadList !=null && !budgetUploadList.isEmpty())
+            {
+            	System.out.println("111");
+            	for(BudgetUpload uplod:budgetUploadList)
+            	{
+            		System.out.println("**"+uplod.toString());
+            	}
+            	
+            }
                 fsIP.close();
                 prepareOutPutFileWithErrors(budgetUploadList);
                 addActionMessage(getText("error.while.validating.masterdata"));

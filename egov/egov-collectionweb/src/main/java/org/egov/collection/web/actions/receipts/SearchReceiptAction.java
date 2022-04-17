@@ -969,7 +969,7 @@ public class SearchReceiptAction extends SearchFormAction {
 				for (Object[] element : rows) {
 					if (!element[3].toString().equalsIgnoreCase("0.00")) {
 						if (element[1].toString().equalsIgnoreCase("3502020")
-								|| element[1].toString().equalsIgnoreCase("3502019")) {
+								|| element[1].toString().equalsIgnoreCase("3502019") || element[1].toString().equalsIgnoreCase("3502072")) {
 							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
 						} else {
 							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
@@ -1285,7 +1285,7 @@ public class SearchReceiptAction extends SearchFormAction {
 					totalAmount = new BigDecimal(0);
 					if (!element[3].toString().equalsIgnoreCase("0.00")) {
 						if (element[1].toString().equalsIgnoreCase("3502020")
-								|| element[1].toString().equalsIgnoreCase("3502019")) {
+								|| element[1].toString().equalsIgnoreCase("3502019") || element[1].toString().equalsIgnoreCase("3502072")) {
 							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
 						} else {
 							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
@@ -1305,7 +1305,7 @@ public class SearchReceiptAction extends SearchFormAction {
 					totalAmount = amtReceiptMap.get(element[5].toString()).getGstAmount();
 					if (!element[3].toString().equalsIgnoreCase("0.00")) {
 						if (element[1].toString().equalsIgnoreCase("3502020")
-								|| element[1].toString().equalsIgnoreCase("3502019")) {
+								|| element[1].toString().equalsIgnoreCase("3502019") || element[1].toString().equalsIgnoreCase("3502072")) {
 							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
 						} else {
 							pAmount = pAmount.add(new BigDecimal(element[3].toString()));

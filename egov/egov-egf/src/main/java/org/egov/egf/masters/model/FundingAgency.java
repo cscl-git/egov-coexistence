@@ -185,6 +185,11 @@ public class FundingAgency extends BaseModel implements EntityType {
 
         return null;
     }
+    
+    @Override
+	public String getMobileNumber() {
+		return null;
+	}
 
     /*
      * @Override public EgwStatus getEgwStatus() {  return null; }

@@ -116,6 +116,12 @@
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
 							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
 									Page 5</a>
+							<a href="#"
+								onclick="generateReport('pdf6','<s:property value='%{instrumentHeaderId.id}'/>',
+							'<s:property value="%{instrumentHeaderId.bankAccountId.id}" />',
+							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.id}" />',
+							'<s:property value="%{instrumentHeaderId.bankAccountId.bankbranch.bank.id}" />'); ">Generate
+									Page 6</a>		
 							</td>
 							<td></td>
 							<td></td>
@@ -178,6 +184,10 @@ function generateReport(type,instrumentnumber,bankaccount,bankbranch,bank){
 	}
 	else if(type=='pdf5'){
  		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex5.action?bank.id="+
+			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
+	}
+	else if(type=='pdf6'){
+		 var url="${pageContext.request.contextPath}/report/bankAdviceReport-exportPDFPex6.action?bank.id="+
 			bank+"&bankbranch.id="+bankbranch+"&bankaccount.id="+bankaccount+"&instrumentnumber.id="+instrumentnumber;
 	}
 	else{

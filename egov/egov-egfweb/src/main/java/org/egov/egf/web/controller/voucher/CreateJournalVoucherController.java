@@ -466,7 +466,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 		final StringBuffer query5 = new StringBuffer(500);
 		list = null;
 		query5.append(
-				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
+				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate,vdi.realizationdate from voucher_detail_instrument vdi   ");
 		LOGGER.info("Query 5 :: " + query5.toString());
 		queryInstru = this.persistenceService.getSession().createSQLQuery(query5.toString());
 		list = queryInstru.list();
@@ -494,6 +494,9 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 				}
 				if (object[6] != null) {
 					pexDetail.setSecondsignatory(object[6].toString());
+				}
+				if (object[7] != null) {
+					pexDetail.setBackdateentry(object[7].toString());
 				}
 				voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
 			}
@@ -554,6 +557,12 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 								&& !voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent().isEmpty()) {
 							resultset.setPexNodate(
 									voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
+						}
+						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
+								&& voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry() != null
+								&& !voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry().isEmpty()) {
+							resultset.setPexRelDate(
+									voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry());
 						}
 						// cheque
 						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
@@ -616,6 +625,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 						&& voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent() != null
 						&& !voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent().isEmpty()) {
 					resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
+				}
+				if (voucherDetailIntrumentMapping.get(result.getId()) != null
+						&& voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry() != null
+						&& !voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry().isEmpty()) {
+					resultset.setPexRelDate(voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry());
 				}
 				// checque
 				if (voucherDetailIntrumentMapping.get(result.getId()) != null
@@ -684,63 +698,226 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 		List<BigDecimal> taxNonMatchingAmount = new ArrayList<BigDecimal>();
 		if (detail != null && !detail.isEmpty()) {
 			for (VoucherDetailLedger row : detail) {
-				if (row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0) {
-					if (row.getGlCode().equalsIgnoreCase("3502007") || row.getGlCode().equalsIgnoreCase("3502009")
-							|| row.getGlCode().equalsIgnoreCase("3502010")
-							|| row.getGlCode().equalsIgnoreCase("3502011")
-							|| row.getGlCode().equalsIgnoreCase("3502012")
-							|| row.getGlCode().equalsIgnoreCase("3502008")) {
+				if (!(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)) {
+					resultset.setGrossAmount(row.getDebitAmount());
+				} 
+				if (row.getGlCode().equalsIgnoreCase("3502007") || row.getGlCode().equalsIgnoreCase("3502009")
+						|| row.getGlCode().equalsIgnoreCase("3502010")
+						|| row.getGlCode().equalsIgnoreCase("3502011")
+						|| row.getGlCode().equalsIgnoreCase("3502012")
+						|| row.getGlCode().equalsIgnoreCase("3502008")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						tdsTax = tdsTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502055")) {
+					}
+					else
+					{
+						tdsTax = tdsTax.subtract(row.getDebitAmount());
+					}
+					
+				} else if (row.getGlCode().equalsIgnoreCase("3502055")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						igstTax = igstTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502054")) {
+					}
+					else
+					{
+						igstTax = igstTax.subtract(row.getDebitAmount());
+					}
+					
+				} else if (row.getGlCode().equalsIgnoreCase("3502054")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						cgstTax = cgstTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502018")) {
+					}
+					else
+					{
+						cgstTax = cgstTax.subtract(row.getDebitAmount());
+					}
+					
+				} else if (row.getGlCode().equalsIgnoreCase("3502018")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						laborTax = laborTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1408055")
-							|| row.getGlCode().equalsIgnoreCase("1408052")) {
+					}
+					else
+					{
+						laborTax = laborTax.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1408055")
+						|| row.getGlCode().equalsIgnoreCase("1408052")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						colTax = colTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1405014")
-							|| row.getGlCode().equalsIgnoreCase("1408053")) {
+					}
+					else
+					{
+						colTax = colTax.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1405014")
+						|| row.getGlCode().equalsIgnoreCase("1408053")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						waterTax = waterTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502058")) {
+					}
+					else
+					{
+						waterTax = waterTax.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3502058")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						qualCessTax = qualCessTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1402003")) {
+					}
+					else
+					{
+						qualCessTax = qualCessTax.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1402003")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						fineTax = fineTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3401004")) {
+					}
+					else
+					{
+						fineTax = fineTax.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3401004")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						secTax = secTax.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3117001")) {
+					}
+					else
+					{
+						secTax = secTax.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3117001")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						gpfAmount = gpfAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3501150")) {
+					}
+					else
+					{
+						gpfAmount = gpfAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3501150")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						npsAmount = npsAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502068")) {
+					}
+					else
+					{
+						npsAmount = npsAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3502068")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						gslicAmount = gslicAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("4601002")) {
+					}
+					else
+					{
+						gslicAmount = gslicAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("4601002")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						hbaAmount = hbaAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3504104")) {
+					}
+					else
+					{
+						hbaAmount = hbaAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3504104")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						licenseAmount = licenseAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502002")) {
+					}
+					else
+					{
+						licenseAmount = licenseAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3502002")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						licAmount = licAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3502064")) {
+					}
+					else
+					{
+						licAmount = licAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3502064")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						bankAmount = bankAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3503003")) {
+					}
+					else
+					{
+						bankAmount = bankAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3503003")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						courtAmount = courtAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("3117002")) {
+					}
+					else
+					{
+						courtAmount = courtAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("3117002")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						pensionAmount = pensionAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1405053")) {
+					}
+					else
+					{
+						pensionAmount = pensionAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1405053")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						electricityChargesAmount = electricityChargesAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1407001")) {
+					}
+					else
+					{
+						electricityChargesAmount = electricityChargesAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1407001")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						adminServiceChargesAmount = adminServiceChargesAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1408001")) {
+					}
+					else
+					{
+						adminServiceChargesAmount = adminServiceChargesAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1408001")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						otherChargesAmount = otherChargesAmount.add(row.getCreditAmount());
-					} else if (row.getGlCode().equalsIgnoreCase("1408059")) {
+					}
+					else
+					{
+						otherChargesAmount = otherChargesAmount.subtract(row.getDebitAmount());
+					}
+				} else if (row.getGlCode().equalsIgnoreCase("1408059")) {
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
 						otherRecovFromEmployeesAmount = otherRecovFromEmployeesAmount.add(row.getCreditAmount());
-					} else {
-						taxNonMatching.add(row.getGlCode());
-						taxNonMatchingAmount.add(row.getCreditAmount());
+					}
+					else
+					{
+						otherRecovFromEmployeesAmount = otherRecovFromEmployeesAmount.subtract(row.getDebitAmount());
 					}
 				} else {
-					resultset.setGrossAmount(row.getDebitAmount());
+					taxNonMatching.add(row.getGlCode());
+					if(row.getDebitAmount().compareTo(BigDecimal.ZERO) == 0)
+					{
+						taxNonMatchingAmount.add(row.getCreditAmount());
+					}
+					else
+					{
+						taxNonMatchingAmount.add(row.getDebitAmount());
+					}
 				}
 			}
 			resultset.setTaxAmount(tdsTax);
@@ -966,7 +1143,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 		final StringBuffer query5 = new StringBuffer(500);
 		list = null;
 		query5.append(
-				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate from voucher_detail_instrument vdi   ");
+				"select vdi.id,vdi.transactionnumber, vdi.transactiondate ,vdi.voucherheaderid,vdi.accountnumber,vdi.instrumentnumber,vdi.instrumentdate,vdi.realizationdate from voucher_detail_instrument vdi   ");
 		LOGGER.info("Query 5 :: " + query5.toString());
 		queryInstru = this.persistenceService.getSession().createSQLQuery(query5.toString());
 		list = queryInstru.list();
@@ -994,6 +1171,9 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 				}
 				if (object[6] != null) {
 					pexDetail.setSecondsignatory(object[6].toString());
+				}
+				if (object[7] != null) {
+					pexDetail.setBackdateentry(object[7].toString());
 				}
 				voucherDetailIntrumentMapping.put(pexDetail.getId(), pexDetail);
 			}
@@ -1054,6 +1234,13 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 							resultset.setPexNodate(
 									voucherDetailIntrumentMapping.get(row.getBpvId()).getApprovalComent());
 						}
+						
+						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
+								&& voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry() != null
+								&& !voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry().isEmpty()) {
+							resultset.setPexRelDate(
+									voucherDetailIntrumentMapping.get(row.getBpvId()).getBackdateentry());
+						}
 						// cheque
 						if (voucherDetailIntrumentMapping.get(row.getBpvId()) != null
 								&& voucherDetailIntrumentMapping.get(row.getBpvId()).getFirstsignatory() != null
@@ -1108,6 +1295,11 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 						&& voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent() != null
 						&& !voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent().isEmpty()) {
 					resultset.setPexNodate(voucherDetailIntrumentMapping.get(result.getId()).getApprovalComent());
+				}
+				if (voucherDetailIntrumentMapping.get(result.getId()) != null
+						&& voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry() != null
+						&& !voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry().isEmpty()) {
+					resultset.setPexRelDate(voucherDetailIntrumentMapping.get(result.getId()).getBackdateentry());
 				}
 				// cheque
 				if (voucherDetailIntrumentMapping.get(result.getId()) != null
@@ -1883,4 +2075,5 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 			return "Created";
 		return "";
 	}
+	
 }
