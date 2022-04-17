@@ -114,6 +114,7 @@ import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.infstr.services.PersistenceService;
+import org.egov.model.instrument.BillData;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.model.instrument.InstrumentVoucher;
 import org.egov.model.payment.ChequeAssignment;
@@ -3170,8 +3171,8 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     	LOGGER.info("A");
     	Set<String> mobileNos=new HashSet<String>();
     	Set<String> mobileNosIteration=new HashSet<String>();
-        Set<String> billNoList=new HashSet<String>();
-        Set<String> billNoListIteration;
+        Set<BillData> billNoList=new HashSet<BillData>();
+        Set<BillData> billNoListIteration;
         String pexNumber = null;
         String pexDate = null;
         BigDecimal pexAmount = null;
@@ -3186,7 +3187,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     	}
     	for(InstrumentVoucher v:instVoucherList)
     	{
-    		billNoListIteration=new HashSet<String>();
+    		billNoListIteration=new HashSet<BillData>();
     		billNoListIteration=getBillNumber(v.getVoucherHeaderId().getId());
     		billNoList.addAll(billNoListIteration);
     	}
@@ -3203,11 +3204,11 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
                         "PEX_MSG_TEMPLATE_ID");
         final String templateId = appList.get(0).getValue();
          try {
-	            for (String billNo : billNoList) {
+	            for (BillData bill : billNoList) {
 	                for(String mobileNo:mobileNos)
 	                {
 	                	if (mobileNo != null && !mobileNo.isEmpty()) {
-		                    buildSmsForMeeting(mobileNo, billNo, pexDate, pexNumber,pexAmount,templateId);
+		                    buildSmsForMeeting(mobileNo, bill.getBillNumber(), pexDate, pexNumber,new BigDecimal(bill.getBillAmount()),templateId);
 		                }
 	                }
 	            }
@@ -3234,14 +3235,15 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
 }
 
 
-private Set<String> getBillNumber(Long bpvId) {
+private Set<BillData> getBillNumber(Long bpvId) {
    	SQLQuery query =  null;
    	List<Object[]> rows = null;
-   	Set<String> billNoList=new HashSet<String>();
+   	Set<BillData> billNoList=new HashSet<BillData>();
    	String bilNo;
+   	BillData bill;
    	try
    	{
-   		 query = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber from miscbilldetail m where m.payvhid=:bpvId ");
+   		 query = this.persistenceService.getSession().createSQLQuery("select m.id,m.billnumber,m.paidamount from miscbilldetail m where m.payvhid=:bpvId ");
    	    query.setLong("bpvId", bpvId);
    	    rows = query.list();
    	    
@@ -3250,8 +3252,11 @@ private Set<String> getBillNumber(Long bpvId) {
    	    	System.out.println("list :"+rows.get(0));
    	    	for(Object[] element : rows)
    	    	{
+   	    		bill=new BillData();
    	    		bilNo= element[1].toString();
-   	    		billNoList.add(bilNo);
+   	    		bill.setBillNumber(bilNo);
+   	    		bill.setBillAmount(element[2].toString());
+   	    		billNoList.add(bill);
    	    	}
    	    }
    	}catch (Exception e) {

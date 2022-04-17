@@ -530,8 +530,7 @@ public class RefundBillService {
     public void expenseBillRegisterStatusChange(final EgBillregister egBillregister, final String workFlowAction) {
         if (null != egBillregister && null != egBillregister.getStatus()
                 && null != egBillregister.getStatus().getCode()) {
-            if (FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE.equals(egBillregister.getStatus().getCode())
-                    && egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
+            if (egBillregister.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
             {
             	egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                 FinancialConstants.CONTINGENCYBILL_PENDING_AUDIT));
@@ -677,8 +676,8 @@ public class RefundBillService {
                 	else
                 	{
                 		stateValue = wfmatrix.getNextState();
-                		egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
-                                FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                		//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                          //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 	}
                     
@@ -782,11 +781,11 @@ public class RefundBillService {
 									&& egBillregister.getRefundable().equalsIgnoreCase("Y")
 									&& egBillregister.getExpendituretype()
 											.equalsIgnoreCase(FinancialConstants.STANDARD_EXPENDITURETYPE_REFUND)) {
-                				egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
-                                        FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                				//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                                  //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 			}else {
-                			egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-                                    FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
+                			//egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+                              //      FinancialConstants.CONTINGENCYBILL_PENDING_FINANCE));
                 		
                 			}
                 		}
