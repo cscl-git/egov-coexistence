@@ -1969,8 +1969,10 @@ if(egBillregister.getBillPayeeDetailsNotLink().isEmpty()) {
                        
                      } catch (ValidationException e) {
                     	 System.out.println("From Exception saving time");
-                    	 e.printStackTrace();
-                    
+                    	 System.out.println(e.getErrors().get(0).getMessage());
+                    	 
+                    	 //e.printStackTrace();
+                    	 redirectAttributes.addFlashAttribute("message",e.getErrors().get(0).getMessage());
                     	 return "redirect:/refund/_paymentRequestblankvoucherForm";
                     //return "redirect:/refund/_paymentRequestForm";
                     }

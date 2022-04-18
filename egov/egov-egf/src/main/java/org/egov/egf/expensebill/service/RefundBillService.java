@@ -93,6 +93,7 @@ import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.script.service.ScriptService;
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
+import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.workflow.entity.StateHistory;
 import org.egov.infra.workflow.matrix.entity.WorkFlowMatrix;
@@ -367,8 +368,14 @@ public class RefundBillService {
     	{ 
         try {
             checkBudgetAndGenerateBANumber(egBillregister);
-        } catch (final ValidationException e) {
-            throw new ValidationException(e.getErrors());
+        } catch (ValidationException e) {
+        	//StringBuilder message = new StringBuilder();
+            //message.append("Budget Check failed: Budget not defined for the given combination."+"\n");
+        	System.out.println(e.getErrors().get(0).getMessage());
+        	throw new ValidationException(
+                    new ValidationError(e.getErrors().get(0).getMessage()+", Budget not defined for the given combination.",
+                    		e.getErrors().get(0).getMessage()+", Budget not defined for the given combination."));
+            //throw new ValidationException(e.getErrors());
         }
     	}
       
