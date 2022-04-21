@@ -584,8 +584,8 @@ public class PaymentRefundController extends BaseBillController {
                 glcodeIdList.add(coa.getId());
                 temp.put(Constants.GLCODE, coa.getGlcode());
                 temp.put("accounthead", coa.getName());
-                temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : gl.getDebitAmount());
-                temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : gl.getCreditAmount());
+                temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : new BigDecimal(gl.getDebitAmount()));
+                temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : new BigDecimal(gl.getCreditAmount()));
                 temp.put("billdetailid", gl.getId());
                 tempList.add(temp);
                 for (CGeneralLedgerDetail gldetail : gl.getGeneralLedgerDetails()) {
@@ -669,6 +669,9 @@ public class PaymentRefundController extends BaseBillController {
     			bill= expenseBillService.getById(Long.parseLong(object[1].toString()));
     			if(bill != null)
     			{
+    				System.out.println("state "+bill.getState());
+    				System.out.println("status "+bill.getStatus());
+    				if(bill.getStatus()!=null && !bill.getStatus().getCode().equalsIgnoreCase("Cancelled"))
     				egBilldetailsList.addAll(bill.getEgBilldetailes());
     			}
     		}
@@ -788,8 +791,8 @@ public class PaymentRefundController extends BaseBillController {
                 glcodeIdList.add(coa.getId());
                 temp.put(Constants.GLCODE, coa.getGlcode());
                 temp.put("accounthead", coa.getName());
-                temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : gl.getDebitAmount());
-                temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : gl.getCreditAmount());
+                temp.put(Constants.DEBITAMOUNT, gl.getDebitAmount() == null ? 0 : new BigDecimal(gl.getDebitAmount()));
+                temp.put(Constants.CREDITAMOUNT, gl.getCreditAmount() == null ? 0 : new BigDecimal(gl.getCreditAmount()));
                 temp.put("billdetailid", gl.getId());
                 
                 for(Entry<BigDecimal,BigDecimal>bb : hs.entrySet()) {
@@ -1221,6 +1224,7 @@ public class PaymentRefundController extends BaseBillController {
     
     private String getMessageByStatus(final EgBillregister expenseBill, final String approverName, final String nextDesign) {
         String message = "";
+        if(expenseBill.getStatus()!=null)
           System.out.println(expenseBill.getStatus().getCode());
           
         if (FinancialConstants.CONTINGENCYBILL_CREATED_STATUS.equals(expenseBill.getStatus().getCode())

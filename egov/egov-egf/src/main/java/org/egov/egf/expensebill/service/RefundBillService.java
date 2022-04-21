@@ -577,6 +577,11 @@ public class RefundBillService {
                 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
                         "Cancelled"));
             }
+            else if (FinancialConstants.REFUNDBILL_CANCELLED_STATUS.equals(egBillregister.getStatus().getCode()))
+            {
+                egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.REFUNDBILL_FIN,
+                        "Cancelled"));
+            }
         }
     }
 

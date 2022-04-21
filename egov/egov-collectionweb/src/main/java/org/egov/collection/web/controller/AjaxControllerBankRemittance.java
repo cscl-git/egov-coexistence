@@ -423,8 +423,8 @@ public class AjaxControllerBankRemittance {
 						" where f.id = v.functionid and b2.id = ei.bankaccountid and c2.id = g2.glcodeid and v.voucherheaderid = m.billvhid and ei2.instrumentheaderid = ei.id " + 
 				" and vh.id = m.billvhid and ei2.voucherheaderid = m.payvhid and m.billvhid = g2.voucherheaderid " + 
 				" and ei.transactiondate >= to_date('"+fromDate+"','dd/mm/yyyy') and ei.transactiondate <= to_date('"+toDate+"','dd/mm/yyyy') " + 
-						" and ei.id_status not in (1) order by ei.transactiondate asc,vh.vouchernumber,debitamount desc,creditamount desc") ;
-
+						" and ei.id_status not in (1) order by ei.transactionnumber asc,ei.transactiondate asc,vh.vouchernumber,debitamount desc,creditamount desc") ;
+													
 			System.out.println("::::::>>>>>" + query);
 			rows = query.list();
 
