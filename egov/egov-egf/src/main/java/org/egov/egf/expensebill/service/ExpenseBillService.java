@@ -246,7 +246,13 @@ public class ExpenseBillService {
             throw new ValidationException(e.getErrors());
         }
     	}
-      
+        if(egBillregister.getEgBillregistermis().getBudget()!=null && egBillregister.getEgBillregistermis().getBudgetaryAppnumber()==null) {
+      	  BigDecimal balance=egBillregister.getEgBillregistermis().getBalance();
+      	  balance=balance.add(egBillregister.getEgBillregistermis().getCurrentexpenditure());
+      	  egBillregister.getEgBillregistermis().setBalance(balance);
+      	  egBillregister.getEgBillregistermis().setCurrentexpenditure(new BigDecimal(0)); 
+      	
+        }
 
         final List<EgChecklists> checkLists = egBillregister.getCheckLists();
 

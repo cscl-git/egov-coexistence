@@ -365,7 +365,7 @@ public class RefundBillService {
         }
 
         if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT) && glCodeList.contains(glCode))
-    	{ 
+    	{
         try {
             checkBudgetAndGenerateBANumber(egBillregister);
         } catch (ValidationException e) {
@@ -378,7 +378,15 @@ public class RefundBillService {
             //throw new ValidationException(e.getErrors());
         }
     	}
-      
+        //added by Abhishek when BAN no note generated but budget available for GLCode 
+      if(egBillregister.getEgBillregistermis().getBudget()!=null && egBillregister.getEgBillregistermis().getBudgetaryAppnumber()==null) {
+    	  BigDecimal balance=egBillregister.getEgBillregistermis().getBalance();
+    	  balance=balance.add(egBillregister.getEgBillregistermis().getCurrentexpenditure());
+    	  egBillregister.getEgBillregistermis().setBalance(balance);
+    	  egBillregister.getEgBillregistermis().setCurrentexpenditure(new BigDecimal(0)); 
+    	
+      }
+  
        // String VOUCHERQUERY = " from CVoucherHeader where id=?";
        // CVoucherHeader  voucherHeader1 = (CVoucherHeader) persistenceService.find(VOUCHERQUERY, Long.valueOf(vhid));
        // egBillregister.getEgBillregistermis().setVoucherHeader(voucherHeader1);
