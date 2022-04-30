@@ -171,7 +171,7 @@ public class RemittanceServiceImpl extends RemittanceService {
      */
     
     @Transactional
-    public ReceiptBean createCashBankRemittance(ReceiptBean receiptBean, List<RemitancePOJO> rp, Date remittanceDate, String narration, String deptIdnew, String functionNew, String subdivisonNew, String receiptNumbers) {   
+    public ReceiptBean createCashBankRemittance(ReceiptBean receiptBean, List<RemitancePOJO> rp, Date remittanceDate, String narration, String deptIdnew, String functionNew, String subdivisonNew, String receiptNumbers, String checkAll) {   
 
         final SimpleDateFormat dateFomatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         InstrumentAccountCode accountCode = microserviceUtils.getInstrumentAccountGlCodeByType(CollectionConstants.INSTRUMENTTYPE_NAME_CASH);
@@ -220,8 +220,68 @@ public class RemittanceServiceImpl extends RemittanceService {
         	totalCashVoucherAmt=totalCashVoucherAmt.add(amt1);
         	serviceGlCodes.put(b.getChartofaccounts().getGlcode(),amt1);
         }
-        
-            if (receiptBean.getSelected() != null) {
+        if(checkAll!=null) {
+
+            if (receiptBean.getFund() != null && !receiptBean.getFund().isEmpty())
+            {
+            	if(receiptBean.getFund().equalsIgnoreCase("Municipal (General) Fund"))
+            		fundCode="01";
+            	else
+            	fundCode = receiptBean.getFund();
+            }
+            if (showRemitDate && remittanceDate != null)
+                voucherDate = remittanceDate;
+            else
+            {
+            	try {
+                    voucherDate = collectionsUtil.getRemittanceVoucherDate(dateFomatter.parse(receiptBean.getReceiptDate()));
+                } catch (final ParseException e) {
+                    LOGGER.error("Error Parsing Date", e);
+                }
+            }
+            if (receiptBean.getService() != null && receiptBean.getService().length() > 0) {
+                // If Cash Amount is present
+                if (receiptBean.getInstrumentAmount() != null && cashInHandGLCode != null) {
+                    createVoucher = "Y";
+                    String functionCode=functionNew;//receiptBean.getFunctionCode();
+					//String deptCode=receiptBean.getDepartment();												   
+                    
+                    final Remittance remittance = populateAndPersistRemittanceNew(totalCashAmt, null, fundCode,
+                            cashInHandGLCode, null, serviceGlCodes, functionCode, receiptBean, createVoucher,
+                            narration,voucherDate, depositedBankAccount, totalCashVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
+                            null,deptIdnew,subdivisonNew);
+                    
+                    receiptBean.setRemittanceReferenceNumber(remittance.getReferenceNumber());
+                    receiptBean.setRemittanceVouherNumber(remittance.getReferenceVoucherNumber());
+                    receiptBean.setVoucherid(remittance.getVoucherid());
+                    for(String key : keys)
+                    {
+                    	try {
+                        MisRemittanceDetails mrd= new MisRemittanceDetails();
+                        mrd.setVoucher_number(remittance.getReferenceVoucherNumber());
+                        mrd.setVoucher_date(voucherDate);
+                        //mrd.setMis_receipt_id(Long.valueOf(receiptBean.getReceiptId()));
+                        mrd.setBankaccount(key);
+                        BigDecimal bankamt=new BigDecimal(bankAccountMap.get(key).toString());
+                        mrd.setAmount(bankamt);
+                        mrd.setDepartment(deptIdnew);
+                        mrd.setFunction(functionCode);
+                        mrd.setNarration(narration);
+                        mrd.setSubdivison(subdivisonNew);
+                        mrd.setReceiptnumbers(receiptNumbers);
+                        misRemittanceDetailService.create(mrd);
+                    	}
+                    	catch(Exception e)
+                    	{
+                    		e.printStackTrace();
+                    	}
+                    }
+                }
+            }
+        }
+        else
+        {
+        	if (receiptBean.getSelected() != null) {
                 if (receiptBean.getFund() != null && !receiptBean.getFund().isEmpty())
                 {
                 	if(receiptBean.getFund().equalsIgnoreCase("Municipal (General) Fund"))
@@ -257,19 +317,19 @@ public class RemittanceServiceImpl extends RemittanceService {
                         for(String key : keys)
                         {
                         	try {
-	                        MisRemittanceDetails mrd= new MisRemittanceDetails();
-	                        mrd.setVoucher_number(remittance.getReferenceVoucherNumber());
-	                        mrd.setVoucher_date(voucherDate);
-	                        //mrd.setMis_receipt_id(Long.valueOf(receiptBean.getReceiptId()));
-	                        mrd.setBankaccount(key);
-	                        BigDecimal bankamt=new BigDecimal(bankAccountMap.get(key).toString());
-	                        mrd.setAmount(bankamt);
-	                        mrd.setDepartment(deptIdnew);
-	                        mrd.setFunction(functionCode);
-	                        mrd.setNarration(narration);
-	                        mrd.setSubdivison(subdivisonNew);
-	                        mrd.setReceiptnumbers(receiptNumbers);
-	                        misRemittanceDetailService.create(mrd);
+		                        MisRemittanceDetails mrd= new MisRemittanceDetails();
+		                        mrd.setVoucher_number(remittance.getReferenceVoucherNumber());
+		                        mrd.setVoucher_date(voucherDate);
+		                        //mrd.setMis_receipt_id(Long.valueOf(receiptBean.getReceiptId()));
+		                        mrd.setBankaccount(key);
+		                        BigDecimal bankamt=new BigDecimal(bankAccountMap.get(key).toString());
+		                        mrd.setAmount(bankamt);
+		                        mrd.setDepartment(deptIdnew);
+		                        mrd.setFunction(functionCode);
+		                        mrd.setNarration(narration);
+		                        mrd.setSubdivison(subdivisonNew);
+		                        mrd.setReceiptnumbers(receiptNumbers);
+		                        misRemittanceDetailService.create(mrd);
                         	}
                         	catch(Exception e)
                         	{
@@ -279,7 +339,7 @@ public class RemittanceServiceImpl extends RemittanceService {
                     }
                 }
             }
-        
+        }
         return receiptBean;
     }
     
@@ -2144,7 +2204,7 @@ public class RemittanceServiceImpl extends RemittanceService {
     }
     
     @Transactional
-    public ReceiptBean createChequeBankRemittance(ReceiptBean receiptBeanList, List<RemitancePOJO> rp, Date remittanceDate,String narration,String deptIdnew,String functionNew, String subdivisonNew,String receiptNumbers) {  
+    public ReceiptBean createChequeBankRemittance(ReceiptBean receiptBeanList, List<RemitancePOJO> rp, Date remittanceDate,String narration,String deptIdnew,String functionNew, String subdivisonNew,String receiptNumbers,String checkAll) {  
 
     	final SimpleDateFormat dateFomatter = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         InstrumentAccountCode accountCode = microserviceUtils.getInstrumentAccountGlCodeByType(CollectionConstants.INSTRUMENTTYPE_NAME_CHEQUE);
@@ -2195,6 +2255,67 @@ public class RemittanceServiceImpl extends RemittanceService {
         	serviceGlCodes.put(b.getChartofaccounts().getGlcode(),amt1);
         }
         
+        if(checkAll!=null) {
+
+            if (receiptBeanList.getFund() != null && !receiptBeanList.getFund().isEmpty())
+            {
+            	if(receiptBeanList.getFund().equalsIgnoreCase("Municipal (General) Fund"))
+            		fundCode="01";
+            	else
+            	fundCode = receiptBeanList.getFund();
+            }
+            if (showRemitDate && remittanceDate != null)
+                voucherDate = remittanceDate;
+            else
+            {
+            	try {
+                    voucherDate = collectionsUtil.getRemittanceVoucherDate(dateFomatter.parse(receiptBeanList.getReceiptDate()));
+                } catch (final ParseException e) {
+                    LOGGER.error("Error Parsing Date", e);
+                }
+            }
+            if (receiptBeanList.getService() != null && receiptBeanList.getService().length() > 0) {
+                // If Cash Amount is present
+                if (receiptBeanList.getInstrumentAmount() != null && chequeInHandGlcode != null) {
+                    createVoucher = "Y";
+                    String functionCode=functionNew;//receiptBeanList.getFunctionCode();
+                    String deptCode=deptIdnew;//receiptBeanList.getDepartment();
+
+                    final Remittance remittance = populateAndPersistRemittanceNew(null, totalChequeAmt, fundCode,
+                            chequeInHandGlcode, null, serviceGlCodes, functionCode, receiptBeanList, createVoucher,
+                            narration,voucherDate, depositedBankAccount, totalChequeVoucherAmt, BigDecimal.ZERO, Collections.EMPTY_LIST,
+                            null,deptCode,subdivisonNew);
+                    
+                    receiptBeanList.setRemittanceReferenceNumber(remittance.getReferenceNumber());
+                    receiptBeanList.setRemittanceVouherNumber(remittance.getReferenceVoucherNumber());
+                    receiptBeanList.setVoucherid(remittance.getVoucherid());
+                    for(String key : keys)
+                    {
+                    	try {
+                        MisRemittanceDetails mrd= new MisRemittanceDetails();
+                        mrd.setVoucher_number(remittance.getReferenceVoucherNumber());
+                        mrd.setVoucher_date(voucherDate);
+                        //mrd.setMis_receipt_id(Long.valueOf(receiptBeanList.getReceiptId()));
+                        mrd.setBankaccount(key);
+                        BigDecimal bankamt=new BigDecimal(bankAccountMap.get(key).toString());
+                        mrd.setAmount(bankamt);
+                        mrd.setDepartment(deptIdnew);
+                        mrd.setFunction(functionCode);
+                        mrd.setNarration(narration);
+                        mrd.setSubdivison(subdivisonNew);
+                        mrd.setReceiptnumbers(receiptNumbers);
+                        misRemittanceDetailService.create(mrd);
+                    	}
+                    	catch(Exception e)
+                    	{
+                    		e.printStackTrace();
+                    	}
+                    }
+                }
+            }
+        
+        }
+        else {
             if (receiptBeanList.getSelected() != null) {
                 if (receiptBeanList.getFund() != null && !receiptBeanList.getFund().isEmpty())
                 {
@@ -2231,19 +2352,19 @@ public class RemittanceServiceImpl extends RemittanceService {
                         for(String key : keys)
                         {
                         	try {
-	                        MisRemittanceDetails mrd= new MisRemittanceDetails();
-	                        mrd.setVoucher_number(remittance.getReferenceVoucherNumber());
-	                        mrd.setVoucher_date(voucherDate);
-	                        //mrd.setMis_receipt_id(Long.valueOf(receiptBeanList.getReceiptId()));
-	                        mrd.setBankaccount(key);
-	                        BigDecimal bankamt=new BigDecimal(bankAccountMap.get(key).toString());
-	                        mrd.setAmount(bankamt);
-	                        mrd.setDepartment(deptIdnew);
-	                        mrd.setFunction(functionCode);
-	                        mrd.setNarration(narration);
-	                        mrd.setSubdivison(subdivisonNew);
-	                        mrd.setReceiptnumbers(receiptNumbers);
-	                        misRemittanceDetailService.create(mrd);
+		                        MisRemittanceDetails mrd= new MisRemittanceDetails();
+		                        mrd.setVoucher_number(remittance.getReferenceVoucherNumber());
+		                        mrd.setVoucher_date(voucherDate);
+		                        //mrd.setMis_receipt_id(Long.valueOf(receiptBeanList.getReceiptId()));
+		                        mrd.setBankaccount(key);
+		                        BigDecimal bankamt=new BigDecimal(bankAccountMap.get(key).toString());
+		                        mrd.setAmount(bankamt);
+		                        mrd.setDepartment(deptIdnew);
+		                        mrd.setFunction(functionCode);
+		                        mrd.setNarration(narration);
+		                        mrd.setSubdivison(subdivisonNew);
+		                        mrd.setReceiptnumbers(receiptNumbers);
+		                        misRemittanceDetailService.create(mrd);
                         	}
                         	catch(Exception e)
                         	{
@@ -2253,8 +2374,8 @@ public class RemittanceServiceImpl extends RemittanceService {
                     }
                 }
             }
-        
-       
+        }
+               
         
         return receiptBeanList;
     }

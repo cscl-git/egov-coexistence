@@ -193,7 +193,15 @@ public class ChequeRemittanceAction extends BaseFormAction {
     private String subdivison="-1";
     private String receiptNo;
     private List<RemitancePOJO> remittance = new ArrayList<>();
+    private String selectAllReceipts;
+	
+    public String getSelectAllReceipts() {
+		return selectAllReceipts;
+	}
 
+	public void setSelectAllReceipts(String selectAllReceipts) {
+		this.selectAllReceipts = selectAllReceipts;
+	}
     //Property added by prasanta
     Map<String,String> serviceCategoryNames = new HashMap<String,String>();
     Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
@@ -325,12 +333,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 				deptId = "-1";
 				setDeptId("-1");
 			}
-			/*
-			 * resultList =
-			 * remittanceService.findCashRemittanceDetailsForServiceAndFund("MISCELLANEOUS",
-			 * fromDate, toDate, getServiceTypeId(), receiptNo, deptId, "search",
-			 * searchAmount, subdivison, collectedBy);
-			 */
+			
 			try {
 			receiptBeanList = remittanceService.findCashRemittanceDetailsForServiceAndFundNew("MISCELLANEOUS", fromDate, toDate,
 					getServiceTypeId(), receiptNo, deptId, "search", searchAmount, subdivison, collectedBy,"Cheque");
@@ -436,16 +439,37 @@ public class ChequeRemittanceAction extends BaseFormAction {
     public String create() {
         List<ReceiptBean> eblist=new ArrayList<ReceiptBean>();
         String receiptNumbers="";
-		for(ReceiptBean f: finalBeanList)
+        if(null!=getSelectAllReceipts() && getSelectAllReceipts().equalsIgnoreCase("on"))
 		{
-			if(f.getSelected()!=null)
+        	finalBeanList.clear();
+			try {
+				finalBeanList = remittanceService.findCashRemittanceDetailsForServiceAndFundNew("MISCELLANEOUS", fromDate, toDate,
+						getServiceTypeId(), receiptNo, deptId, "search", searchAmount, subdivison, collectedBy,"Cheque");
+				for(ReceiptBean f: finalBeanList)
+				{
+					eblist.add(f);
+					if(receiptNumbers.equalsIgnoreCase(""))
+						receiptNumbers=f.getReceiptNumber();
+					else
+						receiptNumbers+=","+f.getReceiptNumber();
+				}
+			}
+			catch(Exception e)
 			{
-				eblist.add(f);
-				
-				if(receiptNumbers.equalsIgnoreCase(""))
-					receiptNumbers=f.getReceiptNumber();
-				else
-					receiptNumbers+=","+f.getReceiptNumber();
+				e.printStackTrace();
+			}
+		}
+		else {
+			for(ReceiptBean f: finalBeanList)
+			{
+				if(f.getSelected()!=null)
+				{
+					eblist.add(f);
+					if(receiptNumbers.equalsIgnoreCase(""))
+						receiptNumbers=f.getReceiptNumber();
+					else
+						receiptNumbers+=","+f.getReceiptNumber();
+				}
 			}
 		}
 		System.out.println("selectfinalList ---->>> "+eblist);
@@ -456,7 +480,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
 		System.out.println("::::::re Size::: " + re.size());
 		ReceiptBean receipts =null;
 		
-		receipts=remittanceService.createChequeBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers);
+		receipts=remittanceService.createChequeBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers,getSelectAllReceipts());
 		//List<Receipt> receipts = remittanceService.createCashBankRemittance(finalList, accountNumberId, remittanceDate);
 		if(receipts!=null)
 		{
@@ -464,13 +488,24 @@ public class ChequeRemittanceAction extends BaseFormAction {
 			{
 				for(ReceiptBean f: finalBeanList)
 				{
-					if(f.getSelected()!=null)
+					if(getSelectAllReceipts()!=null)
 					{
 						eblist.add(f);
 						persistenceService.getSession()
 		                .createSQLQuery(
 		                        "update mis_receipts_details set payment_status = 'DEPOSITED' where receipt_number ='"+f.getReceiptNumber()+"'")
 		                .executeUpdate();
+					}
+					else
+					{
+						if(f.getSelected()!=null)
+						{
+							eblist.add(f);
+							persistenceService.getSession()
+			                .createSQLQuery(
+			                        "update mis_receipts_details set payment_status = 'DEPOSITED' where receipt_number ='"+f.getReceiptNumber()+"'")
+			                .executeUpdate();
+						}
 					}
 				}
 			}
@@ -1005,6 +1040,14 @@ public class ChequeRemittanceAction extends BaseFormAction {
 
 	public void setSubdivisonNew(String subdivisonNew) {
 		this.subdivisonNew = subdivisonNew;
+	}
+
+	public String getSubdivison() {
+		return subdivison;
+	}
+
+	public void setSubdivison(String subdivison) {
+		this.subdivison = subdivison;
 	}
 
 	public File[] getFile() {
