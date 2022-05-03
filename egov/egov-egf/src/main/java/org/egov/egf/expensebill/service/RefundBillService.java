@@ -497,11 +497,11 @@ public class RefundBillService {
       
 //            commented as budget check was disabled
 			if (egBillregister.getRefundable() == null) {
-           try {
-           checkBudgetAndGenerateBANumber(egBillregister);
-           } catch (final ValidationException e) {
-               throw new ValidationException(e.getErrors());
-            }
+	           try {
+	           checkBudgetAndGenerateBANumber(egBillregister);
+	           } catch (final ValidationException e) {
+	               throw new ValidationException(e.getErrors());
+	            }
 			}
         }
         if (updatedegBillregister != null) {
