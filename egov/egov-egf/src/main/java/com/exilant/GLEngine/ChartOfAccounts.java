@@ -505,9 +505,16 @@ public class ChartOfAccounts {
 			paramMap.put("voucherHeader", voucherHeader);
 			if (txnObj.getBillId() != null)
 				paramMap.put("bill", txnObj.getBillId());
-			if (!budgetDetailsDAO.budgetaryCheck(paramMap))
-				throw new ValidationException("Budget check failed: Insufficient Budget for " + txnObj.getGlCode(),
-						"Budget check failed: Insufficient Budget for " + txnObj.getGlCode());
+			try
+			{
+				if (!budgetDetailsDAO.budgetaryCheck(paramMap))
+					throw new ValidationException("Budget check failed: Insufficient Budget for " + txnObj.getGlCode(),
+							"Budget check failed: Insufficient Budget for " + txnObj.getGlCode());
+			}catch (Exception e) {
+				System.out.println("message :::"+e.getMessage());
+				e.printStackTrace();
+			}
+			
 		}
 		return true;
 	}
