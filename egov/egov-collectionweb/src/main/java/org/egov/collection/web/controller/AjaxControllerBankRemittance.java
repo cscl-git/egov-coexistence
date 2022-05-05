@@ -324,7 +324,7 @@ public class AjaxControllerBankRemittance {
     	System.out.println("XLS 1");
     	
     	String[] COLUMNS = { "SlNo", " Pex Date", "Pex/Cheque no.", "Bpv No",
-					"Bpv Date", "Voucher NO.", "Voucher Date", "Voucher Type","Party Name","Budget Head","Narration","GlCode","Account Number","Particulars"," Debit Amount(Rs.)"," Credit Amount(Rs.)"};
+					"Bpv Date", "Voucher NO.", "Voucher Date", "Voucher Type","Party Name","Budget Head","Narration","GlCode","Account Number","Particulars"," Debit Amount(Rs.)"," Credit Amount(Rs.)","Paid Amount"};
 		
 		List details= new ArrayList<>();
 		List<ExpenditurePex> detailList=new ArrayList();
@@ -425,7 +425,7 @@ public class AjaxControllerBankRemittance {
 				query = this.persistenceService.getSession().createSQLQuery("select vh.vouchernumber as vouchernumber, " + 
 				" to_char(voucherdate, 'dd-Mon-yyyy')as voucherdate,vh.description as partyName,(select vouchernumber from voucherheader where id = ei2.voucherheaderid) as bvpno," + 
 				" ei.transactionnumber as pex, to_char(ei.transactiondate, 'dd-Mon-yyyy') as pexdate,concat(vh.name, '-', vh.type) as vouchertype," + 
-						" f.name as functionName,vh.description as naration,c2.name as glcode,g2.glcodeid as glcodeid ,debitamount as debitamount,g2.creditamount as creditamount,g2.glcode as code,vh.id as id,b2.accountnumber " + 
+						" f.name as functionName,vh.description as naration,c2.name as glcode,g2.glcodeid as glcodeid ,debitamount as debitamount,g2.creditamount as creditamount,g2.glcode as code,vh.id as id,b2.accountnumber,m.paidamount " + 
 						" from voucherheader vh,vouchermis v,function f,egf_instrumentheader ei,egf_instrumentvoucher ei2,miscbilldetail m,chartofaccounts c2,generalledger g2,bankaccount b2 " + 
 						" where f.id = v.functionid and b2.id = ei.bankaccountid and c2.id = g2.glcodeid and v.voucherheaderid = m.billvhid and ei2.instrumentheaderid = ei.id " + 
 				" and vh.id = m.billvhid and ei2.voucherheaderid = m.payvhid and m.billvhid = g2.voucherheaderid " + 
@@ -475,6 +475,7 @@ String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 					r.setCreditamt((null != e[12] ? e[12].toString() : null));
 					r.setGlcodeId((null != e[13] ? e[13].toString() : null));
 					r.setAccNum((null != e[15] ? e[15].toString() : null));
+					r.setPaidAmount((null != e[16] ? e[16].toString() : null));
 					//if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
 					//{}
 					//else {
@@ -685,7 +686,8 @@ String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 			if (retrachment.getCreditamt()!= null)
 				row.createCell(15).setCellValue(new Double(retrachment.getCreditamt()));
  
-
+			if (retrachment.getPaidAmount()!= null)
+				row.createCell(15).setCellValue(new Double(retrachment.getPaidAmount()));
 
 		}
 
