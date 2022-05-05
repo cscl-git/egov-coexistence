@@ -209,7 +209,7 @@ public class BankRemittanceAction extends BaseFormAction {
 	private String receiptNo;
 	private List<RemitancePOJO> remittance = new ArrayList<>();
 	private int pageNum = 1;
-	private int pageSize = 40;
+	private int pageSize = 60;
 	protected PaginatedList searchResult;
 	
 	public void setPage(final int pageNum) {
