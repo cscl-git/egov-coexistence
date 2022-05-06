@@ -702,7 +702,7 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             strQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
             strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
             strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and  gl.glcodeid =:glCodeId");
-            strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate  >=:strStDate");
+            strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and (vh.state_id is not null and (select st.status from eg_wf_states st where st.id = vh.state_id)!= 1)and vh.status != 4 and vh.voucherdate  >=:strStDate");
             //abhishek modified when previous exp not calculated from payment request and refund when budget apply from JV
             //strQuery.append(" and vmis.billnumber  notnull and CAST(vh.voucherdate AS DATE) <=TO_DATE(:strAODate,'dd-Mon-yyyy')");
             strQuery.append(" and CAST(vh.voucherdate AS DATE) <=TO_DATE(:strAODate,'dd-Mon-yyyy')");
