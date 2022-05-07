@@ -221,7 +221,7 @@
 							+'</select>'+'</td>'
 								+'</tr>');
 				}
-				document.getElementById("historyDetailTable").scrollIntoView();
+				//document.getElementById("historyDetailTable").scrollIntoView();
 			 }
 		 })
 	}
@@ -331,7 +331,7 @@
 				//jQuery("#historyDetailTable tbody").focus();
 				//jQuery("#historyDetailTable").focus();
 				//document.getElementById("historyDetailTable").focus();
-				document.getElementById("historyDetailTable").scrollIntoView();
+				//document.getElementById("historyDetailTable").scrollIntoView();
 			 }
 		 })
 		 //document.getElementById("remitAccountNumber").focus();
@@ -363,21 +363,7 @@
 			if(null!=document.getElementById("selected_"+i)){
 				document.getElementById("selected_"+i).value= checked;
 				document.getElementById("selected_"+i).checked = checked;
-			}//else{
-				//if(j==0){
-					//i+=40;
-					//alert("i "+i);
-					//var x=list.length+i;
-					//alert(x);
-					//for(i;i<x;i++){
-						//document.getElementById("selected_"+i).value= checked;
-						//document.getElementById("selected_"+i).checked = checked;
-					//}
-					//j=1;
-				//}
-				//document.getElementById("selected_"+i).value= checked;
-				//document.getElementById("selected_"+i).checked = checked;
-			//}
+			}
 			if(checked==true)
 				document.getElementById("selected_"+i).disabled=true;
 			else
