@@ -73,6 +73,7 @@ public class Inbox {
     private String link;
     private String moduleName;
     private Date createdDate;
+    private Date lstModifiedDate;
     private boolean draft;
 
     public Inbox() {
@@ -91,6 +92,7 @@ public class Inbox {
         this.link = workflowTypes.getLink().replace(":ID", stateAware.myLinkId());
         this.moduleName = workflowTypes.getModule().getDisplayName();
         this.createdDate = state.getCreatedDate();
+        this.lstModifiedDate = state.getLastModifiedDate();
         this.draft = state.isNew() && (state.getCreatedBy()==getUserId());
     }
 
@@ -178,7 +180,7 @@ public class Inbox {
     }
 
     public int getElapsed() {
-        return DateUtils.daysBetween(createdDate, new Date());
+        return DateUtils.daysBetween(lstModifiedDate, new Date());
     }
 
     public Date getCreatedDate() {
@@ -196,4 +198,12 @@ public class Inbox {
     public void setDraft(final boolean draft) {
         this.draft = draft;
     }
+
+	public Date getLstModifiedDate() {
+		return lstModifiedDate;
+	}
+
+	public void setLstModifiedDate(Date lstModifiedDate) {
+		this.lstModifiedDate = lstModifiedDate;
+	}
 }
