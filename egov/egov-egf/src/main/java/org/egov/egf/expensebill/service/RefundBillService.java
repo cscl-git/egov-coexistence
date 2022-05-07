@@ -838,6 +838,13 @@ public class RefundBillService {
 							owenrPos.setId(own_pos);
 						}
 						System.out.println("User with maximum age: " + sh.getId() + "    " + sh.getOwnerPosition());
+					}
+					else if(egBillregister.getState()!=null && egBillregister.getState().getValue().equalsIgnoreCase("Pending with Audit"))// added abhishek for rejection by audit on 07052022 
+					{
+						owenrPos.setId(egBillregister.getState().getPreviousOwner());
+			            stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
+			            wfmatrix.setNextAction(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING);
+			            egBillregister.setZone(null);
 					}else {
 						final Long own_pos = egBillregister.getState().getCreatedBy();
 						egBillregister.getState().setOwnerPosition(own_pos);

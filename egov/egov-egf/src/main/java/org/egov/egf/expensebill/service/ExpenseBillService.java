@@ -673,15 +673,24 @@ public class ExpenseBillService {
             	}
 				
 				if (FinancialConstants.BUTTONREJECT.equalsIgnoreCase(workFlowAction)) {
-					
-					owenrPos.setId(egBillregister.getCreatedBy());
-		            stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
-		            egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+					if(egBillregister.getState()!=null && egBillregister.getState().getValue().equalsIgnoreCase("Pending with Audit"))// added abhishek for rejection by audit on 07052022 
+					{
+						owenrPos.setId(egBillregister.getState().getPreviousOwner());
+			            stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
+			            wfmatrix.setNextAction(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING);
+			            egBillregister.setZone(null);
+					}
+					else
+					{
+						owenrPos.setId(egBillregister.getCreatedBy());
+						stateValue = FinancialConstants.WORKFLOW_STATE_REJECTED;
+					}
+					egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
                     .withComments(approvalComent)
                     .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
                     .withNextAction(wfmatrix.getNextAction())
                     .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
-		        
+					
 		        }
 				else if (FinancialConstants.BUTTONAPPROVE.equalsIgnoreCase(workFlowAction))
 				{
