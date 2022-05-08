@@ -1602,10 +1602,14 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             hibQuery.setParameterList("budgetHeadList", budgetHeadList);
             final List<BudgetDetail> bdList = hibQuery.list();
             if (bdList == null || bdList.size() == 0)
-                // return BigDecimal.ZERO;
+            {    // return BigDecimal.ZERO;
+            	StringBuilder message = new StringBuilder();
+                message.append("Budget Check failed: Budget not defined for the given combination."+"\n");
                 throw new ValidationException(
                         new ValidationError("Budget Check failed: Budget not defined for the given combination.",
                                 "Budget Check failed: Budget not defined for the given combination."));
+                
+            }
             else
                 return getQtrApprovedAmt(bdList);
         } catch (final ValidationException v) {
@@ -1616,8 +1620,7 @@ public class BudgetDetailsHibernateDAO implements BudgetDetailsDAO {
             throw new ValidationException(EMPTY_STRING, "Exp in getBudgetedAmtForYear==" + e.getMessage());
         }
     }
-
-
+    
     /**
      * This parameter HashMap contains deptid,functionid,
      * functionaryid,schemeid,

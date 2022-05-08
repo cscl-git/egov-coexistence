@@ -1,7 +1,7 @@
 package org.egov.infra.microservice.models;
 
 public class RemitancePOJO {
-
+	private String receiptNo;
 	private String glName;
 	private String glcode;
 	private String amount;
@@ -29,6 +29,12 @@ public class RemitancePOJO {
 	}
 	public void setAmount(String amount) {
 		this.amount = amount;
+	}
+	public String getReceiptNo() {
+		return receiptNo;
+	}
+	public void setReceiptNo(String receiptNo) {
+		this.receiptNo = receiptNo;
 	}
 	
 }

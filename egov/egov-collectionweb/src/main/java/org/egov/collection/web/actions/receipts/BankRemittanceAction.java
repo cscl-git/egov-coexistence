@@ -153,8 +153,17 @@ public class BankRemittanceAction extends BaseFormAction {
 	private String deptIdnew;
 	private String functionNew;
 	private String subdivisonNew;
+	private String selectAllReceipts;
 	
-    @Autowired
+    public String getSelectAllReceipts() {
+		return selectAllReceipts;
+	}
+
+	public void setSelectAllReceipts(String selectAllReceipts) {
+		this.selectAllReceipts = selectAllReceipts;
+	}
+
+	@Autowired
     private transient FinancialYearDAO financialYearDAO;
     @Autowired
     private transient BankaccountHibernateDAO bankaccountHibernateDAO;
@@ -200,7 +209,7 @@ public class BankRemittanceAction extends BaseFormAction {
 	private String receiptNo;
 	private List<RemitancePOJO> remittance = new ArrayList<>();
 	private int pageNum = 1;
-	private int pageSize = 40;
+	private int pageSize = 100;
 	protected PaginatedList searchResult;
 	
 	public void setPage(final int pageNum) {
@@ -510,18 +519,41 @@ public class BankRemittanceAction extends BaseFormAction {
     @ValidationErrorPage(value = "error")
     @Action(value = "/receipts/bankRemittance-create")
     public String create() {
+    	System.out.println("selectAllReceipts "+getSelectAllReceipts());
 		List<ReceiptBean> eblist=new ArrayList<ReceiptBean>();
 		String receiptNumbers="";
-		for(ReceiptBean f: finalList)
+		if(null!=getSelectAllReceipts() && getSelectAllReceipts().equalsIgnoreCase("on"))
 		{
-			if(f.getSelected()!=null)
+			finalList.clear();
+			try {
+				finalList = remittanceService.findCashRemittanceDetailsForServiceAndFundNew("MISCELLANEOUS", fromDate, toDate,
+						getServiceTypeId(), receiptNo, deptId, "search", searchAmount, subdivison, collectedBy,"Cash");
+				for(ReceiptBean f: finalList)
+				{
+					eblist.add(f);
+					if(receiptNumbers.equalsIgnoreCase(""))
+						receiptNumbers=f.getReceiptNumber();
+					else
+						receiptNumbers+=","+f.getReceiptNumber();
+				}
+			}
+			catch(Exception e)
 			{
-				eblist.add(f);
-				
-				if(receiptNumbers.equalsIgnoreCase(""))
-					receiptNumbers=f.getReceiptNumber();
-				else
-					receiptNumbers+=","+f.getReceiptNumber();
+				e.printStackTrace();
+			}
+		}
+		else {
+			for(ReceiptBean f: finalList)
+			{
+				if(f.getSelected()!=null)
+				{
+					eblist.add(f);
+					
+					if(receiptNumbers.equalsIgnoreCase(""))
+						receiptNumbers=f.getReceiptNumber();
+					else
+						receiptNumbers+=","+f.getReceiptNumber();
+				}
 			}
 		}
 		System.out.println("receiptnumbers ---->>> "+receiptNumbers);
@@ -532,20 +564,31 @@ public class BankRemittanceAction extends BaseFormAction {
 		System.out.println("::::::re Size::: " + re.size());
 		ReceiptBean receipts =null;
 		
-		receipts=remittanceService.createCashBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers);
+		receipts=remittanceService.createCashBankRemittance(eblist.get(0), re, remittanceDate,narration,deptIdnew,functionNew,subdivisonNew,receiptNumbers,getSelectAllReceipts());
 		if(receipts!=null)
 		{
 			try 
 			{
 				for(ReceiptBean f: finalList)
 				{
-					if(f.getSelected()!=null)
+					if(getSelectAllReceipts()!=null)
 					{
 						eblist.add(f);
 						persistenceService.getSession()
 		                .createSQLQuery(
 		                        "update mis_receipts_details set payment_status = 'DEPOSITED' where receipt_number ='"+f.getReceiptNumber()+"'")
 		                .executeUpdate();
+					}
+					else
+					{
+						if(f.getSelected()!=null)
+						{
+							eblist.add(f);
+							persistenceService.getSession()
+			                .createSQLQuery(
+			                        "update mis_receipts_details set payment_status = 'DEPOSITED' where receipt_number ='"+f.getReceiptNumber()+"'")
+			                .executeUpdate();
+						}
 					}
 				}
 			}
