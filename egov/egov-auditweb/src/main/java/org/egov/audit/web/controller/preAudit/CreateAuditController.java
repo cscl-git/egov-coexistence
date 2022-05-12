@@ -834,7 +834,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 					continue;
 				}
 				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+					if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 						continue;
 					}
 					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
@@ -918,7 +918,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			for (AuditCheckList checkListUI : auditDetail.getCheckList()) {
 
 				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+					if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 						continue;
 					}
 					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
@@ -960,7 +960,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		for (AuditCheckList checkListDb : auditDetails.getCheckList()) {
 			for (AuditCheckList checkListUI : auditDetail.getCheckList()) {
 				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+					if (null == checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 						continue;
 					}
 					if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {

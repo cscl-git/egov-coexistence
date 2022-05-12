@@ -80,7 +80,13 @@ function setWorkFLowAction(name) {
 				}
 		}
 	document.getElementById('workFlowAction').value=name;
-	
+	if(name=='auditor' && document.getElementById('auditStatus').value == 'Pending with Department')
+	{
+		$('#approvalDepartment').prop('required',false);
+		$('#approvalDesignation').prop('required',false);
+		$('#approvalPosition').prop('required',false);
+		$('#approvalComent').prop('required',true);
+	}
 if($("#passUnderobjection").is(':checked')){
 		
 		$('#passUnderobjection').val("1");

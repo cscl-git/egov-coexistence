@@ -23,6 +23,7 @@
 						<c:forEach items="${validActionList}" var="validButtons">
 						<input type="submit" id="${validButtons}" name="${validButtons}" class="btn btn-primary btn-wf-primary" onclick="setWorkFLowAction('${validButtons}')" value="${validButtons}"/>
 					</c:forEach>
+					<input type="submit" id="sendToAud" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('auditor')" value="Send To Auditor"/>
 				</c:if>
 				<c:if test="${auditDetail.auditStatus == 'Pending with Section Officer' }">
 						<input type="submit" id="sendToDept" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('department')" value="Send To Dept"/>
