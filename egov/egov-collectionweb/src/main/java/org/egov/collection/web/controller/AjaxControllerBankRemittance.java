@@ -12,7 +12,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -30,10 +33,13 @@ import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.collection.bean.ReceiptBean;
 import org.egov.collection.constants.CollectionConstants;
+import org.egov.collection.service.RemittanceServiceImpl;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.microservice.models.RemitancePOJO;
+import org.egov.infra.utils.DateUtils;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.expenditurePex.ExpenditurePex;
 import org.egov.model.recoveries.Recovery;
@@ -62,7 +68,8 @@ public class AjaxControllerBankRemittance {
 
 	@Autowired
     protected transient PersistenceService persistenceService;
-
+	@Autowired
+	private RemittanceServiceImpl remittanceService;
 	@Autowired
 	private AppConfigValueService appConfigValuesService;
 	public static final Locale LOCALE = new Locale("en", "IN");
@@ -317,7 +324,7 @@ public class AjaxControllerBankRemittance {
     	System.out.println("XLS 1");
     	
     	String[] COLUMNS = { "SlNo", " Pex Date", "Pex/Cheque no.", "Bpv No",
-					"Bpv Date", "Voucher NO.", "Voucher Date", "Voucher Type","Party Name","Budget Head","Narration","GlCode","Account Number","Particulars"," Debit Amount(Rs.)"," Credit Amount(Rs.)"};
+					"Bpv Date", "Voucher NO.", "Voucher Date", "Voucher Type","Party Name","Budget Head","Narration","GlCode","Account Number","Particulars"," Debit Amount(Rs.)"," Credit Amount(Rs.)","Paid Amount"};
 		
 		List details= new ArrayList<>();
 		List<ExpenditurePex> detailList=new ArrayList();
@@ -418,7 +425,7 @@ public class AjaxControllerBankRemittance {
 				query = this.persistenceService.getSession().createSQLQuery("select vh.vouchernumber as vouchernumber, " + 
 				" to_char(voucherdate, 'dd-Mon-yyyy')as voucherdate,vh.description as partyName,(select vouchernumber from voucherheader where id = ei2.voucherheaderid) as bvpno," + 
 				" ei.transactionnumber as pex, to_char(ei.transactiondate, 'dd-Mon-yyyy') as pexdate,concat(vh.name, '-', vh.type) as vouchertype," + 
-						" f.name as functionName,vh.description as naration,c2.name as glcode,g2.glcodeid as glcodeid ,debitamount as debitamount,g2.creditamount as creditamount,g2.glcode as code,vh.id as id,b2.accountnumber " + 
+						" f.name as functionName,vh.description as naration,c2.name as glcode,g2.glcodeid as glcodeid ,debitamount as debitamount,g2.creditamount as creditamount,g2.glcode as code,vh.id as id,b2.accountnumber,m.paidamount " + 
 						" from voucherheader vh,vouchermis v,function f,egf_instrumentheader ei,egf_instrumentvoucher ei2,miscbilldetail m,chartofaccounts c2,generalledger g2,bankaccount b2 " + 
 						" where f.id = v.functionid and b2.id = ei.bankaccountid and c2.id = g2.glcodeid and v.voucherheaderid = m.billvhid and ei2.instrumentheaderid = ei.id " + 
 				" and vh.id = m.billvhid and ei2.voucherheaderid = m.payvhid and m.billvhid = g2.voucherheaderid " + 
@@ -468,6 +475,7 @@ String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 					r.setCreditamt((null != e[12] ? e[12].toString() : null));
 					r.setGlcodeId((null != e[13] ? e[13].toString() : null));
 					r.setAccNum((null != e[15] ? e[15].toString() : null));
+					r.setPaidAmount((null != e[16] ? e[16].toString() : null));
 					//if(r.getBvp().contains("CJV")||r.getBvp().contains("EJV")||r.getBvp().contains("PJV"))
 					//{}
 					//else {
@@ -678,7 +686,8 @@ String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 			if (retrachment.getCreditamt()!= null)
 				row.createCell(15).setCellValue(new Double(retrachment.getCreditamt()));
  
-
+			if (retrachment.getPaidAmount()!= null)
+				row.createCell(15).setCellValue(new Double(retrachment.getPaidAmount()));
 
 		}
 
@@ -687,5 +696,49 @@ String bvpNew="",vNew="", budgetHeadNew="", accNumNew="", narrationNew="";
 
 	}
 
-
+    @RequestMapping(value = "allreceipts")
+	  @ResponseBody public List<RemitancePOJO> getAllReceipts(@RequestParam("fromDate")
+	  String fromDate,@RequestParam("toDate") String toDate,@RequestParam("serviceType") String serviceType,
+	  @RequestParam("receiptNew") String receiptNew,@RequestParam("deptId") String deptId,@RequestParam("amount") String searchAmount,
+	  @RequestParam("subdivison") String subdivison,@RequestParam("collectedBy") String collectedBy,@RequestParam("mode") String mode) { 
+		 System.out.println("fromDate:: "+fromDate+" toDate:: "+toDate);
+		 List<RemitancePOJO> details=new ArrayList<>();
+		 SQLQuery query =  null;
+		 List<Object[]> rows = null;
+		 RemitancePOJO r  = null;
+		 List<ReceiptBean> resultList = new ArrayList<>();
+		 
+		  try { 
+			  SimpleDateFormat DateFor = new SimpleDateFormat("dd/MM/yyyy");
+			  Date dateFrom = DateFor.parse(fromDate);
+			  Date dateTo = DateFor.parse(toDate);
+			  if (serviceType.equalsIgnoreCase("") || serviceType.equalsIgnoreCase("-1")
+					  || serviceType.equalsIgnoreCase(" ")) {
+				  serviceType=null;
+			  }
+			  if (deptId == null || deptId.equals("")) {
+				  deptId = "-1";
+			  }
+			  resultList = remittanceService.findCashRemittanceDetailsForServiceAndFundNew("MISCELLANEOUS", dateFrom, dateTo,
+					  serviceType, receiptNew, deptId, "search", searchAmount, subdivison, collectedBy,mode);
+			  //null, null, "-1", "search", null, "-1", null,"Cash");	
+							  
+	  if(resultList.size()!=0) 
+	  {
+	    		   for(ReceiptBean e : resultList)
+	    	    	{
+	    			   r = new RemitancePOJO();
+	    			   r.setReceiptNo((null!=e.getReceiptNumber()?e.getReceiptNumber().toString():null));
+	    			   details.add(r);
+	    	    	}
+	    	   }
+	    	   return details;  
+	  }
+	  catch (Exception e) { 
+				e.printStackTrace();
+			}
+		String n="Controller from ajax";
+	       return details;
+	    }
+	
 }

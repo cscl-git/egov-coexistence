@@ -686,7 +686,17 @@ public class UpdateExpenseBillController extends BaseBillController {
         	}
             if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONREJECT) && approverName.equalsIgnoreCase(""))
         	{	
-        		approverName =getEmployeeName(approvalPosition);
+            	System.out.println("reject name :::"+approverName+"-----"+approverName);
+            	if(approvalPosition != null && approvalPosition != 0l)
+            	{
+            		approverName =getEmployeeName(approvalPosition);
+            	}
+            	else
+            	{
+            		approvalPosition=updatedEgBillregister.getState().getOwnerPosition();
+            		approverName =getEmployeeName(approvalPosition);
+            	}
+        		
         	}
             model.addAttribute(BILL_TYPES, BillType.values());
             final String approverDetails = financialUtils.getApproverDetails(workFlowAction,

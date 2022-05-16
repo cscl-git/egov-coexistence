@@ -365,7 +365,7 @@ public class RefundBillService {
         }
 
         if(!workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONSAVEASDRAFT) && glCodeList.contains(glCode))
-    	{ 
+    	{
         try {
             checkBudgetAndGenerateBANumber(egBillregister);
         } catch (ValidationException e) {
@@ -378,7 +378,15 @@ public class RefundBillService {
             //throw new ValidationException(e.getErrors());
         }
     	}
-      
+        //added by Abhishek when BAN no note generated but budget available for GLCode 
+      if(egBillregister.getEgBillregistermis().getBudget()!=null && egBillregister.getEgBillregistermis().getBudgetaryAppnumber()==null) {
+    	  BigDecimal balance=egBillregister.getEgBillregistermis().getBalance();
+    	  balance=balance.add(egBillregister.getEgBillregistermis().getCurrentexpenditure());
+    	  egBillregister.getEgBillregistermis().setBalance(balance);
+    	  egBillregister.getEgBillregistermis().setCurrentexpenditure(new BigDecimal(0)); 
+    	
+      }
+  
        // String VOUCHERQUERY = " from CVoucherHeader where id=?";
        // CVoucherHeader  voucherHeader1 = (CVoucherHeader) persistenceService.find(VOUCHERQUERY, Long.valueOf(vhid));
        // egBillregister.getEgBillregistermis().setVoucherHeader(voucherHeader1);
@@ -489,11 +497,11 @@ public class RefundBillService {
       
 //            commented as budget check was disabled
 			if (egBillregister.getRefundable() == null) {
-           try {
-           checkBudgetAndGenerateBANumber(egBillregister);
-           } catch (final ValidationException e) {
-               throw new ValidationException(e.getErrors());
-            }
+	           try {
+	           checkBudgetAndGenerateBANumber(egBillregister);
+	           } catch (final ValidationException e) {
+	               throw new ValidationException(e.getErrors());
+	            }
 			}
         }
         if (updatedegBillregister != null) {
@@ -830,6 +838,13 @@ public class RefundBillService {
 							owenrPos.setId(own_pos);
 						}
 						System.out.println("User with maximum age: " + sh.getId() + "    " + sh.getOwnerPosition());
+					}
+					else if(egBillregister.getState()!=null && egBillregister.getState().getValue().equalsIgnoreCase("Pending with Audit"))// added abhishek for rejection by audit on 07052022 
+					{
+						owenrPos.setId(egBillregister.getState().getPreviousOwner());
+			            stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;
+			            wfmatrix.setNextAction(FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING);
+			            egBillregister.setZone(null);
 					}else {
 						final Long own_pos = egBillregister.getState().getCreatedBy();
 						egBillregister.getState().setOwnerPosition(own_pos);

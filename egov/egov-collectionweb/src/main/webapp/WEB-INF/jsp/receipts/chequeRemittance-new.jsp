@@ -214,7 +214,7 @@
 							+'</select>'+'</td>'
 								+'</tr>');
 				}
-				document.getElementById("historyDetailTable").scrollIntoView();
+				//document.getElementById("historyDetailTable").scrollIntoView();
 			 }
 		 })
 	}
@@ -260,7 +260,7 @@
 							
 				
 				}
-				document.getElementById("historyDetailTable").scrollIntoView();
+				//document.getElementById("historyDetailTable").scrollIntoView();
 			 }
 		
 		 })
@@ -269,22 +269,85 @@
 
 	// Changes selection of all receipts to given value (checked/unchecked)
 	function changeSelectionOfAllReceipts(checked) {
-		
 		var list = document.getElementsByName('instrumentAmount');
+		var j=0;
 		for (i = 0; i < list.length; i++) {
-			document.getElementById("selected_"+i).value= checked;
-			document.getElementById("selected_"+i).checked = checked;
-		}
-		
-		var totalAmtDisplay = 0.00;
-		for (i = 0; i < list.length; i++) {
-			if(document.getElementById("selected_"+i).checked){
-				totalAmtDisplay = parseInt(totalAmtDisplay) + parseInt(document.getElementById("instrumentAmount_"+i).value);
+			if(null!=document.getElementById("selected_"+i)){
+				document.getElementById("selected_"+i).value= checked;
+				document.getElementById("selected_"+i).checked = checked;
 			}
+			if(checked==true)
+				document.getElementById("selected_"+i).disabled=true;
+			else
+				document.getElementById("selected_"+i).disabled=false;
 		}
-		document.getElementById("remittanceAmount").value = totalAmtDisplay;
+		if(checked==true)
+			handleReceiptSelectionEventSelectAll();
+		else
+			jQuery("#historyDetailTable tbody").empty();
+	}
+	
+	function handleReceiptSelectionEventSelectAll() {
+		dom.get("button32").disabled = false;
+		dom.get("button32").className = "buttonsubmit";
+		var fromDate=document.getElementById("fromDate").value;
+		var toDate=document.getElementById("toDate").value;
+		var deptId=document.getElementById("deptId").value;
+		var service=document.getElementById("serviceType").value;
+		var subdivison=document.getElementById("subdivison").value;
+		var receiptNew=document.getElementById("receiptNo").value;
+		var searchAmount=document.getElementById("searchAmount").value;
+		var collected=document.getElementById("collectedBy").value;
+		
+		var receiptNos="";
+		
+		jQuery.ajax({
+			 url:'/services/collection/remittanceBankdetail/allreceipts?fromDate='+fromDate+'&toDate='+toDate+'&deptId='+deptId+'&serviceType='+service+'&subdivison='+subdivison+'&amount='+searchAmount+'&receiptNew='+receiptNew+'&collectedBy='+collected+'&mode=cheque',
+			 contentType:"application/json",		
+			 dataType:"json",
+			 success:function(r)
+			 {
+				data=r;
+				for (var i=0; i<data.length; i++) {
+					console.log("receipts "+data[i].receiptNo);
+					if(receiptNos=="")
+					{
+						receiptNos+= data[i].receiptNo;
+					}else{
+						receiptNos+="','"+data[i].receiptNo;
+						
+					}
+				}
+				jQuery("#historyDetailTable tbody").empty();
+				jQuery.ajax({
+					 url:'/services/collection/remittanceBankdetail/gldetails?receiptNo='+receiptNos,
+					 contentType:"application/json",		
+					 dataType:"json",
+					 success:function(r)
+					 {
+						 data=r;
+						for (var i=0; i<data.length; i++) {
+								
+								console.log(":::name  :::: "+data[i].glName+"::::Code:: "+data[i].glcode+":::amount:: "+data[i].amount);
+								jQuery("#historyDetailTable tbody").append('<tr>'+'<td>'+'<input type="text" name="remittance['+i+'].glName" readonly="true" value="'+data[i].glName+'" style="width:100%"/></td>'
+										+'<td >'+'<input type="text" name="remittance['+i+'].glcode" readonly="true" value="'+data[i].glcode+'" style="width:100%"/></td>'
+										+'<td >'+'<input type="text" name="remittance['+i+'].amount" readonly="true" value="'+data[i].amount+'" style="width:100%"/></td>'
+										+'<td align="center" >'+'<select id="remitAccountNumber" name="remittance['+i+'].bankaccount" >'
+										+'<option value="-1">Select</option>'
+										+'<c:forEach items="${dropdownData.bankaccountNumberList}" var="accNum">'
+											+'<option value="${accNum}" >${accNum}</option>'
+										+'</c:forEach>'
+									+'</select>'+'</td>'
+										+'</tr>');
+						}
+						document.getElementById("historyDetailTable").scrollIntoView();
+					 }
+				 })
+			 }
+		});
 		
 	}
+	
 	
 	function validate() {
 		//dom.get("bankselectionerror").style.display = "none";
@@ -337,7 +400,6 @@
 						}
 					}
 				}
-			
 			}
 		
 		var acc= document.getElementById("remitAccountNumber").value;
@@ -347,11 +409,7 @@
 				document.getElementById("remitAccountNumber").focus();
 				return false;
 		}
-		/* if(document.getElementById('accountNumberId').value != dom.get("remitAccountNumber").value.trim())
-			{
-				 alert("Account number for which search result has displayed and selected account number in search drop down are different. \n Please make sure account number in drop down and account number for which search has done are same.");
-				 return false;
-			} */
+
 		var flag=confirm('Receipts once remitted cannot be modified, please verify before you proceed.');
         if(flag==false)
         {
@@ -383,20 +441,6 @@
 
 	function searchDataToRemit() {
 		var serviceType=dom.get("serviceType").value;
-		/* if(serviceType==-1){
-			bootbox.alert("Please Select Service Type");
-			return false;
-		}
-		if(jQuery("#finYearId").val()==-1 && jQuery("#fromDate").val()=="" && jQuery("#toDate").val()==""){
-			bootbox.alert("<s:text name='msg.please.enter.either.financial.year.or.fromDate.and.toDate'/>");
-			return false;
-		}
-		if (dom.get("accountNumberId").value != null
-				&& dom.get("accountNumberId").value == -1) {
-			dom.get("bankselectionerror").innerHTML = "";
-			dom.get("accountselectionerror").style.display = "block";
-			return false;
-		} */
 		if(jQuery("#fromDate").val()=="" && jQuery("#toDate").val()==""){
 			bootbox.alert("Please enter from date and to date");
 			return false;
@@ -412,7 +456,6 @@
 			bootbox.alert("Please Enter From Date");
 			return false;
 		}
-		//jQuery('#finYearId').prop("disabled", false);
 		jQuery('#remittanceAmount').val("");
 		document.chequeRemittanceForm.action = "chequeRemittance-listData.action";
 		return true;
@@ -457,7 +500,7 @@
 		// DeSelect all checkboxes
 		changeSelectionOfAllReceipts(false);
 
-		// Set all amounts to zero
+		/* // Set all amounts to zero
 		totalAmount = 0;
 		cashAmount = 0;
 		chequeAmount = 0;
@@ -468,7 +511,7 @@
 		refreshSummary();
 
 		// Enable/disable buttons
-		enableButtons();
+		enableButtons(); */
 	}
 
 	// Select all receipts
@@ -534,20 +577,6 @@
 						</tr>
 						<tr>
 							<td width="4%" class="bluebox">&nbsp;</td>
-							<%-- <td class="bluebox"><s:text name="bankremittance.accountnumber" />: <span class="mandatory1">*</span></td>
-							<td class="bluebox">
-								<select id="accountNumberId" name="accountNumberId" value="%{accountNumberId}">
-										<option value="-1">Select</option>
-										<c:forEach items="${dropdownData.accountNumberList}" var="accNum">
-											<c:if test="${accNum.bankAccount == accountNumberId }">
-												<option value="${accNum.bankAccount}" selected="selected">${accNum.bank} - ${accNum.bankAccount}</option>
-											</c:if>
-											<c:if test="${accNum.bankAccount != accountNumberId }">
-												<option value="${accNum.bankAccount}" >${accNum.bank} - ${accNum.bankAccount}</option>
-											</c:if>
-										</c:forEach>
-								</select>		
-							</td> --%>
 							<td width="21%" class="bluebox">Department</td>
 		  					<td width="24%" class="bluebox"><s:select headerKey=""
 							headerValue="----Choose----" name="deptId" id="deptId" cssClass="selectwk" list="dropdownData.departmentList" listKey="code" listValue="name"  value="%{deptId}"/> </td>
@@ -586,22 +615,17 @@
 						    <td width="24%" class="bluebox">
 						    <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy"/></td>
 	      				</tr>
-						<%-- <tr>
-							<td width="4%" class="bluebox">&nbsp;</td>
-							<td class="bluebox"><s:text name="bankremittance.financialyear" />:</td>
-							<td class="bluebox"><s:select headerKey="-1" headerValue="--Select--" list="dropdownData.financialYearList" listKey="id" id="finYearId" listValue="finYearRange" label="finYearRange" name="finYearId" value="%{finYearId}" /></td>
-							<td class="bluebox">&nbsp;</td>
-							<td class="bluebox">&nbsp;</td>
-						</tr> --%>
-						
 					</table>
 					</div>
+					
 					<div class="buttonbottom">
 						<input name="search" type="submit" class="buttonsubmit" id="search" value="<s:text name='lbl.search'/>" onclick="return searchDataToRemit()" />
 					</div>
 					<s:if test="%{!receiptBeanList.isEmpty()}">
 						<display:table name="receiptBeanList" class="table table-bordered" uid="currentRow" pagesize="${pageSize}" style="border:1px;width:100%" cellpadding="0" cellspacing="0" export="false" requestURI="">
-							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Select" style="width:5%; text-align: center">
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Select<input type='checkbox' id='selectAllReceipts' name='selectAllReceipts' value='on' onClick='setCheckboxStatuses(this.checked);'/>"
+							style="width:5%; text-align: center">
+							<%-- <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Select" style="width:5%; text-align: center"> --%>
 								<c:set var="rowNumber" value="${currentRow_rowNum-1}" ></c:set>
 								<input type='checkbox' name='finalBeanList[${rowNumber}].selected'  id='selected_${rowNumber}' value ="false" onClick="handleReceiptSelectionEvent(${rowNumber})" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].service"  id="service_${rowNumber}" value="${currentRow.service}" />

@@ -42,6 +42,7 @@ public class ExpenditurePex {
 
 	private String accNum;
 	
+	private String paidAmount;
 	
 	public String getAccNum() {
 		return accNum;
@@ -153,6 +154,14 @@ public class ExpenditurePex {
 
 	public void setCreditamt(String creditamt) {
 		this.creditamt = creditamt;
+	}
+
+	public String getPaidAmount() {
+		return paidAmount;
+	}
+
+	public void setPaidAmount(String paidAmount) {
+		this.paidAmount = paidAmount;
 	}
 
 }

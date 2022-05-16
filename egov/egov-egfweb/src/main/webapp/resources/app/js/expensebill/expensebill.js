@@ -1682,8 +1682,6 @@ function validateSubLedger(Curraction) {
 
 
 	}else{
-		
-		
 		return true;
 	}
 

@@ -665,7 +665,7 @@ public class PreApprovedVoucherAction extends GenericWorkFlowAction {
     public String loadvoucherview() throws ApplicationException {
     	try {
     	
-
+    		System.out.println("vhid-------- "+parameters.get(VHID)[0]);
         billDetails = new HashMap<String, Object>();
         if (parameters.get("from") != null
                 && FinancialConstants.STANDARD_VOUCHER_TYPE_CONTRA.equals(parameters.get("from")[0])) {

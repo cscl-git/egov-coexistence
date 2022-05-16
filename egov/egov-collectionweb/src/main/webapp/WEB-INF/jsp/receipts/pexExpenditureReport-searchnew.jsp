@@ -194,7 +194,7 @@ function submitForm1() {
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Particulars" style="width:10%;text-align: center" value="${currentRow.particulars}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Debit Amount" style="width:10%;text-align: center" value="${currentRow.debitamt}" />
 							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Credit Amount" style="width:10%;text-align: center" value="${currentRow.creditamt}" />
-							
+							<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Paid Amount" style="width:10%;text-align: center" value="${currentRow.paidAmount}" />
 							
 						</display:table>
 						<div class="center">
