@@ -1652,6 +1652,14 @@ function validateSubLedger(Curraction) {
 
 	if (Curraction.value == 'Forward') {
 		
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+				return false;
+			}
+		}
+		
 		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
 		var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
 		var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
