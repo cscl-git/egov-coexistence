@@ -550,6 +550,16 @@
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-view.jsp"/>
     </definition>
 
+	<definition name="update_Credit_Debit" extends="base_layout_expense_form">
+        <put-attribute name="page-title" value="lbl.expensebill" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/expensebill/update_Credit_Debit.jsp"/>
+    </definition>
+
+	<definition name="success_saved" extends="base_layout_expense_form">
+        <put-attribute name="page-title" value="lbl.expensebill" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/expensebill/success_saved.jsp"/>
+    </definition>
+    
     <definition name="expensebill-update" extends="base_layout_expense_form">
         <put-attribute name="page-title" value="title.expensebill.create" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/expensebill/expensebill-update.jsp"/>

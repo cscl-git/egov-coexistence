@@ -99,7 +99,11 @@ public class EgBilldetails extends AbstractPersistable<Integer> implements java.
     @Length(max = 250)
     private String narration;
 
-    
+    @Transient
+    private String accountDebitAmount_Value;
+    @Transient
+    private String accountCreditAmount_Value;
+
 
     @Transient
     private CChartOfAccounts chartOfAccounts;
@@ -236,6 +240,22 @@ public class EgBilldetails extends AbstractPersistable<Integer> implements java.
     public void setFunction(CFunction function) {
         this.function = function;
     }
+
+	public String getAccountDebitAmount_Value() {
+		return accountDebitAmount_Value;
+	}
+
+	public void setAccountDebitAmount_Value(String accountDebitAmount_Value) {
+		this.accountDebitAmount_Value = accountDebitAmount_Value;
+	}
+
+	public String getAccountCreditAmount_Value() {
+		return accountCreditAmount_Value;
+	}
+
+	public void setAccountCreditAmount_Value(String accountCreditAmount_Value) {
+		this.accountCreditAmount_Value = accountCreditAmount_Value;
+	}
 
 	
 
