@@ -2102,5 +2102,21 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	}
+	@RequestMapping(value="/openRetrenchmentSearchForm", method = RequestMethod.POST)
+	public String openRetranchmentSearchForm(@ModelAttribute("auditDetail")final AuditDetail auditDetail, Model model) {
+		auditDetail.setDepartments(this.getDepartmentsFromMs());
+		auditDetail.setBillFrom(null);
+		auditDetail.setBillTo(null);
+		model.addAttribute("auditDetail", auditDetail);
+		return "retranchmentSearchForm";
+	}
+	@RequestMapping(value="/searchRetrenchment", method=RequestMethod.POST)
+	public String searchRetrenchmentRegisterReport(@ModelAttribute("auditDetail")final AuditDetail auditDetail,Model model ) {
+		List<>
+		return "retranchmentSearchForm";
+	}
+	
+	
+	
 
 }
