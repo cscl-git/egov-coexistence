@@ -221,8 +221,50 @@
 				</div>
 			</div>
 		</div>
-
+	<!-- added for retrachment -->
+		<c:if
+			test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
+		<div>
+			Retrachment
+			<c:if test="${auditDetail.retrachmentcheck == 'Y'}">
+				<form:checkbox path="retrachmentcheck" id="retrachmentcheck"
+					onclick="myFunctionRet()" value="${auditDetail.retrachmentcheck}" ></form:checkbox>
+				<div style="text-align: right;">
+					<div class="form-group">
+						<div id="recomment" style="display: none;">
+							<label class="col-sm-3 control-label text-left-audit"><spring:message
+									text="Retrachment Comment" /> </label>
+							<div class="col-sm-3 add-margin">
+								<form:textarea class="form-control"
+									data-pattern="alphanumericwithspecialcharacters"
+									id="retrachmentcomment" path="retrachmentcomment" value="${auditDetail.retrachmentcomment}" 
+									maxlength="2000" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:if>
+			<c:if test="${auditDetail.retrachmentcheck != 'Y' || auditDetail.retrachmentcheck == ''}">
+				<form:checkbox path="retrachmentcheck" id="retrachmentcheck"
+					onclick="myFunctionRet()" value="Y"></form:checkbox>
+				<div style="text-align: right;">
+					<div class="form-group">
+						<div id="recomment" style="display: none;">
+							<label class="col-sm-3 control-label text-left-audit"><spring:message
+									text="Retrachment Comment" /> </label>
+							<div class="col-sm-3 add-margin">
+								<form:textarea class="form-control"
+									data-pattern="alphanumericwithspecialcharacters"
+									id="retrachmentcomment" path="retrachmentcomment"
+									maxlength="2000" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</c:if>
 		
+		</div>
+		</c:if>
 
 	</div>
 </div>
@@ -289,5 +331,18 @@
 		</tr>
 	</table>
 </div>
+<script>
+/* function myFunctionRet() {
+alert("called");
+	var checkBox = document.getElementsByName("retrachmentcheck");
+	// Get the output text
+	var text = document.getElementById("recomment");
 
-
+	// If the checkbox is checked, display the output text
+	if (checkBox.checked == true) {
+		text.style.display = "block";
+	} else {
+		text.style.display = "none";
+	}
+} */
+</script>

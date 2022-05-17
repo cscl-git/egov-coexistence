@@ -158,10 +158,49 @@
                 <jsp:include page="../common/commonworkflowmatrix-button.jsp"/>
             </div>
         </c:if>
-        
+        <%-- <c:if test="${mode == 'readOnly'}">
+			<div class="row">
+				<div class="col-sm-12 text-center" style="padding-top: 1250px;">
+					<button class="button button-primary">
+						<a href='javascript:void(0)' class="buttonsubmit"
+							onclick="updateCreditDebit(${egBillregister.id })">Update
+							Credit Debit Details</a>
+					</button>
+
+					<input name="button" type="button"
+						class="button button-primary buttonsubmit" id="button1"
+						value="Print" onclick="window.print()">&nbsp; <input
+						type="submit" name="closeButton" id="closeButton"
+						value='<spring:message code="lbl.close" text="Close"/>'
+						Class="btn btn-default" onclick="window.close();" />
+
+					<button class="button button-primary">
+						<a href='javascript:void(0)' class="buttonsubmit"
+							onclick="retrachment(${egBillregister.id })">View
+						Retrachment jsp</a>
+					</button>
+
+
+				</div>
+			</div>
+		</c:if> --%>
     </div>
 
 </form:form>
+<script>
+/* function updateCreditDebit(id){
+	alert(id);
+	var url = "/services/EGF/expensebill/updateCreditDebit/"+ id;
+	window.open(url,'','width=900, height=700');
+	}
+
+function retrachment(id){
+alert("ret "+id);
+	var url = "/services/EGF/expensebill/retrachment/"+ id;
+	window.open(url,'','width=900, height=700');
+	} */
+	
+</script>
 <script src="<cdn:url value='/resources/app/js/expensebill/viewexpensebill.js?rnd=${app_release_no}'/>"></script>
 <script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>

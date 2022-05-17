@@ -5,9 +5,6 @@
 	modelAttribute="egBillregister" id="egBillregister"
 	class="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
-	<%-- <input type="hidden" name="auditId" id="auditId" value="${egBillregister.auditId }" /> --%>
-	<%-- <form:hidden path="auditId" id="auditId"
-		value="${egBillregister.auditId }" /> --%>
 	<div class="panel panel-primary" data-collapsed="0">
 		<div class="panel-heading custom_form_panel_heading">
 			<div class="panel-title">
@@ -15,6 +12,7 @@
 			</div>
 		</div>
 		<div style="padding: 0 15px;">
+		<div>
 			<table class="table table-bordered" id="tblaccountdetails">
 				<thead>
 					<tr>
@@ -76,6 +74,72 @@
 					</c:choose>
 				</tbody>
 			</table>
+			</div>
+			<div class="panel-heading custom_form_panel_heading">
+				<div class="panel-title">
+					<spring:message code="lbl.subledger.details" text="Subledger Details"/>
+				</div>
+			</div>
+	
+	<div style="padding: 0 15px;">
+		<table class="table table-bordered" id="tblsubledgerdetails">
+			<thead>
+				<tr>
+					<th><spring:message code="lbl.account.code" text="Account Code"/></th>
+					<th><spring:message code="lbl.subledgertype" text="Subledger Type"/></th>
+					<th><spring:message code="lbl.subledger.name" text="Subledger Name"/></th>
+					<th><spring:message code="lbl.amount" text="Amount"/></th>
+				</tr>
+			</thead>
+			<tbody>
+				<c:choose>
+					<c:when test="${egBillregister.billPayeedetails.size() > 0}">
+						<c:forEach items="${egBillregister.billPayeedetails}" var="billPayeeDeatils" varStatus="item">
+							<tr id="subledhgerrow">
+								<td>
+									<span class="subLedgerGlCode_${item.index }">${billPayeeDeatils.egBilldetailsId.chartOfAccounts.glcode }</span>
+								</td>
+								<td>
+									<span class="subLedgerType_${item.index }">${billPayeeDeatils.detailTypeName }</span>
+								</td>
+								<td>
+									<span class="subLedgerName_${item.index }">${billPayeeDeatils.detailKeyName }</span>
+								</td>
+								<c:if test="${billPayeeDeatils.debitAmount > 0 }">
+									<td class="text-right">
+										<%-- <span class="subLedgerAmount_${item.index } subLedgerAmount">${billPayeeDeatils.debitAmount}</span> --%>
+										<input type="text" id="accountSubLedgerAmount_Value"
+												class="subLedgerAmount"
+												value="${billPayeeDeatils.debitAmount}"
+												name="accountSubLedgerAmount_Value" />
+										<input type="hidden" id="accountSubLedgerAmount_Value"
+										class="subLedgerAmount_${item.index } subLedgerAmount"
+										value="${billPayeeDeatils.debitamount }" 
+									</td>
+								</c:if>
+								
+								<c:if test="${billPayeeDeatils.creditAmount > 0 }">
+									<td class="text-right">
+										<%-- <span class="subLedgerAmount_${item.index } subLedgerAmount">${billPayeeDeatils.creditAmount}</span> --%>
+										<input type="text" id="accountSubLedgerAmount_Value"
+												class="subLedgerAmount"
+												value="${billPayeeDeatils.creditAmount}"
+												name="accountSubLedgerAmount_Value" />
+										<input type="hidden" id="accountSubLedgerAmount_Value"
+										class="subLedgerAmount_${item.index } subLedgerAmount"
+										value="${billPayeeDeatils.creditAmount }" 		
+									</td>
+								</c:if>
+								
+							</tr>
+						</c:forEach>
+					</c:when>
+					<c:otherwise>
+					</c:otherwise>
+				</c:choose>
+			</tbody>
+		</table>
+	</div>
 			<div>
 				
 
