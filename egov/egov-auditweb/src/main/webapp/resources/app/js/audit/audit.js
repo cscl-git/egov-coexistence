@@ -13,6 +13,22 @@ $(document).ready(
 			}
 	
 });
+
+$(document).ready(
+	function() {
+	 var retrachmentcheck=$('#retrachmentcheck').val();
+	 console.log("ret ::"+retrachmentcheck);
+			if (retrachmentcheck == 0 || retrachmentcheck == 'null'
+					|| retrachmentcheck == null) {
+
+	 $('input[type=checkbox]').removeAttr('checked');
+	 }
+	
+			if (retrachmentcheck == 1) {
+				myFunctionRet();
+			}
+	
+});
 $('body').on('focus',".datepicker", function(){
     $(this).datepicker();
 });
@@ -38,6 +54,7 @@ function openHistory(auditId,checkListId){
 	}
 
 function searchCheck(){
+	alert("searchCheck");
 if($("#passUnderobjection").is(':checked')){
 		
 		$('#passUnderobjection').val("1");
@@ -55,7 +72,6 @@ function downloadexcel(){
 }
 
 function myFunction() {
-
 	var checkBox = document.getElementById("passUnderobjection");
 	// Get the output text
 	var text = document.getElementById("xxxx");
@@ -68,6 +84,32 @@ function myFunction() {
 	}
 }
 
+function myFunctionRet() {
+	var checkBox = document.getElementById("retrachmentcheck");
+	// Get the output text
+	var text = document.getElementById("recomment");
+	
+	// If the checkbox is checked, display the output text
+	if (checkBox.checked == true) {
+		text.style.display = "block";
+	} else {
+		text.style.display = "none";
+	}
+}
+function myFunctionRet1() {
+		var value = document.getElementById("retrachmentcheckvalue").value;
+		var checkBox = document.getElementById("retrachmentcheck");
+		// Get the output text
+		
+		var text = document.getElementById("recomment");
+		// If the checkbox is checked, display the output text
+		if(value!='' || value!=null || value!=' '){
+			$('#retrachmentcheck').prop('checked', true);
+			text.style.display = "block";
+		} else {
+			text.style.display = "none";
+		}
+	}
 function setWorkFLowAction(name) {
 	console.log(name);
 	if (name == 'sectionOfficer'
@@ -93,6 +135,7 @@ if($("#passUnderobjection").is(':checked')){
 	}
 	
 }
+
 
 function openSource(sourcepath){
 	window
