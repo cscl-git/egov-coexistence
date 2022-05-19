@@ -30,7 +30,7 @@ public class RetrachmentDetails extends AbstractAuditable implements java.io.Ser
 	@Id
 	@GeneratedValue(generator = SEQ_RETRACHMENT, strategy = GenerationType.SEQUENCE)
 	private Long id;
-	private Date date;
+	private String date;
 	private String department_name;
 	private BigDecimal amountofbill;
 	private BigDecimal amountbyaudit;
@@ -118,13 +118,7 @@ public class RetrachmentDetails extends AbstractAuditable implements java.io.Ser
 		
 	}
 
-	public Date getDate() {
-		return date;
-	}
-
-	public void setDate(Date date) {
-		this.date = date;
-	}
+	
 
 	public String getDepartment_name() {
 		return department_name;
@@ -194,6 +188,14 @@ public class RetrachmentDetails extends AbstractAuditable implements java.io.Ser
 
 	public void setAuditid(String auditid) {
 		this.auditid = auditid;
+	}
+
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
 	}
 
 }

@@ -125,6 +125,7 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
+import org.egov.model.bills.RetrachmentDetails;
 import org.egov.pims.commons.Position;
 import org.egov.services.payment.MiscbilldetailService;
 import org.hibernate.SQLQuery;
@@ -2103,16 +2104,20 @@ public class CreateAuditController extends GenericWorkFlowController {
 		return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	}
 	@RequestMapping(value="/openRetrenchmentSearchForm", method = RequestMethod.POST)
-	public String openRetranchmentSearchForm(@ModelAttribute("auditDetail")final AuditDetail auditDetail, Model model) {
+	public String openRetranchmentSearchForm(@ModelAttribute("auditDetail")final AuditDetail auditDetail, Model model,HttpServletRequest request) {
+		System.out.println("### inside controller");
 		auditDetail.setDepartments(this.getDepartmentsFromMs());
-		auditDetail.setBillFrom(null);
-		auditDetail.setBillTo(null);
 		model.addAttribute("auditDetail", auditDetail);
 		return "retranchmentSearchForm";
 	}
 	@RequestMapping(value="/searchRetrenchment", method=RequestMethod.POST)
 	public String searchRetrenchmentRegisterReport(@ModelAttribute("auditDetail")final AuditDetail auditDetail,Model model ) {
-		List<>
+		List<RetrachmentDetails> lst = new ArrayList<RetrachmentDetails>();
+		lst = auditService.getRetranchmentRegisterData(auditDetail);
+		auditDetail.setRetrachmentDetailsList(lst);
+		auditDetail.setDepartment(null);
+		auditDetail.setDepartments(this.getDepartmentsFromMs());
+		model.addAttribute("auditDetail", auditDetail);
 		return "retranchmentSearchForm";
 	}
 	

@@ -11,6 +11,7 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
 import org.egov.model.bills.DocumentUpload;
+import org.egov.model.bills.RetrachmentDetails;
 
 public class AuditDetail {
 	
@@ -36,6 +37,8 @@ public class AuditDetail {
     private int fund;
     private Date billFrom;
     private Date billTo;
+    private String fromDate;
+    private String toDate;
     private List<PostAuditResult> postAuditResultList=new ArrayList<PostAuditResult>();
     private int counter = 0;
     private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
@@ -48,6 +51,7 @@ public class AuditDetail {
 	private String passunderobjectioncomment ;
 	private String retrachmentcheck;
 	private String retrachmentcomment;
+	private List<RetrachmentDetails> retrachmentDetailsList;
 	public String getPassunderobjectioncomment() {
 		return passunderobjectioncomment;
 	}
@@ -260,6 +264,24 @@ public class AuditDetail {
 	}
 	public void setRetrachmentcomment(String retrachmentcomment) {
 		this.retrachmentcomment = retrachmentcomment;
+	}
+	public List<RetrachmentDetails> getRetrachmentDetailsList() {
+		return retrachmentDetailsList;
+	}
+	public void setRetrachmentDetailsList(List<RetrachmentDetails> retrachmentDetailsList) {
+		this.retrachmentDetailsList = retrachmentDetailsList;
+	}
+	public String getFromDate() {
+		return fromDate;
+	}
+	public void setFromDate(String fromDate) {
+		this.fromDate = fromDate;
+	}
+	public String getToDate() {
+		return toDate;
+	}
+	public void setToDate(String toDate) {
+		this.toDate = toDate;
 	}
 	
 
