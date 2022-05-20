@@ -78,7 +78,8 @@ public class ReconcileBean {
 	private BigDecimal otherCreditAmount;
 	private BigDecimal otherDebitAmount;
 	private String statusType;
-	
+	//Newly Added
+	private String reconciledComment;
 	
 	
 	public Long getBranchId() {
@@ -225,6 +226,12 @@ public class ReconcileBean {
 	}
 	public void setStatusType(String statusType) {
 		this.statusType = statusType;
+	}
+	public String getReconciledComment() {
+		return reconciledComment;
+	}
+	public void setReconciledComment(String reconciledComment) {
+		this.reconciledComment = reconciledComment;
 	}
 	
     
