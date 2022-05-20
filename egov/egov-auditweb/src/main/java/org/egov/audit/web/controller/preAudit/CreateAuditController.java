@@ -790,13 +790,15 @@ public class CreateAuditController extends GenericWorkFlowController {
 				|| auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Section Officer")
 				|| auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Examiner")) {
 			auditDetails = auditService.getById(auditDetail.getAuditId());
-															  
-													   
 											   
 		}
+		if(auditDetail.getRetrachmentcheck()!=null) {
+		System.out.println("check "+auditDetail.getRetrachmentcheck());
+		System.out.println("comment "+auditDetail.getRetrachmentcomment());
+		
 		auditDetails.setRetrachmentcheck(auditDetail.getRetrachmentcheck());
 		auditDetails.setRetrachmentcomment(auditDetail.getRetrachmentcomment());
-		
+		}
 		if (workFlowAction.equalsIgnoreCase("APPROVE")) {
 			long millis = System.currentTimeMillis();
 			Date date = new java.util.Date(millis);

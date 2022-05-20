@@ -434,7 +434,7 @@ public class AuditService {
 			}
 		      
 		     	List<Object[]> list= null;//,to_char(r.date, 'dd-Mon-yyyy') as rdate
-				String sql="select to_char(r.date,'dd-Mon-yyyy') as rdate,r.department_name,r.amountofbill,r.amountbyaudit,r.amountretrached,r.billdetail,r.remarks from RetrachmentDetails r where r.date >= to_date('"+fromDateNew+"','dd/mm/yyyy') and r.date <= to_date('"+toDateNew+"','dd/mm/yyyy')";
+				String sql="select to_char(r.retrachmentdate,'dd-Mon-yyyy') as rdate,r.department_name,r.amountofbill,r.amountbyaudit,r.amountretrached,r.billdetail,r.remarks from RetrachmentDetails r where r.retrachmentdate >= to_date('"+fromDateNew+"','dd/mm/yyyy') and date(r.retrachmentdate) <= to_date('"+toDateNew+"','dd/mm/yyyy')";
 				
 				if(auditDetail.getDepartment() != null) {
 						sql+=" and r.department_name ='"+auditDetail.getDepartment()+"'";
@@ -445,7 +445,7 @@ public class AuditService {
 				if(list!=null) {
 					for (final Object[] o : list) {
 						RetrachmentDetails r=new RetrachmentDetails();
-						r.setDate(o[0]!=null?o[0].toString():"");
+						r.setRetdate(o[0]!=null?o[0].toString():null);
 						r.setDepartment_name(o[1]!=null?o[1].toString():"");
 						r.setAmountofbill(o[2]!=null?new BigDecimal(o[2].toString()):new BigDecimal("0"));
 						r.setAmountbyaudit(o[3]!=null?new BigDecimal(o[3].toString()):new BigDecimal("0"));
