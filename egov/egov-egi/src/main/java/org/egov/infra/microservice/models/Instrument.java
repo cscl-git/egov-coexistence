@@ -95,6 +95,8 @@ public class Instrument {
     private String instrumentStatus;
 
     private List<InstrumentVoucher> instrumentVouchers = new ArrayList<>();
+    
+    private String reconciledComment;
 
     public String getId() {
         return id;
@@ -280,4 +282,13 @@ public class Instrument {
         this.instrumentStatus = instrumentStatus;
     }
 
+	public String getReconciledComment() {
+		return reconciledComment;
+	}
+
+	public void setReconciledComment(String reconciledComment) {
+		this.reconciledComment = reconciledComment;
+	}
+
+    
 }
