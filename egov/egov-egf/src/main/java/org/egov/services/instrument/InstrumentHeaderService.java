@@ -67,7 +67,8 @@ public class InstrumentHeaderService extends PersistenceService<InstrumentHeader
     }
 
     @Transactional
-    public InstrumentHeader reconcile(Date recociledOn,Long ihId,EgwStatus reconciledStatus)
+//    public InstrumentHeader reconcile(Date recociledOnx,Long ihId,EgwStatus reconciledStatus)
+    public InstrumentHeader reconcile(Long ihId,EgwStatus reconciledStatus)
     {
     	//InstrumentOtherDetails io = find("from InstrumentOtherDetails where instrumentHeaderId.id=?",ihId);
     	InstrumentHeader ih = findById(ihId);
