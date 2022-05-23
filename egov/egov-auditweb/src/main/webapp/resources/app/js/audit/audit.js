@@ -100,10 +100,9 @@ function myFunctionRet1() {
 		var value = document.getElementById("retrachmentcheckvalue").value;
 		var checkBox = document.getElementById("retrachmentcheck");
 		// Get the output text
-		
 		var text = document.getElementById("recomment");
 		// If the checkbox is checked, display the output text
-		if(value!='' || value!=null || value!=' '){
+		if(value!=''){
 			$('#retrachmentcheck').prop('checked', true);
 			text.style.display = "block";
 		} else {

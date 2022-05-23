@@ -85,7 +85,7 @@
 					<c:forEach items="${auditDetail.retrachmentDetailsList }" var="ret" varStatus="item">
 						<tr>
 							<td>${item.index+1 }</td><!-- ${item.index+1 } -->
-							<td>${ret.date }</td><!-- ${ret.date } -->
+							<td>${ret.retdate }</td><!-- ${ret.date } -->
 							<td>${ret.department_name }</td><!-- ${ret.department_name } -->
 							<td>${ret.amountofbill }</td>
 							<td>${ret.amountbyaudit }</td>
@@ -151,13 +151,5 @@
 			buttons : [ 'excel', 'print' ]
 		});
 	});
-	/* $('.datepicker').datepicker({
-		dateFormat: 'dd-mm-yy',
-        changeMonth: true,
-        changeYear: true,     
-        showAnim: 'slideDown',
-        duration: 'fast',                    
-        yearRange: new Date().getFullYear() + ':' + new Date().getFullYear(),
-    }); */
 	
 </script>

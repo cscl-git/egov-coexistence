@@ -871,7 +871,7 @@ public class UpdateExpenseBillController extends BaseBillController {
 			if (retrachmentDetails == null) {
 				RetrachmentDetails retrachmentDetail = new RetrachmentDetails();
 				retrachmentDetail.setAuditid(auditId);
-				retrachmentDetail.setDate(d.toString());
+				retrachmentDetail.setRetrachmentdate(d);
 				retrachmentDetail.setAmountofbill(actual_Debit_sum);
 				retrachmentDetail.setAmountbyaudit(update_Credit_sum);
 				BigDecimal retra = actual_Credit_sum.subtract(update_Credit_sum);
