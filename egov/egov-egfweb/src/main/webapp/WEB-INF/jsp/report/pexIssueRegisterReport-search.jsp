@@ -98,6 +98,10 @@
 #codescontainer li.yui-ac-prehighlight {
 	background: #FFFFCC;
 }
+
+.tabView{
+	word-break: break-all;
+}
 </style>
 <title><s:text name="pex.issueregister.report" /></title>
 
@@ -360,6 +364,10 @@ $(document).ready(function() {
 					<th><spring:message code="lbl.bpv.number" text="BPV Number And Date" /></th>
 					<th><spring:message code="lbl.amount" text="Amount(&#8377;)" /></th>
 					<th><spring:message code="lbl.status" text="Status" /></th>
+					<!-- New Fields Added -->	
+					<th><spring:message code="lbl.status" text="Reconcile Date" /></th>
+					<th><spring:message code="lbl.status" text="Reconcile Comment" /></th>
+					<th><spring:message code="lbl.status" text="PEX Realization Date" /></th>
 				</tr>
 			</thead>
 			<tbody>
@@ -371,21 +379,25 @@ $(document).ready(function() {
 
 							<tr id="rtgsView">
 								<td>${item.index + 1}</td>
-								<td>${rtgsResultObj.bank}</td>
-								<td>${rtgsResultObj.accountNumber}</td>
-								<td>${rtgsResultObj.bankBranch}</td>
-								<td>${rtgsResultObj.rtgsDate}</td>
-								<td>${rtgsResultObj.rtgsNumber}</td>
-								<td>${rtgsResultObj.department}</td>
-								<td>${rtgsResultObj.partyName}</td>
-								<td>${rtgsResultObj.paymentNumber},${rtgsResultObj.paymentDate}</td>
-								<td>${rtgsResultObj.paymentAmount}</td>
-								<td>${rtgsResultObj.status}</td>
+								<td class="tabView">${rtgsResultObj.bank}</td>
+								<td class="tabView">${rtgsResultObj.accountNumber}</td>
+								<td class="tabView">${rtgsResultObj.bankBranch}</td>
+								<td class="tabView">${rtgsResultObj.rtgsDate}</td>
+								<td class="tabView">${rtgsResultObj.rtgsNumber}</td>
+								<td class="tabView">${rtgsResultObj.department}</td>
+								<td class="tabView">${rtgsResultObj.partyName}</td>
+								<td class="tabView">${rtgsResultObj.paymentNumber}, ${rtgsResultObj.paymentDate}</td>
+								<td class="tabView">${rtgsResultObj.paymentAmount}</td>
+								<td class="tabView">${rtgsResultObj.status}</td>
+								<!-- New Fields -->
+								<td class="tabView">${rtgsResultObj.reconciledOn}</td>
+								<td class="tabView">${rtgsResultObj.reconciledComment}</td>
+								<td class="tabView">${rtgsResultObj.realizationDate}</td>
 							</tr>
 						</c:forEach>
 					</c:when>
 					<c:otherwise>
-						<td colspan="10">No Records Found..</td>
+						<td colspan="13">No Records Found..</td>
 					</c:otherwise>
 				</c:choose>
 			</tbody>

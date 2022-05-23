@@ -198,9 +198,8 @@ table.its th {
 
 				<s:if test="%{bankAdviseResultList.size>0}">
 					<tr align="center">
-
-						<th class="bluebgheadtd" width="30%">Party Name</th>
-						<th class="bluebgheadtd" width="20%">Bank Name</th>
+						<th class="bluebgheadtd" width="20%">Party Name</th>
+						<th class="bluebgheadtd" width="10%">Bank Name</th>
 						<th class="bluebgheadtd" width="10%">Account Number</th>
 						<th class="bluebgheadtd" width="10%">IFSC Code</th>
 						<th class="bluebgheadtd" width="10%">Amount(Rs.)</th>

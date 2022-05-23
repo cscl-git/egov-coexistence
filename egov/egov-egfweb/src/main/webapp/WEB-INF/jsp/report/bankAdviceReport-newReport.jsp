@@ -222,32 +222,22 @@ table.its th {
 					dataType : "json",
 					success : function(r) {
 						data = r;
-						$("#tableRow")
-								.append(
-										"<thead><tr><th>Pex Number</th><th>Realization Date</th></thead>");
-
-						for (var i = 0; i < data.length; i++) {
-
-							console.log(data[i].transactionNumber);
-
-							$("#tableRow")
-									.append(
-											"<tr><td class='greybox' width='10%' class='form-control' id = 'transactionNumber["
-													+ i
-													+ "].pex' name = 'transactionNumber["
-													+ i
-													+ "].pex' value = transactionNumber["
-													+ i
-													+ "].pex>"
-													+ data[i].transactionNumber
-													+ "</td><td class='greybox' width='10%' ><input type='date' class='form-control' id = 'realDate["
-														+i
-														+"].pex' name = 'realDate["+i+"].pex' >"
-
-													+ "</td><tr>");
-
+						console.log(data);
+						//$("#tableRow").append("<thead><tr><th>Pex Number</th><th>Realization Date</th></thead>");
+						if(data.length > 0){
+							for (var i = 0; i < data.length; i++) {
+								var j = i+1;
+								console.log(data[i].transactionNumber);
+								$("#tableRow").append(
+									"<tr><td>"+j+"</td>"
+									+"<td id = 'transactionNumber["+ i+ "].pex' name = 'transactionNumber["+ i+ "].pex' value = transactionNumber["+ i+ "].pex>"
+									+ data[i].transactionNumber+"</td>"
+									+ "<td ><input type='date' class='form-control' id = 'realDate["+i+"].pex' name = 'realDate["+i+"].pex' >"
+									+ "</td><tr>");
+							}
+						}else{
+							$("#tableRow").append("<tr><td colspan='3'>No Records Found..</td></tr>");
 						}
-
 					}
 				})
 	}
@@ -302,103 +292,165 @@ table.its th {
 </script>
 
 <body>
-	<form:form name="bankAdvice" role="form" method="post"
-		modelAttribute="bankAdvice" id="bankAdvice"
-		action="bankAdviceReportPex" enctype="multipart/form-data"
-		class="form-horizontal form-groups-bordered">
-		<div class="formmainbox">
-			<div class="page-container">
-				<div class="main-content">
-
-					<table align="center" width="100%" cellpadding="0" cellspacing="0">
-
-						<center>Bank Advice Report for RTGS/PEX</center>
-						<tr>
-							<td class="greybox" width="10%">From Date:<span
-								class="greybox"><span class="mandatory"></span></span></td>
-							<td class="greybox"><form:input id="fromdate"
-									path="fromDate" class="form-control datepicker"
-									data-date-end-date="0d" required="required"
-									placeholder="DD/MM/YYYY" /></td>
-							<td class="greybox" width="10%">To Date:<span
-								class="greybox"><span class="mandatory"></span></span></td>
-							<td class="greybox"><form:input id="todate" path="toDate"
-									class="form-control datepicker" data-date-end-date="0d"
-									required="required" placeholder="DD/MM/YYYY" /></td>
-						</tr>
-						<br>
-
-						<tr>
-							<td class="greybox" width="10%">Bank Name:<span
-								class="greybox"><span class="mandatory"></span></span></td>
-
-							<td class="greybox"><form:select path="bankName"
-									id="bankname" required="required" class="form-control"
-									onchange="populateBranchNames()">
-									<form:option value="-1">-Select-</form:option>
-									<form:options items="${bankNames}" itemValue="id"
-										itemLabel="name" />
-								</form:select></td>
-
-							<td class="greybox" width="10%">Branch Name:<span
-								class="bluebox"><span class="mandatory"></span></span></td>
-							<td class="greybox"><form:select path="branchName"
-									id="branchname" required="required" class="form-control"
-									onchange="populateAccountNumber()">
-
-									<form:option value="">
-										<spring:message code="lbl.select" text="Select" />
-									</form:option>
-								</form:select></td>
-						</tr>
-						<br>
-
-						<tr>
-							<td class="greybox" width="10%">Account Number:<span
-								class="bluebox"><span class="mandatory"></span></span></td>
-							<td class="greybox"><form:select path="accountNumber"
-									id="accountnumber" required="required" class="form-control">
-									<form:option value="">
-										<spring:message code="lbl.select" text="Select" />
-									</form:option>
-								</form:select></td>
-						</tr>
-
-					</table>
+	<div class="container">
+		<form:form name="bankAdvice" role="form" method="post"
+			modelAttribute="bankAdvice" id="bankAdvice"
+			action="bankAdviceReportPex" enctype="multipart/form-data"
+			class="form-horizontal form-groups-bordered">
+			<div class="panel panel-primary" data-collapsed="0">
+				<div class="panel-heading">
+					<div class="panel-title" style="text-align: center;">
+						<!--<spring:message code="lbl-asset-create" text="Create Asset" />-->
+						Bank Advice Report for RTGS/PEX
+					</div>
+				</div>
+				<div class="panel-body">
+					<label class="col-sm-3 control-label text-right"> <spring:message
+							code="asset-dept" text="From Date" /> <span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="fromdate" path="fromDate"
+							class="form-control datepicker" data-date-end-date="0d"
+							required="required" placeholder="DD/MM/YYYY" />
+					</div>
+					<label class="col-sm-3 control-label text-right"> <spring:message
+							code="asset-dept" text="To Date" /> <span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="todate" path="toDate"
+							class="form-control datepicker" data-date-end-date="0d"
+							required="required" placeholder="DD/MM/YYYY" />
+					</div>
+					<label class="col-sm-3 control-label text-right"> <spring:message
+							code="asset-dept" text="Bank Name" /> <span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="bankName" id="bankname" required="required"
+							class="form-control" onchange="populateBranchNames()">
+							<form:option value="-1">-Select-</form:option>
+							<form:options items="${bankNames}" itemValue="id"
+								itemLabel="name" />
+						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-right"> <spring:message
+							code="asset-dept" text="Branch Name" /> <span class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="branchName" id="branchname" required="required"
+							class="form-control" onchange="populateAccountNumber()">
+							<form:option value="">
+								<spring:message code="lbl.select" text="Select" />
+							</form:option>
+						</form:select>
+					</div>
+					<label class="col-sm-3 control-label text-right"> <spring:message
+							code="asset-dept" text="Account Number" /> <span
+						class="mandatory"></span>
+					</label>
+					<div class="col-sm-3 add-margin">
+						<form:select path="accountNumber" id="accountnumber"
+							required="required" class="form-control">
+							<form:option value="">
+								<spring:message code="lbl.select" text="Select" />
+							</form:option>
+						</form:select>
+					</div>
+				</div>
+				<div align="center" class="buttonbottom">
+					<div class="row text-center">
+						<input type="button" name="bankAdviceSubmit" id="bankAdviceSubmit"
+							class="btn btn-primary" value="Search"
+							onclick="populatePexNumber()" /> <input type="button"
+							name="button2" id="button2" value="Close" class="btn btn-default"
+							onclick="window.parent.postMessage('close','*');window.close();" />
+					</div>
 				</div>
 			</div>
-
-		</div>
-
-		<div align="center">
-			<input type="button" name="bankAdviceSubmit" id="bankAdviceSubmit"
-				class="btn btn-primary" value="Search" onclick="populatePexNumber()" />
-			<input type="button" name="bankAdviceSubmit" id="bankAdviceSubmit"
-				class="btn btn-primary" value="Export to Excel"
-				onclick="populatePexNumberEXCEL()" />
-		</div>
-
-		<%-- <form:form name="bankAdvice" role="form" method="post"
-		modelAttribute="bankAdvices" id="bankAdvices"
-		action="bankAdviceReportController" enctype="multipart/form-data"
-		class="form-horizontal form-groups-bordered"> --%>
-		<div class="tab-pane fade in active" id="resultheader">
-			<div class="panel panel-primary" data-collapsed="0">
-
-				<table class="table table-bordered" align="center" id="tableRow">
-
-
-				</table>
-			</div>
-			<div align="center">
-				<input type="submit" name="bankAdviceSubmit" id="bankAdviceSubmit"
-					class="btn btn-primary" value="Submit" />
-			</div>
-
-
-		</div>
-
-
+	</div>
 	</form:form>
 
+	<div class="panel panel-primary" data-collapsed="0">
+		<div class="panel-heading">
+			<div class="panel-title">
+				<spring:message code="asset-search-result" text="Search Result" />
+			</div>
+		</div>
+		<div class="panel-body">
+			<table class="table table-bordered" id="resultHeader">
+				<thead>
+					<tr>
+						<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
+						<th><spring:message code="lbl-sl-no" text="PEX Number" /></th>
+						<th><spring:message code="code" text="Realization Date" /></th>
+					</tr>
+				</thead>
+				<tbody id="tableRow">
+
+				</tbody>
+			</table>
+		</div>
+		<div align="center" class="buttonbottom">
+			<div class="row text-center">
+				<input type="submit" name="bankAdviceSubmit" id="bankAdviceSubmit"
+					class="btn btn-primary" value="Submit" /> <input type="button"
+					name="bankAdviceSubmit" id="bankAdviceSubmit"
+					class="btn btn-primary" value="Export to Excel"
+					onclick="populatePexNumberEXCEL()" />
+			</div>
+		</div>
+	</div>
+	</div>
+
 </body>
+
+<link type="text/css" rel="stylesheet"
+	href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
+<link type="text/css" rel="stylesheet"
+	href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
+<script type="text/javascript"
+	src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
+<script type="text/javascript"
+	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
+<script type="text/javascript"
+	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
+	
+	<style>
+@media (max-width: 768px) {
+  .table-bordered tbody > tr {
+    border-bottom: 1px solid #ebebeb;
+  }
+}
+@media (max-width: 768px) {
+  .table-bordered tbody > tr td {
+    border: none;
+  }
+}
+</style>
+
+<script>
+    $(document).ready(function() {
+	    $('#resultHeader').DataTable( {
+	        dom: 'Bfrtip',
+	        aaSorting : [],
+	        buttons: [
+	            'copy', 'csv', 'excel', 'pdf', 'print'
+	        ]
+	    } );
+	} );
+
+	function  selectAssetRef(code, name){
+		var retVal = name + '~'+ code;	
+		window.opener.onPopupClose(retVal);//myValue is the value you want to return to main javascript
+		window.close();
+	}
+</script>
