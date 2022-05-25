@@ -143,7 +143,7 @@ textarea {
 			</div>
 			<form:hidden id="billId" path="billId" />
 			<form:hidden id="auditId" path="auditId" />
-			<form:hidden id="retrachmentcheckvalue" path="retrachmentcheck" />
+			<form:hidden path="" id="retrachmentcheckvalue"  value="${retrachmentcheckvalue}"/>
 			<form:hidden id="retrachmentcomment" path="retrachmentcomment" />
 			<form:hidden path="workFlowAction" id="workFlowAction" />
 			<form:hidden id="auditStatus" path="auditStatus" />

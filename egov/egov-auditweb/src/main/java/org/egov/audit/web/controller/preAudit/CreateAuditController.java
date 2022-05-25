@@ -265,7 +265,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 	private String contentType;
 	private String fileName;
 	private InputStream inputStream;
-
+	private String retrachmentcheckvalue;
+	
 	@Autowired
 	JasperReportService jasperReportService;
 
@@ -305,7 +306,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
 		auditDetail.setAuditType(auditDetails.getType());
 		auditDetail.setPassUnderobjection(auditDetails.getPassUnderobjection());
-		auditDetail.setRetrachmentcheck(auditDetails.getRetrachmentcheck());
 		auditDetail.setRetrachmentcomment(auditDetails.getRetrachmentcomment());
 		
 		EgBillregister bill = null;
@@ -792,12 +792,15 @@ public class CreateAuditController extends GenericWorkFlowController {
 			auditDetails = auditService.getById(auditDetail.getAuditId());
 											   
 		}
-		if(auditDetail.getRetrachmentcheck()!=null) {
-		System.out.println("check "+auditDetail.getRetrachmentcheck());
-		System.out.println("comment "+auditDetail.getRetrachmentcomment());
+		System.out.println("retrachmentcomment "+auditDetail.getRetrachmentcomment());
 		
-		auditDetails.setRetrachmentcheck(auditDetail.getRetrachmentcheck());
-		auditDetails.setRetrachmentcomment(auditDetail.getRetrachmentcomment());
+		if(null!=auditDetail.getRetrachmentcomment()) {
+			String[] arr=auditDetail.getRetrachmentcomment().split(",");
+			System.out.println("arr[1] "+arr[1]+" arr[0]"+arr[0]);
+			auditDetails.setRetrachmentcomment(arr[1]!=null?arr[1]:arr[0]);
+		}
+		else {
+			auditDetails.setRetrachmentcomment(null);
 		}
 		if (workFlowAction.equalsIgnoreCase("APPROVE")) {
 			long millis = System.currentTimeMillis();
@@ -2199,6 +2202,14 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetail.setDepartments(this.getDepartmentsFromMs());
 		model.addAttribute("auditDetail", auditDetail);
 		return "retranchmentSearchForm";
+	}
+
+	public String getRetrachmentcheckvalue() {
+		return retrachmentcheckvalue;
+	}
+
+	public void setRetrachmentcheckvalue(String retrachmentcheckvalue) {
+		this.retrachmentcheckvalue = retrachmentcheckvalue;
 	}
 	
 	

@@ -225,7 +225,7 @@
 		<c:if
 			test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
 		<div>
-			Retrachment
+			Retrenchment
 			<c:if test="${auditDetail.retrachmentcheck == 'Y'}">
 				<form:checkbox path="retrachmentcheck" id="retrachmentcheck"
 					onclick="myFunctionRet()" value="${auditDetail.retrachmentcheck}" ></form:checkbox>
@@ -233,7 +233,7 @@
 					<div class="form-group">
 						<div id="recomment" style="display: none;">
 							<label class="col-sm-3 control-label text-left-audit"><spring:message
-									text="Retrachment Comment" /> </label>
+									text="Retrenchment Comment" /> </label>
 							<div class="col-sm-3 add-margin">
 								<form:textarea class="form-control"
 									data-pattern="alphanumericwithspecialcharacters"
@@ -246,12 +246,12 @@
 			</c:if>
 			<c:if test="${auditDetail.retrachmentcheck != 'Y' || auditDetail.retrachmentcheck == ''}">
 				<form:checkbox path="retrachmentcheck" id="retrachmentcheck"
-					onclick="myFunctionRet()" value="Y"></form:checkbox>
+					onclick="myFunctionRet()"  value="N"></form:checkbox>
 				<div style="text-align: right;">
 					<div class="form-group">
 						<div id="recomment" style="display: none;">
 							<label class="col-sm-3 control-label text-left-audit"><spring:message
-									text="Retrachment Comment" /> </label>
+									text="Retrenchment Comment" /> </label>
 							<div class="col-sm-3 add-margin">
 								<form:textarea class="form-control"
 									data-pattern="alphanumericwithspecialcharacters"
@@ -265,7 +265,24 @@
 		
 		</div>
 		</c:if>
-
+		<c:if test="${auditDetail.retrachmentcheck == 'Y' && auditDetail.auditStatus == 'Pending with Department'}">
+		<div>
+			<div style="text-align: right;">
+				<div class="form-group">
+					<div id="recomment" style="display: none;">
+						<label class="col-sm-3 control-label text-left-audit"><spring:message
+								text="Retrechmnent Comment" /> </label>
+						<div class="col-sm-3 add-margin">
+							<form:textarea class="form-control"
+								data-pattern="alphanumericwithspecialcharacters"
+								id="retrachmentcomment" path="retrachmentcomment" value="${auditDetail.retrachmentcomment}" 
+								maxlength="2000" readonly="true"/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		</c:if>
 	</div>
 </div>
 
@@ -332,17 +349,5 @@
 	</table>
 </div>
 <script>
-/* function myFunctionRet() {
-alert("called");
-	var checkBox = document.getElementsByName("retrachmentcheck");
-	// Get the output text
-	var text = document.getElementById("recomment");
 
-	// If the checkbox is checked, display the output text
-	if (checkBox.checked == true) {
-		text.style.display = "block";
-	} else {
-		text.style.display = "none";
-	}
-} */
 </script>

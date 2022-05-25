@@ -49,7 +49,7 @@ public class AuditDetail {
 	private String notes;
 	private Integer passUnderobjection=0;
 	private String passunderobjectioncomment ;
-	private String retrachmentcheck;
+	private String retrachmentcheck="N";
 	private String retrachmentcomment;
 	private List<RetrachmentDetails> retrachmentDetailsList;
 	public String getPassunderobjectioncomment() {

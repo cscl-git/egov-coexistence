@@ -804,38 +804,32 @@ public class UpdateExpenseBillController extends BaseBillController {
 				return "success_saved";
 			}																	
 		}
+		egBillregister.setBillamount(update_Debit_sum);
+		egBillregister.setPassedamount(update_Debit_sum);
 		EgBillPayeedetails payee = new EgBillPayeedetails();
 		j = 0;
-		for (String sub : subledger_Amount) {
-			try {
-				if (payee.getCreditAmount() != (new BigDecimal("0"))) {
-					actual_Subledger_sum = actual_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getCreditAmount());
-					egBillregister.getBillPayeedetails().get(j).setCreditAmount(new BigDecimal(sub));
-					update_Subledger_sum = update_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getCreditAmount());
-				}
-				else {
-					actual_Subledger_sum = actual_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getDebitAmount());
-					egBillregister.getBillPayeedetails().get(j).setDebitAmount(new BigDecimal(sub));
-					update_Subledger_sum = update_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getDebitAmount());
-				}
-				j++;
-			} catch (Exception e) {
-				model.addAttribute("message", "Failure : Please enter correct details");
-				return "success_saved";
-			}																	
+		if(subledger_Amount!=null)
+		{
+			for (String sub : subledger_Amount) {
+				try {
+					if (payee.getCreditAmount() != (new BigDecimal("0"))) {
+						actual_Subledger_sum = actual_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getCreditAmount());
+						egBillregister.getBillPayeedetails().get(j).setCreditAmount(new BigDecimal(sub));
+						update_Subledger_sum = update_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getCreditAmount());
+					}
+					else {
+						actual_Subledger_sum = actual_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getDebitAmount());
+						egBillregister.getBillPayeedetails().get(j).setDebitAmount(new BigDecimal(sub));
+						update_Subledger_sum = update_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getDebitAmount());
+					}
+					j++;
+				} catch (Exception e) {
+					model.addAttribute("message", "Failure : Please enter correct details");
+					return "success_saved";
+				}																	
+			}
 		}
-																		 
-		/*
-		 * EgBillPayeedetails paye = new EgBillPayeedetails(); int k = 0; int count =
-		 * egBillregister.getBillPayeedetails().size(); for (int z = 0; z < count; z++)
-		 * { try { if (paye.getCreditAmount() != (new BigDecimal("0"))) {
-		 * egBillregister.getBillPayeedetails().get(k).setCreditAmount(update_Credit_sum
-		 * ); } else {
-		 * egBillregister.getBillPayeedetails().get(k).setDebitAmount(update_Credit_sum)
-		 * ; } k++; } catch (Exception e) { model.addAttribute("message",
-		 * "Failure : Please enter correct details"); return "success_saved"; } }
-		 */
-
+		
 		if (actual_Debit_sum.compareTo(update_Debit_sum) == -1) {
 			model.addAttribute("message",
 					"Failure : Updated Debit Details must not be greater than or equal to Previous record");
@@ -854,8 +848,8 @@ public class UpdateExpenseBillController extends BaseBillController {
 					+ update_Credit_sum + " Debit Sum is " + update_Debit_sum;
 			model.addAttribute("message", s);
 			return "success_saved";
-		} else if (update_Subledger_sum.compareTo(update_Credit_sum) == -1
-				|| update_Subledger_sum.compareTo(update_Credit_sum) == 1) {
+		} else if (subledger_Amount!=null && ( update_Subledger_sum.compareTo(update_Credit_sum) == -1
+				|| update_Subledger_sum.compareTo(update_Credit_sum) == 1)) {
 			String s = "Failure : Updated Subledger Details and Credit Details must be equal. Credit Sum is "
 					+ update_Credit_sum + " Subledger Sum is " + update_Subledger_sum;
 			model.addAttribute("message", s);

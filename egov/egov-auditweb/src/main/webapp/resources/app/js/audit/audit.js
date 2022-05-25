@@ -92,8 +92,12 @@ function myFunctionRet() {
 	// If the checkbox is checked, display the output text
 	if (checkBox.checked == true) {
 		text.style.display = "block";
+		$('#retrachmentcheckvalue').val('Y');
+		//$('#retrachmentcheckvalue').attr('value', '#retrachmentcheck'.checked ? 'Y' : 'N');
 	} else {
 		text.style.display = "none";
+		$('#retrachmentcheckvalue').val('N');
+		//$('#retrachmentcheckvalue').attr('value', '#retrachmentcheck'.checked ? 'Y' : 'N');
 	}
 }
 function myFunctionRet1() {
@@ -104,8 +108,10 @@ function myFunctionRet1() {
 		// If the checkbox is checked, display the output text
 		if(value!=''){
 			$('#retrachmentcheck').prop('checked', true);
+			$('#retrachmentcheckvalue').val('Y');
 			text.style.display = "block";
 		} else {
+			$('#retrachmentcheckvalue').val('N');
 			text.style.display = "none";
 		}
 	}
