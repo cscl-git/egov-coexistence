@@ -96,10 +96,15 @@
 					</td>
 					<%-- <td style="text-align: right"><s:property value="reconciledComment" /></td> --%>
 					<td>
-					<input type="text"
+					<%-- <input type="text"
 						id="reconComments<s:property value="#status.index"/>"
 						name="reconComments[<s:property value="#status.index"/>]"
-						class="form-control" value="<s:property value="reconciledComment" />"/>
+						class="form-control" value="<s:property value="reconciledComment" />"/> --%>
+						
+						<textarea cols="30" rows="2" id="reconComments<s:property value="#status.index"/>" 
+							name="reconComments[<s:property value="#status.index"/>]">
+							<s:property value="reconciledComment" />
+						</textarea>
 					</td>
 				</tr>
 			</s:iterator>
