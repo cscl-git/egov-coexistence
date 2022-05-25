@@ -170,7 +170,7 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	@Transient
 	private Long leadAuditorEmpNo;
 	
-	private String retrachmentcheck;
+	
 	private String retrachmentcomment;
 	
 	
@@ -424,15 +424,6 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	public void setStateId(String stateId) {
 		this.stateId = stateId;
 	}
-
-	public String getRetrachmentcheck() {
-		return retrachmentcheck;
-	}
-
-	public void setRetrachmentcheck(String retrachmentcheck) {
-		this.retrachmentcheck = retrachmentcheck;
-	}
-
 	public String getRetrachmentcomment() {
 		return retrachmentcomment;
 	}

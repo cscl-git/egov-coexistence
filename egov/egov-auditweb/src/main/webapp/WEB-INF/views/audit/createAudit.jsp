@@ -50,7 +50,10 @@ window.onload = function checklistDate() {
 		var year = cDate.getFullYear();
 		currDate = currDate + "/" + year;*/
 	}
-	myFunctionRet1();
+	if (status === "Pending with Department") {
+		alert("onload");
+		$('#retrachmentcomment').attr('readonly', true);
+	}
 }
 </script>
 <style>
@@ -129,7 +132,7 @@ textarea {
 						<div class="col-sm-3 add-margin">
 							<a href="#" id="sourceLink"
 								onclick="return openSource('${billSource}');">View Bill</a>
-								<c:if test="${auditDetail.retrachmentcheck == 'Y' && auditDetail.auditStatus == 'Pending with Department'}">
+								<c:if test="${null!=auditDetail.retrachmentcomment && auditDetail.auditStatus == 'Pending with Department'}">
 									<div>
 										<a href='javascript:void(0)' class="buttonsubmit"
 										onclick="updateCreditDebit()">Update
@@ -143,8 +146,7 @@ textarea {
 			</div>
 			<form:hidden id="billId" path="billId" />
 			<form:hidden id="auditId" path="auditId" />
-			<form:hidden path="" id="retrachmentcheckvalue"  value="${retrachmentcheckvalue}"/>
-			<form:hidden id="retrachmentcomment" path="retrachmentcomment" />
+			<%-- <form:hidden id="retrachmentcomment" path="retrachmentcomment" /> --%>
 			<form:hidden path="workFlowAction" id="workFlowAction" />
 			<form:hidden id="auditStatus" path="auditStatus" />
 		</div>

@@ -49,7 +49,6 @@ public class AuditDetail {
 	private String notes;
 	private Integer passUnderobjection=0;
 	private String passunderobjectioncomment ;
-	private String retrachmentcheck="N";
 	private String retrachmentcomment;
 	private List<RetrachmentDetails> retrachmentDetailsList;
 	public String getPassunderobjectioncomment() {
@@ -253,12 +252,7 @@ public class AuditDetail {
 	public void setType(String type) {
 		this.type = type;
 	}
-	public String getRetrachmentcheck() {
-		return retrachmentcheck;
-	}
-	public void setRetrachmentcheck(String retrachmentcheck) {
-		this.retrachmentcheck = retrachmentcheck;
-	}
+	
 	public String getRetrachmentcomment() {
 		return retrachmentcomment;
 	}

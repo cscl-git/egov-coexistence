@@ -222,67 +222,23 @@
 			</div>
 		</div>
 	<!-- added for retrachment -->
-		<c:if
+		<%-- <c:if
 			test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
-		<div>
-			Retrenchment
-			<c:if test="${auditDetail.retrachmentcheck == 'Y'}">
-				<form:checkbox path="retrachmentcheck" id="retrachmentcheck"
-					onclick="myFunctionRet()" value="${auditDetail.retrachmentcheck}" ></form:checkbox>
+		 --%>	<div>
 				<div style="text-align: right;">
 					<div class="form-group">
-						<div id="recomment" style="display: none;">
-							<label class="col-sm-3 control-label text-left-audit"><spring:message
-									text="Retrenchment Comment" /> </label>
-							<div class="col-sm-3 add-margin">
-								<form:textarea class="form-control"
-									data-pattern="alphanumericwithspecialcharacters"
-									id="retrachmentcomment" path="retrachmentcomment" value="${auditDetail.retrachmentcomment}" 
-									maxlength="2000" />
-							</div>
-						</div>
-					</div>
-				</div>
-			</c:if>
-			<c:if test="${auditDetail.retrachmentcheck != 'Y' || auditDetail.retrachmentcheck == ''}">
-				<form:checkbox path="retrachmentcheck" id="retrachmentcheck"
-					onclick="myFunctionRet()"  value="N"></form:checkbox>
-				<div style="text-align: right;">
-					<div class="form-group">
-						<div id="recomment" style="display: none;">
-							<label class="col-sm-3 control-label text-left-audit"><spring:message
-									text="Retrenchment Comment" /> </label>
-							<div class="col-sm-3 add-margin">
-								<form:textarea class="form-control"
-									data-pattern="alphanumericwithspecialcharacters"
-									id="retrachmentcomment" path="retrachmentcomment"
-									maxlength="2000" />
-							</div>
-						</div>
-					</div>
-				</div>
-			</c:if>
-		
-		</div>
-		</c:if>
-		<c:if test="${auditDetail.retrachmentcheck == 'Y' && auditDetail.auditStatus == 'Pending with Department'}">
-		<div>
-			<div style="text-align: right;">
-				<div class="form-group">
-					<div id="recomment" style="display: none;">
 						<label class="col-sm-3 control-label text-left-audit"><spring:message
-								text="Retrechmnent Comment" /> </label>
+								text="Retrenchment Comment" /> </label>
 						<div class="col-sm-3 add-margin">
 							<form:textarea class="form-control"
 								data-pattern="alphanumericwithspecialcharacters"
 								id="retrachmentcomment" path="retrachmentcomment" value="${auditDetail.retrachmentcomment}" 
-								maxlength="2000" readonly="true"/>
+								maxlength="2000" />
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
-		</c:if>
+		<%-- </c:if> --%>
 	</div>
 </div>
 

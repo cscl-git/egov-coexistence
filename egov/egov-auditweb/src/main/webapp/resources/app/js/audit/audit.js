@@ -14,7 +14,7 @@ $(document).ready(
 	
 });
 
-$(document).ready(
+/*$(document).ready(
 	function() {
 	 var retrachmentcheck=$('#retrachmentcheck').val();
 	 console.log("ret ::"+retrachmentcheck);
@@ -28,7 +28,7 @@ $(document).ready(
 				myFunctionRet();
 			}
 	
-});
+});*/
 $('body').on('focus',".datepicker", function(){
     $(this).datepicker();
 });
@@ -84,7 +84,7 @@ function myFunction() {
 	}
 }
 
-function myFunctionRet() {
+/*function myFunctionRet() {
 	var checkBox = document.getElementById("retrachmentcheck");
 	// Get the output text
 	var text = document.getElementById("recomment");
@@ -114,7 +114,7 @@ function myFunctionRet1() {
 			$('#retrachmentcheckvalue').val('N');
 			text.style.display = "none";
 		}
-	}
+	}*/
 function setWorkFLowAction(name) {
 	console.log(name);
 	if (name == 'sectionOfficer'

@@ -265,7 +265,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 	private String contentType;
 	private String fileName;
 	private InputStream inputStream;
-	private String retrachmentcheckvalue;
 	
 	@Autowired
 	JasperReportService jasperReportService;
@@ -784,6 +783,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 				&& workFlowAction.equalsIgnoreCase("department")) {
 			auditDetails = populateDetailsAudit(auditDetail);
 		} else if (auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Auditor")
+				&& workFlowAction.equalsIgnoreCase("examiner")) {
+			auditDetails = populateDetailsAudit(auditDetail);
+		} else if (auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Auditor")
 				&& workFlowAction.equalsIgnoreCase("sectionOfficer")) {
 			auditDetails = populateDetailsSO(auditDetail);
 		} else if (workFlowAction.equalsIgnoreCase("reject")
@@ -795,9 +797,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 		System.out.println("retrachmentcomment "+auditDetail.getRetrachmentcomment());
 		
 		if(null!=auditDetail.getRetrachmentcomment()) {
-			String[] arr=auditDetail.getRetrachmentcomment().split(",");
-			System.out.println("arr[1] "+arr[1]+" arr[0]"+arr[0]);
-			auditDetails.setRetrachmentcomment(arr[1]!=null?arr[1]:arr[0]);
+			//String[] arr=auditDetail.getRetrachmentcomment().split(",");
+			auditDetails.setRetrachmentcomment(auditDetail.getRetrachmentcomment());
 		}
 		else {
 			auditDetails.setRetrachmentcomment(null);
@@ -2203,16 +2204,6 @@ public class CreateAuditController extends GenericWorkFlowController {
 		model.addAttribute("auditDetail", auditDetail);
 		return "retranchmentSearchForm";
 	}
-
-	public String getRetrachmentcheckvalue() {
-		return retrachmentcheckvalue;
-	}
-
-	public void setRetrachmentcheckvalue(String retrachmentcheckvalue) {
-		this.retrachmentcheckvalue = retrachmentcheckvalue;
-	}
-	
-	
 	
 
 }
