@@ -28,6 +28,7 @@ import org.egov.infra.microservice.models.Instrument;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.instrument.InstrumentHeader;
 import org.egov.services.instrument.InstrumentHeaderService;
+import org.jfree.util.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.InputStreamResource;
@@ -56,6 +57,8 @@ public class BankAdviceController {
 	public static final Locale LOCALE = new Locale("en", "IN");
 	public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd/mm/yyyy hh:mm:ss", LOCALE);
 //	public static final SimpleDateFormat DDMMYYYYFORMAT2 = new SimpleDateFormat("dd hh:mm:ss", LOCALE);
+	
+	List<InstrumentHeader> pexList = new ArrayList<InstrumentHeader>();
 
 	@RequestMapping(value = "/bankAdviceReport")
 	public String search(@ModelAttribute("bankAdvice") final BankAdvice bankAdvice, final Model model,
@@ -121,9 +124,10 @@ public class BankAdviceController {
 				h.setTransactionNumber(li.getTransactionNumber());
 				h.setRealizationDate(li.getRealizationDate());
 				pex.add(h);
+				pexList.add(h);
 			}
 		}
-
+		System.out.println("Pex List Size..:"+pexList.size());
 		return pex;
 	}
 
@@ -135,15 +139,20 @@ public class BankAdviceController {
 				"from InstrumentHeader where bankaccountid=?" + " and transactiondate BETWEEN ? AND ?",
 				Long.parseLong(instrumentHeader.getAccountNumber()), instrumentHeader.getFromDate(),
 				instrumentHeader.getToDate());
+		System.out.println("Pex Number Size..:"+pexNumbers.size());
 		try {
 			for (int i = 0; i < pexNumbers.size(); i++) {
 				String pex = request.getParameter("transactionNumber[" + i + "].pex");
 				String realizationDate = request.getParameter("realDate[" + i + "].pex");
+				System.out.println("Pex Acc No..:"+pex);
+				System.out.println("Pex realization Date.:"+realizationDate);
 				if (realizationDate != null) {
+					System.out.println(i+".Realization Date Not NUll.."+realizationDate);
 					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 					Date date = dateFormat.parse(realizationDate);
 					pexNumbers.get(i).setRealizationDate(date);
 					instrumentHeaderService.reconciled(date, pexNumbers.get(i).getId());
+					System.out.println("Reconciled..");
 				}
 			}
 		} catch (Exception e) {
@@ -214,6 +223,14 @@ public class BankAdviceController {
 		workbook.write(out);
 		return new ByteArrayInputStream(out.toByteArray());
 
+	}
+
+	public List<InstrumentHeader> getPexList() {
+		return pexList;
+	}
+
+	public void setPexList(List<InstrumentHeader> pexList) {
+		this.pexList = pexList;
 	}
 
 }

@@ -222,15 +222,15 @@ table.its th {
 					dataType : "json",
 					success : function(r) {
 						data = r;
-						console.log(data);
+						//console.log(data);
 						//$("#tableRow").append("<thead><tr><th>Pex Number</th><th>Realization Date</th></thead>");
 						if(data.length > 0){
 							for (var i = 0; i < data.length; i++) {
 								var j = i+1;
-								console.log(data[i].transactionNumber);
+								//console.log(data[i].transactionNumber);
 								$("#tableRow").append(
 									"<tr><td>"+j+"</td>"
-									+"<td id = 'transactionNumber["+ i+ "].pex' name = 'transactionNumber["+ i+ "].pex' value = transactionNumber["+ i+ "].pex>"
+									+"<td id = 'transactionNumber["+ i+ "].pex' name = 'transactionNumber["+ i+ "].pex' value = 'transactionNumber["+ i+ "].pex'>"
 									+ data[i].transactionNumber+"</td>"
 									+ "<td ><input type='date' class='form-control' id = 'realDate["+i+"].pex' name = 'realDate["+i+"].pex' >"
 									+ "</td><tr>");
@@ -293,15 +293,13 @@ table.its th {
 
 <body>
 	<div class="container">
-		<form:form name="bankAdvice" role="form" method="post"
-			modelAttribute="bankAdvice" id="bankAdvice"
-			action="bankAdviceReportPex" enctype="multipart/form-data"
-			class="form-horizontal form-groups-bordered">
+		<form:form name="bankAdvice" role="form" method="post" modelAttribute="bankAdvice" id="bankAdvice"
+			action="bankAdviceReportPex" enctype="multipart/form-data" class="form-horizontal form-groups-bordered">
+			
 			<div class="panel panel-primary" data-collapsed="0">
 				<div class="panel-heading">
 					<div class="panel-title" style="text-align: center;">
-						<!--<spring:message code="lbl-asset-create" text="Create Asset" />-->
-						Bank Advice Report for RTGS/PEX
+						Bank Advice Report for Realization
 					</div>
 				</div>
 				<div class="panel-body">
@@ -359,98 +357,43 @@ table.its th {
 				<div align="center" class="buttonbottom">
 					<div class="row text-center">
 						<input type="button" name="bankAdviceSubmit" id="bankAdviceSubmit"
-							class="btn btn-primary" value="Search"
-							onclick="populatePexNumber()" /> <input type="button"
-							name="button2" id="button2" value="Close" class="btn btn-default"
+							class="btn btn-primary" value="Search" onclick="populatePexNumber()" /> 
+							
+						<input type="button" name="button2" id="button2" value="Close" class="btn btn-default"
 							onclick="window.parent.postMessage('close','*');window.close();" />
 					</div>
 				</div>
 			</div>
-	</div>
-	</form:form>
-
-	<div class="panel panel-primary" data-collapsed="0">
-		<div class="panel-heading">
-			<div class="panel-title">
-				<spring:message code="asset-search-result" text="Search Result" />
+			<div class="panel panel-primary" data-collapsed="0">
+				<div class="panel-heading">
+					<div class="panel-title">
+						<spring:message code="asset-search-result" text="Search Result" />
+					</div>
+				</div>
+				<div class="panel-body">
+					<table class="table table-bordered" id="resultHeader">
+						<thead>
+							<tr>
+								<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
+								<th><spring:message code="lbl-sl-no" text="PEX Number" /></th>
+								<th><spring:message code="code" text="Realization Date" /></th>
+							</tr>
+						</thead>
+						<tbody id="tableRow">
+		
+						</tbody>
+					</table>
+				</div>
+				<div align="center" class="buttonbottom">
+					<div class="row text-center">
+						<input type="submit" name="bankAdviceSubmit" id="bankAdviceSubmit" class="btn btn-primary" value="Submit" /> 
+						<input type="button" name="bankAdviceSubmit" id="bankAdviceSubmit"
+							class="btn btn-primary" value="Export to Excel" onclick="populatePexNumberEXCEL()" />
+					</div>
+				</div>
 			</div>
-		</div>
-		<div class="panel-body">
-			<table class="table table-bordered" id="resultHeader">
-				<thead>
-					<tr>
-						<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>
-						<th><spring:message code="lbl-sl-no" text="PEX Number" /></th>
-						<th><spring:message code="code" text="Realization Date" /></th>
-					</tr>
-				</thead>
-				<tbody id="tableRow">
-
-				</tbody>
-			</table>
-		</div>
-		<div align="center" class="buttonbottom">
-			<div class="row text-center">
-				<input type="submit" name="bankAdviceSubmit" id="bankAdviceSubmit"
-					class="btn btn-primary" value="Submit" /> <input type="button"
-					name="bankAdviceSubmit" id="bankAdviceSubmit"
-					class="btn btn-primary" value="Export to Excel"
-					onclick="populatePexNumberEXCEL()" />
-			</div>
-		</div>
-	</div>
+		</form:form>
 	</div>
 
 </body>
 
-<link type="text/css" rel="stylesheet"
-	href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css">
-<link type="text/css" rel="stylesheet"
-	href="https://cdn.datatables.net/buttons/2.1.0/css/buttons.dataTables.min.css">
-<script type="text/javascript"
-	src="https://code.jquery.com/jquery-3.5.1.js"></script>
-<script type="text/javascript"
-	src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
-<script type="text/javascript"
-	src="https://cdn.datatables.net/buttons/2.1.0/js/dataTables.buttons.min.js"></script>
-<script type="text/javascript"
-	src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script type="text/javascript"
-	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/pdfmake.min.js"></script>
-<script type="text/javascript"
-	src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.53/vfs_fonts.js"></script>
-<script type="text/javascript"
-	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
-<script type="text/javascript"
-	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
-	
-	<style>
-@media (max-width: 768px) {
-  .table-bordered tbody > tr {
-    border-bottom: 1px solid #ebebeb;
-  }
-}
-@media (max-width: 768px) {
-  .table-bordered tbody > tr td {
-    border: none;
-  }
-}
-</style>
-
-<script>
-    $(document).ready(function() {
-	    $('#resultHeader').DataTable( {
-	        dom: 'Bfrtip',
-	        aaSorting : [],
-	        buttons: [
-	            'copy', 'csv', 'excel', 'pdf', 'print'
-	        ]
-	    } );
-	} );
-
-	function  selectAssetRef(code, name){
-		var retVal = name + '~'+ code;	
-		window.opener.onPopupClose(retVal);//myValue is the value you want to return to main javascript
-		window.close();
-	}
-</script>
