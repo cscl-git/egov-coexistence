@@ -32,6 +32,7 @@ public class AuditDetail {
     private Long stateId;
     private Long auditId;
     private String auditStatus;
+    private String auditStateValue;
     private String workFlowAction;
     private String expenditureType;
     private int fund;
@@ -276,6 +277,12 @@ public class AuditDetail {
 	}
 	public void setToDate(String toDate) {
 		this.toDate = toDate;
+	}
+	public String getAuditStateValue() {
+		return auditStateValue;
+	}
+	public void setAuditStateValue(String auditStateValue) {
+		this.auditStateValue = auditStateValue;
 	}
 	
 

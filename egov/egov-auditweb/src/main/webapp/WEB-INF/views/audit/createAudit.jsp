@@ -51,7 +51,6 @@ window.onload = function checklistDate() {
 		currDate = currDate + "/" + year;*/
 	}
 	if (status == "Pending with Department") {
-		alert("onload");
 		$('#retrachmentcomment').attr('readonly', true);
 	}
 }
@@ -175,11 +174,9 @@ textarea {
 			<c:if test="${auditDetail.auditStatus == 'Pending with Department' }">
 				<jsp:include page="commonworkflowmatrix-auditbill.jsp" />
 			</c:if>
-			<c:if test="${auditDetail.auditStatus != 'Pending With Audit' }">
 			<div class="buttonbottom" align="center">
 				<jsp:include page="commonworkflowmatrix-button.jsp" />
 			</div>
-			</c:if>
 		</c:if>
 	</div>
 

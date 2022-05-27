@@ -310,6 +310,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 		EgBillregister bill = null;
 		auditDetail.setAuditId(Long.parseLong(auditId));
 		auditDetail.setAuditStatus(auditDetails.getStatus().getCode());
+		auditDetail.setAuditStateValue(auditDetails.getState().getValue());
 		List<AuditPostBillMpng> billDetailsMpngLIst = null;
 		List<AuditPostVoucherMpng> voucherDetailsMpngList = null;
 		if (auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit")) {

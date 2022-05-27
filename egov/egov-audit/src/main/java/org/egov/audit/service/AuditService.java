@@ -111,6 +111,10 @@ public class AuditService {
 	public AuditDetails findByid(final Long id) {
 		return auditRepository.findById(id);
 	}
+	
+	public AuditDetails findByBillId(final Long id) {
+		return auditRepository.findByBillId(id);
+	}
 
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
 		return documentUploadRepository.findByObjectIdAndObjectType(objectId, objectType);
@@ -270,10 +274,22 @@ public class AuditService {
 						.withtLastModifiedBy(user.getId());
 			}
 			else if(workFlowAction.contentEquals("Verify")) {//added by abhishek
+					System.out.println("auditDetails.getStateType()--- "+auditDetails.getStateType());
+					System.out.println("auditDetails.getCurrentState().getValue()--- "+auditDetails.getCurrentState().getValue());
 				 wfmatrix = auditRegisterWorkflowService.getWfMatrix(auditDetails.getStateType(), null, null, null,
 							auditDetails.getCurrentState().getValue(), null);
 		            if (stateValue.isEmpty())
 		                stateValue = wfmatrix.getNextState();
+		            if(auditDetails.getCurrentState().getValue().equalsIgnoreCase("Final Approval Pending")) {
+		            	stateValue="Pending With Audit";
+		            	auditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+		    					AuditConstants.AUDIT_PENDING_WITH_DEPARTMENT));
+		            }
+		            if(auditDetails.getCurrentState().getValue().equalsIgnoreCase("Pending With Audit")) {
+		            	stateValue="Pending With Auditor";
+		            	auditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+		    					AuditConstants.AUDIT_PENDING_WITH_AUDITOR));
+		            }
 				List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
 	                       FinancialConstants.MODULE_NAME_APPCONFIG, "AUDIT_DEFAULT");
 	            owenrPos=new Position();
