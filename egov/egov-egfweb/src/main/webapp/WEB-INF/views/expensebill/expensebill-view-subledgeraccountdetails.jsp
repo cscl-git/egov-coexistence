@@ -63,6 +63,8 @@
 					<th><spring:message code="lbl.account.code" text="Account Code"/></th>
 					<th><spring:message code="lbl.subledgertype" text="Subledger Type"/></th>
 					<th><spring:message code="lbl.subledger.name" text="Subledger Name"/></th>
+					<th><spring:message code="lbl.subledger.account" text="Bank Account"/></th>
+					<th><spring:message code="lbl.subledger.ifsc" text="IFSC Code"/></th>
 					<th><spring:message code="lbl.amount" text="Amount"/></th>
 				</tr>
 			</thead>
@@ -79,6 +81,12 @@
 								</td>
 								<td>
 									<span class="subLedgerName_${item.index }">${billPayeeDeatils.detailKeyName }</span>
+								</td>
+								<td>
+									<span class="subLedgerName_${item.index }">${billPayeeDeatils.detailKeyAccount }</span>
+								</td>
+								<td>
+									<span class="subLedgerName_${item.index }">${billPayeeDeatils.detailKeyIfsc }</span>
 								</td>
 								<c:if test="${billPayeeDeatils.debitAmount > 0 }">
 									<td class="text-right">

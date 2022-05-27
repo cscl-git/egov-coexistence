@@ -114,7 +114,9 @@ $(document).ready(function(){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -138,6 +140,8 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger[0].payTo').value=data.name;
 			document.getElementById('tempSubLedger[0].detailkeyId').value=data.id;
+			document.getElementById('tempSubLedger[0].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger[0].ifscCode').value=data.ifsccode;
 			if(document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value==""){
 				document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value=document.getElementById('tempSubLedger[0].detailkeyId').value;
 				document.getElementById('tempSubLedger[0].netPayableDetailKeyName').value=detailKeyName;
@@ -430,7 +434,9 @@ function subledger_initialize(dataId){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -447,12 +453,14 @@ $('.subLedgerCodeOT').typeahead({
 		displayKey : 'codeAndName',
 		source : entityName.ttAdapter()
 	}).on('typeahead:selected', function (event, data) {
-				   
+			  
 
 		document.getElementById('tempSubLedger['+index+'].subLedgerCode').value=data.code;
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger['+index+'].payTo').value=data.name;
 			document.getElementById('tempSubLedger['+index+'].detailkeyId').value=data.id;
+			document.getElementById('tempSubLedger['+index+'].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger['+index+'].ifscCode').value=data.ifsccode;
 			if(document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value==""){
 				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value=document.getElementById('tempSubLedger['+index+'].detailkeyId').value;
 				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value=detailKeyName;
@@ -1076,8 +1084,10 @@ function addSubledger(){
 $("#populateAccountDetails").click(function () {
 	var isMerged= false;
 	var accountDetailsCount = $("#tblaccountdetails > tbody > tr:visible[id='accountdetailsrow']").length;
+	
 	if(validateAccountDetails())
 		{
+
 		$('#tbldebitdetails  > tbody > tr:visible[id="debitdetailsrow"]').each(function() {
 			 if($(this).find(".debitdetailid").val()!='' && $(this).find(".debitAmount").val()!='')
 				{
@@ -1115,7 +1125,8 @@ $("#populateAccountDetails").click(function () {
 						populateSubLedgerDetails($(this).find(".debitdetailid").val(),$(this).find(".debitaccountcode").val(),
 								$(this).find(".debitDetailTypeId").val(),$(this).find(".debitDetailKeyId").val(),
 								$(this).find(".debitDetailTypeName").val(),$(this).find(".debitDetailKeyName").val(),
-								$(this).find(".debitAmount").val(),true);
+								$(this).find(".debitAmount").val(),true);				        
+
 					}
 			 }
 		 });
@@ -1183,12 +1194,21 @@ $("#populateAccountDetails").click(function () {
 				$netPayableAccountCodeId =document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value;
 				//where this id
 				$("#netPayableId").val(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value);
+				if(document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value != null) {
+					if(document.getElementById('tempSubLedger['+index+'].bankAccount').value ==  '' || document.getElementById('tempSubLedger['+index+'].ifscCode').value == '') {
+		              bootbox.alert("Either Bank Account or IFSC Code is missing for " +document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value + ", please update the details.");
+					  return false;	
+					}
+					
+				}
 				accountDetailsCount++;
+				
 				if(document.getElementById('tempSubLedger['+index+'].netPayableIsSubLedger').value!="false"  && document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value!="" && document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value!=""){
 					populateSubLedgerDetails(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value,document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value,
 							document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value,
 									document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeName').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value,
-											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,false);
+											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,document.getElementById('tempSubLedger['+index+'].bankAccount').value,
+											document.getElementById('tempSubLedger['+index+'].ifscCode').value,false);
 				}
 			}
 		 });
@@ -1315,6 +1335,8 @@ function clearAllDetails() {
 			document.getElementById('tempSubLedger[0].detailkeyId').value = "";
 			document.getElementById('tempSubLedger[0].subLedgerCode').value = "";
 			document.getElementById('tempSubLedger[0].payTo').value = "";
+			document.getElementById('tempSubLedger[0].bankAccount').value = "";
+			document.getElementById('tempSubLedger[0].ifscCode').value = "";
 			document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
 		}else{
 			var objects = $('.subledge-delete-row');
@@ -1334,13 +1356,15 @@ function clearAllDetails() {
 }
 
 
-function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,isdebit){
+function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,bankAccount,ifscCode,isdebit){
 	
 	$('.subLedgerGlCode_' + subLedgerCount).html('');
     $('#subLedgerDetailTypeId_' + subLedgerCount).val('');
 	$('#subLedgerDetailKeyId_' + subLedgerCount).val('');
 	$('.subLedgerType_' + subLedgerCount).html('');
 	$('.subLedgerName_' + subLedgerCount).html('');
+	$('.subLedgerAccount_' + subLedgerCount).html('');
+	$('.subLedgerIfsc_' + subLedgerCount).html('');
 	$('.subLedgerAmount_' + subLedgerCount).html('');
 	$('#subLedgerGlCodeId_' + subLedgerCount).val('');  
 	$('#subLedgerIsDebit_' + subLedgerCount).val('');
@@ -1367,6 +1391,8 @@ function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detai
 	$('#subLedgerDetailKeyId_' + subLedgerCount).val(detailKeyId);
 	$('.subLedgerType_' + subLedgerCount).html(detailTypeName);
 	$('.subLedgerName_' + subLedgerCount).html(detailKeyName);
+	$('.subLedgerAccount_' + subLedgerCount).html(bankAccount);
+	$('.subLedgerIfsc_' + subLedgerCount).html(ifscCode);
 	$('.subLedgerAmount_' + subLedgerCount).html(amount);
 	
 }

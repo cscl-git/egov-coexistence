@@ -243,7 +243,7 @@ String namenew="%"+cap;
         }
         for (final EntityType entity : entitiesList)
         	
-            entityNames.add(entity.getCode() + " - " + entity.getName() + "~" + entity.getEntityId());
+            entityNames.add(entity.getCode() + " - " + entity.getName() + "~" + entity.getEntityId() + "$" + entity.getBankaccount() + "@" +entity.getIfsccode());
         System.out.println(name);
         System.out.println(accountDetailType);
         for(String responcename:entityNames) {

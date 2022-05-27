@@ -221,6 +221,13 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
     private Boolean budgetCheckReq = true;
     
     private String subdivision;
+    
+   
+	@Transient
+	private Long bankaccount;
+    
+	@Transient
+    private String ifsccode;
 
     public Boolean isBudgetCheckReq() {
         return budgetCheckReq;
@@ -643,5 +650,23 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
 	public void setPaymentvoucherheaderid(Long paymentvoucherheaderid) {
 		this.paymentvoucherheaderid = paymentvoucherheaderid;
 	}
+
+	public Long getBankaccount() {
+		return bankaccount;
+	}
+
+	public void setBankaccount(Long bankaccount) {
+		this.bankaccount = bankaccount;
+	}
+
+	public String getIfsccode() {
+		return ifsccode;
+	}
+
+	public void setIfsccode(String ifsccode) {
+		this.ifsccode = ifsccode;
+	}
+	
+	
 
 }
