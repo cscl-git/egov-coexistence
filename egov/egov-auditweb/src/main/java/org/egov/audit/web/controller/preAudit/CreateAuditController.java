@@ -1202,10 +1202,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		} else if (workflowAction.equalsIgnoreCase("saveAsDraft")) {
 			message = "Audit No : " + audit.getAuditno() + " is saved successfully";
-   
-													  
-																					 
-		}
+		} else if (workflowAction.equalsIgnoreCase("Verify")) {
+			message = "Audit No : " + audit.getAuditno() + " is verified ";
+		} 
 
 		return message;
 	}

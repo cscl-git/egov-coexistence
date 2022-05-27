@@ -136,7 +136,12 @@ public class AuditService {
 		} else if (workFlowAction.equalsIgnoreCase("examiner")) {
 			savedAuditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
 					AuditConstants.AUDIT_PENDING_WITH_EXAMINER));
-		} else if (workFlowAction.equals("approve")) {
+		} else if (savedAuditDetails.getState() != null && workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONVERIFY))
+        {//added abhishek for verify audit status
+			savedAuditDetails.setStatus(financialUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+					AuditConstants.AUDIT_PENDING_WITH_DEPARTMENT));
+        } 
+		else if (workFlowAction.equals("approve")) {
 			savedAuditDetails.setStatus(
 					auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT, AuditConstants.AUDIT_APPROVED_STATUS));
 			if (savedAuditDetails.getType().equals("Pre-Audit")) {
@@ -235,7 +240,7 @@ public class AuditService {
 			actionName = "Post Audit pending";
 			natureOfTask = "Post-Audit";
 		}
-		if ((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equals("Approve"))) {
+		if ((workFlowAction.equalsIgnoreCase("Forward") || workFlowAction.equals("Verify") || workFlowAction.equals("Approve"))) {
 			System.out.println("logic for workflow ::: " + workFlowAction);
 			String stateValue = "";
 			WorkFlowMatrix wfmatrix;
@@ -263,7 +268,23 @@ public class AuditService {
 										: "")
 						.withNextAction(actionName).withNatureOfTask(natureOfTask).withCreatedBy(user.getId())
 						.withtLastModifiedBy(user.getId());
-			} else {
+			}
+			else if(workFlowAction.contentEquals("Verify")) {//added by abhishek
+				 wfmatrix = auditRegisterWorkflowService.getWfMatrix(auditDetails.getStateType(), null, null, null,
+							auditDetails.getCurrentState().getValue(), null);
+		            if (stateValue.isEmpty())
+		                stateValue = wfmatrix.getNextState();
+				List<AppConfigValues> configValuesByModuleAndKey = appConfigValuesService.getConfigValuesByModuleAndKey(
+	                       FinancialConstants.MODULE_NAME_APPCONFIG, "AUDIT_DEFAULT");
+	            owenrPos=new Position();
+	            owenrPos.setId(Long.valueOf(configValuesByModuleAndKey.get(0).getValue()));
+	            auditDetails.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+	              .withComments(comment)
+	              .withStateValue(stateValue).withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+	              .withNextAction(actionName)
+	               .withNatureOfTask(natureOfTask);
+			}
+			else {
 				System.out.println("Forward");
 				if (designation != null && finalDesignationNames.get(designation.getName().toUpperCase()) != null)
 					stateValue = FinancialConstants.WF_STATE_FINAL_APPROVAL_PENDING;

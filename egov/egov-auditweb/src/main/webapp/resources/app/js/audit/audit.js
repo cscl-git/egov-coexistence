@@ -134,6 +134,13 @@ function setWorkFLowAction(name) {
 		$('#approvalPosition').prop('required',false);
 		$('#approvalComent').prop('required',true);
 	}
+	if(name=='Reject')
+	{
+		$('#approvalDepartment').prop('required',false);
+		$('#approvalDesignation').prop('required',false);
+		$('#approvalPosition').prop('required',false);
+		$('#approvalComent').prop('required',true);
+	}
 if($("#passUnderobjection").is(':checked')){
 		
 		$('#passUnderobjection').val("1");
