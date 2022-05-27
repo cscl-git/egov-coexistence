@@ -10,6 +10,6 @@ public interface AuditRepository extends JpaRepository<AuditDetails, Long>{
 	
 	AuditDetails findByAuditno(final String auditNumber);
 	AuditDetails findById(Long id);
-	AuditDetails findByBillId(Long id);
-
+	AuditDetails findByEgBillregister(EgBillregister egBillregister);
+	
 }

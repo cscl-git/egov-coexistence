@@ -61,6 +61,8 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
+import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.service.AuditService;
 import org.egov.audit.service.ManageAuditorService;
 import org.egov.audit.utils.AuditConstants;
 import org.egov.commons.Fund;
@@ -107,7 +109,8 @@ public class CancelBillAction extends BaseFormAction {
 	public final SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy", Constants.LOCALE);
 	@Autowired
 	private ExpenseBillRepository expenseBillRepository;
-	
+	@Autowired
+	private AuditService auditService;
 	@Autowired
 	 private ManageAuditorService manageAuditorService;
 	
@@ -360,7 +363,9 @@ public class CancelBillAction extends BaseFormAction {
 			    idListLength++;
 			}
 		System.out.println("id :::"+billId);
+		
 		EgBillregister egBillregister = expenseBillService.getById(billId);
+		AuditDetails auditDetails=auditService.findByEgBillregister(egBillregister);
 		User user = securityUtils.getCurrentUser();
 		Position owenrPos = new Position();
 		//List<ManageAuditor> auditorList=manageAuditorService.getAudiorsDepartmentByType(Integer.parseInt(egBillregister.getEgBillregistermis().getDepartmentcode()), "RSA");

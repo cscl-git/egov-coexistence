@@ -112,8 +112,8 @@ public class AuditService {
 		return auditRepository.findById(id);
 	}
 	
-	public AuditDetails findByBillId(final Long id) {
-		return auditRepository.findByBillId(id);
+	public AuditDetails findByEgBillregister(EgBillregister egBillregister) {
+		return auditRepository.findByEgBillregister(egBillregister);
 	}
 
 	public List<DocumentUpload> findByObjectIdAndObjectType(final Long objectId, final String objectType) {
