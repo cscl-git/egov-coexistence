@@ -207,7 +207,7 @@ public class ChequeRemittanceAction extends BaseFormAction {
     Map<String,Map<String,String>> serviceTypeMap = new HashMap<>();
     private String serviceTypeId = null;
     private int pageNum = 1;
-	private int pageSize = 20;
+	private int pageSize = 100;
 	protected PaginatedList searchResult;
 	
 	public void setPage(final int pageNum) {

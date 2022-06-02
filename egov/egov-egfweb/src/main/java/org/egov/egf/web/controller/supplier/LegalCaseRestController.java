@@ -33,7 +33,7 @@ public class LegalCaseRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getLegalCase", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3000","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getLegalCases( @ModelAttribute final LegalCaseSearchResult legalCaseSearchResult){
 		System.out.println("Inside Legal Case Rest Controleler");
 		 List<LegalCaseSearchResult> legalcaseSearchList =null;
@@ -95,7 +95,7 @@ public HttpHeaders getHeaders() {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
-		allowheaderList.add("http://localhost:3010");
+		allowheaderList.add("http://localhost:3000");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);
 		return headers;

@@ -171,6 +171,8 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 	private Long leadAuditorEmpNo;
 	
 	
+	private String retrachmentcomment;
+	
 	
 	public String getLeadAuditorName() {
 		return leadAuditorName;
@@ -421,6 +423,13 @@ public class AuditDetails extends StateAware implements java.io.Serializable {
 
 	public void setStateId(String stateId) {
 		this.stateId = stateId;
+	}
+	public String getRetrachmentcomment() {
+		return retrachmentcomment;
+	}
+
+	public void setRetrachmentcomment(String retrachmentcomment) {
+		this.retrachmentcomment = retrachmentcomment;
 	}
 
 }

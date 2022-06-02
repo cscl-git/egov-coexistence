@@ -214,7 +214,7 @@
 							+'</select>'+'</td>'
 								+'</tr>');
 				}
-				document.getElementById("historyDetailTable").scrollIntoView();
+				//document.getElementById("historyDetailTable").scrollIntoView();
 			 }
 		 })
 	}
@@ -260,7 +260,7 @@
 							
 				
 				}
-				document.getElementById("historyDetailTable").scrollIntoView();
+				//document.getElementById("historyDetailTable").scrollIntoView();
 			 }
 		
 		 })

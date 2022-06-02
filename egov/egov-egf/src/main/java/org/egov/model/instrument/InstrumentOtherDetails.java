@@ -72,6 +72,7 @@ public class InstrumentOtherDetails extends BaseModel {
     private BigDecimal reconciledAmount;
     private Date reconciledOn;
     private String dishonorBankRefNo;
+    private String reconciledComment;
 
     public Date getReconciledOn() {
         return reconciledOn;
@@ -120,5 +121,13 @@ public class InstrumentOtherDetails extends BaseModel {
     public void setDishonorBankRefNo(final String dishonorBankRefNo) {
         this.dishonorBankRefNo = dishonorBankRefNo;
     }
+
+	public String getReconciledComment() {
+		return reconciledComment;
+	}
+
+	public void setReconciledComment(String reconciledComment) {
+		this.reconciledComment = reconciledComment;
+	}
 
 }

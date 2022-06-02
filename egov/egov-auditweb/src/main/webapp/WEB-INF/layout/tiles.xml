@@ -115,7 +115,10 @@ value="/WEB-INF/views/audit/auditStateSearch.jsp" />
         <put-attribute name="page-title" value="Audit" cascade="true"/>
         <put-attribute name="body" value="/WEB-INF/views/audit/checkbill-list.jsp"/>
     </definition>
-
+<definition name="retranchmentSearchForm" extends="base_layout">
+        <put-attribute name="page-title" value="Audit" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/audit/retranchmentSearchForm.jsp"/>
+    </definition>
 
 
 

@@ -74,6 +74,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BigDecimalType;
 import org.hibernate.type.StringType;
+import org.jfree.util.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -295,7 +296,7 @@ public class ManualReconcileHelper {
        
 		StringBuffer query=new StringBuffer().append(" select string_agg(distinct v.vouchernumber, ',') as \"voucherNumber\" ,ih.id as \"ihId\",iv.voucherheaderid as \"vhId\", case when ih.instrumentNumber is null then 'Direct' else ih.instrumentNumber end as \"chequeNumber\", " + 
 				 " to_char(ih.instrumentdate,'dd/mm/yyyy') as \"chequeDate\" ,ih.instrumentAmount as \"chequeAmount\",rec.transactiontype as \"txnType\" , " 
-				 + " case when rec.transactionType='Cr' then 'Payment' else 'Receipt' end as \"type\" , insType.type as instrumentType , to_char(io.reconciledon,'dd/mm/yyyy') as \"reconciledOn\" FROM BANKRECONCILIATION rec, BANKACCOUNT BANK," 
+				 + " case when rec.transactionType='Cr' then 'Payment' else 'Receipt' end as \"type\" , insType.type as instrumentType , io.reconciledcomment as \"reconciledComment\", to_char(io.reconciledon,'dd/mm/yyyy') as \"reconciledOn\" FROM BANKRECONCILIATION rec, BANKACCOUNT BANK," 
 				 +" VOUCHERHEADER v ,egf_instrumentheader ih, egf_instrumentotherdetails io, egf_instrumentVoucher iv, egf_instrumenttype insType WHERE " 
 				 + " ih.bankAccountId = BANK.ID AND bank.id =:bankAccId AND IH.INSTRUMENTDATE >= '"+reconBean.getFromDate()+"' AND IH.INSTRUMENTDATE <= '"+reconBean.getReconciliationDate()+"' " 
 				 +" AND v.ID= iv.voucherheaderid and v.STATUS not in ("+voucherExcludeStatuses+") " +instrumentCondition  );
@@ -310,12 +311,12 @@ public class ManualReconcileHelper {
 			query.append(" AND ih.id_status in('4') ");
 		}
 				 query.append(" AND rec.instrumentHeaderId=cast(ih.id as varchar(100)) and iv.instrumentHeaderid=ih.id and io.instrumentheaderid=ih.id and insType.id=ih.instrumenttype and ih.instrumentNumber is not null" 
-				 + " group by ih.id,rec.transactiontype,insType.type,iv.voucherheaderid ,io.reconciledon" 
+				 + " group by ih.id,rec.transactiontype,insType.type,iv.voucherheaderid ,io.reconciledcomment,io.reconciledon" 
 				  
 				 + " union " 
 				  
 				 +" select string_agg(distinct v.vouchernumber, ',') as \"voucherNumber\" , ih.id as \"ihId\",iv.voucherheaderid as \"vhId\", case when ih.transactionnumber is null then 'Direct' else ih.transactionnumber end as \"chequeNumber\", " + 
-				 " to_char(ih.transactiondate,'dd/mm/yyyy') as \"chequedate\" ,ih.instrumentAmount as \"chequeamount\",rec.transactiontype as \"txnType\", case when rec.transactionType= 'Cr' then 'Payment' else 'Receipt' end as \"type\" , insType.type as instrumentType , to_char(io.reconciledon,'dd/mm/yyyy') as \"reconciledOn\" FROM BANKRECONCILIATION rec, BANKACCOUNT BANK," 
+				 " to_char(ih.transactiondate,'dd/mm/yyyy') as \"chequedate\" ,ih.instrumentAmount as \"chequeamount\",rec.transactiontype as \"txnType\", case when rec.transactionType= 'Cr' then 'Payment' else 'Receipt' end as \"type\" , insType.type as instrumentType ,io.reconciledcomment as \"reconciledComment\", to_char(io.reconciledon,'dd/mm/yyyy') as \"reconciledOn\" FROM BANKRECONCILIATION rec, BANKACCOUNT BANK," 
 				 +" VOUCHERHEADER v ,egf_instrumentheader ih, egf_instrumentotherdetails io, egf_instrumentVoucher iv, egf_instrumenttype insType WHERE ih.bankAccountId = BANK.ID AND bank.id = :bankAccId " 
 				 +" AND IH.transactiondate >= '"+reconBean.getFromDate()+"' AND IH.transactiondate <= '"+reconBean.getReconciliationDate()+"' " +instrumentCondition  
 				 +" AND v.ID= iv.voucherheaderid and v.STATUS not in ("+voucherExcludeStatuses+") ");
@@ -331,7 +332,7 @@ public class ManualReconcileHelper {
 
 				//"AND ((ih.id_status=(select id from egw_status where moduletype='Instrument' and description='Deposited') and ih.ispaycheque='0')or (ih.ispaycheque='1' and ih.id_status=(select id from egw_status where moduletype='Instrument' and description='New'))) " 
 				 query.append(" AND rec.instrumentHeaderId=cast(ih.id as varchar(100)) and iv.instrumentHeaderid=ih.id and io.instrumentheaderid=ih.id and insType.id=ih.instrumenttype and ih.transactionnumber is not null" 
-				 +" group by ih.id,rec.transactiontype,insType.type,iv.voucherheaderid,io.reconciledon " ); 
+				 +" group by ih.id,rec.transactiontype,insType.type,iv.voucherheaderid,io.reconciledcomment,io.reconciledon " ); 
         		
         
 			  System.out.println("###query:::"+query);
@@ -369,6 +370,7 @@ public class ManualReconcileHelper {
 		createSQLQuery.addScalar("type",StringType.INSTANCE);
 		createSQLQuery.addScalar("instrumentType",StringType.INSTANCE);
 		createSQLQuery.addScalar("reconciledOn",StringType.INSTANCE);
+		createSQLQuery.addScalar("reconciledComment",StringType.INSTANCE);
 		createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReconcileBean.class));
 	        list = (List<ReconcileBean>)createSQLQuery.list();
 	        try {
@@ -449,11 +451,13 @@ public class ManualReconcileHelper {
     }
 
     @Transactional
-	public void update(List<Date> reconDates, List<String> instrumentHeaders) {
-		int i=0;
+	public void update(List<Date> reconDates, List<String> reconComments, List<String> instrumentHeaders) {
+		//int i=0;
 		EgwStatus reconciledStatus = egwStatusHibernateDAO.getStatusByModuleAndCode(FinancialConstants.STATUS_MODULE_INSTRUMENT, FinancialConstants.INSTRUMENT_RECONCILED_STATUS);
 		Map<String,Date> instrumentIdAndDateMap = new HashMap<>();
-		try {
+		Map<String,String> instrumentIdAndCommentMap = new HashMap<>();
+		int len = 0;
+		/*try {
 		for(Date reconcileOn:reconDates)
 		{
 			if(reconcileOn!=null)
@@ -471,7 +475,32 @@ public class ManualReconcileHelper {
 		}
 		}catch(Exception e) {
 			e.printStackTrace();
+		}*/
+		//For Recon Comments
+		try {
+			len = reconDates.size();
+			if(len > 0) {
+				for(int j=0;j<len;j++) {
+					Date reconcileOn =  reconDates.get(j);
+					String reconcileComment =  reconComments.get(j);
+					String ihId = instrumentHeaders.get(j);
+					
+					if(!ihId.contains("rm_rec~")){
+						InstrumentHeader ih = instrumentHeaderService.reconcile(Long.parseLong(ihId),reconciledStatus ); 
+					    instrumentOtherDetailsService.reconcileNew(reconcileOn, reconcileComment,  Long.parseLong(ihId),ih.getInstrumentAmount());
+					}
+					else{
+						instrumentIdAndDateMap.put(ihId.split("rm_rec~")[1],reconcileOn);
+						instrumentIdAndCommentMap.put(ihId.split("rm_rec~")[1],reconcileComment);
+					}
+				}
+			}else {
+				Log.info("Recon Dates List Empty");
+			}
+		}catch(Exception e) {
+			e.printStackTrace();
 		}
+		
 		if(!instrumentIdAndDateMap.isEmpty()){
 		    List<Instrument> instruments = microserviceUtils.getInstruments(StringUtils.join(instrumentIdAndDateMap.keySet(),","));
 		    FinancialStatus finStatus = new FinancialStatus();
@@ -479,6 +508,7 @@ public class ManualReconcileHelper {
 		    finStatus.setName("Reconciled");
 		    instruments.stream().forEach(ins-> {
 		        ins.setReconciledOn(instrumentIdAndDateMap.get(ins.getId()));
+		        ins.setReconciledComment(instrumentIdAndCommentMap.get(ins.getId()));
 		    });
 		    microserviceUtils.updateInstruments(instruments, null, finStatus);
 		}

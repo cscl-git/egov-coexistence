@@ -151,14 +151,14 @@
 							<td style="display: none;"><form:textarea
 									path="checkList[${status.index}].auditor_comments"
 									id="checkList[${status.index}].auditor_comments"
-									required="required" class="form-control auditor_comments"
-									maxlength="200"></form:textarea></td>
+									 class="form-control auditor_comments" 
+									maxlength="200"></form:textarea></td><!-- required="required" removed by abhishek on 11052022 -->
 							<c:if test="${audit.status != 'Seen/Checked' }">
 								<td><form:textarea
 										path="checkList[${status.index}].user_comments"
 										id="checkList[${status.index}].user_comments"
-										class="form-control user_comments" required="required"
-										maxlength="200"></form:textarea></td>
+										class="form-control user_comments" 
+										maxlength="200"></form:textarea></td><!-- required="required" removed by abhishek on 11052022 -->
 							</c:if>
 							<c:if test="${audit.status == 'Seen/Checked' }">
 								<td><form:textarea
@@ -221,9 +221,24 @@
 				</div>
 			</div>
 		</div>
-
-		
-
+	<!-- added for retrachment -->
+		<%-- <c:if
+			test="${auditDetail.auditStatus == 'Created' || auditDetail.auditStatus == 'Pending with Auditor' || auditDetail.auditStatus == 'Pending with Section Officer' || auditDetail.auditStatus == 'Pending with Examiner'}">
+		 --%>	<div>
+				<div style="text-align: right;">
+					<div class="form-group">
+						<label class="col-sm-3 control-label text-left-audit"><spring:message
+								text="Retrenchment Comment" /> </label>
+						<div class="col-sm-3 add-margin">
+							<form:textarea class="form-control"
+								data-pattern="alphanumericwithspecialcharacters"
+								id="retrachmentcomment" path="retrachmentcomment" value="${auditDetail.retrachmentcomment}" 
+								maxlength="2000" />
+						</div>
+					</div>
+				</div>
+			</div>
+		<%-- </c:if> --%>
 	</div>
 </div>
 
@@ -289,5 +304,6 @@
 		</tr>
 	</table>
 </div>
+<script>
 
-
+</script>

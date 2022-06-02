@@ -1283,7 +1283,13 @@ function validate(){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
 		return false;
 	}
-	
+	var filename=document.forms[0].file.value;
+	if(filename ==null ||filename.length==0 ){
+		var confrm=confirm("Document not uploaded, do you want to proceed?");
+		if(!confrm){
+			return false;
+		}
+	}
 	/*if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
@@ -1679,29 +1685,38 @@ function validateSubLedger(Curraction) {
 	if (Curraction.value == 'Forward') {
 		
 		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
-		var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
-		var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
-		var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
-		
-
-		if (subLedgerGlCode == null || subLedgerGlCode == '') {
-			bootbox.alert('Please select subLedger Detail');
-			return false;
-		}else if (subLedgerType == null || subLedgerType == '') {
-			bootbox.alert('Please select subLedger Detail');
-			return false;
-		} else if (subLedgerName == null || subLedgerName == '') {
-			bootbox.alert('Please select subLedger Detail');
-			return false;
-		} else if (subLedgerAmount == null || subLedgerAmount == '') {
-			bootbox.alert('Please select subLedger Detail');
-			return false;
-		} 	
-
-
+			var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
+			var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
+			var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
+			if (subLedgerGlCode == null || subLedgerGlCode == '' || subLedgerType == null || subLedgerType == ''
+				|| subLedgerName == null || subLedgerName == '' || subLedgerAmount == null || subLedgerAmount == '') {
+				var txt;
+				if (confirm("No SubLedger added, Do you want to continue without adding subledger details. ")) {
+				    txt = "true";
+				  } else {
+				    txt = "false";
+				  }
+				if(txt=="true"){
+					return true;
+				}
+				else{ 
+					return false;
+				}
+			}
+			/*if (subLedgerGlCode == null || subLedgerGlCode == '') {
+				bootbox.alert('Please select subLedger Detail');
+				return false;
+			}else if (subLedgerType == null || subLedgerType == '') {
+				bootbox.alert('Please select subLedger Detail');
+				return false;
+			} else if (subLedgerName == null || subLedgerName == '') {
+				bootbox.alert('Please select subLedger Detail');
+				return false;
+			} else if (subLedgerAmount == null || subLedgerAmount == '') {
+				bootbox.alert('Please select subLedger Detail');
+				return false;
+			}*/
 	}else{
-		
-		
 		return true;
 	}
 

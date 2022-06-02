@@ -89,12 +89,18 @@
 	}
 	
 	function printEJV(){
-		var id = '<s:property value="voucherHeader.id"/>';
-		window.open("${pageContext.request.contextPath}/report/expenseJournalVoucherPrint-print.action?id="+id,'Print','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
+		//var id = '<s:property value="voucherHeader.id"/>';
+		//window.open("${pageContext.request.contextPath}/report/expenseJournalVoucherPrint-print.action?id="+id,'Print','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
+		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
+		document.forms[0].action = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+voucherHeaderId;
+		document.forms[0].submit(); 
 	}
 	function printJV(){
-		var id = '<s:property value="voucherHeader.id"/>';
-		window.open("${pageContext.request.contextPath}/voucher/journalVoucherPrint-print.action?id="+id,'Print','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
+		//var id = '<s:property value="voucherHeader.id"/>';
+		//window.open("${pageContext.request.contextPath}/voucher/journalVoucherPrint-print.action?id="+id,'Print','resizable=yes,scrollbars=yes,left=300,top=40, width=900, height=700');
+		var voucherHeaderId = '<s:property value="voucherHeader.id"/>';
+		document.forms[0].action = "/services/EGF/voucher/preApprovedVoucher-loadvoucherview.action?vhid="+voucherHeaderId;
+		document.forms[0].submit(); 
 	}
 function openSource(){
 	var url = '<s:property value='%{getSourcePath()}' />'
@@ -342,10 +348,28 @@ function onSubmit()
 					<%@ include file='../workflow/commonWorkflowMatrix-button.jsp'%>
 				</s:if>
 				<s:else>
-					<div class="buttonbottom" align="center">
+					<div class="buttonbottom" id="buttondiv">
+						<s:if test="%{type == finConstExpendTypeContingency}">
+							<input type="button" class="button" id="print" value="Print Preview"
+								action="expenseJournalVoucherPrint" method="print"
+								onclick="printEJV()" />
+						</s:if>
+						<s:else>
+						<s:if test="%{!finanicalYearAndClosedPeriodCheckIsClosed}">
+							<input type="button" class="button" id="print" value="Print Preview"
+								action="journalVoucherPrint" method="print" onclick="printJV()" />
+								</s:if>
+								<s:else>
+								<input type="button" name="button2" id="button2" value="Close"
+									class="button" onclick="window.parent.postMessage('close','*');window.close();" />
+								</s:else>
+						</s:else>
+			
+					</div>
+					<%-- <div class="buttonbottom" align="center">
 						<input type="button" name="button2" id="button2" value="<s:text name='lbl.close'/>"
 							class="button" onclick="javascript:window.parent.postMessage('close','*');" />
-					</div>
+					</div> --%>
 				</s:else>
 			</div>
 		</div>

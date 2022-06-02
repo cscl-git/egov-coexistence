@@ -69,6 +69,7 @@ import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.egf.model.ReconcileBean;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
+import org.jfree.util.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 
 @ParentPackage("egov")
@@ -109,6 +110,7 @@ public class ManualReconciliationAction extends BaseFormAction {
 	private List<ReconcileBean> unReconciledCheques;
 	List<String> instrumentHeaders;
 	List<Date> reconDates;
+	List<String> reconComments;
 	@Autowired
 	private BankHibernateDAO bankHibernateDAO;
         private Integer DEFAULT_LIMIT = 100;
@@ -217,23 +219,10 @@ public class ManualReconciliationAction extends BaseFormAction {
 	@ValidationErrorPage("search")
 	public String update()
 	{
-
-		manualReconcileHelper.update(reconDates,instrumentHeaders);
+		//Log.info("Recon Comments..:"+reconComments.toString());
+		manualReconcileHelper.update(reconDates, reconComments, instrumentHeaders);
 		return "update";
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	@Action(value = "/brs/manualReconciliation-generateReport")
 	@SuppressWarnings({ "unchecked", "deprecation" })
@@ -306,17 +295,14 @@ public class ManualReconciliationAction extends BaseFormAction {
 			e.printStackTrace();
 		}
 	    return result;
+	}
+
+	public List<String> getReconComments() {
+		return reconComments;
+	}
+
+	public void setReconComments(List<String> reconComments) {
+		this.reconComments = reconComments;
 	} 
-
-
-
-
-
-
-
-
-
-
-
 
 }

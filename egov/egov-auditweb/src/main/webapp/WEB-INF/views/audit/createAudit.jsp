@@ -50,7 +50,9 @@ window.onload = function checklistDate() {
 		var year = cDate.getFullYear();
 		currDate = currDate + "/" + year;*/
 	}
-
+	if (status == "Pending with Department") {
+		$('#retrachmentcomment').attr('readonly', true);
+	}
 }
 </script>
 <style>
@@ -129,12 +131,21 @@ textarea {
 						<div class="col-sm-3 add-margin">
 							<a href="#" id="sourceLink"
 								onclick="return openSource('${billSource}');">View Bill</a>
+								<c:if test="${null!=auditDetail.retrachmentcomment && auditDetail.auditStatus == 'Pending with Department'}">
+									<div>
+										<a href='javascript:void(0)' class="buttonsubmit"
+										onclick="updateCreditDebit()">Update
+										Credit Debit Details</a>
+									</div>	
+								</c:if>
 						</div>
 					</c:if>
+					
 				</div>
 			</div>
 			<form:hidden id="billId" path="billId" />
 			<form:hidden id="auditId" path="auditId" />
+			<%-- <form:hidden id="retrachmentcomment" path="retrachmentcomment" /> --%>
 			<form:hidden path="workFlowAction" id="workFlowAction" />
 			<form:hidden id="auditStatus" path="auditStatus" />
 		</div>
@@ -170,6 +181,15 @@ textarea {
 	</div>
 
 </form:form>
+<script>
+function updateCreditDebit(){
+	var id= document.getElementById("billId").value;
+	var aud= document.getElementById("auditId").value;
+	var url = "/services/EGF/expensebill/updateCreditDebit/"+ id+"/"+aud;
+	window.open(url,'','width=900, height=700');
+}
+
+</script>
 <script
 	src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 <script

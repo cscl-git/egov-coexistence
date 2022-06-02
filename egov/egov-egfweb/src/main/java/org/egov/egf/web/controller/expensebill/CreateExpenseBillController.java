@@ -369,7 +369,11 @@ public class CreateExpenseBillController extends BaseBillController {
     private String getMessageByStatus(final EgBillregister expenseBill, final String approverName, final String nextDesign) {
         String message = "";
         
-        if(expenseBill.getState().getValue().equalsIgnoreCase("Rejected"))
+        if(expenseBill.getState() != null && expenseBill.getStatus() != null && expenseBill.getStatus().getDescription().equalsIgnoreCase("Rejected") && expenseBill.getState().getValue().equalsIgnoreCase("Final Approval Pending") )
+        {
+        	message="Expense bill "+expenseBill.getBillnumber() +" has been send back to "+ approverName;
+        }
+        else if(expenseBill.getState().getValue().equalsIgnoreCase("Rejected"))
         {
         	message="Expense bill "+expenseBill.getBillnumber() +" has been rejected and sent back to Initiator";
         }
