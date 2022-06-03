@@ -158,17 +158,24 @@ $('.subLedgerCodeOT').typeahead({
 });
 
 $('.btn-wf-primary').click(function(){
+ 
 	var button = $(this).attr('id');
-	if (button != null && (button == 'Forward')) {
+			   
+	if (button != null && (button == 'Forward' || button == 'Verify')) {
 		if(!validateWorkFlowApprover(button))
 			return false;
 		if(!$("form").valid())
 			return false;
+					   
+			   
+	   
+				
 		if(validate()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
 			return false;
+  
 	 }
 	else if (button != null && (button == 'Reject')) {
 		
@@ -1263,6 +1270,7 @@ function addCustomEventListener(target,type,func){
 
 
 function validate(){
+
 	if(billamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.account.details'));
 		return false;
@@ -1295,6 +1303,7 @@ function validate(){
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
 		return false;
 	}*/
+ 
 	return true;
 }
 
@@ -1684,10 +1693,13 @@ function validateSubLedger(Curraction) {
 
 	if (Curraction.value == 'Forward') {
 		
+  
 		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
 			var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
 			var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
 			var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
+  
+
 			if (subLedgerGlCode == null || subLedgerGlCode == '' || subLedgerType == null || subLedgerType == ''
 				|| subLedgerName == null || subLedgerName == '' || subLedgerAmount == null || subLedgerAmount == '') {
 				var txt;
@@ -1716,11 +1728,17 @@ function validateSubLedger(Curraction) {
 				bootbox.alert('Please select subLedger Detail');
 				return false;
 			}*/
+
+
 	}else{
+  
+  
 		return true;
 	}
 
 }
+			  
+						  
 
 
 function validateFormGlcode(){
@@ -1731,6 +1749,7 @@ function validateFormGlcode(){
 		
 		if(i>0){
 		codes.push(options[i].value);
+	
 		}
 	}
 	
@@ -1757,3 +1776,23 @@ function validateFormGlcode(){
     return b;
     }
 	
+//himdri start
+function validateUpload(){
+
+	var filesize=document.forms[0].documentsSize.value;
+	if(filesize ==null ||filesize==0){
+ 
+			  
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+//himdri end
+ 
+			
