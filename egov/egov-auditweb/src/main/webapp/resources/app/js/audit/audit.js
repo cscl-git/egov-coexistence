@@ -84,37 +84,6 @@ function myFunction() {
 	}
 }
 
-/*function myFunctionRet() {
-	var checkBox = document.getElementById("retrachmentcheck");
-	// Get the output text
-	var text = document.getElementById("recomment");
-	
-	// If the checkbox is checked, display the output text
-	if (checkBox.checked == true) {
-		text.style.display = "block";
-		$('#retrachmentcheckvalue').val('Y');
-		//$('#retrachmentcheckvalue').attr('value', '#retrachmentcheck'.checked ? 'Y' : 'N');
-	} else {
-		text.style.display = "none";
-		$('#retrachmentcheckvalue').val('N');
-		//$('#retrachmentcheckvalue').attr('value', '#retrachmentcheck'.checked ? 'Y' : 'N');
-	}
-}
-function myFunctionRet1() {
-		var value = document.getElementById("retrachmentcheckvalue").value;
-		var checkBox = document.getElementById("retrachmentcheck");
-		// Get the output text
-		var text = document.getElementById("recomment");
-		// If the checkbox is checked, display the output text
-		if(value!=''){
-			$('#retrachmentcheck').prop('checked', true);
-			$('#retrachmentcheckvalue').val('Y');
-			text.style.display = "block";
-		} else {
-			$('#retrachmentcheckvalue').val('N');
-			text.style.display = "none";
-		}
-	}*/
 function setWorkFLowAction(name) {
 	console.log(name);
 	if (name == 'sectionOfficer'
@@ -145,9 +114,21 @@ if($("#passUnderobjection").is(':checked')){
 		
 		$('#passUnderobjection').val("1");
 	}
-	
+	checkRSA(name);
 }
 
+function chechRSA(name)
+{
+	if (name == 'sectionOfficer'
+		&& (document.getElementById('auditStatus').value == 'Created'
+				|| document.getElementById('auditStatus').value == 'Pending with Auditor' || document
+				.getElementById('auditStatus').value == 'Pending with Examiner')) {
+	if (document.getElementById('leadAuditorEmpNo').value == '-1') {
+				bootbox.alert("Please select the RSA employee");
+				return false;
+			}
+	}
+}
 
 function openSource(sourcepath){
 	window

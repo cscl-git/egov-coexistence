@@ -72,6 +72,8 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.ManageAuditorService;
+import org.egov.audit.utils.AuditConstants;
+import org.egov.audit.utils.AuditUtils;
 import org.egov.audit.service.AuditService;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bank;
@@ -194,6 +196,8 @@ public class UpdateExpenseBillController extends BaseBillController {
     private ChartOfAccountsService chartOfAccountsService;
     @Autowired
     private FinancialUtils financialUtils;
+    @Autowired
+	private AuditUtils auditUtils;
     @Autowired
     private CheckListService checkListService;
     @Autowired
@@ -624,6 +628,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
         } else {
             try {
+            	AuditDetails auditDetails=auditService.findByEgBillregister(egBillregister);
                 if (null != workFlowAction)
                 {
                 	egBillregister.setDocumentDetail(list);
@@ -649,6 +654,13 @@ public class UpdateExpenseBillController extends BaseBillController {
                             persistenceService.getSession().flush();
                     	}
                     	
+                    }
+                    if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONCANCEL))
+                    {
+                    	auditDetails.setState(null);
+        				auditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+            					AuditConstants.AUDIT_CANCELLED_STATUS));
+        				auditRepository.save(auditDetails);
                     }
                 }   
                 
@@ -806,6 +818,12 @@ public class UpdateExpenseBillController extends BaseBillController {
 		}
 		egBillregister.setBillamount(update_Debit_sum);
 		egBillregister.setPassedamount(update_Debit_sum);
+		if(null!=egBillregister.getEgBillregistermis() && null!=egBillregister.getEgBillregistermis().getBudgetaryAppnumber() && null!=egBillregister.getEgBillregistermis().getCurrentexpenditure())
+		{
+			System.out.println("current Exp before----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
+			egBillregister.getEgBillregistermis().setCurrentexpenditure(update_Debit_sum);
+			System.out.println("current Exp after----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
+		}
 		EgBillPayeedetails payee = new EgBillPayeedetails();
 		j = 0;
 		if(subledger_Amount!=null)
@@ -872,12 +890,14 @@ public class UpdateExpenseBillController extends BaseBillController {
 				retrachmentDetail.setAmountretrached(retra);
 				retrachmentDetail.setBilldetail(egBillregister.getEgBillregistermis().getNarration());
 				retrachmentDetail.setDepartment_name(department.getName());
+				retrachmentDetail.setRemarks(audit.getRetrachmentcomment());
 				retrachmentService.createRetrachment(retrachmentDetail);
 			} else {
 				retrachmentDetails.setAmountofbill(actual_Debit_sum);
 				retrachmentDetails.setAmountbyaudit(update_Credit_sum);
 				BigDecimal retra = actual_Credit_sum.subtract(update_Credit_sum);
 				retrachmentDetails.setAmountretrached(retra);
+				retrachmentDetails.setRemarks(audit.getRetrachmentcomment());
 				retrachmentService.createRetrachment(retrachmentDetails);
 			}
 
