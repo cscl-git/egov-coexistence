@@ -17,7 +17,7 @@
 						<input type="submit" id="sendToDept" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('department')" value="Send To Dept"/>
 						<input type="submit" id="sendToSO" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('sectionOfficer')" value="Send To RSA"/>
 						<input type="submit" id="sendToExaminer" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('examiner')" value="Send To Examiner"/>
-						
+						<input type="submit" id="reject" class="btn btn-primary btn-wf-primary"  onclick="setWorkFLowAction('reject')" value="Reject"/>
 				</c:if>
 				<c:if test="${auditDetail.auditStatus == 'Pending with Department' }">
 					<c:if test="${auditDetail.auditStateValue != 'Pending With Audit' }">

@@ -62,9 +62,11 @@ import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.audit.entity.AuditDetails;
+import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditService;
 import org.egov.audit.service.ManageAuditorService;
 import org.egov.audit.utils.AuditConstants;
+import org.egov.audit.utils.AuditUtils;
 import org.egov.commons.Fund;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
 import org.egov.egf.expensebill.repository.ExpenseBillRepository;
@@ -119,7 +121,10 @@ public class CancelBillAction extends BaseFormAction {
 	
 	@Autowired
     private FinancialUtils financialUtils;
-	
+	@Autowired
+	private AuditUtils auditUtils;
+	@Autowired
+	private AuditRepository auditRepository;
 	@Autowired
     private SecurityUtils securityUtils;
 
@@ -379,46 +384,65 @@ public class CancelBillAction extends BaseFormAction {
     	{
     		owenrPos.setId(null);
     	}
-		 try
-		 {
-			 
-		
-		 egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
-	                FinancialConstants.CONTINGENCYBILL_PENDING_CANCEL));
-		 if(egBillregister.getState().getValue().equalsIgnoreCase("END"))
-		 {
-			 egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
-	         .withComments("Send to Audit")
-	         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-	         .withNextAction("")
-	         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
-	         .withCreatedBy(user.getId())
-	         .withtLastModifiedBy(user.getId());
-		 }
-		 else
-		 {
-			 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
-	         .withComments("Send to Audit")
-	         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
-	         .withNextAction("")
-	         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
-	         .withCreatedBy(user.getId())
-	         .withtLastModifiedBy(user.getId());
-		 }
-		 
-		 System.out.println("end end");
-		 applyAuditing(egBillregister,user.getId());
-		 System.out.println("end end 1");
-		 expenseBillRepository.save(egBillregister);
-		 System.out.println("end end 2");
-		 persistenceService.getSession().flush();
-		 System.out.println("end end 3");
+		int flag=0;
+		try
+		{
+			if(null!=auditDetails && !auditDetails.getStatus().getCode().equalsIgnoreCase("Approved")) {	 
+				egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+		                     FinancialConstants.CONTINGENCYBILL_CANCELLED_STATUS));
+				egBillregister.setState(null);
+				egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
+		                .withComments("Cancelled")
+		                .withStateValue("Cancelled").withDateInfo(new Date())
+		                .withNextAction("")
+		                .withCreatedBy(user.getId()).withtLastModifiedBy(user.getId())
+		                .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME);
+				flag=1;
+				auditDetails.setState(null);
+				auditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+    					AuditConstants.AUDIT_CANCELLED_STATUS));
+				auditRepository.save(auditDetails);
+			}
+			else {
+				egBillregister.setStatus(financialUtils.getStatusByModuleAndCode(FinancialConstants.CONTINGENCYBILL_FIN,
+		                FinancialConstants.CONTINGENCYBILL_PENDING_CANCEL));
+			 if(egBillregister.getState().getValue().equalsIgnoreCase("END"))
+			 {
+				 egBillregister.transition().startNext().withSenderName(user.getUsername() + "::" + user.getName())
+		         .withComments("Send to Audit")
+		         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+		         .withNextAction("")
+		         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
+		         .withCreatedBy(user.getId())
+		         .withtLastModifiedBy(user.getId());
+			 }
+			 else
+			 {
+				 egBillregister.transition().progressWithStateCopy().withSenderName(user.getUsername() + "::" + user.getName())
+		         .withComments("Send to Audit")
+		         .withStateValue("Pending for Cancellation").withDateInfo(new Date()).withOwner(owenrPos).withOwnerName((owenrPos.getId() != null && owenrPos.getId() > 0L) ? getEmployeeName(owenrPos.getId()):"")
+		         .withNextAction("")
+		         .withNatureOfTask(FinancialConstants.WORKFLOWTYPE_EXPENSE_BILL_DISPLAYNAME)
+		         .withCreatedBy(user.getId())
+		         .withtLastModifiedBy(user.getId());
+			 }
+			} 
+			 System.out.println("end end");
+			 applyAuditing(egBillregister,user.getId());
+			 System.out.println("end end 1");
+			 expenseBillRepository.save(egBillregister);
+			 System.out.println("end end 2");
+			 persistenceService.getSession().flush();
+			 System.out.println("end end 3");
 		 }catch (Exception e) {
 			e.printStackTrace();
 		}
 		 //egBillregister
-		 System.out.println("end");
-		addActionMessage(getText("cacncel.bill.success.msg"));
+		System.out.println("end");
+		if(flag==1)
+			addActionMessage(getText("cbill.cancellation.succesful"));
+		else
+			addActionMessage(getText("cacncel.bill.success.msg"));
 		System.out.println("end 1");
 		prepareBeforeSearch();
 		System.out.println("end 2");
