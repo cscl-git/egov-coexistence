@@ -78,6 +78,7 @@
 						<th><spring:message code="auditorSignature" text="Signature of the Auditor" /></th>
 						<th><spring:message code="rsaSignature" text="Signature of RSA/Examiner" /></th>
 						<th><spring:message code="remarks" text="Remarks" /></th>
+						<th><spring:message code="status" text="Status" /></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -94,6 +95,7 @@
 							<td></td>
 							<td></td>
 							<td>${ret.remarks }</td>
+							<td>${ret.status}</td>
 						</tr>
 					</c:forEach>
 				</c:if>

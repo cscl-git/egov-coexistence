@@ -40,6 +40,8 @@ public class RetrachmentDetails extends AbstractAuditable implements java.io.Ser
 	private String billdetail;
 	private String remarks;
 	
+	@Transient
+	private String status;	
 	private String auditid;
 	
 	@Transient
@@ -217,6 +219,16 @@ public class RetrachmentDetails extends AbstractAuditable implements java.io.Ser
 	public void setRetdate(String retdate) {
 		this.retdate = retdate;
 	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	
+	
 	
 	
 

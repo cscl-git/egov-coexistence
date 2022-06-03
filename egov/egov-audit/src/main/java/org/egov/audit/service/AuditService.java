@@ -471,7 +471,7 @@ public class AuditService {
 			}
 		      
 		     	List<Object[]> list= null;//,to_char(r.date, 'dd-Mon-yyyy') as rdate
-				String sql="select to_char(r.retrachmentdate,'dd-Mon-yyyy') as rdate,r.department_name,r.amountofbill,r.amountbyaudit,r.amountretrached,r.billdetail,r.remarks from RetrachmentDetails r where r.retrachmentdate >= to_date('"+fromDateNew+"','dd/mm/yyyy') and date(r.retrachmentdate) <= to_date('"+toDateNew+"','dd/mm/yyyy')";
+				String sql="select to_char(r.retrachmentdate,'dd-Mon-yyyy') as rdate,r.department_name,r.amountofbill,r.amountbyaudit,r.amountretrached,r.billdetail,r.remarks, r.auditid from RetrachmentDetails r where r.retrachmentdate >= to_date('"+fromDateNew+"','dd/mm/yyyy') and date(r.retrachmentdate) <= to_date('"+toDateNew+"','dd/mm/yyyy')";
 				
 				if(auditDetail.getDepartment() != null) {
 						sql+=" and r.department_name ='"+auditDetail.getDepartment()+"'";
@@ -489,6 +489,17 @@ public class AuditService {
 						r.setAmountretrached(o[4]!=null?new BigDecimal(o[4].toString()):new BigDecimal("0"));
 						r.setBilldetail(o[5]!=null?o[5].toString():"");
 						r.setRemarks(o[6]!=null?o[6].toString():"");
+						r.setAuditid(o[7]!=null?o[7].toString():"");
+						String statusQuery = "select s.description from egw_status s, audit_details a where s.id=a.status_id and a.id="+r.getAuditid();
+						org.hibernate.Query statusdesc = persistenceService.getSession().createSQLQuery(statusQuery);
+						List<String> statusList = null;
+						statusList = statusdesc.list(); 
+						if(statusList != null) {
+							for(String d : statusList) {
+								r.setStatus(d != null? d: null );
+							}
+						}
+						
 						lst.add(r);
 					}
 				}
