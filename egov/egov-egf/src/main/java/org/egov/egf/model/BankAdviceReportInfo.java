@@ -253,7 +253,7 @@ public class BankAdviceReportInfo {
 		return reconciledOn;
 	}
 
-	public void setReconciledOn(Date reconciledOn) {
+	public void setReconciledOn(final Date reconciledOn) {
 		this.reconciledOn = reconciledOn;
 	}
 
@@ -261,7 +261,7 @@ public class BankAdviceReportInfo {
 		return reconciledComment;
 	}
 
-	public void setReconciledComment(String reconciledComment) {
+	public void setReconciledComment(final String reconciledComment) {
 		this.reconciledComment = reconciledComment;
 	}
 
