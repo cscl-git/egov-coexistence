@@ -115,7 +115,9 @@ $(document).ready(function(){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -138,6 +140,8 @@ $('.subLedgerCodeOT').typeahead({
 		document.getElementById('tempSubLedger[0].subLedgerCode').value=data.code;
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger[0].payTo').value=data.name;
+			document.getElementById('tempSubLedger[0].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger[0].ifscCode').value=data.ifsccode;
 			document.getElementById('tempSubLedger[0].detailkeyId').value=data.id;
 			document.getElementById('tempSubLedger[0].detailTypeId').value=document.getElementById('tempSubLedger[0].subLedgerType').value;
 			
@@ -355,7 +359,9 @@ function subledger_initialize(dataId){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -377,6 +383,8 @@ $('.subLedgerCodeOT').typeahead({
 		document.getElementById('tempSubLedger['+index+'].subLedgerCode').value=data.code;
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger['+index+'].payTo').value=data.name;
+			document.getElementById('tempSubLedger['+index+'].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger['+index+'].ifscCode').value=data.ifsccode;
 			document.getElementById('tempSubLedger['+index+'].detailkeyId').value=data.id;
 			document.getElementById('tempSubLedger['+index+'].detailTypeId').value=document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
 			
@@ -1244,6 +1252,8 @@ function clearAllDetails() {
 			document.getElementById('tempSubLedger[0].detailkeyId').value = "";
 			document.getElementById('tempSubLedger[0].subLedgerCode').value = "";
 			document.getElementById('tempSubLedger[0].payTo').value = "";
+			document.getElementById('tempSubLedger[0].bankAccount').value = "";
+			document.getElementById('tempSubLedger[0].ifscCode').value = "";
 			document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
 		}else{
 			var objects = $('.subledge-delete-row');
