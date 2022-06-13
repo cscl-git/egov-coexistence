@@ -38,8 +38,8 @@ public class AuditDetail {
     private int fund;
     private Date billFrom;
     private Date billTo;
-    private String fromDate;
-    private String toDate;
+    private Date fromDate;
+    private Date toDate;
     private List<PostAuditResult> postAuditResultList=new ArrayList<PostAuditResult>();
     private int counter = 0;
     private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
@@ -266,23 +266,31 @@ public class AuditDetail {
 	public void setRetrachmentDetailsList(List<RetrachmentDetails> retrachmentDetailsList) {
 		this.retrachmentDetailsList = retrachmentDetailsList;
 	}
-	public String getFromDate() {
-		return fromDate;
-	}
-	public void setFromDate(String fromDate) {
-		this.fromDate = fromDate;
-	}
-	public String getToDate() {
-		return toDate;
-	}
-	public void setToDate(String toDate) {
-		this.toDate = toDate;
-	}
+
+	/*
+	 * public String getFromDate() { return fromDate; } public void
+	 * setFromDate(String fromDate) { this.fromDate = fromDate; } public String
+	 * getToDate() { return toDate; } public void setToDate(String toDate) {
+	 * this.toDate = toDate; }
+	 */
+	
 	public String getAuditStateValue() {
 		return auditStateValue;
 	}
 	public void setAuditStateValue(String auditStateValue) {
 		this.auditStateValue = auditStateValue;
+	}
+	public Date getFromDate() {
+		return fromDate;
+	}
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+	public Date getToDate() {
+		return toDate;
+	}
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
 	}
 	
 

@@ -821,7 +821,12 @@ public class UpdateExpenseBillController extends BaseBillController {
 		if(null!=egBillregister.getEgBillregistermis() && null!=egBillregister.getEgBillregistermis().getBudgetaryAppnumber() && null!=egBillregister.getEgBillregistermis().getCurrentexpenditure())
 		{
 			System.out.println("current Exp before----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
+			BigDecimal previous_old=egBillregister.getEgBillregistermis().getPreviousexpenditure();
+			BigDecimal current_old=egBillregister.getEgBillregistermis().getCurrentexpenditure();
+			BigDecimal diff=current_old.subtract(update_Debit_sum);
 			egBillregister.getEgBillregistermis().setCurrentexpenditure(update_Debit_sum);
+			BigDecimal previousexpenditurenew=previous_old.subtract(diff);
+			egBillregister.getEgBillregistermis().setPreviousexpenditure(previousexpenditurenew);
 			System.out.println("current Exp after----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
 		}
 		EgBillPayeedetails payee = new EgBillPayeedetails();

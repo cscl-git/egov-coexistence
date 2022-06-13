@@ -54,13 +54,9 @@ function openHistory(auditId,checkListId){
 	}
 
 function searchCheck(){
-	alert("searchCheck");
 if($("#passUnderobjection").is(':checked')){
-		
 		$('#passUnderobjection').val("1");
-	}
-	
-	
+	}	
 }
 function downloadexcel(){
 	var billFrom = document.getElementById("billFrom").value;

@@ -33,6 +33,22 @@
 						<form:input id="toDate" path="toDate"
 							class="form-control datepicker" data-date-end-date="0d" required="required" placeholder="DD/MM/YYYY" />
 					</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.audit.dateFrom" text="Audit Date From" /><span
+						class="mandatory"></span> </label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="billFrom" path="billFrom" required="required"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
+					</div>
+					<label class="col-sm-3 control-label text-left-audit"><spring:message
+							code="lbl.audit.dateTo" text="Audit Date To" /><span
+						class="mandatory"></span> </label>
+					<div class="col-sm-3 add-margin">
+						<form:input id="billTo" path="billTo" required="required"
+							class="form-control datepicker" data-date-end-date="0d"
+							placeholder="DD/MM/YYYY" />
+					</div>
 					<label class="col-sm-3 control-label text-left-audit">
 					<spring:message code="lbl.department" text="Department" />
 					</label>
@@ -128,6 +144,11 @@
 <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+
+<script
+	src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
+<script
+	src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>    
 <style>
 @media ( max-width : 768px) {
 	.table-bordered tbody>tr {

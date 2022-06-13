@@ -461,17 +461,17 @@ public class AuditService {
 		try {
 			SimpleDateFormat sdf1 = new SimpleDateFormat("MM/dd/yyyy");
 	        SimpleDateFormat sdf2 = new SimpleDateFormat("dd/MM/yyyy");
-	        String fromDateNew="", toDateNew="";
-		      try {
-				 fromDateNew = sdf2.format(sdf1.parse(auditDetail.getFromDate()));
-				 toDateNew = sdf2.format(sdf1.parse(auditDetail.getToDate()));
-			} catch (ParseException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			/*
+			 * String fromDateNew="", toDateNew=""; try { fromDateNew =
+			 * sdf2.format(sdf1.parse(auditDetail.getFromDate())); toDateNew =
+			 * sdf2.format(sdf1.parse(auditDetail.getToDate())); } catch (ParseException e)
+			 * { // TODO Auto-generated catch block e.printStackTrace(); }
+			 */
 		      
 		     	List<Object[]> list= null;//,to_char(r.date, 'dd-Mon-yyyy') as rdate
-				String sql="select to_char(r.retrachmentdate,'dd-Mon-yyyy') as rdate,r.department_name,r.amountofbill,r.amountbyaudit,r.amountretrached,r.billdetail,r.remarks from RetrachmentDetails r where r.retrachmentdate >= to_date('"+fromDateNew+"','dd/mm/yyyy') and date(r.retrachmentdate) <= to_date('"+toDateNew+"','dd/mm/yyyy')";
+				String sql="select to_char(r.retrachmentdate,'dd-Mon-yyyy') as rdate,r.department_name,r.amountofbill,"+
+		     	" r.amountbyaudit,r.amountretrached,r.billdetail,r.remarks from RetrachmentDetails r "+
+				" where r.retrachmentdate >= '"+AuditConstants.DDMMYYYYFORMAT1.format(auditDetail.getFromDate())+"' and date(r.retrachmentdate) <= '"+AuditConstants.DDMMYYYYFORMAT1.format(auditDetail.getToDate())+"'";
 				
 				if(auditDetail.getDepartment() != null) {
 						sql+=" and r.department_name ='"+auditDetail.getDepartment()+"'";
