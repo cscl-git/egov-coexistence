@@ -222,7 +222,7 @@ table.its th {
 					dataType : "json",
 					success : function(r) {
 						data = r;
-						//console.log(data);
+						console.log(data.length);
 						//$("#tableRow").append("<thead><tr><th>Pex Number</th><th>Realization Date</th></thead>");
 						if(data.length > 0){
 							for (var i = 0; i < data.length; i++) {
@@ -309,7 +309,7 @@ table.its th {
 					<div class="col-sm-3 add-margin">
 						<form:input id="fromdate" path="fromDate"
 							class="form-control datepicker" data-date-end-date="0d"
-							required="required" placeholder="DD/MM/YYYY" />
+							required="required" placeholder="MM/DD/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-right"> <spring:message
 							code="asset-dept" text="To Date" /> <span class="mandatory"></span>
@@ -317,7 +317,7 @@ table.its th {
 					<div class="col-sm-3 add-margin">
 						<form:input id="todate" path="toDate"
 							class="form-control datepicker" data-date-end-date="0d"
-							required="required" placeholder="DD/MM/YYYY" />
+							required="required" placeholder="MM/DD/YYYY" />
 					</div>
 					<label class="col-sm-3 control-label text-right"> <spring:message
 							code="asset-dept" text="Bank Name" /> <span class="mandatory"></span>
@@ -371,7 +371,7 @@ table.its th {
 					</div>
 				</div>
 				<div class="panel-body">
-					<table class="table table-bordered" id="resultHeader">
+					<table class="table">
 						<thead>
 							<tr>
 								<th><spring:message code="lbl-sl-no" text="Sr. No." /></th>

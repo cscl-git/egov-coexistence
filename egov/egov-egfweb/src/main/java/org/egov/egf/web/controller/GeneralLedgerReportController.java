@@ -61,8 +61,8 @@ public class GeneralLedgerReportController {
 	private final static String CAPITAL_DIVISION_REPORT_SEARCH_HOME = "capitaldivision-search-home";
 	
 	
-	 @Autowired
-	    private FinancialYearDAO financialYearDAO;
+	@Autowired
+	private FinancialYearDAO financialYearDAO;
 	@Autowired
 	private DepartmentService departmentService;
 	@Autowired
@@ -72,10 +72,7 @@ public class GeneralLedgerReportController {
 	private BudgetDetailService budgetDetailService;
 	@Autowired
 	private EgovMasterDataCaching masterDataCache;
-	
-	
-	
-	
+
 	@Autowired
     @Qualifier("chartOfAccountsService")
     private ChartOfAccountsService chartOfAccountsService;
@@ -106,18 +103,14 @@ public class GeneralLedgerReportController {
 		model.addAttribute("departments", microserviceUtils.getDepartments());
 		model.addAttribute("funds", fundService.findAll());
 		model.addAttribute("functions", functionDAO.findAll());
-	
-		
 	}
 
-	
 	@RequestMapping(value = "home",  method = {RequestMethod.GET,RequestMethod.POST})
 	public String search(@ModelAttribute("generalLedgerPOJO")GeneralLedgerPOJO generalLedgerPOJO,  Model model) {
 	  System.out.println("generalledgerreport--->>>>");
 		prepareNewForm(model);
 		model.addAttribute("data_success",data_sucess );
 		return GERENAL_LEDGER_REPORT_SEARCH_HOME;
-
 	}
 	
 	
@@ -125,9 +118,8 @@ public class GeneralLedgerReportController {
 	public String result(@ModelAttribute("generalLedgerPOJO")GeneralLedgerPOJO generalLedgerPOJO,Model model) {
 		System.out.println("Results ------>>>>>");
 		
-		 List<String> glnames = new ArrayList();
+		List<String> glnames = new ArrayList();
 		StringBuilder queryString  = new StringBuilder(" ");
-		   
 		 	
 		queryString.append(" voucherdate >= TO_DATE('"+ generalLedgerPOJO.getFrom_date()+"','dd/mm/yyyy') and voucherdate <= TO_DATE('"+generalLedgerPOJO.getTo_date()+"','dd/mm/yyyy')" );
 		if(generalLedgerPOJO.getDepartment()!=null && !generalLedgerPOJO.getDepartment().isEmpty()) {
@@ -144,7 +136,6 @@ public class GeneralLedgerReportController {
 		prepareNewForm(model);
 	
 		return GERENAL_LEDGER_REPORT_SEARCH_HOME;
-
 	}
 	
 	
@@ -152,51 +143,39 @@ public class GeneralLedgerReportController {
 	public void xls(@ModelAttribute("generalLedgerPOJO")GeneralLedgerPOJO generalLedgerPOJO,Model model,HttpServletResponse response) {
 		System.out.println("Results ------>>>>>");
 		
-		 byte[] fileContent=null;
+		byte[] fileContent=null;
 		
-		 System.out.println("Results ------>>>>>");
-			
-			
-			System.out.println(generalLedgerPOJO.getTo_date());
-			System.out.println(generalLedgerPOJO.getFrom_date());
-			
-			System.out.println(generalLedgerPOJO.getDepartment());
-			
-			
-			StringBuilder queryString  = new StringBuilder(" ");
-			   
-			
-			  String head = header+" from "+generalLedgerPOJO.getFrom_date()+" to "+generalLedgerPOJO.getTo_date();
-			queryString.append(" voucherdate >= TO_DATE('"+ generalLedgerPOJO.getFrom_date()+"','dd/mm/yyyy') and voucherdate <= TO_DATE('"+generalLedgerPOJO.getTo_date()+"','dd/mm/yyyy')" );
-			if(generalLedgerPOJO.getDepartment()!=null && !generalLedgerPOJO.getDepartment().isEmpty()) {
-				queryString.append(" and department =:department");
-			}
-			List<DedicatedExpenseViewData> d = generalLedgerReportService.getDedicated(queryString,null, null,generalLedgerPOJO.getDepartment());
-			
-			
-			Map<String,String>headerData  = new HashMap<>();
-			headerData.put("h1", head);
-			fileContent = generalLedgerReportService.DedicatedExpense(headerData, d);
+		System.out.println("Results ------>>>>>");
+		System.out.println(generalLedgerPOJO.getTo_date());
+		System.out.println(generalLedgerPOJO.getFrom_date());
+		System.out.println(generalLedgerPOJO.getDepartment());
 		
-		 response.setContentType("application/ms-excel");
-		 response.setContentLength(fileContent.length); 
-		 response.setHeader("Expires:", "0"); // eliminates browser caching 
-		 response.setHeader("Content-Disposition","attachment; filename=salaryexpenditure.xls"); 
-		 try { 
-			 OutputStream outStream =response.getOutputStream(); 
+		StringBuilder queryString  = new StringBuilder(" ");
+		
+		String head = header+" from "+generalLedgerPOJO.getFrom_date()+" to "+generalLedgerPOJO.getTo_date();
+		queryString.append(" voucherdate >= TO_DATE('"+ generalLedgerPOJO.getFrom_date()+"','dd/mm/yyyy') and voucherdate <= TO_DATE('"+generalLedgerPOJO.getTo_date()+"','dd/mm/yyyy')" );
+		if(generalLedgerPOJO.getDepartment()!=null && !generalLedgerPOJO.getDepartment().isEmpty()) {
+			queryString.append(" and department =:department");
+		}
+		List<DedicatedExpenseViewData> d = generalLedgerReportService.getDedicated(queryString,null, null,generalLedgerPOJO.getDepartment());
+		
+		Map<String,String>headerData  = new HashMap<>();
+		headerData.put("h1", head);
+		fileContent = generalLedgerReportService.DedicatedExpense(headerData, d);
+		
+		response.setContentType("application/ms-excel");
+		response.setContentLength(fileContent.length); 
+		response.setHeader("Expires:", "0"); // eliminates browser caching 
+		response.setHeader("Content-Disposition","attachment; filename=salaryexpenditure.xls"); 
+		try { 
+			OutputStream outStream =response.getOutputStream(); 
 			 outStream.write(fileContent); outStream.flush();
-		 		  }
-		 		  catch(Exception ex) {
-		 		  
-		 		  }
-	
+		 }catch(Exception ex) {
+			 System.err.println("Error : While creating Excel Report."+ex.getMessage());
+ 		 }
 		//return GERENAL_LEDGER_REPORT_SEARCH_HOME;
-
 	}
 
-	
-	
-	
 	@RequestMapping(value = "capitalrevenuehome",  method = {RequestMethod.GET,RequestMethod.POST})
 	public String capitalRevenuesearchhome(@ModelAttribute("capitalRevenueRequestPojo")CapitalRevenueRequestPojo capitalRevenueRequestPojo, 
 			Model model,HttpServletRequest request) {
@@ -204,9 +183,7 @@ public class GeneralLedgerReportController {
 		prepareNewForm(model);
 		model.addAttribute("data_success",data_sucess );
 		return CAPITAL_REVENUE_REPORT_SEARCH_HOME;
-
 	}
-	
 	
 	@RequestMapping(value = "capitalrevenuehomeresults",  method = {RequestMethod.GET,RequestMethod.POST})
 	public String capitalRevenuesearch(@ModelAttribute("capitalRevenueRequestPojo")CapitalRevenueRequestPojo capitalRevenueRequestPojo,  Model model,HttpServletResponse response,HttpServletRequest request) {

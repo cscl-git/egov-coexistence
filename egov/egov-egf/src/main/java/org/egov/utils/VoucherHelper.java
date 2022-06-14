@@ -54,7 +54,9 @@ import static org.egov.infra.utils.ApplicationConstant.UNDERSCORE;
 
 import java.io.Serializable;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -81,6 +83,7 @@ import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.voucher.VoucherDetails;
 import org.egov.pims.service.EisUtilService;
+import org.egov.services.voucher.VoucherService;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,6 +101,7 @@ public class VoucherHelper {
 	public static final String DEFAULT_SEQUENCE_PREFIX = "SQ_";
 	@SuppressWarnings("unchecked")
 	private PersistenceService persistenceService;
+	private VoucherService voucherService;
 	@Autowired
 	private EisCommonService eisCommonService;
 	@Autowired
@@ -200,10 +204,23 @@ public class VoucherHelper {
 				misQuery.append(" and billmis.fund.id=")
 						.append(egBillRegister.getEgBillregistermis().getFund().getId());
 
-			if (null != egBillRegister.getEgBillregistermis().getDepartmentcode() && !egBillRegister.getEgBillregistermis().getDepartmentcode().equals("-1")) {
-				misQuery.append(" and billmis.departmentcode='");
-				misQuery.append(egBillRegister.getEgBillregistermis().getDepartmentcode()+"'");
+			System.out.println("Starting New..");
+			VoucherHelper voucher = new VoucherHelper();
+			String res = voucher.isAllowedToViewDepartmentData();
+			System.out.println("Allowed Deptt..:"+res);
+			if(!res.equals("")) {
+				if(res.equalsIgnoreCase("All")) {
+					if (null != egBillRegister.getEgBillregistermis().getDepartmentcode() && !egBillRegister.getEgBillregistermis().getDepartmentcode().equals("-1")) {
+						misQuery.append(" and billmis.departmentcode='");
+						misQuery.append(egBillRegister.getEgBillregistermis().getDepartmentcode()+"'");
+					}
+				}else {
+					misQuery.append(" and billmis.departmentcode='"+res+"'");
+					//misQuery.append(egBillRegister.getEgBillregistermis().getDepartmentcode()+"'");
+				}
 			}
+			System.out.println("Done..");
+			//}
 			if (null != egBillRegister.getEgBillregistermis().getFunctionaryid()) {
 				misQuery.append(" and billmis.functionaryid.id=");
 				misQuery.append(egBillRegister.getEgBillregistermis().getFunctionaryid().getId());
@@ -232,6 +249,43 @@ public class VoucherHelper {
 		return misQuery.toString();
 
 	}
+	
+	// Check If a user has permission to view Other Department Data. If Accounts Department, then allow all
+	public String isAllowedToViewDepartmentData() {
+		String retVal = "";
+		//List<Department> assignedDepartments =  getAllAssgnDeptforUser();
+		Department assignedDepartment = null;
+		try {
+			assignedDepartment = getAssignedDeptforUser();//getDepartmentOfUser();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		/*boolean flag = false;
+		if(assignedDepartments.size()>0) {
+			for(Department dept : assignedDepartments) {
+				if(dept.getName().equalsIgnoreCase("Accounts Branch")) {
+					retVal = "All";
+					flag = true;
+					break;
+				}else {
+					retVal += dept.getName() +",";
+				}
+			}
+			if(!flag) {
+				retVal = retVal.substring(0, retVal.lastIndexOf(","));
+			}
+		}*/
+		if(assignedDepartment != null) {
+			System.out.println("Assigned Department Name.."+assignedDepartment.getName());
+			if(assignedDepartment.getName().equalsIgnoreCase("Accounts Branch")) {
+				retVal = "All";
+			}else {
+				retVal= assignedDepartment.getName();
+			}
+		}
+		System.out.println("Allowed Departments..."+retVal);
+		return retVal;
+	}
 
 	/**
 	 * Constructs the corresponding sequence name for an EG_NUMBERS record. E.g.
@@ -251,14 +305,34 @@ public class VoucherHelper {
 		final StringBuffer numDateQuery = new StringBuffer();
 		try {
 
-			if (null != billDateFrom && StringUtils.isNotEmpty(billDateFrom))
-				numDateQuery.append(" and br.billdate>='")
+			/*if (null != billDateFrom && StringUtils.isNotEmpty(billDateFrom))
+				numDateQuery.append(" and br.billdate>= '")
 						.append(Constants.DDMMYYYYFORMAT1.format(Constants.DDMMYYYYFORMAT2.parse(billDateFrom)))
 						.append("'");
 			if (null != billDateTo && StringUtils.isNotEmpty(billDateTo))
 				numDateQuery.append(" and br.billdate<='")
 						.append(Constants.DDMMYYYYFORMAT1.format(Constants.DDMMYYYYFORMAT2.parse(billDateTo)))
+						.append("'");*/
+			/*if (null != billDateFrom && StringUtils.isNotEmpty(billDateFrom))
+				numDateQuery.append(" and br.billdate>=CAST('")
+						.append(Constants.DDMMYYYYFORMAT1.format(Constants.DDMMYYYYFORMAT2.parse(billDateFrom)))
+						.append("' AS DATE)");
+			if (null != billDateTo && StringUtils.isNotEmpty(billDateTo))
+				numDateQuery.append(" and br.billdate<=CAST('")
+						.append(Constants.DDMMYYYYFORMAT1.format(Constants.DDMMYYYYFORMAT2.parse(billDateTo)))
+						.append("' AS DATE)");*/
+			
+			if (null != billDateFrom && StringUtils.isNotEmpty(billDateFrom))
+				numDateQuery.append(" and br.billdate >= '")
+						.append(Constants.DDMMYYYYFORMAT4.format(Constants.DDMMYYYYFORMAT2.parse(billDateFrom)))
 						.append("'");
+			
+			if (null != billDateTo && StringUtils.isNotEmpty(billDateTo))
+				numDateQuery.append(" and br.billdate<='")
+						.append(Constants.DDMMYYYYFORMAT4.format(Constants.DDMMYYYYFORMAT2.parse(billDateTo)))
+						.append("'");
+			LOGGER.info("Bill Date To..:"+billDateTo);
+			endDateCalculation(billDateTo);
 		} catch (final ParseException e) {
 			if (LOGGER.isDebugEnabled())
 				LOGGER.debug("Exception occured while parsing date" + e);
@@ -268,7 +342,33 @@ public class VoucherHelper {
 		}
 		return numDateQuery.toString();
 	}
-
+	
+	public static String endDateCalculation(String billDate) {
+		String retVal = "";
+		Date endDate;
+		try {
+			//String dtObj = Constants.DDMMYYYYFORMAT2.parse(billDate);
+			endDate = Constants.DDMMYYYYFORMAT4.parse(billDate);
+			endDate.setHours(23);
+			endDate.setMinutes(59);
+			endDate.setSeconds(59);
+			//Constants.DDMMYYYYFORMAT4.format(Constants.DDMMYYYYFORMAT2.parse(billDate))
+			retVal = endDate.toString();
+		} catch (ParseException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		/*Date startDate = cal.getTime();
+		 cal.set(Calendar.HOUR_OF_DAY, 23);
+		 cal.set(Calendar.MINUTE, 59);
+		 cal.set(Calendar.SECOND, 59);
+		 cal.set(Calendar.MILLISECOND, 999);
+		 Date endDate = cal.getTime();*/
+		System.out.println("Return Formatted Date..:"+retVal);
+		return retVal;
+	}
+//CAST(billDateFrom AS DATE)
 	public String getEg_Voucher(final String vouType, final String fiscalPeriodIdStr)
 			throws TaskFailedException, Exception {
 		if (LOGGER.isDebugEnabled())
@@ -366,6 +466,18 @@ public class VoucherHelper {
 		return list;
 	}
 
+	/*public Department getDepartmentOfUser() {
+		long loggedInUser = ApplicationThreadLocals.getUserId();//.intValue();
+		System.out.println("user Id..."+loggedInUser);
+		Department dept = null;
+		try {
+			dept = eisCommonService.getDepartmentForUser(loggedInUser);
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+        return dept;
+    }*/
+	
 	public List<Department> getAllAssgnDeptforUser() {
 		new HashMap<String, String>();
 		// paramMap.put("code", employee.getCode());
@@ -380,6 +492,18 @@ public class VoucherHelper {
 				departmentList.add(employeeView.getDepartment());
 		}
 		return departmentList;
+	}
+	
+	public Department getAssignedDeptforUser() {
+		System.out.println("Starting getAssignedDeptforUser");
+		Department dept = null;
+		try {
+			dept = voucherService.getCurrentDepartment();
+		}catch(Exception e) {
+			e.printStackTrace();
+		}
+		System.out.println("Done.."+dept);
+		return dept;
 	}
 	
 	public List<String> getVoucherNamesByType(String voucherType){
@@ -549,6 +673,10 @@ public class VoucherHelper {
 
 	public void setFiscalPeriodHibernateDAO(FiscalPeriodHibernateDAO fiscalPeriodHibernateDAO) {
 		this.fiscalPeriodHibernateDAO = fiscalPeriodHibernateDAO;
+	}
+
+	public void setVoucherService(VoucherService voucherService) {
+		this.voucherService = voucherService;
 	}
 
 }

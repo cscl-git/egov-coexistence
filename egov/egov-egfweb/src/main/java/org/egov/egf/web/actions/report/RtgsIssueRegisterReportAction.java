@@ -576,7 +576,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 							+ " gld.amount as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch,"
 							+ " ba.accountnumber as accountNumber,"
-							+ " ihod.reconciledComment as reconciledComment, to_char(ihod.reconciledOn,'dd/mm/yyyy') as reconciledOn"
+							+ " ihod.reconciledComment as reconciledComment, ihod.reconciledOn as reconciledOn"
 							+ " FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,"
 							+ " generalledgerdetail gld, egf_instrumentotherdetails ihod,"
 							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat, accountdetailkey a WHERE "
