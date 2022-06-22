@@ -1790,6 +1790,7 @@ function validateFormGlcode(workFlowAction){
 					if( workFlowAction=='Forward'){
 					alert("Amount is invalid in Subledger for glocode "+glocode_alert);
 					return ;
+	  
 				}		 
 			}	 
 			}	 
@@ -1846,8 +1847,12 @@ function validateFormGlcode(workFlowAction){
 			var approvalDesignation=document.getElementById('approvalDesignation').value;
 			var approvalPosition=document.getElementById('approvalPosition').value;
 			var approvalComent=document.getElementById('approvalComent').value;
-			if(workFlowAction=='Forward')
+			if(workFlowAction=='Forward' || workFlowAction=='Verify')
 			{
+				if(validateUpload()){
+					status = true;
+				}else
+				  return false;   
 				if(approvalDepartment == null || approvalDepartment == '' ||approvalDepartment=='-1')
 				{
 					bootbox.alert('Please select approval department details');
@@ -1876,7 +1881,21 @@ function validateFormGlcode(workFlowAction){
 	
 }
 
+function validateUpload(){
 
 
+
+	var filesize=document.forms[0].documentsSize.value;
+	if(filesize ==null ||filesize==0){
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+			 return false;
+			}
+	     }
+		}
+	return true;
+	}
 
 

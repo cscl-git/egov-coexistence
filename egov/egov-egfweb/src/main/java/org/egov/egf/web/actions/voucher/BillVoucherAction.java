@@ -167,6 +167,7 @@ public class BillVoucherAction extends BaseVoucherAction {
                         .append(Constants.DDMMYYYYFORMAT1
                                 .format(Constants.DDMMYYYYFORMAT2.parse(voucherTypeBean.getVoucherDateTo())))
                         .append("'");
+            System.out.println("voucher from bill query"+query.toString());
             preApprovedVoucherList = persistenceService.findAllBy(query.toString(), 4);
             populateDepartmentNames();
             if (preApprovedVoucherList.size() == 0) {

@@ -346,6 +346,7 @@ public class RemitRecoveryService {
         query.append("   " + getMisSQlQuery(voucherHeader))
                 .append(" ORDER BY vh.VOUCHERNUMBER,  vh.VOUCHERDATE");
 
+        System.out.println("getRecoveryDetails | query := " + query.toString());
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("RemitRecoveryService | getRecoveryDetails | query := " + query.toString());
 

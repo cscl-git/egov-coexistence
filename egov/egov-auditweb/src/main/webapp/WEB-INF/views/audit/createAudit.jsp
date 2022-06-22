@@ -157,9 +157,10 @@ textarea {
 				<jsp:include page="audit-billDetails.jsp" />
 			</div>
 		</c:if>
-		<jsp:include page="billdocument-upload.jsp" />
-		<br> <br>
-		<jsp:include page="commonworkflowhistory-view.jsp" />
+		
+			<jsp:include page="billdocument-upload.jsp" />
+			<jsp:include page="commonworkflowhistory-view.jsp" />
+		
 		<c:if test="${mode !='view' }">
 			<c:if test="${auditDetail.auditStatus != 'Pending with Department' }">
 				<div class="show-row form-group">
