@@ -499,7 +499,6 @@ public class AuditService {
 								r.setStatus(d != null? d: null );
 							}
 						}
-						
 						lst.add(r);
 					}
 				}
