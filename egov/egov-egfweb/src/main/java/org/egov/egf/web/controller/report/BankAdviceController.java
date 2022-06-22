@@ -59,6 +59,7 @@ public class BankAdviceController {
 //	public static final SimpleDateFormat DDMMYYYYFORMAT2 = new SimpleDateFormat("dd hh:mm:ss", LOCALE);
 	
 	List<InstrumentHeader> pexList = new ArrayList<InstrumentHeader>();
+	long pexListSize;
 
 	@RequestMapping(value = "/bankAdviceReport")
 	public String search(@ModelAttribute("bankAdvice") final BankAdvice bankAdvice, final Model model,
@@ -128,6 +129,7 @@ public class BankAdviceController {
 			}
 		}
 		System.out.println("Pex List Size..:"+pexList.size());
+		pexListSize = pexList.size();
 		return pex;
 	}
 
@@ -140,13 +142,16 @@ public class BankAdviceController {
 				Long.parseLong(instrumentHeader.getAccountNumber()), instrumentHeader.getFromDate(),
 				instrumentHeader.getToDate());
 		System.out.println("Pex Number Size..:"+pexNumbers.size());
+		System.out.println("Pex Number Size Older..:"+pexListSize);
+		int j = 0;
 		try {
-			for (int i = 0; i < pexNumbers.size(); i++) {
+			for (int i = 0; i < pexListSize; i++) {//pexNumbers.size()
+				j=i;
 				String pex = request.getParameter("transactionNumber[" + i + "].pex");
 				String realizationDate = request.getParameter("realDate[" + i + "].pex");
 				System.out.println("Pex Acc No..:"+pex);
 				System.out.println("Pex realization Date.:"+realizationDate);
-				if (realizationDate != null) {
+				if (!realizationDate.equalsIgnoreCase("") && realizationDate != null) {		//.isEmpty()) {
 					System.out.println(i+".Realization Date Not NUll.."+realizationDate);
 					DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 					Date date = dateFormat.parse(realizationDate);
@@ -156,6 +161,8 @@ public class BankAdviceController {
 				}
 			}
 		} catch (Exception e) {
+			System.out.println("......."+j);
+			e.printStackTrace();
 			model.addAttribute("message", "Failure: Realization Date is Not Saved with Corresponding PEX Numbers.");
 			return "success_saved";
 		}
@@ -231,6 +238,14 @@ public class BankAdviceController {
 
 	public void setPexList(List<InstrumentHeader> pexList) {
 		this.pexList = pexList;
+	}
+
+	public long getPexListSize() {
+		return pexListSize;
+	}
+
+	public void setPexListSize(long pexListSize) {
+		this.pexListSize = pexListSize;
 	}
 
 }

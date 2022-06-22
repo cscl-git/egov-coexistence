@@ -102,9 +102,7 @@
 						class="form-control" value="<s:property value="reconciledComment" />"/> --%>
 						
 						<textarea cols="30" rows="2" id="reconComments<s:property value="#status.index"/>" 
-							name="reconComments[<s:property value="#status.index"/>]">
-							<s:property value="reconciledComment" />
-						</textarea>
+							name="reconComments[<s:property value="#status.index"/>]" value="<s:property value="reconciledComment" />"><s:property value="reconciledComment"/></textarea>
 					</td>
 				</tr>
 			</s:iterator>

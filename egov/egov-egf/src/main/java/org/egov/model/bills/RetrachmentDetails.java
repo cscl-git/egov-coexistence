@@ -226,7 +226,5 @@ public class RetrachmentDetails extends AbstractAuditable implements java.io.Ser
 	public void setStatus(String status) {
 		this.status = status;
 	}
-	
-	
 
 }

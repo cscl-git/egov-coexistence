@@ -1878,13 +1878,9 @@ function validateFormGlcode(workFlowAction){
 	document.forms[0].action='/services/EGF/refund/refundCreateBlank';
 	document.forms[0].submit();
 	return true;
-	
 }
 
 function validateUpload(){
-
-
-
 	var filesize=document.forms[0].documentsSize.value;
 	if(filesize ==null ||filesize==0){
 		var filename=document.forms[0].file.value;
@@ -1897,5 +1893,3 @@ function validateUpload(){
 		}
 	return true;
 	}
-
-

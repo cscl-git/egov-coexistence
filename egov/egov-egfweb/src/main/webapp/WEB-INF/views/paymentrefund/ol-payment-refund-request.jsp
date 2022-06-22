@@ -230,6 +230,8 @@
 					<th><spring:message code="lbl.detailed.type" text="Detailed Type"/></th>
 					<th><spring:message code="lbl.detailed.code" text="Detailed Code"/></th>
 					<th><spring:message code="lbl.detailed.key" text="Detailed Key"/></th>
+					<th><spring:message code="lbl.bank.account" text="Bank Account"/></th>
+					<th><spring:message code="lbl.ifsc.code" text="IFSC Code"/></th>
 					<th><spring:message code="lbl.rpamount" text="Amount(Rs.)"/></th>
 					<th><spring:message code="lbl.action" text="Action"/></th>
 				</tr>
@@ -258,6 +260,14 @@
 				  </td>
 				  <td>
 				  <input type="text" class="form-control subledger_Payto" id="tempSubLedger[0].payTo" name="egBillregistermis.payto" value="" data-idx="0" maxlength="350" />
+				  
+				  </td>
+				  				  <td>
+				  <input type="text" class="form-control subledger_Bankaccount" id="tempSubLedger[0].bankAccount" name="egBillregistermis.bankaccount" value="" data-idx="0" maxlength="350" />
+				  
+				  </td>
+				  				  <td>
+				  <input type="text" class="form-control subledger_Ifsccode" id="tempSubLedger[0].ifscCode" name="egBillregistermis.ifsccode" value="" data-idx="0" maxlength="350" />
 				  
 				  </td>
 				  <td>
@@ -296,6 +306,14 @@
 				  </td>
 				  <td>
 				  <input type="text" class="form-control subledger_Payto" id="tempSubLedger[0].payTo" name="egBillregistermis.payto" value="" data-idx="0" maxlength="350" />
+				  
+				  </td>
+				  				  <td>
+				  <input type="text" class="form-control subledger_Bankaccount" id="tempSubLedger[0].bankAccount" name="egBillregistermis.bankaccount" value="" data-idx="0" maxlength="350" />
+				  
+				  </td>
+				  				  <td>
+				  <input type="text" class="form-control subledger_Ifsccode" id="tempSubLedger[0].ifscCode" name="egBillregistermis.ifsccode" value="" data-idx="0" maxlength="350" />
 				  
 				  </td>
 				  <td>

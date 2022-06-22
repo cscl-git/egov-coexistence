@@ -53,8 +53,12 @@
 
 <html>
 <head>
-<meta http-equiv="Content-Type"
-	content="text/html; charset=windows-1252">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+
+<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css"	rel="stylesheet" />
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+
 <style type="text/css">
 #codescontainer {
 	position: absolute;
@@ -252,13 +256,14 @@ $(document).ready(function() {
 							data-inputmask="'mask': 'd/m/y'" /></td> --%>
 					<td class="greybox"><s:text name="report.pexassignedfromdate" />:</td>
 					<s:date name="fromDate" format="dd/MM/yyyy" var="fromDateId" />
-					<td class="greybox"><s:textfield name="rtgsAssignedFromDate" id="rtgsAssignedFromDate"
-					maxlength="20"
-					onkeyup="DateFormat(this,this.value,event,false,'3')"
-					value="%{fromDateId}" autocomplete="off"/><a
-					href="javascript:show_calendar('forms[0].rtgsAssignedFromDate');"
+					<td class="greybox">
+					<s:textfield name="rtgsAssignedFromDate" id="rtgsAssignedFromDate" 
+						cssClass="form-control datepicker" value="%{fromDateId}"
+						 onkeyup="DateFormat(this,this.value,event,false,'3')"/>
+					<a href="javascript:show_calendar('forms[0].rtgsAssignedFromDate');"
 					style="text-decoration: none">&nbsp;<img
-					src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a></td>
+					src="/services/egi/resources/erp2/images/calendaricon.gif" border="0" /></a>
+					</td>
 					<%-- <td class="greybox"><s:text name="report.pexassignedtodate" />:</td>
 					<td class="greybox"><s:date name="toDate" var="toDateId"
 							format="dd/MM/yyyy" /> <s:textfield id="rtgsAssignedToDate"
@@ -367,7 +372,7 @@ $(document).ready(function() {
 					<!-- New Fields Added -->	
 					<th><spring:message code="lbl.status" text="Reconcile Date" /></th>
 					<th><spring:message code="lbl.status" text="Reconcile Comment" /></th>
-					<th><spring:message code="lbl.status" text="PEX Realization Date" /></th>
+					<th><spring:message code="lbl.status" text="PEX sent to bank date" /></th>
 				</tr>
 			</thead>
 			<tbody>

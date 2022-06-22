@@ -528,7 +528,7 @@ public class GeneralLedgerReport {
 							// cgn = cashbook.getCGN(vhId1);
 							// type = resultset1.getString("type");
 
-							final String sqlString1 = "select reciept_number  from vouchermis where id=?";
+							final String sqlString1 = "select reciept_number from vouchermis where id=?";
 							pstmt = persistenceService.getSession().createSQLQuery(sqlString1);
 							pstmt.setLong(0, Long.parseLong(vhId1));
 							final List res = pstmt.list();
@@ -676,10 +676,12 @@ public class GeneralLedgerReport {
 							pstmt.setLong(0, Long.parseLong(vhId1));
 							final List res = pstmt.list();
 							if (res.size() != 0 && res.get(0) != null && !res.isEmpty() && vcNum != null) {
-								if (vcNum.substring(2, 5).equalsIgnoreCase("EJV")) {
-									credit_receiptNo = res.get(0).toString();
+								if (vcNum.substring(2, 5).equalsIgnoreCase("EJV")) {//EJV 	//BRV
+									debit_receiptNo = res.get(0).toString();//credit_receiptNo
+									//credit_receiptNo = res.get(0).toString();//credit_receiptNo
 								} else {
-									debit_receiptNo = res.get(0).toString();
+									credit_receiptNo = res.get(0).toString();//debit_receiptNo
+									//debit_receiptNo = res.get(0).toString();//debit_receiptNo
 								}
 							} else {
 								credit_receiptNo = "";
