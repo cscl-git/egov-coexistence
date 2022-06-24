@@ -765,7 +765,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	}
 
 	@RequestMapping(value = "/create/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+	public String save(@ModelAttribute("auditDetail") AuditDetail auditDetail, final Model model,
 			final BindingResult resultBinder, final HttpServletRequest request,
 			@RequestParam("file") MultipartFile[] files) throws IOException {
 		LOGGER.info("Save");
@@ -989,38 +989,102 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AuditChecklistHistory> checkListHistoryList = null;
 		for (AuditCheckList checkListDb : auditDetails.getCheckList()) {
 			for (AuditCheckList checkListUI : auditDetail.getCheckList()) {
-
-				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
-						continue;
+				System.out.println("checkListDb.getChecklist_description()== "+checkListDb.getChecklist_description());
+				System.out.println("checkListUI.getChecklist_description()== "+checkListUI.getChecklist_description());
+				String dbCheck= checkListDb.getChecklist_description();
+				String uiCheck= checkListUI.getChecklist_description();
+				if(dbCheck.contains(",") || uiCheck.contains(","))
+				{
+					 String[] dbArr = null;
+					 String[] uiArr = null;
+					 String dbDes=null;
+					 String uiDes=null;
+					 if(dbCheck.contains(","))
+					 {
+						 dbArr = dbCheck.split(",", 2);
+						 dbDes=dbArr[0].toString();
+					 }
+					 else
+					 {
+						 dbDes=dbCheck;
+					 }
+					 if(uiCheck.contains(","))
+					 {
+						 uiArr = uiCheck.split(",", 2);
+						 uiDes=uiArr[0].toString();
+					 }
+					 else
+					 {
+						 uiDes=uiCheck;
+					 }
+					 if (dbDes.equalsIgnoreCase(uiDes))
+					 {
+						 //if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) { // comment by Abhishek 
+						 if (null !=checkListDb.getStatus() && checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+						 	continue;
+						 }
+						 if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							 checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
+						 } else {
+							 checkListDb.setAuditor_comments(" ");
+						 }
+						 checkListDb.setStatus(checkListUI.getStatus());
+						 // checkListDb.setSeverity(checkListUI.getSeverity());
+						 checkListDb.setChecklist_date(checkListUI.getChecklist_date());
+						 applyAuditing(checkListDb);
+						 checkListHistoryList = new ArrayList<AuditChecklistHistory>();
+						 checkListHistory = new AuditChecklistHistory();
+						 checkListHistory.setAuditCheckList(checkListDb);
+						 checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
+						 checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
+						 if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							 checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
+						 } else {
+							 checkListHistory.setAuditor_comments(" ");
+						 }
+						 checkListHistory.setStatus(checkListUI.getStatus());
+						 checkListHistory.setSeverity(checkListUI.getSeverity());
+						 checkListHistory.setAuditDetails(auditDetails);									   
+						 applyAuditing(checkListHistory);
+						 checkListHistoryList.add(checkListHistory);
+						 checkListDb.getCheckList_history().addAll(checkListHistoryList);
+					 }
+				}
+				else
+				{
+					if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
+						//if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) { // comment by Abhishek 
+						 if (null !=checkListDb.getStatus() && checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+							continue;
+						}
+						if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
+						} else {
+							checkListDb.setAuditor_comments(" ");
+						}
+						checkListDb.setStatus(checkListUI.getStatus());
+						// checkListDb.setSeverity(checkListUI.getSeverity());
+						checkListDb.setChecklist_date(checkListUI.getChecklist_date());
+						applyAuditing(checkListDb);
+						checkListHistoryList = new ArrayList<AuditChecklistHistory>();
+						checkListHistory = new AuditChecklistHistory();
+						checkListHistory.setAuditCheckList(checkListDb);
+						checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
+						checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
+						if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
+						} else {
+							checkListHistory.setAuditor_comments(" ");
+																  
+						}
+						checkListHistory.setStatus(checkListUI.getStatus());
+						checkListHistory.setSeverity(checkListUI.getSeverity());
+						checkListHistory.setAuditDetails(auditDetails);									   
+						applyAuditing(checkListHistory);
+						checkListHistoryList.add(checkListHistory);
+						checkListDb.getCheckList_history().addAll(checkListHistoryList);
 					}
-					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
-						checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
-					} else {
-						checkListDb.setAuditor_comments(" ");
-					}
-					checkListDb.setStatus(checkListUI.getStatus());
-					// checkListDb.setSeverity(checkListUI.getSeverity());
-					checkListDb.setChecklist_date(checkListUI.getChecklist_date());
-					applyAuditing(checkListDb);
-					checkListHistoryList = new ArrayList<AuditChecklistHistory>();
-					checkListHistory = new AuditChecklistHistory();
-					checkListHistory.setAuditCheckList(checkListDb);
-					checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
-					checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
-					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
-						checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
-					} else {
-						checkListHistory.setAuditor_comments(" ");
-															  
-					}
-					checkListHistory.setStatus(checkListUI.getStatus());
-					checkListHistory.setSeverity(checkListUI.getSeverity());
-					checkListHistory.setAuditDetails(auditDetails);									   
-					applyAuditing(checkListHistory);
-					checkListHistoryList.add(checkListHistory);
-					checkListDb.getCheckList_history().addAll(checkListHistoryList);
-				}				
+				}
 			}							
 		}										
 		applyAuditing(auditDetails);
@@ -1067,6 +1131,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 						if (null == checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 							continue;
 						}
+						System.out.println("user comment "+checkListUI.getUser_comments());
 						if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
 							checkListDb.setUser_comments(checkListUI.getUser_comments());
 						} else {
@@ -1100,6 +1165,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 						if (null == checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 							continue;
 						}
+						System.out.println("user comment "+checkListUI.getUser_comments());
 						if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
 							checkListDb.setUser_comments(checkListUI.getUser_comments());
 						} else {
