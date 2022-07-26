@@ -190,8 +190,13 @@ public class ChartOfAccountsService extends PersistenceService<CChartOfAccounts,
 
         if (accountDetailTypeId == 0 || accountDetailTypeId == -1) {
             final Query entitysQuery = getSession()
-                    .createQuery(
-                            " from CChartOfAccounts a where a.isActiveForPosting=true and a.classification=4 and size(a.chartOfAccountDetails) = 0 and (glcode like :glcode or lower(name) like :name) and (purposeId is null or purposeId not in (:ids)) order by a.id");
+            		.createQuery(
+                            " from CChartOfAccounts a where a.isActiveForPosting=true and a.classification=4 and size(a.chartOfAccountDetails) >= 0 and (glcode like :glcode or lower(name) like :name) and (purposeId is null or purposeId not in (:ids)) order by a.id");
+			/*//modified by Abhishek on 19072022 as code not coming in debit details while mapped with account type
+			 * .createQuery(
+			 * " from CChartOfAccounts a where a.isActiveForPosting=true and a.classification=4 and size(a.chartOfAccountDetails) = 0 and (glcode like :glcode or lower(name) like :name) and (purposeId is null or purposeId not in (:ids)) order by a.id"
+			 * );
+			 */
             entitysQuery.setString(GLCODE, "%"+glcode + "%");
             entitysQuery.setString("name", "%"+glcode.toLowerCase() + "%");
             entitysQuery.setParameterList("ids", contingencyBillPurposeIds);

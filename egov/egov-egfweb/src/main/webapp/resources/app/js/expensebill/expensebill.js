@@ -167,7 +167,13 @@ $('.btn-wf-primary').click(function(){
 		if(!$("form").valid())
 			return false;
 					   
-			   
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+				return false;
+			}
+		}	   
 	   
 				
 		if(validate()){
@@ -1291,13 +1297,13 @@ function validate(){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
 		return false;
 	}
-	var filename=document.forms[0].file.value;
+	/*var filename=document.forms[0].file.value;
 	if(filename ==null ||filename.length==0 ){
 		var confrm=confirm("Document not uploaded, do you want to proceed?");
 		if(!confrm){
 			return false;
 		}
-	}
+	}*/
 	/*if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));

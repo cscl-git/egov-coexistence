@@ -430,6 +430,13 @@ public class CreateAuditController extends GenericWorkFlowController {
 				for (AuditCheckList row : auditDetails.getCheckList()) {
 					row.setUser_comments("");
 					row.setCheckListId(String.valueOf(row.getId()));
+					if(row.getStatus().contains(","))
+					{
+						String[] result = row.getStatus().split(",");
+						row.setStatus(result[0]);
+					}
+					else
+						row.setStatus(row.getStatus());
 				}
 				auditDetail.setCheckList(auditDetails.getCheckList());
 			}
