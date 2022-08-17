@@ -504,7 +504,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         BigDecimal totalCredit = new BigDecimal(0.0);
         if (totalGrant == null)
             totalGrant = new BigDecimal(0.0);
-
+        updatedBdgtAppropriationRegisterList.clear();
         if (LOGGER.isInfoEnabled())
             LOGGER.info("budgetAppropriationRegisterList.size() :" + budgetAppropriationRegisterList.size());
         if (budgetAppropriationRegisterList.size() > 0) {
