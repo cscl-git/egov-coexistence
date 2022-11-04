@@ -626,6 +626,25 @@ $('.subledgerGl_code').change(function () {
 
 $('#billSubType').change(function () {
 	
+	//alert("1");
+	
+	$('#file1').removeAttr('required');	
+	
+	var billsubtypeval= $("#billSubType").val();
+	
+	//alert("Bill Type" +billsubtypeval);
+	
+	if(billsubtypeval == 1){
+		//alert("if");
+	$('#file1').attr('required', 'required');
+	$("#file1").addClass("mandatory");
+	}else{
+		//alert("else");
+	$('#file1').removeAttr('required');	
+	$("#file1").removeClass("mandatory");
+	$("#file1-error").css("display", "none");
+	}
+	
 	worksDiv();
 	
 	$("#selectedCheckList").val("");
