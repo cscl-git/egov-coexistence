@@ -205,6 +205,6 @@ function hideIncludeRemittance(){
 </script>
 <body onload="loadEntities();">
 
-	<jsp:include page="pendingTDSReport-deductionform.jsp"></jsp:include>
+	<jsp:include page="pendingTDSReport-deduction.jsp"></jsp:include>
 </body>
 </html>
