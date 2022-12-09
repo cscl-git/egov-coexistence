@@ -208,7 +208,7 @@
           <td class="greybox">
           <s:select name="reconcileBean.statusType" id="statusType" 
 							list="dropdownData.statusTypeList" listKey="code"
-							listValue="description" headerKey="-1" headerValue="Select from below"/>
+							listValue="description" headerKey="" headerValue="Select from below"/>
           </td>
           
         </tr>
@@ -217,6 +217,23 @@
           <td class="greybox"><s:text name="limit" /> <span
             class="greybox"></td>
           <td class="greybox"><s:textfield name="reconcileBean.limit" id="limit"  /></td>
+          
+          <td class="greybox" >Type<span
+            class="greybox"><span
+						class="greybox"><span class="mandatory1">*</span></span></td>
+          <td class="greybox">
+          <s:select name="reconcileBean.paymenttype" id="typeid" 
+							list="#{'1':'Payment','2':'Receipt'}" 
+							headerKey="" headerValue="Select from below" onchange="validatetype(this);"/>
+          </td>
+        </tr>
+         <tr style="display: none" id= deptid>       
+            <td class="greybox"></td>
+			<td class="greybox">Department <span class="greybox"><span class="mandatory1">*</span></span></td>
+			<td class="greybox"><s:select name="reconcileBean.department" id="department"
+							list="dropdownData.departmentList" listKey="code"
+							listValue="name" headerKey=""
+							headerValue="----Choose----"  value="%{department}"/></td>       
         </tr>
 			</table>
 

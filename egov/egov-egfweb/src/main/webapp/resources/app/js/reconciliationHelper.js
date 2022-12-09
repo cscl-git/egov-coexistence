@@ -163,6 +163,8 @@ function validateReconcile() {
 	
 	doLoadingMask();
 	var fd = jQuery('#mrform').serialize();
+		var typeid = document.getElementById("typeid").value;
+	if(typeid == 1){
 	jQuery.ajax({
 		url : "/services/EGF/brs/manualReconciliation-update.action",
 		type : "POST",
@@ -182,6 +184,28 @@ function validateReconcile() {
 
 		}
 	});
+	}else{		
+		jQuery.ajax({
+		url : "/services/EGF/brs/manualReconciliationreceipt-update.action",
+		type : "POST",
+		data : fd,
+		// dataType: "text",
+		success : function(response) {
+			// console.log("success"+response );
+			undoLoadingMask();
+			jQuery('#resultDiv').html(response);
+			// bootbox.alert("Passed to Reconcile Details");
+
+		},
+		error : function(response) {
+			console.log("failed");
+			undoLoadingMask();
+			bootbox.alert(jQuery.i18n.prop('msg.failed.to.reconcile.details'));
+
+		}
+	});
+		
+	}
 
 }
 
@@ -315,6 +339,26 @@ function validate() {
 			return false;
 		}
 	}
+	
+		if (document.getElementById("statusType").value == "") {
+		bootbox.alert('Select Status Type');
+		return false;
+	}
+	if (document.getElementById("typeid").value == "") {
+		bootbox.alert('Select Type');
+		return false;
+	}
+	
 	return true;
 }
+
+
+function validatetype(obj) {
+		var typeid = document.getElementById("typeid").value;
+		if(typeid == 2){
+			jQuery('#deptid').show();	
+		}else{
+			jQuery('#deptid').hide();	
+		}
+	}
 

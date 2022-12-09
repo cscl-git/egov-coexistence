@@ -80,7 +80,9 @@ public class ReconcileBean {
 	private String statusType;
 	//Newly Added
 	private String reconciledComment;
-	
+	private String paymenttype;
+	private String vmId;
+	private String department;
 	
 	public Long getBranchId() {
 		return branchId;
@@ -233,7 +235,24 @@ public class ReconcileBean {
 	public void setReconciledComment(String reconciledComment) {
 		this.reconciledComment = reconciledComment;
 	}
+	public String getPaymenttype() {
+		return paymenttype;
+	}
+	public void setPaymenttype(String paymenttype) {
+		this.paymenttype = paymenttype;
+	}
+	public String getVmId() {
+		return vmId;
+	}
+	public void setVmId(String vmId) {
+		this.vmId = vmId;
+	}
+	public String getDepartment() {
+		return department;
+	}
+	public void setDepartment(String department) {
+		this.department = department;
+	}
 	
-    
 	
 }

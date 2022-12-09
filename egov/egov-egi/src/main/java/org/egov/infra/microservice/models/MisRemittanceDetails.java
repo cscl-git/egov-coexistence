@@ -31,6 +31,10 @@ import javax.persistence.Table;
 	private String narration;
 	private String subdivison;
 	private String receiptnumbers;
+	private BigDecimal reconciledamount;
+	private Date reconciledon;
+	private String reconciledcomment;
+	private String status;
 	
 	public Long getId() {
 		return id;
@@ -93,6 +97,29 @@ import javax.persistence.Table;
 	public void setReceiptnumbers(String receiptnumbers) {
 		this.receiptnumbers = receiptnumbers;
 	}
-	
+	public BigDecimal getReconciledamount() {
+		return reconciledamount;
+	}
+	public void setReconciledamount(BigDecimal reconciledamount) {
+		this.reconciledamount = reconciledamount;
+	}
+	public Date getReconciledon() {
+		return reconciledon;
+	}
+	public void setReconciledon(Date reconciledon) {
+		this.reconciledon = reconciledon;
+	}
+	public String getReconciledcomment() {
+		return reconciledcomment;
+	}
+	public void setReconciledcomment(String reconciledcomment) {
+		this.reconciledcomment = reconciledcomment;
+	}
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}	
 	
 }

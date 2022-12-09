@@ -69,6 +69,7 @@ import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.egf.model.ReconcileBean;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
+import org.egov.infstr.utils.EgovMasterDataCaching;
 import org.jfree.util.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -91,6 +92,9 @@ public class ManualReconciliationAction extends BaseFormAction {
 	private List<Bankbranch> branchList = Collections.EMPTY_LIST;
 	private final List<Bankaccount> accountList = Collections.EMPTY_LIST;
 	private List<EgwStatus> statusTypeList = new ArrayList<EgwStatus>();
+	
+	@Autowired
+	protected EgovMasterDataCaching masterDataCache;
 	/* @Autowired
     private ReconcileService reconcileService;*/
 
@@ -146,6 +150,7 @@ public class ManualReconciliationAction extends BaseFormAction {
 		dropdownData.put("branchList", branchList);
 		dropdownData.put("accountList", accountList);
 		dropdownData.put("statusTypeList", statusTypeList);
+		dropdownData.put("departmentList", masterDataCache.get("egi-department"));
 		if (reconcileBean.getBranchId() != null)
 		{
 			branchList = persistenceService
@@ -175,12 +180,34 @@ public class ManualReconciliationAction extends BaseFormAction {
 	@Action(value = "/brs/manualReconciliation-ajaxSearch")
 	public String search()
 	{
-		unReconciledCheques = manualReconcileHelper.getUnReconciledCheques(reconcileBean);
+		
+        String account2= "";
+		
+		if("2".equalsIgnoreCase(reconcileBean.getPaymenttype())) {
+		List<String> getbankaccounts = manualReconcileHelper.getbankaccounts(reconcileBean);
+		
+		String getaccount = manualReconcileHelper.getaccount(reconcileBean);
+		
+		for (String account : getbankaccounts) {
+			String[] split = account.split("-");
+			//String string0= split[0];
+			//String string1= split[1];
+			String string2= split[2];
+			
+			if(string2.equals(getaccount)) {
+				account2 = account;
+			}
+		}
+		}
+		
+		unReconciledCheques = manualReconcileHelper.getUnReconciledCheques(reconcileBean,account2);
+		if("1".equalsIgnoreCase(reconcileBean.getPaymenttype())) {
 		Collections.sort(unReconciledCheques, new Comparator<ReconcileBean>() {
 		    public int compare(ReconcileBean m1, ReconcileBean m2) {
 		        return (getDate(m1.getChequeDate())).compareTo(getDate(m2.getChequeDate()));
 		    }
 		});
+		}
 		List<ReconcileBean> unReconciledChequesCopy=new ArrayList<ReconcileBean>();
 		unReconciledChequesCopy.addAll(unReconciledCheques);
 		if(unReconciledChequesCopy != null && !unReconciledChequesCopy.isEmpty())
@@ -221,6 +248,15 @@ public class ManualReconciliationAction extends BaseFormAction {
 	{
 		//Log.info("Recon Comments..:"+reconComments.toString());
 		manualReconcileHelper.update(reconDates, reconComments, instrumentHeaders);
+		return "update";
+	}
+	
+	@Action(value = "/brs/manualReconciliationreceipt-update")
+	@ValidationErrorPage("search")
+	public String updateReconciliationReceipt()
+	{
+		//Log.info("Recon Comments..:"+reconComments.toString());
+		manualReconcileHelper.updateReceiptReconciledDetails(reconDates, reconComments, instrumentHeaders);
 		return "update";
 	}
 

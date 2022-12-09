@@ -657,10 +657,12 @@ public class UpdateExpenseBillController extends BaseBillController {
                     }
                     if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONCANCEL))
                     {
+                    	if(auditDetails != null) {
                     	auditDetails.setState(null);
         				auditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
             					AuditConstants.AUDIT_CANCELLED_STATUS));
         				auditRepository.save(auditDetails);
+                    	}
                     }
                 }   
                 
