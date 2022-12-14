@@ -58,17 +58,20 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+							
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+											  
 import javax.servlet.ServletContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+													
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -78,6 +81,7 @@ import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.velocity.runtime.directive.Foreach;
+														
 import org.egov.audit.autonumber.AuditNumberGenerator;
 import org.egov.audit.entity.AuditCheckList;
 import org.egov.audit.entity.AuditChecklistHistory;
@@ -91,6 +95,7 @@ import org.egov.audit.model.AuditDetail;
 import org.egov.audit.model.AuditEmployee;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.model.PostAuditResult;
+														  
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.AuditCheckListHistoryService;
 import org.egov.audit.service.AuditCheckListService;
@@ -106,6 +111,8 @@ import org.egov.commons.dao.EgwStatusHibernateDAO;
 import org.egov.commons.service.FundService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
 import org.egov.egf.expensebill.service.ExpenseBillService;
+											   
+												 
 import org.egov.eis.web.contract.WorkflowContainer;
 import org.egov.eis.web.controller.workflow.GenericWorkFlowController;
 import org.egov.infra.admin.master.entity.AppConfigValues;
@@ -117,16 +124,23 @@ import org.egov.infra.filestore.service.FileStoreService;
 import org.egov.infra.microservice.models.EmployeeInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.persistence.entity.AbstractAuditable;
+													
+													
+													  
+													 
 import org.egov.infra.reporting.engine.ReportService;
 import org.egov.infra.reporting.engine.jasper.JasperReportService;
+														
 import org.egov.infra.security.utils.SecurityUtils;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infstr.services.PersistenceService;
 import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillregister;
 import org.egov.model.bills.Miscbilldetail;
+import org.egov.model.bills.RetrachmentDetails;
 import org.egov.pims.commons.Position;
 import org.egov.services.payment.MiscbilldetailService;
+										 
 import org.hibernate.SQLQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -134,6 +148,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.MessageSource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.HttpHeaders;
+										  
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -148,6 +163,10 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.multipart.MultipartFile;
+													
+																			   
+															 
+															
 
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -178,6 +197,8 @@ public class CreateAuditController extends GenericWorkFlowController {
 	@Qualifier("messageSource")
 	private MessageSource messageSource;
 
+			 
+												   
 	@Autowired
 	private FileStoreService fileStoreService;
 
@@ -244,7 +265,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	private String contentType;
 	private String fileName;
 	private InputStream inputStream;
-
+	
 	@Autowired
 	JasperReportService jasperReportService;
 
@@ -284,9 +305,12 @@ public class CreateAuditController extends GenericWorkFlowController {
 		auditDetail.setAuditScheduledDate(auditDetails.getAudit_sch_date());
 		auditDetail.setAuditType(auditDetails.getType());
 		auditDetail.setPassUnderobjection(auditDetails.getPassUnderobjection());
+		auditDetail.setRetrachmentcomment(auditDetails.getRetrachmentcomment());
+		
 		EgBillregister bill = null;
 		auditDetail.setAuditId(Long.parseLong(auditId));
 		auditDetail.setAuditStatus(auditDetails.getStatus().getCode());
+		auditDetail.setAuditStateValue(auditDetails.getState().getValue());
 		List<AuditPostBillMpng> billDetailsMpngLIst = null;
 		List<AuditPostVoucherMpng> voucherDetailsMpngList = null;
 		if (auditDetails.getType() != null && auditDetails.getType().equalsIgnoreCase("Pre-Audit")) {
@@ -294,8 +318,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 			auditDetail.setBillId(bill.getId());
 			if (bill.getRefundable() != null && bill.getRefundable().equalsIgnoreCase("Y")) {
 				model.addAttribute("billSource", "/services/EGF/refund/view/" + bill.getId());
+										 
 			} else {
 				model.addAttribute("billSource", "/services/EGF/expensebill/view/" + bill.getId());
+										 
 			}
 
 		} else {
@@ -303,6 +329,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			voucherDetailsMpngList = auditDetails.getPostVoucherMpng();
 			if (billDetailsMpngLIst != null && !billDetailsMpngLIst.isEmpty()) {
 				bill = billDetailsMpngLIst.get(0).getEgBillregister();
+
 				for (AuditPostBillMpng row : billDetailsMpngLIst) {
 					List<Miscbilldetail> miscBillList = miscbilldetailService.findAllBy(
 							" from Miscbilldetail where billnumber = ? ", row.getEgBillregister().getBillnumber());
@@ -333,6 +360,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 			}
 
 		}
+
 		if (auditDetails.getStatus().getCode().equalsIgnoreCase("Created")
 				|| auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Auditor")
 				|| auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Section Officer")
@@ -343,6 +371,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 						.findByBillType(bill.getEgBillregistermis().getEgBillSubType().getName());
 			} else {
 				checkListbill = billTypeCheckListService.findByBillType("Post Audit");
+	
 
 			}
 			if (auditDetails.getStatus().getCode().equalsIgnoreCase("Created")) {
@@ -353,13 +382,16 @@ public class CreateAuditController extends GenericWorkFlowController {
 						checklistDetail.setCheckListId(getAuditCheckList(auditDetails, row.getBilltypedescrip(), "ID"));
 						checklistDetail.setSeverity(getAuditCheckList(auditDetails, row.getBilltypedescrip(), "Sev"));
 						checklistDetail.setStatus(getAuditCheckList(auditDetails, row.getBilltypedescrip(), "Stat"));
+					
 						checklistDetail.setChecklist_date(
 								getAuditCheckListDate(auditDetails, row.getBilltypedescrip(), "Date"));
+																							  
 					} else {
 						checklistDetail.setCheckListId("0");
 					}
 					checklistDetail.setChecklist_description(row.getBilltypedescrip());
 					checkList.add(checklistDetail);
+									 
 				}
 			} else {
 				System.out.println("no creteed");
@@ -381,28 +413,44 @@ public class CreateAuditController extends GenericWorkFlowController {
 					}
 					checklistDetail.setChecklist_description(value.getChecklist_description());
 					checkList.add(checklistDetail);
+
 				}
 			}
 
+												
 			auditDetail.setCheckList(checkList);
+		   											
 		} else if (auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Department")) {
 			if (auditDetails.getCheckList() != null && !auditDetails.getCheckList().isEmpty()) {
 				for (AuditCheckList row : auditDetails.getCheckList()) {
 					row.setUser_comments("");
 					row.setCheckListId(String.valueOf(row.getId()));
+					if(row.getStatus().contains(","))
+					{
+						String[] result = row.getStatus().split(",");
+						row.setStatus(result[0]);
+					}
+					else
+						row.setStatus(row.getStatus());
 				}
 				auditDetail.setCheckList(auditDetails.getCheckList());
 			}
 		}
+  
+																													
 		model.addAttribute("workflowHistory",
 				auditUtils.getHistory(auditDetails.getState(), auditDetails.getStateHistory()));
 
 		model.addAttribute(STATE_TYPE, auditDetails.getClass().getSimpleName());
 		if (auditDetails.getStatus().getCode().equalsIgnoreCase("Pending with Department")) {
+  
 			if (auditDetails.getState() != null)
+
 				model.addAttribute("currentState", auditDetails.getState().getValue());
 			prepareWorkflow(model, auditDetails, new WorkflowContainer());
+   
 		}
+								
 		model.addAttribute("auditDetail", auditDetail);
 
 		return "create";
@@ -440,13 +488,13 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		if (auditDetail.getDepartment() != null) {
 			query.append(
-					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?)");
+					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?) AND ad.passunderobjectiondate IS NOT NULL");
 			list = persistenceService.findAllBy(query.toString(), auditDetail.getBillFrom(), auditDetail.getBillTo(), 1,
 					auditDetail.getDepartment());
 
 		} else {
 			query.append(
-					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?)");
+					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND ad.passunderobjectiondate IS NOT NULL");
 			list = persistenceService.findAllBy(query.toString(), auditDetail.getBillFrom(), auditDetail.getBillTo(),
 					1);
 
@@ -515,7 +563,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		if (auditDetail.getDepartment() != null) {
 			query.append(
-					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?)");
+					"select ad.id, ad.auditno , ad.passunderobjectiondate , ad.passunderobjectioncomment from AuditDetails ad where (ad.audit_sch_date between ? and ?) AND (ad.passUnderobjection = ?) AND (ad.department =  ?) AND ad.passunderobjectiondate IS NOT NULL");
 			list = persistenceService.findAllBy(query.toString(), auditDetail.getBillFrom(), auditDetail.getBillTo(), 1,
 					auditDetail.getDepartment());
 
@@ -550,7 +598,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 				List<PassUnderObjection> passUnderObjections = new ArrayList<>();
 
 				temp = auditRepository.findById(result.getId());
-				result.setPaymentReqNumber(temp.getBillNumber());
+				result.setPaymentReqNumber(temp.getEgBillregister().getBillnumber());
 
 				passUnderObjections = temp.getPassUnderObjectionList();
 
@@ -717,7 +765,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	}
 
 	@RequestMapping(value = "/create/save", method = RequestMethod.POST)
-	public String save(@ModelAttribute("auditDetail") final AuditDetail auditDetail, final Model model,
+	public String save(@ModelAttribute("auditDetail") AuditDetail auditDetail, final Model model,
 			final BindingResult resultBinder, final HttpServletRequest request,
 			@RequestParam("file") MultipartFile[] files) throws IOException {
 		LOGGER.info("Save");
@@ -736,19 +784,32 @@ public class CreateAuditController extends GenericWorkFlowController {
 				&& workFlowAction.equalsIgnoreCase("department")) {
 			auditDetails = populateDetailsAudit(auditDetail);
 		} else if (auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Auditor")
+				&& workFlowAction.equalsIgnoreCase("examiner")) {
+			auditDetails = populateDetailsAudit(auditDetail);
+		} else if (auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Auditor")
 				&& workFlowAction.equalsIgnoreCase("sectionOfficer")) {
 			auditDetails = populateDetailsSO(auditDetail);
 		} else if (workFlowAction.equalsIgnoreCase("reject")
 				|| auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Section Officer")
 				|| auditDetail.getAuditStatus().equalsIgnoreCase("Pending with Examiner")) {
 			auditDetails = auditService.getById(auditDetail.getAuditId());
+			auditDetails.setAudit_sch_date(auditDetail.getAuditScheduledDate());								   
 		}
-
+		System.out.println("retrachmentcomment "+auditDetail.getRetrachmentcomment());
+		
+		if(null!=auditDetail.getRetrachmentcomment()) {
+			//String[] arr=auditDetail.getRetrachmentcomment().split(",");
+			auditDetails.setRetrachmentcomment(auditDetail.getRetrachmentcomment());
+		}
+		else {
+			auditDetails.setRetrachmentcomment(null);
+		}
 		if (workFlowAction.equalsIgnoreCase("APPROVE")) {
 			long millis = System.currentTimeMillis();
 			Date date = new java.util.Date(millis);
 
 			auditDetails.setPassunderobjectiondate(date);
+																		  
 
 		}
 		List<DocumentUpload> list = new ArrayList<>();
@@ -834,7 +895,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 					continue;
 				}
 				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+					if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
 						continue;
 					}
 					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
@@ -870,6 +931,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	}
 
 	private AuditDetails populateDetailsDraft(AuditDetail auditDetail) {
+									 													   
 		AuditDetails auditDetails = auditService.getById(auditDetail.getAuditId());
 		AuditChecklistHistory checkListHistory = null;
 		List<AuditChecklistHistory> checkListHistoryList = null;
@@ -916,40 +978,106 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AuditChecklistHistory> checkListHistoryList = null;
 		for (AuditCheckList checkListDb : auditDetails.getCheckList()) {
 			for (AuditCheckList checkListUI : auditDetail.getCheckList()) {
-
-				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
-						continue;
-					}
-					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
-						checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
-					} else {
-						checkListDb.setAuditor_comments(" ");
-					}
-					checkListDb.setStatus(checkListUI.getStatus());
-					// checkListDb.setSeverity(checkListUI.getSeverity());
-					checkListDb.setChecklist_date(checkListUI.getChecklist_date());
-					applyAuditing(checkListDb);
-					checkListHistoryList = new ArrayList<AuditChecklistHistory>();
-					checkListHistory = new AuditChecklistHistory();
-					checkListHistory.setAuditCheckList(checkListDb);
-					checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
-					checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
-					if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
-						checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
-					} else {
-						checkListHistory.setAuditor_comments(" ");
-					}
-					checkListHistory.setStatus(checkListUI.getStatus());
-					checkListHistory.setSeverity(checkListUI.getSeverity());
-					checkListHistory.setAuditDetails(auditDetails);
-					applyAuditing(checkListHistory);
-					checkListHistoryList.add(checkListHistory);
-					checkListDb.getCheckList_history().addAll(checkListHistoryList);
+				System.out.println("checkListDb.getChecklist_description()== "+checkListDb.getChecklist_description());
+				System.out.println("checkListUI.getChecklist_description()== "+checkListUI.getChecklist_description());
+				String dbCheck= checkListDb.getChecklist_description();
+				String uiCheck= checkListUI.getChecklist_description();
+				if(dbCheck.contains(",") || uiCheck.contains(","))
+				{
+					 String[] dbArr = null;
+					 String[] uiArr = null;
+					 String dbDes=null;
+					 String uiDes=null;
+					 if(dbCheck.contains(","))
+					 {
+						 dbArr = dbCheck.split(",", 2);
+						 dbDes=dbArr[0].toString();
+					 }
+					 else
+					 {
+						 dbDes=dbCheck;
+					 }
+					 if(uiCheck.contains(","))
+					 {
+						 uiArr = uiCheck.split(",", 2);
+						 uiDes=uiArr[0].toString();
+					 }
+					 else
+					 {
+						 uiDes=uiCheck;
+					 }
+					 if (dbDes.equalsIgnoreCase(uiDes))
+					 {
+						 //if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) { // comment by Abhishek 
+						 if (null !=checkListDb.getStatus() && checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+						 	continue;
+						 }
+						 if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							 checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
+						 } else {
+							 checkListDb.setAuditor_comments(" ");
+						 }
+						 checkListDb.setStatus(checkListUI.getStatus());
+						 // checkListDb.setSeverity(checkListUI.getSeverity());
+						 checkListDb.setChecklist_date(checkListUI.getChecklist_date());
+						 applyAuditing(checkListDb);
+						 checkListHistoryList = new ArrayList<AuditChecklistHistory>();
+						 checkListHistory = new AuditChecklistHistory();
+						 checkListHistory.setAuditCheckList(checkListDb);
+						 checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
+						 checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
+						 if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							 checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
+						 } else {
+							 checkListHistory.setAuditor_comments(" ");
+						 }
+						 checkListHistory.setStatus(checkListUI.getStatus());
+						 checkListHistory.setSeverity(checkListUI.getSeverity());
+						 checkListHistory.setAuditDetails(auditDetails);									   
+						 applyAuditing(checkListHistory);
+						 checkListHistoryList.add(checkListHistory);
+						 checkListDb.getCheckList_history().addAll(checkListHistoryList);
+					 }
 				}
-			}
-		}
+				else
+				{
+					if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
+						//if (null ==checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) { // comment by Abhishek 
+						 if (null !=checkListDb.getStatus() && checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+							continue;
+						}
+						if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							checkListDb.setAuditor_comments(checkListUI.getAuditor_comments());
+						} else {
+							checkListDb.setAuditor_comments(" ");
+						}
+						checkListDb.setStatus(checkListUI.getStatus());
+						// checkListDb.setSeverity(checkListUI.getSeverity());
+						checkListDb.setChecklist_date(checkListUI.getChecklist_date());
+						applyAuditing(checkListDb);
+						checkListHistoryList = new ArrayList<AuditChecklistHistory>();
+						checkListHistory = new AuditChecklistHistory();
+						checkListHistory.setAuditCheckList(checkListDb);
+						checkListHistory.setChecklist_date(checkListUI.getChecklist_date());
+						checkListHistory.setChecklist_description(checkListUI.getChecklist_description());
+						if (checkListUI.getAuditor_comments() != null && !checkListUI.getAuditor_comments().isEmpty()) {
+							checkListHistory.setAuditor_comments(checkListUI.getAuditor_comments());
+						} else {
+							checkListHistory.setAuditor_comments(" ");
+																  
+						}
+						checkListHistory.setStatus(checkListUI.getStatus());
+						checkListHistory.setSeverity(checkListUI.getSeverity());
+						checkListHistory.setAuditDetails(auditDetails);									   
+						applyAuditing(checkListHistory);
+						checkListHistoryList.add(checkListHistory);
+						checkListDb.getCheckList_history().addAll(checkListHistoryList);
+					}
+				}
+			}							
+		}										
 		applyAuditing(auditDetails);
+
 		return auditDetails;
 	}
 
@@ -959,43 +1087,108 @@ public class CreateAuditController extends GenericWorkFlowController {
 		List<AuditChecklistHistory> checkListHistoryList = new ArrayList<AuditChecklistHistory>();
 		for (AuditCheckList checkListDb : auditDetails.getCheckList()) {
 			for (AuditCheckList checkListUI : auditDetail.getCheckList()) {
-				if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
-					if (checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
-						continue;
-					}
-					if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
-						checkListDb.setUser_comments(checkListUI.getUser_comments());
-					} else {
-						checkListDb.setUser_comments(" ");
-					}
+				//System.out.println("checkListDb.getChecklist_description()== "+checkListDb.getChecklist_description());
+				//System.out.println("checkListUI.getChecklist_description()== "+checkListUI.getChecklist_description());
+				String dbCheck= checkListDb.getChecklist_description();
+				String uiCheck= checkListUI.getChecklist_description();
+				if(dbCheck.contains(",") || uiCheck.contains(","))
+				{
+					 String[] dbArr = null;
+					 String[] uiArr = null;
+					 String dbDes=null;
+					 String uiDes=null;
+					 if(dbCheck.contains(","))
+					 {
+						 dbArr = dbCheck.split(",", 2);
+						 dbDes=dbArr[0].toString();
+					 }
+					 else
+					 {
+						 dbDes=dbCheck;
+					 }
+					 if(uiCheck.contains(","))
+					 {
+						 uiArr = uiCheck.split(",", 2);
+						 uiDes=uiArr[0].toString();
+					 }
+					 else
+					 {
+						 uiDes=uiCheck;
+					 }
+					 if (dbDes.equalsIgnoreCase(uiDes))
+					 {
+						if (null == checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+							continue;
+						}
+						System.out.println("user comment "+checkListUI.getUser_comments());
+						if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
+							checkListDb.setUser_comments(checkListUI.getUser_comments());
+						} else {
+							checkListDb.setUser_comments(" ");
+						}
+						applyAuditing(checkListDb);
+						checkListHistoryList = new ArrayList<AuditChecklistHistory>();
+						checkListHistory = new AuditChecklistHistory();
+						checkListHistory.setAuditCheckList(checkListDb);
+						checkListHistory.setChecklist_date(checkListDb.getChecklist_date());
+						checkListHistory.setChecklist_description(checkListDb.getChecklist_description());
+						checkListHistory.setAuditor_comments(checkListDb.getAuditor_comments());
+						if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
+							checkListHistory.setUser_comments(checkListUI.getUser_comments());
+						} else {
+							checkListHistory.setUser_comments(" ");
+						}
 
-					applyAuditing(checkListDb);
-					/*
-					 * for(AuditChecklistHistory history : checkListDb.getCheckList_history()) {
-					 * if(history.getUser_comments() == null ||
-					 * history.getUser_comments().isEmpty()) {
-					 * history.setUser_comments(checkListUI.getUser_comments());
-					 * applyAuditing(history); } }
-					 */
-					checkListHistoryList = new ArrayList<AuditChecklistHistory>();
-					checkListHistory = new AuditChecklistHistory();
-					checkListHistory.setAuditCheckList(checkListDb);
-					checkListHistory.setChecklist_date(checkListDb.getChecklist_date());
-					checkListHistory.setChecklist_description(checkListDb.getChecklist_description());
-					checkListHistory.setAuditor_comments(checkListDb.getAuditor_comments());
-					if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
-						checkListHistory.setUser_comments(checkListUI.getUser_comments());
-					} else {
-						checkListHistory.setUser_comments(" ");
+						checkListHistory.setStatus(checkListDb.getStatus());
+						checkListHistory.setSeverity(checkListDb.getSeverity());
+						checkListHistory.setAuditDetails(auditDetails);
+						applyAuditing(checkListHistory);
+						checkListHistoryList.add(checkListHistory);
+						checkListDb.getCheckList_history().addAll(checkListHistoryList);
+						;
 					}
-
-					checkListHistory.setStatus(checkListDb.getStatus());
-					checkListHistory.setSeverity(checkListDb.getSeverity());
-					checkListHistory.setAuditDetails(auditDetails);
-					applyAuditing(checkListHistory);
-					checkListHistoryList.add(checkListHistory);
-					checkListDb.getCheckList_history().addAll(checkListHistoryList);
-					;
+				}
+				else
+				{
+					if (checkListDb.getChecklist_description().equalsIgnoreCase(checkListUI.getChecklist_description())) {
+						if (null == checkListDb.getStatus() || checkListDb.getStatus().equalsIgnoreCase("Seen/Checked")) {
+							continue;
+						}
+						//System.out.println("user comment "+checkListUI.getUser_comments());
+						if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
+							checkListDb.setUser_comments(checkListUI.getUser_comments());
+						} else {
+							checkListDb.setUser_comments(" ");
+						}
+	
+						applyAuditing(checkListDb);
+						/*
+						 * for(AuditChecklistHistory history : checkListDb.getCheckList_history()) {
+						 * if(history.getUser_comments() == null ||
+						 * history.getUser_comments().isEmpty()) {
+						 * history.setUser_comments(checkListUI.getUser_comments());
+						 * applyAuditing(history); } }
+						 */
+						checkListHistoryList = new ArrayList<AuditChecklistHistory>();
+						checkListHistory = new AuditChecklistHistory();
+						checkListHistory.setAuditCheckList(checkListDb);
+						checkListHistory.setChecklist_date(checkListDb.getChecklist_date());
+						checkListHistory.setChecklist_description(checkListDb.getChecklist_description());
+						checkListHistory.setAuditor_comments(checkListDb.getAuditor_comments());
+						if (checkListUI.getUser_comments() != null && !checkListUI.getUser_comments().isEmpty()) {
+							checkListHistory.setUser_comments(checkListUI.getUser_comments());
+						} else {
+							checkListHistory.setUser_comments(" ");
+						}
+	
+						checkListHistory.setStatus(checkListDb.getStatus());
+						checkListHistory.setSeverity(checkListDb.getSeverity());
+						checkListHistory.setAuditDetails(auditDetails);
+						applyAuditing(checkListHistory);
+						checkListHistoryList.add(checkListHistory);
+						checkListDb.getCheckList_history().addAll(checkListHistoryList);
+						;
+					}
 				}
 			}
 		}
@@ -1004,6 +1197,7 @@ public class CreateAuditController extends GenericWorkFlowController {
 	}
 
 	private AuditDetails populateDetails(AuditDetail auditDetail) {
+
 		List<AuditCheckList> checkList = new ArrayList<AuditCheckList>();
 		AuditChecklistHistory checkListHistory = null;
 		List<AuditChecklistHistory> checkListHistoryList = null;
@@ -1021,13 +1215,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 			checkListHistory.setAuditCheckList(row);
 			checkListHistory.setChecklist_date(row.getChecklist_date());
 			checkListHistory.setChecklist_description(row.getChecklist_description());
-
 			auditorComment = row.getAuditor_comments();
-
 			if (null == auditorComment) {
 				auditorComment = " ";
 			}
-
 			checkListHistory.setUser_comments(row.getUser_comments());
 			checkListHistory.setAuditor_comments(auditorComment);
 			checkListHistory.setStatus(row.getStatus());
@@ -1048,12 +1239,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 		passUnderObjection.setResolutiondate(null);
 		passUnderObjectionList.add(passUnderObjection);
 		auditDetails.setPassUnderObjectionList(passUnderObjectionList);
-
 		auditDetails.setCheckList(checkList);
 		applyAuditing(auditDetails);
-
 		return auditDetails;
-
 	}
 
 	@RequestMapping(value = "/downloadBillDoc", method = RequestMethod.GET)
@@ -1132,7 +1320,9 @@ public class CreateAuditController extends GenericWorkFlowController {
 			message = "Audit No : " + audit.getAuditno() + " is rejected";
 		} else if (workflowAction.equalsIgnoreCase("saveAsDraft")) {
 			message = "Audit No : " + audit.getAuditno() + " is saved successfully";
-		}
+		} else if (workflowAction.equalsIgnoreCase("Verify")) {
+			message = "Audit No : " + audit.getAuditno() + " is verified ";
+		} 
 
 		return message;
 	}
@@ -2102,5 +2292,23 @@ public class CreateAuditController extends GenericWorkFlowController {
 
 		return microserviceUtils.getEmployee(empId, null, null, null).get(0).getUser().getName();
 	}
+	@RequestMapping(value="/openRetrenchmentSearchForm", method = RequestMethod.POST)
+	public String openRetranchmentSearchForm(@ModelAttribute("auditDetail")final AuditDetail auditDetail, Model model,HttpServletRequest request) {
+		System.out.println("### inside controller");
+		auditDetail.setDepartments(this.getDepartmentsFromMs());
+		model.addAttribute("auditDetail", auditDetail);
+		return "retranchmentSearchForm";
+	}
+	@RequestMapping(value="/searchRetrenchment", method=RequestMethod.POST)
+	public String searchRetrenchmentRegisterReport(@ModelAttribute("auditDetail")final AuditDetail auditDetail,Model model ) {
+		List<RetrachmentDetails> lst = new ArrayList<RetrachmentDetails>();
+		lst = auditService.getRetranchmentRegisterData(auditDetail);
+		auditDetail.setRetrachmentDetailsList(lst);
+		auditDetail.setDepartment(null);
+		auditDetail.setDepartments(this.getDepartmentsFromMs());
+		model.addAttribute("auditDetail", auditDetail);
+		return "retranchmentSearchForm";
+	}
+	
 
 }

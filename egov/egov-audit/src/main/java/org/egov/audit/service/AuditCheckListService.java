@@ -22,7 +22,7 @@ public class AuditCheckListService {
 	}
 
 	public void deleteAuditChecklist(AuditCheckList auditCheckList) {
-		auditCheckListRepository.delete(auditCheckList);
+		auditCheckListRepository.deleteById(auditCheckList.getId());
 	}
 	
 	

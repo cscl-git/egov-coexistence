@@ -595,15 +595,23 @@ public class IncomeExpenditureRestController {
 	@ResponseBody
 	@RequestMapping(value = "getAllBudgetWatchReportRestData", method = RequestMethod.GET)
 	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
-	public ResponseEntity<ResponseInfoWrapper>  getAllBudgetWatchReportRest(ModelMap m ,HttpServletRequest req ){
+	public ResponseEntity<ResponseInfoWrapper>  getAllBudgetWatchReportRest(ModelMap m ,HttpServletRequest req, @RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate){
 		
 			boolean datafound = false;
 			Department d = null;
 			CFinancialYear cf = new CFinancialYear();
 			Fund f = new Fund();
+			
+                if(null==fromDate|| null==toDate ) {				
+				return new ResponseEntity<>(ResponseInfoWrapper.builder()
+						.responseInfo(ResponseInfo.builder().status(SUCCESS).build())
+						.responseBody("Invalid Request, Required Parameters not Passed ").build(),getHeaders(),  HttpStatus.OK);
+			}
+
+			
 			List<BudgetAppDisplay> budgetApprRegNewList = new ArrayList<>();
 			budgetApprRegNewList=null;
-			budgetAppropriationRegisterReportAction.generateRestReport();
+			budgetAppropriationRegisterReportAction.generateRestReport(fromDate,toDate);
 			budgetApprRegNewList = budgetAppropriationRegisterReportAction.getUpdatedBdgtAppropriationRegisterList();
 			
 			if(null!=budgetApprRegNewList) {

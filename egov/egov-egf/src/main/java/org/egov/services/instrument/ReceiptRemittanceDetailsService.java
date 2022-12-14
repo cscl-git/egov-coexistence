@@ -48,47 +48,41 @@
 
 package org.egov.services.instrument;
 
-import java.util.Date;
-
-import org.egov.commons.EgwStatus;
+import org.egov.infra.microservice.models.MisRemittanceDetails;
 import org.egov.infstr.services.PersistenceService;
-import org.egov.model.instrument.InstrumentHeader;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
-public class InstrumentHeaderService extends PersistenceService<InstrumentHeader, Long> {
+import java.math.BigDecimal;
+import java.util.Date;
 
-    public InstrumentHeaderService() {
-        super(InstrumentHeader.class);
+@Service
+@Transactional(readOnly = true)
+public class ReceiptRemittanceDetailsService extends PersistenceService<MisRemittanceDetails, Long> {
+
+    public ReceiptRemittanceDetailsService() {
+        super(MisRemittanceDetails.class);
     }
 
-    public InstrumentHeaderService(final Class<InstrumentHeader> type) {
+    public ReceiptRemittanceDetailsService(final Class<MisRemittanceDetails> type) {
         super(type);
     }
 
+  
+    //New Method after adding Recon COmment
     @Transactional
-//    public InstrumentHeader reconcile(Date recociledOnx,Long ihId,EgwStatus reconciledStatus)
-    public InstrumentHeader reconcile(Long ihId,EgwStatus reconciledStatus)
+    public void receiptReconcileNew(Date recociledOn, String recocileComment, Long ihId, BigDecimal instrumentAmount)
     {
-    	//InstrumentOtherDetails io = find("from InstrumentOtherDetails where instrumentHeaderId.id=?",ihId);
-    	InstrumentHeader ih = findById(ihId);
-    	ih.setStatusId(reconciledStatus);
-    	applyAuditing(ih);
-    	update(ih);
-    	return ih;
+    	MisRemittanceDetails mis = find("from MisRemittanceDetails where id.id=?",ihId);
+    	mis.setReconciledamount(instrumentAmount);
+    	mis.setReconciledon(recociledOn);
+    	mis.setReconciledcomment(recocileComment);
+    	mis.setStatus("Reconciled");
+    	//mis.setInstrumentStatusDate(new Date());
+    	//applyAuditing(mis);
+    	update(mis);
     	
     }
     
-    @Transactional
-    public InstrumentHeader reconciled(Date recociledOn,Long ihId)
-    {
-    	//InstrumentOtherDetails io = find("from InstrumentOtherDetails where instrumentHeaderId.id=?",ihId);
-    	InstrumentHeader ih = findById(ihId);
-    	ih.setRealizationDate(recociledOn);
-    	applyAuditing(ih);
-    	update(ih);
-    	return ih;
-    	 
-    }
-
+	
 }

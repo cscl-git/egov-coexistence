@@ -77,6 +77,8 @@ public class BankAdviceReportInfo {
 	private String typeOfPayment;
 	private String mobNo;
 	
+	private Date reconciledOn;
+	private String reconciledComment;
 
     public BigDecimal getDtId() {
         return dtId;
@@ -245,6 +247,22 @@ public class BankAdviceReportInfo {
 
 	public void setMobNo(String mobNo) {
 		this.mobNo = mobNo;
+	}
+
+	public Date getReconciledOn() {
+		return reconciledOn;
+	}
+
+	public void setReconciledOn(final Date reconciledOn) {
+		this.reconciledOn = reconciledOn;
+	}
+
+	public String getReconciledComment() {
+		return reconciledComment;
+	}
+
+	public void setReconciledComment(final String reconciledComment) {
+		this.reconciledComment = reconciledComment;
 	}
 
 }

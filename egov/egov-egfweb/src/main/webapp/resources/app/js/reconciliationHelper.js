@@ -124,8 +124,14 @@ function validateReconcile() {
 	var value = false;
 	for (i = 0; i <= len - 2; i++) {
 		var recon = document.getElementById('reconDates' + i).value.split('/');
+		console.log("Recon Date.."+recon);
+		var reconCmnt = document.getElementById('reconComments' + i).value.split('/');
+		console.log("Recon Comment.."+reconCmnt);
+		
 		recon = recon[1]+"/"+recon[0]+"/"+recon[2];
+		console.log("1."+recon);
 		recon = new Date(recon)
+		console.log("2."+recon);
 		if (recon > toDate) {
 			var a = i + 1;
 			rows = row.concat(a);
@@ -138,18 +144,27 @@ function validateReconcile() {
 	if (value == true) {
 
 		;
-		bootbox
-				.alert(jQuery.i18n.prop('msg.rec.date.should.be.less.than.or.equal.to.bank.stmt.date',numOfrows.replace(/\,$/, '')));
+		bootbox.alert(jQuery.i18n.prop('msg.rec.date.should.be.less.than.or.equal.to.bank.stmt.date',numOfrows.replace(/\,$/, '')));
 		return false;
 	}
 
-	if (!validateReconDate()) {
+	/*if (!validateReconDate()) {
 		bootbox.alert(jQuery.i18n.prop('msg.add.atleast.one.reconciliation.date'));
 		return false;
 	}
-
+	if (!validateReconComment()) {
+		bootbox.alert(jQuery.i18n.prop('msg.add.atleast.one.reconciliation.comment'));
+		return false;
+	}*/
+	if (!validateRecon()) {
+		bootbox.alert(jQuery.i18n.prop('msg.add.atleast.one.reconciliation.comment.date'));
+		return false;
+	}
+	
 	doLoadingMask();
 	var fd = jQuery('#mrform').serialize();
+		var typeid = document.getElementById("typeid").value;
+	if(typeid == 1){
 	jQuery.ajax({
 		url : "/services/EGF/brs/manualReconciliation-update.action",
 		type : "POST",
@@ -169,6 +184,28 @@ function validateReconcile() {
 
 		}
 	});
+	}else{		
+		jQuery.ajax({
+		url : "/services/EGF/brs/manualReconciliationreceipt-update.action",
+		type : "POST",
+		data : fd,
+		// dataType: "text",
+		success : function(response) {
+			// console.log("success"+response );
+			undoLoadingMask();
+			jQuery('#resultDiv').html(response);
+			// bootbox.alert("Passed to Reconcile Details");
+
+		},
+		error : function(response) {
+			console.log("failed");
+			undoLoadingMask();
+			bootbox.alert(jQuery.i18n.prop('msg.failed.to.reconcile.details'));
+
+		}
+	});
+		
+	}
 
 }
 
@@ -216,6 +253,26 @@ function validateReconDate() {
 			return true;
 	}
 
+	return false;
+}
+
+function validateReconComment() {
+	var len = jQuery('#resultTable tr').length;
+	for (i = 0; i <= len - 2; i++) {
+		if (document.getElementById('reconComments' + i).value != '')
+			return true;
+	}
+	return false;
+}
+
+function validateRecon() {
+	var len = jQuery('#resultTable tr').length;
+	for (i = 0; i <= len - 2; i++) {
+		if (document.getElementById('reconDates' + i).value != ''){
+			if (document.getElementById('reconComments' + i).value != '')
+				return true;
+		}
+	}
 	return false;
 }
 
@@ -282,6 +339,25 @@ function validate() {
 			return false;
 		}
 	}
+	
+		if (document.getElementById("statusType").value == "") {
+		bootbox.alert('Select Status Type');
+		return false;
+	}
+	if (document.getElementById("typeid").value == "") {
+		bootbox.alert('Select Type');
+		return false;
+	}
+	
 	return true;
 }
+
+function validatetype(obj) {
+		var typeid = document.getElementById("typeid").value;
+		if(typeid == 2){
+			jQuery('#deptid').show();	
+		}else{
+			jQuery('#deptid').hide();	
+		}
+	}
 

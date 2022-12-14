@@ -191,6 +191,8 @@ public interface FinancialConstants {
 																			// workflow
 	public static final String INSTRUMENT_APPROVED_STATUS = "Approved";
 	public static final String STATUS_MODULE_INSTRUMENT = "Instrument";
+	public static final String STATUS_MODULE_REMITTANCE = "Remittance";
+	public static final String REMITTANCE_RECONCILED_STATUS = "Reconciled";
 
 	public static final String STATUS_MODULE_DISHONORCHEQUE = "DISHONORCHEQUE";
 	public static final String DISHONORCHEQUE_CREATED_STATUS = "Created";

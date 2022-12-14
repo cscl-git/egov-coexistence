@@ -1,6 +1,7 @@
 package org.egov.egf.web.controller.supplier;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -119,13 +121,19 @@ public class AuditRestDataController {
 	@ResponseBody
 	@RequestMapping(value = "getAllAudit", method = RequestMethod.GET)
 	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
-	public ResponseEntity<ResponseInfoWrapper>  getAllAudit(){
+	public ResponseEntity<ResponseInfoWrapper>  getAllAudit(@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate){
 	
-	
+		final StringBuffer query = new StringBuffer(500);
 		 List<AuditDetails> auditDetailsList= new ArrayList<>();
 		 List<AuditRestDataPOJO> responseData =  new ArrayList<>();
 		 auditDetailsList=null;
-       auditDetailsList = (List<AuditDetails> )auditService.getAllAudit();
+	
+		 query
+	       .append(
+	               " From AuditDetails ad where ")
+	               .append(auditUtils.getAllAuditDateQuery(fromDate, toDate));
+		 LOGGER.info("getAllAudit Query :: "+query.toString());
+       auditDetailsList = (List<AuditDetails> )persistenceService.findAllBy(query.toString());
        
        if(null==auditDetailsList) {
     	   return new ResponseEntity<>(ResponseInfoWrapper.builder()

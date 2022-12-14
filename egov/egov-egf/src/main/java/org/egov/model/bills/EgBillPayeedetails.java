@@ -96,6 +96,12 @@ public class EgBillPayeedetails extends AbstractPersistable<Integer> implements 
     @Transient
     private String detailKeyName;
 
+	@Transient
+    private String detailKeyAccount;
+    
+    @Transient
+    private String detailKeyIfsc;
+
     @Transient
     private Boolean isDebit;
 
@@ -106,6 +112,9 @@ public class EgBillPayeedetails extends AbstractPersistable<Integer> implements 
     @Length(max = 250)
     private String narration;
 
+    @Transient
+    private String accountSubLedgerAmount_Value;
+    
     public Integer getAccountDetailKeyId() {
         return accountDetailKeyId;
     }
@@ -203,5 +212,33 @@ public class EgBillPayeedetails extends AbstractPersistable<Integer> implements 
     public void setIsDebit(final Boolean isDebit) {
         this.isDebit = isDebit;
     }
+
+
+	public String getDetailKeyAccount() {
+		return detailKeyAccount;
+	}
+
+	public void setDetailKeyAccount(String detailKeyAccount) {
+		this.detailKeyAccount = detailKeyAccount;
+	}
+
+	public String getDetailKeyIfsc() {
+		return detailKeyIfsc;
+	}
+
+	public void setDetailKeyIfsc(String detailKeyIfsc) {
+		this.detailKeyIfsc = detailKeyIfsc;
+	}
+    
+    
+
+	public String getAccountSubLedgerAmount_Value() {
+		return accountSubLedgerAmount_Value;
+	}
+
+	public void setAccountSubLedgerAmount_Value(String accountSubLedgerAmount_Value) {
+		this.accountSubLedgerAmount_Value = accountSubLedgerAmount_Value;
+	}
+
 
 }

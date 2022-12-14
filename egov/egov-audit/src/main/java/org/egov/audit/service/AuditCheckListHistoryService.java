@@ -20,7 +20,7 @@ private static final Logger LOGGER = Logger.getLogger(AuditCheckListHistoryServi
 
 	public void deleteAuditChecklistHistory(List<AuditChecklistHistory> auditChecklisthistory) {
 		for(AuditChecklistHistory auditcheckhistory:auditChecklisthistory) {
-			auditCheckListHistoryRepository.delete(auditcheckhistory);
+			auditCheckListHistoryRepository.deleteById(auditcheckhistory.getId());
 		}
 		
 	}

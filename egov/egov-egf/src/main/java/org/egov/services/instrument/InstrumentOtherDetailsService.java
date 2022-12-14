@@ -77,5 +77,19 @@ public class InstrumentOtherDetailsService extends PersistenceService<Instrument
     	update(io);
     	
     }
+    //New Method after adding Recon COmment
+    @Transactional
+    public void reconcileNew(Date recociledOn, String recocileComment, Long ihId, BigDecimal instrumentAmount)
+    {
+    	InstrumentOtherDetails io = find("from InstrumentOtherDetails where instrumentHeaderId.id=?",ihId);
+    	io.setReconciledAmount(instrumentAmount);
+    	io.setReconciledOn(recociledOn);
+    	io.setReconciledComment(recocileComment);
+    	io.setInstrumentStatusDate(new Date());
+    	applyAuditing(io);
+    	update(io);
+    	
+    }
+    
 	
 }

@@ -547,6 +547,8 @@ System.out.println("debug :::: balance(4) :: :: "+egBillregister.getEgBillregist
             }
             payeeDetails.setDetailTypeName(detailType.getName());
             payeeDetails.setDetailKeyName(entity.getName());
+            payeeDetails.setDetailKeyAccount(entity.getBankaccount());
+            payeeDetails.setDetailKeyIfsc(entity.getIfsccode());
 
         }
     }

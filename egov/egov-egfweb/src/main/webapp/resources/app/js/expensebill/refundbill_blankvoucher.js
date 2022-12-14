@@ -115,7 +115,9 @@ $(document).ready(function(){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],//ct.split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -139,6 +141,8 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger[0].payTo').value=data.name;
 			document.getElementById('tempSubLedger[0].detailkeyId').value=data.id;
+			document.getElementById('tempSubLedger[0].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger[0].ifscCode').value=data.ifsccode;
 			document.getElementById('tempSubLedger[0].detailTypeId').value=document.getElementById('tempSubLedger[0].subLedgerType').value;
 			
 			
@@ -356,6 +360,8 @@ function subledger_initialize(dataId){
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
 						id : ct.split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -378,6 +384,8 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger['+index+'].payTo').value=data.name;
 			document.getElementById('tempSubLedger['+index+'].detailkeyId').value=data.id;
+			document.getElementById('tempSubLedger['+index+'].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger['+index+'].ifscCode').value=data.ifsccode;
 			document.getElementById('tempSubLedger['+index+'].detailTypeId').value=document.getElementById('tempSubLedger['+index+'].subLedgerType').value;
 			
 				 
@@ -1118,12 +1126,20 @@ $("#populateAccountDetails").click(function () {
 				$netPayableAccountCodeId =document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value;
 				//where this id
 				$("#netPayableId").val(document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value);
+				if(document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value != null) {
+					if(document.getElementById('tempSubLedger['+index+'].bankAccount').value ==  '' || document.getElementById('tempSubLedger['+index+'].ifscCode').value == '') {
+		              bootbox.alert("Either Bank Account or IFSC Code is missing for " +document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value + ", please update the details.");
+					  return false;	
+					}
+					
+				}
 				accountDetailsCount++;
 				if(document.getElementById('tempSubLedger['+index+'].netPayableIsSubLedger').value!="false"  && document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value!="" && document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value!=""){
 					populateSubLedgerDetails(document.getElementsByName('billPayeedetails['+index+'].egBilldetailsId.glcodeid')[0].value,document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value,
 							document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value,
 									document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeName').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value,
-											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,false);
+											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,document.getElementById('tempSubLedger['+index+'].bankAccount').value,
+											document.getElementById('tempSubLedger['+index+'].ifscCode').value,false);
 				}
 			}
 		 });
@@ -1244,6 +1260,8 @@ function clearAllDetails() {
 			document.getElementById('tempSubLedger[0].detailkeyId').value = "";
 			document.getElementById('tempSubLedger[0].subLedgerCode').value = "";
 			document.getElementById('tempSubLedger[0].payTo').value = "";
+			document.getElementById('tempSubLedger[0].bankAccount').value = "";
+			document.getElementById('tempSubLedger[0].ifscCode').value = "";
 			document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
 		}else{
 			var objects = $('.subledge-delete-row');
@@ -1263,7 +1281,7 @@ function clearAllDetails() {
 }
 
 
-function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,isdebit){
+function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,bankAccount,ifscCode,isdebit){
 	
 	$('.subLedgerGlCode_' + subLedgerCount).html('');
     $('#subLedgerDetailTypeId_' + subLedgerCount).val('');
@@ -1296,6 +1314,8 @@ function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detai
 	$('#subLedgerDetailKeyId_' + subLedgerCount).val(detailKeyId);
 	$('.subLedgerType_' + subLedgerCount).html(detailTypeName);
 	$('.subLedgerName_' + subLedgerCount).html(detailKeyName);
+	$('.subLedgerAccount_' + subLedgerCount).html(bankAccount);
+	$('.subLedgerIfsc_' + subLedgerCount).html(ifscCode);
 	$('.subLedgerAmount_' + subLedgerCount).html(amount);
 	
 }
@@ -1790,6 +1810,7 @@ function validateFormGlcode(workFlowAction){
 					if( workFlowAction=='Forward'){
 					alert("Amount is invalid in Subledger for glocode "+glocode_alert);
 					return ;
+	  
 				}		 
 			}	 
 			}	 
@@ -1846,8 +1867,12 @@ function validateFormGlcode(workFlowAction){
 			var approvalDesignation=document.getElementById('approvalDesignation').value;
 			var approvalPosition=document.getElementById('approvalPosition').value;
 			var approvalComent=document.getElementById('approvalComent').value;
-			if(workFlowAction=='Forward')
+			if(workFlowAction=='Forward' || workFlowAction=='Verify')
 			{
+				if(validateUpload()){
+					status = true;
+				}else
+				  return false;   
 				if(approvalDepartment == null || approvalDepartment == '' ||approvalDepartment=='-1')
 				{
 					bootbox.alert('Please select approval department details');
@@ -1873,10 +1898,18 @@ function validateFormGlcode(workFlowAction){
 	document.forms[0].action='/services/EGF/refund/refundCreateBlank';
 	document.forms[0].submit();
 	return true;
-	
 }
 
-
-
-
-
+function validateUpload(){
+	var filesize=document.forms[0].documentsSize.value;
+	if(filesize ==null ||filesize==0){
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+			 return false;
+			}
+	     }
+		}
+	return true;
+	}

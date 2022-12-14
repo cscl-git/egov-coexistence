@@ -72,6 +72,9 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.audit.model.ManageAuditor;
 import org.egov.audit.repository.AuditRepository;
 import org.egov.audit.service.ManageAuditorService;
+import org.egov.audit.utils.AuditConstants;
+import org.egov.audit.utils.AuditUtils;
+import org.egov.audit.service.AuditService;
 import org.egov.commons.Accountdetailtype;
 import org.egov.commons.Bank;
 import org.egov.commons.CChartOfAccountDetail;
@@ -86,12 +89,17 @@ import org.egov.commons.service.ChartOfAccountsService;
 import org.egov.commons.service.CheckListService;
 import org.egov.egf.commons.bank.service.CreateBankService;
 import org.egov.egf.expensebill.repository.DocumentUploadRepository;
+import org.egov.egf.expensebill.repository.RetrachmentRepository;																 
 import org.egov.egf.expensebill.service.ExpenseBillService;
 import org.egov.egf.expensebill.service.RefundBillService;
+import org.egov.egf.expensebill.service.RetrachmentService;														   
 import org.egov.egf.utils.FinancialUtils;
+import org.egov.eis.repository.DesignationRepository;													 
 import org.egov.eis.web.contract.WorkflowContainer;
+import org.egov.infra.admin.master.entity.AppConfig;													
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.User;
+import org.egov.infra.admin.master.service.AppConfigService;															
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
@@ -111,6 +119,7 @@ import org.egov.model.bills.DocumentUpload;
 import org.egov.model.bills.EgBillPayeedetails;
 import org.egov.model.bills.EgBilldetails;
 import org.egov.model.bills.EgBillregister;
+import org.egov.model.bills.RetrachmentDetails;
 import org.egov.model.voucher.PreApprovedVoucher;
 import org.egov.pims.commons.Position;
 import org.egov.utils.Constants;
@@ -188,6 +197,8 @@ public class UpdateExpenseBillController extends BaseBillController {
     @Autowired
     private FinancialUtils financialUtils;
     @Autowired
+	private AuditUtils auditUtils;
+    @Autowired
     private CheckListService checkListService;
     @Autowired
     private MicroserviceUtils microServiceUtil;
@@ -211,7 +222,13 @@ public class UpdateExpenseBillController extends BaseBillController {
 	private PaymentRefundUtils paymentRefundUtils;
     @Autowired
     private ChartOfAccountDetailService chartOfAccountDetailService;
-
+    @Autowired
+	private RetrachmentService retrachmentService;
+	@Autowired
+	private RetrachmentRepository retrachmentRepository;
+	@Autowired
+	private AuditService auditService;
+	
     public UpdateExpenseBillController(final AppConfigValueService appConfigValuesService) {
 		super(appConfigValuesService);
     }
@@ -611,6 +628,7 @@ public class UpdateExpenseBillController extends BaseBillController {
             }
         } else {
             try {
+            	AuditDetails auditDetails=auditService.findByEgBillregister(egBillregister);
                 if (null != workFlowAction)
                 {
                 	egBillregister.setDocumentDetail(list);
@@ -636,6 +654,15 @@ public class UpdateExpenseBillController extends BaseBillController {
                             persistenceService.getSession().flush();
                     	}
                     	
+                    }
+                    if(workFlowAction.equalsIgnoreCase(FinancialConstants.BUTTONCANCEL))
+                    {
+                    	if(auditDetails != null) {
+                    	auditDetails.setState(null);
+        				auditDetails.setStatus(auditUtils.getStatusByModuleAndCode(AuditConstants.AUDIT,
+            					AuditConstants.AUDIT_CANCELLED_STATUS));
+        				auditRepository.save(auditDetails);
+                    	}
                     }
                 }   
                 
@@ -719,6 +746,184 @@ public class UpdateExpenseBillController extends BaseBillController {
         }
     }
 
+    @RequestMapping(value = "/updateCreditDebit/{billId}/{auditId}", method = RequestMethod.GET)
+	public String updateCreditDebitJSPOpen(@ModelAttribute("egBillregister") final EgBillregister egBillregister,
+			final Model model, @PathVariable String billId, @PathVariable String auditId,
+			final BindingResult resultBinder, final HttpServletRequest request) {
+		System.out.println(billId);
+		egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
+		setDropDownValues(model);
+		model.addAttribute("mode", "readOnly");
+		model.addAttribute(BILL_TYPES, BillType.values());
+		prepareBillDetailsForView(egBillregister);
+		prepareCheckList(egBillregister);
+		final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService
+				.getNetPayableCodesByAccountDetailType(0);
+		for (final EgBilldetails details : egBillregister.getBillDetails())
+			if (expensePayableAccountList != null && !expensePayableAccountList.isEmpty()
+					&& expensePayableAccountList.contains(details.getChartOfAccounts()))
+				model.addAttribute(NET_PAYABLE_AMOUNT, details.getCreditamount());
+
+		model.addAttribute("egBillregister", egBillregister);
+		return "update_Credit_Debit";
+	}
+
+	@RequestMapping(value = "/updateCreditDebit/{billId}/{auditId}", params = "saveCreditDebitDetails", method = RequestMethod.POST)
+	public String updateCreditDebitSaved(@ModelAttribute("egBillregister") final EgBillregister egBillregister,
+			final Model model, @PathVariable String billId, @PathVariable String auditId,
+			final BindingResult resultBinder, final HttpServletRequest request) {
+		
+		String[] debit_Amount = request.getParameterValues("accountDebitAmount_Value");
+		String[] credit_Amount = request.getParameterValues("accountCreditAmount_Value");
+		String[] subledger_Amount = request.getParameterValues("accountSubLedgerAmount_Value");
+		egBillregister.getBillDetails().addAll(egBillregister.getEgBilldetailes());
+		setDropDownValues(model);
+		model.addAttribute(BILL_TYPES, BillType.values());
+		prepareBillDetailsForView(egBillregister);
+		prepareCheckList(egBillregister);
+		final List<CChartOfAccounts> expensePayableAccountList = chartOfAccountsService
+				.getNetPayableCodesByAccountDetailType(0);
+		for (final EgBilldetails details : egBillregister.getBillDetails())
+			if (expensePayableAccountList != null && !expensePayableAccountList.isEmpty()
+					&& expensePayableAccountList.contains(details.getChartOfAccounts()))
+				model.addAttribute(NET_PAYABLE_AMOUNT, details.getCreditamount());
+		
+		BigDecimal actual_Credit_sum = new BigDecimal("0.0"), actual_Debit_sum = new BigDecimal("0.0"), actual_Subledger_sum = new BigDecimal("0.0");
+		BigDecimal update_Credit_sum = new BigDecimal("0.0"), update_Debit_sum = new BigDecimal("0.0"), update_Subledger_sum = new BigDecimal("0.0");
+		int i = 0;
+		for (String cred : credit_Amount) {
+			try {
+				if (egBillregister.getBillDetails().get(i).getCreditamount() != (new BigDecimal("0"))) {
+					actual_Credit_sum = actual_Credit_sum.add(egBillregister.getBillDetails().get(i).getCreditamount());
+					egBillregister.getBillDetails().get(i).setCreditamount(new BigDecimal(cred));
+					update_Credit_sum = update_Credit_sum.add(egBillregister.getBillDetails().get(i).getCreditamount());
+				}
+				i++;
+			} catch (Exception e) {
+				model.addAttribute("message", "Failure : Please enter correct details");
+				return "success_saved";
+			}
+		}
+		int j = 0;
+		for (String cred : debit_Amount) {
+			try {
+				if (egBillregister.getBillDetails().get(j).getDebitamount() != (new BigDecimal("0"))) {
+					actual_Debit_sum = actual_Debit_sum.add(egBillregister.getBillDetails().get(j).getDebitamount());
+					egBillregister.getBillDetails().get(j).setDebitamount(new BigDecimal(cred));
+					update_Debit_sum = update_Debit_sum.add(egBillregister.getBillDetails().get(j).getDebitamount());
+				}
+				j++;
+			} catch (Exception e) {
+				model.addAttribute("message", "Failure : Please enter correct details");
+				return "success_saved";
+			}																	
+		}
+		egBillregister.setBillamount(update_Debit_sum);
+		egBillregister.setPassedamount(update_Debit_sum);
+		if(null!=egBillregister.getEgBillregistermis() && null!=egBillregister.getEgBillregistermis().getBudgetaryAppnumber() && null!=egBillregister.getEgBillregistermis().getCurrentexpenditure())
+		{
+			System.out.println("current Exp before----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
+			BigDecimal previous_old=egBillregister.getEgBillregistermis().getPreviousexpenditure();
+			BigDecimal current_old=egBillregister.getEgBillregistermis().getCurrentexpenditure();
+			BigDecimal diff=current_old.subtract(update_Debit_sum);
+			egBillregister.getEgBillregistermis().setCurrentexpenditure(update_Debit_sum);
+			System.out.println("current Exp after----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
+			System.out.println("current balance before----- "+egBillregister.getEgBillregistermis().getBalance());
+			BigDecimal previousbalance=egBillregister.getEgBillregistermis().getBalance();
+			BigDecimal currentbalance=previousbalance.subtract(diff);
+			egBillregister.getEgBillregistermis().setBalance(currentbalance);
+			System.out.println("current balance after----- "+egBillregister.getEgBillregistermis().getBalance());
+			//BigDecimal previousexpenditurenew=previous_old.subtract(diff);
+			//egBillregister.getEgBillregistermis().setPreviousexpenditure(previousexpenditurenew);
+			//System.out.println("current Exp after----- "+egBillregister.getEgBillregistermis().getCurrentexpenditure());
+		}
+		EgBillPayeedetails payee = new EgBillPayeedetails();
+		j = 0;
+		if(subledger_Amount!=null)
+		{
+			for (String sub : subledger_Amount) {
+				try {
+					if (payee.getCreditAmount() != (new BigDecimal("0"))) {
+						actual_Subledger_sum = actual_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getCreditAmount());
+						egBillregister.getBillPayeedetails().get(j).setCreditAmount(new BigDecimal(sub));
+						update_Subledger_sum = update_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getCreditAmount());
+					}
+					else {
+						actual_Subledger_sum = actual_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getDebitAmount());
+						egBillregister.getBillPayeedetails().get(j).setDebitAmount(new BigDecimal(sub));
+						update_Subledger_sum = update_Subledger_sum.add(egBillregister.getBillPayeedetails().get(j).getDebitAmount());
+					}
+					j++;
+				} catch (Exception e) {
+					model.addAttribute("message", "Failure : Please enter correct details");
+					return "success_saved";
+				}																	
+			}
+		}
+		
+		if (actual_Debit_sum.compareTo(update_Debit_sum) == -1) {
+			model.addAttribute("message",
+					"Failure : Updated Debit Details must not be greater than or equal to Previous record");
+			return "success_saved";
+		} else if (actual_Credit_sum.compareTo(update_Credit_sum) == -1) {
+			model.addAttribute("message",
+					"Failure : Updated Credit Details must not be greater than or equal to Previous record");
+			return "success_saved";
+		} else if (actual_Subledger_sum.compareTo(update_Subledger_sum) == -1) {
+			model.addAttribute("message",
+					"Failure : Updated Subledger Details must not be greater than or equal to Previous record");
+			return "success_saved";
+		} else if (update_Credit_sum.compareTo(update_Debit_sum) == -1
+				|| update_Credit_sum.compareTo(update_Debit_sum) == 1) {
+			String s = "Failure : Updated Credit Details and Debit Details must be equal. Credit Sum is "
+					+ update_Credit_sum + " Debit Sum is " + update_Debit_sum;
+			model.addAttribute("message", s);
+			return "success_saved";
+		} else if (subledger_Amount!=null && ( update_Subledger_sum.compareTo(update_Credit_sum) == -1
+				|| update_Subledger_sum.compareTo(update_Credit_sum) == 1)) {
+			String s = "Failure : Updated Subledger Details and Credit Details must be equal. Credit Sum is "
+					+ update_Credit_sum + " Subledger Sum is " + update_Subledger_sum;
+			model.addAttribute("message", s);
+			return "success_saved";
+		}
+
+		try {
+			Date d = new Date();
+			AuditDetails audit = auditService.findByid(Long.parseLong(auditId));
+			org.egov.infra.admin.master.entity.Department department = departmentService
+					.getDepartmentByCode(audit.getDepartment());
+			RetrachmentDetails retrachmentDetails = retrachmentService.findByAuditId(auditId);
+			if (retrachmentDetails == null) {
+				RetrachmentDetails retrachmentDetail = new RetrachmentDetails();
+				retrachmentDetail.setAuditid(auditId);
+				retrachmentDetail.setRetrachmentdate(d);
+				retrachmentDetail.setAmountofbill(actual_Debit_sum);
+				retrachmentDetail.setAmountbyaudit(update_Credit_sum);
+				BigDecimal retra = actual_Credit_sum.subtract(update_Credit_sum);
+				retrachmentDetail.setAmountretrached(retra);
+				retrachmentDetail.setBilldetail(egBillregister.getEgBillregistermis().getNarration());
+				retrachmentDetail.setDepartment_name(department.getName());
+				retrachmentDetail.setRemarks(audit.getRetrachmentcomment());
+				retrachmentService.createRetrachment(retrachmentDetail);
+			} else {
+				retrachmentDetails.setAmountofbill(actual_Debit_sum);
+				retrachmentDetails.setAmountbyaudit(update_Credit_sum);
+				BigDecimal retra = actual_Credit_sum.subtract(update_Credit_sum);
+				retrachmentDetails.setAmountretrached(retra);
+				retrachmentDetails.setRemarks(audit.getRetrachmentcomment());
+				retrachmentService.createRetrachment(retrachmentDetails);
+			}
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			model.addAttribute("message", "Failure : Data is not saved.");
+			return "success_saved";
+		}
+
+		model.addAttribute("message", "Success : Your Credit and Debit Details are successfully saved.");
+		return "success_saved";
+	}
+	
     private void populateauditWorkFlow(EgBillregister updatedEgBillregister) {
     	AuditDetails audit=new AuditDetails();
     	final User user = securityUtils.getCurrentUser();

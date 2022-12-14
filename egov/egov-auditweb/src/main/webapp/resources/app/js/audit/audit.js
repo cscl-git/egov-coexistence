@@ -13,6 +13,22 @@ $(document).ready(
 			}
 	
 });
+
+/*$(document).ready(
+	function() {
+	 var retrachmentcheck=$('#retrachmentcheck').val();
+	 console.log("ret ::"+retrachmentcheck);
+			if (retrachmentcheck == 0 || retrachmentcheck == 'null'
+					|| retrachmentcheck == null) {
+
+	 $('input[type=checkbox]').removeAttr('checked');
+	 }
+	
+			if (retrachmentcheck == 1) {
+				myFunctionRet();
+			}
+	
+});*/
 $('body').on('focus',".datepicker", function(){
     $(this).datepicker();
 });
@@ -39,11 +55,8 @@ function openHistory(auditId,checkListId){
 
 function searchCheck(){
 if($("#passUnderobjection").is(':checked')){
-		
 		$('#passUnderobjection').val("1");
-	}
-	
-	
+	}	
 }
 function downloadexcel(){
 	var billFrom = document.getElementById("billFrom").value;
@@ -55,7 +68,6 @@ function downloadexcel(){
 }
 
 function myFunction() {
-
 	var checkBox = document.getElementById("passUnderobjection");
 	// Get the output text
 	var text = document.getElementById("xxxx");
@@ -80,12 +92,38 @@ function setWorkFLowAction(name) {
 				}
 		}
 	document.getElementById('workFlowAction').value=name;
-	
+	if(name=='auditor' && document.getElementById('auditStatus').value == 'Pending with Department')
+	{
+		$('#approvalDepartment').prop('required',false);
+		$('#approvalDesignation').prop('required',false);
+		$('#approvalPosition').prop('required',false);
+		$('#approvalComent').prop('required',true);
+	}
+	if(name=='Reject')
+	{
+		$('#approvalDepartment').prop('required',false);
+		$('#approvalDesignation').prop('required',false);
+		$('#approvalPosition').prop('required',false);
+		$('#approvalComent').prop('required',true);
+	}
 if($("#passUnderobjection").is(':checked')){
 		
 		$('#passUnderobjection').val("1");
 	}
-	
+	checkRSA(name);
+}
+
+function chechRSA(name)
+{
+	if (name == 'sectionOfficer'
+		&& (document.getElementById('auditStatus').value == 'Created'
+				|| document.getElementById('auditStatus').value == 'Pending with Auditor' || document
+				.getElementById('auditStatus').value == 'Pending with Examiner')) {
+	if (document.getElementById('leadAuditorEmpNo').value == '-1') {
+				bootbox.alert("Please select the RSA employee");
+				return false;
+			}
+	}
 }
 
 function openSource(sourcepath){

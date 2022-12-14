@@ -64,6 +64,7 @@
 				<th><s:text name="lbl.instrument.type"/></th>
 				<th><s:text name="lbl.amount"/></th>
 				<th><s:text name="lbl.reconciliation.date"/></th>
+				<th><s:text name="lbl.reconciliation.comment"/></th>
 			</tr>
 		</thead>
 		<s:if test="%{unReconciledCheques.size>0}">
@@ -93,12 +94,22 @@
 						class="form-control datepicker" data-inputmask="'mask': 'd/m/y'" value="<s:property value="reconciledOn" />"/>
 					<%-- </s:else> --%>
 					</td>
+					<%-- <td style="text-align: right"><s:property value="reconciledComment" /></td> --%>
+					<td>
+					<%-- <input type="text"
+						id="reconComments<s:property value="#status.index"/>"
+						name="reconComments[<s:property value="#status.index"/>]"
+						class="form-control" value="<s:property value="reconciledComment" />"/> --%>
+						
+						<textarea cols="30" rows="2" id="reconComments<s:property value="#status.index"/>" 
+							name="reconComments[<s:property value="#status.index"/>]" value="<s:property value="reconciledComment" />"><s:property value="reconciledComment"/></textarea>
+					</td>
 				</tr>
 			</s:iterator>
 		</s:if>
 		<s:else>
 			<tr>
-				<td colspan="7" style="text-align: center"><s:text name="msg.no.record.found"/></td>
+				<td colspan="8" style="text-align: center"><s:text name="msg.no.record.found"/></td>
 			</tr>
 		</s:else>
 	</table>

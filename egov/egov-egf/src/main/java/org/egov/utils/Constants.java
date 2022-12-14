@@ -133,6 +133,9 @@ public class Constants {
     public static final SimpleDateFormat DDMMYYYYFORMAT1 = new SimpleDateFormat("dd-MMM-yyyy", LOCALE);
     public static final SimpleDateFormat DDMMYYYYFORMAT2 = new SimpleDateFormat("dd/MM/yyyy", LOCALE);
     public static final SimpleDateFormat DDMMYYYYFORMAT3 = new SimpleDateFormat("dd-MMM-yyyy");
+    
+    public static final SimpleDateFormat DDMMYYYYFORMAT4 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", LOCALE);//2020-07-02 00:00:00.000
+    public static final SimpleDateFormat DDMMYYYYFORMAT5 = new SimpleDateFormat("dd/MM/yyyy", LOCALE);
     public static final String END = "END";
 
     // These are the standard buttons used in transactions accrross the product

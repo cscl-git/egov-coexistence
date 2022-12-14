@@ -48,6 +48,7 @@
 package org.egov.commons.dao;
 
 import org.egov.commons.EgwStatus;
+import org.egov.infra.microservice.models.MisRemittanceDetails;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.stereotype.Repository;
@@ -111,6 +112,17 @@ public class EgwStatusHibernateDAO {
 
     public EgwStatus findById(final Integer integer, final boolean b) {
         return (EgwStatus) getCurrentSession().get(EgwStatus.class, integer);
+    }
+    
+    /**
+     * @param moduleType Module type
+     * @param statusCode Status code
+     * @return EgwStatus object for given module type and status code
+     */
+    public MisRemittanceDetails getRemittanceDetails(Long id) {
+        Query qry = this.getCurrentSession().createQuery("from MisRemittanceDetails S where S.id =:id");
+        qry.setLong("id", id);
+        return (MisRemittanceDetails) qry.uniqueResult();
     }
 
 }

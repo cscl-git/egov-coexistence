@@ -11,6 +11,7 @@ import org.egov.audit.entity.AuditDetails;
 import org.egov.infra.admin.master.entity.User;
 import org.egov.infra.microservice.models.Department;
 import org.egov.model.bills.DocumentUpload;
+import org.egov.model.bills.RetrachmentDetails;
 
 public class AuditDetail {
 	
@@ -31,11 +32,14 @@ public class AuditDetail {
     private Long stateId;
     private Long auditId;
     private String auditStatus;
+    private String auditStateValue;
     private String workFlowAction;
     private String expenditureType;
     private int fund;
     private Date billFrom;
     private Date billTo;
+    private Date fromDate;
+    private Date toDate;
     private List<PostAuditResult> postAuditResultList=new ArrayList<PostAuditResult>();
     private int counter = 0;
     private List<AuditBillDetails> auditBillDetails=new ArrayList<AuditBillDetails>();
@@ -46,7 +50,8 @@ public class AuditDetail {
 	private String notes;
 	private Integer passUnderobjection=0;
 	private String passunderobjectioncomment ;
-	
+	private String retrachmentcomment;
+	private List<RetrachmentDetails> retrachmentDetailsList;
 	public String getPassunderobjectioncomment() {
 		return passunderobjectioncomment;
 	}
@@ -247,6 +252,45 @@ public class AuditDetail {
 	}
 	public void setType(String type) {
 		this.type = type;
+	}
+	
+	public String getRetrachmentcomment() {
+		return retrachmentcomment;
+	}
+	public void setRetrachmentcomment(String retrachmentcomment) {
+		this.retrachmentcomment = retrachmentcomment;
+	}
+	public List<RetrachmentDetails> getRetrachmentDetailsList() {
+		return retrachmentDetailsList;
+	}
+	public void setRetrachmentDetailsList(List<RetrachmentDetails> retrachmentDetailsList) {
+		this.retrachmentDetailsList = retrachmentDetailsList;
+	}
+
+	/*
+	 * public String getFromDate() { return fromDate; } public void
+	 * setFromDate(String fromDate) { this.fromDate = fromDate; } public String
+	 * getToDate() { return toDate; } public void setToDate(String toDate) {
+	 * this.toDate = toDate; }
+	 */
+	
+	public String getAuditStateValue() {
+		return auditStateValue;
+	}
+	public void setAuditStateValue(String auditStateValue) {
+		this.auditStateValue = auditStateValue;
+	}
+	public Date getFromDate() {
+		return fromDate;
+	}
+	public void setFromDate(Date fromDate) {
+		this.fromDate = fromDate;
+	}
+	public Date getToDate() {
+		return toDate;
+	}
+	public void setToDate(Date toDate) {
+		this.toDate = toDate;
 	}
 	
 

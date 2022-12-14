@@ -278,5 +278,24 @@ public class AuditUtils {
 		
 		return misQuery.toString();
 	}
+	
+	public  String getAllAuditDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" ad.audit_sch_date>='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateFrom))
+						.append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and ad.audit_sch_date<='")
+						.append(AuditConstants.DDMMYYYYFORMAT1.format(billDateTo))
+						.append("'");
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing getAllAuditDateQuery");
+		}
+		return numDateQuery.toString();
+	}
 
 }

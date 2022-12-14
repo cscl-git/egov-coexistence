@@ -114,7 +114,9 @@ $(document).ready(function(){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -138,6 +140,8 @@ $('.subLedgerCodeOT').typeahead({
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger[0].payTo').value=data.name;
 			document.getElementById('tempSubLedger[0].detailkeyId').value=data.id;
+			document.getElementById('tempSubLedger[0].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger[0].ifscCode').value=data.ifsccode;
 			if(document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value==""){
 				document.getElementById('tempSubLedger[0].netPayableDetailKeyId').value=document.getElementById('tempSubLedger[0].detailkeyId').value;
 				document.getElementById('tempSubLedger[0].netPayableDetailKeyName').value=detailKeyName;
@@ -154,17 +158,30 @@ $('.subLedgerCodeOT').typeahead({
 });
 
 $('.btn-wf-primary').click(function(){
+ 
 	var button = $(this).attr('id');
-	if (button != null && (button == 'Forward')) {
+			   
+	if (button != null && (button == 'Forward' || button == 'Verify')) {
 		if(!validateWorkFlowApprover(button))
 			return false;
 		if(!$("form").valid())
 			return false;
+					   
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+				return false;
+			}
+		}	   
+	   
+				
 		if(validate()){
 			deleteHiddenSubledgerRow();
 			return true;
 		}else
 			return false;
+  
 	 }
 	else if (button != null && (button == 'Reject')) {
 		
@@ -430,7 +447,9 @@ function subledger_initialize(dataId){
 					return {
 						code:ct.split("~")[0].split("-")[0],
 						name : ct.split("~")[0].split("-")[1],
-						id : ct.split("~")[1],
+						id : ct.split("$")[0].split("~")[1],
+						bankaccount : ct.split("@")[0].split("$")[1],
+						ifsccode : ct.split("@")[1],
 						codeAndName:ct
 					};
 				});
@@ -447,12 +466,14 @@ $('.subLedgerCodeOT').typeahead({
 		displayKey : 'codeAndName',
 		source : entityName.ttAdapter()
 	}).on('typeahead:selected', function (event, data) {
-				   
+			  
 
 		document.getElementById('tempSubLedger['+index+'].subLedgerCode').value=data.code;
 			detailKeyName = data.name;
 			document.getElementById('tempSubLedger['+index+'].payTo').value=data.name;
 			document.getElementById('tempSubLedger['+index+'].detailkeyId').value=data.id;
+			document.getElementById('tempSubLedger['+index+'].bankAccount').value=data.bankaccount;
+			document.getElementById('tempSubLedger['+index+'].ifscCode').value=data.ifsccode;
 			if(document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value==""){
 				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value=document.getElementById('tempSubLedger['+index+'].detailkeyId').value;
 				document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value=detailKeyName;
@@ -604,6 +625,25 @@ $('.subledgerGl_code').change(function () {
 });
 
 $('#billSubType').change(function () {
+	
+	//alert("1");
+	
+	$('#file1').removeAttr('required');	
+	
+	var billsubtypeval= $("#billSubType").val();
+	
+	//alert("Bill Type" +billsubtypeval);
+	
+	if(billsubtypeval == 1){
+		//alert("if");
+	$('#file1').attr('required', 'required');
+	$("#file1").addClass("mandatory");
+	}else{
+		//alert("else");
+	$('#file1').removeAttr('required');	
+	$("#file1").removeClass("mandatory");
+	$("#file1-error").css("display", "none");
+	}
 	
 	worksDiv();
 	
@@ -1076,8 +1116,10 @@ function addSubledger(){
 $("#populateAccountDetails").click(function () {
 	var isMerged= false;
 	var accountDetailsCount = $("#tblaccountdetails > tbody > tr:visible[id='accountdetailsrow']").length;
+	
 	if(validateAccountDetails())
 		{
+
 		$('#tbldebitdetails  > tbody > tr:visible[id="debitdetailsrow"]').each(function() {
 			 if($(this).find(".debitdetailid").val()!='' && $(this).find(".debitAmount").val()!='')
 				{
@@ -1115,7 +1157,8 @@ $("#populateAccountDetails").click(function () {
 						populateSubLedgerDetails($(this).find(".debitdetailid").val(),$(this).find(".debitaccountcode").val(),
 								$(this).find(".debitDetailTypeId").val(),$(this).find(".debitDetailKeyId").val(),
 								$(this).find(".debitDetailTypeName").val(),$(this).find(".debitDetailKeyName").val(),
-								$(this).find(".debitAmount").val(),true);
+								$(this).find(".debitAmount").val(),true);				        
+
 					}
 			 }
 		 });
@@ -1183,12 +1226,21 @@ $("#populateAccountDetails").click(function () {
 				$netPayableAccountCodeId =document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value;
 				//where this id
 				$("#netPayableId").val(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value);
+				if(document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value != null) {
+					if(document.getElementById('tempSubLedger['+index+'].bankAccount').value ==  '' || document.getElementById('tempSubLedger['+index+'].ifscCode').value == '') {
+		              bootbox.alert("Either Bank Account or IFSC Code is missing for " +document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value + ", please update the details.");
+					  return false;	
+					}
+					
+				}
 				accountDetailsCount++;
+				
 				if(document.getElementById('tempSubLedger['+index+'].netPayableIsSubLedger').value!="false"  && document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value!="" && document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value!=""){
 					populateSubLedgerDetails(document.getElementById('tempSubLedger['+index+'].netPayableAccountCode').value,document.getElementById('tempSubLedger['+index+'].netPayableGlcode').value,
 							document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeId').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyId').value,
 									document.getElementById('tempSubLedger['+index+'].netPayableDetailTypeName').value,document.getElementById('tempSubLedger['+index+'].netPayableDetailKeyName').value,
-											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,false);
+											document.getElementById('tempSubLedger['+index+'].expense-netPayableAmount').value,document.getElementById('tempSubLedger['+index+'].bankAccount').value,
+											document.getElementById('tempSubLedger['+index+'].ifscCode').value,false);
 				}
 			}
 		 });
@@ -1243,6 +1295,7 @@ function addCustomEventListener(target,type,func){
 
 
 function validate(){
+
 	if(billamount == 0){
 		bootbox.alert($.i18n.prop('msg.please.select.account.details'));
 		return false;
@@ -1263,12 +1316,19 @@ function validate(){
 		bootbox.alert($.i18n.prop('msg.please.select.atleast.one.debit.details'));
 		return false;
 	}
-	
+	/*var filename=document.forms[0].file.value;
+	if(filename ==null ||filename.length==0 ){
+		var confrm=confirm("Document not uploaded, do you want to proceed?");
+		if(!confrm){
+			return false;
+		}
+	}*/
 	/*if(!$netPayableAccountCodeId)
 	{
 		bootbox.alert($.i18n.prop('msg.please.select.one.net.payable.account.detail'));
 		return false;
 	}*/
+ 
 	return true;
 }
 
@@ -1315,6 +1375,8 @@ function clearAllDetails() {
 			document.getElementById('tempSubLedger[0].detailkeyId').value = "";
 			document.getElementById('tempSubLedger[0].subLedgerCode').value = "";
 			document.getElementById('tempSubLedger[0].payTo').value = "";
+			document.getElementById('tempSubLedger[0].bankAccount').value = "";
+			document.getElementById('tempSubLedger[0].ifscCode').value = "";
 			document.getElementById('tempSubLedger[0].expense-netPayableAmount').value = "";
 		}else{
 			var objects = $('.subledge-delete-row');
@@ -1334,13 +1396,15 @@ function clearAllDetails() {
 }
 
 
-function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,isdebit){
+function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detailTypeName,detailKeyName,amount,bankAccount,ifscCode,isdebit){
 	
 	$('.subLedgerGlCode_' + subLedgerCount).html('');
     $('#subLedgerDetailTypeId_' + subLedgerCount).val('');
 	$('#subLedgerDetailKeyId_' + subLedgerCount).val('');
 	$('.subLedgerType_' + subLedgerCount).html('');
 	$('.subLedgerName_' + subLedgerCount).html('');
+	$('.subLedgerAccount_' + subLedgerCount).html('');
+	$('.subLedgerIfsc_' + subLedgerCount).html('');
 	$('.subLedgerAmount_' + subLedgerCount).html('');
 	$('#subLedgerGlCodeId_' + subLedgerCount).val('');  
 	$('#subLedgerIsDebit_' + subLedgerCount).val('');
@@ -1367,6 +1431,8 @@ function populateSubLedgerDetails(glCodeId,glCode,detailTypeId,detailKeyId,detai
 	$('#subLedgerDetailKeyId_' + subLedgerCount).val(detailKeyId);
 	$('.subLedgerType_' + subLedgerCount).html(detailTypeName);
 	$('.subLedgerName_' + subLedgerCount).html(detailKeyName);
+	$('.subLedgerAccount_' + subLedgerCount).html(bankAccount);
+	$('.subLedgerIfsc_' + subLedgerCount).html(ifscCode);
 	$('.subLedgerAmount_' + subLedgerCount).html(amount);
 	
 }
@@ -1650,36 +1716,31 @@ function populateVarianceDetails()
 
 function validateSubLedger(Curraction) {
 
-	if (Curraction.value == 'Forward') {/*
-		var temp=document.getElementById('tempSubLedger[0].subLedgerType').value;
-		if(temp == null || temp == '') {
-			var txt;
-			if (confirm("No SubLedger added, Do you want to continue without adding subledger details. ")) {
-			    txt = "true";
-			  } else {
-			    txt = "false";
-			  }
-			if(txt=="true"){
-				if(validateFormGlcode()){
-					bootbox.alert("Please fill Subledger details Correctly.");
-					return false;
-				}
-				else
-					return true;
-			}
-			else{ 
-				return false;
-			}
-			//bootbox.alert('No SubLedger added, please recheck ');
-			//return false;
-		}
-		else {
-			var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
+	if (Curraction.value == 'Forward') {
+		
+  
+		var subLedgerGlCode = document.getElementsByClassName('subLedgerGlCode_0')[0].innerHTML;
 			var subLedgerType = document.getElementsByClassName('subLedgerType_0')[0].innerHTML;
 			var subLedgerName = document.getElementsByClassName('subLedgerName_0')[0].innerHTML;
 			var subLedgerAmount = document.getElementsByClassName('subLedgerAmount_0')[0].innerHTML;
-			
-			if (subLedgerGlCode == null || subLedgerGlCode == '') {
+  
+
+			if (subLedgerGlCode == null || subLedgerGlCode == '' || subLedgerType == null || subLedgerType == ''
+				|| subLedgerName == null || subLedgerName == '' || subLedgerAmount == null || subLedgerAmount == '') {
+				var txt;
+				if (confirm("No SubLedger added, Do you want to continue without adding subledger details. ")) {
+				    txt = "true";
+				  } else {
+				    txt = "false";
+				  }
+				if(txt=="true"){
+					return true;
+				}
+				else{ 
+					return false;
+				}
+			}
+			/*if (subLedgerGlCode == null || subLedgerGlCode == '') {
 				bootbox.alert('Please select subLedger Detail');
 				return false;
 			}else if (subLedgerType == null || subLedgerType == '') {
@@ -1691,17 +1752,18 @@ function validateSubLedger(Curraction) {
 			} else if (subLedgerAmount == null || subLedgerAmount == '') {
 				bootbox.alert('Please select subLedger Detail');
 				return false;
-			} 
-		}
+			}*/
 
 
-	*/}else{
-		
-		
+	}else{
+  
+  
 		return true;
 	}
 
 }
+			  
+						  
 
 
 function validateFormGlcode(){
@@ -1712,6 +1774,7 @@ function validateFormGlcode(){
 		
 		if(i>0){
 		codes.push(options[i].value);
+	
 		}
 	}
 	
@@ -1738,3 +1801,23 @@ function validateFormGlcode(){
     return b;
     }
 	
+//himdri start
+function validateUpload(){
+
+	var filesize=document.forms[0].documentsSize.value;
+	if(filesize ==null ||filesize==0){
+ 
+			  
+		var filename=document.forms[0].file.value;
+		if(filename ==null ||filename.length==0 ){
+			var confrm=confirm("Document not uploaded, do you want to proceed?");
+			if(!confrm){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+//himdri end
+ 
+			

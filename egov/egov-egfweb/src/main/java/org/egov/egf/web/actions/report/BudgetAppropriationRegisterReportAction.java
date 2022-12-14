@@ -367,7 +367,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         updateBdgtAppropriationList();
     }
 
-    public void generateRestReport() {
+    public void generateRestReport(Date fromDate,Date toDate) {
     
          Query query = null;
 
@@ -377,7 +377,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
              strQuery.append("select vmis.budgetary_appnumber as bdgApprNumber, vh.vouchernumber as VoucherNumber, vh.voucherdate as voucherDate, vh.description as description,vh.createddate as createdDate, ");
              strQuery.append(" null as billNumber, null as billDate,null as billCreatedDate, gl.debitamount as debitAmount, gl.creditamount as creditAmount from generalledger gl, vouchermis vmis,  ");
              strQuery.append(" voucherheader vh  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid  ");
-             strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and (vh.state_id is not null and (select st.status from eg_wf_states st where st.id=vh.state_id)!=1) and vh.status != 4 ");
+             strQuery.append(" and (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and (vh.state_id is not null and (select st.status from eg_wf_states st where st.id=vh.state_id)!=1) and vh.status != 4 and vh.voucherdate <= '"+getFormattedDate(toDate)+"' and vh.voucherdate >= '"+getFormattedDate(fromDate)+"' ");
             // strQuery.append(" and vh.voucherdate <=:strAODate");
              strQuery.append(getFunctionQuery("gl.functionid"));
              strQuery.append(getDepartmentQuery("vmis.departmentcode"));
@@ -385,7 +385,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
              strQuery.append(" ");
              strQuery.append(" union select distinct bmis.budgetary_appnumber as bdgApprNumber, vh1.vouchernumber as VoucherNumber, vh1.voucherdate as  voucherDate , br.narration as description,vh1.createddate as createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,  bd.debitamount as debitAmount, bd.creditamount as creditAmount  ");
              strQuery.append(" from eg_billdetails bd, eg_billregistermis bmis, eg_billregister br, voucherHeader vh1 where br.id = bd.billid and br.id = bmis.billid  ");
-             strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid )  ");
+             strQuery.append(" and (bmis.budgetary_appnumber != 'null' and bmis.budgetary_appnumber is not null) and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and (vh1.id = bmis.voucherheaderid ) and vh1.voucherdate <= '"+getFormattedDate(toDate)+"' and vh1.voucherdate >= '"+getFormattedDate(fromDate)+"'  ");
             // strQuery.append(" and br.billdate  <=:strAODate");
              strQuery.append(getFunctionQuery("bd.functionid"));
              strQuery.append(getDepartmentQuery("bmis.departmentcode"));
@@ -395,7 +395,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
              strQuery.append(" br.narration as description,cast( null as date) createdDate, br.billnumber as billNumber, br.billdate as billDate,br.createddate as billCreatedDate ,   bd1.debitamount as debitAmount, bd1.creditamount as creditAmount from eg_billdetails bd1, eg_billregistermis bmis1, eg_billregister br  ");
              strQuery.append(" where br.id = bd1.billid and br.id = bmis1.billid  ");
              strQuery.append(" and (bmis1.budgetary_appnumber != 'null' and bmis1.budgetary_appnumber is not null) ");
-             strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null ");
+             strQuery.append(" and br.statusid not in (select id from egw_status where description='Cancelled' and moduletype in ('EXPENSEBILL', 'REFUNDBILL', 'SALBILL', 'WORKSBILL', 'PURCHBILL', 'CBILL', 'SBILL', 'CONTRACTORBILL')) and bmis1.voucherheaderid is null and br.billdate  <= '"+getFormattedDate(toDate)+"' and br.billdate  >= '"+getFormattedDate(fromDate)+"' ");
            //  strQuery.append(" and br.billdate <=:strAODate");
              strQuery.append(getFunctionQuery("bd1.functionid"));
              strQuery.append(getDepartmentQuery("bmis1.departmentcode"));
@@ -431,7 +431,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
              strsubQuery.append(" voucherheader vh,  eg_billregistermis bmis, eg_billregister br  where vh.id = gl.voucherheaderid and vh.id = vmis.voucherheaderid and vh.id = bmis.voucherheaderid and bmis.billid = br.id ");
            //  strsubQuery.append(" and  gl.glcodeid =:glCodeId ");
              strsubQuery.append(" and  ");
-             strsubQuery.append(" (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 ");
+             strsubQuery.append(" (vmis.budgetary_appnumber  != 'null' and vmis.budgetary_appnumber is not null) and vh.status != 4 and vh.voucherdate <= '"+getFormattedDate(toDate)+"' and vh.voucherdate >= '"+getFormattedDate(fromDate)+"' ");
            //  strsubQuery.append(" and vh.voucherdate <=:strAODate");
              strsubQuery.append(getFunctionQuery("gl.functionid"));
              strsubQuery.append(getDepartmentQuery("vmis.departmentcode"));
@@ -504,7 +504,7 @@ public class BudgetAppropriationRegisterReportAction extends BaseFormAction {
         BigDecimal totalCredit = new BigDecimal(0.0);
         if (totalGrant == null)
             totalGrant = new BigDecimal(0.0);
-
+        updatedBdgtAppropriationRegisterList.clear();
         if (LOGGER.isInfoEnabled())
             LOGGER.info("budgetAppropriationRegisterList.size() :" + budgetAppropriationRegisterList.size());
         if (budgetAppropriationRegisterList.size() > 0) {

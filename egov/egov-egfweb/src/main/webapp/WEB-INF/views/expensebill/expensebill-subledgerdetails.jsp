@@ -68,6 +68,8 @@
 				<th><spring:message code="lbl.subledgercode" text="Account Code" /></th>
 				<th><spring:message code="lbl.payto" text="Party Name"/></th>
 				<th><spring:message code="lbl.amount" text="Amount"/></th>
+				<th><spring:message code="lbl.subledgerbankaccount.bankaccount" text="Account Number"/></th>
+				<th><spring:message code="lbl.ifsccode" text="IFSC Code"/></th>
 				<th><spring:message code="lbl.action" text="Action"/></th> 					
 			</tr>
 		</thead>
@@ -112,6 +114,12 @@
 				<td>
 				<input type="text" id="tempSubLedger[0].expense-netPayableAmount" name="tempSubLedger[0].netPayableAmount"  data-idx="0" class="form-control text-right netPayable_Amount" onkeyup="decimalvalue(this);" data-pattern="decimalvalue"> 
 				</td> 
+				<td>
+				<form:input class="form-control subledger_Bankaccount" id="tempSubLedger[0].bankAccount" path="egBillregistermis.bankaccount" data-idx="0" maxlength="350" />
+				</td>							
+				<td>
+				<form:input class="form-control subledger_Ifsccode" id="tempSubLedger[0].ifscCode" path="egBillregistermis.ifsccode" data-idx="0" maxlength="350" />
+				</td>
 				<td class="text-center"><span style="cursor:pointer;" onclick="addSubledgerRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 <span class="add-padding subledge-delete-row" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>
 			</tr>

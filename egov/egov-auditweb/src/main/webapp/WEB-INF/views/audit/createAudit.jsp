@@ -7,7 +7,6 @@
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn"%>
 
 <script type="text/javascript">
-	
 window.onload = function checklistDate() {
 	
 	var status = '${auditDetail.auditStatus}';
@@ -18,7 +17,6 @@ window.onload = function checklistDate() {
 
 		//alert("Hello! status created is true");
 		//alert('${auditDetail.checkList[0]}');
-
 
 	var today = new Date();
 	var dd = today.getDate();
@@ -33,11 +31,9 @@ window.onload = function checklistDate() {
     }
     var today = dd + '/' + mm + '/' + yyyy;
   
-	
 	   var allTableData = document.getElementById("tblchecklist");
 	   var totalNumbeOfRows = allTableData.rows.length;
 
-		
 		for (var i = 0; i <=totalNumbeOfRows-2; i++) {
 			document.getElementById("checkList["+i+"].checklist_date").value=today;	
 		}
@@ -54,9 +50,16 @@ window.onload = function checklistDate() {
 		var year = cDate.getFullYear();
 		currDate = currDate + "/" + year;*/
 	}
-
+	if (status == "Pending with Department") {
+		$('#retrachmentcomment').attr('readonly', true);
+	}
 }
 </script>
+<style>
+textarea {
+	border: 1px solid;
+}
+</style>
 
 
 <form:form name="auditForm" role="form" method="post" action="save"
@@ -115,8 +118,8 @@ window.onload = function checklistDate() {
 						</c:if>
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
-							code="lbl.auditType" text="Audit Type" /> <span class="mandatory"></span>
-					</label>
+							code="lbl.auditType" text="Audit Type" /> <span
+						class="mandatory"></span> </label>
 					<div class="col-sm-3 add-margin">
 						<form:input class="form-control patternvalidation"
 							data-pattern="alphanumericwithspecialcharacters" id="auditType"
@@ -128,12 +131,21 @@ window.onload = function checklistDate() {
 						<div class="col-sm-3 add-margin">
 							<a href="#" id="sourceLink"
 								onclick="return openSource('${billSource}');">View Bill</a>
+								<c:if test="${null!=auditDetail.retrachmentcomment && auditDetail.auditStatus == 'Pending with Department'}">
+									<div>
+										<a href='javascript:void(0)' class="buttonsubmit"
+										onclick="updateCreditDebit()">Update
+										Credit Debit Details</a>
+									</div>	
+								</c:if>
 						</div>
 					</c:if>
+					
 				</div>
 			</div>
 			<form:hidden id="billId" path="billId" />
 			<form:hidden id="auditId" path="auditId" />
+			<%-- <form:hidden id="retrachmentcomment" path="retrachmentcomment" /> --%>
 			<form:hidden path="workFlowAction" id="workFlowAction" />
 			<form:hidden id="auditStatus" path="auditStatus" />
 		</div>
@@ -145,9 +157,10 @@ window.onload = function checklistDate() {
 				<jsp:include page="audit-billDetails.jsp" />
 			</div>
 		</c:if>
-		<jsp:include page="billdocument-upload.jsp" />
-		<br> <br>
-		<jsp:include page="commonworkflowhistory-view.jsp" />
+		
+			<jsp:include page="billdocument-upload.jsp" />
+			<jsp:include page="commonworkflowhistory-view.jsp" />
+		
 		<c:if test="${mode !='view' }">
 			<c:if test="${auditDetail.auditStatus != 'Pending with Department' }">
 				<div class="show-row form-group">
@@ -169,6 +182,15 @@ window.onload = function checklistDate() {
 	</div>
 
 </form:form>
+<script>
+function updateCreditDebit(){
+	var id= document.getElementById("billId").value;
+	var aud= document.getElementById("auditId").value;
+	var url = "/services/EGF/expensebill/updateCreditDebit/"+ id+"/"+aud;
+	window.open(url,'','width=900, height=700');
+}
+
+</script>
 <script
 	src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 <script
