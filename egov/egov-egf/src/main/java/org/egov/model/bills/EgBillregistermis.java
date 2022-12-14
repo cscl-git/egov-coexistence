@@ -224,7 +224,7 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
     
    
 	@Transient
-	private Long bankaccount;
+	private String bankaccount;
     
 	@Transient
     private String ifsccode;
@@ -650,12 +650,12 @@ public class EgBillregistermis extends AbstractPersistable<Integer> implements j
 	public void setPaymentvoucherheaderid(Long paymentvoucherheaderid) {
 		this.paymentvoucherheaderid = paymentvoucherheaderid;
 	}
-
-	public Long getBankaccount() {
+	
+	public String getBankaccount() {
 		return bankaccount;
 	}
 
-	public void setBankaccount(Long bankaccount) {
+	public void setBankaccount(String bankaccount) {
 		this.bankaccount = bankaccount;
 	}
 
