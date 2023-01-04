@@ -160,19 +160,30 @@ public class ReportHelper {
         
         
         ByteArrayOutputStream xlsReport = new ByteArrayOutputStream();
-        JRXlsExporter exporter = new JRXlsExporter();
+        //JRXlsExporter exporter = new JRXlsExporter();
         //exporter.setExporterInput(jasperPrint);
-        exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, xlsReport);
-        exporter.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET,
-                Boolean.FALSE);
-        exporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE,
-                Boolean.TRUE);
-        exporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND,
-                Boolean.FALSE);
-        exporter.setParameter(JRXlsExporterParameter.IS_IGNORE_GRAPHICS,
-                Boolean.FALSE);
-        exporter.exportReport();
+        
+        JExcelApiExporter exporterXLS=new JExcelApiExporter();
+        exporterXLS.setParameter(JExcelApiExporterParameter.JASPER_PRINT, jasperPrint);
+        exporterXLS.setParameter(JExcelApiExporterParameter.OUTPUT_STREAM, xlsReport);
+        exporterXLS.setParameter(JExcelApiExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.FALSE);
+        exporterXLS.setParameter(JExcelApiExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+        exporterXLS.setParameter(JExcelApiExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+        exporterXLS.setParameter(JExcelApiExporterParameter.IS_IGNORE_GRAPHICS, Boolean.FALSE);
+        exporterXLS.exportReport();
+        
+		/*
+		 * exporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
+		 * exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, xlsReport);
+		 * exporter.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET,
+		 * Boolean.FALSE);
+		 * exporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE,
+		 * Boolean.TRUE);
+		 * exporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND,
+		 * Boolean.FALSE);
+		 * exporter.setParameter(JRXlsExporterParameter.IS_IGNORE_GRAPHICS,
+		 * Boolean.FALSE); exporter.exportReport();
+		 */
        // return xlsReport;
         
         inputStream = new ByteArrayInputStream(xlsReport.toByteArray());

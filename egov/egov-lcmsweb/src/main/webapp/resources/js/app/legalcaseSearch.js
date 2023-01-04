@@ -47,6 +47,8 @@
  */
 var tableContainer;
 var reportdatatable;
+var temp=[];
+var unique=[];
 jQuery(document).ready(
 		function($) {
 			$("#downloadexcel").hide();
@@ -74,6 +76,15 @@ jQuery(document).ready(
 			$('#legalcaseReportSearchPdf').click(function() {
 				submitFormForPdf();
 	});
+	$('#legalcasesavecheckboxval').click(function() {
+	   /*alert("onclick");*/
+			submitcheckboxes();	
+  });
+  
+  $('#legacasesaveremarks').click(function() {
+	   /*alert("onclick");*/
+			legalCaseRemarks();	
+  });
 			
 		});
 $('#searchapp').keyup(function(){
@@ -105,6 +116,47 @@ function submitFormForPdf(){
 			  }
 			});
 }
+
+
+function submitcheckboxes(){
+	/*alert("save click");*/
+	var mytable=$('#legalCaseResults').dataTable();
+	var rowcollection=mytable.$(".impcases:checked",{"page": "all"});
+	var mycheckboxes=[];
+	rowcollection.each(function(index,elem){
+		var checkbox_value=$(elem).val();
+		//alert("selected checkboxes :"+checkbox_value);
+		mycheckboxes.push(checkbox_value);
+	});
+	
+	//alert("onclick temp values:"+temp);
+	
+	//alert("onclick unique values:"+unique);
+	
+	$.ajax({
+			 type: "POST",
+			  url: "/services/lcms/search/legalcasecheckboxupdate",
+			  dataType: "json",
+			  contentType: "application/json",
+			  data:JSON.stringify(mycheckboxes),
+			  success: function(data){			
+			  }
+			});
+			
+	 $.ajax({
+			 type: "POST",
+			  url: "/services/lcms/search/legalcaseuncheckboxupdate",
+			  dataType: "json",
+			  contentType: "application/json",
+			  data:JSON.stringify(unique),
+			  success: function(data){
+				 console.log("done"+data);
+				 bootbox.alert(data);
+			  }
+			});
+	
+}
+
 function submitForm() {
 
 	var caseNumber = $("#caseNumber").val();
@@ -137,7 +189,19 @@ function submitForm() {
 		                "searchable": false,
 						"className" : "text-right"
 					},
-						{
+					{       
+						   "data" : {legalcaseno : "legalcaseno", id : "id", impcasesflag: "impcasesflag"},
+							"sTitle" : "Important Cases",
+							"className" : "text-right",
+							"render" : function(data, type, full) {
+								if(data.impcasesflag == false){								
+								return '<input type="checkbox" name="importantcases"  class="impcases" id="impcases'+data.id+'" value="'+data.id+'" style= "height: 71px;width: 20px;" onclick="impCases(\''+ data.id +'\',\''+data.legalcaseno+'\',\''+data.impcasesflag+'\')">';
+						}else{
+						return '<input type="checkbox" name="importantcases"  class="impcases" id="impcases'+data.id+'" value="'+data.id+'" style= "height: 71px;width: 20px;accent-color: red;" onclick="impCases(\''+ data.id +'\',\''+data.legalcaseno+'\',\''+data.impcasesflag+'\')" checked="checked">';	
+						}		
+						}
+					},
+						/*{
 							"data" : {legalcaseno : "legalcaseno", id : "id"},
 							"sTitle" : "File Number",
 							"className" : "text-right",
@@ -145,7 +209,7 @@ function submitForm() {
 								return '<a href="javascript:void(0);" onclick="openLegalCase(\''+ data.id +'\',\''+data.legalcaseno+'\')">' + data.legalcaseno + '</a>';
 								
 							}
-						},
+						},*/
 						
 						{
 							"data" : "casenumber",
@@ -155,7 +219,7 @@ function submitForm() {
 
 						{
 							"data" : "casetitle",
-							"sTitle" : "Case Title",
+							"sTitle" : "Title of Case",
 							"className" : "text-right"
 						},
 						{
@@ -173,7 +237,7 @@ function submitForm() {
 							"sTitle" : "Case Status",
 							"className" : "text-right"
 						},
-						{
+						/*{
 							"data" : "petitioners",
 							"sTitle" : "Petitioners",
 							"className" : "text-left"
@@ -182,15 +246,15 @@ function submitForm() {
 							"data" : "respondants",
 							"sTitle" : "Respondents",
 							"className" : "text-left"
-						},
+						},*/
 						{
 							"data" : "concernedBranch",
-							"sTitle" : "Concerned Branch",
+							"sTitle" : "Name of the Branch to which cases relates",
 							"className" : "text-left"
 						},
 						{
 							"data" : "hearingDate",
-							"sTitle" : "Next Hearing Date",
+							"sTitle" : "Next date of hearing",
 							"className" : "text-left"
 						},
 						{
@@ -198,7 +262,7 @@ function submitForm() {
 							"sTitle" : "Hearing Outcome",
 							"className" : "text-left"
 						},
-						{
+						/*{
 							"data" : "petetiontype",
 							"sTitle" : "Petetion Type",
 							"className" : "text-left"
@@ -253,7 +317,19 @@ function submitForm() {
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="15">Update Payment</option></select>');
 								}
 							}
-						} ],
+						},*/
+						{       
+						   "data" : {legalcaseno : "legalcaseno", id : "id", legalcaseremarks:"legalcaseremarks"},
+							"sTitle" : "Remarks",
+							"className" : "text-right",
+							"render" : function(data, type, full) {
+								if(data.legalcaseremarks=="" || data.legalcaseremarks==null){							
+								return '<input type="text" name="legalcaseremarks"  class="remarks" id="'+data.id+'"  style= "border:1px solid;height:35px;">';	
+						}else{
+						        return '<input type="text" name="legalcaseremarks"  class="remarks" id="'+data.id+'" value="'+data.legalcaseremarks+'"  style= "border:1px solid;height:35px;">';	
+						}
+						}
+					}  ],
 				"footerCallback" : function(row, data, start, end, display) {
 					var api = this.api(), data;
 					if (data.length == 0) {
@@ -389,4 +465,60 @@ function loadsubreportstatus(){
 	
 function openLegalCase(data,id) {
 	window.open("/services/lcms/application/view/?id="+ data , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
+}
+
+function impCases(data,id,impcasesflag) {
+	//alert("onclick" + data);
+	if ($("#impcases"+data+"").is(':checked')) {
+		/*alert("checked if");*/	
+	$("#impcases"+data+"").prop("checked",true);	
+	 $("input[type=checkbox]:checked").css('accent-color', 'red');	
+	}
+	else{
+	var unchecked=($("#impcases"+data+"").val());
+	temp.push(unchecked);	
+	temp.forEach(element =>{
+		if(!unique.includes(element)){
+			unique.push(element);
+		}
+	});
+
+	//alert("temp values:"+temp);
+	
+	//alert("unique checked values:"+unique);
+	$("#impcases"+data+"").removeAttr("checked");			
+	$("#impcases"+data+"").prop("checked",false);
+	}
+}
+
+function legalCaseRemarks() {
+    //alert("onclick");
+    
+    var mytable=$('#legalCaseResults').dataTable();
+	var rowcollection=mytable.$("input:text",{"page": "all"});
+	var mytextboxes=[];
+	rowcollection.each(function(index,elem){
+		var textbox_value=$(elem).val();
+		var textbox_id=$(elem).attr('id');
+		if(textbox_value != ""){
+		//alert("selected id :"+textbox_id);	
+		//alert("selected textboxes :"+textbox_value);
+		var remarks=textbox_id+'-'+textbox_value;
+		//alert(remarks +"remarks");
+		mytextboxes.push(remarks);
+		}	
+	});
+	
+		$.ajax({
+			 type: "POST",
+			  url: "/services/lcms/search/legalcaseremarks",
+			  dataType: "json",
+			  contentType: "application/json",
+			  data:JSON.stringify(mytextboxes),
+			  success: function(data){
+				 console.log("done"+data);
+				 bootbox.alert(data);		
+			  }
+			});
+			
 }

@@ -146,6 +146,80 @@ public class SearchLegalCaseService {
 		return legalcaseSearchList;
 
 	}
+	
+	public List<String> getLegalCaseData(final LegalCaseSearchResult legalCaseSearchResultObj) {
+		final Boolean loggedInUserViewAccess = checkLoggedInUser(securityUtils.getCurrentUser());
+		final StringBuilder queryStr = new StringBuilder();
+		queryStr.append("select distinct concat_ws('--',concat('Next Hearing Date :',hearings10_.hearingDate),concat('File Number :',legalcase0_.lcnumber),concat('Branch :',concernedb7_.concernedBranch)) as hearingdate \r\n"
+				+ "from EGLC_LEGALCASE legalcase0_ \r\n"
+				+ "left outer join eglc_concerned_branch_master concernedb7_ on legalcase0_.concernedbranch=concernedb7_.id \r\n"
+				+ "left outer join EGLC_JUDGMENT judgment14_ on legalcase0_.id=judgment14_.legalcase\r\n"
+				+ "cross join eglc_court_master courtmaste1_ \r\n"
+				+ "cross join EGLC_CASETYPE_MASTER casetypema2_\r\n"
+				+ "cross join EGLC_JUDGMENT judgment3_ \r\n"
+				+ "cross join eglc_petitiontype_master petitionty4_\r\n"
+				+ "cross join EGW_STATUS egwstatus5_\r\n"
+				+ "cross join eglc_reportstatus reportstat6_\r\n"
+				+ "left outer join EGLC_BIDEFENDINGCOUNSILDETAILS bidefendin8_ on (legalcase0_.id=bidefendin8_.legalcase and bidefendin8_.defCounsilPrimary='YES') \r\n"
+				+ "left outer join EGLC_LEGALCASE legalcase9_ on bidefendin8_.legalcase=legalcase9_.id \r\n"
+				+ "left outer join EGLC_HEARINGS hearings10_ on (legalcase0_.id=hearings10_.legalcase and\r\n"
+				+ "hearings10_.hearingDate=(select max(hearings12_.hearingDate) from EGLC_HEARINGS hearings12_ \r\n"
+				+ "left outer join EGLC_LEGALCASE legalcase13_ on hearings12_.legalcase=legalcase13_.id where legalcase0_.id=hearings12_.legalcase)) \r\n"
+				+ "left outer join EGLC_LEGALCASE legalcase11_ on hearings10_.legalcase=legalcase11_.id \r\n"
+				+ "where legalcase0_.COURT=courtmaste1_.id and legalcase0_.CASETYPE=casetypema2_.id and\r\n"
+				+ "legalcase0_.PETITIONTYPE=petitionty4_.id and legalcase0_.STATUS=egwstatus5_.ID and egwstatus5_.MODULETYPE='Legal Case' and (legalcase0_.id not in  (select judgment15_.legalcase from EGLC_JUDGMENT judgment15_ cross join EGLC_JUDGMENTTYPE_MASTER judgmentty16_ where judgment15_.judgmenttype=judgmentty16_.id and judgmentty16_.judgmenttype='Decided'))\r\n"
+				+ "and hearings10_.hearingDate is not null\r\n"
+				+ "and hearings10_.hearingDate between current_date and current_date + INTERVAL '7 day'\r\n"
+				+ "group by legalcase0_.lcnumber,concernedb7_.concernedBranch,hearings10_.hearingDate \r\n"
+				+ "order by hearingdate asc \r\n");
+		/*
+		 * queryStr.append(" egwStatus.code  as  caseStatus ,");
+		 * queryStr.append(" bidefcounsil.oppPartyAdvocate  as  standingCouncil ,");
+		 * queryStr.
+		 * append(" hear.hearingDate  as  hearingDate , hear.hearingOutcome  as  hearingOutcome, "
+		 * ); queryStr.append(
+		 * " cb.concernedBranch  as  concernedBranch, jt.replySubmit as replySubmit, jt.argument as argument"
+		 * ); queryStr.
+		 * append(" from LegalCase legalObj,CourtMaster courtmaster,CaseTypeMaster casetypemaster, Judgment jt,"
+		 * ); queryStr.append(
+		 * " PetitionTypeMaster petmaster,EgwStatus egwStatus,ReportStatus reportStatus Left JOIN legalObj.concernedBranch cb"
+		 * ); queryStr.append(
+		 * " LEFT JOIN BidefendingCounsilDetails bidefcounsil ON legalObj.id =bidefcounsil.legalCase and bidefcounsil.defCounsilPrimary ='YES'"
+		 * ); queryStr.append(
+		 * " LEFT JOIN Hearings hear on legalObj.id=hear.legalCase and hear.hearingDate =(select max(hear2.hearingDate) from Hearings hear2 where legalObj.id=hear2.legalCase) "
+		 * ); queryStr.append(" LEFT JOIN   legalObj.judgment jt");
+		 * queryStr.append(" where legalObj.courtMaster.id=courtmaster.id and  ");
+		 * queryStr.append(
+		 * " legalObj.caseTypeMaster.id=casetypemaster.id and legalObj.petitionTypeMaster.id=petmaster.id and "
+		 * ); queryStr.
+		 * append(" legalObj.status.id=egwStatus.id and egwStatus.moduletype =:moduleType "
+		 * );
+		 */
+		/*
+		 * if (legalCaseSearchResultObj.getReportStatusId() != null)
+		 * queryStr.append("  and legalObj.reportStatus.id = reportStatus.id ");
+		 */
+
+		//getAppendQuery(legalCaseSearchResultObj, queryStr);
+		SQLQuery queryResult = persistenceService.getSession().createSQLQuery(queryStr.toString());
+		//queryResult.setResultTransformer(Transformers.aliasToBean(LegalCaseSearchResult.class));
+		//queryResult = setParametersToQuery(legalCaseSearchResultObj, queryResult);
+		System.out.println("query:: " + queryResult.toString());
+		System.out.println("final query " + queryStr);
+		//final List<LegalCaseSearchResult> legalcaseSearchList = (List<LegalCaseSearchResult>)queryResult.list();
+		final List<String> legalcaseSearchList = queryResult.list();
+
+		System.out.println("sizeeee " + legalcaseSearchList.size());
+
+		/*
+		 * if (loggedInUserViewAccess) for (final LegalCaseSearchResult searchResults :
+		 * legalcaseSearchList)
+		 * searchResults.setLegalViewAccess(loggedInUserViewAccess);
+		 */
+
+		return legalcaseSearchList;
+
+	}
 
 	private Query setParametersToQuery(final LegalCaseSearchResult legalCaseSearchResultObj, final Query queryResult) {
 		queryResult.setString("moduleType", LcmsConstants.MODULE_TYPE_LEGALCASE);
@@ -242,7 +316,7 @@ public class SearchLegalCaseService {
 		}
 
 		if (legalCaseSearchResultOblj.getIscaseImp() != null)
-			queryStr.append("and legalObj.caseImportant='Yes'");
+			queryStr.append("and (legalObj.caseImportant='Yes' or legalObj.impcasesflag=true)");
 
 	}
 

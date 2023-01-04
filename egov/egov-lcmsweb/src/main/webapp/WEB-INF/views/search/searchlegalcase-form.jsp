@@ -52,6 +52,9 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn"%>
 
+
+<html>
+<body onload="nextHearingDate()">
 <div class="row">
 	<div class="col-md-12">
 		<form:form modelAttribute="legalCaseSearchResult"
@@ -275,6 +278,12 @@
 					class="btn btn-primary">Download Excel</a> <a
 					href="javascript:void(0);" id="legalcaseReportSearchPdf"
 							class="btn btn-primary">Download Pdf</a>
+					    <a
+					href="javascript:void(0);" id="legalcasesavecheckboxval"
+							class="btn btn-primary">Important Cases</a>
+					<a
+					href="javascript:void(0);" id="legacasesaveremarks"
+							class="btn btn-primary">Save Remarks</a>			
 					</div>
 		</div>
 		
@@ -282,6 +291,19 @@
 	</div>
 </div>
 
+<script type="text/javascript">
+<%-- $(document).ready(function() {
+	
+	var listofhearing= '<%=session.getAttribute("listofhearingdates")%>';
+	 bootbox.alert(listofhearing); 	
+}); --%>
+
+function nextHearingDate() {
+	var listofhearing= '<%=session.getAttribute("listofhearingdates")%>';
+	 bootbox.alert(listofhearing); 	
+}
+
+</script>
 
 <link rel="stylesheet"
 	href="<cdn:url value='/resources/global/js/jquery/plugins/datatables/responsive/css/datatables.responsive.css' context='/services/egi'/>">
@@ -304,3 +326,6 @@
 <script
 	src="<cdn:url value='/resources/js/app/legalcaseSearch.js?rnd=${app_release_no}'/>"
 	type="text/javascript"></script>
+	
+	</body>
+	</html>

@@ -59,6 +59,7 @@ import org.egov.lcms.reports.entity.LegalCasePdfbean;
 import org.egov.lcms.reports.entity.LegalCaseSearchResult;
 import org.egov.lcms.reports.entity.LegalCaseSearchResultInfo;
 import org.egov.lcms.transactions.entity.ReportStatus;
+import org.egov.lcms.transactions.service.LegalCaseFileNoService;
 import org.egov.lcms.transactions.service.SearchLegalCaseService;
 import org.egov.lcms.utils.LegalCaseUtil;
 import org.egov.lcms.web.adaptor.LegalCaseSearchJsonAdaptor;
@@ -68,6 +69,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -89,6 +91,7 @@ import net.sf.jasperreports.engine.xml.JRXmlLoader;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -98,6 +101,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -115,6 +119,9 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
 
     @Autowired
     private SearchLegalCaseService searchLegalCaseService;
+    
+    @Autowired
+	private LegalCaseFileNoService legalCaseileNoService;
 
     @Autowired
     JudgmentTypeService JudgmentTypeService;
@@ -146,8 +153,45 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/searchForm")
-    public String searchForm(final Model model) {
+    public String searchForm(final Model model,@ModelAttribute final LegalCaseSearchResult legalCaseSearchResult,final HttpServletRequest request) {
+    	
+    	final List<String> legalcaseSearchList = searchLegalCaseService
+                .getLegalCaseData(legalCaseSearchResult);
+    	String fileno= "";
+    	Date hearingdate=null;
+    	String branch="";
+    	String nexthearingdate="";
+    	DateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd");
+		/*
+		 * for (Object[] object : legalcaseSearchList) { hearingdate=(Date)object[0];
+		 * nexthearingdate=dateFormat.format(hearingdate); fileno = (String)object[1];
+		 * branch=(String)object[2]; System.out.println("hearingdate:"+hearingdate);
+		 * System.out.println("nexthearingdate:"+nexthearingdate);
+		 * System.out.println("fileno:"+fileno); System.out.println("branch:"+branch);
+		 * break; }
+		 */
+    	int size = legalcaseSearchList.size();
+    	System.out.println("list size:"+size);	   	
+    	HttpSession session=request.getSession();
+    	
+    	StringBuilder strbul=new StringBuilder();
+    	for (String str : legalcaseSearchList) {
+    		strbul.append(str);
+    		strbul.append("<br />");
+		}
+    
+    	
+    	String legaldata=strbul.toString();
+      	
+    	if(size==0) {
+            session.setAttribute("listofhearingdates", "No Hearing Dates for Next 7 Days");	
+        	}else {
+        		session.setAttribute("listofhearingdates", legaldata);	
+        	}
+        	
+    	    	
         model.addAttribute("currDate", new Date());
+        
         return "searchlegalcase-form";
     }
 
@@ -363,4 +407,56 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
 		final JasperPrint print = JasperFillManager.fillReport(report, parameters, source);
 		return print;
 	}
+	
+	@RequestMapping(value = "/legalcasecheckboxupdate",method = RequestMethod.POST)
+	public @ResponseBody void getLegalCasecheckbox(@RequestBody Long[] mycheckboxes) throws IOException, JRException {
+			  
+		  try { 
+				  for (Long data : mycheckboxes) {
+					  
+				 legalCaseileNoService.updateCheckboxes(data);					
+				}
+							 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	@RequestMapping(value = "/legalcaseuncheckboxupdate",method = RequestMethod.POST)
+	public @ResponseBody String getLegalCaseunchecked(@RequestBody Long[] myuncheckedcheckboxes) throws IOException, JRException {
+			  
+		  try { 				
+				  for (Long data : myuncheckedcheckboxes) {
+				  				  
+				  legalCaseileNoService.updateunCheckboxes(data);
+				  }
+				 
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+       return "Important Cases Saved Successfully";
+	}
+	
+	
+    @RequestMapping(value = "/legalcaseremarks", method = RequestMethod.POST)
+    public @ResponseBody String legalCaseRemarksSubmit(@RequestBody String[] mytextboxes) {
+		
+    	
+    	 try { 				
+			  for (String data : mytextboxes) {
+				  
+				  String[] legalcaseremarks = data.split("-");
+				  String id = legalcaseremarks[0];
+				  String remarks=legalcaseremarks[1];
+			  			  
+			  legalCaseileNoService.updateLegalRemarks(id,remarks);
+			  }
+			 
+	} catch (Exception e) {
+		e.printStackTrace();
+	}
+    	 
+  return "Remarks Updated Successfully";
+
+    }
 }
