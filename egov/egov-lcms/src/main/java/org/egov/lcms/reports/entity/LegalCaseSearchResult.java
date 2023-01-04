@@ -96,7 +96,7 @@ public class LegalCaseSearchResult {
     private String replySubmit;
     private String argument;
     private String hearingOutcome;
-   
+    private String legalcaseremarks;
     public String getFromDate() {
         return fromDate;
     }
@@ -396,7 +396,13 @@ public class LegalCaseSearchResult {
 		this.isJudgementPending = isJudgementPending;
 	}
 
-	
+	public String getLegalcaseremarks() {
+		return legalcaseremarks;
+	}
+
+	public void setLegalcaseremarks(String legalcaseremarks) {
+		this.legalcaseremarks = legalcaseremarks;
+	}	
 
 
 	

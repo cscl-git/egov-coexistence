@@ -286,7 +286,15 @@ public class LegalCase extends AbstractAuditable {
     private ConcernedBranchMaster concernedBranch;
     
     @Audited
-    private String concernedBranchEmail;    
+    private String concernedBranchEmail; 
+    
+    @Column(name = "impcasesflag")
+    @Audited
+    private Boolean impcasesflag;
+    
+    @Column(name = "legalcaseremarks")
+    @Audited
+    private String legalcaseremarks;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "reportstatus")
@@ -1212,5 +1220,21 @@ public class LegalCase extends AbstractAuditable {
 
 	public void setCouncelengage(String councelengage) {
 		this.councelengage = councelengage;
+	}
+	
+	public Boolean getImpcasesflag() {
+		return impcasesflag;
+	}
+
+	public void setImpcasesflag(Boolean impcasesflag) {
+		this.impcasesflag = impcasesflag;
+	}
+
+	public String getLegalcaseremarks() {
+		return legalcaseremarks;
+	}
+
+	public void setLegalcaseremarks(String legalcaseremarks) {
+		this.legalcaseremarks = legalcaseremarks;
 	}
 }
