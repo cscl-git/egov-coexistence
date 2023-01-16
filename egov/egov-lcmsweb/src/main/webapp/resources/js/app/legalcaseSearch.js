@@ -201,7 +201,7 @@ function submitForm() {
 						}		
 						}
 					},
-						/*{
+						{
 							"data" : {legalcaseno : "legalcaseno", id : "id"},
 							"sTitle" : "File Number",
 							"className" : "text-right",
@@ -209,12 +209,17 @@ function submitForm() {
 								return '<a href="javascript:void(0);" onclick="openLegalCase(\''+ data.id +'\',\''+data.legalcaseno+'\')">' + data.legalcaseno + '</a>';
 								
 							}
-						},*/
+						},
 						
 						{
 							"data" : "casenumber",
 							"sTitle" : "Case Number",
 							"className" : "text-right"
+						},
+						{
+							"data" : "petetiontype",
+							"sTitle" : "Petetion Type",
+							"className" : "text-left"
 						},
 
 						{
@@ -292,7 +297,7 @@ function submitForm() {
 							"data" : "argument",
 							"sTitle" : "Argument",
 							"className" : "text-left"
-						},
+						},*/
 						{
 							title : 'Actions',
 							"className" : "text-right",
@@ -317,7 +322,7 @@ function submitForm() {
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="15">Update Payment</option></select>');
 								}
 							}
-						},*/
+						},
 						{       
 						   "data" : {legalcaseno : "legalcaseno", id : "id", legalcaseremarks:"legalcaseremarks"},
 							"sTitle" : "Remarks",

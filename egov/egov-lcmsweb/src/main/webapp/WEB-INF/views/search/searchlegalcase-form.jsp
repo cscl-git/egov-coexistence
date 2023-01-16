@@ -209,6 +209,17 @@
 								itemLabel="name" />
 						</form:select>
 					</div>
+					
+					<label class="col-sm-2 control-label text-right">Branch:</label>
+	        <div class="col-sm-3 add-margin">
+		<form:select name="concernedBranchId" path="" data-first-option="false"
+			id="concernedBranchId" cssClass="form-control">
+			<form:option value="">
+				<spring:message code="lbls.select" />
+			</form:option>
+			<form:options items="${branchList}" itemValue="id" itemLabel="concernedBranch" />
+		</form:select>
+	</div>
 				</div>
 				<!-- End -->
 				<div class="form-group">
@@ -299,6 +310,10 @@
 }); --%>
 
 function nextHearingDate() {
+	
+	var x= document.getElementById("statusId");
+    x.remove(3);
+    
 	var listofhearing= '<%=session.getAttribute("listofhearingdates")%>';
 	 bootbox.alert(listofhearing); 	
 }

@@ -150,7 +150,7 @@ public class SearchLegalCaseService {
 	public List<String> getLegalCaseData(final LegalCaseSearchResult legalCaseSearchResultObj) {
 		final Boolean loggedInUserViewAccess = checkLoggedInUser(securityUtils.getCurrentUser());
 		final StringBuilder queryStr = new StringBuilder();
-		queryStr.append("select distinct concat_ws('--',concat('Next Hearing Date :',hearings10_.hearingDate),concat('File Number :',legalcase0_.lcnumber),concat('Branch :',concernedb7_.concernedBranch)) as hearingdate \r\n"
+		queryStr.append("select distinct concat_ws('  |  ',row_number() over(order by legalcase0_.id),concat('Hearing Date :',hearings10_.hearingDate),concat('Case No :',legalcase0_.casenumber),concat('Tittle of Case :',legalcase0_.casetitle),concat('Court Name :',courtmaste1_.\"name\"),concat('Defending Counsel :',coalesce(bidefendin8_.opppartyadvocate,' - ')),concat('Branch :',concernedb7_.concernedBranch)) as hearingdate \r\n"
 				+ "from EGLC_LEGALCASE legalcase0_ \r\n"
 				+ "left outer join eglc_concerned_branch_master concernedb7_ on legalcase0_.concernedbranch=concernedb7_.id \r\n"
 				+ "left outer join EGLC_JUDGMENT judgment14_ on legalcase0_.id=judgment14_.legalcase\r\n"
@@ -170,7 +170,7 @@ public class SearchLegalCaseService {
 				+ "legalcase0_.PETITIONTYPE=petitionty4_.id and legalcase0_.STATUS=egwstatus5_.ID and egwstatus5_.MODULETYPE='Legal Case' and (legalcase0_.id not in  (select judgment15_.legalcase from EGLC_JUDGMENT judgment15_ cross join EGLC_JUDGMENTTYPE_MASTER judgmentty16_ where judgment15_.judgmenttype=judgmentty16_.id and judgmentty16_.judgmenttype='Decided'))\r\n"
 				+ "and hearings10_.hearingDate is not null\r\n"
 				+ "and hearings10_.hearingDate between current_date and current_date + INTERVAL '7 day'\r\n"
-				+ "group by legalcase0_.lcnumber,concernedb7_.concernedBranch,hearings10_.hearingDate \r\n"
+				+ "group by legalcase0_.lcnumber,concernedb7_.concernedBranch,hearings10_.hearingDate,legalcase0_.id,legalcase0_.casetitle,courtmaste1_.\"name\",bidefendin8_.opppartyadvocate \r\n"
 				+ "order by hearingdate asc \r\n");
 		/*
 		 * queryStr.append(" egwStatus.code  as  caseStatus ,");
@@ -250,6 +250,9 @@ public class SearchLegalCaseService {
 
 		if (legalCaseSearchResultObj.getJudgmentTypeId() != null)
 			queryResult.setInteger("judgmentid", legalCaseSearchResultObj.getJudgmentTypeId());
+		if (legalCaseSearchResultObj.getConcernedBranchId() != null)
+			queryResult.setInteger("branchid", legalCaseSearchResultObj.getConcernedBranchId());
+
 		final List<String> statusCodeList = new ArrayList<>();
 
 		if (legalCaseSearchResultObj.getIsStatusExcluded() != null) {
@@ -314,6 +317,11 @@ public class SearchLegalCaseService {
 			queryStr.append(
 					" and legalObj.id not in (select ej.legalCase.id from Judgment ej where ej.judgmentType.name='Decided') ");
 		}
+		
+		
+		if (legalCaseSearchResultOblj.getConcernedBranchId() != null)
+			queryStr.append(" and cb.id =:branchid ");
+
 
 		if (legalCaseSearchResultOblj.getIscaseImp() != null)
 			queryStr.append("and (legalObj.caseImportant='Yes' or legalObj.impcasesflag=true)");
