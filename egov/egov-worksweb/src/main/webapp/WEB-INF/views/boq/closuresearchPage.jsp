@@ -8,6 +8,7 @@
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
          <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 	<form:form name="search-closure-work-agreement-form" role="form"
 	method="post" action="searchclosurePage"
@@ -23,18 +24,19 @@
 						class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.name.work" /></label>
 					<div class="col-sm-9 add-margin">
-							<form:textarea class="form-control" path="name_work_order_search" maxlength="2000" style="height: 100px;"
+							<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand"  
+							path="name_work_order_search" maxlength="2000" style="height: 100px;"
 					 />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_number_search"  />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="work_number_search"  />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_agreement_number_search" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="work_agreement_number_search" />
 					</div>
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message

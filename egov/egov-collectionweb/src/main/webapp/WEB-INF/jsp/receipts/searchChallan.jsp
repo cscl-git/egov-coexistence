@@ -152,7 +152,7 @@
 	      <td width="21%" class="bluebox2"><s:text name="searchchallan.department"/></td>
 	      <td width="24%" class="bluebox2"><s:select headerKey="-1" headerValue="%{getText('challan.select')}" name="departmentId" id="departmentId" cssClass="selectwk" list="dropdownData.departmentList" listKey="id" listValue="name"  /> </td>
 	      <td width="21%" class="bluebox2"><s:text name="searchchallan.challanNumber"/></td>
-	   	  <td width="30%" class="bluebox2"><s:textfield id="challanNumber" name="challanNumber"/></td>
+	   	  <td width="30%" class="bluebox2"><s:textfield id="challanNumber" name="challanNumber" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 	     </tr>
 	     <tr>
 	      <td width="4%" class="bluebox">&nbsp;</td>
@@ -218,4 +218,5 @@
 	</s:if>
 </s:if>
 </s:form>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 </body>

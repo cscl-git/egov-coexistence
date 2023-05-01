@@ -64,7 +64,7 @@
 							<div class="col-sm-3 add-margin">
 								<form:input path="name"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumericwithspecialcharacterswithspace" maxlength="100" />
+									data-pattern="alphanumericwithspace" maxlength="100" />
 								<form:errors path="name" cssClass="error-msg" />
 							</div>
 							<label class="col-sm-2 control-label text-right"><spring:message
@@ -137,3 +137,4 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/js/app/advocateMasterHelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

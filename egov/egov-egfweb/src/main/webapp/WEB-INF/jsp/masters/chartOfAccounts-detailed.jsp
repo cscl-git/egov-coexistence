@@ -100,6 +100,7 @@
 	<s:fielderror />
 	<div class="formmainbox">
 		<div class="subheadnew"><s:text name="lbl.add.detailed.chart.of.accounts"/></div>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 		<s:form name="chartOfAccountsForm" action="chartOfAccounts"
 			theme="simple">
 			<table width="100%" border="0" cellspacing="0" cellpadding="0"
@@ -111,7 +112,7 @@
 					<td class="bluebox">
 						<div id="myAutoComplete" style="width: 15em; padding-bottom: 2em;">
 							<input type="text" name="glCode" id="glCode"
-								onblur="generateGlCode();" />
+								onblur="generateGlCode();" class = "patternvalidation" data-pattern="alphanumericwithspace" />
 							<div id="myContainer"></div>
 						</div>
 					</td>
@@ -120,7 +121,7 @@
 					<td class="bluebox" width="10%"><input type="text"
 						readonly="readonly" name="generatedGlcode" id="generatedGlcode"
 						size="10" /> <input type="text" name="newGlcode" id="newGlcode"
-						size="2" maxlength='<s:property value="glCodeLengths[4l]"/>' /></td>
+						size="2" maxlength='<s:property value="glCodeLengths[4l]"/>' class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 				</tr>
 				<tr>
 					<td width="20%" class="greybox">&nbsp;</td>
@@ -129,14 +130,14 @@
 					<td class="greybox"><input type="text" id="model.name"
 						name="model.name" onKeyDown="textCounter('model.name',100)"
 						onKeyUp="textCounter('model.name',100)"
-						onblur="textCounter('model.name',100)" /></td>
+						onblur="textCounter('model.name',100)" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 					<td width="10%" class="greybox"><strong><s:text
 								name="chartOfAccount.description" />:</strong></td>
 					<td width="22%" class="greybox"><input type="text"
 						id="model.desc" name="model.desc"
 						onKeyDown="textCounter('model.desc',250)"
 						onKeyUp="textCounter('model.desc',250)"
-						onblur="textCounter('model.desc',250)" /></td>
+						onblur="textCounter('model.desc',250)" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 				</tr>
 				<tr>
 					<td width="20%" class="bluebox">&nbsp;</td>

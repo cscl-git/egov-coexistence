@@ -71,7 +71,7 @@
 						<div class="col-sm-6 add-margin">
 							<form:input path="name"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="250" required="required" />
+								data-pattern="alphanumericwithspace" maxlength="250" required="required" />
 							<form:errors path="name" cssClass="error-msg" />
 						</div>
 					</div>
@@ -170,7 +170,7 @@
 								code="lbl.description" text="Description"/> </label>
 						<div class="col-sm-6 add-margin">
 							<form:textarea path="description" type="text" placeholder=""
-								autocomplete="off" class="form-control low-width"
+								autocomplete="off" class="form-control low-width patternvalidation" data-pattern="alphanumericwithspace"
 								maxlength="250" />
 							<form:errors path="description" cssClass="error-msg" />
 						</div>

@@ -62,6 +62,7 @@
 	src="/services/EGF/resources/javascript/dateValidation.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="/services/EGF/resources/javascript/ajaxCommonFunctions.js?rnd=${app_release_no}"></script>
+<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <meta http-equiv="Content-Type"
 	content="text/html; charset=windows-1252">
 <style type="text/css">

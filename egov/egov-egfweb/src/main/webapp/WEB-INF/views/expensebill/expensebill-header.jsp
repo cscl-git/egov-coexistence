@@ -146,11 +146,11 @@
 		<div class="col-sm-3 add-margin">
 		 <c:choose>
 	          <c:when test="${refundable != null && !refundable.isEmpty()}">
-	          <form:textarea path="egBillregistermis.narration" id="narration" readonly="true" class="form-control" maxlength="1024" ></form:textarea>
+	          <form:textarea path="egBillregistermis.narration" id="narration" readonly="true" class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="1024" ></form:textarea>
 			  <form:errors path="egBillregistermis.narration" cssClass="add-margin error-msg" />
 	          </c:when>
 	          <c:otherwise>
-			<form:textarea path="egBillregistermis.narration" id="narration" class="form-control" maxlength="1024" ></form:textarea>
+			<form:textarea path="egBillregistermis.narration" id="narration" class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="1024" ></form:textarea>
 			<form:errors path="egBillregistermis.narration" cssClass="add-margin error-msg" />
 	          </c:otherwise>
 	     </c:choose>

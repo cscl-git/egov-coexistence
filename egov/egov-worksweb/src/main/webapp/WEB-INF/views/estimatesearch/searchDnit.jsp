@@ -8,6 +8,7 @@
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
         <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 	<form:form name="search-dnit-form-mis" role="form" method="post"
 		action="workDnitSearchnew" modelAttribute="workdnitDetails"
@@ -23,7 +24,7 @@
 <label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.search.work.name" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:textarea class="form-control" path="workName"
+						<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workName"
 							maxlength="2000" />
 							</div>
 							

@@ -47,7 +47,7 @@
   ~
   --%>
 
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <div class="main-content">
 	<div class="row">
 		<div class="col-md-12">
@@ -62,7 +62,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="type" required="required" id="type"
 								class="form-control mandatory text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="20" />
+								data-pattern="alphanumericwithspace" maxlength="20" />
 							<form:errors path="type" cssClass="error-msg" />
 						</div>
 						<label class="col-sm-2 control-label text-right"><spring:message
@@ -70,7 +70,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="recoveryName" required="required"
 								class="form-control mandatory text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="50" />
+								data-pattern="alphanumericwithspace" maxlength="50" />
 							<form:errors path="recoveryName" cssClass="error-msg" />
 						</div>
 					</div>
@@ -140,7 +140,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="remitted" required="required"
 								class="form-control mandatory text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="100" />
+								data-pattern="alphanumericwithspace" maxlength="100" />
 							<form:errors path="remitted" cssClass="error-msg" />
 						</div>
 						<label class="col-sm-2 control-label text-right"><spring:message
@@ -148,7 +148,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="ifscCode"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="16" />
+								data-pattern="alphanumericwithspace" maxlength="16" />
 							<form:errors path="ifscCode" cssClass="error-msg" />
 						</div>
 					</div>
@@ -159,7 +159,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="accountNumber"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="32" />
+								data-pattern="alphanumericwithspace" maxlength="32" />
 							<form:errors path="accountNumber" cssClass="error-msg" />
 						</div>
 						<label class="col-sm-2 control-label text-right"><spring:message
@@ -167,7 +167,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:textarea path="description"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" rows="2" cols="30" />
+								data-pattern="alphanumericwithspace" rows="2" cols="30" />
 							<form:errors path="description" cssClass="error-msg" />
 						</div>
 					</div>

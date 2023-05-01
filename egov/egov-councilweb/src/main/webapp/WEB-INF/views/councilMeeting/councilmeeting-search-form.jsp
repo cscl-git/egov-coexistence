@@ -76,7 +76,8 @@
 							<label class="col-sm-2 control-label text-right"><spring:message
 							code="lbl.meeting.number" /> </label>
 							<div class="col-sm-3 add-margin">
-								<form:input type="text" cssClass="form-control"
+								<form:input type="text" cssClass="form-control patternvalidation"
+								    data-pattern="alphanumerichyphenbackslash"
 									path="meetingNumber" id="meetingNumber"/>
 								<form:errors path="meetingNumber" cssClass="error-msg" />
 							</div>

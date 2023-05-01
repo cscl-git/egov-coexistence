@@ -78,7 +78,7 @@
 					<div class="col-sm-3 col-md-2 add-margin">
 						<form:input type="text" path="name" id="name"
 							cssClass="form-control text-left patternvalidation"
-							data-pattern="alphanumericspecialcharacters" maxlength="100"
+							data-pattern="alphanumericwithspace" maxlength="100"
 							required="required" />
 						<form:errors path="name" cssClass="error-msg" />
 					</div>
@@ -95,7 +95,7 @@
 					<div class="col-sm-3 add-margin">
 						<form:textarea class="form-control text-left patternvalidation"
 							path="address" id="address" name="address"
-							data-pattern="alphanumericwithspecialcharacterswithspace"
+							data-pattern="alphanumericwithspace"
 							maxlength="256" />
 						<form:errors path="address" cssClass="error-msg" />
 					</div>
@@ -137,7 +137,7 @@
 					<div class="col-sm-3 add-margin">
 						<form:input path="panNumber"
 							class="form-control text-left patternvalidation" id="panNumber"
-							data-pattern="alphanumeric" maxlength="10" />
+							data-pattern="alphanumericwithspace" maxlength="10" />
 						<form:errors path="panNumber" cssClass="error-msg" />
 					</div>
 					<label class="col-sm-2 control-label text-right"><spring:message
@@ -145,7 +145,7 @@
 					<div class="col-sm-3 add-margin">
 						<form:input path="specilization"
 							class="form-control text-left patternvalidation"
-							data-pattern="alphanumericspecialcharacters" maxlength="100" />
+							data-pattern="alphanumericwithspace" maxlength="100" />
 						<form:errors path="specilization" cssClass="error-msg" />
 					</div>
 				</div>

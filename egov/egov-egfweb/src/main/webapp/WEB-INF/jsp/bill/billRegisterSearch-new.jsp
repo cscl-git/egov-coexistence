@@ -55,6 +55,7 @@
 <title><s:text name="bill.search.heading"></s:text></title>
 </head>
 <body onload="changeMandatoryField()">
+<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 	<s:form name="billRegisterForm" action="billRegisterSearch"
 		theme="simple">
 		<jsp:include page="../budget/budgetHeader.jsp">
@@ -81,7 +82,7 @@
 					<td class="greybox"><s:text name="bill.search.billnumber" /></td>
 					<td class="greybox"><s:textfield name="billnumber"
 							id="billnumber" value="%{billnumber}"
-							onblur="changeMandatoryField()" /></td>
+							onblur="changeMandatoryField()" class="patternvalidation" data-pattern="alphanumerichyphenbackslashcomma" /></td>
 				</tr>
 				<tr>
 					<td class="bluebox">&nbsp;</td>

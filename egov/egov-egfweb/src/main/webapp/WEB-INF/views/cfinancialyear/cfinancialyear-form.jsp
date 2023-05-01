@@ -65,13 +65,13 @@
 							<c:if test="${mode == 'create'}">
 								<form:input path="finYearRange"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="25" />
+									data-pattern="alphanumericwithspace" maxlength="25" />
 								<form:errors path="finYearRange" cssClass="error-msg" />
 							</c:if>
 							<c:if test="${mode == 'edit'}">
 								<form:input path="finYearRange"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="25" readonly="true" />
+									data-pattern="alphanumericwithspace" maxlength="25" readonly="true" />
 								<form:errors path="finYearRange" cssClass="error-msg" />
 							</c:if>
 						</div>
@@ -135,7 +135,7 @@
 													<input type="text" value="${var1.name}"
 														name="cFiscalPeriod[${counter.index}].name" id="name"
 														maxlength="10"
-														class="form-control text-right patternvalidation" />
+														class="form-control text-right patternvalidation" data-pattern="alphanumericwithspace" />
 													<input type="hidden" id="cmdaddListId"
 														value="cFiscalPeriod[${counter.index}].id" />
 												</c:if><c:if test="${mode == 'edit'}"> 
@@ -144,7 +144,7 @@
 														value="${var1.name}"
 														id="cFiscalPeriod[${counter.index}].name" maxlength="10"
 														readonly="readonly"
-														class="form-control text-right patternvalidation" />
+														class="form-control text-right patternvalidation" data-pattern="alphanumericwithspace" />
 												</c:if> </td>
 											<td><fmt:formatDate value="${var1.startingDate}"
 													var="startDate" pattern="dd/MM/yyyy" /> <c:if

@@ -108,17 +108,17 @@
 				
 					
 				<td>
-				<form:input class="form-control subledger_Payto" id="tempSubLedger[0].payTo" path="egBillregistermis.payto" data-idx="0" maxlength="350" />
+				<form:input class="form-control subledger_Payto patternvalidation" data-pattern="alphanumericwithspace" id="tempSubLedger[0].payTo" path="egBillregistermis.payto" data-idx="0" maxlength="350" />
 				
 				</td>
 				<td>
 				<input type="text" id="tempSubLedger[0].expense-netPayableAmount" name="tempSubLedger[0].netPayableAmount"  data-idx="0" class="form-control text-right netPayable_Amount" onkeyup="decimalvalue(this);" data-pattern="decimalvalue"> 
 				</td> 
 				<td>
-				<form:input class="form-control subledger_Bankaccount" id="tempSubLedger[0].bankAccount" path="egBillregistermis.bankaccount" data-idx="0" maxlength="350" />
+				<form:input class="form-control subledger_Bankaccount patternvalidation" data-pattern="alphanumericwithspace" id="tempSubLedger[0].bankAccount" path="egBillregistermis.bankaccount" data-idx="0" maxlength="350" />
 				</td>							
 				<td>
-				<form:input class="form-control subledger_Ifsccode" id="tempSubLedger[0].ifscCode" path="egBillregistermis.ifsccode" data-idx="0" maxlength="350" />
+				<form:input class="form-control subledger_Ifsccode" id="tempSubLedger[0].ifscCode patternvalidation" data-pattern="alphanumericwithspace" path="egBillregistermis.ifsccode" data-idx="0" maxlength="350" />
 				</td>
 				<td class="text-center"><span style="cursor:pointer;" onclick="addSubledgerRow(this);" tabindex="0" id="tempSubLedger[0].addButton" data-toggle="tooltip" title="" data-original-title="" aria-hidden="true"><i class="fa fa-plus"></i></span>
 				 <span class="add-padding subledge-delete-row" onclick="deleteSubledgerRow(this);"><i class="fa fa-trash"  aria-hidden="true" data-toggle="tooltip" title="" data-original-title="Delete!"></i></span> </td>

@@ -111,6 +111,18 @@ var regexp_special_name = /[^a-zA-Z0-9 ()/-]/g ;
 //Master data code pattern. data-pattern="masterCode";
 var regexp_code = /[^a-zA-Z0-9_-]/g ;
 
+//This will allow you to enter alphabets and numbers with or without space and dot(.) and comma(,). (eg: data-pattern="alphanumericwithspaceanddotcomma")
+var regexp_alphanumericdotcomma = /[^a-zA-Z0-9 .,]/g ;
+
+//This will allow you to enter alphabets and numbers with or without space and dot(.) , comma(,) , backslash(/), ,dash(-). (eg: data-pattern="alphanumericwithspaceanddotcomma")
+var regexp_alphanumericemail = /[^a-zA-Z0-9 .,/-@]/g ;
+
+//This will allow you to enter alphabets and numbers with specified special characters like  slash(/), hyphen(-), ampersand(&). (eg: data-pattern="alphanumerichyphenbackslash")
+var regexp_alphanumerichyphenbackslashampersand = /[^a-zA-Z0-9 &-/]/g ;
+
+//This will allow you to enter alphabets and numbers with specified special characters like  slash(/), hyphen(-), comma(,). (eg: data-pattern="alphanumerichyphenbackslashcomma")
+var regexp_alphanumerichyphenbackslashcomma = /[^a-zA-Z0-9 ,-/]/g ;
+
 function patternvalidation(){
 	jQuery('.patternvalidation').on("input", function(){
 		
@@ -236,4 +248,26 @@ function alphabetWithSpecialCharForContraWOAndSupplierName(obj){
 	if(jQuery(obj).val().match(regexp_alphabetWithSpecialChar)){
         jQuery(obj).val( jQuery(obj).val().replace(regexp_alphabetWithSpecialCharForContraWOAndSupplier,'') );
     }
+}
+
+function alphanumericwithspaceanddotcomma(obj){
+	if(jQuery(obj).val().match(regexp_alphanumericdotcomma)){
+		jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumericdotcomma,'') );
+	}
+}
+
+function alphanumericwithspaceemail(obj){
+	if(jQuery(obj).val().match(regexp_alphanumericemail)){
+		jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumericemail,'') );
+	}
+}
+function alphanumerichyphenbackslashampersand(obj){
+	if(jQuery(obj).val().match(regexp_alphanumerichyphenbackslashampersand)){
+		jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumerichyphenbackslashampersand,'') );
+	}
+}
+function alphanumerichyphenbackslashcomma(obj){
+	if(jQuery(obj).val().match(regexp_alphanumerichyphenbackslashcomma)){
+		jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumerichyphenbackslashcomma,'') );
+	}
 }

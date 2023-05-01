@@ -106,13 +106,14 @@ function loadNamesForSelectedType()
 		<div style="color: green">
 			<s:actionmessage theme="simple" />
 		</div>
+		<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 		<s:form action="cancelVoucher" name="cancelVoucher" theme="simple">
 			<table align="center" width="100%" cellpadding="0" cellspacing="0">
 				<tr>
 					<td class="greybox">&nbsp;</td>
 					<td class="greybox"><s:text name="voucher.number" /></td>
 					<td class="greybox"><s:textfield name="voucherNumber"
-							id="voucherNumber" maxlength="25" value="%{voucherNumber}" /></td>
+							id="voucherNumber" maxlength="25" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 					<td class="greybox"></td>
 					<td class="greybox"></td>
 				</tr>

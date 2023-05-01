@@ -815,3 +815,12 @@ $(window).on('load', function () {
 			}
 	});
 });
+
+
+function alphanumericwithspace(obj){
+    var regexp_alphanumeric = "/[^a-zA-Z0-9 ]/g" ;
+    if(jQuery(obj).val().match(regexp_alphanumeric)){
+        jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumeric,'') );
+    }
+}
+

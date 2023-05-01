@@ -4,7 +4,7 @@
 <%@ taglib uri="/WEB-INF/taglibs/cdn.tld" prefix="cdn"%>
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 <form:form name="search-bgsecurity-form" role="form" method="post"
 	action="bgsecuritySearch" modelAttribute="bgSecurityDetails"
@@ -37,7 +37,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.bg.security.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="security_number" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="security_number" />
 					</div>
 				</div>
 			</div>

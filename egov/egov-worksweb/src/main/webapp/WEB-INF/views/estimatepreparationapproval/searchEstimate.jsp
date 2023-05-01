@@ -8,6 +8,7 @@
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
         <script
 	src="<cdn:url value='/resources/js/estimatepreparationapproval/estimationhelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 	<form:form name="search-estimate-form" role="form" method="post"
 		action="workEstimateSearch" modelAttribute="workEstimateDetails"
@@ -25,7 +26,7 @@
 <label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.search.work.name" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:textarea class="form-control" path="workName" id="workName"
+						<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workName" id="workName"
 							maxlength="2000" />
 							</div>
 							
@@ -87,7 +88,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.preparation.estimate.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="estimateNumber" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" path="estimateNumber" />
 					</div>
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -107,7 +108,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.work.location" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="workLocation" id="workLocation" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="workLocation" id="workLocation" />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>
@@ -272,7 +273,7 @@
 							</div>
 							<label class="col-sm-3 control-label text-left-audit">Created By </label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" id="createdbyuser" 
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumericwithspace" id="createdbyuser" 
 									path="createdbyuser" />
 							</div>
 					
@@ -308,7 +309,7 @@
 										code="lbl.estimate.preparation.work.status" /></th>
 								<th><spring:message
 										code="lbl.estimate.preparation.work.pending" /></th>
-										<th><spring:message code="lbl.action" /></th
+										<th><spring:message code="lbl.action" /></th>
 
 							</tr>
 						</thead>

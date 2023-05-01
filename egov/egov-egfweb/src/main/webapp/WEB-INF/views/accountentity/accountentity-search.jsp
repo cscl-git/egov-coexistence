@@ -82,7 +82,7 @@
 							<div class="col-sm-3 add-margin">
 								<form:input path="name"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="350" />
+									data-pattern="alphanumericwithspace" maxlength="350" />
 								<form:errors path="name" cssClass="error-msg" />
 							</div>
 						</div>
@@ -92,7 +92,7 @@
 							<div class="col-sm-3 add-margin">
 								<form:input path="code"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="25" />
+									data-pattern="alphanumericwithspace" maxlength="25" />
 								<form:errors path="code" cssClass="error-msg" />
 							</div>
 						</div>
@@ -160,3 +160,4 @@
 	type="text/javascript"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/accountEntityHelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

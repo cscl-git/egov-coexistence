@@ -6,6 +6,7 @@
 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 	<form:form name="search-estimate-form" role="form" method="post"
 		action="searchEditDnit" modelAttribute="workdnitDetails"
@@ -21,7 +22,7 @@
 <label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.search.work.name" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:textarea class="form-control" path="workName"
+						<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workName"
 							maxlength="2000" />
 							</div>
 							
@@ -44,7 +45,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.preparation.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="estimateNumber" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" path="estimateNumber" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.works.wing" /></label>
@@ -76,7 +77,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.work.location" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="workLocation" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="workLocation" />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.estimate.preparation.sector.number" /></label>

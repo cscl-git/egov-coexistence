@@ -58,7 +58,7 @@
 	font-weight: bold;
 }
 </style>
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <form:form role="form" modelAttribute="chartOfAccountsReport"
 	id="coaSearchResultForm"
 	cssClass="form-horizontal form-groups-bordered"
@@ -107,9 +107,9 @@
 							<label class="col-sm-3 control-label text-right"><spring:message
 									code="lbl.accountcode" text="Account Code"/> :</label>
 							<div class="col-sm-3 add-margin">
-								<form:input id="accountCode" type="text" class="form-control "
+								<form:input id="accountCode" type="text" class="form-control patternvalidation" data-pattern="alphanumericwithspace"
 									autocomplete="off" path="" name="accountCode" value=""
-									placeholder="" />
+									placeholder=""/>
 								<input type="hidden" id="accountCodeId" value="" />
 
 							</div>

@@ -82,7 +82,7 @@
 					<div class="col-sm-3 add-margin">
 						<form:textarea class="form-control text-left patternvalidation"
 							path="address" id="address" name="address"
-							data-pattern="alphanumericwithspecialcharacterswithspace"
+							data-pattern="alphanumericwithspace"
 							maxlength="256" required="required" />
 						<form:errors path="address" cssClass="error-msg" />
 					</div>

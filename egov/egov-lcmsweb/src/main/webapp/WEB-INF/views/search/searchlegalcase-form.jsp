@@ -104,7 +104,7 @@
 							code="lbl.standingcons" />:</label>
 					<div class="col-sm-3 add-margin">
 						<input type="text" name="standingCouncil"
-							class="form-control patternvalidation" data-pattern="string"
+							class="form-control patternvalidation" data-pattern="alphanumericwithspace"
 							id="standingCouncil" />
 					</div>
 				</div>
@@ -341,6 +341,6 @@ function nextHearingDate() {
 <script
 	src="<cdn:url value='/resources/js/app/legalcaseSearch.js?rnd=${app_release_no}'/>"
 	type="text/javascript"></script>
-	
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 	</body>
 	</html>

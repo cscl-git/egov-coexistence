@@ -421,7 +421,7 @@
 										name="budgetReAppropriation.comments" /></td>
 								<td class="greybox"><s:textarea
 										id="appropriationMisc.remarks"
-										name="appropriationMisc.remarks" cols="50" rows="3" style="width: 200px;"/></td>
+										name="appropriationMisc.remarks" cols="50" rows="3" style="width: 200px;" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 								<td class="greybox"></td>
 							</tr>
 						</table> <br />
@@ -518,6 +518,7 @@
 			<s:hidden name="actionName" id="actionName" />
 		</div>
 	</s:form>
+	<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 	<div id="beReGrid" style="display: none"></div>
 </body>
 </html>

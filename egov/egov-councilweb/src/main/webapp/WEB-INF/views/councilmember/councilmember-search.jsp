@@ -108,7 +108,7 @@
 							<div class="col-sm-3 add-margin">
 								<form:input path="name"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="100" />
+									data-pattern="alphanumericwithspace" maxlength="100" />
 								<form:errors path="name" cssClass="error-msg" />
 							</div>
 						</div>
@@ -184,3 +184,4 @@
 <script src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/datetime-moment.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/councilMemberHelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

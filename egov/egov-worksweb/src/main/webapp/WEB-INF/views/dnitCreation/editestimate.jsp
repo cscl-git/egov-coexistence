@@ -58,7 +58,7 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.work.location" /></label>
 			<div class="col-sm-3 add-margin">
-			<form:input type="text" class="form-control-works"
+			<form:input type="text" class="form-control-works patternvalidation" data-pattern="alphanumericwithspace" 
 				path="workLocation" />
 							</div>
 
@@ -223,7 +223,7 @@
 									code="lbl.estimate.preparation.dnit.prepared.by" /></label>
 			<div class="col-sm-3 add-margin">
 				<form:input type="text" path="estimatePreparedBy"
-					id="estimatePreparedBy" cssClass="form-control-works"
+					id="estimatePreparedBy" cssClass="form-control-works patternvalidation" data-pattern="alphanumericwithspace" 
 					cssErrorClass="form-control-works error"  />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -270,20 +270,20 @@
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.name.work" /></label>
 			<div class="col-sm-9 block-colm">
-			<form:textarea class="form-control-works" path="workName"
+			<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workName"
 				maxlength="2000" style="height: 100px;" />
 							</div>
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.necessity" /></label>
 			<div class="col-sm-9 block-colm">
-			<form:textarea class="form-control-works" path="necessity"
+			<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="necessity"
 				maxlength="2000" style="height: 100px;" />
 							</div>
 		
 			<label class="col-sm-3 control-label text-left-audit1"><spring:message
 									code="lbl.estimate.preparation.scope.work" /></label>
 			<div class="col-sm-9 block-colm">
-			<form:textarea class="form-control-works" path="workScope"
+			<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workScope"
 				maxlength="2000" style="height: 100px;" />
 		</div>
 		

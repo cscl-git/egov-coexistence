@@ -107,7 +107,7 @@
 			<tr>
 			 <td width="10%" class="greybox"><b>Narration :</b></td>
 			 <td width="25%" class="greybox">
-			 	<textarea name="egBillregistermis.narration" id="narration"  class="form-control" maxlength="1024" >${voucherDetails.narration}</textarea>
+			 	<textarea name="egBillregistermis.narration" id="narration"  class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="1024" >${voucherDetails.narration}</textarea>
 			 </td>
 			 <td width="10%" class="greybox"><b>BAN Number :  </b></td>
 			 <td width="25%" class="greybox">${voucherDetails.banNumber}</td>
@@ -453,7 +453,7 @@
 			  <div class="show-row form-group">
 				<label class="col-sm-3 control-label text-right"><spring:message code="lbl.comments" text="Comments"/></label>
 				 <div class="col-sm-8 add-margin">
-					<textarea class="form-control"  id="approvalComent" name="approvalComent"></textarea>
+					<textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace"  id="approvalComent" name="approvalComent"></textarea>
 				 </div>
 			  </div>
 		</div>

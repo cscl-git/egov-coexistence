@@ -72,7 +72,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="preambleNumber" required="required"
 								id="preambleNumber"
-								class="form-control text-left patternvalidation" />
+								class="form-control text-left patternvalidation" data-pattern="alphanumerichyphenbackslash"/>
 							<form:errors path="preambleNumber" cssClass="error-msg" />
 						</div>
 					</c:when>    

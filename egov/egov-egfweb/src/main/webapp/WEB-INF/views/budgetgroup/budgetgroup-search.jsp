@@ -66,7 +66,7 @@
 							<div class="col-sm-4 add-margin">
 								<form:input path="name"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="250" />
+									data-pattern="alphanumericwithspace" maxlength="250" />
 							</div>
 							<input type="hidden" id="mode" name="mode" value="${mode}" />
 						</div>
@@ -135,3 +135,4 @@
 	type="text/javascript"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/budgetGroupHelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

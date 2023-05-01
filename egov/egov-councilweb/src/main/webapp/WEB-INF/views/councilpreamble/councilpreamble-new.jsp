@@ -88,7 +88,7 @@
 	src="<cdn:url value='/resources/app/js/ckeditor.js'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/ckeditorload.js'/>"></script>
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <script>
 	$('#buttonSubmit').click(function(e) {
 		if ($('form').valid()) {

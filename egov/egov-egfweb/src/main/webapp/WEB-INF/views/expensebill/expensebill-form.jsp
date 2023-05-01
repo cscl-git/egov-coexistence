@@ -149,7 +149,15 @@
         </div>
         <jsp:include page="../common/commonworkflowmatrix-expensebill.jsp"/>
         <div class="buttonbottom" align="center">
-            <jsp:include page="../common/commonworkflowmatrix-button.jsp"/>
+         <%--    <jsp:include page="../common/commonworkflowmatrix-button.jsp"/> --%>        
+          <table>
+		<tr>
+			<td id="actionButtons">
+			 <input type="submit" id="Forward" class="btn btn-primary btn-wf-primary"  value="Forward"  onclick="return validateSubLedger('Forward')"/>
+             <input type="button" name="button2" id="button2" value='<spring:message code="lbl.close" text="Close"/>' class="btn btn-default" onclick="window.parent.postMessage('close','*');window.close();" />
+			</td>
+		</tr>
+	</table> 
         </div>
     </div>
 

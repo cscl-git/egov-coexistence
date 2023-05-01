@@ -51,7 +51,7 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <link href="<egov:url path='/resources/css/displaytagFormatted.css?rnd=${app_release_no}'/>"
 	rel="stylesheet" type="text/css" />
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <html>
 <head>
 <title><s:text name="lbl.voucher.search"/></title>
@@ -95,7 +95,7 @@
 					<td style="width: 5%"></td>
 					<td class="greybox"><s:text name="voucher.number" /></td>
 					<td class="greybox"><s:textfield name="voucherNumber"
-							id="voucherNumber" maxlength="25" value="%{voucherNumber}"  onblur="changeField();" /></td>
+							id="voucherNumber" maxlength="25" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace"  onblur="changeField();" /></td>
 					<td class="greybox"></td>
 					<td class="greybox"></td>
 				</tr>
@@ -140,10 +140,10 @@
 					<td style="width: 5%"></td>
 					<td class="bluebox">Amount</td>
 					<td class="bluebox"><s:textfield name="amount"
-							id="amount" maxlength="25" value="%{amount}" /></td>
+							id="amount" maxlength="25" value="%{amount}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 					<td class="bluebox">Party Name</td>
 					<td class="bluebox"><s:textfield name="partyName"
-							id="partyName" maxlength="25" value="%{partyName}" /></td>
+							id="partyName" maxlength="25" value="%{partyName}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 				</tr>
 				
 				<tr>

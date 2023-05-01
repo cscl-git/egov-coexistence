@@ -12,6 +12,7 @@
 <link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+ <script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <script>
 				$(document).ready(function() {
 		$('input[id$=work_start_date]').datepicker({
@@ -70,14 +71,14 @@
 						class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.name.work" /></label>
 					<div class="col-sm-9 add-margin">
-						<form:textarea class="form-control" path="name_work_order"
+						<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="name_work_order"
 							maxlength="2000" style="height: 100px;" />
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.dnit.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_number"  />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="work_number"  />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.estimate.work.number" /></label>
@@ -192,7 +193,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.details" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="work_details" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="work_details" />
 					</div>
 
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -352,13 +353,13 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.search.work.location" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="workLocation" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="workLocation" />
 					</div>
 					
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.work.order.search.work.authority" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control"
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="approval_competent_authority" />
 					</div>
 
@@ -664,7 +665,7 @@
 							Boq Upload Remarks:<span class="mandatory"></span>
 						</h4>
 						<div>
-							<form:textarea class="form-control-works" style="height: 80px;"
+							<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" style="height: 80px;"
 								path="comments" id="comments" maxlength="500" />
 						</div>
 						<br>

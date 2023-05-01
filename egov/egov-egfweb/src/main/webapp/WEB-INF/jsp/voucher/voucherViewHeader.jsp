@@ -178,7 +178,7 @@
 				&nbsp;</td>
 			<td colspan="3" class="<c:out value='${tdclass}' />">
 			
-			 <textarea name="narration" cols="150" rows="3" id="narration" onblur="checkLength(this)"> <s:property value="%{getMasterName('narration')}" /></textarea>
+			 <textarea name="narration" cols="150" rows="3" id="narration" onblur="checkLength(this)" class="patternvalidation" data-pattern="alphanumericwithspace"> <s:property value="%{getMasterName('narration')}" /></textarea>
 			</td>
 			
 			<c:choose>

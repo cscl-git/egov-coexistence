@@ -113,7 +113,7 @@
 	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.casenumber" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin text-left">
-		<form:input class="form-control patternvalidation" data-pattern="alphanumeric" maxlength="40" id="caseNumber"
+		<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="40" id="caseNumber"
 					required="required" path="caseNumber" style="width: 59%;display: inline;"/>
 		<form:select path="wpYear" data-first-option="false" id="wpYear" cssClass="form-control"
 					 style="width: 35%;display: inline;">
@@ -209,13 +209,13 @@
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.title" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="caseTitle" id="caseTitle" name="caseTitle" />
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="caseTitle" id="caseTitle" name="caseTitle" />
 		<form:errors path="caseTitle" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
 			code="lbl.prayer" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
-		<form:textarea class="form-control" maxlength="10000" id="prayer" path="prayer" />
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="10000" id="prayer" path="prayer" />
 		<form:errors path="prayer" cssClass="add-margin error-msg" />
 	</div>
 </div>
@@ -305,13 +305,13 @@
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right">Brief:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="brief"
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="brief"
 							style="height: 100px;" maxlength="500" id="brief" />
 		
 	</div>
 	<label class="col-sm-2 control-label text-right" >Councel Engage:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="councelengage"
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="councelengage"
 							style="height: 100px;" maxlength="500" id="councelengage" />
 	</div>
 </div>

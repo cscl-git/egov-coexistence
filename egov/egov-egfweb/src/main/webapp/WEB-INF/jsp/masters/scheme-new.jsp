@@ -117,6 +117,7 @@
     </SCRIPT>
 </head>
 <body>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 	<s:form name="schemeForm" action="scheme" theme="css_xhtml"
 		validate="true">
 		<div class="formmainbox">
@@ -153,7 +154,7 @@
 						class="mandatory1"> *</span></td>
 					<td class="greybox" width="30%"><s:textfield id="code"
 							name="code" value="%{scheme.code}"
-							onblur="checkuniquenesscode();" /></td>
+							onblur="checkuniquenesscode();" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 					<egov:uniquecheck id="codeuniquecode" name="codeuniquecode"
 						fieldtoreset="code" fields="['Value']"
 						url='masters/scheme-codeUniqueCheck.action' />
@@ -162,7 +163,7 @@
 						class="mandatory1"> *</span></td>
 					<td class="greybox" width="30%"><s:textfield id="name"
 							name="name" value="%{scheme.name}"
-							onblur="checkuniquenessname();" /></td>
+							onblur="checkuniquenessname();" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 					<egov:uniquecheck id="uniquename" name="uniquename"
 						fieldtoreset="name" fields="['Value']"
 						url='masters/scheme-nameUniqueCheck.action' />
@@ -205,7 +206,7 @@
 							name="scheme.description" /></td>
 					<td class="bluebox" colspan="3"><s:textarea id="description"
 							name="description" value="%{scheme.description}"
-							style="width:470px" /></td>
+							style="width:470px" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 				</tr>
 			</table>
 			<br />

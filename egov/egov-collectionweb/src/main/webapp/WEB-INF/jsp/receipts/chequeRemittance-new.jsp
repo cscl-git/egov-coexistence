@@ -176,7 +176,7 @@
 		dom.get("button32").className = "buttonsubmit";
 		var receipts=document.getElementsByName('receiptNumber');
 		var receiptNos="";
-		for (i = 0; i < receipts.length; i++) {
+		/* for (i = 0; i < receipts.length; i++) {
 			if(document.getElementById("selected_"+i).checked){
 				document.getElementById("selected_"+i).value= true;
 				if(receiptNos=="")
@@ -189,7 +189,25 @@
 			}else{
 				document.getElementById("selected_"+i).value= false;
 			}
-		}
+		} */
+
+		jQuery('#currentRow tbody tr').each(function(index, object){
+            //alert("each");
+            if(jQuery(this).find('input[type="checkbox"]').prop("checked")){
+                //alert("checked");
+                jQuery(this).attr('value','true');
+                if(receiptNos=="")
+                {
+                    receiptNos+= jQuery(this).find('.receitno').val();
+                    //alert("if receiptNos:"+receiptNos);
+                }else{
+                    receiptNos+="','"+jQuery(this).find('.receitno').val();
+                    //alert("else receiptNos:"+receiptNos);
+                }
+            }else{
+                jQuery(this).attr('value','false');
+            }
+        });
 		
 		jQuery("#historyDetailTable tbody").empty();
 		jQuery.ajax({
@@ -271,7 +289,7 @@
 	function changeSelectionOfAllReceipts(checked) {
 		var list = document.getElementsByName('instrumentAmount');
 		var j=0;
-		for (i = 0; i < list.length; i++) {
+		/* for (i = 0; i < list.length; i++) {
 			if(null!=document.getElementById("selected_"+i)){
 				document.getElementById("selected_"+i).value= checked;
 				document.getElementById("selected_"+i).checked = checked;
@@ -280,7 +298,27 @@
 				document.getElementById("selected_"+i).disabled=true;
 			else
 				document.getElementById("selected_"+i).disabled=false;
-		}
+		} */
+
+		jQuery('#currentRow thead tr').each(function(index, object){
+            //alert("each");
+            if(jQuery(this).find('input[type="checkbox"]').prop("checked")){
+                //alert("checked");            
+             jQuery('#currentRow tbody tr td:first-child input:checkbox').each(function(){
+            	 jQuery(this).val("true");
+            	 jQuery(this).prop('checked',true);
+            	 jQuery(this).attr('disabled',true);
+                 });
+            }else{
+                //alert("else");               
+            	 jQuery('#currentRow tbody tr td:first-child input:checkbox').each(function(){
+            		 jQuery(this).val("false");
+                	 jQuery(this).prop('checked',false);
+                	 jQuery(this).attr('disabled',false);
+                     });                
+            }
+        });
+        
 		if(checked==true)
 			handleReceiptSelectionEventSelectAll();
 		else
@@ -386,7 +424,7 @@
 		} else{
 			var receipts=document.getElementsByName('receiptNumber');
 			var receiptNos="";
-			for (i = 0; i < receipts.length; i++) {
+			/* for (i = 0; i < receipts.length; i++) {
 				if(document.getElementById("selected_"+i).checked){
 					var recdate=document.getElementById("receiptDate_"+i).value;
 					var remdate=dom.get("remittanceDate").value;
@@ -399,7 +437,31 @@
 							return false;
 						}
 					}
-				}
+				} */
+
+			jQuery('#currentRow tbody tr').each(function(index, object){
+	            //alert("each");
+	            if(jQuery(this).find('input[type="checkbox"]').prop("checked")){
+	                //alert("checked");              
+	                var recdate= jQuery(this).find('.receitdate').val();
+	                var remdate=dom.get("remittanceDate").value;
+					var part1= recdate.split("/");
+					var part2 = remdate.split("/");
+					var date1 = new Date(part1[1] + "/" + part1[0] + "/" + part1[2]);
+					var date2 = new Date(part2[1] + "/" + part2[0] + "/" + part2[2]);
+					if(date1.setHours(0,0,0,0) > date2.setHours(0,0,0,0)) {
+						bootbox.alert("Remittance Date should not be before Receipt Date");
+							return false;
+				 }else{
+					    doLoadingMask('#loadingMask');
+						//jQuery('#finYearId').prop("disabled", false);
+						document.chequeRemittanceForm.action = "chequeRemittance-create.action";
+						return true;
+					 }
+					 	                
+	            }
+	        });
+			
 			}
 		
 		var acc= document.getElementById("remitAccountNumber").value;
@@ -415,7 +477,7 @@
         {
          return false;
         }
-		if (!isChecked(document.getElementsByName('receiptIds'))) {
+		/* if (!isChecked(document.getElementsByName('receiptIds'))) {
 			dom.get("selectremittanceerror").style.display = "block";
 			window.scroll(0, 0);
 			return false;
@@ -424,7 +486,7 @@
 				//jQuery('#finYearId').prop("disabled", false);
 				document.chequeRemittanceForm.action = "chequeRemittance-create.action";
 				return true;
-		}
+		} */
 
 	}
 
@@ -598,7 +660,7 @@
 						 	<td width="4%" class="bluebox">&nbsp;</td>
 						    <td width="21%" class="bluebox">Amount</td>
 						    <td width="24%" class="bluebox">
-						    <div class="yui-skin-sam"><s:textfield id="searchAmount" type="text" name="searchAmount"/></td>
+						    <div class="yui-skin-sam"><s:textfield id="searchAmount" type="text" name="searchAmount" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 						    
 						    <td width="21%" class="bluebox"><s:text name="Sub divison"/></td>
 						    <td width="24%" class="bluebox">
@@ -609,11 +671,11 @@
 							<td width="4%" class="bluebox">&nbsp;</td>
 						    <td width="21%" class="bluebox">Receipt No</td>
 						    <td width="24%" class="bluebox">
-						    <div class="yui-skin-sam"><s:textfield id="receiptNo" type="text" name="receiptNo"/></td>
+						    <div class="yui-skin-sam"><s:textfield id="receiptNo" type="text" name="receiptNo" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 						
 							<td width="21%" class="bluebox"><s:text name="Collected By"/></td>
 						    <td width="24%" class="bluebox">
-						    <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy"/></td>
+						    <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 	      				</tr>
 					</table>
 					</div>
@@ -631,7 +693,7 @@
 								<input type="hidden" name="finalBeanList[${rowNumber}].service"  id="service_${rowNumber}" value="${currentRow.service}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].serviceName"  id="serviceName_${rowNumber}" value="${currentRow.serviceName}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].receiptId"  id="receiptId_${rowNumber}" value="${currentRow.receiptId}" />
-								<input type="hidden" name="finalBeanList[${rowNumber}].receiptNumber"  id="receiptNumber_${rowNumber}" value="${currentRow.receiptNumber}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].receiptNumber" class="receitno" id="receiptNumber_${rowNumber}" value="${currentRow.receiptNumber}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].fund"  id="fund_${rowNumber}" value="${currentRow.fund}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].fundName"  id="fundName_${rowNumber}" value="${currentRow.fundName}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].functionCode"  id="functionCode_${rowNumber}" value="${currentRow.functionCode}" />
@@ -639,7 +701,7 @@
 								<input type="hidden" name="finalBeanList[${rowNumber}].subDivision" id="subDivision_${rowNumber}"  value="${currentRow.subDivision}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].instrumentAmount"  id="instrumentAmount_${rowNumber}" value="${currentRow.instrumentAmount}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].instrumentType"  id="instrumentType_${rowNumber}" value="${currentRow.instrumentType}" />
-								<input type="hidden" name="finalBeanList[${rowNumber}].receiptDate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
+								<input type="hidden" name="finalBeanList[${rowNumber}].receiptDate" class="receitdate"  id="receiptDate_${rowNumber}" value="${currentRow.receiptDate}" />
 								<input type="hidden" name="finalBeanList[${rowNumber}].createdUser"  id="createdUser_${rowNumber}" value="${currentRow.createdUser}" />
 								<input type="hidden" name="instrumentAmount" disabled="disabled" id="instrumentAmount" value="${currentRow.instrumentAmount}" />
 								<input type="hidden" name="receiptNumber" disabled="disabled" id="receiptNumber" value="${currentRow.receiptNumber}" />
@@ -695,7 +757,7 @@
 							<td class="bluebox"><s:textfield id="remittanceDate" name="remittanceDate" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" /></td>
 							
 							<td class="bluebox">Narration<span class="mandatory" /></td>
-							<td class="bluebox" colspan="3"><s:textarea id="narration" name="narration" cols="100" rows="3"/></td>	
+							<td class="bluebox" colspan="3"><s:textarea id="narration" name="narration" cols="100" rows="3" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>	
 						</tr>
 						<tr>
 							<td class="bluebox" colspan="3">&nbsp;</td>
@@ -747,5 +809,6 @@
 			</div>
 		</s:push>
 	</s:form>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 </body>
 </html>

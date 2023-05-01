@@ -6,6 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <form:form name="bg-security-form" role="form" method="post"
 	action="bgSecuritySave" modelAttribute="bgSecurityDetails"
 	enctype="multipart/form-data"
@@ -31,13 +32,13 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.tender.preparation.name.work" /></label>
 					<div class="col-sm-9 block-colm">
-						<form:textarea class="form-control txtRight" path="project_name" style="height: 100px;"
+						<form:textarea class="form-control txtRight patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="project_name" style="height: 100px;"
 									maxlength="2000"  />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.bg.tender.number" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control txtRight"
+						<form:input type="text" class="form-control txtRight patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="security_tender_number" required="required" />
 						<form:errors path="security_tender_number"
 							cssClass="add-margin error-msg" />
@@ -45,7 +46,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.bg.security.number" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control txtRight"
+						<form:input type="text" class="form-control txtRight patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="security_number" required="required" />
 						<form:errors path="security_number"
 							cssClass="add-margin error-msg" />
@@ -53,7 +54,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.bg.security.validity" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control txtRight"
+						<form:input type="text" class="form-control txtRight patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="security_validity" required="required" />
 						<form:errors path="security_validity"
 							cssClass="add-margin error-msg" />
@@ -91,7 +92,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.bg.security.loa.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control txtRight"
+						<form:input type="text" class="form-control txtRight patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="loaNumber"  />
 						<form:errors path="loaNumber" cssClass="add-margin error-msg" />
 					</div>
@@ -103,7 +104,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.tender.preparation.naration" /></label>
 					<div class="col-sm-9 block-colm">
-						<form:textarea class="form-control-works" path="narration" style="height: 100px;"
+						<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="narration" style="height: 100px;"
 									maxlength="2000"  />
 							</div>
 

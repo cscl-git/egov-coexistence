@@ -102,14 +102,14 @@
 							id="bipartisanPetitionerDetailsList[${status.index}].name"
 							name="bipartisanPetitionerDetailsList[${status.index}].name"
 							value="${bipartisanPetitionerDetailsList.name}" maxlength="300"
-							required="required" /></td>
+							required="required" onkeyup='alphanumericwithspace(this);' /></td>
 
 						<td class="text-right"><input type="text"
 							class="form-control table-input"
 							name="bipartisanPetitionerDetailsList[${status.index}].address"
 							id="bipartisanPetitionerDetailsList[${status.index}].address"
 							value="${bipartisanPetitionerDetailsList.address}"
-							maxlength="256" /></td>
+							maxlength="256" onkeyup='alphanumericwithspace(this);'/></td>
 						<td class="text-right"><input type="text"
 							class="form-control table-input text-left" data-pattern="number"
 							name="bipartisanPetitionerDetailsList[${status.index}].contactNumber"
@@ -153,14 +153,14 @@
 				onblur="onChangeofPetitioncheck(this)" /></td> -->
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left"
-						data-pattern="alphanumerichyphenbackslash"
+						data-pattern="alphanumericwithspace"
 						name="bipartisanPetitionerDetailsList[0].name"
 						id="bipartisanPetitionerDetailsList[0].name" maxlength="300"
-						required="required"></td>
+						required="required" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input"
 						name="bipartisanPetitionerDetailsList[0].address"
-						id="bipartisanPetitionerDetailsList[0].address" maxlength="256"></td>
+						id="bipartisanPetitionerDetailsList[0].address" maxlength="256" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left patternvalidation"
 						name="bipartisanPetitionerDetailsList[0].contactNumber"
@@ -231,14 +231,14 @@
 							class="form-control table-input text-left"
 							id="bipartisanRespondentDetailsList[${status.index}].name"
 							name="bipartisanRespondentDetailsList[${status.index}].name"
-							value="${bipartisanRespondentDetailsList.name}" /></td>
+							value="${bipartisanRespondentDetailsList.name}" onkeyup='alphanumericwithspace(this);' /></td>
 
 
 						<td><input type="text-right"
 							class="form-control table-input text-right"
 							id="bipartisanRespondentDetailsList[${status.index}].address"
 							name="bipartisanRespondentDetailsList[${status.index}].address"
-							value="${bipartisanRespondentDetailsList.address}" /></td>
+							value="${bipartisanRespondentDetailsList.address}" onkeyup='alphanumericwithspace(this);' /></td>
 						<td class="text-right"><input type="text"
 							id="bipartisanRespondentDetailsList[${status.index}].contactNumber"
 							name="bipartisanRespondentDetailsList[${status.index}].contactNumber"
@@ -286,14 +286,14 @@
 				onblur="onChangeofPetitioncheck(this)" /></td> -->
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left"
-						data-pattern="alphanumerichyphenbackslash"
+						data-pattern="alphanumericwithspace"
 						name="bipartisanRespondentDetailsList[0].name"
 						id="bipartisanRespondentDetailsList[0].name" maxlength="50"
-						required="required"></td>
+						required="required" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input"
 						name="bipartisanRespondentDetailsList[0].address"
-						id="bipartisanRespondentDetailsList[0].address" maxlength="256"></td>
+						id="bipartisanRespondentDetailsList[0].address" maxlength="256" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left patternvalidation"
 						name="bipartisanRespondentDetailsList[0].contactNumber"
@@ -521,14 +521,14 @@
 			code="lbl.representedby" />:</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
 		<form:input class="form-control patternvalidation"
-			data-pattern="string" maxlength="50" id="representedby"
+			data-pattern="alphanumericwithspace" maxlength="50" id="representedby"
 			path="representedby" />
 		<form:errors path="representedby" cssClass="add-margin error-msg" />
 	</div>
 
 	<label class="col-sm-3 control-label text-right" id="persons">Brief History:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="remarks" id="remarks"
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="remarks" id="remarks"
 			name="remarks" maxlength="256" />
 		<form:errors path="remarks" cssClass="add-margin error-msg" />
 	</div>

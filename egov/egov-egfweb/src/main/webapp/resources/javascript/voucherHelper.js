@@ -142,14 +142,14 @@ function createTextFieldFormatterJV(prefix,suffix,type){
 	
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:100%;' onkeyup='autocompletecode(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
+		el.innerHTML = " <input type='"+type+"' id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:100%;' onkeyup='autocompletecode(this,event);alphanumericwithspace(this);' autocomplete='off' onblur='fillNeibrAfterSplitGlcode(this);'/>";
 		
 	}
 }
 function createTextFieldFormatterForFunctionJV(prefix,suffix,type){
     return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='"+type+"'  id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:90px;' onkeyup='autocompletecodeFunction(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitFunction(this)'/>";
+		el.innerHTML = "<input type='"+type+"'  id='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+billDetailTableIndex+"]"+suffix+"' style='width:90px;' onkeyup='autocompletecodeFunction(this,event);alphanumericwithspace(this);' autocomplete='off' onblur='fillNeibrAfterSplitFunction(this)'/>";
 		
 	}
 		
@@ -198,7 +198,7 @@ function createSLTextFieldFormatterJV(prefix,suffix,onblurfunction){
 
 function createSLDetailCodeTextFieldFormatterJV(prefix,suffix,onblurfunction, suffix2, onClickForSearch){
     return function(el, oRecord, oColumn, oData) {
-		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' style='width:90px;'  autocomplete='off'  onfocus='onFocusDetailCode(this);autocompleteEntities1By20(this);' onblur='"+onblurfunction+"'/>"
+		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' style='width:90px;'  autocomplete='off'  onfocus='onFocusDetailCode(this);autocompleteEntities1By20(this);' onblur='"+onblurfunction+"' onkeyup='alphanumericwithspace(this);'/>"
 		+" <img src='/services/egi/resources/erp2/images/plus1.gif' id='"+prefix+"["+slDetailTableIndex+"]"+suffix2+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix2+"' style='width:15px;'  onClick='"+onClickForSearch+"'/>";
 		
 	}
@@ -1039,6 +1039,13 @@ function fillNeibrAfterSplitGlcode(obj)
 	fillNeibrAfterSplitFunction(funcObj);
 	
 }
+function alphanumericwithspace(obj){
+    var regexp_alphanumeric = "/[^a-zA-Z0-9 ]/g" ;
+    if(jQuery(obj).val().match(regexp_alphanumeric)){
+        jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumeric,'') );
+    }
+}
+
 function fillNeibrAfterSplitFunction(obj)
 {
 	var temp = obj.value;

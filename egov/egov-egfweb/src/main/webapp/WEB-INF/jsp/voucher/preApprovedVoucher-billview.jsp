@@ -193,6 +193,8 @@ function onSubmit()
 
 </script>
 <body onload="checkBillIdBillview()">
+<script
+        src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 	<s:form action="preApprovedVoucher" theme="simple"
 		name="preApprovedVoucher" id="preApprovedVoucher">
 		<jsp:include page="../budget/budgetHeader.jsp">
@@ -336,7 +338,7 @@ function onSubmit()
 						<tr>
 							<td class="bluebox"><s:text name="lbl.comments"/> </td>
 							<td class="bluebox"><s:textarea name="comments"
-									id="comments" cols="150" rows="3" onblur="checkLength(this)" /></td>
+									id="comments" cols="150" rows="3" onblur="checkLength(this)" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
 							<td><s:hidden id="methodName" name="methodName" value="save"/></td>
 						</tr>
 						<br />

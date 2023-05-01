@@ -64,7 +64,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="courtType"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumericspecialcharacters" maxlength="100" />
+								data-pattern="alphanumericwithspace" maxlength="100" />
 							<form:errors path="courtType" cssClass="error-msg" />
 						</div>
 						<label class="col-sm-2 control-label text-right">
@@ -143,3 +143,4 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/jquery.validate.min.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/js/app/courttypeMasterHelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

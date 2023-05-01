@@ -124,4 +124,4 @@
 
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/councilMeeting.js?rnd=${app_release_no}'/>"></script>
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

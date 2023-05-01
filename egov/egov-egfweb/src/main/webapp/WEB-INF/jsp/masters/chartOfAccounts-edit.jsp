@@ -79,6 +79,7 @@
 	</div>
 	<span style="color: red"> <s:actionmessage /> <s:actionerror />
 		<s:fielderror /></span>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 	<s:form name="chartOfAccountsForm" action="chartOfAccounts"
 		theme="simple">
 		<div class="formmainbox">
@@ -100,7 +101,7 @@
 					<td width="20%" class="greybox">&nbsp;</td>
 					<td width="10%" class="greybox"><strong><s:text
 								name="chartOfAccount.description" />:</strong></td>
-					<td width="22%" class="greybox"><s:textfield name="desc" /></td>
+					<td width="22%" class="greybox"><s:textfield name="desc" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 					<td width="10%" class="greybox"><strong><s:text
 								name="chartOfAccount.type" />:</strong></td>
 					<td class="greybox"><s:if test="model.type == 'I'">

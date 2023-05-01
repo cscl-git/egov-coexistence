@@ -64,6 +64,7 @@
 	content="text/html; charset=windows-1252">
 <script type="text/javascript"
 	src="/services/EGF/resources/javascript/autocomplete-debug.js"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <title>Journal voucher Create</title>
 </head>
 
@@ -124,7 +125,7 @@
 								class="mandatory1">*</span></td>
 							<td class="greybox" colspan="3"><s:textarea id="narration"
 									name="description" cols="100" rows="3"
-									onblur="checkVoucherNarrationLen(this)" /></td>
+									onblur="checkVoucherNarrationLen(this)" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						</tr>
 						<tr>
 							<td style="width: 5%"></td>

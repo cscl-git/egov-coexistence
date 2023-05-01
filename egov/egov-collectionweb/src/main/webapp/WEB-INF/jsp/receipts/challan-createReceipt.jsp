@@ -52,6 +52,7 @@
 <head>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/receiptinstrument.js?rnd=${app_release_no}"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <style type="text/css">
 #bankcodescontainer {
 	position: absolute;
@@ -631,7 +632,7 @@ function validate()
 								<td class="bluebox" style="text-align: center;"><s:text
 										name="challan.challanNumber" /> &nbsp;&nbsp; <s:textfield
 										name="challanNumber" id="challanNumber"
-										value="%{challanNumber}" onblur="getReceipt();" /></td>
+										value="%{challanNumber}" onblur="getReceipt();" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 							</tr>
 							<tr>
 								<td class="bluebox" style="text-align: center;"><b>OR</b></td>
