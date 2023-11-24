@@ -117,4 +117,4 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/TableTools.min.js' context='/services/egi'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/councilAttendance.js?rnd=${app_release_no}'/>"></script>
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

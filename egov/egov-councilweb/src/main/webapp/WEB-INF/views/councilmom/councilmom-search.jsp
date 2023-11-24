@@ -81,8 +81,8 @@
 							<label class="col-sm-2 control-label text-right"><spring:message
 							code="lbl.meeting.number" /> </label>
 							<div class="col-sm-3 add-margin">
-								<form:input type="text" cssClass="form-control"
-									path="meetingNumber" id="meetingNumber"/>
+								<form:input type="text" cssClass="form-control patternvalidation"
+								data-pattern="alphanumerichyphenbackslash"	path="meetingNumber" id="meetingNumber"/>
 								<form:errors path="meetingNumber" cssClass="error-msg" />
 							</div>
 						</div>
@@ -175,4 +175,4 @@
 	src="<cdn:url value='/resources/global/js/jquery/plugins/datatables/datetime-moment.js' context='/services/egi'/>"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/councilMomHelper.js?rnd=${app_release_no}'/>"></script>
-	
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>		

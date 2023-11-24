@@ -213,7 +213,7 @@
 				name="contra.refNumber" /></span> <span class="greybox"><span
 			class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:textfield name="contraBean.chequeNumber"
-			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" onkeyup="decimalvalue(this)"/>
+			id="chequeNum" value="%{contraBean.chequeNumber}" onblur="validateChequeNumber(this)" class="patternvalidation" data-pattern="alphanumericwithspace" onkeyup="decimalvalue(this)"/>
 				<span>
 					<font style='color: red;'>
 						<p class="error-block" id="chequeNumberlblError"></p>
@@ -235,7 +235,7 @@
 	<td class="bluebox"><s:text name="contra.amount" /> (Rs.) <span
 		class="bluebox"><span class="mandatory1">*</span></span></td>
 	<td class="bluebox"><s:textfield name="amount" id="amount"
-			cssStyle="text-align:right" /></td>
+			cssStyle="text-align:right" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
 	<td class="bluebox"></td>
 	<td class="bluebox"></td>
 </tr>
@@ -244,7 +244,7 @@
 	<td class="greybox"></td>
 	<td class="greybox"><s:text name="voucher.narration" /></td>
 	<td class="greybox" colspan="3"><s:textarea name="description"
-			id="description" style="width:93%" /></td>
+			id="description" style="width:93%" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 	<td class="greybox"></td>
 	<td class="greybox"></td>
 </tr>

@@ -68,7 +68,7 @@
 	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.courttype" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
-		<form:select path="courtMaster.courtType" data-first-option="false"
+		<form:select path="courtTypeMaster" data-first-option="false"
 			cssClass="form-control" required="required" name="courtType"
 			id="courtType">
 			<form:option value="">
@@ -76,7 +76,7 @@
 			</form:option>
 			<form:options items="${courtTypeList}" itemValue="id" id="courtTypeDropdown" itemLabel="courtType" />
 		</form:select>
-		<form:errors path="courtMaster.courtType"
+		<form:errors path="courtTypeMaster"
 			cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right"><spring:message
@@ -84,17 +84,17 @@
 	<div class="col-sm-3 add-margin">
 		<form:select path="petitionTypeMaster" id="petitionTypeMaster"
 			data-first-option="false" cssClass="form-control" required="required">
-			<form:option value="">
+			<%-- <form:option value="">
 				<spring:message code="lbls.select" />
 			</form:option>
 			<!-- //Edited by me.. -->
 			<form:options items="${petitiontypeList}" itemValue="id"
-								itemLabel="petitionType" />
+								itemLabel="petitionType" /> --%>
 		</form:select>
 		<form:errors path="petitionTypeMaster" cssClass="add-margin error-msg" />
 	</div>
 </div>
-<div class="form-group">
+<%-- <div class="form-group">
 	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.court" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
@@ -108,17 +108,17 @@
 		</form:select>
 		<form:errors path="courtMaster" cssClass="add-margin error-msg" />
 	</div>	
-</div>
+</div> --%>
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.casenumber" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin text-left">
-		<form:input class="form-control patternvalidation" data-pattern="alphanumeric" maxlength="40" id="caseNumber"
+		<form:input class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="40" id="caseNumber"
 					required="required" path="caseNumber" style="width: 59%;display: inline;"/>
 		<form:select path="wpYear" data-first-option="false" id="wpYear" cssClass="form-control"
 					 style="width: 35%;display: inline;">
-			<form:option value="">
-				<spring:message code="lbls.select" />
+			<form:option value="">Year
+				<%-- <spring:message code="lbls.select" /> --%>			
 			</form:option>
 			<form:options items="${wPYearList}" />
 		</form:select>
@@ -143,7 +143,7 @@
 		<form:errors path="fileNumber" cssClass="add-margin error-msg" />
 	</c:if>
 </div>
-<div class="form-group">
+<%-- <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.reappealofcase" /> ?:</label>
 	<div class="col-sm-3 add-margin">
@@ -171,8 +171,8 @@
 			</form:select>
 			<form:errors path="appealNum" cssClass="add-margin error-msg" />
 		</div>
-	</div>
-</div>
+	</div> --%>
+<%-- </div>
 <c:if test="${isReappealCase}">
 	<div class="form-group reappealcase" style="display: block;">
 </c:if>
@@ -204,23 +204,33 @@
 		</form:select>
 		<form:errors path="prevPetitionType" cssClass="add-margin error-msg" />
 	</div>
-</div>
+</div> --%>
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.title" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="caseTitle" id="caseTitle" name="caseTitle" />
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="caseTitle" id="caseTitle" name="caseTitle" />
 		<form:errors path="caseTitle" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
 			code="lbl.prayer" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
-		<form:textarea class="form-control" maxlength="10000" id="prayer" path="prayer" />
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" maxlength="10000" id="prayer" path="prayer" />
 		<form:errors path="prayer" cssClass="add-margin error-msg" />
 	</div>
 </div>
 <div class="form-group">
-	<label class="col-sm-3 control-label text-left"><spring:message
+<label class="col-sm-3 control-label text-right"></label>
+	<div class="col-sm-3 add-margin">		
+	</div>
+<label class="col-sm-2 control-label text-right">Brief:</label>
+	<div class="col-sm-3 add-margin">
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="brief"
+							style="height: 100px;" maxlength="500" id="brief" />		
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.casedate" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin text-center">
 		<form:input path="caseDate" class="form-control datepicker"
@@ -229,34 +239,14 @@
 			data-inputmask="'mask': 'd/m/y'" required="required" />
 		<form:errors path="caseDate" cssClass="add-margin error-msg" />
 	</div>
-</div>
-<div class="form-group">
-	<label class="col-sm-3 control-label text-right"><spring:message
-			code="lbl.nodalofficer.department" />:</label>
+	<label class="col-sm-2 control-label text-right"><spring:message
+			code="lbl.nexthearingdate" />:</label>
 	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficerdepartment"
-			path="nodalOfficerDepartment" data-pattern="address" />
-		<form:errors path="nodalOfficerDepartment" cssClass="add-margin error-msg" />
+		<form:input path="nextHearingDate" class="form-control datepicker"
+			title="Please enter a valid date" pattern="\d{1,2}/\d{1,2}/\d{4}" id="nextHearingDate"
+			data-inputmask="'mask': 'd/m/y'"/>
+		<form:errors path="nextHearingDate" cssClass="add-margin error-msg" />
 	</div>
-	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
-			code="lbl.nodalofficer" /><span class="mandatory"></span>:</label>
-	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" required="required"/>
-		<form:errors path="nodalOfficer" cssClass="add-margin error-msg" />
-	</div>	
-</div>
-<div class="form-group">
-	<label class="col-sm-3 control-label text-right">Nodal Officer Name<span class="mandatory"></span>:</label>
-	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficername"
-			path="nodalOfficername" data-pattern="address" required="required"/>
-		<form:errors path="nodalOfficername" cssClass="add-margin error-msg" />
-	</div>
-	<label class="col-sm-2 control-label text-right" id="persons">Nodal Officer Phone No<span class="mandatory"></span>:</label>
-	<div class="col-sm-3 add-margin">
-		<form:input type="number" class="form-control patternvalidation" maxlength="10" id="nodalofficernumber" path="nodalOfficernumber" data-pattern="address" required="required" onKeyPress="if(this.value.length==10) return false;"/>
-		<form:errors path="nodalOfficernumber" cssClass="add-margin error-msg" required="required" />
-	</div>	
 </div>
 <div class="form-group">
 	<label class="col-sm-3 control-label text-right"><spring:message
@@ -271,7 +261,77 @@
 		</form:select>
 		<form:errors path="concernedBranch" cssClass="add-margin error-msg" />
 	</div>
-	<label class="col-sm-2 control-label text-right" id="persons">
+	<label class="col-sm-2 control-label text-right"><spring:message
+			code="lbl.division" /><span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:select path="division" data-first-option="false"
+			id="division" cssClass="form-control" required="required">
+			<%-- <form:option value="">
+				<spring:message code="lbls.select" />
+			</form:option>
+			<form:options items="${ConcernedBranchList}" itemValue="id" itemLabel="division" /> --%>
+		</form:select>
+		<form:errors path="division" cssClass="add-margin error-msg" />
+	</div>
+</div>
+<%-- <div class="form-group">
+	 <label class="col-sm-3 control-label text-right"><spring:message
+			code="lbl.nodalofficer.department" />:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficerdepartment"
+			path="nodalOfficerDepartment" data-pattern="address" />
+		<form:errors path="nodalOfficerDepartment" cssClass="add-margin error-msg" />
+	</div> 
+	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
+			code="lbl.nodalofficer" /><span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficer" path="nodalOfficer" data-pattern="address" required="required"/>
+		<form:errors path="nodalOfficer" cssClass="add-margin error-msg" />
+	</div>	
+</div> --%>
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right">Nodal Officer Name<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalofficername"
+			path="nodalOfficername" data-pattern="address" required="required"/>
+		<form:errors path="nodalOfficername" cssClass="add-margin error-msg" />
+	</div>
+	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
+			code="lbl.estimatepreparedby" /><span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="estimatepreparedby"
+			path="estimatePreparedBy" data-pattern="address" required="required" />
+		<form:errors path="estimatePreparedBy" cssClass="add-margin error-msg" />
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right">Nodal Officer Designation<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="nodalOfficerDesignation"
+			path="nodalOfficerDesignation" data-pattern="address" required="required"/>
+		<form:errors path="nodalOfficerDesignation" cssClass="add-margin error-msg" />
+	</div>
+	<label class="col-sm-2 control-label text-right">Dealing Hand Designation<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input class="form-control patternvalidation" maxlength="100" id="dealingHandDesignation"
+			path="dealingHandDesignation" data-pattern="address" required="required"/>
+		<form:errors path="dealingHandDesignation" cssClass="add-margin error-msg" />
+	</div>
+</div>
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right" id="persons">Nodal Officer Mobile No<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input type="number" class="form-control patternvalidation" maxlength="10" id="nodalofficernumber" path="nodalOfficernumber" data-pattern="address" required="required" onKeyPress="if(this.value.length==10) return false;"/>
+		<form:errors path="nodalOfficernumber" cssClass="add-margin error-msg" required="required" />
+	</div>	
+	<label class="col-sm-2 control-label text-right" id="persons">Dealing Hand Mobile No<span class="mandatory"></span>:</label>
+	<div class="col-sm-3 add-margin">
+		<form:input type="number" class="form-control patternvalidation" maxlength="10" id="dealingHandnumber" path="dealingHandnumber" data-pattern="address" required="required" onKeyPress="if(this.value.length==10) return false;"/>
+		<form:errors path="dealingHandnumber" cssClass="add-margin error-msg" required="required" />
+	</div>	
+</div>
+<div class="form-group">
+	<label class="col-sm-3 control-label text-right" id="persons">
 		<spring:message code="lbl.concerned.branch.email" />:
 	</label>
 	<div class="col-sm-3 add-margin">
@@ -281,7 +341,7 @@
 	</div>	
 </div>
 <div class="form-group">
-	<label class="col-sm-3 control-label text-right"><spring:message
+	<%-- <label class="col-sm-3 control-label text-right"><spring:message
 			code="lbl.casecatagory" /><span class="mandatory"></span>:</label>
 	<div class="col-sm-3 add-margin">
 		<form:select path="caseTypeMaster" data-first-option="false"
@@ -293,29 +353,17 @@
 				id="courtTypeDropdown" itemLabel="caseType" />
 		</form:select>
 		<form:errors path="caseTypeMaster" cssClass="add-margin error-msg" />
-	</div>
-	<label class="col-sm-2 control-label text-right" id="persons"><spring:message
-			code="lbl.estimatepreparedby" />:</label>
-	<div class="col-sm-3 add-margin">
-		<form:input class="form-control patternvalidation" maxlength="100" id="estimatepreparedby"
-			path="estimatePreparedBy" data-pattern="address" />
-		<form:errors path="estimatePreparedBy" cssClass="add-margin error-msg" />
-	</div>
+	</div> --%>
+	
 </div>
-<div class="form-group">
-	<label class="col-sm-3 control-label text-right">Brief:</label>
+<%-- <div class="form-group">
+	<label class="col-sm-2 control-label text-right" >Counsel Engage:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="brief"
-							style="height: 100px;" maxlength="500" id="brief" />
-		
-	</div>
-	<label class="col-sm-2 control-label text-right" >Councel Engage:</label>
-	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="councelengage"
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="councelengage"
 							style="height: 100px;" maxlength="500" id="councelengage" />
 	</div>
-</div>
-<div class="form-group">
+</div> --%>
+<%-- <div class="form-group">
 <label class="col-sm-3 control-label text-right">Is Case Important ?</label>
 <div class="col-sm-3 add-margin">
 
@@ -324,7 +372,7 @@
       
         <input type="radio" name="caseImportant" id="caseno"  class="caseimp" value="No" <c:if test="${legalCase.caseImportant=='No'}">checked="checked"</c:if>><span>NO</span>
 </div>
-</div>
+</div> --%>
  <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons" style="display:none;"><spring:message
 			code="lbl.fieldbycarp" /> ?:</label>

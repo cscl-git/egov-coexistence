@@ -57,7 +57,7 @@
 	<label class="col-sm-2 control-label text-right" for="name"> <spring:message code="contractor.name" text='Name'/><span class="mandatory"></span>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="name" id="name" size="40" maxlength="100" cssClass="form-control patternvalidation" data-pattern="alphabetWithSpecialCharForContraWOAndSupplierName" required="required"/>
+		<form:input path="name" id="name" size="40" maxlength="100" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" required="required"/>
 		<form:errors path="name" cssClass="add-margin error-msg" />
 	</div>
 </div>
@@ -96,7 +96,7 @@
 	<label class="col-sm-2 control-label text-right" for="narration"> <spring:message code="contractor.narration" text='Narration'/>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea path="narration" cols="35" cssClass="form-control textfieldsvalidate" id="narration" maxlength = "250" />
+		<form:textarea path="narration" cols="35" cssClass="form-control textfieldsvalidate patternvalidation" data-pattern="alphanumericwithspace" id="narration" maxlength = "250" />
 		<form:errors path="narration" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" for="mobileNumber"> <spring:message code="lbl.mobile" text='mobile'/><span class="mandatory"></span> 
@@ -142,7 +142,7 @@
 	<label class="col-sm-2 control-label text-right" for="bankAccount"> <spring:message code="contractor.bankAccount" text='Bank Account Number'/>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="bankAccount" id="bankAccount" maxlength="22" size="24" cssClass="form-control" />
+		<form:input path="bankAccount" id="bankAccount" maxlength="22" size="24" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
 		<form:errors path="bankAccount" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" for="registrationNumber"> <spring:message code="contractor.registrationNo" text='Registration No'/>
@@ -202,7 +202,7 @@
 	<label class="col-sm-2 control-label text-right" for="vigilance"> <spring:message code="contractor.vigilance" text='Vigilance Case'/>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea path="vigilance" cols="35" cssClass="form-control textfieldsvalidate" id="vigilance" maxlength = "250" />
+		<form:textarea path="vigilance" cols="35" cssClass="form-control textfieldsvalidate patternvalidation" data-pattern="alphanumericwithspace" id="vigilance" maxlength = "250" />
 		<form:errors path="vigilance" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" for="adharnumber"> <spring:message code="contractor.adhaar" text='Adhaar Number'/>

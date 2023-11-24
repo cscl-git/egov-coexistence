@@ -435,7 +435,7 @@ loadBankDetailFailureHandler = function(){
 	</span> <span style="float: left;" id="chequeradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);"
 			type="radio" value="cheque" align="absmiddle" id="chequeradiobutton"
-			name="paytradiobutton" /> Cheque &nbsp;
+			name="paytradiobutton" /> Cheque/Online &nbsp;
 	</span> <span style="float: left;" id="ddradiobuttonspan"> <input
 			onClick="showInstrumentDetails(this);setinstrumenttypevalue(this);"
 			type="radio" align="absmiddle" id="ddradiobutton"

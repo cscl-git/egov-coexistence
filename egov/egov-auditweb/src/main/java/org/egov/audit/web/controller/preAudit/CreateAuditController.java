@@ -1608,8 +1608,10 @@ public class CreateAuditController extends GenericWorkFlowController {
 		AuditEmployee emp = null;
 		List<AuditEmployee> auditEmployees = new ArrayList<AuditEmployee>();
 		List<ManageAuditor> auditorList = manageAuditorService.getAudiorsByType("Auditor");
+		System.out.println("Audit List in audit search API::::::"+auditorList);
 		List<Long> checkFOrDuplicates = new ArrayList<Long>();
 		for (ManageAuditor value : auditorList) {
+			System.out.println("Employee id in audit search API::::::"+value.getEmployeeid());
 			Long checkId = Long.valueOf(value.getEmployeeid());
 			if (checkFOrDuplicates.contains(checkId)) {
 				continue;

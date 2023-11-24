@@ -750,13 +750,13 @@ $(document).on('click', 'input[type="checkbox"]', function() {
 });
 
 
-$("#buttonid").on("click",function(){
+/*$("#buttonid").on("click",function(){
     if (($("input[name*='defCounsilPrimary']:checked").length)<=0) {
         bootbox.alert("You must check at least one checkbox");
         return false;
     }
     
-});
+});*/
 
 //$("#buttonSubmit").on("click",function(){
 //    if (($("input[name*='defCounsilPrimary']:checked").length)<=0) {
@@ -815,3 +815,11 @@ $(window).on('load', function () {
 			}
 	});
 });
+
+
+function alphanumericwithspace(obj){
+    var regexp_alphanumeric = "/[^a-zA-Z0-9 ]/g" ;
+    if(jQuery(obj).val().match(regexp_alphanumeric)){
+        jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumeric,'') );
+    }
+}

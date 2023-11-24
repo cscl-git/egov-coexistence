@@ -49,6 +49,7 @@
 
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ page language="java"%>
+<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <div class="panel-heading custom_form_panel_heading">
 	<div class="panel-title">Reconciled/Unreconciled Items </div>
 </div>
@@ -102,7 +103,7 @@
 						class="form-control" value="<s:property value="reconciledComment" />"/> --%>
 						
 						<textarea cols="30" rows="2" id="reconComments<s:property value="#status.index"/>" 
-							name="reconComments[<s:property value="#status.index"/>]" value="<s:property value="reconciledComment" />"><s:property value="reconciledComment"/></textarea>
+							name="reconComments[<s:property value="#status.index"/>]" value="<s:property value="reconciledComment" />" class="patternvalidation" data-pattern="alphanumericwithspace"><s:property value="reconciledComment"/></textarea>
 					</td>
 				</tr>
 			</s:iterator>

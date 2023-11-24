@@ -55,6 +55,7 @@
 <head>
 <link rel="stylesheet" type="text/css"
 	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <title>PEX Ref. No Assignment Search</title>
 </head>
 <body onload="onload()">
@@ -94,7 +95,7 @@
 							onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>
 					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
-					<td class="greybox"><s:textfield name="voucherNumber"
+					<td class="greybox"><s:textfield name="voucherNumber" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash" 
 							id="voucherNumber" value="%{voucherNumber}" /></td>
 				</tr>
 				<tr>

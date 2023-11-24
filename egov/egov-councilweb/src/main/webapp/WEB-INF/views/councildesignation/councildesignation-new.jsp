@@ -64,3 +64,4 @@
 	</div>
 </form:form>
 <script> $('#buttonSubmit').click(function(e){ if($('form').valid()){ }else{ e.preventDefault(); }  });</script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

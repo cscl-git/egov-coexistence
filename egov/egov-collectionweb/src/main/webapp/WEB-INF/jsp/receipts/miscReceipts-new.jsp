@@ -52,6 +52,7 @@
 	src="${pageContext.request.contextPath}/resources/js/MiscReceiptsService.js?rnd=${app_release_no}"></script>
 <script type="text/javascript"
 	src="${pageContext.request.contextPath}/resources/js/autocomplete-debug.js?rnd=${app_release_no}"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <style type="text/css">
 #codescontainer {
 	position: absolute;
@@ -905,20 +906,20 @@ var totaldbamt=0,totalcramt=0;
 					<td width="24%" class="bluebox"><s:textarea
 							name="referenceDesc" id="referenceDesc" value="%{referenceDesc}"
 							cols="18" rows="3" style="width:200px;" maxlength="200"
-							onkeyup="return ismaxlength(this)" /></td>
+							onkeyup="return ismaxlength(this)" class = "patternvalidation" data-pattern="alphanumerichyphenbackslashcomma" /></td>
 				</tr>
 				<tr>
 					<td width="4%" class="bluebox2">&nbsp;</td>
 					<td class="bluebox" width="21%"><s:text
 							name="billreceipt.counter.paidby" /><span class="mandatory1">*</span></td>
 					<td class="bluebox"><s:textfield label="paidBy" id="paidBy"
-							maxlength="40" name="paidBy" value="%{payeeName}" /></td>
+							maxlength="40" name="paidBy" value="%{payeeName}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslashcomma" /></td>
 					<td width="21%" class="bluebox2"><s:text
 							name="challan.payeeAddress" /></td>
 					<td width="24%" class="bluebox2"><s:textarea
 							name="payeeAddress" id="payeeAddress" value="%{payeeAddress}"
 							cols="18" rows="3" style="width:200px;" maxlength="55"
-							onkeyup="return ismaxlength(this)" /></td>
+							onkeyup="return ismaxlength(this)" class = "patternvalidation" data-pattern="alphanumerichyphenbackslashcomma"/></td>
 				</tr>
 				<tr>
 					<s:if test="%{shouldShowHeaderField('field')}">
@@ -972,7 +973,7 @@ var totaldbamt=0,totalcramt=0;
 					<td width="21%" class="bluebox2"><s:text
 							name="misc.receipt.gst.no" /></td>
 					<td width="24%" class="bluebox2"><s:textfield label="gstno" id="gstno"
-							maxlength="50" name="gstno" value="%{gstno}" /></td>
+							maxlength="50" name="gstno" value="%{gstno}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslashcomma" /></td>
 				</tr>
 				
 			</table>

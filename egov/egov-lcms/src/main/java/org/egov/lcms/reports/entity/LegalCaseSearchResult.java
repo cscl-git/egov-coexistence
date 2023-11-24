@@ -97,6 +97,7 @@ public class LegalCaseSearchResult {
     private String argument;
     private String hearingOutcome;
     private String legalcaseremarks;
+    private Integer concernedBranchId;
     public String getFromDate() {
         return fromDate;
     }
@@ -403,9 +404,12 @@ public class LegalCaseSearchResult {
 	public void setLegalcaseremarks(String legalcaseremarks) {
 		this.legalcaseremarks = legalcaseremarks;
 	}	
+	public Integer getConcernedBranchId() {
+		return concernedBranchId;
+	}
 
-
-	
-	
+	public void setConcernedBranchId(Integer concernedBranchId) {
+		this.concernedBranchId = concernedBranchId;
+	}
    
 }

@@ -65,7 +65,7 @@
 		<td class="bluebox"><s:text name="bill.search.amount" /></td>
 
 		<td class="bluebox"> <s:textfield id="amount"
-				name="amount" value="%{amount}"  cssClass="form-control"
+				name="amount" value="%{amount}"  cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace"
 				 /></td>
 	</s:if>
 	<s:if test="%{shouldShowHeaderField('fundsource')}">
@@ -135,7 +135,7 @@
 		<td class="bluebox"><s:text name="bill.search.party" /></td>
 
 		<td class="bluebox"> <s:textfield id="partyName"
-				name="partyName" value="%{partyName}"  cssClass="form-control"
+				name="partyName" value="%{partyName}"  cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace"
 				 /></td>
 	</s:if>
 </tr>

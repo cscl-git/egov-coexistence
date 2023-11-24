@@ -54,6 +54,7 @@
 <head>
 <link rel="stylesheet" type="text/css"
 	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <s:if
 	test="%{disableExpenditureType == true && enablePensionType == false}">
 	<title><s:text name="lbl.salary.bill.payment.search"/> </title>
@@ -87,7 +88,7 @@
 					<td class="bluebox"></td>
 					<td class="bluebox"><s:text name="payment.billnumber" /></td>
 					<td class="bluebox"><s:textfield name="billNumber"
-							id="billNumber" maxlength="25" value="%{billNumber}" /></td>
+							id="billNumber" maxlength="25" value="%{billNumber}" class="patternvalidation" data-pattern="alphanumerichyphenbackslash"/></td>
 					<td class="bluebox"></td>
 					<td class="bluebox"></td>
 				</tr>

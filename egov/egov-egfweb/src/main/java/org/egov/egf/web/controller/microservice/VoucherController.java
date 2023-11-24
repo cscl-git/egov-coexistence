@@ -199,6 +199,7 @@ public class VoucherController extends BaseBillController{
 				headerDetails.put(VoucherConstant.DESCRIPTION, voucher.getDescription());
 				headerDetails.put(VoucherConstant.MODULEID, voucher.getModuleId());
 				System.out.println("Naration ::::"+voucher.getDescription());
+				System.out.println("description new log ::::"+voucher.getDescription());
 				headerDetails.put(VoucherConstant.DESCRIPTION, voucher.getDescription());
 				String source = voucher.getSource();
 				headerDetails.put(VoucherConstant.SOURCEPATH, source);
@@ -311,6 +312,7 @@ public class VoucherController extends BaseBillController{
 	@ResponseBody
 	public MisReceiptsDetailsResponse  createMiscReceiptDetails(@RequestBody MisReceiptsDetailsRequest misReceiptsDetailsRequest ){
 		System.out.println("1....nEW");
+		
 		ModelMap model =null;
 		MisReceiptsDetailsResponse res = new MisReceiptsDetailsResponse();
 		res.setSuccess(false);
@@ -319,6 +321,8 @@ public class VoucherController extends BaseBillController{
 		Date date   = null;
 		 try {
 			 model= new ModelMap();
+			 System.out.println("Miscllineous data new log paidby..."+m.getPaid_by());
+			 System.out.println("Miscllineous data new log narration..."+m.getNarration());
 			date   = new Date(m.getReceipt_date());
 			misReceiptDetail = new MisReceiptDetail();
          	misReceiptDetail.setBank_branch(m.getBank_branch());

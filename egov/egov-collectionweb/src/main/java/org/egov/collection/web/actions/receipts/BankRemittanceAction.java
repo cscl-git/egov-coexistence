@@ -64,6 +64,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
@@ -522,12 +523,14 @@ public class BankRemittanceAction extends BaseFormAction {
     	System.out.println("selectAllReceipts "+getSelectAllReceipts());
 		List<ReceiptBean> eblist=new ArrayList<ReceiptBean>();
 		String receiptNumbers="";
+		finalList.removeIf(Objects::isNull);
 		if(null!=getSelectAllReceipts() && getSelectAllReceipts().equalsIgnoreCase("on"))
 		{
 			finalList.clear();
 			try {
 				finalList = remittanceService.findCashRemittanceDetailsForServiceAndFundNew("MISCELLANEOUS", fromDate, toDate,
 						getServiceTypeId(), receiptNo, deptId, "search", searchAmount, subdivison, collectedBy,"Cash");
+				finalList.removeIf(Objects::isNull);
 				for(ReceiptBean f: finalList)
 				{
 					eblist.add(f);

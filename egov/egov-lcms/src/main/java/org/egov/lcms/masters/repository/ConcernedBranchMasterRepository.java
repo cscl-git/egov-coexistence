@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface ConcernedBranchMasterRepository  extends JpaRepository<ConcernedBranchMaster, java.lang.Long>{
-	List<ConcernedBranchMaster> findByActiveTrueOrderByOrderNumberAsc();
+	List<ConcernedBranchMaster> findByActiveTrueOrderByConcernedBranchAsc();
 }

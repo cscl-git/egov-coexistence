@@ -84,7 +84,7 @@
 					code="lbl.meeting.number" /> <span class="mandatory"></span></label>
 			<div class="col-sm-3 add-margin">
 				<form:input path="meetingNumber" id="meetingNumber"
-					cssClass="form-control" required="required"
+					cssClass="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" required="required"
 					cssErrorClass="form-control error" />
 				<form:errors path="meetingNumber" cssClass="error-msg" />
 			</div>	

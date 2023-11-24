@@ -67,7 +67,7 @@
 							<div class="col-sm-3 add-margin">
 								<form:input path="name"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="100" />
+									data-pattern="alphanumericwithspace" maxlength="100" />
 								<form:errors path="name" cssClass="error-msg" />
 							</div>
 							<label class="col-sm-3 control-label text-right"><spring:message
@@ -75,7 +75,7 @@
 							<div class="col-sm-3 add-margin">
 								<form:input path="code"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumeric" maxlength="50" />
+									data-pattern="alphanumericwithspace" maxlength="50" />
 								<form:errors path="code" cssClass="error-msg" />
 							</div>
 
@@ -168,3 +168,4 @@
 	type="text/javascript"></script>
 <script type="text/javascript"
 	src="<cdn:url value='/resources/app/js/functionHelper.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

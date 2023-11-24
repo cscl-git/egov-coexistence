@@ -62,7 +62,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="name"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="50" required="required" />
+								data-pattern="alphanumericwithspace" maxlength="50" required="required" />
 							<form:errors path="name" cssClass="error-msg" />
 						</div>
 						<label class="col-sm-3 control-label text-right"><spring:message
@@ -70,7 +70,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="description"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="50" required="required" />
+								data-pattern="alphanumericwithspace" maxlength="50" required="required" />
 							<form:errors path="description" cssClass="error-msg" />
 						</div>
 					</div>

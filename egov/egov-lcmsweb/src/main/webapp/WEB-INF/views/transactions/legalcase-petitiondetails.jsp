@@ -102,14 +102,14 @@
 							id="bipartisanPetitionerDetailsList[${status.index}].name"
 							name="bipartisanPetitionerDetailsList[${status.index}].name"
 							value="${bipartisanPetitionerDetailsList.name}" maxlength="300"
-							required="required" /></td>
+							required="required" onkeyup='alphanumericwithspace(this);' /></td>
 
 						<td class="text-right"><input type="text"
 							class="form-control table-input"
 							name="bipartisanPetitionerDetailsList[${status.index}].address"
 							id="bipartisanPetitionerDetailsList[${status.index}].address"
 							value="${bipartisanPetitionerDetailsList.address}"
-							maxlength="256" /></td>
+							maxlength="256" onkeyup='alphanumericwithspace(this);'/></td>
 						<td class="text-right"><input type="text"
 							class="form-control table-input text-left" data-pattern="number"
 							name="bipartisanPetitionerDetailsList[${status.index}].contactNumber"
@@ -153,14 +153,14 @@
 				onblur="onChangeofPetitioncheck(this)" /></td> -->
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left"
-						data-pattern="alphanumerichyphenbackslash"
+						data-pattern="alphanumericwithspace"
 						name="bipartisanPetitionerDetailsList[0].name"
 						id="bipartisanPetitionerDetailsList[0].name" maxlength="300"
-						required="required"></td>
+						required="required" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input"
 						name="bipartisanPetitionerDetailsList[0].address"
-						id="bipartisanPetitionerDetailsList[0].address" maxlength="256"></td>
+						id="bipartisanPetitionerDetailsList[0].address" maxlength="256" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left patternvalidation"
 						name="bipartisanPetitionerDetailsList[0].contactNumber"
@@ -203,8 +203,10 @@
 			<th class="text-center"><spring:message code="lbl.slno" /> <%-- <th class="text-center"><spring:message code="lbl.IsGovtDept" /></th> --%>
 			<th class="text-center"><spring:message code="lbl.name" /><span
 				class="mandatory"></span></th>
-			<th class="text-center"><spring:message code="lbl.discription" /></th>
-			<th class="text-center"><spring:message code="lbl.contactnumber" /></th>
+			<th class="text-center"><spring:message code="lbl.discription" /><span
+				class="mandatory"></span></th>
+			<th class="text-center"><spring:message code="lbl.contactnumber" /><span
+				class="mandatory"></span></th>
 			<%-- <th class="text-center"><spring:message code="lbl.Govt_Dept" /></th> --%>
 			<th class="text-center"><spring:message
 					code="lbl.add/delete_Res" /></th>
@@ -230,18 +232,18 @@
 						<td><input type="text"
 							class="form-control table-input text-left"
 							id="bipartisanRespondentDetailsList[${status.index}].name"
-							name="bipartisanRespondentDetailsList[${status.index}].name"
-							value="${bipartisanRespondentDetailsList.name}" /></td>
+							name="bipartisanRespondentDetailsList[${status.index}].name" required="required"
+							value="${bipartisanRespondentDetailsList.name}" onkeyup='alphanumericwithspace(this);' /></td>
 
 
-						<td><input type="text-right"
+						<td><input type="text"
 							class="form-control table-input text-right"
 							id="bipartisanRespondentDetailsList[${status.index}].address"
-							name="bipartisanRespondentDetailsList[${status.index}].address"
-							value="${bipartisanRespondentDetailsList.address}" /></td>
+							name="bipartisanRespondentDetailsList[${status.index}].address" required="required" 
+							value="${bipartisanRespondentDetailsList.address}" onkeyup='alphanumericwithspace(this);' /></td>
 						<td class="text-right"><input type="text"
 							id="bipartisanRespondentDetailsList[${status.index}].contactNumber"
-							name="bipartisanRespondentDetailsList[${status.index}].contactNumber"
+							name="bipartisanRespondentDetailsList[${status.index}].contactNumber" required="required" 
 							class="form-control table-input text-left patternvalidation"
 							value="${bipartisanRespondentDetailsList.contactNumber}" /></td>
 						<%-- 
@@ -286,18 +288,18 @@
 				onblur="onChangeofPetitioncheck(this)" /></td> -->
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left"
-						data-pattern="alphanumerichyphenbackslash"
+						data-pattern="alphanumericwithspace"
 						name="bipartisanRespondentDetailsList[0].name"
 						id="bipartisanRespondentDetailsList[0].name" maxlength="50"
-						required="required"></td>
+						required="required" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input"
 						name="bipartisanRespondentDetailsList[0].address"
-						id="bipartisanRespondentDetailsList[0].address" maxlength="256"></td>
+						id="bipartisanRespondentDetailsList[0].address" maxlength="256" required="required" onkeyup='alphanumericwithspace(this);'></td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input text-left patternvalidation"
 						name="bipartisanRespondentDetailsList[0].contactNumber"
-						id="bipartisanRespondentDetailsList[0].contactNumber"
+						id="bipartisanRespondentDetailsList[0].contactNumber" required="required" 
 						onkeyup="decimalvalue(this);" maxlength="10"></td>
 					<%-- 	<td class="text-right"><form:select path=""
 					data-first-option="false"
@@ -331,7 +333,7 @@
 
 
 
-<div  id="mainContainerDiv" >
+<%-- <div  id="mainContainerDiv" >
 
 <div class="panel-heading">
 	<div class="panel-title">
@@ -371,13 +373,13 @@
 
 						<td>
 						 <div class="dropdown-content" id="autocomplete">
-						<%-- <input type="text"
+						<input type="text"
 							class="form-control table-input text-left"
 							id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
 							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
 							value="${biDefendingCounsilDetailsList.oppPartyAdvocate}" autocomplete="off"/>
 							
-							<div id="worklist_" ></div> --%>
+							<div id="worklist_" ></div>
 									<select class="form-control table-input text-left patternvalidation" 
 										required="required" id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
 							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate" value="${biDefendingCounsilDetailsList.oppPartyAdvocate}">
@@ -387,8 +389,8 @@
 										<c:forEach items="${defendingDropdown}" var="category">
 										        <option value="${category.name}" >${category.name}</option>
 										    
-										<%-- <options items="${}" itemValue="id"
-											id="oppPartyAdvocate" itemLabel="name" /> --%>
+										<options items="${}" itemValue="id"
+											id="oppPartyAdvocate" itemLabel="name" />
 										</c:forEach>
 									</select>
 								</div>
@@ -407,10 +409,10 @@
 							value="${biDefendingCounsilDetailsList.counselphoneNo}" readonly="readonly"/></td>
 						
 					
-						<%-- <input type="hidden" id="activeid"
+						<input type="hidden" id="activeid"
 							name="biDefendingCounsilDetailsList[${status.index}].id"
 							id="biDefendingCounsilDetailsList[${status.index}].id"
-							value="${biDefendingCounsilDetailsList.id}" /> --%>
+							value="${biDefendingCounsilDetailsList.id}" />
 						<input type="hidden"
 							id="biDefendingCounsilDetailsList[${status.index}].isRepondent"
 							name="biDefendingCounsilDetailsList[${status.index}].isRepondent"
@@ -442,13 +444,13 @@
 						
 						<td>
 						 <div class="dropdown-content" id="autocomplete">
-						<%-- <input type="text"
+						<input type="text"
 							class="form-control table-input text-left"
 							id="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
 							name="biDefendingCounsilDetailsList[${status.index}].oppPartyAdvocate"
 							value="${biDefendingCounsilDetailsList.oppPartyAdvocate}" autocomplete="off"/>
 							
-							<div id="worklist_" ></div> --%>
+							<div id="worklist_" ></div>
 									<select class="form-control table-input text-left patternvalidation"
 										required="required" id="biDefendingCounsilDetailsList[0].oppPartyAdvocate"
 							name="biDefendingCounsilDetailsList[0].oppPartyAdvocate">
@@ -458,13 +460,13 @@
 											<c:forEach items="${defendingDropdown}" var="category">
 										        <option value="${category.name}" >${category.name}</option>
 										    
-										<%-- <options items="${}" itemValue="id"
-											id="oppPartyAdvocate" itemLabel="name" /> --%>
+										<options items="${}" itemValue="id"
+											id="oppPartyAdvocate" itemLabel="name" />
 										</c:forEach> 
 									</select>
 								</div>
 							</td>	
-					<%-- <td class="text-right">
+					<td class="text-right">
 					<div class="dropdown-content" id="autocomplete">
 					<input type="text" autocomplete="off"
 						class="form-control table-input text-left"
@@ -475,7 +477,7 @@
 						<div id="worklist_${status.index}" ></div>
 						
 						</div>
-						</td> --%>
+						</td>
 					<td class="text-right"><input type="text"
 						class="form-control table-input"
 						name="biDefendingCounsilDetailsList[0].counselEmail"
@@ -506,35 +508,26 @@
 		</c:choose>
 	</tbody>
 </table>
-</div>
+</div> --%>
 
 
-
-
-
-
-
-
-
-<div class="form-group">
+<%-- <div class="form-group">
 	<label class="col-sm-3 control-label text-right" id="persons"><spring:message
 			code="lbl.representedby" />:</label>
 	<div class="col-sm-3 add-margin" id="personsdiv">
 		<form:input class="form-control patternvalidation"
-			data-pattern="string" maxlength="50" id="representedby"
+			data-pattern="alphanumericwithspace" maxlength="50" id="representedby"
 			path="representedby" />
 		<form:errors path="representedby" cssClass="add-margin error-msg" />
 	</div>
 
 	<label class="col-sm-3 control-label text-right" id="persons">Brief History:</label>
 	<div class="col-sm-3 add-margin">
-		<form:textarea class="form-control" path="remarks" id="remarks"
+		<form:textarea class="form-control patternvalidation" data-pattern="alphanumericwithspace" path="remarks" id="remarks"
 			name="remarks" maxlength="256" />
 		<form:errors path="remarks" cssClass="add-margin error-msg" />
 	</div>
-
-	
-</div>
+</div> --%>
 
 
 

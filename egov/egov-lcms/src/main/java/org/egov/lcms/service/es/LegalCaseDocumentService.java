@@ -103,9 +103,9 @@ public class LegalCaseDocumentService {
             legalCaseDocument = LegalCaseDocument.builder().withCaseNumber(legalCase.getCaseNumber())
                     .withLcNumber(legalCase.getLcNumber()).withCaseTitle(legalCase.getCaseTitle())
                     .withCaseDate(legalCase.getCaseDate()).withCaseReceivingDate(legalCase.getCaseReceivingDate())
-                    .withCaseType(legalCase.getCaseTypeMaster().getCaseType())
-                    .withCourtName(legalCase.getCourtMaster().getName())
-                    .withCourtType(legalCase.getCourtMaster().getCourtType().getCourtType())
+                    //.withCaseType(legalCase.getCaseTypeMaster().getCaseType())
+                    //.withCourtName(legalCase.getCourtMaster().getName())
+                    .withCourtType(legalCase.getCourtTypeMaster().getCourtType())
                     .withPetitionType(legalCase.getPetitionTypeMaster().getPetitionType())
                     .withStatus(legalCase.getStatus().getDescription())
                     .withPetitionerNames(legalCase.getPetitionersNames())
@@ -139,9 +139,9 @@ public class LegalCaseDocumentService {
         legalCaseDocument.setCaseDate(legalCase.getCaseDate());
         legalCaseDocument.setCaseReceivingDate(legalCase.getCaseReceivingDate());
         legalCaseDocument.setCaseTitle(legalCase.getCaseTitle());
-        legalCaseDocument.setCaseType(legalCase.getCaseTypeMaster().getCaseType());
-        legalCaseDocument.setCourtName(legalCase.getCourtMaster().getName());
-        legalCaseDocument.setCourtType(legalCase.getCourtMaster().getCourtType().getCourtType());
+        //legalCaseDocument.setCaseType(legalCase.getCaseTypeMaster().getCaseType());
+        //legalCaseDocument.setCourtName(legalCase.getCourtMaster().getName());
+        legalCaseDocument.setCourtType(legalCase.getCourtTypeMaster().getCourtType());
         legalCaseDocument.setPetitionType(legalCase.getPetitionTypeMaster().getPetitionType());
         legalCaseDocument.setFiledByULB((null==legalCase.getIsFiledByCorporation())?false:legalCase.getIsFiledByCorporation());
         legalCaseDocument.setNextDate(legalCase.getNextDate());
@@ -163,11 +163,16 @@ public class LegalCaseDocumentService {
             legalCaseDocument.setSeniorAdvocate(
                     legalCase.getLegalCaseAdvocates().get(0).getAdvocateMaster().getIsSenioradvocate());
         }
-        if (LcmsConstants.LEGALCASE_INTERIMSTAY_STATUS.equalsIgnoreCase(legalCase.getStatus().getCode()))
-            if (!legalCase.getLegalCaseInterimOrder().isEmpty())
+        if (LcmsConstants.LEGALCASE_INTERIMSTAY_STATUS.equalsIgnoreCase(legalCase.getStatus().getCode())) {
+            if (!legalCase.getLegalCaseInterimOrder().isEmpty()) {
                 legalCaseDocument.setInterimOrderType(legalCase.getLegalCaseInterimOrder().get(0).getInterimOrder().getInterimOrderType());
-            else
+            }
+            
+            
+           if (legalCaseInterimOrder != null) {
                 legalCaseDocument.setInterimOrderType(legalCaseInterimOrder.getInterimOrder().getInterimOrderType());
+           }
+           }
         if (LcmsConstants.LEGALCASE_STATUS_JUDGMENT.equalsIgnoreCase(legalCase.getStatus().getCode())) {
             legalCaseDocument.setJudgmentOutcome(judgment.getJudgmentType().getName());
             legalCaseDocument.setJudgmentDate(judgment.getOrderDate());

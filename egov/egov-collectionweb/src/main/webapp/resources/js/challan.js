@@ -460,12 +460,20 @@ function createTextFieldFormatterForFunction(prefix,suffix,table){
 		el.innerHTML = "<input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"' style='width:90px;' onfocus='autocompletecodeFunction(this,event)' autocomplete='off' onblur='fillNeibrAfterSplitFunction(this)' />";
 	}
 }
+
+function alphanumericwithspace(obj){
+    var regexp_alphanumeric = "/[^a-zA-Z0-9 ]/g" ;
+    if(jQuery(obj).val().match(regexp_alphanumeric)){
+        jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumeric,'') );
+    }
+}
+
 function createLongTextFieldFormatter(prefix,suffix,table){
 
     return function(el, oRecord, oColumn, oData) {
      var rec=billDetailTableIndex;
 		var value = (YAHOO.lang.isValue(oData))?oData:"";
-		el.innerHTML = "<input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"'  style='width:350px;' onfocus='autocompletecode(this,event)' autocomplete='off'  onblur='fillNeibrAfterSplitGlcode(this)'/>";
+		el.innerHTML = "<input type='text' id='"+prefix+"["+rec+"]"+suffix+"' name='"+prefix+"["+rec+"]"+suffix+"'  style='width:350px;' onfocus='autocompletecode(this,event)' autocomplete='off'  onblur='fillNeibrAfterSplitGlcode(this)' onkeyup='alphanumericwithspace(this);'/>";
 	}
 }
 

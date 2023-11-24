@@ -54,6 +54,7 @@
 <html>
 <head>
 	<script type="text/javascript" src="${pageContext.request.contextPath}/resources/javascript/voucherHelper.js?rnd=${app_release_no}"></script>
+	<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 	<meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
 	<title>Create Voucher From Bill</title>
 	<script type="text/javascript">
@@ -132,7 +133,7 @@
 						</tr>
 						<tr>
 							<td class="bluebox"><s:text name="bill.Number" /></td>
-							<td class="bluebox"><s:textfield name="billNumber" id="billNumber" maxlength="50" value="%{billNumber}" /></td>
+							<td class="bluebox"><s:textfield name="billNumber" id="billNumber" maxlength="50" value="%{billNumber}" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 							<td class="bluebox"><s:text name="voucher.subdivision" /></td>
 							<td class="bluebox">
 							<s:select name="vouchermis.subdivision" id="subdivision" list="dropdownData.subdivisionList"

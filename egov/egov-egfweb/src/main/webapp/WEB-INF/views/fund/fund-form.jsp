@@ -59,14 +59,14 @@
             <label class="col-sm-3 control-label text-right"><spring:message code="lbl.name" text="Name"/> <span
               class="mandatory"></span> </label>
             <div class="col-sm-3 add-margin">
-              <form:input path="name" class="form-control text-left patternvalidation" data-pattern="alphanumeric"
+              <form:input path="name" class="form-control text-left patternvalidation" data-pattern="alphanumericwithspace"
                 maxlength="50" required="required" />
               <form:errors path="name" cssClass="error-msg" />
             </div>
             <label class="col-sm-3 control-label text-right"><spring:message code="lbl.code" text="Code"/> <span
               class="mandatory"></span> </label>
             <div class="col-sm-3 add-margin">
-              <form:input path="code" class="form-control text-left patternvalidation" data-pattern="alphanumeric"
+              <form:input path="code" class="form-control text-left patternvalidation" data-pattern="patternvalidation"
                 maxlength="50" required="required" />
               <form:errors path="code" cssClass="error-msg" />
             </div>
@@ -74,13 +74,13 @@
           <div class="form-group">
             <label class="col-sm-3 control-label text-right"><spring:message code="lbl.identifier" text="Identifier"/> </label>
             <div class="col-sm-3 add-margin">
-              <form:input path="identifier" class="form-control text-right patternvalidation" data-pattern="number" />
+              <form:input path="identifier" class="form-control text-right patternvalidation" data-pattern="patternvalidation" />
               <form:errors path="identifier" cssClass="error-msg" />
             </div>
             <label class="col-sm-3 control-label text-right"><spring:message code="lbl.llevel" text="Level"/><span
               class="mandatory"></span>  </label>
             <div class="col-sm-3 add-margin">
-              <form:input path="llevel" class="form-control text-right patternvalidation" data-pattern="number" required="required" />
+              <form:input path="llevel" class="form-control text-right patternvalidation" data-pattern="patternvalidation" required="required" />
               <form:errors path="llevel" cssClass="error-msg" />
             </div>
           </div>

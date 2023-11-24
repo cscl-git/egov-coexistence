@@ -263,11 +263,11 @@ public class HearingsController {
         if (smsEnabled) {
             try {
             	if(legalCase.getNodalOfficername()!=null && !legalCase.getNodalOfficername().isEmpty() && legalCase.getNodalOfficernumber() != null && !legalCase.getNodalOfficernumber().isEmpty() && !legalCase.getNodalOfficernumber().equalsIgnoreCase("0")) {
-	            	customMessage="Hello "+legalCase.getNodalOfficername()+", Your case in Type of Court: "+legalCase.getCourtMaster().getCourtType().getCourtType()+", Petition Type: "+legalCase.getPetitionTypeMaster().getPetitionType()+", Case number: "+legalCase.getCaseNumber() +", For Concerned Branch: "+legalCase.getConcernedBranch().getConcernedBranch()+", Hearing scheduled on: "+legalCase.getNextDate()+". Regards, Chandigarh Smart City Ltd.";
+	            	customMessage="Hello "+legalCase.getNodalOfficername()+", Your case in Type of Court: "+legalCase.getCourtTypeMaster().getCourtType()+", Petition Type: "+legalCase.getPetitionTypeMaster().getPetitionType()+", Case number: "+legalCase.getCaseNumber() +", For Concerned Branch: "+legalCase.getConcernedBranch().getConcernedBranch()+", Hearing scheduled on: "+legalCase.getNextDate()+". Regards, Chandigarh Smart City Ltd.";
             		buildSmsForAgendaInvitation(legalCase.getNodalOfficername(), legalCase.getNodalOfficernumber(), customMessage,templateId);
             	}
 	            if(name!=null && !name.isEmpty() && phone != null && !phone.isEmpty() && !phone.equalsIgnoreCase("0")) {
-	            	customMessage="Hello "+name+", Your case in Type of Court: "+legalCase.getCourtMaster().getCourtType().getCourtType()+", Petition Type: "+legalCase.getPetitionTypeMaster().getPetitionType()+", Case number: "+legalCase.getCaseNumber() +", For Concerned Branch: "+legalCase.getConcernedBranch().getConcernedBranch()+", Hearing scheduled on: "+legalCase.getNextDate()+". Regards, Chandigarh Smart City Ltd.";
+	            	customMessage="Hello "+name+", Your case in Type of Court: "+legalCase.getCourtTypeMaster().getCourtType()+", Petition Type: "+legalCase.getPetitionTypeMaster().getPetitionType()+", Case number: "+legalCase.getCaseNumber() +", For Concerned Branch: "+legalCase.getConcernedBranch().getConcernedBranch()+", Hearing scheduled on: "+legalCase.getNextDate()+". Regards, Chandigarh Smart City Ltd.";
             		buildSmsForAgendaInvitation(name, phone, customMessage,templateId);
             	}
             }catch(Exception e) {

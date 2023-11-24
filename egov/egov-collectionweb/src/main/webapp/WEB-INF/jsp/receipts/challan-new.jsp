@@ -711,14 +711,14 @@ function addServiceTypeDropdown(tableId){
 	    </tr>
 	    <tr> <td width="4%" class="bluebox2">&nbsp;</td>
 	    <td width="21%" class="bluebox2"><s:text name="challan.payeename"/><span class="mandatory"/></td>
-	    <td width="24%" class="bluebox2"><s:textfield name="payeeName" id="payeeName" value="%{payeeName}" maxlength="49"/></td>
+	    <td width="24%" class="bluebox2"><s:textfield name="payeeName" id="payeeName" value="%{payeeName}" maxlength="49" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 	     <td width="21%" class="bluebox2"><s:text name="challan.payeeAddress"/></td>
-	    <td width="24%" class="bluebox2"><s:textarea name="payeeAddress" id="payeeAddress" value="%{payeeAddress}" cols="18" rows="1" maxlength="255" onkeyup="return ismaxlength(this)"/></td>
+	    <td width="24%" class="bluebox2"><s:textarea name="payeeAddress" id="payeeAddress" value="%{payeeAddress}" cols="18" rows="1" maxlength="255" onkeyup="return ismaxlength(this)" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 	    </tr>
 	  <tr> 
 	      	<td width="4%" class="bluebox">&nbsp;</td>
 		    <td width="21%" class="bluebox"><s:text name="challan.narration"/></td>
-		    <td width="24%" class="bluebox"><s:textarea name="referenceDesc" id="referenceDesc" value="%{referenceDesc}" cols="18" rows="1" maxlength="125" onkeyup="return ismaxlength(this)"/></td>
+		    <td width="24%" class="bluebox"><s:textarea name="referenceDesc" id="referenceDesc" value="%{referenceDesc}" cols="18" rows="1" maxlength="125" onkeyup="return ismaxlength(this)" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 	    </tr>
 	    <tr>
         <td width="4%" class="bluebox">&nbsp;</td>
@@ -851,6 +851,7 @@ function addServiceTypeDropdown(tableId){
 	<s:hidden id="challanNextState" name="challanNextState" value="%{challan.state.nextAction}"/>
 </s:push>
 </s:form>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 </div>
 <!-- <script src="<cdn:url value='/resources/global/js/egov/inbox.js?rnd=${app_release_no}' context='/services/egi'/>"></script>-->
 </body>

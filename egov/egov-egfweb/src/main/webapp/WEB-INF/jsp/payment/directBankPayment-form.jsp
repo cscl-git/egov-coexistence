@@ -124,7 +124,7 @@
 	<td class="greybox"><s:text name="document.number" /><span
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:textfield name="commonBean.documentNumber"
-			id="commonBean.documentNumber" size="25" /></td>
+			id="commonBean.documentNumber" size="25" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
 	<td class="greybox"><s:text name="document.date" /><span
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<s:date name='commonBean.documentDate' var="commonBean.documentDateId"
@@ -160,7 +160,7 @@
 	<td class="bluebox"></td>
 	<td class="bluebox"><s:text name="voucher.narration" /><span class="mandatory1">*</span></td>
 	<td class="bluebox" colspan="3"><s:textarea name="description"
-			id="description" style="width:95%" /></td>
+			id="description" style="width:95%" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
 </tr>
 <tr>
 	<td class="greybox"></td>

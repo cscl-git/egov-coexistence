@@ -72,3 +72,4 @@
 		}
 	});
 </script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

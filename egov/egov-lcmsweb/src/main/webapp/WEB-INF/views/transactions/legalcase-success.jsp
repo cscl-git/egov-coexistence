@@ -72,7 +72,7 @@
 								<spring:message code="lbl.courttype" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.courtMaster.courtType.courtType}" />
+								<c:out value="${legalCase.courtTypeMaster.courtType}" />
 							</div>
 
 							<div class="col-xs-3 add-margin">
@@ -82,14 +82,14 @@
 								<c:out value="${legalCase.petitionTypeMaster.petitionType}" />
 							</div>
 						</div>
-						<div class="row add-border">
+						<%-- <div class="row add-border">
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.court" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.courtMaster.name}" />
 							</div>							
-						</div>
+						</div> --%>
 						<div class="row add-border">
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.casenumber" />
@@ -104,7 +104,7 @@
 								<c:out value="${legalCase.lcNumber}" />
 							</div>
 						</div>
-						<div class="row add-border">
+					<%-- 	<div class="row add-border">
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.reappealofcase" />
 							</div>
@@ -139,8 +139,8 @@
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.appealNum}" />-<c:out value="${legalCase.prevCaseYear}" />
 							</div>
-						</div>
-						<div class="row add-border">
+						</div> --%>
+						<%-- <div class="row add-border">
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.reappl.courttype" />
 							</div>
@@ -154,7 +154,7 @@
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.prevPetitionType.petitionType}" />
 							</div>
-						</div>
+						</div> --%>
 						<div class="row add-border">
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.title" />
@@ -162,13 +162,17 @@
 							<div class="col-xs-9 add-margin view-content">
 								<c:out value="${legalCase.caseTitle}" />
 							</div>
-						</div>
-						<div class="row add-border">
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.prayer" />
 							</div>
 							<div class="col-xs-9 add-margin view-content">
 								<c:out value="${legalCase.prayer}" />
+							</div>
+						</div>
+						<div class="row add-border">
+							<div class="col-xs-3 add-margin">Brief</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.brief}" />
 							</div>
 						</div>
 						<div class="row add-border">
@@ -180,14 +184,22 @@
 									value="${legalCase.caseDate}" var="casedate" />
 								<c:out value="${casedate}" />
 							</div>
+							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.nexthearingdate" />
+							</div>
+							<div class="col-sm-3 add-margin view-content">
+								<fmt:formatDate pattern="dd/MM/yyyy"
+									value="${legalCase.nextHearingDate}" var="nextHearingDate" />
+								<c:out value="${nextHearingDate}" />
+							</div>
 						</div>
 						<div class="row add-border">
-							<div class="col-xs-3 add-margin">
+							<%-- <div class="col-xs-3 add-margin">
 								<spring:message code="lbl.nodalofficer.department" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.nodalOfficerDepartment}" />
-							</div>
+							</div> --%>
 							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.nodalofficer" />
 							</div>
@@ -203,11 +215,39 @@
 								<c:out value="${legalCase.nodalOfficername}" />
 							</div>
 							<div class="col-xs-3 add-margin">
-								Nodal Officer Phone No
+								<spring:message code="lbl.estimatepreparedby" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.estimatePreparedBy}" />
+							</div>						
+						</div>
+						<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+								Nodal Officer Designation
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.nodalOfficerDesignation}" />
+							</div>
+						<div class="col-xs-3 add-margin">
+								Dealing Hand Designation
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.dealingHandDesignation}" />
+							</div>
+						</div>
+						<div class="row add-border">
+						<div class="col-xs-3 add-margin">
+								Nodal Officer Mobile No
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.nodalOfficernumber}" />
-							</div>							
+							</div>	
+						<div class="col-xs-3 add-margin">
+								Dealing Hand Mobile No
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.dealingHandnumber}" />
+							</div>
 						</div>
 						<div class="row add-border">
 							<div class="col-xs-3 add-margin">
@@ -217,36 +257,36 @@
 								<c:out value="${legalCase.concernedBranch.concernedBranch}" />
 							</div>
 							<div class="col-xs-3 add-margin">
+								<spring:message code="lbl.division" />
+							</div>
+							<div class="col-xs-3 add-margin view-content">
+								<c:out value="${legalCase.division.division}" />
+							</div>							
+						</div>
+						<div class="row add-border">
+							<div class="col-xs-3 add-margin">
 								<spring:message code="lbl.concerned.branch.email" />
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.concernedBranchEmail}" />
 							</div>							
 						</div>
-						<div class="row add-border">
-							<div class="col-xs-3 add-margin"><spring:message code="lbl.casecatagory" /></div>
+						<!-- <div class="row add-border"> -->
+							<%-- <div class="col-xs-3 add-margin"><spring:message code="lbl.casecatagory" /></div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.caseTypeMaster.caseType}" />
-							</div>
-							<div class="col-xs-3 add-margin">
-								<spring:message code="lbl.estimatepreparedby" />
-							</div>
-							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.estimatePreparedBy}" />
-							</div>
-						</div>
-						<div class="row add-border">
-							<div class="col-xs-3 add-margin">Brief</div>
-							<div class="col-xs-3 add-margin view-content">
-								<c:out value="${legalCase.brief}" />
-							</div>
-							<div class="col-xs-3 add-margin">
+							</div> --%>
+							
+						<!-- </div> -->
+						<%-- <div class="row add-border">
+							
+							 <div class="col-xs-3 add-margin">
 								Councel Engage
 							</div>
 							<div class="col-xs-3 add-margin view-content">
 								<c:out value="${legalCase.councelengage}" />
-							</div>
-						</div>
+							</div> 
+						</div> --%>
 					</div>
 
 				</div>
@@ -349,7 +389,8 @@
 						<th class="text-center"><spring:message code="lbl.name" /><span
 							class="mandatory"></span></th>
 						<th class="text-center"><spring:message
-								code="lbl.discription" /></th>
+								code="lbl.discription" /><span
+							class="mandatory"></span></th>
 						<th class="text-center"><spring:message
 								code="lbl.contactnumber" /></th>
 						<%-- <th class="text-center"><spring:message code="lbl.Govt_Dept" /></th> --%>
@@ -424,7 +465,7 @@
 			</table>
 			
 			
-			<div class="panel-heading">
+		<%-- 	<div class="panel-heading">
 				<div class="panel-title">
 					<spring:message code="lbl.defending.counsel" />
 				</div>
@@ -482,7 +523,7 @@
 						</tr>
 					</c:forEach>
 				</tbody>
-			</table>
+			</table> --%>
 			
 			<div class="row">
 				<div class="col-md-12">

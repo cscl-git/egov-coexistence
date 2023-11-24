@@ -75,6 +75,13 @@ function updateGridDateBENIBB(index) {
 
 }
 
+function alphanumericwithspace(obj){
+    var regexp_alphanumeric = "/[^a-zA-Z0-9 ]/g" ;
+    if(jQuery(obj).val().match(regexp_alphanumeric)){
+        jQuery(obj).val( jQuery(obj).val().replace(regexp_alphanumeric,'') );
+    }
+}
+
 function createTextFieldFormatterBENIBB(prefix, suffix) {
 	return function(el, oRecord, oColumn, oData) {
 		var value = (YAHOO.lang.isValue(oData)) ? oData : "";
@@ -82,7 +89,7 @@ function createTextFieldFormatterBENIBB(prefix, suffix) {
 				+ bankEntriesNotInBankBookTableIndex + "]" + suffix
 				+ "' name='" + prefix + "["
 				+ bankEntriesNotInBankBookTableIndex + "]" + suffix
-				+ "' style='width:90px;' />";
+				+ "' style='width:90px;' onkeyup='alphanumericwithspace(this);' />";
 	}
 }
 

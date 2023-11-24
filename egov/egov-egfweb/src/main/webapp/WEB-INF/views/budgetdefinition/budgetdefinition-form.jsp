@@ -67,7 +67,7 @@
 						<div class="col-sm-6 add-margin">
 							<form:input path="name"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="50" />
+								data-pattern="alphanumericwithspace" maxlength="50" />
 							<form:errors path="name" cssClass="error-msg" />
 						</div>
 					</div>
@@ -134,7 +134,7 @@
 						<div class="col-sm-6 add-margin">
 							<form:textarea path="description"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumeric" maxlength="250" />
+								data-pattern="alphanumericwithspace" maxlength="250" />
 							<form:errors path="description" cssClass="error-msg" />
 						</div>
 					</div>

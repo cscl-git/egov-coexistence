@@ -5,6 +5,7 @@
 
 <script
         src="<cdn:url value='/resources/js/estimateworks.js?rnd=${app_release_no}' context='/services/works'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 <form:form name="search-tender-form" role="form" method="post"
 	action="tenderSearch" modelAttribute="tender" id="tender"
@@ -17,7 +18,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.tender.preparation.name.work" /></label>
 					<div class="col-sm-9 block-colm">
-						<form:textarea class="form-control" path="project_name_search" style="height: 100px;"
+						<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="project_name_search" style="height: 100px;"
 									maxlength="2000"  />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -40,7 +41,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.tender.loa.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="loaNumber" />
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="loaNumber" />
 					</div>
 
 				</div>

@@ -77,6 +77,7 @@
 		<div class="subheadnew">
 			<s:text name="chartOfAccount.detailed" />
 		</div>
+		<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 		<s:form name="chartOfAccountsForm" id="chartOfAccountsForm"
 			action="chartOfAccounts" theme="simple">
 
@@ -88,7 +89,7 @@
 								name="chartOfAccount.accountCode" />:</strong><span class="mandatory1">*</span></td>
 					<td class="bluebox">
 						<div id="myAutoComplete" style="width: 20em; padding-bottom: 2em;">
-							<input type="text" name="glCode" id="glCode" />
+							<input type="text" name="glCode" id="glCode" class = "patternvalidation" data-pattern="alphanumericwithspace" />
 							<div id="myContainer" style="width: 50em;"></div>
 						</div>
 					</td>

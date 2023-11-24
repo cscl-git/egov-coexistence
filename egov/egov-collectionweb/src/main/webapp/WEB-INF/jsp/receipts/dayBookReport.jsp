@@ -565,7 +565,7 @@ function onBodyLoad(){
 	    <!-- add by bhushan -->
 	    <td width="21%" class="bluebox"><s:text name="Collected By"/></td>
 	      <td width="24%" class="bluebox">
-	      <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy"/></td>
+	      <div class="yui-skin-sam"><s:textfield id="collectedBy" type="text" name="collectedBy" class = "patternvalidation" data-pattern="alphanumericwithspace"/></td>
 	      
 	     
 	    
@@ -594,6 +594,7 @@ function onBodyLoad(){
     <option value="posmohbd"> POS MOH B&D</option> 
     <option value="posmohcattle"> POS MOH Cattle</option>
     <option value="posmohslh">POS MOH SLH</option>
+    <option value="ONLINE">ONLINE</option>
 </select> </td>
 	    
 	    </tr>
@@ -734,6 +735,7 @@ function onBodyLoad(){
 </div>
 </s:if>
 </s:form>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 </body>
 
 	

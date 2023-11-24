@@ -111,7 +111,7 @@ public class PetitionTypeMasterService extends PersistenceService<PetitionTypeMa
     }
 
     public List<PetitionTypeMaster> findActivePetitionByCourtType(final CourtTypeMaster courtType) {
-        return petitionTypeMasterRepository.findByActiveTrueAndCourtType(courtType);
+        return petitionTypeMasterRepository.findByActiveTrueAndCourtTypeOrderByPetitionTypeAsc(courtType);
     }
 
     public List<PetitionTypeMaster> search(final PetitionTypeMaster petitionTypeMaster) {

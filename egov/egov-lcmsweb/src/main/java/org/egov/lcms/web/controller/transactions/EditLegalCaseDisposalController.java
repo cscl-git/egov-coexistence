@@ -83,11 +83,23 @@ public class EditLegalCaseDisposalController {
     private LegalCase getLegalCase(@RequestParam("lcNumber") final String lcNumber) {
         return legalCaseService.findByLcNumber(lcNumber);
     }
+    
+     
+    @ModelAttribute
+    private LegalCase getLegalCaseData(@RequestParam("lcNumber") final Long lcNumber) {
+        return legalCaseService.findById(lcNumber);
+    }
+
 
     @RequestMapping(value = "/edit/", method = RequestMethod.GET)
-    public String edit(@RequestParam("lcNumber") final String lcNumber, final Model model) {
-        final LegalCase legalCase = legalCaseService.findByLcNumber(lcNumber);
-        final List<LegalCaseDisposal> legalCaseDisposalList = getLegalCase(lcNumber).getLegalcaseDisposal();
+    public String edit(@RequestParam("lcNumber") final Long lcNumber, final Model model) {
+		/* final LegalCase legalCase = legalCaseService.findByLcNumber(lcNumber); */
+   	    final LegalCase legalCase = legalCaseService.findById(lcNumber); 
+		/*
+		 * final List<LegalCaseDisposal> legalCaseDisposalList =
+		 * getLegalCase(lcNumber).getLegalcaseDisposal();
+		 */
+    	final List<LegalCaseDisposal> legalCaseDisposalList = getLegalCaseData(lcNumber).getLegalcaseDisposal();
         final LegalCaseDisposal legalCaseDisposalObj = legalCaseDisposalList.get(0);
         model.addAttribute(LcmsConstants.LEGALCASE, legalCase);
         model.addAttribute(LEGALCASEDISPOSAL, legalCaseDisposalObj);

@@ -69,7 +69,7 @@
 							code="lbl.vouchernumber" text="Voucher Number" /> </label>
 				<div class="col-sm-3 add-margin">
 						<form:input class="form-control patternvalidation"
-							data-pattern="alphanumericwithspecialcharacters"
+							data-pattern="alphanumerichyphenbackslash"
 							id="voucherNumber" path="voucherNumber" maxlength="50" />
 				</div>
 				

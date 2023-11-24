@@ -53,6 +53,7 @@
 <head>
 <link rel="stylesheet" type="text/css"
 	href="/services/EGF/resources/css/ccMenu.css?rnd=${app_release_no}" />
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <title><s:text name="surrender.pex.search" /></title>
 </head>
 <body>
@@ -90,11 +91,11 @@
 					<td class="bluebox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
 					<td class="bluebox"><s:textfield name="voucherNumber"
-							id="voucherNumber" value="%{voucherNumber}" /></td>
+							id="voucherNumber" value="%{voucherNumber}" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 					<td class="bluebox"><s:text
 							name="chq.assignment.pex.transacton.no" /></td>
 					<td class="bluebox"><s:textfield name="instrumentNumber"
-							id="instrumentNumber" onkeyup="validateOnlyNumber()" /></td>
+							id="instrumentNumber" onkeyup="validateOnlyNumber()" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 				</tr>
 				<tr>
 					<td class="greybox"></td>

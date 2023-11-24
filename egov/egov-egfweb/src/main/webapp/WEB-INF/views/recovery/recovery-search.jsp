@@ -50,6 +50,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java"%>
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ taglib uri="/WEB-INF/tags/cdn.tld" prefix="cdn" %>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <form:form role="form" action="search" modelAttribute="recovery"
 	id="recoverysearchform" cssClass="form-horizontal form-groups-bordered"
 	enctype="multipart/form-data">
@@ -80,7 +81,7 @@
 							<label class="col-sm-2 control-label text-left"><spring:message
 									code="lbl.deductions.code" text="Deduction Code"/> </label>
 							<div class="col-sm-3 add-margin">
-								<form:input path="type" id="type" cssClass="form-control" cssErrorClass="form-control error"/>
+								<form:input path="type" id="type" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" cssErrorClass="form-control error"/>
 								<form:errors path="type" cssClass="error-msg" />
 							</div>
 						</div>
@@ -89,7 +90,7 @@
 							<label class="col-sm-2 control-label text-left"><spring:message
 									code="lbl.deductions.name" text="Deduction Name"/> </label>
 							<div class="col-sm-3 add-margin">
-								<form:input path="recoveryName" id="recoveryName" cssClass="form-control" cssErrorClass="form-control error"/>
+								<form:input path="recoveryName" id="recoveryName" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" cssErrorClass="form-control error"/>
 								<form:errors path="recoveryName" cssClass="error-msg" />
 							</div>
 							<input type="hidden" id="mode" name="mode" value="${mode}" />

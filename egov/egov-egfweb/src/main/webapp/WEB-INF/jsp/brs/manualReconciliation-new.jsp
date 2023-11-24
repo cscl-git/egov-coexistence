@@ -55,6 +55,7 @@
 <head>
 <script src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
 <script type="text/javascript" src="<cdn:url value='/resources/app/js/reconciliationHelper.js?rnd=${app_release_no}'/>"></script>
+<script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 
 
@@ -198,7 +199,7 @@
           <td class="greybox"></td>
            <td class="greybox"><s:text name="instrumentNo" /> <span
             class="greybox"></td>
-          <td class="greybox"><input type="text"  name="reconcileBean.instrumentNo" id="instrumentNo" /></td>
+          <td class="greybox"><input type="text"  name="reconcileBean.instrumentNo" id="instrumentNo" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
 
           
           <!-- <td class="greybox"></td> -->

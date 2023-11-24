@@ -64,7 +64,7 @@
 						<div class="col-sm-3 add-margin">
 							<form:input path="caseType"
 								class="form-control text-left patternvalidation"
-								data-pattern="alphanumericwithspecialcharacterswithspace"
+								data-pattern="alphanumericwithspace"
 								maxlength="50" />
 							<form:errors path="caseType" cssClass="error-msg" />
 						</div>
@@ -146,3 +146,4 @@
 <script
 	src="<cdn:url value='/resources/js/app/casetypeMasterHelper.js?rnd=${app_release_no}'/>"
 	type="text/javascript"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

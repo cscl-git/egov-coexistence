@@ -110,7 +110,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.egov.lcms.masters.entity.ConcernedBranchMaster;
 import org.egov.lcms.masters.entity.JudgmentType;
+import org.egov.lcms.masters.service.ConcernedBranchMasterService;
 import org.egov.lcms.masters.service.JudgmentTypeService;
 
 @Controller
@@ -125,6 +127,9 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
 
     @Autowired
     JudgmentTypeService JudgmentTypeService;
+    
+    @Autowired
+    private ConcernedBranchMasterService concernedBranchMasterService;
     
     @Autowired
     private LegalCaseUtil legalCaseUtil;
@@ -150,6 +155,11 @@ public class LegalCaseSearchController extends GenericLegalCaseController {
 
     public @ModelAttribute("reportStatusList") List<ReportStatus> getReportStatusList() {
         return searchLegalCaseService.getReportStatus();
+    }
+   
+    
+    public @ModelAttribute("branchList") List<ConcernedBranchMaster> getConcernedBranchList() {
+        return concernedBranchMasterService.getActiveConcernedBranchs();
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/searchForm")

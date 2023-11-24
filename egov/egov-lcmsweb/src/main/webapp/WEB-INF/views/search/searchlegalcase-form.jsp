@@ -52,6 +52,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib uri="/WEB-INF/taglib/cdn.tld" prefix="cdn"%>
 
+
 <html>
 <body onload="nextHearingDate()">
 <div class="row">
@@ -87,7 +88,7 @@
 
 
 				<div class="form-group">
-					<label class="col-sm-3 control-label text-right"><spring:message
+					<%-- <label class="col-sm-3 control-label text-right"><spring:message
 							code="lbl.casecategory" />:</label>
 					<div class="col-sm-3 add-margin">
 						<form:select name="casecategory" path="" data-first-option="false"
@@ -98,14 +99,15 @@
 							<form:options items="${caseTypeList}" itemValue="id"
 								itemLabel="caseType" />
 						</form:select>
-					</div>
-					<label class="col-sm-2 control-label text-right"><spring:message
+					</div> --%>
+					<label class="col-sm-3 control-label text-right"><spring:message
 							code="lbl.standingcons" />:</label>
 					<div class="col-sm-3 add-margin">
 						<input type="text" name="standingCouncil"
-							class="form-control patternvalidation" data-pattern="string"
+							class="form-control patternvalidation" data-pattern="alphanumericwithspace"
 							id="standingCouncil" />
 					</div>
+					
 				</div>
 
 				<div class="form-group">
@@ -122,6 +124,19 @@
 						</form:select>
 					</div>
 					<label class="col-sm-2 control-label text-right"><spring:message
+							code="lbl.petitiontype" />:</label>
+					<div class="col-sm-3 add-margin">
+						<form:select name="petitionTypeId" path=""
+							data-first-option="false" id="petitionTypeMaster"
+							cssClass="form-control">
+							<%-- <form:option value="">
+								<spring:message code="lbls.select" />
+							</form:option>
+							<form:options items="${petitiontypeList}" itemValue="id"
+								itemLabel="petitionType" /> --%>
+						</form:select>
+					</div>
+					 <%-- <label class="col-sm-2 control-label text-right"><spring:message
 							code="lbl.court" />:</label>
 					<div class="col-sm-3 add-margin">
 						<form:select name="courtId" path="" data-first-option="false"
@@ -132,18 +147,18 @@
 							<form:options items="${courtsList}" itemValue="id"
 								itemLabel="name" />
 						</form:select>
-					</div>
+					</div>  --%>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-3 control-label text-right"><spring:message
-							code="lbl.casestartdate" />:</label>
+							code="lbl.casestartdate" /><span class="mandatory"></span>:</label>
 					<div class="col-sm-3 add-margin">
 						<form:input path="" name="caseFromDate" id="caseFromDate"
 							cssClass="form-control datepicker" value="${caseFromDate}"
 							cssErrorClass="form-control error" />
 					</div>
 					<label class="col-sm-2 control-label text-right"><spring:message
-							code="lbl.caseenddate" />:</label>
+							code="lbl.caseenddate" /><span class="mandatory"></span>:</label>
 					<div class="col-sm-3 add-margin">
 						<form:input path="" name="caseToDate" id="caseToDate"
 							cssClass="form-control datepicker" value="${caseToDate}"
@@ -163,20 +178,7 @@
 							<form:options items="${statusList}" itemValue="id"
 								itemLabel="description" />
 						</form:select>
-					</div>
-					<label class="col-sm-2 control-label text-right"><spring:message
-							code="lbl.petitiontype" />:</label>
-					<div class="col-sm-3 add-margin">
-						<form:select name="petitionTypeId" path=""
-							data-first-option="false" id="petitionTypeId"
-							cssClass="form-control">
-							<form:option value="">
-								<spring:message code="lbls.select" />
-							</form:option>
-							<form:options items="${petitiontypeList}" itemValue="id"
-								itemLabel="petitionType" />
-						</form:select>
-					</div>
+					</div>					
 				</div>
 				<div class="form-group" id="reportstatus">
 					<label class="col-sm-3 control-label text-right"><spring:message
@@ -195,7 +197,7 @@
 				</div>
 				<!-- Newly Added For Judgement By Bikash Dhal-->
 				<div class="form-group" id="reportstatus">
-					<label class="col-sm-3 control-label text-right">Judgment
+					<%-- <label class="col-sm-3 control-label text-right">Judgment
 						Type:</label>
 					<div class="col-sm-3 add-margin">
 						<form:select name="judgmentTypeId" path=""
@@ -207,10 +209,21 @@
 							<form:options items="${judgementTypeList}" itemValue="id"
 								itemLabel="name" />
 						</form:select>
-					</div>
+					</div> --%>
+					
+					<label class="col-sm-3 control-label text-right">Branch:</label>
+	        <div class="col-sm-3 add-margin">
+		<form:select name="concernedBranchId" path="" data-first-option="false"
+			id="concernedBranchId" cssClass="form-control">
+			<form:option value="">
+				<spring:message code="lbls.select" />
+			</form:option>
+			<form:options items="${branchList}" itemValue="id" itemLabel="concernedBranch" />
+		</form:select>
+	</div>
 				</div>
 				<!-- End -->
-				<div class="form-group">
+				<%-- <div class="form-group">
 					<label class="col-sm-3 control-label text-right"></label>
 						<div class="col-sm-3 add-margin"></div>
 					<label class="col-sm-5 control-label text-right">Include
@@ -244,7 +257,7 @@
 							<input type="checkbox" name="isJudgementDone"
 								value="isJudgementDone" />
 						</div>
-				</div>
+				</div> --%>
 				<div class="row">
 					<div class="text-center">
 						<a href="javascript:void(0);" id="legalcaseReportSearch"
@@ -277,12 +290,12 @@
 					class="btn btn-primary">Download Excel</a> <a
 					href="javascript:void(0);" id="legalcaseReportSearchPdf"
 							class="btn btn-primary">Download Pdf</a>
-						<a
+					    <a
 					href="javascript:void(0);" id="legalcasesavecheckboxval"
 							class="btn btn-primary">Important Cases</a>
 					<a
 					href="javascript:void(0);" id="legacasesaveremarks"
-							class="btn btn-primary">Save Remarks</a>		
+							class="btn btn-primary">Save Remarks</a>			
 					</div>
 		</div>
 		
@@ -292,14 +305,16 @@
 
 <script type="text/javascript">
 <%-- $(document).ready(function() {
-
-	var nexthearing= '<%=session.getAttribute("nexthearingdate")%>';
-	var fileno= '<%=session.getAttribute("filenumber")%>';
-	var branch= '<%=session.getAttribute("branch")%>';
-	bootbox.alert("Nexthearingdate :" +nexthearing + '<br />' + "Fileno :" +fileno + '<br />' + "Branch :" +branch);	
+	
+	var listofhearing= '<%=session.getAttribute("listofhearingdates")%>';
+	 bootbox.alert(listofhearing); 	
 }); --%>
 
 function nextHearingDate() {
+	
+/* 	var x= document.getElementById("statusId");
+    x.remove(3); */
+    
 	var listofhearing= '<%=session.getAttribute("listofhearingdates")%>';
 	 bootbox.alert(listofhearing); 	
 }
@@ -327,6 +342,8 @@ function nextHearingDate() {
 <script
 	src="<cdn:url value='/resources/js/app/legalcaseSearch.js?rnd=${app_release_no}'/>"
 	type="text/javascript"></script>
-	
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
+<script
+	src="<cdn:url value='/resources/js/app/populateDropdown.js?rnd=${app_release_no}'/>"></script>		
 	</body>
 	</html>

@@ -6,6 +6,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 <form:form name="tender-form" role="form" method="post"
 	action="tenderSave" modelAttribute="tender" id="tender"
 	enctype="multipart/form-data"
@@ -31,13 +32,13 @@
 				<label class="col-sm-3 control-label text-left-audit"><spring:message
 									code="lbl.tender.preparation.name.work" /></label>
 					<div class="col-sm-9 add-margin">
-						<form:textarea class="form-control" path="project_name" style="height: 100px;"
+						<form:textarea class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="project_name" style="height: 100px;"
 									maxlength="2000"  />
 							</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.tender.loa.number" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control" path="loaNumber" required="required"/>
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="loaNumber" required="required"/>
 						<form:errors path="loaNumber" cssClass="add-margin error-msg" />
 					</div>
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
@@ -62,7 +63,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.tender.vendor.details" /><span class="mandatory"></span></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control"
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="contractorDetails" required="required"/>
 						<form:errors path="contractorDetails"
 							cssClass="add-margin error-msg" />
@@ -70,7 +71,7 @@
 					<label class="col-sm-3 control-label text-left-audit"><spring:message
 							code="lbl.tender.pro.number" /></label>
 					<div class="col-sm-3 add-margin">
-						<form:input type="text" class="form-control"
+						<form:input type="text" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" 
 							path="tenderProNumber" />
 						<form:errors path="tenderProNumber"
 							cssClass="add-margin error-msg" />

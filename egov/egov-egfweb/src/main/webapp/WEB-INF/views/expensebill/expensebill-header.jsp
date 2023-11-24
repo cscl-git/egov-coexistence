@@ -146,11 +146,11 @@
 		<div class="col-sm-3 add-margin">
 		 <c:choose>
 	          <c:when test="${refundable != null && !refundable.isEmpty()}">
-	          <form:textarea path="egBillregistermis.narration" id="narration" readonly="true" class="form-control" maxlength="1024" ></form:textarea>
+	          <form:textarea path="egBillregistermis.narration" id="narration" readonly="true" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" maxlength="1024" ></form:textarea>
 			  <form:errors path="egBillregistermis.narration" cssClass="add-margin error-msg" />
 	          </c:when>
 	          <c:otherwise>
-			<form:textarea path="egBillregistermis.narration" id="narration" class="form-control" maxlength="1024" ></form:textarea>
+			<form:textarea path="egBillregistermis.narration" id="narration" class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" maxlength="1024" ></form:textarea>
 			<form:errors path="egBillregistermis.narration" cssClass="add-margin error-msg" />
 	          </c:otherwise>
 	     </c:choose>
@@ -164,6 +164,7 @@
 	  <div class="form-group" style="display: none;">
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.party.billnumber" text="Party Bill Number"/>
+			<span id="spanbillnumberid"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" id="partyBillNumber" path="egBillregistermis.partyBillNumber" maxlength="32" />
@@ -172,6 +173,7 @@
 		
 		<label class="col-sm-2 control-label text-right">
 			<spring:message code="lbl.party.billdate" text="Party Bill Date"/>
+			<span id="spanbilldateid"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input id="partyBillDate" path="egBillregistermis.partyBillDate" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>
@@ -183,6 +185,7 @@
 	<div class="form-group">
 		<label class="col-sm-3 control-label text-right">
 			<spring:message code="lbl.party.billnumber" text="Party Bill Number"/>
+			<span id="spanbillnumberid"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input class="form-control patternvalidation" data-pattern="alphanumerichyphenbackslash" id="partyBillNumber" path="egBillregistermis.partyBillNumber" maxlength="32" />
@@ -191,6 +194,7 @@
 		
 		<label class="col-sm-2 control-label text-right">
 			<spring:message code="lbl.party.billdate" text="Party Bill Date"/>
+			<span id="spanbilldateid"></span>
 		</label>
 		<div class="col-sm-3 add-margin">
 			<form:input id="partyBillDate" path="egBillregistermis.partyBillDate" class="form-control datepicker" data-date-end-date="0d" placeholder="DD/MM/YYYY"/>

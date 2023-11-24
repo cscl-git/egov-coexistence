@@ -118,6 +118,7 @@
 </head>
 <body>
 	<jsp:include page="../budget/budgetHeader.jsp" />
+	<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 	<div class="formmainbox">
 		<div class="subheadnew">
 			<s:if test="showMode == 'new'">
@@ -166,7 +167,7 @@
 						<%-- <s:if test="showMode == 'new'"> --%>
 						<td class="bluebox"><s:textfield id="name" name="name"
 								value="%{subScheme.name}" cssStyle="width: 250px"
-								onblur="checkuniquenessname();" /></td>
+								onblur="checkuniquenessname();" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						<egov:uniquecheck id="uniquename" name="uniquename"
 							fieldtoreset="name" fields="['Value']"
 							url='masters/subScheme-nameUniqueCheck.action' />
@@ -178,7 +179,7 @@
 							class="mandatory1"> *</span></td>
 						<%-- <s:if test="showMode == 'new'"> --%>
 						<td class="greybox"><s:textfield id="code" name="code"
-								value="%{subScheme.code}" onblur="checkuniquenesscode();" /></td>
+								value="%{subScheme.code}" onblur="checkuniquenesscode();" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						<egov:uniquecheck id="codeuniquecode" name="codeuniquecode"
 							fieldtoreset="code" fields="['Value']"
 							url='masters/subScheme-codeUniqueCheck.action' />
@@ -230,7 +231,7 @@
 						<td class="bluebox"><strong><s:text name="lbl.council.loan.proposal.number"/> </strong></td>
 						<td class="bluebox"><s:textfield
 								id="councilLoanProposalNumber" name="councilLoanProposalNumber"
-								value="%{subScheme.councilLoanProposalNumber}" /></td>
+								value="%{subScheme.councilLoanProposalNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						<td class="bluebox"><strong><s:text name="lbl.council.loan.proposal.date"/> </strong></td>
 						<td class="bluebox"><s:date
 								name="subScheme.councilLoanProposalDate"
@@ -248,7 +249,7 @@
 						<td class="greybox"><s:textfield
 								id="councilAdminSanctionNumber"
 								name="councilAdminSanctionNumber"
-								value="%{subScheme.councilAdminSanctionNumber}" /></td>
+								value="%{subScheme.councilAdminSanctionNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						<td class="greybox"><strong><s:text name="lbl.council.admin.sanctioned.date"/> </strong></td>
 						<td class="greybox"><s:date
 								name="subScheme.councilAdminSanctionDate"
@@ -265,7 +266,7 @@
 						<td class="bluebox"><strong><s:text name="lbl.government.loan.proposal.number"/> </strong></td>
 						<td class="bluebox"><s:textfield id="govtLoanProposalNumber"
 								name="govtLoanProposalNumber"
-								value="%{subScheme.govtLoanProposalNumber}" /></td>
+								value="%{subScheme.govtLoanProposalNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						<td class="bluebox"><strong><s:text name="lbl.government.loan.proposal.date"/> </strong></td>
 						<td class="bluebox"><s:date
 								name="subScheme.govtLoanProposalDate"
@@ -281,7 +282,7 @@
 						<td class="greybox"><strong><s:text name="lbl.govt.admin.sanction.number"/> </strong></td>
 						<td class="greybox"><s:textfield id="govtAdminSanctionNumber"
 								name="govtAdminSanctionNumber"
-								value="%{subScheme.govtAdminSanctionNumber}" /></td>
+								value="%{subScheme.govtAdminSanctionNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
 						<td class="greybox"><strong><s:text name="lbl.govt.admin.sanction.date"/> </strong></td>
 						<td class="greybox"><s:date
 								name="subScheme.govtAdminSanctionDate"

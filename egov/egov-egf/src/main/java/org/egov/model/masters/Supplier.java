@@ -126,7 +126,7 @@ public class Supplier extends AbstractAuditable implements EntityType {
     @OptionalPattern(regex = Constants.ALPHANUMERIC, message = "Special Characters are not allowed in IFSC Code")
     private String ifscCode;
 
-    @Length(max = 22, message = "Maximum of 22 Characters allowed for Bank Account")
+    @Length(max = 40, message = "Maximum of 40 Characters allowed for Bank Account")
     @OptionalPattern(regex = Constants.ALPHANUMERIC, message = "Special Characters are not allowed in Bank Account")
     private String bankAccount;
 

@@ -115,7 +115,7 @@ public class CourtTypeMasterService extends PersistenceService<CourtTypeMaster, 
     }
 
     public List<CourtTypeMaster> getActiveCourtTypes() {
-        return courtTypeMasterRepository.findByActiveTrueOrderByOrderNumberAsc();
+        return courtTypeMasterRepository.findByActiveTrueOrderByCourtTypeAsc();
     }
 
     public List<CourtTypeMaster> search(final CourtTypeMaster courtTypeMaster) {

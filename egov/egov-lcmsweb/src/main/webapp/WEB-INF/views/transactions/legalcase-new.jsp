@@ -101,3 +101,4 @@
 	src="<cdn:url value='/resources/js/app/populateDropdown.js?rnd=${app_release_no}'/>"></script>
 <script
 	src="<cdn:url value='/resources/js/app/legalcasenew.js?rnd=${app_release_no}'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

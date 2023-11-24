@@ -638,11 +638,19 @@ $('#billSubType').change(function () {
 		//alert("if");
 	$('#file1').attr('required', 'required');
 	$("#file1").addClass("mandatory");
+	$('#partyBillNumber').attr('required', 'required');
+	$("#spanbillnumberid").addClass("mandatory");
+	$('#partyBillDate').attr('required', 'required');
+	$("#spanbilldateid").addClass("mandatory");
 	}else{
 		//alert("else");
 	$('#file1').removeAttr('required');	
 	$("#file1").removeClass("mandatory");
 	$("#file1-error").css("display", "none");
+	$('#partyBillNumber').removeAttr('required');	
+	$("#spanbillnumberid").removeClass("mandatory");
+	$('#partyBillDate').removeAttr('required');	
+	$("#spanbilldateid").removeClass("mandatory");
 	}
 	
 	worksDiv();

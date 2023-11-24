@@ -8,6 +8,7 @@
 	<link href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/themes/base/jquery-ui.css" rel="stylesheet" />
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.1/jquery-ui.min.js"></script>
+     <script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
     <script>
 				$(document).ready(function() {
 		$('input[id$=estimateDate]').datepicker({
@@ -114,7 +115,7 @@
 		<label class="col-sm-3 control-label text-left-audit1"><spring:message
 				code="lbl.estimate.preparation.work.location" /></label>
 		<div class="col-sm-3 add-margin">
-			<form:input type="text" class="form-control-works"
+			<form:input type="text" class="form-control-works patternvalidation" data-pattern="alphanumericwithspace"
 				path="workLocation" />
 		</div>
 
@@ -280,7 +281,7 @@
 				code="lbl.estimate.preparation.dnit.prepared.by" /></label>
 		<div class="col-sm-3 add-margin">
 			<form:input type="text" path="estimatePreparedBy"
-				id="estimatePreparedBy" cssClass="form-control-works"
+				id="estimatePreparedBy" cssClass="form-control-works patternvalidation" data-pattern="alphanumericwithspace"
 				cssErrorClass="form-control-works error" />
 		</div>
 		<label class="col-sm-3 control-label text-left-audit1"><spring:message
@@ -328,14 +329,14 @@
 				code="lbl.estimate.preparation.name.work" /><span
 			class="mandatory"></span></label>
 		<div class="col-sm-3 block-colm">
-			<form:textarea class="form-control-works" path="workName"
+			<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workName"
 				maxlength="2000" style="height: 100px;" />
 		</div>
 		<label class="col-sm-3 control-label text-left-audit1"><spring:message
 				code="lbl.estimate.preparation.necessity" /><span
 			class="mandatory"></span></label>
 		<div class="col-sm-3 block-colm">
-			<form:textarea class="form-control-works" path="necessity"
+			<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="necessity"
 				maxlength="2000" style="height: 100px;" />
 		</div>
 		
@@ -343,7 +344,7 @@
 				code="lbl.estimate.preparation.scope.work" /><span
 			class="mandatory"></span></label>
 		<div class="col-sm-3 block-colm">
-			<form:textarea class="form-control-works" path="workScope"
+			<form:textarea class="form-control-works patternvalidation" data-pattern="alphanumerichyphenbackslashampersand" path="workScope"
 				maxlength="2000" style="height: 100px;" />
 		</div>
 		<c:if
