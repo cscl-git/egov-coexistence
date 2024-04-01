@@ -405,11 +405,12 @@ public class CollectionCommon {
         final List<AppConfigValues> appList = appConfigValuesService.getConfigValuesByModuleAndKey("EGF",
                 "receiptImagePath");
         final String imgPath = appList.get(0).getValue();
-        
+        System.out.println("imgPath log : "+imgPath);
         final ReportRequest reportInput = new ReportRequest(templateName, receiptList, reportParams);
         reportParams.put("BACKGROUND", imgPath+"background.png");
         reportParams.put("CORNER_LOGO_PATH", imgPath+"logo.png");
-        reportParams.put("RECEIPT_HEADER", imgPath+"receiptHeader.png");
+        //reportParams.put("RECEIPT_HEADER", imgPath+"receiptHeader.png");
+        reportParams.put("RECEIPT_HEADER", imgPath+"receiptHeaderNew.png");
         // Set the flag so that print dialog box is automatically opened
         // whenever the PDF is opened
         reportInput.setReportFormat(ReportFormat.PDF);

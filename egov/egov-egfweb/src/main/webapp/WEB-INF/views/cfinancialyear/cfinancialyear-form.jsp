@@ -135,7 +135,7 @@
 													<input type="text" value="${var1.name}"
 														name="cFiscalPeriod[${counter.index}].name" id="name"
 														maxlength="10"
-														class="form-control text-right patternvalidation" data-pattern="alphanumericwithspace" />
+														class="form-control text-right patternvalidation" data-pattern="alphanumericwithhyphen" />
 													<input type="hidden" id="cmdaddListId"
 														value="cFiscalPeriod[${counter.index}].id" />
 												</c:if><c:if test="${mode == 'edit'}"> 
@@ -144,7 +144,7 @@
 														value="${var1.name}"
 														id="cFiscalPeriod[${counter.index}].name" maxlength="10"
 														readonly="readonly"
-														class="form-control text-right patternvalidation" data-pattern="alphanumericwithspace" />
+														class="form-control text-right patternvalidation" data-pattern="alphanumericwithhyphen" />
 												</c:if> </td>
 											<td><fmt:formatDate value="${var1.startingDate}"
 													var="startDate" pattern="dd/MM/yyyy" /> <c:if
