@@ -61,9 +61,9 @@ public class LegalCaseRestController {
 			lg.setConcernedBranch(l.getConcernedBranch());
 			lg.setCaseFromDate(l.getCaseFromDate());
 			lg.setCaseToDate(l.getCaseToDate());
-			lg.setCaseType(l.getLegalCase().getCaseTypeMaster().getCaseType());
-			lg.setCourtId(Integer.parseInt(l.getLegalCase().getCourtMaster().getId().toString()));
-			lg.setCourtType(Integer.parseInt(l.getLegalCase().getCourtMaster().getCourtType().getId().toString()));
+			//lg.setCaseType(l.getLegalCase().getCaseTypeMaster().getCaseType());
+			//lg.setCourtId(Integer.parseInt(l.getLegalCase().getCourtMaster().getId().toString()));
+			lg.setCourtType(Integer.parseInt(l.getLegalCase().getCourtTypeMaster().getId().toString()));
 			lg.setLegalCase(l.getLegalCase());
 			lg.setHearingDate(l.getHearingDate());
 			legal.add(lg);

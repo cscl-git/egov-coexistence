@@ -244,7 +244,7 @@
 	<td class="greybox"></td>
 	<td class="greybox"><s:text name="voucher.narration" /></td>
 	<td class="greybox" colspan="3"><s:textarea name="description"
-			id="description" style="width:93%" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
+			id="description" style="width:93%" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 	<td class="greybox"></td>
 	<td class="greybox"></td>
 </tr>

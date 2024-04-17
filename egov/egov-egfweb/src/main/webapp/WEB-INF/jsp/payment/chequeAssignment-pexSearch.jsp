@@ -95,7 +95,7 @@
 							onchange="enableOrDisableBillType(this)" value="%{paymentMode}" /></td>
 					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
-					<td class="greybox"><s:textfield name="voucherNumber" class = "patternvalidation" data-pattern="alphanumericwithspace"
+					<td class="greybox"><s:textfield name="voucherNumber" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash"
 							id="voucherNumber" value="%{voucherNumber}" /></td>
 				</tr>
 				<tr>
