@@ -88,7 +88,7 @@
 					<td class="bluebox"></td>
 					<td class="bluebox"><s:text name="payment.billnumber" /></td>
 					<td class="bluebox"><s:textfield name="billNumber"
-							id="billNumber" maxlength="25" value="%{billNumber}" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
+							id="billNumber" maxlength="25" value="%{billNumber}" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 					<td class="bluebox"></td>
 					<td class="bluebox"></td>
 				</tr>

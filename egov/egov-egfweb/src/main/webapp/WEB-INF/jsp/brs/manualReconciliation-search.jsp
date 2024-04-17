@@ -92,7 +92,7 @@
 					<input type="text"
 						id="reconDates<s:property value="#status.index"/>"
 						name="reconDates[<s:property value="#status.index"/>]"
-						class="form-control datepicker" data-inputmask="'mask': 'd/m/y'" value="<s:property value="reconciledOn" />"/>
+						class="form-control datepicker" data-inputmask="'mask': 'd/m/y'"/>
 					<%-- </s:else> --%>
 					</td>
 					<%-- <td style="text-align: right"><s:property value="reconciledComment" /></td> --%>

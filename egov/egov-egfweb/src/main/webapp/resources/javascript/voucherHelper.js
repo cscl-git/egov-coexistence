@@ -198,7 +198,7 @@ function createSLTextFieldFormatterJV(prefix,suffix,onblurfunction){
 
 function createSLDetailCodeTextFieldFormatterJV(prefix,suffix,onblurfunction, suffix2, onClickForSearch){
     return function(el, oRecord, oColumn, oData) {
-		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' style='width:90px;'  autocomplete='off'  onfocus='onFocusDetailCode(this);autocompleteEntities1By20(this);' onblur='"+onblurfunction+"' onkeyup='alphanumericwithspace(this);'/>"
+		el.innerHTML = "<input type='text' id='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix+"' style='width:90px;'  autocomplete='off'  onfocus='onFocusDetailCode(this);autocompleteEntities1By20(this);' onblur='"+onblurfunction+"' onkeyup='alphanumerichyphenbackslashdotat(this);'/>"
 		+" <img src='/services/egi/resources/erp2/images/plus1.gif' id='"+prefix+"["+slDetailTableIndex+"]"+suffix2+"' name='"+prefix+"["+slDetailTableIndex+"]"+suffix2+"' style='width:15px;'  onClick='"+onClickForSearch+"'/>";
 		
 	}

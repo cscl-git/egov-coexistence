@@ -133,7 +133,7 @@
 						</tr>
 						<tr>
 							<td class="bluebox"><s:text name="bill.Number" /></td>
-							<td class="bluebox"><s:textfield name="billNumber" id="billNumber" maxlength="50" value="%{billNumber}" class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
+							<td class="bluebox"><s:textfield name="billNumber" id="billNumber" maxlength="50" value="%{billNumber}" class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 							<td class="bluebox"><s:text name="voucher.subdivision" /></td>
 							<td class="bluebox">
 							<s:select name="vouchermis.subdivision" id="subdivision" list="dropdownData.subdivisionList"

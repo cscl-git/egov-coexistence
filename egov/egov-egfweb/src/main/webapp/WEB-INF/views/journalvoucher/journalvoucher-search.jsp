@@ -69,7 +69,7 @@
 							code="lbl.vouchernumber" text="Voucher Number" /> </label>
 				<div class="col-sm-3 add-margin">
 						<form:input class="form-control patternvalidation"
-							data-pattern="alphanumericwithspecialcharacters"
+							data-pattern="alphanumerichyphenbackslash"
 							id="voucherNumber" path="voucherNumber" maxlength="50" />
 				</div>
 				
@@ -259,3 +259,4 @@
         src="<cdn:url value='/resources/app/js/audit/audit.js?rnd=${app_release_no}' context='/services/audit'/>"></script>
 <script
 	src="<cdn:url value='/resources/app/js/i18n/jquery.i18n.properties.js?rnd=${app_release_no}' context='/services/EGF'/>"></script>
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>

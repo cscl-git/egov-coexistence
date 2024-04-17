@@ -750,13 +750,13 @@ $(document).on('click', 'input[type="checkbox"]', function() {
 });
 
 
-$("#buttonid").on("click",function(){
+/*$("#buttonid").on("click",function(){
     if (($("input[name*='defCounsilPrimary']:checked").length)<=0) {
         bootbox.alert("You must check at least one checkbox");
         return false;
     }
     
-});
+});*/
 
 //$("#buttonSubmit").on("click",function(){
 //    if (($("input[name*='defCounsilPrimary']:checked").length)<=0) {

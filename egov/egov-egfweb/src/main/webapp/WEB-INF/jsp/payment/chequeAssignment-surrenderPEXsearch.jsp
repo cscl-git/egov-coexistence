@@ -91,11 +91,11 @@
 					<td class="bluebox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
 					<td class="bluebox"><s:textfield name="voucherNumber"
-							id="voucherNumber" value="%{voucherNumber}"  class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
+							id="voucherNumber" value="%{voucherNumber}"  class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 					<td class="bluebox"><s:text
 							name="chq.assignment.pex.transacton.no" /></td>
 					<td class="bluebox"><s:textfield name="instrumentNumber"
-							id="instrumentNumber" onkeyup="validateOnlyNumber()"  class="patternvalidation" data-pattern="alphanumericwithspace" /></td>
+							id="instrumentNumber" onkeyup="validateOnlyNumber()"  class="patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 				</tr>
 				<tr>
 					<td class="greybox"></td>

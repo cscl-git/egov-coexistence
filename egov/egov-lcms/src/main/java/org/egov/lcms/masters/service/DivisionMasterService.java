@@ -45,19 +45,42 @@
  *   In case of any queries, you can reach eGovernments Foundation at contact@egovernments.org.
  *
  */
-package org.egov.lcms.masters.repository;
-
-import org.egov.lcms.masters.entity.CourtTypeMaster;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+package org.egov.lcms.masters.service;
 
 import java.util.List;
 
-@Repository
-public interface CourtTypeMasterRepository extends JpaRepository<CourtTypeMaster, java.lang.Long> {
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 
-    CourtTypeMaster findByCode(String code);
+import org.egov.infstr.services.PersistenceService;
+import org.egov.lcms.masters.entity.ConcernedBranchMaster;
+import org.egov.lcms.masters.entity.CourtTypeMaster;
+import org.egov.lcms.masters.entity.DivisionMaster;
+import org.egov.lcms.masters.entity.PetitionTypeMaster;
+import org.egov.lcms.masters.repository.DivisionMasterRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-    List<CourtTypeMaster> findByActiveTrueOrderByCourtTypeAsc();
+@Service
+@Transactional(readOnly = true)
+public class DivisionMasterService extends PersistenceService<DivisionMaster, Long>{
 
+	@Autowired
+    private DivisionMasterRepository divisionMasterRepository;
+    
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public DivisionMasterService() {
+        super(DivisionMaster.class);
+    }
+    
+    public DivisionMasterService(final Class<DivisionMaster> type) {
+        super(type);
+    }
+
+    public List<DivisionMaster> findActiveDivisionByBranchType(final ConcernedBranchMaster concernedBranch) {
+        return divisionMasterRepository.findByActiveTrueAndConcernedBranchOrderByDivisionAsc(concernedBranch);
+    }
 }

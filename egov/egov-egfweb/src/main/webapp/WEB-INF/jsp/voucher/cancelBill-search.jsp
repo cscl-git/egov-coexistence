@@ -140,7 +140,7 @@ function validateCancel()
 				<tr>
 				<td class="bluebox" width="10%" ></td>
 					<td class="bluebox"><s:text name="bill.Number" /></td>
-					<td class="bluebox"><s:textfield name="billNumber" id="billNumber" value="%{billNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
+					<td class="bluebox"><s:textfield name="billNumber" id="billNumber" value="%{billNumber}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 					<td class="bluebox"><s:text name="voucher.fund" /><span class="mandatory1">*</span></td>
 					<td class="bluebox"><s:select name="fund.id" id="fund.id" list="dropdownData.fundList" listKey="id" listValue="name" headerKey="-1" headerValue="%{getText('lbl.choose.options')}" value="%{fund.id}" /></td>
 				</tr>

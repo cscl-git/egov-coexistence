@@ -130,16 +130,16 @@ public class LcmsConstants {
     public static final String LEGALCASE_STATUS_CODE_REPLYCUMWRITTENSTATEMENT = "REPLY_CUM_WRITTEN_STATEMENT";
     public static final String LEGALCASE_STATUS_CODE_FILINGOFDOCUMENTS = "FILING_OF_DOCUMENTS";
     public static final String LEGALCASE_STATUS_ORDER = "ORDER";
-    public static final String LEGALCASE_STATUS_CREATED = "LCCREATED";
-    public static final String LEGALCASE_STATUS_JUDGMENT = "JUDGMENT";
-    public static final String LEGALCASE_STATUS_JUDGMENT_IMPLIMENTED = "JUDGEMENT_IMPL";
-    public static final String LEGALCASE_STATUS_CLOSED = "CLOSED";
+    public static final String LEGALCASE_STATUS_CREATED = "PENDING";
+    public static final String LEGALCASE_STATUS_JUDGMENT = "DISPOSED_OFF_WITH_DIRECTION";
+    public static final String LEGALCASE_STATUS_JUDGMENT_IMPLIMENTED = "DISPOSED_OFF_WITHOUT_DIRECTION";
+    public static final String LEGALCASE_STATUS_CLOSED = "DISMISSED";
     public static final String LEGALCASE_STATUS_HEARING_REPLYTOTI = "HEARING_REPLY_TO_TI";
     public static final String LEGALCASE_STATUS_ORDER_REPLYTOTI = "ORDER_REPLY_TO_TI";
     public static final String ADVOCATEBILL_REJECTED_STATUS = "PROSECUTOR_REJECTED";
     public static final String ADVOCATEBILL_EDITED_STATUS = "BILL_EDITTED";
-    public static final String LEGALCASE_HEARING_STATUS = "HEARING";
-    public static final String LEGALCASE_INTERIMSTAY_STATUS = "INTERIM_STAY";
+    public static final String LEGALCASE_HEARING_STATUS = "PENDING";
+    public static final String LEGALCASE_INTERIMSTAY_STATUS = "PENDING";
     /**
      * Time series report action constants
      */

@@ -43,6 +43,6 @@ public class ConcernedBranchMasterService  extends PersistenceService<ConcernedB
     }
 
     public List<ConcernedBranchMaster> getActiveConcernedBranchs() {
-        return concernedBranchMasterRepository.findByActiveTrueOrderByOrderNumberAsc();
+        return concernedBranchMasterRepository.findByActiveTrueOrderByConcernedBranchAsc();
     }
 }

@@ -75,7 +75,7 @@
 										<spring:message code="lbl.courttype" />
 									</div>
 									<div class="col-xs-3 add-margin view-content">
-										<c:out value="${legalCase.courtMaster.courtType.courtType}" />
+										<c:out value="${legalCase.courtTypeMaster.courtType}" />
 									</div>
 
 									<div class="col-xs-3 add-margin">
@@ -85,14 +85,14 @@
 										<c:out value="${legalCase.petitionTypeMaster.petitionType}" />
 									</div>
 								</div>
-								<div class="row add-border">
+								<%-- <div class="row add-border">
 									<div class="col-xs-3 add-margin">
 										<spring:message code="lbl.court" />
 									</div>
 									<div class="col-xs-3 add-margin view-content">
 										<c:out value="${legalCase.courtMaster.name}" />
 									</div>
-								</div>
+								</div> --%>
 								<div class="row add-border">
 									<div class="col-xs-3 add-margin">
 										<spring:message code="lbl.casenumber" />
@@ -197,12 +197,12 @@
 									</div>							
 								</div>
 								<div class="row add-border">
-									<div class="col-xs-3 add-margin">
+									<%-- <div class="col-xs-3 add-margin">
 										<spring:message code="lbl.casecatagory" />
 									</div>
 									<div class="col-xs-3 add-margin view-content">
 										<c:out value="${legalCase.caseTypeMaster.caseType}" />
-									</div>
+									</div> --%>
 									<div class="col-xs-3 add-margin">
 										<spring:message code="lbl.estimatepreparedby" />
 									</div>

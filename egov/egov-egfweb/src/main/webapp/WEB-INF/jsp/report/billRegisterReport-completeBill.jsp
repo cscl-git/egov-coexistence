@@ -81,7 +81,7 @@
 	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.html5.min.js"></script>
 <script type="text/javascript"
 	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
-
+<script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
 
 <script>
 $(document).ready(function() {
@@ -158,11 +158,11 @@ $(document).ready(function() {
 			<td style="width: 5%"></td>
 				<td class="greybox"><s:text name="voucher.number" /></td>
 				<td class="greybox"><s:textfield name="voucherNumber"
-						id="voucherNumber" maxlength="30" value="%{voucherNumber}" /></td>
+						id="voucherNumber" maxlength="30" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 
 				<td class="greybox"><s:text name="bill.number" /></td>
 				<td class="greybox"><s:textfield name="billNumber"
-						id="billNumber" maxlength="30" value="%{billNumber}" /></td>
+						id="billNumber" maxlength="30" value="%{billNumber}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 			</tr>
 
 		</table>

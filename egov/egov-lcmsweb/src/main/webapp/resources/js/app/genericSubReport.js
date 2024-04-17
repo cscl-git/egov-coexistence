@@ -346,7 +346,7 @@ function callAjaxBydrillDownReport(aggregatedByValues) {
 	
 
 function openLegalCase(data) {
-	window.open("/services/lcms/application/view/?lcNumber="+ data , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
+	window.open("/services/lcms/application/view/?id="+ data , "", "height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");
 }
 
 

@@ -47,17 +47,17 @@
  */
 package org.egov.lcms.masters.repository;
 
-import org.egov.lcms.masters.entity.CourtTypeMaster;
+import java.util.List;
+
+import org.egov.lcms.masters.entity.ConcernedBranchMaster;
+import org.egov.lcms.masters.entity.DivisionMaster;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-
 @Repository
-public interface CourtTypeMasterRepository extends JpaRepository<CourtTypeMaster, java.lang.Long> {
+public interface DivisionMasterRepository extends JpaRepository<DivisionMaster, java.lang.Long> {
 
-    CourtTypeMaster findByCode(String code);
+    List<DivisionMaster> findByActiveTrueAndConcernedBranchOrderByDivisionAsc(ConcernedBranchMaster concernedBranch);
 
-    List<CourtTypeMaster> findByActiveTrueOrderByCourtTypeAsc();
 
 }

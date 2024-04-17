@@ -94,7 +94,7 @@
 					<td class="greybox"><s:text
 							name="chq.assignment.paymentvoucherno" /></td>
 					<td class="greybox"><s:textfield name="voucherNumber"
-							id="voucherNumber" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
+							id="voucherNumber" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 				</tr>
 				<tr>
 					<td class="bluebox"><s:text name="chq.assignment.billtype" />

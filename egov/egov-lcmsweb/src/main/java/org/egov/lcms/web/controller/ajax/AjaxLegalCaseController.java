@@ -66,10 +66,13 @@ import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.DepartmentService;
 import org.egov.lcms.masters.entity.AdvocateMaster;
 import org.egov.lcms.masters.entity.CourtMaster;
+import org.egov.lcms.masters.entity.DivisionMaster;
 import org.egov.lcms.masters.entity.PetitionTypeMaster;
 import org.egov.lcms.masters.service.AdvocateMasterService;
+import org.egov.lcms.masters.service.ConcernedBranchMasterService;
 import org.egov.lcms.masters.service.CourtMasterService;
 import org.egov.lcms.masters.service.CourtTypeMasterService;
+import org.egov.lcms.masters.service.DivisionMasterService;
 import org.egov.lcms.masters.service.PetitionTypeMasterService;
 import org.egov.lcms.transactions.entity.LegalCase;
 import org.egov.lcms.transactions.service.LegalCaseService;
@@ -110,6 +113,13 @@ public class AjaxLegalCaseController {
 
     @PersistenceContext
     private EntityManager entityManager;
+    
+    @Autowired
+    private DivisionMasterService divisionMasterService;
+    
+    @Autowired
+    private ConcernedBranchMasterService concernedBranchMasterService;
+
 
     public Session getCurrentSession() {
         return entityManager.unwrap(Session.class);
@@ -192,7 +202,7 @@ public class AjaxLegalCaseController {
             if (legalCase != null) {
                 map.put("caseStatus", legalCase.getStatus().getDescription());
                 map.put("caseTitle", legalCase.getCaseTitle());
-                map.put("caseType", legalCase.getCaseTypeMaster().getCaseType());
+                //map.put("caseType", legalCase.getCaseTypeMaster().getCaseType());
                 map.put("viewLegalCase", LcmsConstants.VIEW_LEGALCASE_LINK + legalCase.getLcNumber());
                 if (!legalCase.getJudgment().isEmpty()) {
                     map.put("judgmentType", legalCase.getJudgment().get(0).getJudgmentType().getName());
@@ -206,4 +216,16 @@ public class AjaxLegalCaseController {
         }
         return map;
     }
+    
+    @RequestMapping(value = "/ajax-divisioneByBranchType", method = GET, produces = MediaType.APPLICATION_JSON_VALUE)
+    public @ResponseBody List<DivisionMaster> getAllDivisionTypesByBranchType(@RequestParam final Long concernedBranch) {
+        List<DivisionMaster> divisionList = new ArrayList<DivisionMaster>(0);
+        if (concernedBranch != null) {
+        	divisionList = divisionMasterService
+                    .findActiveDivisionByBranchType(concernedBranchMasterService.findOne(concernedBranch));
+        	divisionList.forEach(divisionType -> divisionType.toString());
+        }
+        return divisionList;
+    }
+
 }

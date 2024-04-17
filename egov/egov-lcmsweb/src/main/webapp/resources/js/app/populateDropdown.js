@@ -50,6 +50,9 @@ $(document).ready(function(){
 		loadPetitionTypes();
 		loadCourtNames();
 	});
+		$('#concernedBranch').change(function(){
+		loadBranchTypes();
+	});
 	function loadPetitionTypes(){
         $.ajax({
 			url: "/services/lcms/legalcase/ajax-petitionTypeByCourtType",     
@@ -109,6 +112,28 @@ $(document).ready(function(){
 				$('#prevPetitionType').append($("<option value=''>Select from below</option>"));
 				$.each(response, function(index, value) {
 					$('#prevPetitionType').append($('<option>').text(value.petitionType).attr('value', value.id))
+				});
+			}, 
+			error: function (response) {
+				console.log("failed");
+			}
+		});		
+	}
+		
+	function loadBranchTypes(){
+        $.ajax({
+			url: "/services/lcms/legalcase/ajax-divisioneByBranchType",     
+			type: "GET",
+			data: {
+				concernedBranch: $('#concernedBranch').val()  
+			},
+			dataType: "json",
+			success: function (response) {
+			    console.log("success"+response);
+				$('#division').empty();
+				$('#division').append($("<option value=''>Select from below</option>"));
+				$.each(response, function(index, value) {
+				$('#division').append($('<option>').text(value.division).attr('value', value.id))
 				});
 			}, 
 			error: function (response) {

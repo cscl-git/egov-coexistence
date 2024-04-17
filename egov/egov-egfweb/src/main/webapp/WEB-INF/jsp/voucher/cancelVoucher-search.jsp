@@ -113,7 +113,7 @@ function loadNamesForSelectedType()
 					<td class="greybox">&nbsp;</td>
 					<td class="greybox"><s:text name="voucher.number" /></td>
 					<td class="greybox"><s:textfield name="voucherNumber"
-							id="voucherNumber" maxlength="25" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumericwithspace" /></td>
+							id="voucherNumber" maxlength="25" value="%{voucherNumber}" class = "patternvalidation" data-pattern="alphanumerichyphenbackslash" /></td>
 					<td class="greybox"></td>
 					<td class="greybox"></td>
 				</tr>

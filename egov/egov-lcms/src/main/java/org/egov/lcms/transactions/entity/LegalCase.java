@@ -55,6 +55,7 @@ import org.egov.lcms.masters.entity.CaseTypeMaster;
 import org.egov.lcms.masters.entity.ConcernedBranchMaster;
 import org.egov.lcms.masters.entity.CourtMaster;
 import org.egov.lcms.masters.entity.CourtTypeMaster;
+import org.egov.lcms.masters.entity.DivisionMaster;
 import org.egov.lcms.masters.entity.PetitionTypeMaster;
 import org.egov.lcms.utils.constants.LcmsConstants;
 import org.egov.pims.commons.Position;
@@ -91,17 +92,29 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private Date nextDate;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+	/*
+	 * @ManyToOne(fetch = FetchType.LAZY)
+	 * 
+	 * @NotNull
+	 * 
+	 * @JoinColumn(name = "CASETYPE", nullable = false)
+	 * 
+	 * @Audited private CaseTypeMaster caseTypeMaster;
+	 * 
+	 * @ManyToOne(fetch = FetchType.LAZY)
+	 * 
+	 * @NotNull
+	 * 
+	 * @JoinColumn(name = "COURT")
+	 * 
+	 * @Audited private CourtMaster courtMaster;
+	 */
+    
     @NotNull
-    @JoinColumn(name = "CASETYPE", nullable = false)
-    @Audited
-    private CaseTypeMaster caseTypeMaster;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @NotNull
+    @ManyToOne
     @JoinColumn(name = "COURT")
     @Audited
-    private CourtMaster courtMaster;
+    private CourtTypeMaster courtTypeMaster;
 
     @ManyToOne
     @JoinColumn(name = "STATUS", nullable = false)
@@ -280,10 +293,28 @@ public class LegalCase extends AbstractAuditable {
     @Audited
     private String estimatePreparedBy;
     
+    @Column(name = "nodalofficerdesignation")
+    @Audited
+    private String nodalOfficerDesignation;
+    
+    @Column(name = "dealinghanddesignation")
+    @Audited
+    private String dealingHandDesignation;
+    
+    @Column(name = "dealinghandnumber")
+    @Audited
+    private String dealingHandnumber;
+    
+   
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "concernedbranch")
     @Audited
     private ConcernedBranchMaster concernedBranch;
+    
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "division")
+    @Audited
+    private DivisionMaster division;
     
     @Audited
     private String concernedBranchEmail;
@@ -300,6 +331,12 @@ public class LegalCase extends AbstractAuditable {
     @JoinColumn(name = "reportstatus")
     @Audited
     private ReportStatus reportStatus;
+       
+    @NotNull
+    @Temporal(TemporalType.DATE)
+    @Column(name = "nexthearingdate")
+    @Audited
+    private Date nextHearingDate;
 
     @OneToMany(mappedBy = "legalCase", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @Audited
@@ -647,13 +684,20 @@ public class LegalCase extends AbstractAuditable {
         this.nextDate = nextDate;
     }
 
-    public CourtMaster getCourtMaster() {
-        return courtMaster;
-    }
+	/*
+	 * public CourtMaster getCourtMaster() { return courtMaster; }
+	 * 
+	 * public void setCourtMaster(final CourtMaster courtMaster) { this.courtMaster
+	 * = courtMaster; }
+	 */
+    
+    public CourtTypeMaster getCourtTypeMaster() {
+		return courtTypeMaster;
+	}
 
-    public void setCourtMaster(final CourtMaster courtMaster) {
-        this.courtMaster = courtMaster;
-    }
+	public void setCourtTypeMaster(CourtTypeMaster courtTypeMaster) {
+		this.courtTypeMaster = courtTypeMaster;
+	}
 
     public EgwStatus getStatus() {
 
@@ -932,13 +976,12 @@ public class LegalCase extends AbstractAuditable {
         this.finwpYear = finwpYear;
     }
 
-    public CaseTypeMaster getCaseTypeMaster() {
-        return caseTypeMaster;
-    }
-
-    public void setCaseTypeMaster(final CaseTypeMaster caseTypeMaster) {
-        this.caseTypeMaster = caseTypeMaster;
-    }
+	/*
+	 * public CaseTypeMaster getCaseTypeMaster() { return caseTypeMaster; }
+	 * 
+	 * public void setCaseTypeMaster(final CaseTypeMaster caseTypeMaster) {
+	 * this.caseTypeMaster = caseTypeMaster; }
+	 */
 
     public String getCaseNumber() {
         return caseNumber;
@@ -1237,4 +1280,46 @@ public class LegalCase extends AbstractAuditable {
 	public void setLegalcaseremarks(String legalcaseremarks) {
 		this.legalcaseremarks = legalcaseremarks;
 	}
+	
+
+	public Date getNextHearingDate() {
+		return nextHearingDate;
+	}
+
+	public void setNextHearingDate(Date nextHearingDate) {
+		this.nextHearingDate = nextHearingDate;
+	}
+
+	public String getNodalOfficerDesignation() {
+		return nodalOfficerDesignation;
+	}
+
+	public void setNodalOfficerDesignation(String nodalOfficerDesignation) {
+		this.nodalOfficerDesignation = nodalOfficerDesignation;
+	}
+
+	public String getDealingHandDesignation() {
+		return dealingHandDesignation;
+	}
+
+	public void setDealingHandDesignation(String dealingHandDesignation) {
+		this.dealingHandDesignation = dealingHandDesignation;
+	}
+
+	public String getDealingHandnumber() {
+		return dealingHandnumber;
+	}
+
+	public void setDealingHandnumber(String dealingHandnumber) {
+		this.dealingHandnumber = dealingHandnumber;
+	}
+
+	public DivisionMaster getDivision() {
+		return division;
+	}
+
+	public void setDivision(DivisionMaster division) {
+		this.division = division;
+	}
+		
 }

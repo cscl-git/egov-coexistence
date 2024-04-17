@@ -142,7 +142,7 @@
 	<label class="col-sm-2 control-label text-right" for="bankAccount"> <spring:message code="supplier.bankAccount" text="Bank Account Number"/>
 	</label>
 	<div class="col-sm-3 add-margin">
-		<form:input path="bankAccount" id="bankAccount" maxlength="22" size="24" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
+		<form:input path="bankAccount" id="bankAccount" maxlength="40" size="24" cssClass="form-control patternvalidation" data-pattern="alphanumericwithspace" />
 		<form:errors path="bankAccount" cssClass="add-margin error-msg" />
 	</div>
 	<label class="col-sm-2 control-label text-right" for="registrationNumber"> <spring:message code="supplier.registrationNo" text="Registration No"/>

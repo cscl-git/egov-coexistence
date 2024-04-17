@@ -875,6 +875,11 @@
         <put-attribute name="body" value="/WEB-INF/views/journalvoucher/journalvoucher-search.jsp"/>
     </definition>
     
+     <definition name="journalvoucher-searchnew" extends="base_layout">
+        <put-attribute name="page-title" value="title.journalvouchernew.create" cascade="true"/>
+        <put-attribute name="body" value="/WEB-INF/views/journalvoucher/journalvoucher-searchnew.jsp"/>
+    </definition>
+    
 
     <definition name="pr-voucher-search" extends="base_layout">
         <put-attribute name="page-title" value="title.voucher.search" cascade="true"/>

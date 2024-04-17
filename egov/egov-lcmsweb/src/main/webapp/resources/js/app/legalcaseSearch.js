@@ -158,12 +158,23 @@ function submitcheckboxes(){
 }
 
 function submitForm() {
-
+	
+	var casestartdate=$('#caseFromDate').val();
+	var caseenddate=$('#caseToDate').val();
+	var startdateParts=casestartdate.split("/");
+	var enddateParts=caseenddate.split("/");
+	var startdate1=new Date(+startdateParts[2],startdateParts[1] - 1, +startdateParts[0]);
+	var enddate1=new Date(+enddateParts[2],enddateParts[1] - 1, +enddateParts[0]);
+	var diff=enddate1.getTime() - startdate1.getTime();
+	diff=diff / (1000 * 3600 * 24);
+	if((casestartdate == null || casestartdate == "") && (caseenddate == null || caseenddate == ""))  {
+	bootbox.alert("Please select Start Date And End Date");	
+	}
+	else if(diff > 364){
+		bootbox.alert("Selected Dates Should Not Exceed More Than 1 Year");
+	}else{
 	var caseNumber = $("#caseNumber").val();
 	var lcNumber = $("#lcNumber").val();
-	
-
-
 	$('.report-section').removeClass('display-hide');
 	$('#report-footer').show();
 	var isCancelled = jQuery('#isStatusExcluded').is(":checked");
@@ -227,11 +238,11 @@ function submitForm() {
 							"sTitle" : "Title of Case",
 							"className" : "text-right"
 						},
-						{
+						/*{
 							"data" : "courtname",
 							"sTitle" : "Court Name",
 							"className" : "text-right"
-						},
+						},*/
 						{
 							"data" : "standingcouncil",
 							"sTitle" : "Defending Counsel",
@@ -305,16 +316,15 @@ function submitForm() {
 								if(full.legalViewAccess)
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option></select>');
 
-								if (full.casestatus == 'LCCREATED'
-										|| full.casestatus == 'HEARING' || full.casestatus == 'INTERIM_STAY' && !full.legalViewAccess) {
+								if (full.casestatus == 'PENDING' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Judgment</option><option value="2">Add/Edit Defending Counsel</option><option value="10">Edit para wise remarks/Counter filing date</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="7">Interim Order</option><option value="8">Close Case</option></select>');
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="1">Create Judgement</option><option value="3">Edit legalCase</option><option value="4">View legalCase</option><option value="6">Hearings</option><option value="15">Update Payment</option><option value="8">Close Case</option></select>');
-								} else if (full.casestatus == 'JUDGMENT' && !full.legalViewAccess) {
+								} else if (full.casestatus == 'DISPOSED_OFF_WITH_DIRECTION' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option><option value="11">Judgment Implementation</option></select>');
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="4">View legalCase</option><option value="5">Edit Judgment</option><option value="8">Close Case</option></select>');
-								} else if (full.casestatus == 'CLOSED' && !full.legalViewAccess) {
+								} else if (full.casestatus == 'DISMISSED' && !full.legalViewAccess) {
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="9">Edit Close Case</option></select>');
-								} else if (full.casestatus == 'JUDGEMENT_IMPL' && !full.legalViewAccess) {
+								} else if (full.casestatus == 'DISPOSED_OFF_WITHOUT_DIRECTION' && !full.legalViewAccess) {
 									//return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="12">Edit Judgment Implementation</option><option value="8">Close Case</option></select>');
 									return ('<select class="dropchange" id="additionconn" ><option>Select from Below</option><option value="8">Close Case</option></select>');
 								}else if (full.casestatus == 'UPDATE_PAYMENT' && !full.legalViewAccess) {
@@ -349,6 +359,7 @@ function submitForm() {
 
 			});
 	$('.loader-class').modal('hide');
+  }
 }
 
 function onchnageofDate() {
@@ -433,7 +444,7 @@ $("#legalCaseResults").on('change', 'tbody tr td .dropchange', function() {
 		window.open(url,"","height=650,width=980,scrollbars=yes,left=0,top=0,status=yes");//Added By Kundan For new Pop Window
 	}
 	if (this.value == 9) {
-		var url = '/services/lcms/legalcasedisposal/edit/?id=' + id;
+		var url = '/services/lcms/legalcasedisposal/edit/?lcNumber=' + id;
 		$('#searchlegalcaseForm1').attr('method', 'get');
 		$('#searchlegalcaseForm1').attr('action', url);
 //		window.location = url;
