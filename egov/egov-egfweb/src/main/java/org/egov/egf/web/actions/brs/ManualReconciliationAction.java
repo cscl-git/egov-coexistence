@@ -237,7 +237,22 @@ public class ManualReconciliationAction extends BaseFormAction {
 	@Action(value = "/brs/manualReconciliation-ajaxBalance")
 	public String balance()
 	{
-		unReconciledDrCr = manualReconcileHelper.getUnReconciledDrCr(reconcileBean.getAccountId(), reconcileBean.getFromDate(), reconcileBean.getToDate());
+		
+		String account2= "";
+		
+		List<String> getbankaccounts = manualReconcileHelper.getbankaccountsForBalance(reconcileBean);
+			
+		String getaccount = manualReconcileHelper.getaccountForBalance(reconcileBean);
+		
+		for (String account : getbankaccounts) {
+			String[] split = account.split("-");
+			String string2= split[2];				
+			if(string2.equals(getaccount)) {
+				account2 = account;
+			}
+		}
+		
+		unReconciledDrCr = manualReconcileHelper.getUnReconciledDrCr(reconcileBean.getAccountId(), reconcileBean.getFromDate(), reconcileBean.getToDate(),account2,reconcileBean.getDepartment());
 
 		return "balance";
 	}

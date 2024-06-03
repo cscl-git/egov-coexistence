@@ -84,7 +84,7 @@ public class LoginAttemptService {
             }
             loginAttempt.setLastModifiedOn(new Date());
             if (loginAttempt.getFailedAttempts() >= MAX_LOGIN_ATTEMPT_ALLOWED) {
-                user.setAccountLocked(true);
+                user.setAccountLocked(false);
                 userService.updateUser(user);
             }
             return Optional.of(loginAttemptRepository.save(loginAttempt));

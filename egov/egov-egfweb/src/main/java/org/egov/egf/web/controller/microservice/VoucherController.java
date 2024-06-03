@@ -246,11 +246,16 @@ public class VoucherController extends BaseBillController{
 						subledgerDetails.add(subledgertDetailMap);
 					}
 				}
+				String vouchermisByReceiptNo = voucherService.getVouchermisByReceiptNo(voucher.getReceiptNumber()); 
+				System.out.println("vouchermisByReceiptNo"+vouchermisByReceiptNo);
+				if("".equals(vouchermisByReceiptNo) || vouchermisByReceiptNo==null) {
+					System.out.println("iffff");
 				CVoucherHeader voucherHeader = createVoucher.createVoucher(headerDetails, accountdetails,
 						subledgerDetails);
 				voucher.setId(voucherHeader.getId());
 				voucher.setVoucherNumber(voucherHeader.getVoucherNumber());
 				response.getVouchers().add(voucher);
+				}
 				response.setResponseInfo(MicroserviceUtils.getResponseInfo(voucherRequest.getRequestInfo(),
 						HttpStatus.SC_CREATED, null));
 			} catch (ValidationException e) {
@@ -343,7 +348,11 @@ public class VoucherController extends BaseBillController{
          	misReceiptDetail.setChequeddno(m.getChequeddno());
          	misReceiptDetail.setChequedddate(new Date(m.getChequedddate()));
          	System.out.println("Details :::"+misReceiptDetail.toString());
+         	MisReceiptDetail findByReceipts = misReceiptDetailService.findByReceipts(m);
+         	System.out.println("findByReceipts details"+findByReceipts);
+         	if(findByReceipts ==null) {
          	misReceiptDetail  = misReceiptDetailService.save(misReceiptDetail);
+         	}
          	System.out.println("Saved Successfully");
          	res.setSuccess(true);
          	res.setMessage("Saved Successfully");

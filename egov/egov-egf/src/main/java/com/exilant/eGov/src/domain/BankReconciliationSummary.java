@@ -52,7 +52,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.egov.commons.Bankaccount;
+import org.egov.egf.model.ReceiptDetails;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.exception.ApplicationRuntimeException;
 import org.egov.infra.microservice.models.Instrument;
 import org.egov.infra.microservice.models.InstrumentSearchContract;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
@@ -61,6 +63,10 @@ import org.egov.model.brs.BrsEntries;
 import org.egov.model.instrument.InstrumentHeader;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.BigDecimalType;
+import org.hibernate.type.DateType;
+import org.hibernate.type.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -92,7 +98,7 @@ public class BankReconciliationSummary {
 	
 	
 	
-	public String getUnReconciledDrCr(Integer bankAccId,Date fromDate,Date toDate) throws Exception
+	public String getUnReconciledDrCr(Integer bankAccId,Date fromDate,Date toDate,String accountno) throws Exception
 	{
 		String totalQuery="SELECT (sum(case when ih.ispaycheque='1' then ih.instrumentAmount else 0 end))  AS \"brs_creditTotal\", "
 			+" (sum( case when ih.ispaycheque= '0' then ih.instrumentAmount else 0 end) ) AS \"brs_debitTotal\" "
@@ -102,6 +108,39 @@ public class BankReconciliationSummary {
 			+" AND  ( (ih.ispaycheque='0' and  ih.id_status=(select id from egw_status where moduletype='Instrument'  and description='Deposited'))or (ih.ispaycheque='1' and  ih.id_status=(select id from egw_status where moduletype='Instrument'  and description='New'))) "
 			+" and ih.instrumentnumber is not null";
 	//see u might need to exclude brs entries here 
+		
+		String totalreceiptdebit="select sum(mrd.amount) as brs_receiptTotal\r\n"
+				+ "				from \r\n"
+				+ "				voucherheader v \r\n"
+				+ "				left join vouchermis v2 on v.id =v2.voucherheaderid\r\n"
+				+ "				left join mis_receipts_details mis on v2.reciept_number =mis.receipt_number\r\n"
+				+ "				left join mis_remittance_details mrd on mis.receipt_number =trim(split_part(mrd.receiptnumbers,',',1),' \"\" ')\r\n"
+				+ "				where\r\n"
+				+ "				v.voucherdate  >= :fromDate AND \r\n"
+				+ "				v.voucherdate  <= :toDate AND \r\n"
+				+ "				v.STATUS not in (4,5) and\r\n"
+				+ "				mis.payment_status= 'DEPOSITED' and\r\n"
+				+ "				mis.payment_mode in ('CHEQUE','DD') and \r\n"
+				+ "				mrd.bankaccount =:bankAccountId and\r\n"
+				+ "				(mrd.status is null or mrd.status = '')";
+		
+		
+		String othertotalreceiptdebit="select sum(mrd.amount) as brs_receiptTotal\r\n"
+				+ "				from \r\n"
+				+ "				voucherheader v \r\n"
+				+ "				left join vouchermis v2 on v.id =v2.voucherheaderid\r\n"
+				+ "				left join mis_receipts_details mis on v2.reciept_number =mis.receipt_number\r\n"
+				+ "				left join mis_remittance_details mrd on mis.receipt_number =trim(split_part(mrd.receiptnumbers,',',1),' \"\" ')\r\n"
+				+ "				where\r\n"
+				+ "				v.voucherdate  >= :fromDate AND \r\n"
+				+ "				v.voucherdate  <= :toDate AND \r\n"
+				+ "				v.STATUS not in (4,5) and\r\n"
+				+ "				mis.payment_status= 'DEPOSITED' and\r\n"
+				+ "				mis.payment_mode not in ('CHEQUE','DD') and \r\n"
+				+ "				mrd.bankaccount =:bankAccountId and\r\n"
+				+ "				(mrd.status is null or mrd.status = '')";
+		
+
 		
 		String otherTotalQuery=" SELECT (sum(case when ih.ispaycheque='1' then ih.instrumentAmount else 0 end ))  AS \"brs_creditTotalOthers\", "
 			+" (sum(case when ih.ispaycheque='0' then ih.instrumentAmount else 0 end ) ) AS \"brs_debitTotalOthers\" "
@@ -126,6 +165,9 @@ public class BankReconciliationSummary {
 		String debitOtherTotal=null;
 		String creditTotalBrsEntry=null;
 		String debitTotalBrsEntry=null;
+		String receiptTotal=null;
+		String otherreceiptTotal=null;
+
 		
 		try
 		{
@@ -142,6 +184,26 @@ public class BankReconciliationSummary {
 				creditTotal=my[0]!=null?my[0].toString():null;
 				debitTotal=my[1]!=null?my[1].toString():null;
 			}
+			
+			
+			totalSQLQuery =  persistenceService.getSession().createSQLQuery(totalreceiptdebit);
+			totalSQLQuery.setString("bankAccountId",accountno);
+			totalSQLQuery.setDate("fromDate",fromDate);
+			totalSQLQuery.setDate("toDate",toDate);
+			
+			list = totalSQLQuery.list();
+			if (list.size()>0)
+			{
+				if(LOGGER.isDebugEnabled())     LOGGER.debug(list.get(0));
+				Object firstElement = list.get(0);
+				 if (firstElement instanceof BigDecimal) {
+				        BigDecimal firstValue = (BigDecimal) firstElement;
+				        receiptTotal = firstValue.toString();
+				    } else {
+				        // Handle the case where the first element is not a BigDecimal
+				    }
+			}
+
 
 			totalSQLQuery = persistenceService.getSession().createSQLQuery(otherTotalQuery);
 			totalSQLQuery.setInteger("bankAccountId",bankAccId);
@@ -155,6 +217,26 @@ public class BankReconciliationSummary {
 				creditOthertotal=my[0]!=null?my[0].toString():null;
 				debitOtherTotal=my[1]!=null?my[1].toString():null;
 			}
+			
+			
+			totalSQLQuery =  persistenceService.getSession().createSQLQuery(othertotalreceiptdebit);
+			totalSQLQuery.setString("bankAccountId",accountno);
+			totalSQLQuery.setDate("fromDate",fromDate);
+			totalSQLQuery.setDate("toDate",toDate);
+			
+			list = totalSQLQuery.list();
+			if (list.size()>0)
+			{
+				if(LOGGER.isDebugEnabled())     LOGGER.debug(list.get(0));
+				Object firstElement = list.get(0);
+				 if (firstElement instanceof BigDecimal) {
+				        BigDecimal firstValue = (BigDecimal) firstElement;
+				        otherreceiptTotal = firstValue.toString();
+				    } else {
+				        // Handle the case where the first element is not a BigDecimal
+				    }
+			}
+
 
 			totalSQLQuery = persistenceService.getSession().createSQLQuery(brsEntryQuery);
 			totalSQLQuery.setInteger("bankAccountId",bankAccId);
@@ -173,7 +255,7 @@ public class BankReconciliationSummary {
 			debitTotal = recInsAmount.add(StringUtils.isNumeric(debitTotal) ? new BigDecimal(debitTotal) : new BigDecimal(0)).toString();
 
 		unReconciledDrCr=(creditTotal != null ? creditTotal : "0" )+"/"+(creditOthertotal!= null ? creditOthertotal : "0")
-		+"/"+(debitTotal!= null ? debitTotal : "0") +"/"+( debitOtherTotal!= null ? debitOtherTotal : "0")+""+
+		+"/"+(receiptTotal!= null ? receiptTotal : "0") +"/"+( otherreceiptTotal!= null ? otherreceiptTotal : "0")+""+
 		"/"+(creditTotalBrsEntry!= null ? creditTotalBrsEntry : "0") +"/"+( debitTotalBrsEntry!= null ? debitTotalBrsEntry : "0")+"";
 		}
 		catch(Exception e)
@@ -257,4 +339,99 @@ public class BankReconciliationSummary {
             }
 	    return Collections.EMPTY_LIST;
 	}
+	
+	
+	
+	public List<ReceiptDetails> getChequeReconciledReceiptsBankSummary(Date fromDate, Date toDate, String accountno) 
+	{
+		List<ReceiptDetails> list=new ArrayList<ReceiptDetails>();
+		String instrumentCondition="";
+			StringBuffer query = null;
+			try{	
+			     query=new StringBuffer().append("select mis.chequeddno as chequeNumber,mis.chequedddate as chequeDate,mrd.amount as amount,mis.payment_mode as paymentMode    \r\n"
+			     		+ "						from\r\n"
+			     		+ "					voucherheader v \r\n"
+			     		+ "						left join vouchermis v2 on v.id =v2.voucherheaderid\r\n"
+			     		+ "						left join mis_receipts_details mis on v2.reciept_number =mis.receipt_number\r\n"
+			     		+ "						left join mis_remittance_details mrd on mis.receipt_number =trim(split_part(mrd.receiptnumbers,',',1),' \\\"\\\" ')\r\n"
+			     		+ "							where\r\n"
+			     		+ "						v.voucherdate  >='"+fromDate+"' AND \r\n"
+			     		+ "						v.voucherdate  <= '"+toDate+"' AND\r\n"
+			     		+ "							v.STATUS not in (4,5) and\r\n"
+			     		+ "							mis.payment_status= 'DEPOSITED' and\r\n"
+			     		+ "							mis.payment_mode in ('CHEQUE','DD') and\r\n"
+			     		+ "							mrd.bankaccount ='"+accountno+"' and\r\n"
+			     		+ "							(mrd.status is null or mrd.status = '')");
+			     
+			     System.out.println("###query1:::"+query);
+					
+					LOGGER.info("from date : "+fromDate);
+			        LOGGER.info("Reconciliation or to Date : "+toDate);
+			        
+					SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+					createSQLQuery.addScalar("chequeNumber",StringType.INSTANCE);
+					createSQLQuery.addScalar("chequeDate",DateType.INSTANCE);
+					createSQLQuery.addScalar("amount",BigDecimalType.INSTANCE);
+					createSQLQuery.addScalar("paymentMode",StringType.INSTANCE);
+					createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReceiptDetails.class));
+					list = (List<ReceiptDetails>)createSQLQuery.list();
+			
+			}
+			catch(Exception e)
+			{
+				LOGGER.error("Exp in getUnReconciledCheques:"+e.getMessage());
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			
+
+		return list;
+	}
+	
+	public List<ReceiptDetails> getOtherInstrumentReceiptsBankSummary(Date fromDate, Date toDate, String accountno) 
+	{
+		List<ReceiptDetails> list=new ArrayList<ReceiptDetails>();
+		String instrumentCondition="";
+			StringBuffer query = null;
+			try{	
+			     query=new StringBuffer().append("select mis.chequeddno as chequeNumber,mis.chequedddate as chequeDate,mrd.amount as amount,\r\n"
+			     		+ "				mis.payment_mode as paymentMode   \r\n"
+			     		+ "				from \r\n"
+			     		+ "				voucherheader v \r\n"
+			     		+ "				left join vouchermis v2 on v.id =v2.voucherheaderid\r\n"
+			     		+ "			    left join mis_receipts_details mis on v2.reciept_number =mis.receipt_number\r\n"
+			     		+ "				left join mis_remittance_details mrd on mis.receipt_number =trim(split_part(mrd.receiptnumbers,',',1),' \\\"\\\" ')\r\n"
+			     		+ "				where\r\n"
+			     		+ "				v.voucherdate  >= '"+fromDate+"' AND\r\n"
+			     		+ "				v.voucherdate  <= '"+toDate+"' AND \r\n"
+			     		+ "				v.STATUS not in (4,5) and\r\n"
+			     		+ "			    mis.payment_status= 'DEPOSITED' and\r\n"
+			     		+ "				mis.payment_mode not in ('CHEQUE','DD') and\r\n"
+			     		+ "				mrd.bankaccount ='"+accountno+"' and\r\n"
+			     		+ "				(mrd.status is null or mrd.status = '')");
+			     
+			     System.out.println("###query1:::"+query);
+					
+					LOGGER.info("from date : "+fromDate);
+			        LOGGER.info("Reconciliation or to Date : "+toDate);
+			        
+					SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+					createSQLQuery.addScalar("chequeNumber",StringType.INSTANCE);
+					createSQLQuery.addScalar("chequeDate",DateType.INSTANCE);
+					createSQLQuery.addScalar("amount",BigDecimalType.INSTANCE);
+					createSQLQuery.addScalar("paymentMode",StringType.INSTANCE);
+					createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReceiptDetails.class));
+					list = (List<ReceiptDetails>)createSQLQuery.list();
+			
+			}
+			catch(Exception e)
+			{
+				LOGGER.error("Exp in getUnReconciledCheques:"+e.getMessage());
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+			
+
+		return list;
+	}
+
+
 }

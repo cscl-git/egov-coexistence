@@ -130,7 +130,7 @@ public class ManualReconcileHelper {
 
         private int DEFAULT_LIMIT = 100;
         
-	public Map<String,String> getUnReconciledDrCr(Long bankAccId,Date fromDate,Date toDate)  
+	public Map<String,String> getUnReconciledDrCr(Long bankAccId,Date fromDate,Date toDate,String accountno,String department)  
 	{
 		Map<String,String> unreconMap=new LinkedHashMap<String,String>();
 		//String  ="decode(iv.voucherHeaderId,null,0,ih.instrumentAmount)";
@@ -147,6 +147,22 @@ public class ManualReconcileHelper {
 			+ " and description='Deposited'))or (ih.ispaycheque='1' and  ih.id_status=(select id from egw_status where "
 			+ " moduletype='Instrument'  and description='New'))) "
 			+" and ih.instrumentnumber is not null";
+		
+		
+		String totalReceiptQuery="SELECT SUM(mrd.amount) AS brs_receiptTotal\r\n"
+				+ "FROM voucherheader v\r\n"
+				+ "JOIN vouchermis v2 ON v.id = v2.voucherheaderid\r\n"
+				+ "JOIN MIS_REMITTANCE_DETAILS mrd ON v.vouchernumber = mrd.voucher_number\r\n"
+				+ "JOIN mis_receipts_details mis ON TRIM(SPLIT_PART(mrd.receiptnumbers, ',', 1), ' \"\" ') = mis.receipt_number\r\n"
+				+ "WHERE v.voucherdate  >= :fromDate AND \r\n"
+				+ "	  v.voucherdate  <= :toDate AND\r\n"
+				+ "      v.STATUS NOT IN (4, 5)\r\n"
+				+ "  AND mis.payment_status = 'DEPOSITED'\r\n"
+				+ "  AND mrd.bankaccount = :bankAccountId\r\n"
+				+ "  AND (mrd.status IS NULL OR mrd.status = '')\r\n"
+				+ "  AND v2.departmentcode = COALESCE(NULLIF(:department, ''), mrd.department)";
+		
+
 	//see u might need to exclude brs entries here 
 		
 		String otherTotalQuery=" SELECT (sum(case when ih.ispaycheque='1' then ih.instrumentAmount else 0 end))  AS \"brs_creditTotalOthers\", "
@@ -194,6 +210,8 @@ public class ManualReconcileHelper {
 		String creditTotalBrsEntry=null;
 		String debitTotalBrsEntry=null;
 		String creditOthertotalPex=null;
+		String receiptTotal=null;
+
 		try
 		{
 			SQLQuery totalSQLQuery = persistenceService.getSession().createSQLQuery(totalQuery);
@@ -209,6 +227,29 @@ public class ManualReconcileHelper {
 				creditTotal=my[0]!=null?my[0].toString():null;
 				debitTotal=my[1]!=null?my[1].toString():null;
 			}
+			
+			
+			totalSQLQuery = persistenceService.getSession().createSQLQuery(totalReceiptQuery);
+			totalSQLQuery.setString("bankAccountId",accountno);
+			totalSQLQuery.setDate("fromDate",fromDate);
+			totalSQLQuery.setDate("toDate",toDate);
+			totalSQLQuery.setString("department",department);
+			
+			 list = totalSQLQuery.list();
+			if (list.size()>0)
+			{
+				if(LOGGER.isDebugEnabled())     LOGGER.debug(list.get(0));
+				Object firstElement = list.get(0);
+				 if (firstElement instanceof BigDecimal) {
+				        BigDecimal firstValue = (BigDecimal) firstElement;
+				        receiptTotal = firstValue.toString();
+				    } else {
+				        // Handle the case where the first element is not a BigDecimal
+				    }
+				//Object [] my = (Object[])list.get(0);
+				//receiptTotal=my[0]!=null?my[0].toString():null;
+			}
+
 
 			if(LOGGER.isInfoEnabled())     LOGGER.info("  query  for other than cheque/DD: "+otherTotalQuery);
 			totalSQLQuery = persistenceService.getSession().createSQLQuery(otherTotalQuery);
@@ -261,9 +302,12 @@ public class ManualReconcileHelper {
 			debitOtherTotal=debitOtherTotal==null?"0":debitOtherTotal;
 			debitTotalBrsEntry=debitTotalBrsEntry==null?"0":debitTotalBrsEntry;
 			creditOthertotalPex=creditOthertotalPex==null?"0":creditOthertotalPex;
+			receiptTotal=receiptTotal==null?"0":receiptTotal;
+
 			
 			unreconMap.put("Cheque/DD/Cash Payments",creditTotal);
-			unreconMap.put("Cheque/DD/Cash Receipts",debitTotal);
+			//unreconMap.put("Cheque/DD/Cash Receipts",debitTotal);
+			unreconMap.put("Cheque/DD/Cash Receipts",receiptTotal);
 			unreconMap.put("RTGS Payments",creditOthertotal);
 			unreconMap.put("Other Receipts",debitOtherTotal);
 			unreconMap.put("BRS Entry",debitTotalBrsEntry);
@@ -297,94 +341,120 @@ public class ManualReconcileHelper {
 			StringBuffer query = null;
 			try{	
 			if(reconBean.getStatusType().equalsIgnoreCase("New")) {	
-			     query=new StringBuffer().append(" select    string_agg(distinct v.vouchernumber, ',') as \"voucherNumber\" ,mr.id as \"ihId\", vm.voucherheaderid  as \"vhId\",\r\n"
-			     		+ "			     		 v.\"type\" as \"type\",\r\n"
-			     		+ "			     		'Receipt'  as instrumentType ,\r\n"
-			     		+ "			     		mr.amount as chequeAmount,\r\n"
-			     		+ "			     		to_char(v.voucherdate,'dd/mm/yyyy') as reconciledOn,\r\n"
-			     		+ "			     		mr.reconciledcomment as \"reconciledComment\"\r\n"
-			     		+ "			     		FROM \r\n"
-			     		+ "			     		VOUCHERHEADER v ,\r\n"
-			     		+ "			     		VOUCHERMIS vm,\r\n"
-			     		+ "			     		mis_receipts_details mis,\r\n"
-			     		+ "			     		MIS_REMITTANCE_DETAILS mr\r\n"
-			     		+ "			     		 WHERE \r\n"
-			     		+ "			     		v.voucherdate  >= '"+reconBean.getFromDate()+"' AND \r\n"
-			     		+ "			     		v.voucherdate  <= '"+reconBean.getReconciliationDate()+"' AND \r\n"
-			     		+ "			     		v.ID= vm.voucherheaderid  and\r\n"
-			     		+ "			     		v.STATUS not in (4,5) and\r\n"
-			     		+ "			     		v.vouchernumber =mr.voucher_number and \r\n"
-			     		+ "			     		trim(split_part(mr.receiptnumbers,',',1),' \"\" ') =mis.receipt_number\r\n"
-			     		+ "			     		and mis.payment_status= 'DEPOSITED'\r\n"
-			     		+ "			     		and mr.bankaccount ='"+accountno+"' \r\n"
-			     		+ "			     		and (mr.status is null or mr.status = '') \r\n"
-			     		+ "			     		and vm.departmentcode = coalesce(nullif('"+reconBean.getDepartment()+"',''),mr.department) \r\n"
-			     		+ "			     		group by\r\n"
-			     		+ "			     		v.vouchernumber,\r\n"
-			     		+ "			     		mr.id ,\r\n"
-			     		+ "			     		vm.voucherheaderid ,\r\n"
-			     		+ "			     		v.\"type\", \r\n"
-			     		+ "			     		mr.amount,\r\n"
-			     		+ "			     		v.voucherdate,\r\n"
-			     		+ "			     		mr.reconciledcomment ");
+			     query=new StringBuffer().append("SELECT \r\n"
+			     		+ "    string_agg(DISTINCT v.vouchernumber, ',') AS \"voucherNumber\",\r\n"
+			     		+ "    mr.id AS \"ihId\",\r\n"
+			     		+ "    vm.voucherheaderid AS \"vhId\",\r\n"
+			     		+ "    v.type AS type,\r\n"
+			     		+ "    'Receipt' AS instrumentType,\r\n"
+			     		+ "    mr.amount AS chequeAmount,\r\n"
+			     		+ "    mr.reconciledcomment AS reconciledComment\r\n"
+			     		+ "FROM \r\n"
+			     		+ "    VOUCHERHEADER v\r\n"
+			     		+ "JOIN \r\n"
+			     		+ "    VOUCHERMIS vm ON v.ID = vm.voucherheaderid\r\n"
+			     		+ "JOIN \r\n"
+			     		+ "    MIS_REMITTANCE_DETAILS mr ON v.vouchernumber = mr.voucher_number\r\n"
+			     		+ "JOIN \r\n"
+			     		+ "    mis_receipts_details mis ON trim(split_part(mr.receiptnumbers, ',', 1), ' \"\" ') = mis.receipt_number\r\n"
+			     		+ "WHERE \r\n"
+			     		+ "    v.voucherdate  >= '"+reconBean.getFromDate()+"' AND \r\n"
+			     		+ "	v.voucherdate  <= '"+reconBean.getReconciliationDate()+"' AND\r\n"
+			     		+ "    v.STATUS NOT IN (4, 5) AND\r\n"
+			     		+ "    mis.payment_status = 'DEPOSITED' AND\r\n"
+			     		+ "    mr.bankaccount = '"+accountno+"' AND\r\n"
+			     		+ "    (mr.status IS NULL OR mr.status = '') AND\r\n"
+			     		+ "    vm.departmentcode = COALESCE(NULLIF('"+reconBean.getDepartment()+"', ''), mr.department)\r\n"
+			     		+ "GROUP BY\r\n"
+			     		+ "    mr.id,\r\n"
+			     		+ "    vm.voucherheaderid,\r\n"
+			     		+ "    v.type,\r\n"
+			     		+ "    mr.amount,\r\n"
+			     		+ "    v.voucherdate,\r\n"
+			     		+ "    mr.reconciledcomment;");
+			     
+			     System.out.println("###query1:::"+query);
+					
+					LOGGER.info("from date : "+reconBean.getFromDate());
+			        LOGGER.info("Reconciliation or to Date : "+reconBean.getReconciliationDate());
+			        
+					SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+					//createSQLQuery.setLong("bankAccId", reconBean.getAccountId());
+					//createSQLQuery.setDate("fromDate", reconBean.getFromDate()); // added by Abhishek on 24/02/2021
+					//createSQLQuery.setDate("toDate", reconBean.getReconciliationDate());
+					createSQLQuery.addScalar("voucherNumber",StringType.INSTANCE);
+					createSQLQuery.addScalar("ihId",StringType.INSTANCE);
+					createSQLQuery.addScalar("vhId",StringType.INSTANCE);
+					//createSQLQuery.addScalar("vhId",StringType.INSTANCE);
+					//createSQLQuery.addScalar("chequeDate",StringType.INSTANCE);
+					//createSQLQuery.addScalar("chequeNumber",StringType.INSTANCE);
+					createSQLQuery.addScalar("chequeAmount",BigDecimalType.INSTANCE);
+					//createSQLQuery.addScalar("txnType",StringType.INSTANCE);
+					createSQLQuery.addScalar("type",StringType.INSTANCE);
+					createSQLQuery.addScalar("instrumentType",StringType.INSTANCE);
+					createSQLQuery.addScalar("reconciledComment",StringType.INSTANCE);
+					createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReconcileBean.class));
+					list = (List<ReconcileBean>)createSQLQuery.list();
 			}
 			if(reconBean.getStatusType().equalsIgnoreCase("Reconciled")) {				
-				 query=new StringBuffer().append(" select distinct string_agg(distinct v.vouchernumber, ',') as \"voucherNumber\" ,mr.id as \"ihId\", vm.voucherheaderid  as \"vhId\", \r\n"
-				 		+ "				 		v.\"type\" as \"type\",\r\n"
-				 		+ "				 		'Receipt'  as instrumentType ,\r\n"
-				 		+ "				 		mr.amount as chequeAmount,\r\n"
-				 		+ "				 		to_char(mr.reconciledon,'dd/mm/yyyy') as reconciledOn,\r\n"
-				 		+ "				 		mr.reconciledcomment as \"reconciledComment\"\r\n"
-				 		+ "				 		FROM \r\n"
-				 		+ "				 		VOUCHERHEADER v ,\r\n"
-				 		+ "				 		VOUCHERMIS vm,\r\n"
-				 		+ "				 		mis_receipts_details mis,\r\n"
-				 		+ "				 		MIS_REMITTANCE_DETAILS mr\r\n"
-				 		+ "				 		WHERE \r\n"
-				 		+ "				 		v.voucherdate  >= '"+reconBean.getFromDate()+"' AND \r\n"
-				 		+ "				 		v.voucherdate  <= '"+reconBean.getReconciliationDate()+"'  AND \r\n"
-				 		+ "				 		v.ID= vm.voucherheaderid  and\r\n"
-				 		+ "				 		v.STATUS not in (4,5) and\r\n"
-				 		+ "				 		v.vouchernumber =mr.voucher_number and\r\n"
-				 		+ "				 		trim(split_part(mr.receiptnumbers,',',1),' \"\" ') =mis.receipt_number\r\n"
-				 		+ "				 		and mr.bankaccount ='"+accountno+"' \r\n"
-				 		+ "				 		and mr.status = 'Reconciled' \r\n"
-				 		+ "				 		and vm.departmentcode = coalesce(nullif('"+reconBean.getDepartment()+"',''),mr.department)  \r\n"
-				 		+ "				 		group by\r\n"
-				 		+ "				 		v.vouchernumber,\r\n"
-				 		+ "				 		mr.id ,\r\n"
-				 		+ "				 		vm.voucherheaderid ,\r\n"
-				 		+ "				 		v.\"type\", \r\n"
-				 		+ "				 		mr.id  ,\r\n"
-				 		+ "				 		mr.amount,\r\n"
-				 		+ "				 		v.voucherdate,\r\n"
-				 		+ "				 		mr.reconciledcomment ");				
+				 query=new StringBuffer().append("SELECT DISTINCT \r\n"
+				 		+ "    STRING_AGG(DISTINCT v.vouchernumber, ',') AS \"voucherNumber\",\r\n"
+				 		+ "    mr.id AS \"ihId\",\r\n"
+				 		+ "    vm.voucherheaderid AS \"vhId\",\r\n"
+				 		+ "    v.type AS type,\r\n"
+				 		+ "    'Receipt' AS instrumentType,\r\n"
+				 		+ "    mr.amount AS chequeAmount,\r\n"
+				 		+ "    TO_CHAR(mr.reconciledon, 'DD/MM/YYYY') AS reconciledOn,\r\n"
+				 		+ "    mr.reconciledcomment AS reconciledComment\r\n"
+				 		+ "FROM \r\n"
+				 		+ "    VOUCHERHEADER v\r\n"
+				 		+ "JOIN \r\n"
+				 		+ "    VOUCHERMIS vm ON v.ID = vm.voucherheaderid\r\n"
+				 		+ "JOIN \r\n"
+				 		+ "    MIS_REMITTANCE_DETAILS mr ON v.vouchernumber = mr.voucher_number\r\n"
+				 		+ "JOIN \r\n"
+				 		+ "    mis_receipts_details mis ON TRIM(SPLIT_PART(mr.receiptnumbers, ',', 1), ' \"\" ') = mis.receipt_number\r\n"
+				 		+ "WHERE \r\n"
+				 		+ "    v.voucherdate  >= '"+reconBean.getFromDate()+"' AND \r\n"
+				 		+ "	v.voucherdate  <= '"+reconBean.getReconciliationDate()+"' AND\r\n"
+				 		+ "    v.STATUS NOT IN (4, 5)\r\n"
+				 		+ "    AND mr.bankaccount = '"+accountno+"'\r\n"
+				 		+ "    AND mr.status = 'Reconciled'\r\n"
+				 		+ "    AND vm.departmentcode = COALESCE(NULLIF('"+reconBean.getDepartment()+"', ''), mr.department)\r\n"
+				 		+ "GROUP BY\r\n"
+				 		+ "    mr.id,\r\n"
+				 		+ "    vm.voucherheaderid,\r\n"
+				 		+ "    v.type,\r\n"
+				 		+ "    mr.amount,\r\n"
+				 		+ "    mr.reconciledon,\r\n"
+				 		+ "    mr.reconciledcomment;");	
+				 
+				 System.out.println("###query1:::"+query);
+					
+					LOGGER.info("from date : "+reconBean.getFromDate());
+			        LOGGER.info("Reconciliation or to Date : "+reconBean.getReconciliationDate());
+			        
+					SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+					//createSQLQuery.setLong("bankAccId", reconBean.getAccountId());
+					//createSQLQuery.setDate("fromDate", reconBean.getFromDate()); // added by Abhishek on 24/02/2021
+					//createSQLQuery.setDate("toDate", reconBean.getReconciliationDate());
+					createSQLQuery.addScalar("voucherNumber",StringType.INSTANCE);
+					createSQLQuery.addScalar("ihId",StringType.INSTANCE);
+					createSQLQuery.addScalar("vhId",StringType.INSTANCE);
+					//createSQLQuery.addScalar("vhId",StringType.INSTANCE);
+					//createSQLQuery.addScalar("chequeDate",StringType.INSTANCE);
+					//createSQLQuery.addScalar("chequeNumber",StringType.INSTANCE);
+					createSQLQuery.addScalar("chequeAmount",BigDecimalType.INSTANCE);
+					//createSQLQuery.addScalar("txnType",StringType.INSTANCE);
+					createSQLQuery.addScalar("type",StringType.INSTANCE);
+					createSQLQuery.addScalar("instrumentType",StringType.INSTANCE);
+					createSQLQuery.addScalar("reconciledOn",StringType.INSTANCE);
+					createSQLQuery.addScalar("reconciledComment",StringType.INSTANCE);
+					createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReconcileBean.class));
+					list = (List<ReconcileBean>)createSQLQuery.list();
 			}	
 			
-			System.out.println("###query1:::"+query);
 			
-			LOGGER.info("from date : "+reconBean.getFromDate());
-	        LOGGER.info("Reconciliation or to Date : "+reconBean.getReconciliationDate());
-	        
-			SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
-			//createSQLQuery.setLong("bankAccId", reconBean.getAccountId());
-			//createSQLQuery.setDate("fromDate", reconBean.getFromDate()); // added by Abhishek on 24/02/2021
-			//createSQLQuery.setDate("toDate", reconBean.getReconciliationDate());
-			createSQLQuery.addScalar("voucherNumber",StringType.INSTANCE);
-			createSQLQuery.addScalar("ihId",StringType.INSTANCE);
-			createSQLQuery.addScalar("vhId",StringType.INSTANCE);
-			//createSQLQuery.addScalar("vhId",StringType.INSTANCE);
-			//createSQLQuery.addScalar("chequeDate",StringType.INSTANCE);
-			//createSQLQuery.addScalar("chequeNumber",StringType.INSTANCE);
-			createSQLQuery.addScalar("chequeAmount",BigDecimalType.INSTANCE);
-			//createSQLQuery.addScalar("txnType",StringType.INSTANCE);
-			createSQLQuery.addScalar("type",StringType.INSTANCE);
-			createSQLQuery.addScalar("instrumentType",StringType.INSTANCE);
-			createSQLQuery.addScalar("reconciledOn",StringType.INSTANCE);
-			createSQLQuery.addScalar("reconciledComment",StringType.INSTANCE);
-			createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReconcileBean.class));
-			
-		    list = (List<ReconcileBean>)createSQLQuery.list();
 		        try {
 		            this.getUnreconsiledReceiptInstruments(reconBean,list);
 	                } catch (Exception e) {
@@ -809,6 +879,89 @@ public class ManualReconcileHelper {
 		
 		return acc;
 	}
+    
+    public List<String> getbankaccountsForBalance(ReconcileBean reconBean) 
+  	{
+  		List<String> list=new ArrayList<String>();
+  		String instrumentCondition="";		
+  			StringBuffer query = null;
+  			try{	
+  			     query=new StringBuffer().append("  select mr.bankaccount as bankaccount \r\n"
+  			     		+ "   FROM \r\n"
+  			     		+ "   VOUCHERHEADER v ,\r\n"
+  			     		+ "   VOUCHERMIS vm,\r\n"
+  			     		+ "   mis_receipts_details mis,\r\n"
+  			     		+ "   MIS_REMITTANCE_DETAILS mr  \r\n"
+  			     		+ "    WHERE \r\n"
+  			     		+ "    v.voucherdate  >= '"+reconBean.getFromDate()+"' AND \r\n"
+  			     		+ "    v.voucherdate  <= '"+reconBean.getReconciliationDate()+"' AND \r\n"
+  			     		+ "    v.ID= vm.voucherheaderid  and\r\n"
+  			     		+ "    v.STATUS not in (4,5) and\r\n"
+  			     		+ "    v.vouchernumber =mr.voucher_number\r\n"
+  			     		+ "   and mis.payment_status= 'DEPOSITED'\r\n"
+  			     		+ "   and (mr.status is null or mr.status = '') \r\n"
+  			     		+ "   group by\r\n"
+  			     		+ "   mr.bankaccount ");
+			
+  			System.out.println("###query1:::"+query);
+  			
+  			LOGGER.info("from date : "+reconBean.getFromDate());
+  	        LOGGER.info("Reconciliation or to Date : "+reconBean.getReconciliationDate());
+  	        
+  			SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+  			createSQLQuery.addScalar("bankaccount",StringType.INSTANCE);
+  			//createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReconcileBean.class));
+  			
+  		    list = (List<String>)createSQLQuery.list();
+  		        try {
+  		            //this.getUnreconsiledReceiptInstruments(reconBean,list);
+  	                } catch (Exception e) {
+  	                    LOGGER.error("ERROR occurred while fetching the unrconciled receipt instruments : "+e.getMessage());
+  	                }
+  			}
+  			catch(Exception e)
+  			{
+  				LOGGER.error("Exp in getUnReconciledCheques:"+e.getMessage());
+  				throw new ApplicationRuntimeException(e.getMessage());
+  			}
+  					
+  		return list;
+  	}
+    
+    public String getaccountForBalance(ReconcileBean reconBean) 
+	{
+		String acc= "";	
+			StringBuffer query = null;
+			try{	
+			     query=new StringBuffer().append(" select accountnumber as accno from BANKACCOUNT where id=:bankAccId ");	
+			
+			System.out.println("###query1:::"+query);
+			
+			LOGGER.info("from date : "+reconBean.getFromDate());
+	        LOGGER.info("Reconciliation or to Date : "+reconBean.getReconciliationDate());
+	        
+			SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+			createSQLQuery.setLong("bankAccId", reconBean.getAccountId());
+			createSQLQuery.addScalar("accno",StringType.INSTANCE);
+			//createSQLQuery.setResultTransformer(Transformers.aliasToBean(ReconcileBean.class));
+			
+		    acc = (String)createSQLQuery.uniqueResult();
+		        try {
+		            //this.getUnreconsiledReceiptInstruments(reconBean,list);
+	                } catch (Exception e) {
+	                    LOGGER.error("ERROR occurred while fetching the unrconciled receipt instruments : "+e.getMessage());
+	                }
+			}
+			catch(Exception e)
+			{
+				LOGGER.error("Exp in getUnReconciledCheques:"+e.getMessage());
+				throw new ApplicationRuntimeException(e.getMessage());
+			}
+					
+		return acc;
+	}
+    
+
     
 	
 }
