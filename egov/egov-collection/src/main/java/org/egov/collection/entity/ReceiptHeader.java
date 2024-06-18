@@ -156,7 +156,7 @@ public class ReceiptHeader extends StateAware implements Auditable {
 	private String chequeddno;
 	private String chequedddate;
 	private String bank;
-	
+	private String remittanceReceiptNo;
 	
     public String getServiceType() {
 		return serviceType;
@@ -1073,7 +1073,14 @@ public class ReceiptHeader extends StateAware implements Auditable {
 	public void setDepositDate(String depositDate) {
 		this.depositDate = depositDate;
 	}
+    
+	public String getRemittanceReceiptNo() {
+		return remittanceReceiptNo;
+	}
 
+	public void setRemittanceReceiptNo(String remittanceReceiptNo) {
+		this.remittanceReceiptNo = remittanceReceiptNo;
+	}
 	
 
 }

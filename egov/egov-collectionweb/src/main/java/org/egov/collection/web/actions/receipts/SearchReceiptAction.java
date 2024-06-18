@@ -546,13 +546,13 @@ public class SearchReceiptAction extends SearchFormAction {
 						 * 
 						 * } else { service = s3; }
 						 */
-							service = s3;
-						serviceType=s2;
-						}
-					receiptHeader.setServiceType(serviceType!= null ? serviceType : "");
+						service = s3;
+						serviceType = s2;
+					}
+					receiptHeader.setServiceType(serviceType != null ? serviceType : "");
 					receiptHeader.setService((service != null ? service : ""));
-					receiptHeader.setChequeddno(ob[14]!=null?ob[14].toString():"");
-					receiptHeader.setChequedddate(ob[15]!=null?ob[15].toString():"");
+					receiptHeader.setChequeddno(ob[14] != null ? ob[14].toString() : "");
+					receiptHeader.setChequedddate(ob[15] != null ? ob[15].toString() : "");
 					receiptHeader.setReferencenumber("");
 
 					if (ob[5] != null) {
@@ -969,7 +969,8 @@ public class SearchReceiptAction extends SearchFormAction {
 				for (Object[] element : rows) {
 					if (!element[3].toString().equalsIgnoreCase("0.00")) {
 						if (element[1].toString().equalsIgnoreCase("3502020")
-								|| element[1].toString().equalsIgnoreCase("3502019") || element[1].toString().equalsIgnoreCase("3502072")) {
+								|| element[1].toString().equalsIgnoreCase("3502019")
+								|| element[1].toString().equalsIgnoreCase("3502072")) {
 							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
 						} else {
 							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
@@ -989,6 +990,173 @@ public class SearchReceiptAction extends SearchFormAction {
 
 	}
 
+	/*
+	 * @SuppressWarnings("deprecation")
+	 * 
+	 * @Action(value = "/receipts/searchReceipt-searchDayBookReportNew") public
+	 * String searchDayBookReportNew() { target = "searchresult"; collectionVersion
+	 * = ApplicationThreadLocals.getCollectionVersion();
+	 * 
+	 * long start = System.currentTimeMillis(); String servicecategory1 = null;
+	 * String servicecategory = null; String sertype = null; String sertype1 = null;
+	 * String servicesearch = null; List<ReceiptHeader> receiptList = null;
+	 * List<ReceiptHeader> receiptListfinal = new ArrayList<>();
+	 * //receiptList.clear();
+	 * 
+	 * System.out.println("::::Service Search:::: " + servicesearch);
+	 * System.out.println("getServiceTypeId() :::" + getServiceTypeId());
+	 * System.out.println(":::::getDeptId:::: " + getDeptId());
+	 * System.out.println(":::::getCollectedBy:::: " + getCollectedBy());
+	 * System.out.println(":::::Amount:::: " + getSearchAmount());
+	 * System.out.println(":::::getModeOfPayment:::: " + getModeOfPayment());
+	 * System.out.println(":::::getSubdivison:::: " + getSubdivison());
+	 * System.out.println(":::::Amount:::: " + getReceiptType());
+	 * System.out.println(":::::servicetype:::: " + getServiceId()); if
+	 * (getServiceTypeId().equalsIgnoreCase("")) { setServiceTypeId(null); }
+	 * serviceTypeIdforExcel = getServiceTypeId(); List<Receipt> receipts = new
+	 * ArrayList<>(); servicesearch = getServiceTypeId();
+	 * 
+	 * Map<String, Amount> gllist = populateBifurcationAmountNew(getDeptId());
+	 * Map<String, String> dplist = getAlldepartment();
+	 * 
+	 * final StringBuffer query = new StringBuffer(500); List<Object[]> list = null;
+	 * 
+	 * query.append(
+	 * "select mrd.total_amt_paid,mrd.receipt_number,to_char(mrd.receipt_date,'dd/mm/yyyy') as recDate,mrd.paid_by,mrd.payer_address,mrd.narration,mrd.payment_status,mrd.bank_name,mrd.bank_branch,mrd.subdivison,mrd.servicename,mrd.collectedbyname,mrd.gstno,mrd.payment_mode,mrd.chequeddno ,to_char(mrd.chequedddate, 'dd/mm/yyyy') from mis_receipts_details mrd where "
+	 * ); query.append(getDateQuery(getFromDate(), getToDate()));
+	 * query.append(getMisQuery(servicesearch, null, null, getCollectedBy(),
+	 * getSearchAmount(), getModeOfPayment(), getSubdivison(), getReceiptType()));
+	 * 
+	 * System.out.println("receipt query>>> " + query); try { Query q =
+	 * entityManager.createNativeQuery(query.toString()); list = q.getResultList();
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * System.out.println("::::Size of receipt list::: " + list.size()); final
+	 * StringBuffer query1 = new StringBuffer(500); List<Object[]> remittlist =
+	 * null; HashMap<String, List<ReceiptHeader>> receiptMap = new HashMap<>();
+	 * HashMap<String, List<ReceiptHeader>> remittMap = new HashMap<>();
+	 * query1.append(
+	 * "select mrd.voucher_number,to_char(mrd.voucher_date,'dd/mm/yyyy'),mrd.bankaccount,mrd.amount,mrd.receiptnumbers,mrd.department from mis_remittance_details mrd where "
+	 * ); query1.append(getDateQuery1(getFromDate(), getToDate())); if
+	 * (getSubdivison() != null && !getSubdivison().isEmpty() &&
+	 * !getSubdivison().equals("-1")) {
+	 * query1.append(" and mrd.subdivison='").append(getSubdivison()).append("'"); }
+	 * System.out.println("remittance query>>> " + query1); try { Query q1 =
+	 * entityManager.createNativeQuery(query1.toString()); remittlist =
+	 * q1.getResultList();
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * System.out.println("::::Size of remitt list::: " + remittlist.size()); if
+	 * (list.size() != 0) { for (final Object[] ob : list) { //receipytHeader
+	 * -->receipt String depcode = ""; String service = null; String serviceType =
+	 * null; ReceiptHeader receiptHeader = new ReceiptHeader();
+	 * receiptHeader.setReceiptnumber(ob[1].toString());
+	 * receiptHeader.setReceiptdatenew(ob[2] != null ? ob[2].toString() : ""); if
+	 * (ob[10] != null) { String s3 = null; String s4 = null; String s1 = null;
+	 * String s2 = null; String[] split =
+	 * ob[10].toString().split(Pattern.quote(".")); s1 = split[0]; if (split.length
+	 * == 2) { s2 = split[1]; } if (serviceCategoryNames.containsKey(s1)) { s3 =
+	 * serviceCategoryNames.get(s1); } if (serviceCategoryNames.containsKey(s2)) {
+	 * s4 = serviceCategoryNames.get(s2); }
+	 * 
+	 * if (s4 != null) { if (s3 != null) { service = s3 + "." + s4; } else { service
+	 * = s4; } } else { service = s3; }
+	 * 
+	 * service = s3; serviceType=s2; } receiptHeader.setServiceType(serviceType!=
+	 * null ? serviceType : ""); receiptHeader.setService((service != null ? service
+	 * : "")); receiptHeader.setChequeddno(ob[14]!=null?ob[14].toString():"");
+	 * receiptHeader.setChequedddate(ob[15]!=null?ob[15].toString():"");
+	 * receiptHeader.setBank(ob[7]!=null?ob[7].toString():"");
+	 * receiptHeader.setReferencenumber(""); if (ob[5] != null) {
+	 * receiptHeader.setReferenceDesc(ob[5].toString()); }
+	 * receiptHeader.setPayeeName(""); if (ob[4] != null) {
+	 * receiptHeader.setPayeeAddress(ob[4].toString()); } if (ob[3] != null) {
+	 * receiptHeader.setPaidBy(ob[3].toString()); }
+	 * receiptHeader.setCurretnStatus(ob[6].toString()); if (ob[9] != null) {
+	 * receiptHeader.setSubdivison(ob[9].toString()); } if (ob[12] != null) {
+	 * receiptHeader.setGstno(ob[12].toString()); }
+	 * receiptHeader.setCurrentreceipttype("test");
+	 * receiptHeader.setModOfPayment(ob[13].toString()); if (ob[11] != null) {
+	 * receiptHeader.setCreatedUser(ob[11].toString()); } if (gllist != null &&
+	 * !gllist.isEmpty()) { if (gllist.containsKey(ob[1].toString())) {
+	 * receiptHeader.setPrincipalAmount(gllist.get(ob[1].toString()).getPaAmount());
+	 * receiptHeader.setGstAmount(gllist.get(ob[1].toString()).getGstAmount()); if
+	 * (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount()
+	 * != null) { receiptHeader.setTotalAmount(
+	 * (receiptHeader.getPrincipalAmount()).add(receiptHeader.getGstAmount())); }
+	 * else if (receiptHeader.getGstAmount() == null &&
+	 * receiptHeader.getPrincipalAmount() != null) {
+	 * receiptHeader.setTotalAmount(receiptHeader.getPrincipalAmount()); } else if
+	 * (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount()
+	 * == null) { receiptHeader.setTotalAmount(receiptHeader.getGstAmount()); }
+	 * receiptHeader.setDepartment(dplist.get(gllist.get(ob[1].toString()).
+	 * getDepartment())); depcode = gllist.get(ob[1].toString()).getDepartment(); }
+	 * } if (getDeptId() != null && !getDeptId().isEmpty()) { if
+	 * (!getDeptId().equals(depcode)) { //receiptList.add(receiptHeader); continue;
+	 * } } if(receiptMap.get(receiptHeader.getReceiptdatenew()) == null ){
+	 * receiptList=new ArrayList<>(); receiptList.add(receiptHeader);
+	 * receiptMap.put(receiptHeader.getReceiptdatenew(),receiptList); } else{
+	 * receiptMap.get(receiptHeader.getReceiptdatenew()).add(receiptHeader);//map.
+	 * get().add(); } } } if (remittlist.size() != 0) { for (final Object[] ob :
+	 * remittlist) { String depcode = ""; ReceiptHeader receiptHeader = new
+	 * ReceiptHeader(); try { receiptHeader.setReferencenumber(ob[0]!=null ?
+	 * ob[0].toString(): ""); receiptHeader.setDepositDate(ob[1]!=null ?
+	 * ob[1].toString(): ""); receiptHeader.setBankAccountNumber(ob[2]!=null ?
+	 * ob[2].toString(): ""); receiptHeader.setDepositAmount(ob[3]!=null ?
+	 * ob[3].toString(): ""); receiptHeader.setReceiptnumber(ob[4]!=null ?
+	 * ob[4].toString(): ""); receiptHeader.setDepartment(ob[5]!=null ?
+	 * dplist.get(ob[5].toString()): ""); if (getDeptId() != null &&
+	 * !getDeptId().isEmpty()) { if
+	 * (!getDeptId().equals(receiptHeader.getDepartment())) {
+	 * continue;//receiptList.add(receiptHeader); } }
+	 * if(remittMap.get(receiptHeader.getDepositDate()) == null ){ receiptList=new
+	 * ArrayList<>(); receiptList.add(receiptHeader);
+	 * remittMap.put(receiptHeader.getDepositDate(),receiptList);//map.put } else{
+	 * remittMap.get(receiptHeader.getDepositDate()).add(receiptHeader);//map.get().
+	 * add(); } } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * } } List<ReceiptHeader> finalList = new ArrayList<>(); List<Date> dates = new
+	 * ArrayList<Date>(); DateFormat formatter; formatter = new
+	 * SimpleDateFormat("dd/MM/yyyy"); Date startDate = null; Date endDate = null;
+	 * try { startDate = getFromDate();// (Date)formatter.parse(str_date); endDate =
+	 * getToDate();// (Date)formatter.parse(end_date); } catch (Exception e) {
+	 * e.printStackTrace(); } long interval = 24 * 1000 * 60 * 60; // 1 hour in
+	 * millis long endTime = endDate.getTime(); // create your endtime here,
+	 * possibly using Calendar or Date long curTime = startDate.getTime(); while
+	 * (curTime <= endTime) { dates.add(new Date(curTime)); curTime += interval; }
+	 * for (Date d:dates) { Date lDate = (Date) d; String ds =
+	 * formatter.format(lDate); System.out.println(" Date is ..." + ds);
+	 * if(receiptMap.get(ds)!=null) finalList.addAll(receiptMap.get(ds));
+	 * if(remittMap.get(ds)!=null) finalList.addAll(remittMap.get(ds)); }
+	 * System.out.println("finalList.size  :::::" + finalList.size()); /// Bhushan
+	 * :added filter to list List<ReceiptHeader> receiptListfilterList = finalList;
+	 * List<ReceiptHeader> receiptListnew = new ArrayList<>(); //
+	 * receiptList.clear();
+	 * 
+	 * System.out.println("receiptListfilterList  :::::" +
+	 * receiptListfilterList.size());
+	 * 
+	 * if (getDeptId() != null && !getDeptId().isEmpty()) { setDeptId(getDeptId());
+	 * } if (getPage() >= 1) { int showlist = 490 * getPage(); int fromIndex = 0;
+	 * int toIndex = 0; if (showlist > finalList.size()) { fromIndex = (490 *
+	 * (getPage() - 1)); toIndex = finalList.size(); } else { if (finalList.size() <
+	 * 490) { fromIndex = 0; toIndex = finalList.size(); } else { fromIndex =
+	 * showlist - 490; toIndex = showlist; } }
+	 * 
+	 * System.out.println("from::: " + fromIndex + "to:::: " + toIndex);
+	 * receiptListfinal = finalList.subList(fromIndex, toIndex); }
+	 * 
+	 * System.out.println("::::final list size:  " + receiptListfinal.size());
+	 * 
+	 * if (searchResult == null) { Page page = new Page<ReceiptHeader>(getPage(),
+	 * 490, receiptListfinal); searchResult = new EgovPaginatedList(page,
+	 * finalList.size()); } else { searchResult.getList().clear();
+	 * searchResult.getList().addAll(receiptListnew); } long end =
+	 * System.currentTimeMillis(); System.out.println(":::::total time taken:: " +
+	 * (end - start)); resultList = searchResult.getList(); return DAYBOOKREPORTNEW;
+	 * }
+	 */
+
 	@SuppressWarnings("deprecation")
 	@Action(value = "/receipts/searchReceipt-searchDayBookReportNew")
 	public String searchDayBookReportNew() {
@@ -1003,7 +1171,7 @@ public class SearchReceiptAction extends SearchFormAction {
 		String servicesearch = null;
 		List<ReceiptHeader> receiptList = null;
 		List<ReceiptHeader> receiptListfinal = new ArrayList<>();
-		//receiptList.clear();
+		// receiptList.clear();
 
 		System.out.println("::::Service Search:::: " + servicesearch);
 		System.out.println("getServiceTypeId() :::" + getServiceTypeId());
@@ -1021,8 +1189,12 @@ public class SearchReceiptAction extends SearchFormAction {
 		List<Receipt> receipts = new ArrayList<>();
 		servicesearch = getServiceTypeId();
 
-		Map<String, Amount> gllist = populateBifurcationAmountNew(getDeptId());
+		Map<String, Amount> gllist = populateBifurcationAmountNewByRecepitDate(getDeptId());
 		Map<String, String> dplist = getAlldepartment();
+
+		System.out.println("gllist data ****************>>> " + gllist.size());
+
+		System.out.println("dplist data ****************>>> " + dplist.size());
 
 		final StringBuffer query = new StringBuffer(500);
 		List<Object[]> list = null;
@@ -1044,6 +1216,7 @@ public class SearchReceiptAction extends SearchFormAction {
 		System.out.println("::::Size of receipt list::: " + list.size());
 		final StringBuffer query1 = new StringBuffer(500);
 		List<Object[]> remittlist = null;
+		List<ReceiptReportBean> itemList = new ArrayList<>();
 		HashMap<String, List<ReceiptHeader>> receiptMap = new HashMap<>();
 		HashMap<String, List<ReceiptHeader>> remittMap = new HashMap<>();
 		query1.append(
@@ -1057,146 +1230,185 @@ public class SearchReceiptAction extends SearchFormAction {
 			Query q1 = entityManager.createNativeQuery(query1.toString());
 			remittlist = q1.getResultList();
 
+			if (remittlist.size() != 0) {
+				for (final Object[] ob1 : remittlist) {
+					String receiptnumbers = ob1[4].toString();
+					String voucherNo = ob1[0].toString();
+					String voucherDate = ob1[1].toString();
+					String bankaccountno = ob1[2].toString();
+					String depositedamount = ob1[3].toString();
+					BigDecimal depositedAmount = new BigDecimal(depositedamount);
+					System.out.println("::::receiptnumbers " + receiptnumbers);
+
+					ReceiptReportBean reportBean = new ReceiptReportBean();
+
+					reportBean.setReceiptNo(receiptnumbers);
+					reportBean.setRemitanceNo(voucherNo);
+					reportBean.setDateOfDeposite(voucherDate);
+					reportBean.setBankAccountNo(bankaccountno);
+					reportBean.setDepositAmount(depositedAmount);
+
+					itemList.add(reportBean);
+
+				}
+			}
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 		System.out.println("::::Size of remitt list::: " + remittlist.size());
+
+		System.out.println("::::Size of itemList list::: " + itemList.size());
+
+		// List<String[]> splitItems = new ArrayList<>();
+
 		if (list.size() != 0) {
 			for (final Object[] ob : list) {
-				//receipytHeader -->receipt
-					String depcode = "";
-					String service = null;
-					String serviceType = null;
-					ReceiptHeader receiptHeader = new ReceiptHeader();
-						receiptHeader.setReceiptnumber(ob[1].toString());
-						receiptHeader.setReceiptdatenew(ob[2] != null ? ob[2].toString() : "");
-						if (ob[10] != null) {
-							String s3 = null;
-							String s4 = null;
-							String s1 = null;
-							String s2 = null;
-							String[] split = ob[10].toString().split(Pattern.quote("."));
-							s1 = split[0];
-							if (split.length == 2) {
-								s2 = split[1];
+				ReceiptHeader receiptHeader = new ReceiptHeader();
+				String receiptNumberToCheck = ob[1].toString();
+
+				if (itemList.size() != 0) {
+					for (ReceiptReportBean receipt : itemList) {
+
+						String receiptNo = receipt.getReceiptNo();
+						String[] split = receiptNo.split(",");
+						for (String item : split) {
+							if (item.trim().equals(receiptNumberToCheck)) {
+								receiptHeader.setReferencenumber(receipt.getRemitanceNo());
+								receiptHeader.setDepositDate(receipt.getDateOfDeposite());
+								receiptHeader.setBankAccountNumber(receipt.getBankAccountNo());
+								receiptHeader.setDepositAmount(receipt.getDepositAmount().toString());
+								receiptHeader.setRemittanceReceiptNo(receiptNo);
 							}
-							if (serviceCategoryNames.containsKey(s1)) {
-								s3 = serviceCategoryNames.get(s1);
-							}
-							if (serviceCategoryNames.containsKey(s2)) {
-								s4 = serviceCategoryNames.get(s2);
-							}
+						}
+
+					}
+				}
+
+				// receipytHeader -->receipt
+				String depcode = "";
+				String service = null;
+				String serviceType = null;
+
+				receiptHeader.setReceiptnumber(ob[1].toString());
+				receiptHeader.setReceiptdatenew(ob[2] != null ? ob[2].toString() : "");
+				if (ob[10] != null) {
+					String s3 = null;
+					String s4 = null;
+					String s1 = null;
+					String s2 = null;
+					String[] split = ob[10].toString().split(Pattern.quote("."));
+					s1 = split[0];
+					if (split.length == 2) {
+						s2 = split[1];
+					}
+					if (serviceCategoryNames.containsKey(s1)) {
+						s3 = serviceCategoryNames.get(s1);
+					}
+					if (serviceCategoryNames.containsKey(s2)) {
+						s4 = serviceCategoryNames.get(s2);
+					}
 					/*
 					 * if (s4 != null) { if (s3 != null) { service = s3 + "." + s4; } else { service
 					 * = s4; } } else { service = s3; }
 					 */
-								service = s3;
-							serviceType=s2;
-							}
-						receiptHeader.setServiceType(serviceType!= null ? serviceType : "");
-						receiptHeader.setService((service != null ? service : ""));
-						receiptHeader.setChequeddno(ob[14]!=null?ob[14].toString():"");
-						receiptHeader.setChequedddate(ob[15]!=null?ob[15].toString():"");
-						receiptHeader.setBank(ob[7]!=null?ob[7].toString():"");
-						receiptHeader.setReferencenumber("");
-						if (ob[5] != null) {
-							receiptHeader.setReferenceDesc(ob[5].toString());
-						}
-						receiptHeader.setPayeeName("");
-						if (ob[4] != null) {
-							receiptHeader.setPayeeAddress(ob[4].toString());
-						}
-						if (ob[3] != null) {
-							receiptHeader.setPaidBy(ob[3].toString());
-						}
-						receiptHeader.setCurretnStatus(ob[6].toString());
-						if (ob[9] != null) {
-							receiptHeader.setSubdivison(ob[9].toString());
-						}
-						if (ob[12] != null) {
-							receiptHeader.setGstno(ob[12].toString());
-						}
-						receiptHeader.setCurrentreceipttype("test");
-						receiptHeader.setModOfPayment(ob[13].toString());
-						if (ob[11] != null) {
-							receiptHeader.setCreatedUser(ob[11].toString());
-						}
-						if (gllist != null && !gllist.isEmpty()) {
-							if (gllist.containsKey(ob[1].toString())) {
-								receiptHeader.setPrincipalAmount(gllist.get(ob[1].toString()).getPaAmount());
-								receiptHeader.setGstAmount(gllist.get(ob[1].toString()).getGstAmount());
+					service = s3;
+					serviceType = s2;
+				}
+				receiptHeader.setServiceType(serviceType != null ? serviceType : "");
+				receiptHeader.setService((service != null ? service : ""));
+				receiptHeader.setChequeddno(ob[14] != null ? ob[14].toString() : "");
+				receiptHeader.setChequedddate(ob[15] != null ? ob[15].toString() : "");
+				receiptHeader.setBank(ob[7] != null ? ob[7].toString() : "");
+				// receiptHeader.setReferencenumber("");
+				if (ob[5] != null) {
+					receiptHeader.setReferenceDesc(ob[5].toString());
+				}
+				receiptHeader.setPayeeName("");
+				if (ob[4] != null) {
+					receiptHeader.setPayeeAddress(ob[4].toString());
+				}
+				if (ob[3] != null) {
+					receiptHeader.setPaidBy(ob[3].toString());
+				}
+				receiptHeader.setCurretnStatus(ob[6].toString());
+				if (ob[9] != null) {
+					receiptHeader.setSubdivison(ob[9].toString());
+				}
+				if (ob[12] != null) {
+					receiptHeader.setGstno(ob[12].toString());
+				}
+				receiptHeader.setCurrentreceipttype("test");
+				receiptHeader.setModOfPayment(ob[13].toString());
+				if (ob[11] != null) {
+					receiptHeader.setCreatedUser(ob[11].toString());
+				}
+
+				if (gllist != null && !gllist.isEmpty()) {
+					if (gllist.containsKey(ob[1].toString())) {
+						receiptHeader.setPrincipalAmount(gllist.get(ob[1].toString()).getPaAmount());
+						receiptHeader.setGstAmount(gllist.get(ob[1].toString()).getGstAmount());
 						if (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount() != null) {
-									receiptHeader.setTotalAmount(
-											(receiptHeader.getPrincipalAmount()).add(receiptHeader.getGstAmount()));
-								} else if (receiptHeader.getGstAmount() == null
-										&& receiptHeader.getPrincipalAmount() != null) {
-									receiptHeader.setTotalAmount(receiptHeader.getPrincipalAmount());
-								} else if (receiptHeader.getGstAmount() != null
-										&& receiptHeader.getPrincipalAmount() == null) {
-									receiptHeader.setTotalAmount(receiptHeader.getGstAmount());
-								}
-								receiptHeader.setDepartment(dplist.get(gllist.get(ob[1].toString()).getDepartment()));
-								depcode = gllist.get(ob[1].toString()).getDepartment();
-							}
+							receiptHeader.setTotalAmount(
+									(receiptHeader.getPrincipalAmount()).add(receiptHeader.getGstAmount()));
+						} else if (receiptHeader.getGstAmount() == null && receiptHeader.getPrincipalAmount() != null) {
+							receiptHeader.setTotalAmount(receiptHeader.getPrincipalAmount());
+						} else if (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount() == null) {
+							receiptHeader.setTotalAmount(receiptHeader.getGstAmount());
 						}
-						if (getDeptId() != null && !getDeptId().isEmpty()) {
+						receiptHeader.setDepartment(dplist.get(gllist.get(ob[1].toString()).getDepartment()));
+						depcode = gllist.get(ob[1].toString()).getDepartment();
+					}
+				}
+
+				if (getDeptId() != null && !getDeptId().isEmpty()) {
 					if (!getDeptId().equals(depcode)) {
-						//receiptList.add(receiptHeader);
+						// receiptList.add(receiptHeader);
 						continue;
 					}
-							}
-				if(receiptMap.get(receiptHeader.getReceiptdatenew()) == null ){
-					receiptList=new ArrayList<>();
-							receiptList.add(receiptHeader);
-					receiptMap.put(receiptHeader.getReceiptdatenew(),receiptList);
-						}
-				else{
-					receiptMap.get(receiptHeader.getReceiptdatenew()).add(receiptHeader);//map.get().add();
-						}
-							}
-						}
-		if (remittlist.size() != 0) {
-			for (final Object[] ob : remittlist) {
-					String depcode = "";
-					ReceiptHeader receiptHeader = new ReceiptHeader();
-				try {
-					receiptHeader.setReferencenumber(ob[0]!=null ? ob[0].toString(): "");
-					receiptHeader.setDepositDate(ob[1]!=null ? ob[1].toString(): "");
-					receiptHeader.setBankAccountNumber(ob[2]!=null ? ob[2].toString(): "");
-					receiptHeader.setDepositAmount(ob[3]!=null ? ob[3].toString(): "");
-					receiptHeader.setReceiptnumber(ob[4]!=null ? ob[4].toString(): "");
-					receiptHeader.setDepartment(ob[5]!=null ? dplist.get(ob[5].toString()): "");
-					if (getDeptId() != null && !getDeptId().isEmpty()) {
-						if (!getDeptId().equals(receiptHeader.getDepartment())) {
-							continue;//receiptList.add(receiptHeader);
-						}
-						}
-					if(remittMap.get(receiptHeader.getDepositDate()) == null ){
-						receiptList=new ArrayList<>();
-						receiptList.add(receiptHeader);
-						remittMap.put(receiptHeader.getDepositDate(),receiptList);//map.put
-						}
-					else{
-						remittMap.get(receiptHeader.getDepositDate()).add(receiptHeader);//map.get().add();
-						}
-				} catch (Exception e) {
-					e.printStackTrace();
-					}
-
-					}
-					}
+				}
+				if (receiptMap.get(receiptHeader.getReceiptdatenew()) == null) {
+					receiptList = new ArrayList<>();
+					receiptList.add(receiptHeader);
+					receiptMap.put(receiptHeader.getReceiptdatenew(), receiptList);
+				} else {
+					receiptMap.get(receiptHeader.getReceiptdatenew()).add(receiptHeader);// map.get().add();
+				}
+			}
+		}
+		/*
+		 * if (remittlist.size() != 0) { for (final Object[] ob : remittlist) { String
+		 * depcode = ""; ReceiptHeader receiptHeader = new ReceiptHeader(); try {
+		 * receiptHeader.setReferencenumber(ob[0] != null ? ob[0].toString() : "");
+		 * receiptHeader.setDepositDate(ob[1] != null ? ob[1].toString() : "");
+		 * receiptHeader.setBankAccountNumber(ob[2] != null ? ob[2].toString() : "");
+		 * receiptHeader.setDepositAmount(ob[3] != null ? ob[3].toString() : "");
+		 * receiptHeader.setReceiptnumber(ob[4] != null ? ob[4].toString() : "");
+		 * //receiptHeader.setDepartment(ob[5] != null ? dplist.get(ob[5].toString()) :
+		 * ""); if (getDeptId() != null && !getDeptId().isEmpty()) { if
+		 * (!getDeptId().equals(receiptHeader.getDepartment())) { continue;//
+		 * receiptList.add(receiptHeader); } } if
+		 * (remittMap.get(receiptHeader.getDepositDate()) == null) { receiptList = new
+		 * ArrayList<>(); receiptList.add(receiptHeader);
+		 * remittMap.put(receiptHeader.getDepositDate(), receiptList);// map.put } else
+		 * { remittMap.get(receiptHeader.getDepositDate()).add(receiptHeader);//
+		 * map.get().add(); } } catch (Exception e) { e.printStackTrace(); }
+		 * 
+		 * } }
+		 */
 		List<ReceiptHeader> finalList = new ArrayList<>();
 		List<Date> dates = new ArrayList<Date>();
 		DateFormat formatter;
 		formatter = new SimpleDateFormat("dd/MM/yyyy");
 		Date startDate = null;
 		Date endDate = null;
-					try {
+		try {
 			startDate = getFromDate();// (Date)formatter.parse(str_date);
 			endDate = getToDate();// (Date)formatter.parse(end_date);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 		long interval = 24 * 1000 * 60 * 60; // 1 hour in millis
 		long endTime = endDate.getTime(); // create your endtime here, possibly using Calendar or Date
 		long curTime = startDate.getTime();
@@ -1204,16 +1416,21 @@ public class SearchReceiptAction extends SearchFormAction {
 			dates.add(new Date(curTime));
 			curTime += interval;
 		}
-		for (Date d:dates) {
+		for (Date d : dates) {
 			Date lDate = (Date) d;
 			String ds = formatter.format(lDate);
 			System.out.println(" Date is ..." + ds);
-			if(receiptMap.get(ds)!=null)
+			if (receiptMap.get(ds) != null)
 				finalList.addAll(receiptMap.get(ds));
-			if(remittMap.get(ds)!=null)
-			finalList.addAll(remittMap.get(ds));
-					}
+			if (remittMap.get(ds) != null)
+				finalList.addAll(remittMap.get(ds));
+		}
 		System.out.println("finalList.size  :::::" + finalList.size());
+
+		//finalList.removeIf(header -> header.getReferencenumber() == null);
+
+		System.out.println("finalList.size latest:::::" + finalList.size());
+
 		/// Bhushan :added filter to list
 		List<ReceiptHeader> receiptListfilterList = finalList;
 		List<ReceiptHeader> receiptListnew = new ArrayList<>();
@@ -1260,6 +1477,82 @@ public class SearchReceiptAction extends SearchFormAction {
 		return DAYBOOKREPORTNEW;
 	}
 
+	private Map<String, Amount> populateBifurcationAmountNewByRecepitDate(String dept) {
+		final StringBuffer query = new StringBuffer(500);
+		List<Object[]> rows = null;
+		BigDecimal pAmount = null;
+		BigDecimal gstAmount = null;
+		BigDecimal totalAmount = null;
+		Map<String, Amount> amtReceiptMap = new HashMap<>();
+		try {
+			query.append(
+					"select gl.id,gl.glcode,gl.debitamount,gl.creditamount,v2.departmentcode,v2.reciept_number \r\n"
+							+ "from generalledger gl \r\n"
+							+ "left join vouchermis v2 on gl.voucherheaderid =v2.voucherheaderid \r\n"
+							+ "left join mis_receipts_details mrd on mrd.receipt_number =v2.reciept_number \r\n"
+							+ "where v2.reciept_number notnull and ");
+			query.append(getDateQuery(getFromDate(), getToDate()));
+			if (dept != null && !dept.isEmpty()) {
+				query.append(" and v2.departmentcode ='" + dept + "'");
+			}
+			System.out.println("Query>>>> " + query);
+			Query q = entityManager.createNativeQuery(query.toString());
+			rows = q.getResultList();
+			System.out.println(":::::::General Ledger List size::: " + rows.size());
+			Amount amt = null;
+			for (Object[] element : rows) {
+				if (amtReceiptMap.get(element[5].toString()) == null) {
+					pAmount = new BigDecimal(0);
+					gstAmount = new BigDecimal(0);
+					totalAmount = new BigDecimal(0);
+					if (!element[3].toString().equalsIgnoreCase("0.00")) {
+						if (element[1].toString().equalsIgnoreCase("3502020")
+								|| element[1].toString().equalsIgnoreCase("3502019")
+								|| element[1].toString().equalsIgnoreCase("3502072")) {
+							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
+						} else {
+							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
+						}
+					} else {
+						totalAmount = totalAmount.add(new BigDecimal(element[2].toString()));
+					}
+					amt = new Amount();
+					amt.setPaAmount(pAmount);
+					amt.setGstAmount(gstAmount);
+					amt.setTotalAmount(totalAmount);
+					amt.setDepartment(element[4].toString());
+					amtReceiptMap.put(element[5].toString(), amt);
+				} else {
+					pAmount = amtReceiptMap.get(element[5].toString()).getPaAmount();
+					gstAmount = amtReceiptMap.get(element[5].toString()).getGstAmount();
+					totalAmount = amtReceiptMap.get(element[5].toString()).getGstAmount();
+					if (!element[3].toString().equalsIgnoreCase("0.00")) {
+						if (element[1].toString().equalsIgnoreCase("3502020")
+								|| element[1].toString().equalsIgnoreCase("3502019")
+								|| element[1].toString().equalsIgnoreCase("3502072")) {
+							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
+						} else {
+							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
+						}
+					} else {
+						totalAmount = totalAmount.add(new BigDecimal(element[2].toString()));
+					}
+					amt = new Amount();
+					amt.setPaAmount(pAmount);
+					amt.setGstAmount(gstAmount);
+					amt.setTotalAmount(totalAmount);
+					amt.setDepartment(element[4].toString());
+					amtReceiptMap.put(element[5].toString(), amt);
+				}
+
+			}
+			return amtReceiptMap;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return amtReceiptMap;
+	}
+
 	private Map<String, Amount> populateBifurcationAmountNew(String dept) {
 		final StringBuffer query = new StringBuffer(500);
 		List<Object[]> rows = null;
@@ -1285,7 +1578,8 @@ public class SearchReceiptAction extends SearchFormAction {
 					totalAmount = new BigDecimal(0);
 					if (!element[3].toString().equalsIgnoreCase("0.00")) {
 						if (element[1].toString().equalsIgnoreCase("3502020")
-								|| element[1].toString().equalsIgnoreCase("3502019") || element[1].toString().equalsIgnoreCase("3502072")) {
+								|| element[1].toString().equalsIgnoreCase("3502019")
+								|| element[1].toString().equalsIgnoreCase("3502072")) {
 							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
 						} else {
 							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
@@ -1305,7 +1599,8 @@ public class SearchReceiptAction extends SearchFormAction {
 					totalAmount = amtReceiptMap.get(element[5].toString()).getGstAmount();
 					if (!element[3].toString().equalsIgnoreCase("0.00")) {
 						if (element[1].toString().equalsIgnoreCase("3502020")
-								|| element[1].toString().equalsIgnoreCase("3502019") || element[1].toString().equalsIgnoreCase("3502072")) {
+								|| element[1].toString().equalsIgnoreCase("3502019")
+								|| element[1].toString().equalsIgnoreCase("3502072")) {
 							gstAmount = gstAmount.add(new BigDecimal(element[3].toString()));
 						} else {
 							pAmount = pAmount.add(new BigDecimal(element[3].toString()));
@@ -1841,7 +2136,327 @@ public class SearchReceiptAction extends SearchFormAction {
 
 		return fileContent;
 	}
+	
+	private byte[] populateExcelDayBookReportNew(List<ReceiptReportBean> receiptReportList, Map<String, Object> paramMap)
+			throws IOException {
+		HSSFWorkbook wb = new HSSFWorkbook();
+		HSSFSheet sheet = wb.createSheet("Receipt Report");
+		HSSFRow row = sheet.createRow(1);
+		HSSFCell cell;
+		cell = row.createCell(0);
+		cell.setCellValue((String) paramMap.get("HeaderParameter"));
+		HSSFRow rowhead = sheet.createRow(5);
+		rowhead.createCell(0).setCellValue("Sl No.");
+		rowhead.createCell(1).setCellValue("Date");
+		rowhead.createCell(2).setCellValue("Receipt No.");
+		rowhead.createCell(3).setCellValue("GST No.");
+		rowhead.createCell(4).setCellValue("Collected By");
+		rowhead.createCell(5).setCellValue("Payee Name");
+		rowhead.createCell(6).setCellValue("Payee Address");
+		rowhead.createCell(7).setCellValue("Service Category");
+		rowhead.createCell(8).setCellValue("Service Type");
+		rowhead.createCell(9).setCellValue("Cheque/DD No");
+		rowhead.createCell(10).setCellValue("Cheque/DD Date");
+		rowhead.createCell(11).setCellValue("Bank");
+		rowhead.createCell(12).setCellValue("Mode of Payment");
+		rowhead.createCell(13).setCellValue("Particulars");
+		rowhead.createCell(14).setCellValue("Prinicpal Amount");
+		rowhead.createCell(15).setCellValue("GST");
+		rowhead.createCell(16).setCellValue("Total Receipt Amount");
+		rowhead.createCell(17).setCellValue("RemittanceReceiptNos");
+		rowhead.createCell(18).setCellValue("Date of Deposit");
+		rowhead.createCell(19).setCellValue("Remittance No.");
+		rowhead.createCell(20).setCellValue("Bank Account No.");
+		rowhead.createCell(21).setCellValue("Deposit Amount");
+		rowhead.createCell(22).setCellValue("Status");
+		rowhead.createCell(23).setCellValue("Department");
+		int index = 1;
+		int rowCount = 6;
+		HSSFRow details;
+		BigDecimal principalAmt = new BigDecimal("0");
+		BigDecimal gstAmt = new BigDecimal("0");
+		BigDecimal receiptAmt = new BigDecimal("0");
+		BigDecimal depositAmt = new BigDecimal("0");
+		for (ReceiptReportBean bean : receiptReportList) {
+			details = sheet.createRow(rowCount++);
+			details.createCell(0).setCellValue(index++);
+			details.createCell(1).setCellValue(bean.getParamDate());
+			details.createCell(2).setCellValue(bean.getReceiptNo());
+			details.createCell(3).setCellValue(bean.getGstNo());
+			details.createCell(4).setCellValue(bean.getCollectedBy());
+			details.createCell(5).setCellValue(bean.getPayeeName());
+			details.createCell(6).setCellValue(bean.getPayeeAddress());
+			details.createCell(7).setCellValue(bean.getServiceType());
+			details.createCell(8).setCellValue(bean.getServiceCategory());
+			details.createCell(9).setCellValue(bean.getChequeddno());
+			details.createCell(10).setCellValue(bean.getChequedddate());
+			details.createCell(11).setCellValue(bean.getBank());
+			details.createCell(12).setCellValue(bean.getModeOfPayment());
+			details.createCell(13).setCellValue(bean.getParticulars());
+			if (bean.getPrincipalAmt() != null) {
+				details.createCell(14).setCellValue(bean.getPrincipalAmt().doubleValue());
+				principalAmt = principalAmt.add(bean.getPrincipalAmt());
+			} else {
+				details.createCell(14).setCellValue("");
+			}
+			if (bean.getGstAmount() != null) {
+				details.createCell(15).setCellValue(bean.getGstAmount().doubleValue());
+				gstAmt = gstAmt.add(bean.getGstAmount());
+			} else {
+				details.createCell(15).setCellValue("");
+			}
+			if (bean.getTotalReceiptAmount() != null) {
+				details.createCell(16).setCellValue(bean.getTotalReceiptAmount().doubleValue());
+				receiptAmt = receiptAmt.add(bean.getTotalReceiptAmount());
+			} else {
+				details.createCell(16).setCellValue("");
+			}
+			details.createCell(17).setCellValue(bean.getRemittanceReceiptNo());
+			details.createCell(18).setCellValue(bean.getDateOfDeposite());
+			details.createCell(19).setCellValue(bean.getRemitanceNo());
+			details.createCell(20).setCellValue(bean.getBankAccountNo());
+			if (bean.getDepositAmount() != null) {
+				details.createCell(21).setCellValue(bean.getDepositAmount().doubleValue());
+				depositAmt = depositAmt.add(bean.getDepositAmount());
+			} else {
+				details.createCell(21).setCellValue("");
+			}
+			details.createCell(22).setCellValue(bean.getStatus());
+			details.createCell(23).setCellValue(bean.getDepartment());
+		}
+		details = sheet.createRow(rowCount);
+		details.createCell(9).setCellValue("Total");
+		if (principalAmt != null) {
+			details.createCell(10).setCellValue(principalAmt.doubleValue());
+		} else {
+			details.createCell(10).setCellValue("");
+		}
 
+		if (gstAmt != null) {
+			details.createCell(11).setCellValue(gstAmt.doubleValue());
+		} else {
+			details.createCell(11).setCellValue("");
+		}
+		if (receiptAmt != null) {
+			details.createCell(12).setCellValue(receiptAmt.doubleValue());
+		} else {
+			details.createCell(12).setCellValue("");
+		}
+		details.createCell(15).setCellValue("Total");
+		if (depositAmt != null) {
+			details.createCell(16).setCellValue(depositAmt.doubleValue());
+		} else {
+			details.createCell(16).setCellValue("");
+		}
+
+		ByteArrayOutputStream os = new ByteArrayOutputStream();
+		System.out.println("XYZ");
+		wb.write(os);
+		System.out.println("UVW");
+		byte[] fileContent = os.toByteArray();
+		System.out.println("CCCC");
+
+		return fileContent;
+	}
+
+	/*
+	 * @Action(value = "/receipts/searchReceipt-downloadDayBookReportNew") public
+	 * String downloadDayBookReportNew() { target = "searchresult";
+	 * collectionVersion = ApplicationThreadLocals.getCollectionVersion();
+	 * System.out.println("from date ::" + getFromDate());
+	 * System.out.println("to date :::" + getToDate());
+	 * System.out.println("getServiceTypeId() :::" + getServiceTypeId());
+	 * System.out.println("serviceTypeDuringDownload :::" +
+	 * serviceTypeDuringDownload); System.out.println("DepartmentDownload :::" +
+	 * getDeptId()); // getServiceCategoryList2(); String dep = getDeptId(); if
+	 * (dep.equalsIgnoreCase(", ")) dep = null; String[] dept = dep != null ?
+	 * dep.split(",") : null;
+	 * 
+	 * String servicecategory1 = null; String servicecategory = null; String sertype
+	 * = null; String sertype1 = null; String servicesearch = null;
+	 * 
+	 * servicesearch = serviceTypeDuringDownload; Map<String, Amount> gllist =
+	 * populateBifurcationAmountNew(dept != null ? dept[0] : ""); Map<String,
+	 * String> dplist = getAlldepartment(); if
+	 * (serviceTypeDuringDownload.equalsIgnoreCase("") ||
+	 * serviceTypeDuringDownload.contains("0") ||
+	 * serviceTypeDuringDownload.contains("-1")) { serviceTypeDuringDownload = null;
+	 * }
+	 * 
+	 * List<ReceiptHeader> receiptList = new ArrayList<>(); final StringBuffer query
+	 * = new StringBuffer(500); List<Object[]> list = null;
+	 * 
+	 * query.append(
+	 * "select mrd.total_amt_paid,mrd.receipt_number,to_char(mrd.receipt_date,'dd/mm/yyyy') as recDate,mrd.paid_by,mrd.payer_address,mrd.narration,mrd.payment_status,mrd.bank_name,mrd.bank_branch,mrd.subdivison,mrd.servicename,mrd.collectedbyname,mrd.gstno,mrd.payment_mode,mrd.chequeddno,to_char(mrd.chequedddate,'dd/mm/yyyy') from mis_receipts_details mrd where "
+	 * ); query.append(getDateQuery(getFromDate(), getToDate()));
+	 * query.append(getMisQuery(servicesearch, null, null, getCollectedBy(),
+	 * getSearchAmount(), getModeOfPayment(), getSubdivison(), getReceiptType()));
+	 * 
+	 * System.out.println("receipt query>>> " + query); try { Query q =
+	 * entityManager.createNativeQuery(query.toString()); list = q.getResultList();
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * System.out.println("::::Size of receipt list::: " + list.size()); final
+	 * StringBuffer query1 = new StringBuffer(500); List<Object[]> remittlist =
+	 * null; HashMap<String, List<ReceiptHeader>> receiptMap = new HashMap<>();
+	 * HashMap<String, List<ReceiptHeader>> remittMap = new HashMap<>();
+	 * query1.append(
+	 * "select mrd.voucher_number,to_char(mrd.voucher_date,'dd/mm/yyyy'),mrd.bankaccount,mrd.amount,mrd.receiptnumbers,mrd.department from mis_remittance_details mrd where "
+	 * ); query1.append(getDateQuery1(getFromDate(), getToDate())); if
+	 * (getSubdivison() != null && !getSubdivison().isEmpty() &&
+	 * !getSubdivison().equals("-1")) {
+	 * query1.append(" and mrd.subdivison='").append(getSubdivison()).append("'"); }
+	 * System.out.println("remittance query>>> " + query1); try { Query q1 =
+	 * entityManager.createNativeQuery(query1.toString()); remittlist =
+	 * q1.getResultList();
+	 * 
+	 * } catch (Exception e) { e.printStackTrace(); }
+	 * System.out.println("::::Size of remitt list::: " + remittlist.size()); if
+	 * (list.size() != 0) { for (final Object[] ob : list) { // receipytHeader
+	 * -->receipt String depcode = ""; String service = null; String serviceType =
+	 * null; ReceiptHeader receiptHeader = new ReceiptHeader();
+	 * receiptHeader.setReceiptnumber(ob[1].toString());
+	 * receiptHeader.setReceiptdatenew(ob[2] != null ? ob[2].toString() : ""); if
+	 * (ob[10] != null) { String s3 = null; String s4 = null; String s1 = null;
+	 * String s2 = null; String[] split =
+	 * ob[10].toString().split(Pattern.quote(".")); s1 = split[0]; if (split.length
+	 * == 2) { s2 = split[1]; } if (serviceCategoryNames.containsKey(s1)) { s3 =
+	 * serviceCategoryNames.get(s1); } if (serviceCategoryNames.containsKey(s2)) {
+	 * s4 = serviceCategoryNames.get(s2); }
+	 * 
+	 * if (s4 != null) { if (s3 != null) { service = s3 + "." + s4; } else { service
+	 * = s4; } } else { service = s3; }
+	 * 
+	 * service = s3; serviceType = s2; } receiptHeader.setServiceType(serviceType !=
+	 * null ? serviceType : ""); receiptHeader.setService((service != null ? service
+	 * : "")); receiptHeader.setChequeddno(ob[14] != null ? ob[14].toString() : "");
+	 * receiptHeader.setChequedddate(ob[15] != null ? ob[15].toString() : "");
+	 * receiptHeader.setBank(ob[7] != null ? ob[7].toString() : "");
+	 * receiptHeader.setService(service != null ? service : "");
+	 * receiptHeader.setReferencenumber(""); if (ob[5] != null) {
+	 * receiptHeader.setReferenceDesc(ob[5].toString()); }
+	 * receiptHeader.setPayeeName(""); if (ob[4] != null) {
+	 * receiptHeader.setPayeeAddress(ob[4].toString()); } if (ob[3] != null) {
+	 * receiptHeader.setPaidBy(ob[3].toString()); }
+	 * receiptHeader.setCurretnStatus(ob[6].toString()); if (ob[9] != null) {
+	 * receiptHeader.setSubdivison(ob[9].toString()); } if (ob[12] != null) {
+	 * receiptHeader.setGstno(ob[12].toString()); }
+	 * receiptHeader.setCurrentreceipttype("test");
+	 * receiptHeader.setModOfPayment(ob[13].toString()); if (ob[11] != null) {
+	 * receiptHeader.setCreatedUser(ob[11].toString()); } if (gllist != null &&
+	 * !gllist.isEmpty()) { if (gllist.containsKey(ob[1].toString())) {
+	 * receiptHeader.setPrincipalAmount(gllist.get(ob[1].toString()).getPaAmount());
+	 * receiptHeader.setGstAmount(gllist.get(ob[1].toString()).getGstAmount()); if
+	 * (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount()
+	 * != null) { receiptHeader.setTotalAmount(
+	 * (receiptHeader.getPrincipalAmount()).add(receiptHeader.getGstAmount())); }
+	 * else if (receiptHeader.getGstAmount() == null &&
+	 * receiptHeader.getPrincipalAmount() != null) {
+	 * receiptHeader.setTotalAmount(receiptHeader.getPrincipalAmount()); } else if
+	 * (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount()
+	 * == null) { receiptHeader.setTotalAmount(receiptHeader.getGstAmount()); }
+	 * receiptHeader.setDepartment(dplist.get(gllist.get(ob[1].toString()).
+	 * getDepartment())); depcode = gllist.get(ob[1].toString()).getDepartment(); }
+	 * } if (dept != null) if (dept[0] != null && !dept[0].isEmpty()) { if
+	 * (!dept[0].equals(depcode)) { // receiptList.add(receiptHeader); continue; } }
+	 * if (receiptMap.get(receiptHeader.getReceiptdatenew()) == null) { receiptList
+	 * = new ArrayList<>(); receiptList.add(receiptHeader);
+	 * receiptMap.put(receiptHeader.getReceiptdatenew(), receiptList); } else {
+	 * receiptMap.get(receiptHeader.getReceiptdatenew()).add(receiptHeader);//
+	 * map.get().add(); } } } if (remittlist.size() != 0) { for (final Object[] ob :
+	 * remittlist) { String depcode = ""; ReceiptHeader receiptHeader = new
+	 * ReceiptHeader(); try { receiptHeader.setReferencenumber(ob[0] != null ?
+	 * ob[0].toString() : ""); receiptHeader.setDepositDate(ob[1] != null ?
+	 * ob[1].toString() : ""); receiptHeader.setBankAccountNumber(ob[2] != null ?
+	 * ob[2].toString() : ""); receiptHeader.setDepositAmount(ob[3] != null ?
+	 * ob[3].toString() : ""); receiptHeader.setReceiptnumber(ob[4] != null ?
+	 * ob[4].toString() : ""); receiptHeader.setDepartment(ob[5] != null ?
+	 * dplist.get(ob[5].toString()) : ""); if (dep != null && !dep.isEmpty()) { if
+	 * (!dep.equals(receiptHeader.getDepartment())) { continue;//
+	 * receiptList.add(receiptHeader); } } if
+	 * (remittMap.get(receiptHeader.getDepositDate()) == null) { receiptList = new
+	 * ArrayList<>(); receiptList.add(receiptHeader);
+	 * remittMap.put(receiptHeader.getDepositDate(), receiptList);// map.put } else
+	 * { remittMap.get(receiptHeader.getDepositDate()).add(receiptHeader);//
+	 * map.get().add(); } } catch (Exception e) { e.printStackTrace(); }
+	 * 
+	 * } } List<ReceiptHeader> finalList = new ArrayList<>(); List<Date> dates = new
+	 * ArrayList<Date>(); DateFormat formatter; formatter = new
+	 * SimpleDateFormat("dd/MM/yyyy"); Date startDate = null; Date endDate = null;
+	 * try { startDate = getFromDate();// (Date)formatter.parse(str_date); endDate =
+	 * getToDate();// (Date)formatter.parse(end_date); } catch (Exception e) {
+	 * e.printStackTrace(); } long interval = 24 * 1000 * 60 * 60; // 1 hour in
+	 * millis long endTime = endDate.getTime(); // create your endtime here,
+	 * possibly using Calendar or Date long curTime = startDate.getTime(); while
+	 * (curTime <= endTime) { dates.add(new Date(curTime)); curTime += interval; }
+	 * for (Date d : dates) { Date lDate = (Date) d; String ds =
+	 * formatter.format(lDate); System.out.println(" Date is ..." + ds); if
+	 * (receiptMap.get(ds) != null) finalList.addAll(receiptMap.get(ds)); if
+	 * (remittMap.get(ds) != null) finalList.addAll(remittMap.get(ds)); }
+	 * 
+	 * System.out.println("finalList.size() ::::" + finalList.size()); /// Bhushan
+	 * List<ReceiptHeader> receiptListfilterList = finalList;
+	 * System.out.println("receiptListfilterList.size() ::::" +
+	 * receiptListfilterList.size()); List<ReceiptHeader> receiptListnew = new
+	 * ArrayList<>(); // receiptList.clear();
+	 * 
+	 * List<ReceiptReportBean> receiptReportList = new
+	 * ArrayList<ReceiptReportBean>(); ReceiptReportBean bean = null; int i = 1; try
+	 * { if (finalList != null && !finalList.isEmpty()) {
+	 * System.out.println("receipt non empty"); for (ReceiptHeader header :
+	 * finalList) { bean = new ReceiptReportBean();
+	 * bean.setSlNo(String.valueOf(i++)); //
+	 * bean.setParamDate(getDateString(header.getReceiptdate()));
+	 * bean.setParamDate(header.getReceiptdatenew() != null ?
+	 * header.getReceiptdatenew() : ""); bean.setReceiptNo(header.getReceiptnumber()
+	 * != null ? header.getReceiptnumber() : "");
+	 * bean.setCollectedBy(header.getCreatedUser() != null ? header.getCreatedUser()
+	 * : ""); bean.setPayeeName(header.getPaidBy() != null ?
+	 * header.getPaidBy().split("&")[0] : "");
+	 * bean.setPayeeAddress(header.getPayeeAddress() != null ?
+	 * header.getPayeeAddress() : ""); bean.setServiceType(header.getService() !=
+	 * null ? header.getService() : "");
+	 * bean.setServiceCategory(header.getServiceType() != null ?
+	 * header.getServiceType() : ""); bean.setChequeddno(header.getChequeddno() !=
+	 * null ? header.getChequeddno() : "");
+	 * bean.setChequedddate(header.getChequedddate() != null ?
+	 * header.getChequedddate() : ""); bean.setBank(header.getBank() != null ?
+	 * header.getBank() : ""); bean.setModeOfPayment(header.getModOfPayment() !=
+	 * null ? header.getModOfPayment() : "");
+	 * bean.setParticulars(header.getReferenceDesc() != null ?
+	 * header.getReferenceDesc() : "");
+	 * bean.setTotalReceiptAmount(header.getTotalAmount());
+	 * bean.setGstNo(header.getGstno() != null ? header.getGstno() : "");
+	 * bean.setStatus(header.getCurretnStatus() != null ? header.getCurretnStatus()
+	 * : ""); bean.setDepartment(header.getDepartment() != null ?
+	 * header.getDepartment() : ""); if (header.getPrincipalAmount() != null) {
+	 * bean.setPrincipalAmt(header.getPrincipalAmount()); } else {
+	 * bean.setPrincipalAmt(new BigDecimal("0")); } if (header.getGstAmount() !=
+	 * null) { bean.setGstAmount(header.getGstAmount()); } else {
+	 * bean.setPrincipalAmt(new BigDecimal("0")); } if (header.getDepositDate() !=
+	 * null) { bean.setDateOfDeposite(header.getDepositDate()); } else {
+	 * bean.setDateOfDeposite(""); } if (header.getReferencenumber() != null) {
+	 * bean.setRemitanceNo(header.getReferencenumber()); } else {
+	 * bean.setRemitanceNo(""); } if (header.getBankAccountNumber() != null) {
+	 * bean.setBankAccountNo(header.getBankAccountNumber()); } else {
+	 * bean.setBankAccountNo(""); }
+	 * 
+	 * if (header.getDepositAmount() != null) { bean.setDepositAmount(new
+	 * BigDecimal(header.getDepositAmount())); } else { bean.setDepositAmount(new
+	 * BigDecimal("0")); } receiptReportList.add(bean); }
+	 * 
+	 * } } catch (Exception e) { e.printStackTrace(); }
+	 * System.out.println("report size ::" + receiptReportList.size()); Map<String,
+	 * Object> paramMap = new HashMap<String, Object>(); String jasperName =
+	 * "CollectionReport"; paramMap.put("CollectionReportDataSource",
+	 * getDataSource(receiptReportList)); paramMap.put("HeaderParameter",
+	 * "Detail of Collection Report between " + getDateString(getFromDate()) +
+	 * " and " + getDateString(getToDate())); System.out.println("Start of report");
+	 * try { byte[] fileContent = populateExcel(receiptReportList, paramMap);
+	 * inputStream = new ByteArrayInputStream(fileContent); } catch (Exception e) {
+	 * e.printStackTrace(); } System.out.println("END"); return "XLS"; }
+	 */
+	
 	@Action(value = "/receipts/searchReceipt-downloadDayBookReportNew")
 	public String downloadDayBookReportNew() {
 		target = "searchresult";
@@ -1852,10 +2467,10 @@ public class SearchReceiptAction extends SearchFormAction {
 		System.out.println("serviceTypeDuringDownload :::" + serviceTypeDuringDownload);
 		System.out.println("DepartmentDownload :::" + getDeptId());
 		// getServiceCategoryList2();
-		String dep=getDeptId();
-		if(dep.equalsIgnoreCase(", "))
-			dep=null;
-		String[] dept = dep!=null?dep.split(","):null;
+		String dep = getDeptId();
+		if (dep.equalsIgnoreCase(", "))
+			dep = null;
+		String[] dept = dep != null ? dep.split(",") : null;
 
 		String servicecategory1 = null;
 		String servicecategory = null;
@@ -1864,8 +2479,14 @@ public class SearchReceiptAction extends SearchFormAction {
 		String servicesearch = null;
 
 		servicesearch = serviceTypeDuringDownload;
-		Map<String, Amount> gllist = populateBifurcationAmountNew(dept!=null?dept[0]:"");
+		Map<String, Amount> gllist = populateBifurcationAmountNewByRecepitDate(dept != null ? dept[0] : "");
+		//Map<String, Amount> gllist = populateBifurcationAmountNew(dept != null ? dept[0] : "");
 		Map<String, String> dplist = getAlldepartment();
+		
+        System.out.println("downloadDayBookReportNew gllist data ****************>>> " + gllist.size());
+		
+		System.out.println("downloadDayBookReportNew dplist data ****************>>> " + dplist.size());
+		
 		if (serviceTypeDuringDownload.equalsIgnoreCase("") || serviceTypeDuringDownload.contains("0")
 				|| serviceTypeDuringDownload.contains("-1")) {
 			serviceTypeDuringDownload = null;
@@ -1892,6 +2513,7 @@ public class SearchReceiptAction extends SearchFormAction {
 		System.out.println("::::Size of receipt list::: " + list.size());
 		final StringBuffer query1 = new StringBuffer(500);
 		List<Object[]> remittlist = null;
+		List<ReceiptReportBean> itemList = new ArrayList<>();
 		HashMap<String, List<ReceiptHeader>> receiptMap = new HashMap<>();
 		HashMap<String, List<ReceiptHeader>> remittMap = new HashMap<>();
 		query1.append(
@@ -1899,11 +2521,34 @@ public class SearchReceiptAction extends SearchFormAction {
 		query1.append(getDateQuery1(getFromDate(), getToDate()));
 		if (getSubdivison() != null && !getSubdivison().isEmpty() && !getSubdivison().equals("-1")) {
 			query1.append(" and mrd.subdivison='").append(getSubdivison()).append("'");
-			}
+		}
 		System.out.println("remittance query>>> " + query1);
 		try {
 			Query q1 = entityManager.createNativeQuery(query1.toString());
 			remittlist = q1.getResultList();
+			
+			if (remittlist.size() != 0) { 
+				  for (final Object[] ob1 : remittlist) { 
+				  String receiptnumbers=ob1[4].toString(); 
+				  String voucherNo=ob1[0].toString(); 
+				  String voucherDate=ob1[1].toString(); 
+				  String bankaccountno=ob1[2].toString();
+				  String depositedamount=ob1[3].toString();
+				  BigDecimal depositedAmount = new BigDecimal(depositedamount);
+			     System.out.println("::::receiptnumbers " + receiptnumbers);
+			  
+			     ReceiptReportBean reportBean = new ReceiptReportBean();
+			  
+			     reportBean.setReceiptNo(receiptnumbers);
+			     reportBean.setRemitanceNo(voucherNo);
+			     reportBean.setDateOfDeposite(voucherDate);
+			     reportBean.setBankAccountNo(bankaccountno);
+			     reportBean.setDepositAmount(depositedAmount);
+			  
+			     itemList.add(reportBean);
+			  
+			  } 
+		   }
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -1911,11 +2556,32 @@ public class SearchReceiptAction extends SearchFormAction {
 		System.out.println("::::Size of remitt list::: " + remittlist.size());
 		if (list.size() != 0) {
 			for (final Object[] ob : list) {
-				//receipytHeader -->receipt
+				// receipytHeader -->receipt
+				
+				ReceiptHeader receiptHeader = new ReceiptHeader();
+				String receiptNumberToCheck = ob[1].toString();
+				
+				if (itemList.size() != 0) { 
+				for (ReceiptReportBean receipt :  itemList) {
+					
+					String receiptNo = receipt.getReceiptNo();
+					String[] split = receiptNo.split(",");
+					for (String item : split) {
+					if(item.trim().equals(receiptNumberToCheck)){
+						receiptHeader.setReferencenumber(receipt.getRemitanceNo());	
+						receiptHeader.setDepositDate(receipt.getDateOfDeposite());
+						receiptHeader.setBankAccountNumber(receipt.getBankAccountNo());
+						receiptHeader.setDepositAmount(receipt.getDepositAmount().toString());
+						receiptHeader.setRemittanceReceiptNo(receiptNo);
+					}
+					}	
+					
+				}
+				}
+				
 				String depcode = "";
 				String service = null;
-				String serviceType=null;
-				ReceiptHeader receiptHeader = new ReceiptHeader();
+				String serviceType = null;
 				receiptHeader.setReceiptnumber(ob[1].toString());
 				receiptHeader.setReceiptdatenew(ob[2] != null ? ob[2].toString() : "");
 				if (ob[10] != null) {
@@ -1938,16 +2604,16 @@ public class SearchReceiptAction extends SearchFormAction {
 					 * if (s4 != null) { if (s3 != null) { service = s3 + "." + s4; } else { service
 					 * = s4; } } else { service = s3; }
 					 */
-						service = s3;
-					serviceType=s2;
-					}
-				receiptHeader.setServiceType(serviceType!= null ? serviceType : "");
+					service = s3;
+					serviceType = s2;
+				}
+				receiptHeader.setServiceType(serviceType != null ? serviceType : "");
 				receiptHeader.setService((service != null ? service : ""));
-				receiptHeader.setChequeddno(ob[14]!=null?ob[14].toString():"");
-				receiptHeader.setChequedddate(ob[15]!=null?ob[15].toString():"");
-				receiptHeader.setBank(ob[7]!=null?ob[7].toString():"");
+				receiptHeader.setChequeddno(ob[14] != null ? ob[14].toString() : "");
+				receiptHeader.setChequedddate(ob[15] != null ? ob[15].toString() : "");
+				receiptHeader.setBank(ob[7] != null ? ob[7].toString() : "");
 				receiptHeader.setService(service != null ? service : "");
-				receiptHeader.setReferencenumber("");
+				//receiptHeader.setReferencenumber("");
 				if (ob[5] != null) {
 					receiptHeader.setReferenceDesc(ob[5].toString());
 				}
@@ -1977,64 +2643,51 @@ public class SearchReceiptAction extends SearchFormAction {
 						if (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount() != null) {
 							receiptHeader.setTotalAmount(
 									(receiptHeader.getPrincipalAmount()).add(receiptHeader.getGstAmount()));
-						} else if (receiptHeader.getGstAmount() == null
-								&& receiptHeader.getPrincipalAmount() != null) {
+						} else if (receiptHeader.getGstAmount() == null && receiptHeader.getPrincipalAmount() != null) {
 							receiptHeader.setTotalAmount(receiptHeader.getPrincipalAmount());
-						} else if (receiptHeader.getGstAmount() != null
-								&& receiptHeader.getPrincipalAmount() == null) {
+						} else if (receiptHeader.getGstAmount() != null && receiptHeader.getPrincipalAmount() == null) {
 							receiptHeader.setTotalAmount(receiptHeader.getGstAmount());
 						}
 						receiptHeader.setDepartment(dplist.get(gllist.get(ob[1].toString()).getDepartment()));
 						depcode = gllist.get(ob[1].toString()).getDepartment();
 					}
 				}
-				if(dept!=null)
-				if (dept[0] != null && !dept[0].isEmpty()) {
-					if (!dept[0].equals(depcode)) {
-						//receiptList.add(receiptHeader);
-						continue;
+				if (dept != null)
+					if (dept[0] != null && !dept[0].isEmpty()) {
+						if (!dept[0].equals(depcode)) {
+							// receiptList.add(receiptHeader);
+							continue;
+						}
 					}
-				}
-				if(receiptMap.get(receiptHeader.getReceiptdatenew()) == null ){
-					receiptList=new ArrayList<>();
-						receiptList.add(receiptHeader);
-					receiptMap.put(receiptHeader.getReceiptdatenew(),receiptList);
-				}
-				else{
-					receiptMap.get(receiptHeader.getReceiptdatenew()).add(receiptHeader);//map.get().add();
+				if (receiptMap.get(receiptHeader.getReceiptdatenew()) == null) {
+					receiptList = new ArrayList<>();
+					receiptList.add(receiptHeader);
+					receiptMap.put(receiptHeader.getReceiptdatenew(), receiptList);
+				} else {
+					receiptMap.get(receiptHeader.getReceiptdatenew()).add(receiptHeader);// map.get().add();
 				}
 			}
 		}
-		if (remittlist.size() != 0) {
-			for (final Object[] ob : remittlist) {
-				String depcode = "";
-				ReceiptHeader receiptHeader = new ReceiptHeader();
-				try {
-					receiptHeader.setReferencenumber(ob[0]!=null ? ob[0].toString(): "");
-					receiptHeader.setDepositDate(ob[1]!=null ? ob[1].toString(): "");
-					receiptHeader.setBankAccountNumber(ob[2]!=null ? ob[2].toString(): "");
-					receiptHeader.setDepositAmount(ob[3]!=null ? ob[3].toString(): "");
-					receiptHeader.setReceiptnumber(ob[4]!=null ? ob[4].toString(): "");
-					receiptHeader.setDepartment(ob[5]!=null ? dplist.get(ob[5].toString()): "");
-					if (dep != null && !dep.isEmpty()) {
-						if (!dep.equals(receiptHeader.getDepartment())) {
-							continue;//receiptList.add(receiptHeader);
-						}
-					}
-					if(remittMap.get(receiptHeader.getDepositDate()) == null ){
-						receiptList=new ArrayList<>();
-					receiptList.add(receiptHeader);
-						remittMap.put(receiptHeader.getDepositDate(),receiptList);//map.put
-					}
-					else{
-						remittMap.get(receiptHeader.getDepositDate()).add(receiptHeader);//map.get().add();
-					}
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-
-				}
-			}
+		/*
+		 * if (remittlist.size() != 0) { for (final Object[] ob : remittlist) { String
+		 * depcode = ""; ReceiptHeader receiptHeader = new ReceiptHeader(); try {
+		 * receiptHeader.setReferencenumber(ob[0] != null ? ob[0].toString() : "");
+		 * receiptHeader.setDepositDate(ob[1] != null ? ob[1].toString() : "");
+		 * receiptHeader.setBankAccountNumber(ob[2] != null ? ob[2].toString() : "");
+		 * receiptHeader.setDepositAmount(ob[3] != null ? ob[3].toString() : "");
+		 * receiptHeader.setReceiptnumber(ob[4] != null ? ob[4].toString() : "");
+		 * receiptHeader.setDepartment(ob[5] != null ? dplist.get(ob[5].toString()) :
+		 * ""); if (dep != null && !dep.isEmpty()) { if
+		 * (!dep.equals(receiptHeader.getDepartment())) { continue;//
+		 * receiptList.add(receiptHeader); } } if
+		 * (remittMap.get(receiptHeader.getDepositDate()) == null) { receiptList = new
+		 * ArrayList<>(); receiptList.add(receiptHeader);
+		 * remittMap.put(receiptHeader.getDepositDate(), receiptList);// map.put } else
+		 * { remittMap.get(receiptHeader.getDepositDate()).add(receiptHeader);//
+		 * map.get().add(); } } catch (Exception e) { e.printStackTrace(); }
+		 * 
+		 * } }
+		 */
 		List<ReceiptHeader> finalList = new ArrayList<>();
 		List<Date> dates = new ArrayList<Date>();
 		DateFormat formatter;
@@ -2054,17 +2707,22 @@ public class SearchReceiptAction extends SearchFormAction {
 			dates.add(new Date(curTime));
 			curTime += interval;
 		}
-		for (Date d:dates) {
+		for (Date d : dates) {
 			Date lDate = (Date) d;
 			String ds = formatter.format(lDate);
 			System.out.println(" Date is ..." + ds);
-			if(receiptMap.get(ds)!=null)
+			if (receiptMap.get(ds) != null)
 				finalList.addAll(receiptMap.get(ds));
-			if(remittMap.get(ds)!=null)
-			finalList.addAll(remittMap.get(ds));
+			if (remittMap.get(ds) != null)
+				finalList.addAll(remittMap.get(ds));
 		}
 
 		System.out.println("finalList.size() ::::" + finalList.size());
+				
+		//finalList.removeIf(header -> header.getReferencenumber() == null);
+		
+		System.out.println("downloadDayBookReportNew finalList.size latest:::::" + finalList.size());
+		
 		/// Bhushan
 		List<ReceiptHeader> receiptListfilterList = finalList;
 		System.out.println("receiptListfilterList.size() ::::" + receiptListfilterList.size());
@@ -2075,65 +2733,65 @@ public class SearchReceiptAction extends SearchFormAction {
 		ReceiptReportBean bean = null;
 		int i = 1;
 		try {
-		if (finalList != null && !finalList.isEmpty()) {
-			System.out.println("receipt non empty");
-			for (ReceiptHeader header : finalList) {
-				bean = new ReceiptReportBean();
-				bean.setSlNo(String.valueOf(i++));
-				// bean.setParamDate(getDateString(header.getReceiptdate()));
-				bean.setParamDate(header.getReceiptdatenew()!=null?header.getReceiptdatenew():"");
-				bean.setReceiptNo(header.getReceiptnumber()!=null?header.getReceiptnumber():"");
-				bean.setCollectedBy(header.getCreatedUser()!=null?header.getCreatedUser():"");
-				bean.setPayeeName(header.getPaidBy()!=null?header.getPaidBy().split("&")[0]:"");
-				bean.setPayeeAddress(header.getPayeeAddress() != null ?header.getPayeeAddress():"");
-				bean.setServiceType(header.getService()!=null?header.getService():"");
-				bean.setServiceCategory(header.getServiceType()!=null?header.getServiceType():"");
-				bean.setChequeddno(header.getChequeddno()!=null?header.getChequeddno():"");
-				bean.setChequedddate(header.getChequedddate()!=null?header.getChequedddate():"");
-				bean.setBank(header.getBank()!=null?header.getBank():"");
-				bean.setModeOfPayment(header.getModOfPayment()!=null?header.getModOfPayment():"");
-				bean.setParticulars(header.getReferenceDesc()!=null?header.getReferenceDesc():"");
-				bean.setTotalReceiptAmount(header.getTotalAmount());
-				bean.setGstNo(header.getGstno()!=null?header.getGstno():"");
-				bean.setStatus(header.getCurretnStatus()!=null?header.getCurretnStatus():"");
-				bean.setDepartment(header.getDepartment()!=null?header.getDepartment():"");
-				if (header.getPrincipalAmount() != null) {
-					bean.setPrincipalAmt(header.getPrincipalAmount());
-				} else {
-					bean.setPrincipalAmt(new BigDecimal("0"));
-				}
-				if (header.getGstAmount() != null) {
-					bean.setGstAmount(header.getGstAmount());
-				} else {
-					bean.setPrincipalAmt(new BigDecimal("0"));
-				}
-				if (header.getDepositDate() != null) {
-					bean.setDateOfDeposite(header.getDepositDate());
-				} else {
-					bean.setDateOfDeposite("");
-				}
-				if (header.getReferencenumber() != null) {
-					bean.setRemitanceNo(header.getReferencenumber());
-				} else {
-					bean.setRemitanceNo("");
-				}
-				if (header.getBankAccountNumber() != null) {
-					bean.setBankAccountNo(header.getBankAccountNumber());
-				} else {
-					bean.setBankAccountNo("");
+			if (finalList != null && !finalList.isEmpty()) {
+				System.out.println("receipt non empty");
+				for (ReceiptHeader header : finalList) {
+					bean = new ReceiptReportBean();
+					bean.setSlNo(String.valueOf(i++));
+					// bean.setParamDate(getDateString(header.getReceiptdate()));
+					bean.setParamDate(header.getReceiptdatenew() != null ? header.getReceiptdatenew() : "");
+					bean.setReceiptNo(header.getReceiptnumber() != null ? header.getReceiptnumber() : "");
+					bean.setCollectedBy(header.getCreatedUser() != null ? header.getCreatedUser() : "");
+					bean.setPayeeName(header.getPaidBy() != null ? header.getPaidBy().split("&")[0] : "");
+					bean.setPayeeAddress(header.getPayeeAddress() != null ? header.getPayeeAddress() : "");
+					bean.setServiceType(header.getService() != null ? header.getService() : "");
+					bean.setServiceCategory(header.getServiceType() != null ? header.getServiceType() : "");
+					bean.setChequeddno(header.getChequeddno() != null ? header.getChequeddno() : "");
+					bean.setChequedddate(header.getChequedddate() != null ? header.getChequedddate() : "");
+					bean.setBank(header.getBank() != null ? header.getBank() : "");
+					bean.setModeOfPayment(header.getModOfPayment() != null ? header.getModOfPayment() : "");
+					bean.setParticulars(header.getReferenceDesc() != null ? header.getReferenceDesc() : "");
+					bean.setTotalReceiptAmount(header.getTotalAmount());
+					bean.setRemittanceReceiptNo(header.getRemittanceReceiptNo());
+					bean.setGstNo(header.getGstno() != null ? header.getGstno() : "");
+					bean.setStatus(header.getCurretnStatus() != null ? header.getCurretnStatus() : "");
+					bean.setDepartment(header.getDepartment() != null ? header.getDepartment() : "");
+					if (header.getPrincipalAmount() != null) {
+						bean.setPrincipalAmt(header.getPrincipalAmount());
+					} else {
+						bean.setPrincipalAmt(new BigDecimal("0"));
+					}
+					if (header.getGstAmount() != null) {
+						bean.setGstAmount(header.getGstAmount());
+					} else {
+						bean.setPrincipalAmt(new BigDecimal("0"));
+					}
+					if (header.getDepositDate() != null) {
+						bean.setDateOfDeposite(header.getDepositDate());
+					} else {
+						bean.setDateOfDeposite("");
+					}
+					if (header.getReferencenumber() != null) {
+						bean.setRemitanceNo(header.getReferencenumber());
+					} else {
+						bean.setRemitanceNo("");
+					}
+					if (header.getBankAccountNumber() != null) {
+						bean.setBankAccountNo(header.getBankAccountNumber());
+					} else {
+						bean.setBankAccountNo("");
+					}
+
+					if (header.getDepositAmount() != null) {
+						bean.setDepositAmount(new BigDecimal(header.getDepositAmount()));
+					} else {
+						bean.setDepositAmount(new BigDecimal("0"));
+					}
+					receiptReportList.add(bean);
 				}
 
-				if (header.getDepositAmount() != null) {
-					bean.setDepositAmount(new BigDecimal(header.getDepositAmount()));
-				} else {
-					bean.setDepositAmount(new BigDecimal("0"));
-				}
-				receiptReportList.add(bean);
 			}
-
-		}
-		}
-		catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		System.out.println("report size ::" + receiptReportList.size());
@@ -2144,7 +2802,7 @@ public class SearchReceiptAction extends SearchFormAction {
 				+ getDateString(getToDate()));
 		System.out.println("Start of report");
 		try {
-			byte[] fileContent = populateExcel(receiptReportList, paramMap);
+			byte[] fileContent = populateExcelDayBookReportNew(receiptReportList, paramMap);
 			inputStream = new ByteArrayInputStream(fileContent);
 		} catch (Exception e) {
 			e.printStackTrace();

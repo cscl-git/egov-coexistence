@@ -27,6 +27,7 @@ public class ReceiptReportBean {
 	private String chequeddno;
 	private String chequedddate;
 	private String bank;
+	private String remittanceReceiptNo;
 	
 	
 	public String getServiceCategory() {
@@ -167,6 +168,12 @@ public class ReceiptReportBean {
 	}
 	public void setPayeeAddress(String payeeAddress) {
 		this.payeeAddress = payeeAddress;
+	}
+	public String getRemittanceReceiptNo() {
+		return remittanceReceiptNo;
+	}
+	public void setRemittanceReceiptNo(String remittanceReceiptNo) {
+		this.remittanceReceiptNo = remittanceReceiptNo;
 	}
 	
 	
