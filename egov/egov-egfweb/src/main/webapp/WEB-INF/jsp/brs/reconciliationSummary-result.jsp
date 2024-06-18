@@ -160,6 +160,21 @@ jQuery(function () {
             }
         });
     });
+
+    jQuery("#unReconciledDrOthersId").click(function () {
+		opt.title="<s:text name='msg.other.instruments.deposited.but.not.cleared'/>";
+		jQuery.ajax({
+            type: "POST",
+            url: url,
+            data: { bankStmtDate: bankStmtDate, bankAccId : bankAccId,actionName:"OTHER_INSTRUMENT_DEPOSITED_NOT_CLEARED"},
+            success: function (r) {
+                jQuery("#dialog").html(r);
+                jQuery("#dialog").dialog(opt).dialog("open");
+                jQuery('.ui-dialog-titlebar-close').hide();
+            }
+        });
+    });
+    
 });
 </script>
 

@@ -45,6 +45,15 @@
                 <th class="bluebgheadtd"><s:text name="label.payto" /></th>
             </tr>
         </s:if>
+                <s:if test='actionName.equals("OTHER_INSTRUMENT_DEPOSITED_NOT_CLEARED")'>
+            <tr>
+                <th class="bluebgheadtd"><s:text name="label.srNumber" /></th>
+                <th class="bluebgheadtd"><s:text name="label.txnNumber" /> </th>
+                <th class="bluebgheadtd"><s:text name="label.txnDate" /></th>
+                <th class="bluebgheadtd"><s:text name="label.amount" /></th>
+                <th class="bluebgheadtd"><s:text name="label.payto" /></th>
+            </tr>
+        </s:if>
         <s:if test='actionName.equals("RECEIPT_BRS_ENTRIES") or actionName.equals("PAYMENT_BRS_ENTRIES")'>
             <tr>
                 <th class="bluebgheadtd"><s:text name="label.srNumber" /></th>
@@ -71,11 +80,29 @@
                 <td class="blueborderfortd"><s:property value="%{payTo}"/></td>
             </tr>
         </s:iterator>
-         <s:iterator value="unReconciledDepositedInst"  var="item" status="stat">
+        <%--  <s:iterator value="unReconciledDepositedInst"  var="item" status="stat">
             <tr>
                 <td class="blueborderfortd"><s:property value="#stat.index+1"/></td>
                 <td class="blueborderfortd"><s:property value="%{transactionNumber}"/> (<s:property value="%{instrumentType.name}"/>) </td>
                 <td class="blueborderfortd"><s:date name="%{transactionDate}" format="dd/MM/yyyy"/> </td>
+                <td class="blueborderfortd" style="text-align: right;"><s:property value="%{amount}" /></td>
+                <td class="blueborderfortd"><s:property value="%{payee}"/></td>
+            </tr>
+        </s:iterator> --%>
+         <s:iterator value="reconciledChequeReceipts"  var="item" status="stat">
+            <tr>
+                <td class="blueborderfortd"><s:property value="#stat.index+1"/></td>
+                <td class="blueborderfortd"><s:property value="%{chequeNumber}"/> (<s:property value="%{paymentMode}"/>) </td>
+                <td class="blueborderfortd"><s:date name="%{chequeDate}" format="dd/MM/yyyy"/> </td>
+                <td class="blueborderfortd" style="text-align: right;"><s:property value="%{amount}" /></td>
+                <td class="blueborderfortd"><s:property value="%{payee}"/></td>
+            </tr>
+        </s:iterator>
+        <s:iterator value="reconciledOtherInstrumentReceipts"  var="item" status="stat">
+            <tr>
+                <td class="blueborderfortd"><s:property value="#stat.index+1"/></td>
+                <td class="blueborderfortd"><s:property value="%{chequeNumber}"/> (<s:property value="%{paymentMode}"/>) </td>
+                <td class="blueborderfortd"><s:date name="%{chequeDate}" format="dd/MM/yyyy"/> </td>
                 <td class="blueborderfortd" style="text-align: right;"><s:property value="%{amount}" /></td>
                 <td class="blueborderfortd"><s:property value="%{payee}"/></td>
             </tr>

@@ -61,6 +61,7 @@ import org.egov.commons.CFinancialYear;
 import org.egov.commons.dao.BankHibernateDAO;
 import org.egov.commons.dao.FinancialYearHibernateDAO;
 import org.egov.egf.commons.EgovCommon;
+import org.egov.egf.model.ReceiptDetails;
 import org.egov.infra.microservice.models.Instrument;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.model.brs.BrsEntries;
@@ -102,6 +103,7 @@ public class BankReconciliationAction extends BaseFormAction {
 	String bank;
 	String accountNum;
 	String branch;
+	String branchcode;
 
 	BigDecimal accountBalance;
 	double unReconciledCr;
@@ -120,6 +122,7 @@ public class BankReconciliationAction extends BaseFormAction {
 	final String RECEIPT_BRS_ENTRIES="RECEIPT_BRS_ENTRIES";
 	final String PAYMENT_BRS_ENTRIES="PAYMENT_BRS_ENTRIES";
 	final String CHEQUE_DEPOSITED_NOT_CLEARED="CHEQUE_DEPOSITED_NOT_CLEARED";
+	final String OTHER_INSTRUMENT_DEPOSITED_NOT_CLEARED="OTHER_INSTRUMENT_DEPOSITED_NOT_CLEARED";
 	private static final Logger LOGGER = Logger
 			.getLogger(BankReconciliationAction.class);
 
@@ -128,6 +131,8 @@ public class BankReconciliationAction extends BaseFormAction {
     private List<InstrumentHeader> chequDDNotPresentInBank;
     private List<BrsEntries> unReconciledBrsEntries;
     private List<Instrument> unReconciledDepositedInst;
+    private List<ReceiptDetails> reconciledChequeReceipts;
+    private List<ReceiptDetails> reconciledOtherInstrumentReceipts;
 
 	@Override
 	public Object getModel() {
@@ -143,6 +148,20 @@ public class BankReconciliationAction extends BaseFormAction {
     public String brcDetails() {
         bankSDate = parameters.get("bankStmtDate")[0];
         Date dt = new Date();
+        
+        
+        bankAccount = (Bankaccount) persistenceService.find(
+				"from Bankaccount where id=?", bankAccId);
+		bank = bankAccount.getBankbranch().getBank().getName();
+		accountNum = bankAccount.getAccountnumber();
+		branch = bankAccount.getBankbranch().getBranchname();
+		
+		branchcode=bankAccount.getBankbranch().getBranchcode();
+		
+	
+		String accountno = bank + "-" + branchcode + "-" + accountNum;
+        
+
         try {
             dt = sdf.parse(bankSDate);
         } catch (ParseException e) {
@@ -161,7 +180,10 @@ public class BankReconciliationAction extends BaseFormAction {
         }else if (PAYMENT_BRS_ENTRIES.equals(actionName)) {
             unReconciledBrsEntries = bankReconciliationSummary.getBrsEntriesList("Payment", fromDate, dt, bankAccId);
         }else if (CHEQUE_DEPOSITED_NOT_CLEARED.equals(actionName)) {
-            unReconciledDepositedInst = bankReconciliationSummary.getDepositedInstrumentsOfReceipt(bankAccId.intValue(), fromDate, dt);
+            //unReconciledDepositedInst = bankReconciliationSummary.getDepositedInstrumentsOfReceipt(bankAccId.intValue(), fromDate, dt);
+        	reconciledChequeReceipts = bankReconciliationSummary.getChequeReconciledReceiptsBankSummary(fromDate, dt,accountno); 
+        }else if (OTHER_INSTRUMENT_DEPOSITED_NOT_CLEARED.equals(actionName)) {
+        	reconciledOtherInstrumentReceipts = bankReconciliationSummary.getOtherInstrumentReceiptsBankSummary(fromDate, dt,accountno); 
         }
         return "brcDetails";
     }
@@ -202,6 +224,10 @@ public class BankReconciliationAction extends BaseFormAction {
 		bank = bankAccount.getBankbranch().getBank().getName();
 		accountNum = bankAccount.getAccountnumber();
 		branch = bankAccount.getBankbranch().getBranchname();
+		
+		branchcode=bankAccount.getBankbranch().getBranchcode();
+			
+		String accountno = bank + "-" + branchcode + "-" + accountNum;
 
 		Date dt = new Date();
 
@@ -217,7 +243,7 @@ public class BankReconciliationAction extends BaseFormAction {
 
 			String unReconciledDrCr = bankReconciliationSummary
 					.getUnReconciledDrCr(bankAccount.getId().intValue(),
-							fromDate, dt);
+							fromDate, dt,accountno);
 
 			String drcrValues[] = unReconciledDrCr.split("/");
 			if (LOGGER.isInfoEnabled())
@@ -451,5 +477,28 @@ public class BankReconciliationAction extends BaseFormAction {
         this.unReconciledDepositedInst = unReconciledDepositedInst;
     }
     
+	public String getBranchcode() {
+		return branchcode;
+	}
+
+	public void setBranchcode(String branchcode) {
+		this.branchcode = branchcode;
+	}
+	
+	public List<ReceiptDetails> getReconciledChequeReceipts() {
+		return reconciledChequeReceipts;
+	}
+
+	public void setReconciledChequeReceipts(List<ReceiptDetails> reconciledChequeReceipts) {
+		this.reconciledChequeReceipts = reconciledChequeReceipts;
+	}
+
+	public List<ReceiptDetails> getReconciledOtherInstrumentReceipts() {
+		return reconciledOtherInstrumentReceipts;
+	}
+
+	public void setReconciledOtherInstrumentReceipts(List<ReceiptDetails> reconciledOtherInstrumentReceipts) {
+		this.reconciledOtherInstrumentReceipts = reconciledOtherInstrumentReceipts;
+	}
 
 }

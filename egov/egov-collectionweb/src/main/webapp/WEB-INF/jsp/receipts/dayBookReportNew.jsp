@@ -674,6 +674,7 @@ function onBodyLoad(){
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="GST (Rs.)" property="gstAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Amount (Rs.)" property="totalAmount" style="width:8%; text-align: right" format="{0, number, #,##0.00}" />
 
+<display:column headerClass="bluebgheadtd" class="blueborderfortd" title="RemittanceReceiptNos"  property="remittanceReceiptNo"  style="width:8%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Date Of Deposit"  property="depositDate"  style="width:8%;text-align: center" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Remitance No." style="width:16%;text-align:left" property="referencenumber" />
 <display:column headerClass="bluebgheadtd" class="blueborderfortd" title="Bank Account No." style="width:12%;text-align:left" property="bankAccountNumber" />

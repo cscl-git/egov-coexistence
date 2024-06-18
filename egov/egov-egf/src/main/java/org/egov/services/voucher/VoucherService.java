@@ -92,6 +92,7 @@ import org.egov.egf.contract.model.VoucherResponse;
 import org.egov.egf.contract.model.VoucherSearchRequest;
 import org.egov.egf.dashboard.event.FinanceEventType;
 import org.egov.egf.dashboard.event.listener.FinanceDashboardService;
+import org.egov.egf.model.ReconcileBean;
 import org.egov.egf.utils.FinancialUtils;
 import org.egov.eis.entity.Assignment;
 import org.egov.eis.entity.Employee;
@@ -137,6 +138,8 @@ import org.egov.utils.FinancialConstants;
 import org.egov.utils.VoucherHelper;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
+import org.hibernate.type.StringType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
@@ -1661,6 +1664,30 @@ public class VoucherService extends PersistenceService<CVoucherHeader, Long> {
 		 System.out.println(vmis.toString());
 		 return vmis;
 	 }
+	 
+	 public String getVouchermisByReceiptNo(String recieptNumber) 
+		{
+		 System.out.println("###getVouchermisByReceiptNo method recieptNumber:::"+recieptNumber);
+			String receiptNo= "";	
+				StringBuffer query = null; 
+				try{	
+				   query=new StringBuffer().append(" select reciept_number as receiptno  from vouchermis v where reciept_number  =:receiptNo ");	
+				
+				   System.out.println("###query1:::"+query);
+						        
+				SQLQuery createSQLQuery = persistenceService.getSession().createSQLQuery(query.toString());
+				createSQLQuery.setString("receiptNo", recieptNumber);
+				createSQLQuery.addScalar("receiptno",StringType.INSTANCE);
+				
+			    receiptNo = (String)createSQLQuery.uniqueResult();
+				}
+				catch(Exception e){
+					LOGGER.error("Exp in getVouchermisByReceiptNo 2:"+e.getMessage());
+					System.out.println("###getVouchermisByReceiptNo 2:::"+e.getMessage());
+					throw new ApplicationRuntimeException(e.getMessage());
+				}
+			return receiptNo;
+		}
 	 
 	    public void updateSourcePathForGJV(CVoucherHeader voucherHeader)
 	    {
