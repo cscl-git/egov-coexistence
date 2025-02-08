@@ -82,6 +82,8 @@
 <script type="text/javascript"
 	src="https://cdn.datatables.net/buttons/2.1.0/js/buttons.print.min.js"></script>
 <script type="text/javascript" src="/services/egi/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}"></script>
+<link rel="stylesheet" href="<cdn:url value='/resources/global/css/bootstrap/bootstrap-datepicker.css' context='/services/egi'/>"/>
+<script src="<cdn:url value='/resources/global/js/bootstrap/bootstrap-datepicker.js' context='/services/egi'/>" ></script>
 
 <script>
 $(document).ready(function() {
@@ -123,7 +125,7 @@ $(document).ready(function() {
 			</tr>
 
 			<tr>
-			<td style="width: 5%"></td>
+			<%-- <td style="width: 5%"></td>
 				<td class="greybox"><s:text name="voucher.fromdate" /></td>
 				<td class="greybox"><s:date name="fromDate" var="fromDateId"
 							format="dd/MM/yyyy" /> <s:textfield name="fromDate"
@@ -141,7 +143,18 @@ $(document).ready(function() {
 					href="javascript:show_calendar('billRegisterReport.toDate',null,null,'DD/MM/YYYY');"
 					style="text-decoration: none">&nbsp;<img
 							src="/services/egi/resources/erp2/images/calendaricon.gif"
-							border="0" /></a>(dd/mm/yyyy)</td>
+							border="0" /></a>(dd/mm/yyyy)</td> --%>
+			
+			   <td style="width: 5%"></td>
+				<td class="greybox"><s:text name="voucher.fromdate" /></td>			   								
+				<td class="greybox"><s:date name="fromDate" var="fromDateId" format="dd/MM/yyyy" />
+				<s:textfield id="fromDate" name="fromDate" value="%{fromDateId}" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" readonly="true"/></td>
+				
+				<td class="greybox"><s:text name="voucher.todate" /></td>											
+				<td class="greybox"><s:date name="toDate" var="toDateId" format="dd/MM/yyyy" />
+				<s:textfield id="toDate" name="toDate" value="%{toDateId}" data-inputmask="'mask': 'd/m/y'" placeholder="DD/MM/YYYY" readonly="true"/></td>
+							
+							
 			</tr>
 			<tr>
 			<td style="width: 5%"></td>
@@ -179,7 +192,7 @@ $(document).ready(function() {
 
 		</div>
 		<br>
-<c:if test="${not empty billRegReportList}">
+<c:if test="${not empty CompleteBillRegisterReportDTO}">
 		<table class="table table-bordered" id="resultHeader" width="100%"
 			border="0" cellspacing="0" cellpadding="0" style="font-size:1rem;">
 			<thead>
@@ -210,8 +223,8 @@ $(document).ready(function() {
 			<tbody>
 				<c:choose>
 					<c:when
-						test="${billRegReportList!=null && billRegReportList.size() > 0}">
-						<c:forEach items="${billRegReportList}" var="billRegReport"
+						test="${CompleteBillRegisterReportDTO!=null && CompleteBillRegisterReportDTO.size() > 0}">
+						<c:forEach items="${CompleteBillRegisterReportDTO}" var="billRegReport"
 							varStatus="item">
 
 							<tr id="assetView" style="font-size:1rem;">
@@ -220,22 +233,22 @@ $(document).ready(function() {
 								<td>${billRegReport.billNumber}</td>
 								<td>${billRegReport.billDate}</td>
 								<td><a href="#"
-									onclick="return openVoucher('${billRegReport.vhId}')">
+									onclick="return openVoucher('${billRegReport.vhid}')">
 										${billRegReport.voucherNumber } </a></td>
-								<td>${billRegReport.partyName}</td>
+								<td>${billRegReport.payTo}</td>
 								<td>${billRegReport.grossAmount}</td>
-								<td>${billRegReport.deductionAmount}</td>
-								<td>${billRegReport.netAmount}</td>
+								<td>${billRegReport.deduction}</td>
+								<td>${billRegReport.netPay}</td>
 								<td>${billRegReport.paidAmount}</td>
 								<td><a href="#"
-									onclick="return openVoucher('${billRegReport.phId}')">
+									onclick="return openVoucher('${billRegReport.payvhid}')">
 										${billRegReport.paymentVoucherNumber} </a></td>
-								<td>${billRegReport.pexNo}</td>
-								<td><a href="#"
+								<td>${billRegReport.paymentPexNumber}</td>
+								 <td><a href="#"
 									onclick="return openVoucher('${billRegReport.deducVhId}')">
-										${billRegReport.deducVoucherNumber} </a></td>
-								<td>${billRegReport.deducPexNo}</td>
-								<td>${billRegReport.status}</td>
+										${billRegReport.deductionvouchernumber} </a></td>
+								<td>${billRegReport.deductionpexnumber}</td> 
+								<td>${billRegReport.description}</td>
 							</tr>
 						</c:forEach>
 					</c:when>
@@ -309,7 +322,7 @@ $(document).ready(function() {
 			</s:if>
 		
 
-			document.forms[0].action='${pageContext.request.contextPath}/report/billRegisterReport-billSearch.action';
+			document.forms[0].action='${pageContext.request.contextPath}/report/billRegisterReport-billSearchNew.action';
 			document.forms[0].submit();	
 			return  true;
 }
@@ -332,6 +345,38 @@ $(document).ready(function() {
 		{
 			alert('Test in UAT');
 		}
+
+		jQuery(document).ready(function() {
+		    // Initialize "voucherDate" date picker
+		     console.log("onload:");
+		    jQuery("#fromDate").datepicker({
+		        format: 'dd/mm/yyyy',
+		        autoclose: true,
+		        // Restrict past dates if needed
+		        onRender: function(date) {
+		            return date.valueOf() < new Date().valueOf() ? 'disabled' : '';
+		        }
+		    }).on('changeDate', function(ev) {
+			    console.log("onchange:"+ev);
+		        var selectedVoucherDate = jQuery(this).datepicker('getDate');  // Get the selected date
+		        console.log("selectedVoucherDate:"+selectedVoucherDate);
+		        if (selectedVoucherDate) {
+		            var maxDate = new Date(selectedVoucherDate);
+		            maxDate.setFullYear(maxDate.getFullYear() + 1);  // Set max date to 1 year later
+		            console.log("maxDate:"+maxDate);
+		            // Set min and max date for "toDate"
+		            jQuery("#toDate").datepicker("setStartDate", selectedVoucherDate);
+		            jQuery("#toDate").datepicker("setEndDate", maxDate);
+		        }
+
+		    });
+
+		    // Initialize "toDate" date picker
+		    jQuery("#toDate").datepicker({
+		        format: 'dd/mm/yyyy',
+		        autoclose: true
+		    });
+		});
 	</script>
 </body>
 </html>

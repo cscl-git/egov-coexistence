@@ -46,12 +46,12 @@ public class ApnimandiRestController {
 	private HttpHeaders headers = new HttpHeaders();
 	private   List<String> allowheaderList= new ArrayList<String>();
 	private final String headername="Content-Security-Policy";
-	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in https://ch-test.chandigarhsmartcity.in";
 	
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllApniMandiContractorList", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllContractorList(HttpServletRequest req ){
 		
 			 ApnimandiContractor apnimandiContractor=new ApnimandiContractor();
@@ -96,7 +96,7 @@ public class ApnimandiRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllApniMandiDayMarketCollection", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllApniMandiDayMarketCollection(@RequestParam final String fromDate,
 			   @RequestParam final String toDate,HttpServletRequest req ){
 		
@@ -139,7 +139,7 @@ public class ApnimandiRestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllApniMandiCollection", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllApniMandiCollection(@RequestParam final String fromDate,
 			   @RequestParam final String toDate,HttpServletRequest req ){
 		
@@ -196,6 +196,7 @@ public HttpHeaders getHeaders() {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("https://ch-test.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);

@@ -38,7 +38,7 @@ public class EstimateApprovalRestTestController {
 	private HttpHeaders headers = new HttpHeaders();
 	
 	private final String headername="Content-Security-Policy";
-	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in https://ch-test.chandigarhsmartcity.in";
 	
 	
 	public static final String SUCCESS = "Success";
@@ -54,7 +54,7 @@ public class EstimateApprovalRestTestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllEstimationPreparation", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper> getAllEstimationPreparationPOJO(HttpServletRequest req,HttpServletResponse res) {
 			System.out.println("TESTING");
 		  List<EstimatePreparationApprovalRESTPOJO> fetchedData =estimatePreparationApprovalService.getAllEstimationPreparationNative();
@@ -65,7 +65,7 @@ public class EstimateApprovalRestTestController {
 	}
 	@ResponseBody
 	@RequestMapping(value = "getAllDnit", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllDnit(){
 		ModelMap m = new ModelMap();
 		m.put("allestimation", workDnitService.getAllDnitList());
@@ -89,7 +89,7 @@ public class EstimateApprovalRestTestController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllWorkAgreementByMilestone", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllWorkOrderAgreementRestByMileStone(){
 		ModelMap m = new ModelMap();
 		m.put("allWorkAgreement", boQDetailsService.getAllWorkOrderAgreementRestByMileStone());
@@ -117,6 +117,7 @@ public class EstimateApprovalRestTestController {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("https://ch-test.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);

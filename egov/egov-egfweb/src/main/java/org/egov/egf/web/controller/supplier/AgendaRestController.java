@@ -59,11 +59,11 @@ public class AgendaRestController {
 	 private   List<String> allowheaderList= new ArrayList<String>(); 
 	  private HttpHeaders headers = new HttpHeaders();
 	  private final String headername="Content-Security-Policy";
-	  private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	  private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in https://ch-test.chandigarhsmartcity.in";
 		
 	 
 	@RequestMapping("getAllAgenda")
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllAgenda( @ModelAttribute final CouncilPreamble councilPreamble){
 		 List<CouncilPreamble> searchResultList = new ArrayList<CouncilPreamble>();
 		 List<AgendaRestDataView> agendaRestDataViewsList=new ArrayList<AgendaRestDataView>();
@@ -139,7 +139,7 @@ public class AgendaRestController {
 	
 	
 	@RequestMapping(path= {"getAllMeeting"})
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllMeetings( @ModelAttribute final CouncilMeeting councilMeetingobj){
 		List<CouncilMeeting> searchResultList = new ArrayList<CouncilMeeting>();
 		List<MeetingRestDataView>meetingRestDataViewList=new ArrayList<MeetingRestDataView>();
@@ -208,7 +208,7 @@ public class AgendaRestController {
 	}
 	
 	@RequestMapping(path= {"getAllMom"})
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllMoM( @ModelAttribute final CouncilMeeting councilMeetingobj){
 		List<CouncilMeeting> searchResultList = new ArrayList<CouncilMeeting>();
 		List<MeetingRestDataView>meetingRestDataViewList=new ArrayList<MeetingRestDataView>();
@@ -278,7 +278,7 @@ public class AgendaRestController {
 	
 	
 	@RequestMapping(path= {"getAllMom2"})
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllMoM2( @ModelAttribute final CouncilMeeting councilMeetingobj){
 		List<MeetingMOM> searchResultList = new ArrayList<MeetingMOM>();
 		List<MeetingMoMRestDataView>meetingRestDataViewList=new ArrayList<MeetingMoMRestDataView>();
@@ -329,6 +329,7 @@ public class AgendaRestController {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("https://ch-test.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");		
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);

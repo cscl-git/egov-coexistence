@@ -29,11 +29,11 @@ public class LegalCaseRestController {
 	private   List<String> allowheaderList= new ArrayList<String>(); 
 	private HttpHeaders headers = new HttpHeaders();
 	private final String headername="Content-Security-Policy";
-	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	private final String headervalue="default-src 'self' https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in https://ch-test.chandigarhsmartcity.in";
 	
 	@ResponseBody
 	@RequestMapping(value = "getLegalCase", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getLegalCases( @ModelAttribute final LegalCaseSearchResult legalCaseSearchResult){
 		System.out.println("Inside Legal Case Rest Controleler");
 		 List<LegalCaseSearchResult> legalcaseSearchList =null;
@@ -95,6 +95,7 @@ public HttpHeaders getHeaders() {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("https://ch-test.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");
 		headers.set(headername, headervalue);
 		headers.setAccessControlAllowHeaders(allowheaderList);

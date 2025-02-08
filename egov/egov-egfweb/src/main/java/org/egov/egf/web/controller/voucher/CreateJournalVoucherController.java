@@ -51,6 +51,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.Format;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -80,6 +81,7 @@ import org.egov.commons.Vouchermis;
 import org.egov.commons.dao.VoucherHeaderDAO;
 import org.egov.egf.commons.VoucherSearchUtil;
 import org.egov.egf.expensebill.service.VouchermisService;
+import org.egov.egf.model.BillRegisterNewReportBean;
 import org.egov.egf.model.BillRegisterReportBean;
 import org.egov.egf.model.VoucherDetailLedger;
 import org.egov.egf.model.VoucherDetailMain;
@@ -127,6 +129,7 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 	private static final Logger LOGGER = Logger.getLogger(CreateJournalVoucherController.class);
 	private static final String JOURNALVOUCHER_FORM = "journalvoucher-form";
 	private static final String JOURNALVOUCHER_SEARCH = "journalvoucher-search";
+	private static final String JOURNALVOUCHER_SEARCH_NEW = "journalvoucher-searchnew";
 	private static final String VOUCHER_NUMBER_GENERATION_AUTO = "voucherNumberGenerationAuto";
 	private static final String chqdelimitSP = "/";
 	private static final String chqdelimitDP = "//";
@@ -283,6 +286,414 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 
 		voucherHeader.setVoucherDate(new Date());
 		return JOURNALVOUCHER_SEARCH;
+	}
+	
+	@RequestMapping(value = "/newsearchVoucher", method = RequestMethod.POST)
+	public String newSearchVoucher(@ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader, final Model model,
+			final HttpServletRequest request) {
+		voucherHeader.setType(FinancialConstants.STANDARD_VOUCHER_TYPE_JOURNAL);
+		model.addAttribute(STATE_TYPE, voucherHeader.getClass().getSimpleName());
+		prepareWorkflow(model, voucherHeader, new WorkflowContainer());
+
+		voucherHeader.setVoucherDate(new Date());
+		return JOURNALVOUCHER_SEARCH_NEW;
+	}
+	
+	@RequestMapping(value = "/searchNewVoucherResult", params = "search", method = RequestMethod.POST)
+	public String searchNewVoucherResult(@ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader,
+			final Model model, final HttpServletRequest request) {
+		List<BillRegisterNewReportBean> billRegReportList = new ArrayList<BillRegisterNewReportBean>();
+		SQLQuery queryMain = null;
+		final StringBuffer query1 = new StringBuffer(500);
+
+		List<Object[]> list = null;
+		query1.append(
+				"select\r\n"
+				+ "	eb.billnumber,\r\n"
+				+ "	eb.billdate,\r\n"
+				+ "	eb.expendituretype,\r\n"
+				+ "	eb.billamount,\r\n"
+				+ "	eb.statusid,\r\n"
+				+ "	es.description as status,\r\n"
+				+ "	eb2.departmentcode,\r\n"
+				+ "	ed.\"name\" as department,\r\n"
+				+ "	eb2.schemeid,\r\n"
+				+ "	eb2.fundid,\r\n"
+				+ "	s.\"name\" as schemename,\r\n"
+				+ "	eb4.functionid,\r\n"
+				+ "	f.\"name\" as functionname,\r\n"
+				+ "	eb4.glcodeid,\r\n"
+				+ "	c.glcode,\r\n"
+				+ "	c.\"name\" as accountname,\r\n"
+				+ "	eb3.accountdetailtypeid,\r\n"
+				+ "	a2.name as partytype,\r\n"
+				+ "	eb3.accountdetailkeyid,\r\n"
+				+ "	a.detailname as partyname,\r\n"
+				+ "	eb4.debitamount,\r\n"
+				+ "	eb4.creditamount,\r\n"
+				+ "	v.vouchernumber,\r\n"
+				+ "	v.voucherdate,\r\n"
+				+ "	v.\"type\" as vocuherType,\r\n"
+				+ "	v.\"name\" as voucherName,\r\n"
+				+ "	p.\"type\" as pextype,\r\n"
+				+ "	vdi.transactionnumber as pexnumber,\r\n"
+				+ "	vdi.transactiondate as pexdate,\r\n"
+				+ "	p.paymentamount as pexamount,\r\n"
+				+ "	vdi.accountnumber as pexaccountnumber\r\n"
+				+ "from\r\n"
+				+ "	eg_billregister eb\r\n"
+				+ "left join eg_billregistermis eb2 on\r\n"
+				+ "	eb.id = eb2.billid\r\n"
+				+ "left join eg_billdetails eb4 on\r\n"
+				+ "	eb.id = eb4.billid\r\n"
+				+ "left join eg_billpayeedetails eb3 on\r\n"
+				+ "	eb4.id = eb3.billdetailid\r\n"
+				+"left join accountdetailtype a2 on\r\n"
+				+" eb3.accountdetailtypeid  = a2.id\r\n"
+			    +"left join accountdetailkey a on\r\n"
+				+" eb3.accountdetailkeyid = a.detailkey and\r\n"
+				+"a.detailtypeid = eb3.accountdetailtypeid\r\n"
+				+ "left join scheme s on\r\n"
+				+ "	eb2.schemeid = s.id\r\n"
+				+ "left join egw_status es on\r\n"
+				+ "	eb.statusid = es.id\r\n"
+				+ "left join \"function\" f on\r\n"
+				+ "	eb4.functionid = f.id\r\n"
+				+ "left join chartofaccounts c on\r\n"
+				+ "	eb4.glcodeid = c.id\r\n"
+				+ "left join eg_department ed on\r\n"
+				+ "	eb2.departmentcode = cast(ed.id as character varying)\r\n"
+				+ "left join voucherheader v on\r\n"
+				+ "	eb2.voucherheaderid = v.id\r\n"
+				+ "left join paymentheader p on\r\n"
+				+ "	v.id = p.voucherheaderid\r\n"
+				+ "left join voucher_detail_instrument vdi on\r\n"
+				+ "	v.id = vdi.voucherheaderid\r\n"
+				+ "where\r\n"
+				+ "	eb2.fundid ="
+						+ voucherHeader.getFundId().getId())
+				.append(getNewVoucherDateQuery(voucherHeader.getBillFrom(), voucherHeader.getBillTo()))
+				.append(getNewVoucherMisQuery(voucherHeader));
+		
+		LOGGER.info("Query 1 :: " + query1.toString());
+		queryMain = this.persistenceService.getSession().createSQLQuery(query1.toString());
+		list = queryMain.list();
+		
+		BillRegisterNewReportBean billRegisterReportNew = null;
+		
+		for (Object[] object : list) {
+			billRegisterReportNew = new BillRegisterNewReportBean();
+			
+			Format formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String  voucherdate=null;
+			String  pexdate=null;
+			String  billdate=null;
+			if(object[1] !=null) {
+			billdate=formatter.format(object[1]);
+			}
+			if(object[23] !=null) {
+			voucherdate=formatter.format(object[23]);
+			}
+			if(object[28] !=null) {
+			pexdate=formatter.format(object[28]);
+			}
+			int debitamount=0;
+			int creditamount=0;
+			if(object[0] != null) {
+			billRegisterReportNew.setBillNo(object[0].toString());
+			}
+			if(billdate != null) {
+			billRegisterReportNew.setBillDate(billdate.toString());
+			}
+			if(object[2] != null) {
+			billRegisterReportNew.setBillType(object[2].toString());
+			}
+			if(object[3] != null) {
+			billRegisterReportNew.setBudgetBillAmount(new BigDecimal(object[3].toString()));
+			}
+			if(object[5] != null) {
+			billRegisterReportNew.setStatus(object[5].toString());
+			}
+			if(object[7] != null) {
+			billRegisterReportNew.setDepartmentName(object[7].toString());
+			}
+			if(object[10] != null) {
+			billRegisterReportNew.setScheme(object[10].toString());	
+			}
+			if(object[12] != null) {
+			billRegisterReportNew.setFunctionName(object[12].toString());
+			}
+			if(object[20] != null) {
+			BigDecimal b1 = new BigDecimal(object[20].toString());
+			debitamount = b1.intValue();
+			billRegisterReportNew.setDebitAmount(debitamount);
+			}
+			if(object[21] != null) {
+			BigDecimal b2 = new BigDecimal(object[21].toString());			
+			creditamount = b2.intValue();
+			billRegisterReportNew.setCreditAmount(creditamount);
+			}
+			if(debitamount>0) {
+				billRegisterReportNew.setDebitSideAccountHead(object[15].toString());
+			}
+			if(creditamount>0) {
+				billRegisterReportNew.setCreditSideAccountHead(object[15].toString());
+			}
+			if(object[19] != null) {
+			billRegisterReportNew.setPartyName(object[19].toString());
+			}
+			if(object[22] != null) {
+			billRegisterReportNew.setVoucherNo(object[22].toString());
+			}
+			if(voucherdate != null) {
+			billRegisterReportNew.setVoucherDate(voucherdate.toString());
+			}
+			if(object[24] != null) {
+			billRegisterReportNew.setVouchertype(object[24].toString());
+			}
+			if(object[25] != null) {
+			billRegisterReportNew.setVouchername(object[25].toString());
+			}
+			if(object[26] != null) {
+			billRegisterReportNew.setPexType(object[26].toString());
+			}
+			if(object[27] != null) {
+			billRegisterReportNew.setPexNo(object[27].toString());
+			}
+			if(pexdate != null) {
+			billRegisterReportNew.setPexDate(pexdate.toString());
+			}
+			if(object[29] != null) {
+			billRegisterReportNew.setPexAmount(new BigDecimal(object[29].toString()));
+			}
+			if(object[30] != null) {
+			billRegisterReportNew.setPexaccountnumber(object[30].toString());
+			}
+			billRegReportList.add(billRegisterReportNew);
+			
+		}
+		model.addAttribute("billRegReportList", billRegReportList);
+		
+	  return JOURNALVOUCHER_SEARCH_NEW;
+	}
+	
+	@RequestMapping(value = "/searchNewVoucherResult", params = "export", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<InputStreamResource> newVoucherExport(
+			@ModelAttribute("voucherHeader") final CVoucherHeader voucherHeader, final Model model,
+			final HttpServletRequest request) throws IOException {
+		LOGGER.info("export");
+		
+		List<BillRegisterNewReportBean> billRegReportList = new ArrayList<BillRegisterNewReportBean>();
+		SQLQuery queryMain = null;
+		final StringBuffer query1 = new StringBuffer(500);
+
+		List<Object[]> list = null;
+		query1.append(
+				"select\r\n"
+				+ "	eb.billnumber,\r\n"
+				+ "	eb.billdate,\r\n"
+				+ "	eb.expendituretype,\r\n"
+				+ "	eb.billamount,\r\n"
+				+ "	eb.statusid,\r\n"
+				+ "	es.description as status,\r\n"
+				+ "	eb2.departmentcode,\r\n"
+				+ "	ed.\"name\" as department,\r\n"
+				+ "	eb2.schemeid,\r\n"
+				+ "	eb2.fundid,\r\n"
+				+ "	s.\"name\" as schemename,\r\n"
+				+ "	eb4.functionid,\r\n"
+				+ "	f.\"name\" as functionname,\r\n"
+				+ "	eb4.glcodeid,\r\n"
+				+ "	c.glcode,\r\n"
+				+ "	c.\"name\" as accountname,\r\n"
+				+ "	eb3.accountdetailtypeid,\r\n"
+				+ "	a2.name as partytype,\r\n"
+				+ "	eb3.accountdetailkeyid,\r\n"
+				+ "	a.detailname as partyname,\r\n"
+				+ "	eb4.debitamount,\r\n"
+				+ "	eb4.creditamount,\r\n"
+				+ "	v.vouchernumber,\r\n"
+				+ "	v.voucherdate,\r\n"
+				+ "	v.\"type\" as vocuherType,\r\n"
+				+ "	v.\"name\" as voucherName,\r\n"
+				+ "	p.\"type\" as pextype,\r\n"
+				+ "	vdi.transactionnumber as pexnumber,\r\n"
+				+ "	vdi.transactiondate as pexdate,\r\n"
+				+ "	p.paymentamount as pexamount,\r\n"
+				+ "	vdi.accountnumber as pexaccountnumber\r\n"
+				+ "from\r\n"
+				+ "	eg_billregister eb\r\n"
+				+ "left join eg_billregistermis eb2 on\r\n"
+				+ "	eb.id = eb2.billid\r\n"
+				+ "left join eg_billdetails eb4 on\r\n"
+				+ "	eb.id = eb4.billid\r\n"
+				+ "left join eg_billpayeedetails eb3 on\r\n"
+				+ "	eb4.id = eb3.billdetailid\r\n"
+				+"left join accountdetailtype a2 on\r\n"
+				+" eb3.accountdetailtypeid  = a2.id\r\n"
+			    +"left join accountdetailkey a on\r\n"
+				+" eb3.accountdetailkeyid = a.detailkey and\r\n"
+				+"a.detailtypeid = eb3.accountdetailtypeid\r\n"
+				+ "left join scheme s on\r\n"
+				+ "	eb2.schemeid = s.id\r\n"
+				+ "left join egw_status es on\r\n"
+				+ "	eb.statusid = es.id\r\n"
+				+ "left join \"function\" f on\r\n"
+				+ "	eb4.functionid = f.id\r\n"
+				+ "left join chartofaccounts c on\r\n"
+				+ "	eb4.glcodeid = c.id\r\n"
+				+ "left join eg_department ed on\r\n"
+				+ "	eb2.departmentcode = cast(ed.id as character varying)\r\n"
+				+ "left join voucherheader v on\r\n"
+				+ "	eb2.voucherheaderid = v.id\r\n"
+				+ "left join paymentheader p on\r\n"
+				+ "	v.id = p.voucherheaderid\r\n"
+				+ "left join voucher_detail_instrument vdi on\r\n"
+				+ "	v.id = vdi.voucherheaderid\r\n"
+				+ "where\r\n"
+				+ "	eb2.fundid ="
+						+ voucherHeader.getFundId().getId())
+				.append(getNewVoucherDateQuery(voucherHeader.getBillFrom(), voucherHeader.getBillTo()))
+				.append(getNewVoucherMisQuery(voucherHeader));
+		
+		LOGGER.info("Query 1 :: " + query1.toString());
+		queryMain = this.persistenceService.getSession().createSQLQuery(query1.toString());
+		list = queryMain.list();
+		
+		BillRegisterNewReportBean billRegisterReportNew = null;
+		
+		for (Object[] object : list) {
+			billRegisterReportNew = new BillRegisterNewReportBean();
+			
+			Format formatter=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			String  voucherdate=null;
+			String  pexdate=null;
+			String  billdate=null;
+			if(object[1] !=null) {
+			billdate=formatter.format(object[1]);
+			}
+			if(object[23] !=null) {
+			voucherdate=formatter.format(object[23]);
+			}
+			if(object[28] !=null) {
+			pexdate=formatter.format(object[28]);
+			}
+			int debitamount=0;
+			int creditamount=0;
+			if(object[0] != null) {
+			billRegisterReportNew.setBillNo(object[0].toString());
+			}
+			if(billdate != null) {
+			billRegisterReportNew.setBillDate(billdate.toString());
+			}
+			if(object[2] != null) {
+			billRegisterReportNew.setBillType(object[2].toString());
+			}
+			if(object[3] != null) {
+			billRegisterReportNew.setBudgetBillAmount(new BigDecimal(object[3].toString()));
+			}
+			if(object[5] != null) {
+			billRegisterReportNew.setStatus(object[5].toString());
+			}
+			if(object[7] != null) {
+			billRegisterReportNew.setDepartmentName(object[7].toString());
+			}
+			if(object[10] != null) {
+			billRegisterReportNew.setScheme(object[10].toString());	
+			}
+			if(object[12] != null) {
+			billRegisterReportNew.setFunctionName(object[12].toString());
+			}
+			if(object[20] != null) {
+			BigDecimal b1 = new BigDecimal(object[20].toString());
+			debitamount = b1.intValue();
+			billRegisterReportNew.setDebitAmount(debitamount);
+			}
+			if(object[21] != null) {
+			BigDecimal b2 = new BigDecimal(object[21].toString());			
+			creditamount = b2.intValue();
+			billRegisterReportNew.setCreditAmount(creditamount);
+			}
+			if(debitamount>0) {
+				billRegisterReportNew.setDebitSideAccountHead(object[15].toString());
+			}
+			if(creditamount>0) {
+				billRegisterReportNew.setCreditSideAccountHead(object[15].toString());
+			}
+			if(object[19] != null) {
+			billRegisterReportNew.setPartyName(object[19].toString());
+			}
+			if(object[22] != null) {
+			billRegisterReportNew.setVoucherNo(object[22].toString());
+			}
+			if(voucherdate != null) {
+			billRegisterReportNew.setVoucherDate(voucherdate.toString());
+			}
+			if(object[24] != null) {
+			billRegisterReportNew.setVouchertype(object[24].toString());
+			}
+			if(object[25] != null) {
+			billRegisterReportNew.setVouchername(object[25].toString());
+			}
+			if(object[26] != null) {
+			billRegisterReportNew.setPexType(object[26].toString());
+			}
+			if(object[27] != null) {
+			billRegisterReportNew.setPexNo(object[27].toString());
+			}
+			if(pexdate != null) {
+			billRegisterReportNew.setPexDate(pexdate.toString());
+			}
+			if(object[29] != null) {
+			billRegisterReportNew.setPexAmount(new BigDecimal(object[29].toString()));
+			}
+			if(object[30] != null) {
+			billRegisterReportNew.setPexaccountnumber(object[30].toString());
+			}
+			billRegReportList.add(billRegisterReportNew);
+			
+		}
+		
+
+		String[] COLUMNS = { "S.no.", "Bill Type", "Party Name", "Department Name", "Function Name", "Scheme", "Budget Bill Amount",
+				"Debit Side Account Head", "Credit Side Account Head","Debit Amount","Credit Amount", "Bill No", "Bill Date", "Voucher No",
+				"Voucher Date", "Voucher Type", "Pex Type", "Pex/Cheque No", "Pex/Cheque Date", "Pex/Cheque Amount",
+				"Pex Account No", "Status" };
+
+		ByteArrayInputStream in = newResultToExcel(billRegReportList, COLUMNS);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Content-Disposition", "attachment; filename=VoucherDetailReport.xls");
+		return ResponseEntity.ok().headers(headers).body(new InputStreamResource(in));
+	}
+	
+	public String getNewVoucherDateQuery(final Date billDateFrom, final Date billDateTo) {
+		final StringBuffer numDateQuery = new StringBuffer();
+		try {
+
+			if (null != billDateFrom)
+				numDateQuery.append(" and eb.billdate>='").append(DDMMYYYYFORMAT1.format(billDateFrom)).append("'");
+			if (null != billDateTo)
+				numDateQuery.append(" and eb.billdate<='").append(DDMMYYYYFORMAT1.format(billDateTo)).append("'");
+		} catch (final Exception e) {
+			LOGGER.error(e);
+			throw new ApplicationRuntimeException("Error occured while executing search instrument query");
+		}
+		return numDateQuery.toString();
+	}
+
+	public String getNewVoucherMisQuery(final CVoucherHeader voucherHeader) {
+
+		final StringBuffer misQuery = new StringBuffer(300);
+		if (null != voucherHeader) {
+			if (voucherHeader.getVouchermis() != null && voucherHeader.getVouchermis().getDepartmentcode() != null
+					&& !voucherHeader.getVouchermis().getDepartmentcode().isEmpty()) {
+				misQuery.append(" and ed.\"name\"='")
+						.append(voucherHeader.getVouchermis().getDepartmentcode() + "'");
+			}
+		}
+		return misQuery.toString();
+
 	}
 
 	@RequestMapping(value = "/searchVoucherResult", params = "search", method = RequestMethod.POST)
@@ -2054,6 +2465,98 @@ public class CreateJournalVoucherController extends BaseVoucherController {
 			}
 			if (detail.getStatus() != null) {
 				row.createCell(40).setCellValue(detail.getStatus());
+			}
+		}
+
+		workbook.write(out);
+		return new ByteArrayInputStream(out.toByteArray());
+
+	}
+	
+	public static ByteArrayInputStream newResultToExcel(List<BillRegisterNewReportBean> billRegReportList, String[] COLUMNS)
+			throws IOException {
+
+		HSSFWorkbook workbook = new HSSFWorkbook();
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		CreationHelper createHelper = workbook.getCreationHelper();
+
+		Sheet sheet = workbook.createSheet("Voucher Detail New Report");
+
+		// Row for Header
+		Row headerRow = sheet.createRow(0);
+		int sl = 1;
+		// Header
+		for (int col = 0; col < COLUMNS.length; col++) {
+			Cell cell = headerRow.createCell(col);
+			cell.setCellValue(COLUMNS[col]);
+		}
+
+		int rowIdx = 1;
+		for (BillRegisterNewReportBean detail : billRegReportList) {
+			Row row = sheet.createRow(rowIdx++);
+			row.createCell(0).setCellValue(String.valueOf(sl++));
+			if(detail.getBillType() !=null) {
+				row.createCell(1).setCellValue(detail.getBillType());	
+			}
+			if (detail.getPartyName() != null) {
+				row.createCell(2).setCellValue(detail.getPartyName());
+			}
+			if (detail.getDepartmentName() != null) {
+				row.createCell(3).setCellValue(detail.getDepartmentName());
+			}
+			if (detail.getFunctionName() != null) {
+				row.createCell(4).setCellValue(detail.getFunctionName());
+			}
+			if (detail.getScheme() != null) {
+				row.createCell(5).setCellValue(detail.getScheme());
+			}
+			if (detail.getBudgetBillAmount() != null) {
+				row.createCell(6).setCellValue(detail.getBudgetBillAmount().doubleValue());
+			}
+			if (detail.getDebitSideAccountHead() != null) {
+				row.createCell(7).setCellValue(detail.getDebitSideAccountHead());
+			}			
+			if (detail.getCreditSideAccountHead() != null) {
+				row.createCell(8).setCellValue(detail.getCreditSideAccountHead());
+			}
+			if (detail.getDebitAmount() != null) {
+				row.createCell(9).setCellValue(detail.getDebitAmount());
+			}			
+			if (detail.getCreditAmount() != null) {
+				row.createCell(10).setCellValue(detail.getCreditAmount());
+			}
+			if (detail.getBillNo() != null) {
+				row.createCell(11).setCellValue(detail.getBillNo());
+			}
+			if (detail.getBillDate() != null) {
+				row.createCell(12).setCellValue(detail.getBillDate());
+			}
+			if (detail.getVoucherNo() != null) {
+				row.createCell(13).setCellValue(detail.getVoucherNo());
+			}
+			if (detail.getVoucherDate() != null) {
+				row.createCell(14).setCellValue(detail.getVoucherDate());
+			}
+			if (detail.getVouchertype() != null) {
+				row.createCell(15).setCellValue(detail.getVouchertype());
+			}
+			if (detail.getPexType() != null) {
+				row.createCell(16).setCellValue(detail.getPexType());
+			}
+			if (detail.getPexNo() != null) {
+				row.createCell(17).setCellValue(detail.getPexNo());
+			}
+			if (detail.getPexDate() != null) {
+				row.createCell(18).setCellValue(detail.getPexDate());
+			}
+			if (detail.getPexAmount() != null) {
+				row.createCell(19).setCellValue(detail.getPexAmount().doubleValue());
+			}
+			if (detail.getPexaccountnumber() != null) {
+				row.createCell(20).setCellValue(detail.getPexaccountnumber());
+			}
+			if (detail.getStatus() != null) {
+				row.createCell(21).setCellValue(detail.getStatus());
 			}
 		}
 

@@ -50,13 +50,13 @@ public class AuditRestDataController {
 	private   List<String> allowheaderList= new ArrayList<String>(); 
 	private HttpHeaders headers = new HttpHeaders();
 	private final String headername="Content-Security-Policy";
-	private final String headervalue="default-src 'self' http://localhost:3006 https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in";
+	private final String headervalue="default-src 'self' http://localhost:3006 https://egov.chandigarhsmartcity.in https://egov-dev.chandigarhsmartcity.in https://egov-uat.chandigarhsmartcity.in https://mcc.chandigarhsmartcity.in https://chandigarh-dev.chandigarhsmartcity.in https://chandigarh-uat.chandigarhsmartcity.in https://ch-test.chandigarhsmartcity.in";
 	
 	
 	@SuppressWarnings("deprecation")
 	@ResponseBody
 	@RequestMapping(value = "getAllAuditByType", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllAuditByType(@ModelAttribute("auditDetail") final AuditDetail auditDetail){
 	
 		final StringBuffer query = new StringBuffer(500);
@@ -120,7 +120,7 @@ public class AuditRestDataController {
 	
 	@ResponseBody
 	@RequestMapping(value = "getAllAudit", method = RequestMethod.GET)
-	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in"}, allowedHeaders = "*")
+	@CrossOrigin(origins = {"http://localhost:3010","http://localhost:3006","https://egov.chandigarhsmartcity.in","https://egov-uat.chandigarhsmartcity.in","https://egov-dev.chandigarhsmartcity.in","https://ch-test.chandigarhsmartcity.in"}, allowedHeaders = "*")
 	public ResponseEntity<ResponseInfoWrapper>  getAllAudit(@RequestParam(name="fromDate") Date fromDate,@RequestParam(name="toDate") Date toDate){
 	
 		final StringBuffer query = new StringBuffer(500);
@@ -210,6 +210,7 @@ public HttpHeaders getHeaders() {
 		allowheaderList.add("https://mcc.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-dev.chandigarhsmartcity.in");
 		allowheaderList.add("https://chandigarh-uat.chandigarhsmartcity.in");
+		allowheaderList.add("https://ch-test.chandigarhsmartcity.in");
 		allowheaderList.add("http://localhost:3010");
 		allowheaderList.add("http://localhost:3006");
 		headers.set(headername, headervalue);
