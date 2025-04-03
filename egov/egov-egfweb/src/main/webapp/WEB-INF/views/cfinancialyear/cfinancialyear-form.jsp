@@ -65,13 +65,13 @@
 							<c:if test="${mode == 'create'}">
 								<form:input path="finYearRange"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumericwithspace" maxlength="25" />
+									data-pattern="numerichyphen" maxlength="25" />
 								<form:errors path="finYearRange" cssClass="error-msg" />
 							</c:if>
 							<c:if test="${mode == 'edit'}">
 								<form:input path="finYearRange"
 									class="form-control text-left patternvalidation"
-									data-pattern="alphanumericwithspace" maxlength="25" readonly="true" />
+									data-pattern="numerichyphen" maxlength="25" readonly="true" />
 								<form:errors path="finYearRange" cssClass="error-msg" />
 							</c:if>
 						</div>
