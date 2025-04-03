@@ -56,6 +56,9 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -74,6 +77,9 @@ import java.util.TreeMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -81,6 +87,8 @@ import org.apache.struts2.convention.annotation.Action;
 import org.apache.struts2.convention.annotation.ParentPackage;
 import org.apache.struts2.convention.annotation.Result;
 import org.apache.struts2.convention.annotation.Results;
+import org.apache.struts2.interceptor.ServletRequestAware;
+import org.apache.struts2.interceptor.ServletResponseAware;
 import org.apache.struts2.interceptor.validation.SkipValidation;
 import org.egov.billsaccounting.services.VoucherConstant;
 import org.egov.commons.Accountdetailtype;
@@ -102,13 +110,19 @@ import org.egov.egf.web.actions.voucher.BaseVoucherAction;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.exception.ApplicationException;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.DateValidateByUser;
+import org.egov.infra.microservice.models.DateValidations;
 import org.egov.infra.microservice.models.EmployeeInfo;
+import org.egov.infra.microservice.models.RequestInfo;
 import org.egov.infra.microservice.models.User;
+import org.egov.infra.microservice.models.UserInfo;
 import org.egov.infra.notification.service.NotificationService;
 import org.egov.infra.reporting.engine.ReportFormat;
 import org.egov.infra.script.entity.Script;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.autonumber.AutonumberServiceBeanResolver;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -186,7 +200,7 @@ import net.sf.jasperreports.engine.JRException;
         @Result(name = "bankAdvice-HTML", type = "stream", location = Constants.INPUT_STREAM, params = { Constants.INPUT_NAME,
                 Constants.INPUT_STREAM, Constants.CONTENT_TYPE, "text/html" })
 })
-public class ChequeAssignmentAction extends BaseVoucherAction {
+public class ChequeAssignmentAction extends BaseVoucherAction implements ServletResponseAware,ServletRequestAware {
     private static final long serialVersionUID = -3721873563220007939L;
     private static final String SURRENDERSEARCH = "surrendersearch";
     private static final String SURRENDERRTGSSEARCH = "surrenderRTGSsearch";
@@ -233,6 +247,20 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     private transient List<ChequeAssignment> pexList = new LinkedList<>();
     private boolean pexNoGenerationAuto;
     private boolean containsPEX = false;
+    
+    private HttpServletResponse response;
+    
+    private HttpServletRequest request;
+
+    @Override
+    public void setServletResponse(HttpServletResponse response) {
+        this.response = response;
+    }
+    
+    @Override
+    public void setServletRequest(HttpServletRequest request) {
+        this.request = request;
+    }
     
 
     @Autowired
@@ -582,6 +610,14 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeSearchForRemittance.");
         
+        String noofdaysParam = request.getParameter("noofdays");
+        System.out.println("noofdaysParam"+noofdaysParam);      
+        if(noofdaysParam!=null) {
+       	 long noofdays = Long.parseLong(noofdaysParam);
+            System.out.println("No of days passed: " + noofdays);
+       	addActionError("Dates exceeds " + noofdays + " days."); 
+       }
+        
         return "remittanceRtgsSearch";
     }
     
@@ -614,13 +650,73 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         	subdivisionList.add(subdivision);
         }
         addDropdownData("subdivisionList", subdivisionList);
+        
+        String noofdaysParam = request.getParameter("noofdays");
+        System.out.println("noofdaysParam"+noofdaysParam);      
+        if(noofdaysParam!=null) {
+       	 long noofdays = Long.parseLong(noofdaysParam);
+            System.out.println("No of days passed: " + noofdays);
+       	addActionError("Dates exceeds " + noofdays + " days."); 
+       }
+        
         return "remittancePexSearch";
     }
 
     @ValidationErrorPage(value = "remittanceRtgsSearch")
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-searchRemittanceRTGS")
-    public String searchRemittanceRTGS() throws ApplicationException, ParseException {
+    public String searchRemittanceRTGS() throws ApplicationException, ParseException, IOException {
+    	
+    	RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.DEDUCTION_RTGS_ASSIGNMENT_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         	         
+				String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		        String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days."); 
+		             System.out.println("contextpath:"+request.getContextPath());	            
+		             response.sendRedirect(request.getContextPath() +"/payment/chequeAssignment-beforeRemittanceRtgsSearch.action?noofdays=" + thresholdDays);
+		             return null;	
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+    	
     	if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchChequesOfRemittance...");
         final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?", recoveryId);
@@ -641,7 +737,58 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @ValidationErrorPage(value = "remittancePexSearch")
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-searchRemittancePEX")
-    public String searchRemittancePEX() throws ApplicationException, ParseException {
+    public String searchRemittancePEX() throws ApplicationException, ParseException,IOException {
+    	
+    	RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.DEDUCTION_PEX_ASSIGNMENT_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         	         
+				String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		        String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days."); 
+		             System.out.println("contextpath:"+request.getContextPath());	            
+		             response.sendRedirect(request.getContextPath() +"/payment/chequeAssignment-beforeSearchForPexRemittance.action?noofdays=" + thresholdDays);
+		             return null;	
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+    	
     	if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchChequesOfRemittance...");
         final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?", recoveryId);
@@ -759,6 +906,55 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     public String searchRTGS() throws ApplicationException, ParseException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchRTGS...");
+        
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.RTGS_ASSIGNMENT_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		         String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             return "rtgsSearch";		             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}		
+		}
+        
         CopyOnWriteArrayList<ChequeAssignment> rtgsChequeAssignmentList = null;
         List<ChequeAssignment> dbpRtgsAssignmentList = null;
         List<ChequeAssignment> rtgsEntry = new ArrayList<ChequeAssignment>();
@@ -906,6 +1102,55 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     public String search() throws ApplicationException, ParseException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting search...");
+        
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.CHEQUE_ASSIGNMENT_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		         String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             return "search";		             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}		
+		}
+        
         System.out.println(voucherHeader.getVouchermis().getSubdivision());
         System.out.println(voucherHeader.getVouchermis().getDepartmentcode());
         chequeSlNoMap = loadChequeSerialNo(bankaccount);
@@ -1109,6 +1354,55 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @ValidationErrorPage(value = "before_remittance_search")
     @Action(value = "/payment/chequeAssignment-searchChequesOfRemittance")
     public String searchChequesOfRemittance() throws ApplicationException, ParseException {
+    	
+    	RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.DEDUCTION_CHEQUE_ASSIGNMENT_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         	         
+				String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		        String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days."); 
+		             return "before_remittance_search";
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+    	
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchChequesOfRemittance...");
         final Recovery recovery = (Recovery) persistenceService.find("from Recovery where id=?", recoveryId);
@@ -1665,6 +1959,15 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         department = getDefaultDepartmentValueForPayment();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeSearchForSurrender.");
+        
+        String noofdaysParam = request.getParameter("noofdays");
+        System.out.println("noofdaysParam"+noofdaysParam);
+        if(noofdaysParam!=null) {
+        	 long noofdays = Long.parseLong(noofdaysParam);
+             System.out.println("No of days passed: " + noofdays);
+        	addActionError("Dates exceeds " + noofdays + " days."); 
+        }
+        
         return SURRENDERSEARCH;
     }
 
@@ -1678,15 +1981,74 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
         department = getDefaultDepartmentValueForPayment();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeSearchForSurrender.");
+        
+        String noofdaysParam = request.getParameter("noofdays");
+        System.out.println("noofdaysParam"+noofdaysParam);
+        if(noofdaysParam!=null) {
+        	 long noofdays = Long.parseLong(noofdaysParam);
+             System.out.println("No of days passed: " + noofdays);
+        	addActionError("Dates exceeds " + noofdays + " days."); 
+        }
+        
         return SURRENDERRTGSSEARCH;
     }
 
     @SkipValidation
     @ValidationErrorPage(value = SURRENDERSEARCH)
     @Action(value = "/payment/chequeAssignment-searchChequesForSurrender")
-    public String searchChequesForSurrender() {
+    public String searchChequesForSurrender() throws IOException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchChequesForSurrender...");
+        
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.SURRENDER_CHEQUE_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = fromDate;  // Starting date
+		         String toDateStr = toDate;    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             System.out.println("contextpath:"+request.getContextPath());	            
+		             response.sendRedirect(request.getContextPath() +"/payment/chequeAssignment-beforeSearchForSurrender.action?noofdays=" + thresholdDays);
+		             return null;			             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}		
+		}
 
         validateForSurrenderSearch();
         if (getFieldErrors().size() > 0) {
@@ -1749,9 +2111,59 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @SkipValidation
     @ValidationErrorPage(value = SURRENDERRTGSSEARCH)
     @Action(value = "/payment/chequeAssignment-searchForRTGSSurrender")
-    public String searchForRTGSSurrender() {
+    public String searchForRTGSSurrender() throws IOException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchRTGSForSurrender...");
+        
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.SURRENDER_RTGS_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = fromDate;  // Starting date
+		         String toDateStr = toDate;    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             System.out.println("contextpath:"+request.getContextPath());	            
+		             response.sendRedirect(request.getContextPath() +"/payment/chequeAssignment-beforeSearchForRTGSSurrender.action?noofdays=" + thresholdDays);
+		             return null;		             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}		
+		}
 
         validateForSurrenderSearch();
         if (getFieldErrors().size() > 0) {
@@ -1811,9 +2223,59 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @SkipValidation
     @ValidationErrorPage(value = SURRENDERPEXSEARCH)
     @Action(value = "/payment/chequeAssignment-searchForPEXSurrender")
-    public String searchForPEXSurrender() {
+    public String searchForPEXSurrender() throws IOException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchRTGSForSurrender...");
+        
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.SURRENDER_PEX_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = fromDate;  // Starting date
+		         String toDateStr = toDate;    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             System.out.println("contextpath:"+request.getContextPath());	            
+		             response.sendRedirect(request.getContextPath() +"/payment/chequeAssignment-beforeSearchForPEXSurrender.action?noofdays=" + thresholdDays);
+		             return null;		             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}		
+		}
 
         validateForSurrenderSearch();
         if (getFieldErrors().size() > 0) {
@@ -1971,7 +2433,7 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @ValidationErrorPage(value = "surrendercheques")
     @SkipValidation
     @Action(value = "/payment/chequeAssignment-save")
-    public String save() {
+    public String save() throws IOException {
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting surrenderCheques...");
         final StringBuffer reasonMissingRows = new StringBuffer(50);
@@ -3063,6 +3525,56 @@ public class ChequeAssignmentAction extends BaseVoucherAction {
     @Action(value = "/payment/chequeAssignment-searchPEX")
     public String searchPEX() throws ApplicationException, ParseException {
     	
+    	RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.PEX_ASSIGNMENT_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		         String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             return "pexSearch";		             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}
+			
+			
+		}
+    	
         voucherHeader.getVouchermis().setSubdivision(subdivision);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Starting searchRTGS...");
@@ -3421,6 +3933,15 @@ public void buildSmsForMeeting(final String mobileNumber, final String bpvNumber
         loadBankAndAccounForRTGSSurender();
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Completed beforeSearchForSurrender.");
+        
+        String noofdaysParam = request.getParameter("noofdays");
+        System.out.println("noofdaysParam"+noofdaysParam);
+        if(noofdaysParam!=null) {
+        	 long noofdays = Long.parseLong(noofdaysParam);
+             System.out.println("No of days passed: " + noofdays);
+        	addActionError("Dates exceeds " + noofdays + " days."); 
+        }
+        
         return SURRENDERPEXSEARCH;
     }
     

@@ -112,6 +112,8 @@ import org.egov.infra.microservice.models.BusinessDetailsResponse;
 import org.egov.infra.microservice.models.BusinessService;
 import org.egov.infra.microservice.models.BusinessServiceCriteria;
 import org.egov.infra.microservice.models.BusinessServiceMapping;
+import org.egov.infra.microservice.models.DateValidateByUser;
+import org.egov.infra.microservice.models.DateValidations;
 import org.egov.infra.microservice.models.Department;
 import org.egov.infra.microservice.models.Designation;
 import org.egov.infra.microservice.models.EmployeeInfo;
@@ -1949,6 +1951,99 @@ public class MicroserviceUtils {
         StringBuilder uri = new StringBuilder(appConfigManager.getEgovCollSerHost()).append(appConfigManager.getCollSerPaymentWorkflow());
         response = restTemplate.postForObject(uri.toString(), request , PaymentResponse.class);            
         return response;
+    }
+    
+    public List<DateValidations> financeDateValidate() {
+        List<DateValidations> desgList = new ArrayList<>();
+        FilterRequest filterReq =new FilterRequest();
+        try {
+           
+            List mdmObj =  getFinanceMdmsByModuleNameBillRegisterSearch("common-masters", "FinanceDateValidation", filterReq);
+
+              mdmObj.stream().forEach(obj ->{
+                LinkedHashMap<String, Object> lhm = (LinkedHashMap)obj;
+                DateValidations dateValidations = new DateValidations();
+                dateValidations.setCode(lhm.get("code").toString());
+                
+                List<LinkedHashMap<String, Object>> usernameRoleList = (List<LinkedHashMap<String, Object>>) lhm.get("username_role");
+
+                // Iterate over the username_role list and fetch usernames and validDays
+                for (LinkedHashMap<String, Object> userRole : usernameRoleList) {
+                    String username = (String) userRole.get("username");
+                    int validDay = (int) userRole.get("validDay");
+
+                    // Create a UsernameRole object and add it to the DateValidations object
+                    DateValidateByUser usernameRole = new DateValidateByUser(username, validDay);
+                    dateValidations.addUsernameRole(usernameRole);
+                }
+
+                // Add the DateValidations object (with code and usernameRoles) to the list
+                desgList.add(dateValidations);
+
+            });
+            return desgList;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    
+    
+    public JSONArray getFinanceMdmsByModuleNameBillRegisterSearch(String moduleName,String name, FilterRequest filter){
+        String mdmsUrl = appConfigManager.getEgovMdmsSerHost() + this.mdmsSearchUrl;
+        RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(getUserToken());
+        MasterDetail masterDetail = new MasterDetail();
+        masterDetail.setName(name);
+        //Apply filter in the request
+        if(null != filter){
+            if(!StringUtils.isEmpty(filter.getCode()))
+                masterDetail.setFilter("[?(@.code=='" + filter.getCode() + "')]");
+            
+            if(!StringUtils.isEmpty(filter.getName()))
+                masterDetail.setFilter("[?(@.name=='" + filter.getName() + "')]");
+            
+            if(null != filter.getActive())
+                masterDetail.setFilter("[?(@.active=='" + filter.getActive() + "')]");
+            
+            if(null != filter.getNames()) {
+                List<String> names = filter.getNames().parallelStream()
+                        .map(obj -> {
+                            return "'"+obj+"'";
+                        }).collect(Collectors.toList());
+                masterDetail.setFilter("[?(@.name IN " + names + ")]");
+            }
+            
+            if(null != filter.getCodes()) {
+                List<String> codes = filter.getCodes().parallelStream()
+                        .map(obj -> {
+                            return "'"+obj+"'";
+                        }).collect(Collectors.toList());
+                masterDetail.setFilter("[?(@.code IN " + codes + ")]");
+            }
+            
+            if(null != filter.getGlcode())
+                masterDetail.setFilter("[?(@.glcode=='" + filter.getGlcode() + "')]");
+        }
+        ModuleDetail moduleDetail = new ModuleDetail();
+        moduleDetail.setMasterDetails(Arrays.asList(masterDetail));
+        moduleDetail.setModuleName(moduleName);
+        MdmsCriteria mdmscriteria = new MdmsCriteria();
+        mdmscriteria.setTenantId(getTenentId().split(Pattern.quote("."))[0]);
+        mdmscriteria.setModuleDetails(Arrays.asList(moduleDetail));
+        MdmsCriteriaReq mdmsrequest = new MdmsCriteriaReq();
+        mdmsrequest.setRequestInfo(requestInfo);
+        mdmsrequest.setMdmsCriteria(mdmscriteria);
+        try {
+            MdmsResponse response = restTemplate.postForObject(mdmsUrl, mdmsrequest, MdmsResponse.class);
+            Map<String, JSONArray> mdmsmap = response.getMdmsRes().get(moduleName);
+            if (null != mdmsmap && mdmsmap.size() > 0) {
+                return mdmsmap.get(name);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     }
     
 }

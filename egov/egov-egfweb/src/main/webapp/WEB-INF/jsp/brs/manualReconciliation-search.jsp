@@ -50,6 +50,13 @@
 <%@ include file="/includes/taglibs.jsp"%>
 <%@ page language="java"%>
 <script src="<cdn:url value='/resources/global/js/egov/patternvalidation.js?rnd=${app_release_no}' context='/services/egi'/>"></script>
+<s:if test="hasActionErrors() || hasFieldErrors()">
+    <div style="color: red">
+        <s:actionerror />
+        <s:fielderror />
+    </div>
+</s:if>
+<s:else>
 <div class="panel-heading custom_form_panel_heading">
 	<div class="panel-title">Reconciled/Unreconciled Items </div>
 </div>
@@ -115,6 +122,7 @@
 		</s:else>
 	</table>
 </div>
+</s:else>
 <s:if test="%{unReconciledCheques.size>0}">
 	<div class="buttonbottom" id="reconcileDiv" style="display: none">
 		<table>

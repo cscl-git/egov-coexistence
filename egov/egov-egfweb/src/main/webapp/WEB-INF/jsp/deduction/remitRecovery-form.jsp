@@ -413,6 +413,23 @@ function resetSubmit()
 	document.remitRecoveryForm.submit();
 	
 	}
+
+//Function to check for action errors and toggle the div
+function checkForErrors() {
+    var hasErrors = document.getElementById("hasErrors").value === "true"; // Check if there are errors
+    var yourDiv = document.getElementById("yourDivId");
+
+    if (hasErrors) {
+        // Hide the div if there are action errors
+        yourDiv.style.display = "none";
+    } else {
+        // Show the div if no action errors
+        yourDiv.style.display = "block";
+    }
+}
+
+// Call this function after the page loads to check for errors
+document.addEventListener("DOMContentLoaded", checkForErrors);
 </script>
 <style type="text/css">
 #codescontainer {

@@ -61,7 +61,7 @@
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="Cheque Assignment Search" />
 		</jsp:include>
-		<span id="errorSpan" style="color: red;"> <s:actionerror /> <s:fielderror />
+		<span class="mandatory1" id="errorSpan" style="color: red;"> <s:actionerror /> <s:fielderror />
 			<s:actionmessage />
 		</span>
 		<div class="formmainbox">

@@ -62,7 +62,7 @@
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="RTGS Surrender Search" />
 		</jsp:include>
-		<span id="errrorSpan"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
+		<span class="mandatory1" id="errrorSpan" style="color: red;"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">

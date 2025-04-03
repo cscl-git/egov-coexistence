@@ -58,7 +58,7 @@
 <title><s:text name="bankreconciliation" /></title>
 <script type="text/javascript">
 function validateSubmit() {
-	if(!validate())
+	if(!validateAutoReconcil())
 		{
 			return false;
 		}
@@ -136,33 +136,42 @@ function validateSubmit() {
 								headerValue="%{getText('lbl.choose.options')}" /></td>
 						<td class="bluebox"><s:text name="reconciliationdate" /> <span
 							class="bluebox"><span class="mandatory1">*</span></span></td>
-						<td class="greybox"><s:date name="reconciliationDate"
+						<%-- <td class="greybox"><s:date name="reconciliationDate"
 								var="reconciliationDate" format="dd/MM/yyyy" /> <s:textfield
 								id="reconciliationDate" name="reconciliationDate"
 								value="%{reconciliationDate}"
 								onkeyup="DateFormat(this,this.value,event,false,'3')"
 								placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-								data-inputmask="'mask': 'd/m/y'" /></td>
+								data-inputmask="'mask': 'd/m/y'" /></td> --%>
+					<td class="greybox"><input type="text" id="reconciliationDate" name="reconciliationDate" 
+							     	class="form-control datepicker" placeholder="DD/MM/YYYY" data-inputmask="'mask': 'd/m/y'" autocomplete="off"/>
+					</td>
 					</tr>
 					<tr>
 						<td class="greybox"></td>
 						<td class="greybox"><s:text name="fromdate" /> <span
 							class="greybox"><span class="mandatory1">*</span></span></td>
-						<td class="greybox"><s:date name="fromDate" var="fromDate"
+						<%-- <td class="greybox"><s:date name="fromDate" var="fromDate"
 								format="dd/MM/yyyy" /> <s:textfield id="fromDate"
 								name="fromDate" value="%{fromDate}"
 								onkeyup="DateFormat(this,this.value,event,false,'3')"
 								placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td> --%>
+						<td class="greybox"><input type="text" id="fromDate" name="fromDate" 
+							class="form-control datepicker" placeholder="DD/MM/YYYY" data-inputmask="'mask': 'd/m/y'" autocomplete="off"/>
+						</td>
 						<td class="greybox"><s:text name="todate" /> <span
 							class="greybox"><span class="mandatory1">*</span></span></td>
 
-						<td class="greybox"><s:date name="toDate" var="toDate"
+						<%-- <td class="greybox"><s:date name="toDate" var="toDate"
 								format="dd/MM/yyyy" /> <s:textfield id="toDate" name="toDate"
 								value="%{toDate}"
 								onkeyup="DateFormat(this,this.value,event,false,'3')"
 								placeholder="DD/MM/YYYY" cssClass="form-control datepicker"
-								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td>
+								data-inputmask="'mask': 'd/m/y'"  autocomplete="off"/></td> --%>
+					<td class="greybox"><input type="text" id="toDate" name="toDate" 
+						    class="form-control datepicker" placeholder="DD/MM/YYYY" data-inputmask="'mask': 'd/m/y'" autocomplete="off"/>
+					</td>
 					</tr>
 
 				</table>

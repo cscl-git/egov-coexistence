@@ -64,7 +64,7 @@
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="PEX Ref. No. Assignment Search" />
 		</jsp:include>
-		<span id="errorSpan"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
+		<span class="mandatory1" id="errorSpan"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">

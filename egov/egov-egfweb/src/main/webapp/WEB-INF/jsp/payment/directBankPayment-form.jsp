@@ -168,13 +168,13 @@
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:select name="firstsignatory" headerKey="-1"
 			headerValue="Select First Signatory" value="%{firstsignatory}"
-			list="#{'Joint Commissioner':'Joint Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)'}"
+			list="#{'Joint Commissioner':'Joint Commissioner' ,'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)','Project Director':'Project Director'}"
 			id="firstsignatory" /></td>
 	<td class="greybox"><s:text name="payment.secondsignatory" /><span
 		class="greybox"><span class="mandatory1">*</span></span></td>
 	<td class="greybox"><s:select name="secondsignatory" headerKey="-1"
 			headerValue="Select Second Signatory"
-			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer'}"
+			list="#{'Chief Accounts Officer':'Chief Accounts Officer' ,'Assistant Controller (F and A)':'Assistant Controller (F and A)' ,'Section Officer':'Section Officer','Project Director':'Project Director'}"
 			id="secondsignatory" /></td>
 </tr>
 <tr>

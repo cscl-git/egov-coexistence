@@ -123,6 +123,7 @@
 			</table>
 			<jsp:include page="remitRecovery-form.jsp" />
 			<s:hidden type="hidden" id="isNonControlledCodeTds" name="isNonControlledCodeTds" />
+			<input type="hidden" id="hasErrors" value="<s:property value='hasActionErrors()'/>" />
 			<label style="text-align: right;"></label>
 
 			<div class="buttonbottom" style="padding-bottom: 10px;">
@@ -130,6 +131,7 @@
 				<input type="button" id="Close" value='<s:text name="lbl.close"/>' onclick="javascript:window.close()" class="button" />
 			</div>
 		</div>
+		<div id="yourDivId" style="display: none;">
 		<s:if test='%{listRemitBean != null }'>
 			<s:if test="%{ listRemitBean.size()>0}">
 				<div align="center">

@@ -696,7 +696,7 @@ function ConfirmDialog(message) {
   <input name="button32" type="button" class="buttonsubmit" id="button32" value="Cancel Receipt" onclick="return checkcancelforselectedrecord()"/>
   </egov-authz:authorize> --%>
   <input name="button32" type="button" class="button" id="button32" value="<s:text name='lbl.close'/>" onclick="window.parent.postMessage('close','*');window.close();"/>
-  <input name="buttonCancel" type="button" class="buttonsubmit showModal" id="buttonCancel" value="Cancel" data-toggle='modal' data-target='#myModal'/>
+  <!-- <input name="buttonCancel" type="button" class="buttonsubmit showModal" id="buttonCancel" value="Cancel" data-toggle='modal' data-target='#myModal'/> -->
   
   
 </div>

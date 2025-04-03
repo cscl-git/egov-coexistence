@@ -51,6 +51,9 @@
 package org.egov.egf.web.actions.voucher;
 
 import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -71,9 +74,14 @@ import org.egov.eis.service.EisCommonService;
 import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.DateValidateByUser;
+import org.egov.infra.microservice.models.DateValidations;
 import org.egov.infra.microservice.models.Department;
+import org.egov.infra.microservice.models.RequestInfo;
+import org.egov.infra.microservice.models.UserInfo;
 import org.egov.infra.script.entity.Script;
 import org.egov.infra.script.service.ScriptService;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
@@ -137,6 +145,55 @@ public class BillVoucherAction extends BaseVoucherAction {
     @SuppressWarnings("unchecked")
     @Action(value = "/voucher/billVoucher-lists")
     public String lists() throws ValidationException {
+    	
+    	 RequestInfo requestInfo = new RequestInfo();
+         requestInfo.setAuthToken(microserviceUtils.getUserToken());
+         requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+         requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+         
+         UserInfo userInfo = requestInfo.getUserInfo();
+         String loginuserName = userInfo.getUserName();
+         
+      		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.VOUCHER_FROM_BILL_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         
+		         String fromDateStr = voucherTypeBean.getVoucherDateFrom();  // Starting date
+		         String toDateStr = voucherTypeBean.getVoucherDateTo();    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");  
+		             return newForm();		      
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+		
         final StringBuffer query = new StringBuffer(300);
         if (LOGGER.isDebugEnabled())
             LOGGER.debug("Expenditure Type selected :=" + expType);

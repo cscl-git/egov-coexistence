@@ -49,6 +49,9 @@ package org.egov.egf.web.actions.voucher;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -84,7 +87,12 @@ import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.AppConfigValueService;
 import org.egov.infra.config.core.ApplicationThreadLocals;
+import org.egov.infra.microservice.models.DateValidateByUser;
+import org.egov.infra.microservice.models.DateValidations;
+import org.egov.infra.microservice.models.RequestInfo;
+import org.egov.infra.microservice.models.UserInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
 import org.egov.infra.web.struts.actions.BaseFormAction;
@@ -195,12 +203,72 @@ public class CancelVoucherAction extends BaseFormAction {
 	@ValidationErrorPage(value = SEARCH)
 	@Action(value = "/voucher/cancelVoucher-search")
 	public String search() {
+		
+		RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.CANCEL_VOUCHER_SEARCH_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         	         
+				String fromDateStr = parameters.get("fromDate")[0];  // Starting date
+		        String toDateStr = parameters.get("toDate")[0];    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days."); 		            
+		             return SEARCH;	
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+		
 		if (LOGGER.isDebugEnabled()) {
 			LOGGER.debug("...Searching for voucher of type " + voucherHeader.getType());
 			LOGGER.debug("...Searching for voucher of name " + voucherHeader.getName());
 		}
 		voucherHeader.getVouchermis().setDepartmentcode(deptImpl.getCode());
 		voucherSearchList = getVouchersForCancellation();
+		
+		if(voucherSearchList!=null && !voucherSearchList.isEmpty()) {
+			String finyrerrormsg = voucherSearchList.get(0).getFinyrerrormsg();
+			
+			if(finyrerrormsg !=null && !"".equals(finyrerrormsg)) {
+			voucherSearchList.clear();
+		    addActionError(finyrerrormsg); 		            
+	         return SEARCH;	
+			}
+			}
+		
 		List<org.egov.infra.microservice.models.Department> departments = masterDataCache.get("egi-department");
 		Map<String, String> depMap = new HashMap<>();
 		for (org.egov.infra.microservice.models.Department department : departments) {
@@ -242,10 +310,23 @@ public class CancelVoucherAction extends BaseFormAction {
 					toDate);
 
 			final boolean validateClosedPeriod = voucherSearchUtil.validateClosedPeriod(fromDate, toDate);
-			if ((!validateFinancialYearForPosting) || (!validateClosedPeriod))
-				throw new ValidationException(Arrays.asList(new ValidationError(
+			if ((!validateFinancialYearForPosting) || (!validateClosedPeriod)) {
+				/*throw new ValidationException(Arrays.asList(new ValidationError(
 						"Financial Year  Not active for Posting(either year or date within selected date range)",
-						"Financial Year  Not active for Posting(either year or date within selected date range)")));
+						"Financial Year  Not active for Posting(either year or date within selected date range)")));*/
+				
+				 // Initialize the voucherList
+			    List<CVoucherHeader> voucherList = new ArrayList<>();
+			    
+				CVoucherHeader voucherHeader = new CVoucherHeader(); // Initialize voucherHeader
+							
+            // Set the error message
+            voucherHeader.setFinyrerrormsg("Financial Year Not active for Posting (either year or date within selected date range)");
+            
+            // Add the voucherHeader to the list
+			voucherList.add(voucherHeader);
+            return voucherList; // Return the list with the error message
+			}
 		}
 
 		final String filter = voucherSearchUtil.voucherFilterQuery(voucherHeader, fromDate, toDate, "");

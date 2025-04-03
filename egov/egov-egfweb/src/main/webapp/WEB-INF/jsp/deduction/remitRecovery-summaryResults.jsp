@@ -53,6 +53,12 @@
 <s:if test="%{message != ''}">
 	<label style="color: red"><s:property value="message" /></label>
 </s:if>
+<s:if test="hasActionErrors() || hasFieldErrors()">
+    <div style="color: red">
+        <s:actionerror />
+        <s:fielderror />
+    </div>
+</s:if>
 <s:elseif test="%{remittedTDS.size()>0}">
 	<br />
 	<s:form action="saveAssignNumbers" theme="simple"
@@ -148,4 +154,6 @@
 	</div>
 	</s:form>
 </s:elseif>
-<s:else>No records found</s:else>
+<s:else>
+No records found
+</s:else>

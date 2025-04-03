@@ -160,6 +160,9 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
     @Transient
     private String subdivision;
     
+    @Transient
+    private String finyrerrormsg;
+    
     
     public String getSubdivision() {
 		return subdivision;
@@ -644,6 +647,13 @@ public class CVoucherHeader extends StateAware implements java.io.Serializable{
 	public void setRefundable(String refundable) {
 		this.refundable = refundable;
 	}
+	
+	public String getFinyrerrormsg() {
+		return finyrerrormsg;
+	}
 
+	public void setFinyrerrormsg(String finyrerrormsg) {
+		this.finyrerrormsg = finyrerrormsg;
+	}
 	
 }

@@ -57,7 +57,13 @@ import org.egov.commons.Bankaccount;
 import org.egov.commons.Bankbranch;
 import org.egov.commons.Bankreconciliation;
 import org.egov.commons.dao.BankHibernateDAO;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.filestore.entity.FileStoreMapper;
+import org.egov.infra.microservice.models.DateValidateByUser;
+import org.egov.infra.microservice.models.DateValidations;
+import org.egov.infra.microservice.models.RequestInfo;
+import org.egov.infra.microservice.models.UserInfo;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.web.struts.actions.BaseFormAction;
 import org.egov.infra.web.struts.annotation.ValidationErrorPage;
 import org.egov.model.brs.AutoReconcileBean;
@@ -69,6 +75,10 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -214,9 +224,65 @@ public class AutoReconciliationAction extends BaseFormAction {
     /**
      * @return
      */
+    @ValidationErrorPage(value = NEW)
     @Action(value = "/brs/autoReconciliation-schedule")
     public String schedule()
     {
+    	
+    	RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.AUTO_BANK_RECONCILATION_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+				
+				SimpleDateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
+		        
+		        // Convert date to string
+		        String fromdatstr = dateformatter.format(fromDate);
+		        String todatstr = dateformatter.format(toDate);
+		        String fromDateStr = fromdatstr;  // Starting date
+		        String toDateStr = todatstr;    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");              
+		             //response.sendRedirect(request.getContextPath() +"/brs/autoReconciliation-newForm.action?noofdays=" + thresholdDays);
+		             return NEW;		             
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}		
+		}
+    	
     	setup() ;
     	autoReconcileHelper.schedule();  
         return "result";

@@ -54,6 +54,9 @@ import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -97,11 +100,17 @@ import org.egov.infra.admin.master.entity.AppConfigValues;
 import org.egov.infra.admin.master.entity.Boundary;
 import org.egov.infra.admin.master.entity.Department;
 import org.egov.infra.admin.master.service.DepartmentService;
+import org.egov.infra.config.core.ApplicationThreadLocals;
 import org.egov.infra.config.persistence.datasource.routing.annotation.ReadOnly;
 import org.egov.infra.exception.ApplicationRuntimeException;
+import org.egov.infra.microservice.models.DateValidateByUser;
+import org.egov.infra.microservice.models.DateValidations;
+import org.egov.infra.microservice.models.RequestInfo;
+import org.egov.infra.microservice.models.UserInfo;
 import org.egov.infra.microservice.utils.MicroserviceUtils;
 import org.egov.infra.script.entity.Script;
 import org.egov.infra.script.service.ScriptService;
+import org.egov.infra.utils.ApplicationConstant;
 import org.egov.infra.utils.DateUtils;
 import org.egov.infra.validation.exception.ValidationError;
 import org.egov.infra.validation.exception.ValidationException;
@@ -327,22 +336,76 @@ public class RemitRecoveryAction extends BasePaymentAction {
     @ValidationErrorPage(value = NEW)
     @Action(value = "/deduction/remitRecovery-search")
     public String search() {
-        listRemitBean = new ArrayList<RemittanceBean>();
-        if (LOGGER.isDebugEnabled())
-            LOGGER.debug("RemitRecoveryAction | Search | Start");
-        if(remitRecoveryService.isNonControlledCodeTds(remittanceBean)){
-            isNonControlledCodeTds = true;
-            listRemitBean = remitRecoveryService.getRecoveryDetailsForNonControlledCode(remittanceBean, voucherHeader);
-        }else{
-            listRemitBean = remitRecoveryService.getRecoveryDetails(remittanceBean, voucherHeader);
-        }
-        if (listRemitBean == null || listRemitBean.isEmpty())
-            listRemitBean = new ArrayList<RemittanceBean>();
-        else {
-            departmentId = listRemitBean.get(0).getDepartmentId();
-            functionId = listRemitBean.get(0).getFunctionId();
-        }
-        return NEW;
+    	RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.DEDUCTION_PAYMENT_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         	         
+		        SimpleDateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
+			        
+			     // Convert date to string
+			     String fromdatstr = dateformatter.format(remittanceBean.getFromVhDate());
+			     String todatstr = dateformatter.format(voucherHeader.getVoucherDate());
+			     String fromDateStr = fromdatstr;  // Starting date
+			     String toDateStr = todatstr;    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days.");               
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		        	 
+		        	 listRemitBean = new ArrayList<RemittanceBean>();
+		             if (LOGGER.isDebugEnabled())
+		                 LOGGER.debug("RemitRecoveryAction | Search | Start");
+		             if(remitRecoveryService.isNonControlledCodeTds(remittanceBean)){
+		                 isNonControlledCodeTds = true;
+		                 listRemitBean = remitRecoveryService.getRecoveryDetailsForNonControlledCode(remittanceBean, voucherHeader);
+		             }else{
+		                 listRemitBean = remitRecoveryService.getRecoveryDetails(remittanceBean, voucherHeader);
+		             }
+		             if (listRemitBean == null || listRemitBean.isEmpty())
+		                 listRemitBean = new ArrayList<RemittanceBean>();
+		             else {
+		                 departmentId = listRemitBean.get(0).getDepartmentId();
+		                 functionId = listRemitBean.get(0).getFunctionId();
+		             }
+		        	 
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+    	
+		return NEW; 
     }
 
     public void prepareRemit() {
@@ -1295,6 +1358,60 @@ public class RemitRecoveryAction extends BasePaymentAction {
 	@Action(value = "/deduction/remitRecovery-ajaxLoadSummaryData")
     public String ajaxLoadSummaryData() {
 		System.out.println("CCCCCC");
+		
+		RequestInfo requestInfo = new RequestInfo();
+        requestInfo.setAuthToken(microserviceUtils.getUserToken());
+        requestInfo.setUserInfo(microserviceUtils.getUserInfo());
+        requestInfo.getUserInfo().setId(ApplicationThreadLocals.getUserId());
+        
+        UserInfo userInfo = requestInfo.getUserInfo();
+        String loginuserName = userInfo.getUserName();
+        
+     		
+		List<DateValidations> billregisterDateValidate = microserviceUtils.financeDateValidate();
+		
+		for (DateValidations dateValidations : billregisterDateValidate) {
+			String code = dateValidations.getCode();
+			if(ApplicationConstant.DEDUCTION_ASSIGN_ACKNOWLEDGEMENT_DATE_VALIDATION.equals(code)) {					
+			List<DateValidateByUser> dateValidateByUser = dateValidations.getDateValidateByUser();
+			for (DateValidateByUser dateValidations2 : dateValidateByUser) {
+				String username = dateValidations2.getUsername();
+				if(loginuserName.equals(username)){
+				Integer validDay = dateValidations2.getValidDay();
+		         	         
+                SimpleDateFormat dateformatter = new SimpleDateFormat("dd/MM/yyyy");
+		        
+		        // Convert date to string
+		        String fromdatstr = dateformatter.format(fromDate);
+		        String todatstr = dateformatter.format(asOnDate);
+		        String fromDateStr = fromdatstr;  // Starting date
+		        String toDateStr = todatstr;    // Ending date
+
+		         long thresholdDays = validDay;
+
+		         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+		         LocalDate fromDate = LocalDate.parse(fromDateStr, formatter);
+		         LocalDate toDate = LocalDate.parse(toDateStr, formatter);
+
+		         long daysBetween = ChronoUnit.DAYS.between(fromDate, toDate)+ 1;
+
+		         System.out.println("Days between " + fromDate + " and " + toDate + ": " + daysBetween);
+
+		         if (daysBetween > thresholdDays) {
+		        	 System.out.println("Dates exceeds " + thresholdDays + " days.");
+		             addActionError("Dates exceeds " + thresholdDays + " days."); 		            
+		             return "summaryResults";	
+		         } else {
+		        	 System.out.println("Dates is within " + thresholdDays + " days.");
+		         }
+				
+			}
+			}
+			break;
+			}			
+		}
+		
 		prepareAssign();
         populateSummaryData();
         System.out.println("AAAAAAA");

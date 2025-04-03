@@ -62,7 +62,7 @@
 		<jsp:include page="../budget/budgetHeader.jsp">
 			<jsp:param name="heading" value="PEX Surrender Search" />
 		</jsp:include>
-		<span id="errorSpan"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
+		<span id="errorSpan" style="color: red;"> <s:actionerror /> <s:fielderror /> <s:actionmessage />
 		</span>
 		<div class="formmainbox">
 			<div class="subheadnew">

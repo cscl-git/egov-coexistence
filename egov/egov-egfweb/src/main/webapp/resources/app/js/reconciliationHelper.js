@@ -352,6 +352,73 @@ function validate() {
 	return true;
 }
 
+function validateAutoReconcil() {
+	if (document.getElementById("bankId").value == "") {
+		bootbox.alert(jQuery.i18n.prop('msg.select.bank.from.dropdown'));
+		return false;
+	}
+	if (document.getElementById("branchId").value == "") {
+		bootbox.alert(jQuery.i18n.prop('msg.select.branch'));
+		return false;
+	}
+	if (document.getElementById("accountId").value == "") {
+		bootbox.alert(jQuery.i18n.prop('msg.select.account'));
+		return false;
+	}
+	var toDateStr = document.getElementById("toDate").value;
+	var fromDatestr = document.getElementById("fromDate").value;
+	var reconDateStr = document.getElementById("reconciliationDate").value;
+	var toDateParts = toDateStr.split("/");
+	var fromDateParts = fromDatestr.split("/");
+	if (reconDateStr == "") {
+		bootbox.alert(jQuery.i18n.prop('msg.select.reconciliattion.date'));
+		return false;
+	}
+	if (fromDatestr == "") {
+		bootbox.alert(jQuery.i18n.prop('msg.select.bank.statement.from.date'));
+		return false;
+	}
+	if (toDateStr == "") {
+		bootbox.alert(jQuery.i18n.prop('msg.select.bank.statement.to.date'));
+		return false;
+	}
+
+	var fromDate = new Date(fromDateParts[1] + "/" + fromDateParts[0] + "/"
+			+ fromDateParts[2]);
+	var toDates = new Date(toDateParts[1] + "/" + toDateParts[0] + "/"
+			+ toDateParts[2]);
+	if (fromDate > toDates) {
+		bootbox
+				.alert(jQuery.i18n.prop('msg.bank.stmt.from.date.must.be.less.than.or.equal.bank.stmt.to.date'));
+		return false;
+	}
+	if (toDateStr != null && reconDateStr != null) {
+
+		if (toDateParts.length != 3) {
+			bootbox.alert(jQuery.i18n.prop('msg.enter.date.is.ddmmyyyy.format.only'));
+			return false;
+		}
+		var toDate = new Date(toDateParts[1] + "/" + toDateParts[0] + "/"
+				+ toDateParts[2]);
+		var reconDateParts = reconDateStr.split("/");
+
+		if (reconDateParts.length != 3) {
+			bootbox.alert(jQuery.i18n.prop('msg.enter.date.is.ddmmyyyy.format.only'));
+			return false;
+		}
+		var reconDate = new Date(reconDateParts[1] + "/" + reconDateParts[0]
+				+ "/" + reconDateParts[2]);
+		// bootbox.alert(reconDate.toString('MM-dd-yyyy'));
+		if (reconDate < toDate) {
+			bootbox
+					.alert(jQuery.i18n.prop('msg.rec.date.must.be.greater.than.or.equal.to.bank.stmt.to.date'));
+			return false;
+		}
+	}
+		
+	return true;
+}
+
 
 function validatetype(obj) {
 		var typeid = document.getElementById("typeid").value;

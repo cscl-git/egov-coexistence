@@ -177,7 +177,8 @@
                             <dependency>
                                 <groupId>org.postgresql</groupId>
                                 <artifactId>postgresql</artifactId>
-                                <version>${postgres-version}</version>
+                                <version>42.7.2</version>
+                            <!--<version>${postgres-version}</version>-->
                             </dependency>
                         </dependencies>
                         <configuration>
@@ -216,7 +217,8 @@
                             <dependency>
                                 <groupId>org.postgresql</groupId>
                                 <artifactId>postgresql</artifactId>
-                                <version>${postgres-version}</version>
+                                <version>42.7.2</version>                              
+                            <!--<version>${postgres-version}</version>-->
                             </dependency>
                         </dependencies>
                         <configuration>
