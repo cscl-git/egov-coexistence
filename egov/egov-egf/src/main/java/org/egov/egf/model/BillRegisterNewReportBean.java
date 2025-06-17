@@ -28,6 +28,9 @@ public class BillRegisterNewReportBean {
 	private String status;
 	private Integer debitAmount;
 	private Integer creditAmount;
+	private BigDecimal paidAmount;
+	private String paymentvoucherNo;
+	private String paymentvoucherDate;
 	
 	public String getBillType() {
 		return billType;
@@ -167,5 +170,23 @@ public class BillRegisterNewReportBean {
 	}
 	public void setCreditAmount(Integer creditAmount) {
 		this.creditAmount = creditAmount;
-	}			
+	}
+	public BigDecimal getPaidAmount() {
+		return paidAmount;
+	}
+	public void setPaidAmount(BigDecimal paidAmount) {
+		this.paidAmount = paidAmount;
+	}
+	public String getPaymentvoucherNo() {
+		return paymentvoucherNo;
+	}
+	public void setPaymentvoucherNo(String paymentvoucherNo) {
+		this.paymentvoucherNo = paymentvoucherNo;
+	}
+	public String getPaymentvoucherDate() {
+		return paymentvoucherDate;
+	}
+	public void setPaymentvoucherDate(String paymentvoucherDate) {
+		this.paymentvoucherDate = paymentvoucherDate;
+	}
 }
