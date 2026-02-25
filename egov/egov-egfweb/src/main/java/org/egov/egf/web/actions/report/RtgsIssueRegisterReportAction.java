@@ -570,7 +570,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 		
 			queryString = queryString
 					.append(" SELECT a.detailname as partyName, ih.id as ihId, ih.realizationDate as realizationDate, ih.transactionnumber as rtgsNumber, ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
-							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   gld.amount as paymentAmount,"
+							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,   sum(gld.amount) as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch, ba.accountnumber as accountNumber FROM Paymentheader ph, voucherheader vh,vouchermis vmis,bankaccount ba,bankbranch branch,bank b,generalledger gl,generalledgerdetail gld,"
 							+ " egf_instrumentvoucher iv,  egf_instrumentheader ih, egw_status stat, accountdetailkey a WHERE "
 							+ " ph.voucherheaderid = vh.id AND vmis.voucherheaderid = vh.id " + bankQry.toString()
