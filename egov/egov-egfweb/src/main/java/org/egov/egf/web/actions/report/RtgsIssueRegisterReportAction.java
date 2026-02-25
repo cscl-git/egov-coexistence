@@ -573,7 +573,7 @@ public class RtgsIssueRegisterReportAction extends ReportAction {
 					.append(" SELECT a.detailname as partyName, ih.id as ihId, ih.realizationDate as realizationDate, ih.transactionnumber as rtgsNumber,"
 							+ " ih.transactiondate as rtgsDate, vh.id as vhId, vh.vouchernumber as paymentNumber,"
 							+ " to_char(vh.voucherdate,'dd/mm/yyyy') as paymentDate,   gld.detailtypeid as dtId,  gld.detailkeyid as dkId,"
-							+ " gld.amount as paymentAmount,"
+							+ " sum(gld.amount) as paymentAmount,"
 							+ " vmis.departmentcode as department, stat.description as status,b.name as bank,branch.branchname as bankBranch,"
 							+ " ba.accountnumber as accountNumber,"
 							+ " ihod.reconciledComment as reconciledComment, ihod.reconciledOn as reconciledOn"
